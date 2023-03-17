@@ -61,9 +61,10 @@ type
     uri: String;
     username: String;
     password: String;
-    class function Create(const aUri: String;
-                          const aUsername: String;
-                          const aPassword: String): TALWebRTCIceServer; static;
+    class function Create(
+                     const aUri: String;
+                     const aUsername: String;
+                     const aPassword: String): TALWebRTCIceServer; static;
   end;
   TALWebRTCIceServers = Tarray<TALWebRTCIceServer>;
 
@@ -72,9 +73,10 @@ type
     SdpMid: String;
     SdpMLineIndex: Integer;
     Sdp: String;
-    class function Create(const aSdpMid: String;
-                          const aSdpMLineIndex: Integer;
-                          const aSdp: String): TALWebRTCIceCandidate; static;
+    class function Create(
+                     const aSdpMid: String;
+                     const aSdpMLineIndex: Integer;
+                     const aSdp: String): TALWebRTCIceCandidate; static;
   end;
   TALWebRTCIceCandidates = Tarray<TALWebRTCIceCandidate>;
 
@@ -132,26 +134,27 @@ type
     dataChannelProtocol: String; // Subprotocol.
     dataChannelNegotiated: boolean; // Negotiated.
     dataChannelId: integer; // data channel id.
-    class function Create(const aVideoCallEnabled: boolean = true;
-                          const aVideoWidth: integer = 1280;
-                          const aVideoHeight: integer = 720;
-                          const aVideoFps: integer = 0;
-                          const aVideoMaxBitrate: integer = 0;
-                          const aVideoCodec: String = 'VP8';
-                          const aVideoCodecHwAcceleration: boolean = true;
-                          const aAudioStartBitrate: integer = 0;
-                          const aAudioCodec: String = 'opus';
-                          const aNoAudioProcessing: boolean = false;
-                          const aAecDump: boolean = false;
-                          const aDisableBuiltInAEC: boolean = false;
-                          const aDisableBuiltInNS: boolean = false;
-                          const aDataChannelEnabled: boolean = false;
-                          const aDataChannelOrdered: boolean = true;
-                          const aDataChannelMaxRetransmitTimeMs: integer = -1;
-                          const aDataChannelMaxRetransmits: integer = -1;
-                          const aDataChannelProtocol: String = '';
-                          const aDataChannelNegotiated: boolean = false;
-                          const aDataChannelId: integer = -1): TALWebRTCPeerConnectionParameters; static;
+    class function Create(
+                     const aVideoCallEnabled: boolean = true;
+                     const aVideoWidth: integer = 1280;
+                     const aVideoHeight: integer = 720;
+                     const aVideoFps: integer = 0;
+                     const aVideoMaxBitrate: integer = 0;
+                     const aVideoCodec: String = 'VP8';
+                     const aVideoCodecHwAcceleration: boolean = true;
+                     const aAudioStartBitrate: integer = 0;
+                     const aAudioCodec: String = 'opus';
+                     const aNoAudioProcessing: boolean = false;
+                     const aAecDump: boolean = false;
+                     const aDisableBuiltInAEC: boolean = false;
+                     const aDisableBuiltInNS: boolean = false;
+                     const aDataChannelEnabled: boolean = false;
+                     const aDataChannelOrdered: boolean = true;
+                     const aDataChannelMaxRetransmitTimeMs: integer = -1;
+                     const aDataChannelMaxRetransmits: integer = -1;
+                     const aDataChannelProtocol: String = '';
+                     const aDataChannelNegotiated: boolean = false;
+                     const aDataChannelId: integer = -1): TALWebRTCPeerConnectionParameters; static;
   end;
 
   {$REGION ' IOS'}
@@ -435,10 +438,11 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
-{**********************************************************}
-class function TALWebRTCIceServer.Create(const aUri: String;
-                                         const aUsername: String;
-                                         const aPassword: String): TALWebRTCIceServer;
+{***************************************}
+class function TALWebRTCIceServer.Create(
+                 const aUri: String;
+                 const aUsername: String;
+                 const aPassword: String): TALWebRTCIceServer;
 begin
   with result do begin
     Uri := aUri;
@@ -447,10 +451,11 @@ begin
   end;
 end;
 
-{****************************************************************}
-class function TALWebRTCIceCandidate.Create(const aSdpMid: String;
-                                            const aSdpMLineIndex: Integer;
-                                            const aSdp: String): TALWebRTCIceCandidate;
+{******************************************}
+class function TALWebRTCIceCandidate.Create(
+                 const aSdpMid: String;
+                 const aSdpMLineIndex: Integer;
+                 const aSdp: String): TALWebRTCIceCandidate;
 begin
   with result do begin
     SdpMid := aSdpMid;
@@ -459,27 +464,28 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
-class function TALWebRTCPeerConnectionParameters.Create(const aVideoCallEnabled: boolean = true;
-                                                        const aVideoWidth: integer = 1280;
-                                                        const aVideoHeight: integer = 720;
-                                                        const aVideoFps: integer = 0;
-                                                        const aVideoMaxBitrate: integer = 0;
-                                                        const aVideoCodec: String = 'VP8';
-                                                        const aVideoCodecHwAcceleration: boolean = true;
-                                                        const aAudioStartBitrate: integer = 0;
-                                                        const aAudioCodec: String = 'opus';
-                                                        const aNoAudioProcessing: boolean = false;
-                                                        const aAecDump: boolean = false;
-                                                        const aDisableBuiltInAEC: boolean = false;
-                                                        const aDisableBuiltInNS: boolean = false;
-                                                        const aDataChannelEnabled: boolean = false;
-                                                        const aDataChannelOrdered: boolean = true;
-                                                        const aDataChannelMaxRetransmitTimeMs: integer = -1;
-                                                        const aDataChannelMaxRetransmits: integer = -1;
-                                                        const aDataChannelProtocol: String = '';
-                                                        const aDataChannelNegotiated: boolean = false;
-                                                        const aDataChannelId: integer = -1): TALWebRTCPeerConnectionParameters;
+{******************************************************}
+class function TALWebRTCPeerConnectionParameters.Create(
+                 const aVideoCallEnabled: boolean = true;
+                 const aVideoWidth: integer = 1280;
+                 const aVideoHeight: integer = 720;
+                 const aVideoFps: integer = 0;
+                 const aVideoMaxBitrate: integer = 0;
+                 const aVideoCodec: String = 'VP8';
+                 const aVideoCodecHwAcceleration: boolean = true;
+                 const aAudioStartBitrate: integer = 0;
+                 const aAudioCodec: String = 'opus';
+                 const aNoAudioProcessing: boolean = false;
+                 const aAecDump: boolean = false;
+                 const aDisableBuiltInAEC: boolean = false;
+                 const aDisableBuiltInNS: boolean = false;
+                 const aDataChannelEnabled: boolean = false;
+                 const aDataChannelOrdered: boolean = true;
+                 const aDataChannelMaxRetransmitTimeMs: integer = -1;
+                 const aDataChannelMaxRetransmits: integer = -1;
+                 const aDataChannelProtocol: String = '';
+                 const aDataChannelNegotiated: boolean = false;
+                 const aDataChannelId: integer = -1): TALWebRTCPeerConnectionParameters;
 begin
   with result do begin
     VideoCallEnabled := aVideoCallEnabled;
@@ -626,10 +632,12 @@ begin
     LJPeerConnectionParameters.DataChannelNegotiated := aPeerConnectionParameters.DataChannelNegotiated;
     LJPeerConnectionParameters.DataChannelId := aPeerConnectionParameters.DataChannelId;
     //-----
-    fAndroidWebRTC := TJALWebRTC.Wrap(TJALWebRTC.JavaClass.init(TAndroidHelper.Context.getApplicationContext,
-                                                                TJEGL14.JavaClass.eglGetCurrentContext,
-                                                                LJListIceServers,
-                                                                LJPeerConnectionParameters));
+    fAndroidWebRTC := TJALWebRTC.Wrap(
+                        TJALWebRTC.JavaClass.init(
+                          TAndroidHelper.Context.getApplicationContext,
+                          TJEGL14.JavaClass.eglGetCurrentContext,
+                          LJListIceServers,
+                          LJPeerConnectionParameters));
     fAndroidWebRTCListener := TAndroidWebRTCListener.Create(Self);
     fAndroidWebRTC.setListener(fAndroidWebRTCListener);
     //-----
@@ -801,7 +809,7 @@ begin
 
 end;
 
-{************************************}
+{*************************************}
 procedure TALWebRTC.pauseVideoCapturer;
 begin
 
@@ -900,9 +908,10 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
 
-    fAndroidWebRTC.addRemoteIceCandidate(StringToJstring(aIceCandidate.SdpMid),
-                                         aIceCandidate.sdpMLineIndex,
-                                         StringToJstring(aIceCandidate.Sdp));
+    fAndroidWebRTC.addRemoteIceCandidate(
+      StringToJstring(aIceCandidate.SdpMid),
+      aIceCandidate.sdpMLineIndex,
+      StringToJstring(aIceCandidate.Sdp));
 
   {$ENDIF}
   {$ENDREGION}
@@ -1145,11 +1154,12 @@ begin
   {$ENDIF}
 
   if assigned(fWebRTC.fonIceCandidateEvent) then
-    fWebRTC.fonIceCandidateEvent(fWebRTC,
-                                 TALWebRTCIceCandidate.Create(
-                                   JstringToString(candidate.sdpMid),
-                                   candidate.sdpMLineIndex,
-                                   JstringToString(candidate.sdp)));
+    fWebRTC.fonIceCandidateEvent(
+      fWebRTC,
+      TALWebRTCIceCandidate.Create(
+        JstringToString(candidate.sdpMid),
+        candidate.sdpMLineIndex,
+        JstringToString(candidate.sdp)));
 
 end;
 
@@ -1251,11 +1261,12 @@ begin
   fLocalVideoTextureRefChroma := 0;
   fRemoteVideoTextureRefLuma := 0;
   fRemoteVideoTextureRefChroma := 0;
-  if CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
-                                  nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
-                                  (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
-                                  nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
-                                  @fvideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVOpenGLESTextureCacheCreate failed!'); // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
+  if CVOpenGLESTextureCacheCreate(
+       kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
+       nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
+       (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
+       nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
+       @fvideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVOpenGLESTextureCacheCreate failed!'); // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
   //-----
   fIceServers := aIceServers;
   fPeerConnectionParameters := aPeerConnectionParameters;
@@ -1299,19 +1310,19 @@ begin
   ALFreeAndNil(fQueue);
   //-----
   TThread.Synchronize(nil,
-  Procedure
-  Begin
-    if fLocalVideoTextureRefLuma <> 0 then CFRelease(pointer(fLocalVideoTextureRefLuma));
-    if fLocalVideoTextureRefChroma <> 0 then CFRelease(pointer(fLocalVideoTextureRefChroma));
-    if fRemoteVideoTextureRefLuma <> 0 then CFRelease(pointer(fRemoteVideoTextureRefLuma));
-    if fRemoteVideoTextureRefChroma <> 0 then CFRelease(pointer(fRemoteVideoTextureRefChroma));
-    //-----
-    CVOpenGLESTextureCacheFlush(fvideoTextureCacheRef, 0);  // The texture cache automatically flushes currently unused resources when you call the
-                                                            // CVOpenGLESTextureCacheCreateTextureFromImage function, but can you can also flush the
-                                                            // cache explicitly by calling this function. The EAGLContext associated with the cache
-                                                            // may be used to delete or unbind textures.
-    CFrelease(pointer(fvideoTextureCacheRef));
-  end);
+    Procedure
+    Begin
+      if fLocalVideoTextureRefLuma <> 0 then CFRelease(pointer(fLocalVideoTextureRefLuma));
+      if fLocalVideoTextureRefChroma <> 0 then CFRelease(pointer(fLocalVideoTextureRefChroma));
+      if fRemoteVideoTextureRefLuma <> 0 then CFRelease(pointer(fRemoteVideoTextureRefLuma));
+      if fRemoteVideoTextureRefChroma <> 0 then CFRelease(pointer(fRemoteVideoTextureRefChroma));
+      //-----
+      CVOpenGLESTextureCacheFlush(fvideoTextureCacheRef, 0);  // The texture cache automatically flushes currently unused resources when you call the
+                                                              // CVOpenGLESTextureCacheCreateTextureFromImage function, but can you can also flush the
+                                                              // cache explicitly by calling this function. The EAGLContext associated with the cache
+                                                              // may be used to delete or unbind textures.
+      CFrelease(pointer(fvideoTextureCacheRef));
+    end);
   //-----
   inherited;
 
@@ -1556,14 +1567,16 @@ begin
             LMediaConstraints := TRTCMediaConstraints.Wrap(
                                    TRTCMediaConstraints.Wrap(
                                      TRTCMediaConstraints.OCClass.alloc).
-                                       initWithMandatoryConstraints(nil, //mandatory: NSDictionary;
-                                                                    LOptionalConstraints)); //optionalConstraints: NSDictionary
+                                       initWithMandatoryConstraints(
+                                         nil, //mandatory: NSDictionary;
+                                         LOptionalConstraints)); //optionalConstraints: NSDictionary
             try
 
               fPeerConnectionDelegate := TPeerConnectionDelegate.Create(self);
-              fpeerConnection := fPeerConnectionFactory.peerConnectionWithConfiguration(LConfiguration, // configuration: RTCConfiguration;
-                                                                                        LMediaConstraints, // constraints: RTCMediaConstraints;
-                                                                                        fPeerConnectionDelegate.GetObjectID); //delegate: Pointer);
+              fpeerConnection := fPeerConnectionFactory.peerConnectionWithConfiguration(
+                                   LConfiguration, // configuration: RTCConfiguration;
+                                   LMediaConstraints, // constraints: RTCMediaConstraints;
+                                   fPeerConnectionDelegate.GetObjectID); //delegate: Pointer);
               fpeerConnection.retain;
 
             finally
@@ -1586,8 +1599,9 @@ begin
       LMediaConstraints := TRTCMediaConstraints.Wrap(
                              TRTCMediaConstraints.Wrap(
                                TRTCMediaConstraints.OCClass.alloc).
-                                 initWithMandatoryConstraints(nil, //mandatory: NSDictionary;
-                                                              nil)); //optionalConstraints: NSDictionary
+                                 initWithMandatoryConstraints(
+                                   nil, //mandatory: NSDictionary;
+                                   nil)); //optionalConstraints: NSDictionary
       try
 
         LAudioSource := fPeerConnectionFactory.audioSourceWithConstraints(LMediaConstraints); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
@@ -1615,9 +1629,10 @@ begin
           LCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
           LCaptureDeviceFormat := selectFormatForDevice(LCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
           if LCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
-          fCameraVideoCapturer.startCaptureWithDeviceFormatFps(LCaptureDevice, // device: AVCaptureDevice;
-                                                               LCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
-                                                               selectFpsForFormat(LCaptureDeviceFormat)); // fps: NSInteger)
+          fCameraVideoCapturer.startCaptureWithDeviceFormatFps(
+            LCaptureDevice, // device: AVCaptureDevice;
+            LCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
+            selectFpsForFormat(LCaptureDeviceFormat)); // fps: NSInteger)
           fCameraVideoCapturerStopped := False;
 
           // We can set up rendering for the remote track right away since the transceiver already has an
@@ -1667,9 +1682,10 @@ begin
       LCaptureDevice := findDeviceForPosition(AVCaptureDevicePositionFront);
       LCaptureDeviceFormat := selectFormatForDevice(LCaptureDevice, fCameraVideoCapturer.PreferredOutputPixelFormat);
       if LCaptureDeviceFormat = nil then raise Exception.Create('No valid formats for device');
-      fCameraVideoCapturer.startCaptureWithDeviceFormatFps(LCaptureDevice, // device: AVCaptureDevice;
-                                                           LCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
-                                                           selectFpsForFormat(LCaptureDeviceFormat)); // fps: NSInteger)
+      fCameraVideoCapturer.startCaptureWithDeviceFormatFps(
+        LCaptureDevice, // device: AVCaptureDevice;
+        LCaptureDeviceFormat, // format: AVCaptureDeviceFormat;
+        selectFpsForFormat(LCaptureDeviceFormat)); // fps: NSInteger)
       fCameraVideoCapturerStopped := False;
     end);
 
@@ -2084,8 +2100,9 @@ begin
     result := TRTCMediaConstraints.Wrap(
                 TRTCMediaConstraints.Wrap(
                   TRTCMediaConstraints.OCClass.alloc).
-                    initWithMandatoryConstraints(LMandatoryConstraints, //mandatory: NSDictionary;
-                                                 nil)); //optionalConstraints: NSDictionary
+                    initWithMandatoryConstraints(
+                      LMandatoryConstraints, //mandatory: NSDictionary;
+                      nil)); //optionalConstraints: NSDictionary
   finally
     LMandatoryConstraints.release;
   end;
@@ -2263,9 +2280,9 @@ begin
   {$ENDIF}
 
   LWebRTCIceCandidate := TALWebRTCIceCandidate.Create(
-                             NSStrToStr(didGenerateIceCandidate.sdpMid),
-                             didGenerateIceCandidate.sdpMLineIndex,
-                             NSStrToStr(didGenerateIceCandidate.sdp));
+                           NSStrToStr(didGenerateIceCandidate.sdpMid),
+                           didGenerateIceCandidate.sdpMLineIndex,
+                           NSStrToStr(didGenerateIceCandidate.sdp));
 
   TThread.synchronize(nil,
     procedure
@@ -2292,9 +2309,9 @@ begin
   for I := 0 to didRemoveIceCandidates.count - 1 do begin
     LRTCIceCandidate := TRTCIceCandidate.Wrap(didRemoveIceCandidates.objectAtIndex(I));
     LWebRTCIceCandidates[i] := TALWebRTCIceCandidate.Create(
-                                   NSStrToStr(LRTCIceCandidate.sdpMid),
-                                   LRTCIceCandidate.sdpMLineIndex,
-                                   NSStrToStr(LRTCIceCandidate.sdp));
+                                 NSStrToStr(LRTCIceCandidate.sdpMid),
+                                 LRTCIceCandidate.sdpMLineIndex,
+                                 NSStrToStr(LRTCIceCandidate.sdp));
   end;
 
   TThread.synchronize(nil,
@@ -2363,187 +2380,189 @@ begin
   {$ENDIF}
 
   TThread.synchronize(nil,
-  procedure
-  var LPixelBuffer: CVPixelBufferRef;
-      LTextureRefLuma: CVOpenGLESTextureRef;
-      LTextureRefChroma: CVOpenGLESTextureRef;
-      LLumaWidth, LLumaHeight: integer;
-      LChromaWidth, LChromaHeight: integer;
-      LReturnValue: CVReturn;
-  begin
+    procedure
+    var LPixelBuffer: CVPixelBufferRef;
+        LTextureRefLuma: CVOpenGLESTextureRef;
+        LTextureRefChroma: CVOpenGLESTextureRef;
+        LLumaWidth, LLumaHeight: integer;
+        LChromaWidth, LChromaHeight: integer;
+        LReturnValue: CVReturn;
+    begin
 
-    //-----
-    if fiOSWebRTC.Terminated then exit;
+      //-----
+      if fiOSWebRTC.Terminated then exit;
 
-    //init aPixelBuffer
-    LPixelBuffer := TRTCCVPixelBuffer.Wrap(Frame.buffer).pixelBuffer;
-    if LPixelBuffer = 0 then begin // could be nil if nothing should be displayed
-      {$IFDEF DEBUG}
-      ALLog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame', 'pixelBuffer:nil', TalLogType.warn);
+      //init aPixelBuffer
+      LPixelBuffer := TRTCCVPixelBuffer.Wrap(Frame.buffer).pixelBuffer;
+      if LPixelBuffer = 0 then begin // could be nil if nothing should be displayed
+        {$IFDEF DEBUG}
+        ALLog('TALWebRTC.TLocalVideoTrackRenderer.renderFrame', 'pixelBuffer:nil', TalLogType.warn);
+        {$ENDIF}
+        exit; // could be nil if nothing should be displayed
+      end;
+
+      //check the CVPixelBufferGetPixelFormatType
+      if CVPixelBufferGetPixelFormatType(LPixelBuffer) <> kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange then
+        raise Exception.CreateFmt('TALWebRTC.TLocalVideoTrackRenderer.renderFrame: Unknown pixel format type (%d)', [CVPixelBufferGetPixelFormatType(LPixelBuffer)]);
+
+
+      /////////////
+      // Y-plane //
+      /////////////
+
+      //-----
+      LLumaWidth := CVPixelBufferGetWidth(LPixelBuffer); // Returns the width of the pixel buffer.
+      LLumaHeight := CVPixelBufferGetHeight(LPixelBuffer); // Returns the height of the pixel buffer.
+
+      //-----
+      // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
+      // CVImageBuffer and associated parameters. This operation creates a live binding between the image buffer
+      // and the underlying texture object. The EAGLContext associated with the cache may be modified to create,
+      // delete, or bind textures. When used as a source texture or GL_COLOR_ATTACHMENT, the image buffer must be
+      // unlocked before rendering. The source or render buffer texture should not be re-used until the rendering
+      // has completed. This can be guaranteed by calling glFlush()
+      //
+      // The texture cache automatically flushes currently unused resources when you call the
+      // CVOpenGLESTextureCacheCreateTextureFromImage function
+      LReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(
+                        kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
+                        fiOSWebRTC.fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
+                        LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+                        nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
+                        GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
+                        GL_RED_EXT,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
+                        LLumaWidth, // width: The width of the texture image.
+                        LLumaHeight, // height The height of the texture image.
+                        GL_RED_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
+                        GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
+                        0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
+                        @LTextureRefLuma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
+      if LReturnValue <> kCVReturnSuccess then begin
+        {$IFDEF DEBUG}
+        ALLog('TALWebRTC.renderFrame', ALFormatW('CVOpenGLESTextureCacheCreateTextureFromImage (Luma) failed: %d', [LReturnValue]), TalLogType.Error);
+        {$ENDIF}
+        exit;
+      end;
+
+
+      //////////////
+      // UV-plane //
+      //////////////
+
+      //-----
+      LChromaWidth := CVPixelBufferGetWidthOfPlane(LPixelBuffer, 1); // Returns the width of the pixel buffer.
+      LChromaHeight := CVPixelBufferGetHeightOfPlane(LPixelBuffer, 1); // Returns the height of the pixel buffer.
+
+      //-----
+      // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
+      // CVImageBuffer and associated parameters. This operation creates a live binding between the image buffer
+      // and the underlying texture object. The EAGLContext associated with the cache may be modified to create,
+      // delete, or bind textures. When used as a source texture or GL_COLOR_ATTACHMENT, the image buffer must be
+      // unlocked before rendering. The source or render buffer texture should not be re-used until the rendering
+      // has completed. This can be guaranteed by calling glFlush()
+      //
+      // The texture cache automatically flushes currently unused resources when you call the
+      // CVOpenGLESTextureCacheCreateTextureFromImage function
+      LReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(
+                        kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
+                        fiOSWebRTC.fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
+                        LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+                        nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
+                        GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
+                        GL_RG_EXT,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
+                        LChromaWidth, // width: The width of the texture image.
+                        LChromaHeight, // height The height of the texture image.
+                        GL_RG_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
+                        GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
+                        1,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
+                        @LTextureRefChroma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
+      if LReturnValue <> kCVReturnSuccess then begin
+        {$IFDEF DEBUG}
+        ALLog('TALWebRTC.renderFrame', ALFormatW('CVOpenGLESTextureCacheCreateTextureFromImage (Chroma) failed: %d', [LReturnValue]), TalLogType.Error);
+        {$ENDIF}
+        cfRElease(pointer(LTextureRefLuma));
+        exit;
+      end;
+
+
+      /////////////
+      // Y-plane //
+      /////////////
+
+      //-----
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(LTextureRefLuma));
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      case fiOSWebRTC.fWebRTC.FLocalBitmap.MagFilter of
+        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      end;
+      case fiOSWebRTC.fWebRTC.FLocalBitmap.MinFilter of
+        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      end;
+      glBindTexture(GL_TEXTURE_2D, 0);
+
+      //-----
+      {$IFNDEF ALCompilerVersionSupported}
+        {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
-      exit; // could be nil if nothing should be displayed
-    end;
+      TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := LLumaWidth;
+      TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FHeight := LLumaHeight; // we can't use setsize because it's fill finalise the texture
+                                                                                       // but with/height are used only in
+                                                                                       // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
+                                                                                       // begin
+                                                                                       //   ...
+                                                                                       //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
+                                                                                       //   ...
+                                                                                       //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
+                                                                                       //   ...
+                                                                                       // end
+                                                                                       // so i don't need to finalize the texture !!
+      ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap).Handle := CVOpenGLESTextureGetName(LTextureRefLuma);
 
-    //check the CVPixelBufferGetPixelFormatType
-    if CVPixelBufferGetPixelFormatType(LPixelBuffer) <> kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange then
-      raise Exception.CreateFmt('TALWebRTC.TLocalVideoTrackRenderer.renderFrame: Unknown pixel format type (%d)', [CVPixelBufferGetPixelFormatType(LPixelBuffer)]);
-
-
-    /////////////
-    // Y-plane //
-    /////////////
-
-    //-----
-    LLumaWidth := CVPixelBufferGetWidth(LPixelBuffer); // Returns the width of the pixel buffer.
-    LLumaHeight := CVPixelBufferGetHeight(LPixelBuffer); // Returns the height of the pixel buffer.
-
-    //-----
-    // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
-    // CVImageBuffer and associated parameters. This operation creates a live binding between the image buffer
-    // and the underlying texture object. The EAGLContext associated with the cache may be modified to create,
-    // delete, or bind textures. When used as a source texture or GL_COLOR_ATTACHMENT, the image buffer must be
-    // unlocked before rendering. The source or render buffer texture should not be re-used until the rendering
-    // has completed. This can be guaranteed by calling glFlush()
-    //
-    // The texture cache automatically flushes currently unused resources when you call the
-    // CVOpenGLESTextureCacheCreateTextureFromImage function
-    LReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
-                                                                 fiOSWebRTC.fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                                 LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
-                                                                 nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
-                                                                 GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
-                                                                 GL_RED_EXT,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                                 LLumaWidth, // width: The width of the texture image.
-                                                                 LLumaHeight, // height The height of the texture image.
-                                                                 GL_RED_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
-                                                                 GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
-                                                                 0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
-                                                                 @LTextureRefLuma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
-    if LReturnValue <> kCVReturnSuccess then begin
-      {$IFDEF DEBUG}
-      ALLog('TALWebRTC.renderFrame', ALFormatW('CVOpenGLESTextureCacheCreateTextureFromImage (Luma) failed: %d', [LReturnValue]), TalLogType.Error);
-      {$ENDIF}
-      exit;
-    end;
+      //-----
+      if fiOSWebRTC.fLocalVideoTextureRefLuma <> 0 then cfRElease(pointer(fiOSWebRTC.fLocalVideoTextureRefLuma));
+      fiOSWebRTC.fLocalVideoTextureRefLuma := LTextureRefLuma;
 
 
-    //////////////
-    // UV-plane //
-    //////////////
+      //////////////
+      // UV-plane //
+      //////////////
 
-    //-----
-    LChromaWidth := CVPixelBufferGetWidthOfPlane(LPixelBuffer, 1); // Returns the width of the pixel buffer.
-    LChromaHeight := CVPixelBufferGetHeightOfPlane(LPixelBuffer, 1); // Returns the height of the pixel buffer.
+      //-----
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(LTextureRefChroma));
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+      case fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture.MagFilter of
+        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      end;
+      case fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture.MinFilter of
+        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+      end;
+      glBindTexture(GL_TEXTURE_2D, 0);
 
-    //-----
-    // This function either creates a new or returns a cached CVOpenGLESTexture texture object mapped to the
-    // CVImageBuffer and associated parameters. This operation creates a live binding between the image buffer
-    // and the underlying texture object. The EAGLContext associated with the cache may be modified to create,
-    // delete, or bind textures. When used as a source texture or GL_COLOR_ATTACHMENT, the image buffer must be
-    // unlocked before rendering. The source or render buffer texture should not be re-used until the rendering
-    // has completed. This can be guaranteed by calling glFlush()
-    //
-    // The texture cache automatically flushes currently unused resources when you call the
-    // CVOpenGLESTextureCacheCreateTextureFromImage function
-    LReturnValue := CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
-                                                                 fiOSWebRTC.fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                                 LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
-                                                                 nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
-                                                                 GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
-                                                                 GL_RG_EXT,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                                 LChromaWidth, // width: The width of the texture image.
-                                                                 LChromaHeight, // height The height of the texture image.
-                                                                 GL_RG_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
-                                                                 GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
-                                                                 1,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
-                                                                 @LTextureRefChroma); // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
-    if LReturnValue <> kCVReturnSuccess then begin
-      {$IFDEF DEBUG}
-      ALLog('TALWebRTC.renderFrame', ALFormatW('CVOpenGLESTextureCacheCreateTextureFromImage (Chroma) failed: %d', [LReturnValue]), TalLogType.Error);
-      {$ENDIF}
-      cfRElease(pointer(LTextureRefLuma));
-      exit;
-    end;
+      //-----
+      ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture).Handle := CVOpenGLESTextureGetName(LTextureRefChroma);
+
+      //-----
+      if fiOSWebRTC.fLocalVideoTextureRefChroma <> 0 then cfRElease(pointer(fiOSWebRTC.fLocalVideoTextureRefChroma));
+      fiOSWebRTC.fLocalVideoTextureRefChroma := LTextureRefChroma;
 
 
-    /////////////
-    // Y-plane //
-    /////////////
+      ////////////////////////////////
+      // OnLocalFrameAvailableEvent //
+      ////////////////////////////////
 
-    //-----
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(LTextureRefLuma));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    case fiOSWebRTC.fWebRTC.FLocalBitmap.MagFilter of
-      TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    end;
-    case fiOSWebRTC.fWebRTC.FLocalBitmap.MinFilter of
-      TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    end;
-    glBindTexture(GL_TEXTURE_2D, 0);
+      fiOSWebRTC.fWebRTC.FlocalBitmapRotation := Frame.rotation;
+      if assigned(fiOSWebRTC.fWebRTC.fOnLocalFrameAvailableEvent) then
+        fiOSWebRTC.fWebRTC.fOnLocalFrameAvailableEvent(self);
 
-    //-----
-    {$IFNDEF ALCompilerVersionSupported}
-      {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
-    {$ENDIF}
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := LLumaWidth;
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FHeight := LLumaHeight; // we can't use setsize because it's fill finalise the texture
-                                                                                     // but with/height are used only in
-                                                                                     // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
-                                                                                     // begin
-                                                                                     //   ...
-                                                                                     //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
-                                                                                     //   ...
-                                                                                     //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
-                                                                                     //   ...
-                                                                                     // end
-                                                                                     // so i don't need to finalize the texture !!
-    ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap).Handle := CVOpenGLESTextureGetName(LTextureRefLuma);
-
-    //-----
-    if fiOSWebRTC.fLocalVideoTextureRefLuma <> 0 then cfRElease(pointer(fiOSWebRTC.fLocalVideoTextureRefLuma));
-    fiOSWebRTC.fLocalVideoTextureRefLuma := LTextureRefLuma;
-
-
-    //////////////
-    // UV-plane //
-    //////////////
-
-    //-----
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, CVOpenGLESTextureGetName(LTextureRefChroma));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    case fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture.MagFilter of
-      TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-      TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    end;
-    case fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture.MinFilter of
-      TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-      TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    end;
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    //-----
-    ITextureAccess(fiOSWebRTC.fWebRTC.FLocalBitmap.SecondTexture).Handle := CVOpenGLESTextureGetName(LTextureRefChroma);
-
-    //-----
-    if fiOSWebRTC.fLocalVideoTextureRefChroma <> 0 then cfRElease(pointer(fiOSWebRTC.fLocalVideoTextureRefChroma));
-    fiOSWebRTC.fLocalVideoTextureRefChroma := LTextureRefChroma;
-
-
-    ////////////////////////////////
-    // OnLocalFrameAvailableEvent //
-    ////////////////////////////////
-
-    fiOSWebRTC.fWebRTC.FlocalBitmapRotation := Frame.rotation;
-    if assigned(fiOSWebRTC.fWebRTC.fOnLocalFrameAvailableEvent) then
-      fiOSWebRTC.fWebRTC.fOnLocalFrameAvailableEvent(self);
-
-  end);
+    end);
 
 end;
 
@@ -2574,70 +2593,73 @@ begin
 
   //-----
   TThread.Synchronize(nil,
-  procedure
-  var LRTCI420Buffer: RTCI420Buffer;
-  begin
+    procedure
+    var LRTCI420Buffer: RTCI420Buffer;
+    begin
 
-    //-----
-    if fiOSWebRTC.Terminated then exit;
+      //-----
+      if fiOSWebRTC.Terminated then exit;
 
-    //-----
-    LRTCI420Buffer := TRTCI420Buffer.Wrap(frame.buffer);
+      //-----
+      LRTCI420Buffer := TRTCI420Buffer.Wrap(frame.buffer);
 
-    //-----
-    glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.Handle);
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RED_EXT,
-                 LRTCI420Buffer.width,
-                 LRTCI420Buffer.height,
-                 0,
-                 GL_RED_EXT,
-                 GL_UNSIGNED_BYTE,
-                 LRTCI420Buffer.dataY);
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FWidth := LRTCI420Buffer.width;
-    TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FHeight := LRTCI420Buffer.height; // we can't use setsize because it's fill finalise the texture
-                                                                                                // but with/height are used only in
-                                                                                                // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
-                                                                                                // begin
-                                                                                                //   ...
-                                                                                                //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
-                                                                                                //   ...
-                                                                                                //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
-                                                                                                //   ...
-                                                                                                // end
-                                                                                                // so i don't need to finalize the texture !!
+      //-----
+      glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.Handle);
+      glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RED_EXT,
+        LRTCI420Buffer.width,
+        LRTCI420Buffer.height,
+        0,
+        GL_RED_EXT,
+        GL_UNSIGNED_BYTE,
+        LRTCI420Buffer.dataY);
+      TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FWidth := LRTCI420Buffer.width;
+      TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.fRemoteBitmap).FHeight := LRTCI420Buffer.height; // we can't use setsize because it's fill finalise the texture
+                                                                                                  // but with/height are used only in
+                                                                                                  // procedure TCanvasHelper.TexRect(const DestCorners, SrcCorners: TCornersF; const Texture: TTexture; const Color1, Color2, Color3, Color4: TAlphaColor);
+                                                                                                  // begin
+                                                                                                  //   ...
+                                                                                                  //   if (Texture = nil) or (Texture.Width < 1) or (Texture.Height < 1) then Exit
+                                                                                                  //   ...
+                                                                                                  //   InvTexSize := PointF(1 / Texture.Width, 1 / Texture.Height);
+                                                                                                  //   ...
+                                                                                                  // end
+                                                                                                  // so i don't need to finalize the texture !!
 
-    //-----
-    glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.SecondTexture.Handle);
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RED_EXT,
-                 LRTCI420Buffer.ChromaWidth,
-                 LRTCI420Buffer.ChromaHeight,
-                 0,
-                 GL_RED_EXT,
-                 GL_UNSIGNED_BYTE,
-                 LRTCI420Buffer.dataU);
+      //-----
+      glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.SecondTexture.Handle);
+      glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RED_EXT,
+        LRTCI420Buffer.ChromaWidth,
+        LRTCI420Buffer.ChromaHeight,
+        0,
+        GL_RED_EXT,
+        GL_UNSIGNED_BYTE,
+        LRTCI420Buffer.dataU);
 
-    //-----
-    glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.ThirdTexture.Handle);
-    glTexImage2D(GL_TEXTURE_2D,
-                 0,
-                 GL_RED_EXT,
-                 LRTCI420Buffer.ChromaWidth,
-                 LRTCI420Buffer.ChromaHeight,
-                 0,
-                 GL_RED_EXT,
-                 GL_UNSIGNED_BYTE,
-                 LRTCI420Buffer.dataV);
+      //-----
+      glBindTexture(GL_TEXTURE_2D, fiOSWebRTC.fWebRTC.fRemoteBitmap.ThirdTexture.Handle);
+      glTexImage2D(
+        GL_TEXTURE_2D,
+        0,
+        GL_RED_EXT,
+        LRTCI420Buffer.ChromaWidth,
+        LRTCI420Buffer.ChromaHeight,
+        0,
+        GL_RED_EXT,
+        GL_UNSIGNED_BYTE,
+        LRTCI420Buffer.dataV);
 
-    //-----
-    fiOSWebRTC.fWebRTC.FRemoteBitmapRotation := Frame.Rotation;
-    if assigned(fiOSWebRTC.fWebRTC.fOnRemoteFrameAvailableEvent) then
-      fiOSWebRTC.fWebRTC.fOnRemoteFrameAvailableEvent(self);
+      //-----
+      fiOSWebRTC.fWebRTC.FRemoteBitmapRotation := Frame.Rotation;
+      if assigned(fiOSWebRTC.fWebRTC.fOnRemoteFrameAvailableEvent) then
+        fiOSWebRTC.fWebRTC.fOnRemoteFrameAvailableEvent(self);
 
-  end);
+    end);
 
 end;
 

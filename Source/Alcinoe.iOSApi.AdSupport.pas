@@ -43,6 +43,7 @@ const
 
 implementation
 
+{****************************************************************************************}
 procedure StubProc1; cdecl; external libAdSupport name 'OBJC_CLASS_$_ASIdentifierManager';
 
 end.

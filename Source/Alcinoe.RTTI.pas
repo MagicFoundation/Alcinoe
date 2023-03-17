@@ -907,7 +907,7 @@ begin
   inherited;
 end;
 
-{************************************************************}
+{**********************************************************************************************************}
 function TALRttiMethod.FinalCodeAddress(Cls: TClass): Pointer; // CodeAddress calculated => no virtuals etc.
 begin
   if IsStatic then result := fCodeAddress // ex: TMarshal => class function OutString(const S: string): MarshaledString; overload; inline; static;
@@ -1216,16 +1216,17 @@ procedure TALRttiType.init(const aRttiType: TRttiType);
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _sortArray(var aArray: TArray<TALRttiMember>);
   begin
     TArray.sort<TALRttiMember>(
       aArray,
-      TDelegatedComparer<TALRttiMember>.Construct(function(const Left, Right: TALRttiMember): Integer
-      begin
-        Result := ALCompareTextA(Left.Name, Right.Name);
-        if result = 0 then result := Left.Order - Right.Order;
-      end));
+      TDelegatedComparer<TALRttiMember>.Construct(
+        function(const Left, Right: TALRttiMember): Integer
+        begin
+          Result := ALCompareTextA(Left.Name, Right.Name);
+          if result = 0 then result := Left.Order - Right.Order;
+        end));
   end;
 
 var I: integer;

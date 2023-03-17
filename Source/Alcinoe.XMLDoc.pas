@@ -695,20 +695,24 @@ type
   end;
 
 {misc function}
-Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
-                                        Const ChildNodeName, ChildNodeValue : AnsiString;
-                                        Const Recurse: Boolean = False): TalxmlNode;
-Function  ALFindXmlNodeByNameAndChildNodeValue(xmlrec:TalxmlNode;
-                                               Const NodeName: ansiString;
-                                               Const ChildNodeName, ChildNodeValue: AnsiString;
-                                               Const Recurse: Boolean = False): TalxmlNode;
-Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
-                                   Const AttributeName, AttributeValue : AnsiString;
-                                   Const Recurse: Boolean = False): TalxmlNode;
-Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
-                                          Const NodeName: ansiString;
-                                          Const AttributeName, AttributeValue: AnsiString;
-                                          Const Recurse: Boolean = False): TalxmlNode;
+Function  ALFindXmlNodeByChildNodeValue(
+            xmlrec:TalxmlNode;
+            Const ChildNodeName, ChildNodeValue : AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
+Function  ALFindXmlNodeByNameAndChildNodeValue(
+            xmlrec:TalxmlNode;
+            Const NodeName: ansiString;
+            Const ChildNodeName, ChildNodeValue: AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
+Function  ALFindXmlNodeByAttribute(
+            xmlrec:TalxmlNode;
+            Const AttributeName, AttributeValue : AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
+Function  ALFindXmlNodeByNameAndAttribute(
+            xmlrec:TalxmlNode;
+            Const NodeName: ansiString;
+            Const AttributeName, AttributeValue: AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
 function  ALExtractAttrValue(const AttrName, AttrLine: AnsiString; const Default: AnsiString = ''): AnsiString;
 
 implementation
@@ -816,9 +820,10 @@ end;
  ntProcessingInstr	The content of the processing instruction, except for the target.
 
  CreateNode returns the interface for the new node.}
-function ALCreateXmlNode(const NameOrData: AnsiString;
-                         NodeType: TALXMLNodeType = ntElement;
-                         const AddlData: AnsiString = ''): TALXMLNode;
+function ALCreateXmlNode(
+           const NameOrData: AnsiString;
+           NodeType: TALXMLNodeType = ntElement;
+           const AddlData: AnsiString = ''): TALXMLNode;
 begin
   case NodeType of
     ntElement:         Result := TALXmlElementNode.Create(NameOrData);
@@ -909,6 +914,7 @@ end;
 //at the same time the Xmldocument
 procedure TALXMLDocument.MultiThreadPrepare;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _doMultiThreadPrepare(aNode: TalXmlNode);
   var I: integer;
   begin
@@ -958,9 +964,10 @@ end;
 {****************************************************************************************************************************}
 {StreamContainOnlyChildNodes mean that the stream contain ONLY the child node of ContainerNode, so it's not a valid xml stream
  like <root>...</root> but more like <rec>...</rec><rec>...</rec><rec>...</rec>}
-Procedure TALXMLDocument.ParseXmlStream(RawXmlStream: TStream;
-                                        ContainerNode: TALXmlNode;
-                                        StreamContainOnlyChildNodes: Boolean=False);
+Procedure TALXMLDocument.ParseXmlStream(
+            RawXmlStream: TStream;
+            ContainerNode: TALXmlNode;
+            StreamContainOnlyChildNodes: Boolean=False);
 
 Const BufferSize: integer = 8192;
 
@@ -983,9 +990,10 @@ Var buffer: AnsiString;
     If (bufferLength > 0) and (bufferPos > 1) then begin
       if (bufferPos > bufferLength) then RawXmlStream.Position := RawXmlStream.Position - bufferLength + bufferPos - 1;
       Byte2Read := min(bufferPos - 1, bufferLength);
-      if bufferPos <= length(buffer) then ALMove(Pbyte(Buffer)[BufferPos - 1],
-                                                 pointer(Buffer)^,
-                                                 bufferLength-bufferPos+1); // no uniqueString will be call in this variant
+      if bufferPos <= length(buffer) then ALMove(
+                                            Pbyte(Buffer)[BufferPos - 1],
+                                            pointer(Buffer)^,
+                                            bufferLength-bufferPos+1); // no uniqueString will be call in this variant
       bufferPos := 1;
     end
     else begin
@@ -1231,13 +1239,14 @@ Var buffer: AnsiString;
 
       LstParams.Clear;
       If (LContent <> '') then begin
-        ALExtractHeaderFields([' ', #9, #13, #10],    //Separators
-                              [' ', #9, #13, #10],    //WhiteSpace
-                              ['"', ''''],            //Quotes
-                              PAnsiChar(LContent),    //Content
-                              lstParams,              //Strings
-                              False,                  //Decode
-                              False);                 //StripQuotes
+        ALExtractHeaderFields(
+          [' ', #9, #13, #10],    //Separators
+          [' ', #9, #13, #10],    //WhiteSpace
+          ['"', ''''],            //Quotes
+          PAnsiChar(LContent),    //Content
+          lstParams,              //Strings
+          False,                  //Decode
+          False);                 //StripQuotes
         I := 0;
         While I <= LstParams.Count - 1 do begin
           LContent := LstParams.ValueFromIndex[I];
@@ -1875,7 +1884,7 @@ begin
   if Assigned(FOnParseStartDocument) then FOnParseStartDocument(Self);
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALXMLDocument.DoParseStartElement(const Path, Name: AnsiString; Attributes: TALStringsA);
 begin
   if Assigned(FOnParseStartElement) then FOnParseStartElement(Self, Path, Name, Attributes);
@@ -1895,8 +1904,9 @@ end;
  Typically, applications do not directly call the TALXMLNode constructor. Instead, new nodes are
  created automatically for an XML document as necessary. To add new nodes to a document,
  applications call the parent node’s AddChild method.}
-constructor TALXMLNode.Create(const NameOrData: AnsiString;
-                              const AddlData: AnsiString = '');
+constructor TALXMLNode.Create(
+              const NameOrData: AnsiString;
+              const AddlData: AnsiString = '');
 Begin
   FDocument := nil;
 end;
@@ -1916,9 +1926,10 @@ end;
  by calling ChildNodes. ->Add or ChildNodes. ->Insert.}
 function TALXMLNode.CloneNode(Deep: Boolean): TALXMLNode;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function InternalCloneNode(const SourceNode: TALXmlNode;
-                             const TargetParentNode: TALXmlNode): TalXmlNode;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function InternalCloneNode(
+             const SourceNode: TALXmlNode;
+             const TargetParentNode: TALXmlNode): TalXmlNode;
   var I: Integer;
   begin
     case SourceNode.nodeType of
@@ -2889,7 +2900,7 @@ begin
   FChildNodes := Value;
 end;
 
-{***************************************************}
+{*****************************************************}
 function TALXmlElementNode.GetNodeType: TALXMLNodeType;
 begin
   Result := NtElement;
@@ -3144,9 +3155,10 @@ begin
   FInternalValue := Value;
 end;
 
-{************************************************************************}
-constructor TALXmlProcessingInstrNode.Create(const NameOrData: AnsiString;
-                                             const AddlData: AnsiString = '');
+{*******************************************}
+constructor TALXmlProcessingInstrNode.Create(
+              const NameOrData: AnsiString;
+              const AddlData: AnsiString = '');
 Var I: integer;
 begin
   inherited;
@@ -3520,9 +3532,10 @@ begin
   else begin
     if (Index < 0) or (Index > FCount) then ALXMLDocError(CALXmlListIndexError, [Index]);
     if FCount = FCapacity then Grow;
-    if Index < FCount then ALMove(FList[Index],
-                                  FList[Index + 1],
-                                  (FCount - Index) * SizeOf(Pointer));
+    if Index < FCount then ALMove(
+                             FList[Index],
+                             FList[Index + 1],
+                             (FCount - Index) * SizeOf(Pointer));
   end;
   Pointer(FList[index]) := nil;
   FList[index] := Node;
@@ -3594,9 +3607,10 @@ begin
   Dec(FCount);
   if Index < FCount then begin
     FList[Index] := nil;
-    ALMove(FList[Index + 1],
-           FList[Index],
-           (FCount - Index) * SizeOf(Pointer));
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
     Pointer(FList[FCount]) := nil;
   end;
   if assigned(Node) then FreeAndNil(Node);
@@ -3716,10 +3730,11 @@ begin
   FCount := NewCount;
 end;
 
-{********************************************************}
-Function  ALFindXmlNodeByChildNodeValue(xmlrec:TalxmlNode;
-                                        Const ChildNodeName, ChildNodeValue : AnsiString;
-                                        Const Recurse: Boolean = False): TalxmlNode;
+{**************************************}
+Function  ALFindXmlNodeByChildNodeValue(
+            xmlrec:TalxmlNode;
+            Const ChildNodeName, ChildNodeValue : AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
 var I, J : integer;
 Begin
   result := nil;
@@ -3733,20 +3748,22 @@ Begin
       end;
     end;
     if Recurse then begin
-      result := ALFindXmlNodeByChildNodeValue(xmlrec.ChildNodes[i],
-                                              ChildNodeName,
-                                              ChildNodeValue,
-                                              Recurse);
+      result := ALFindXmlNodeByChildNodeValue(
+                  xmlrec.ChildNodes[i],
+                  ChildNodeName,
+                  ChildNodeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
 end;
 
-{***************************************************************}
-Function  ALFindXmlNodeByNameAndChildNodeValue(xmlrec:TalxmlNode;
-                                               Const NodeName: ansiString;
-                                               Const ChildNodeName, ChildNodeValue: AnsiString;
-                                               Const Recurse: Boolean = False): TalxmlNode;
+{*********************************************}
+Function  ALFindXmlNodeByNameAndChildNodeValue(
+            xmlrec:TalxmlNode;
+            Const NodeName: ansiString;
+            Const ChildNodeName, ChildNodeValue: AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
 var I, J : integer;
 Begin
   result := nil;
@@ -3762,20 +3779,22 @@ Begin
       end;
     end;
     if Recurse then begin
-      result := ALFindXmlNodeByNameAndChildNodeValue(xmlrec.ChildNodes[i],
-                                                     NodeName,
-                                                     ChildNodeName,
-                                                     ChildNodeValue,
-                                                     Recurse);
+      result := ALFindXmlNodeByNameAndChildNodeValue(
+                  xmlrec.ChildNodes[i],
+                  NodeName,
+                  ChildNodeName,
+                  ChildNodeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
 end;
 
-{***************************************************}
-Function  ALFindXmlNodeByAttribute(xmlrec:TalxmlNode;
-                                   Const AttributeName, AttributeValue : AnsiString;
-                                   Const Recurse: Boolean = False): TalxmlNode;
+{*********************************}
+Function  ALFindXmlNodeByAttribute(
+            xmlrec:TalxmlNode;
+            Const AttributeName, AttributeValue : AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
 
 var I : integer;
 Begin
@@ -3787,20 +3806,22 @@ Begin
       break;
     end;
     if Recurse then begin
-      result := ALFindXmlNodeByAttribute(xmlrec.ChildNodes[I],
-                                         AttributeName,
-                                         AttributeValue,
-                                         Recurse);
+      result := ALFindXmlNodeByAttribute(
+                  xmlrec.ChildNodes[I],
+                  AttributeName,
+                  AttributeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
 end;
 
-{**********************************************************}
-Function  ALFindXmlNodeByNameAndAttribute(xmlrec:TalxmlNode;
-                                          Const NodeName: ansiString;
-                                          Const AttributeName, AttributeValue: AnsiString;
-                                          Const Recurse: Boolean = False): TalxmlNode;
+{****************************************}
+Function  ALFindXmlNodeByNameAndAttribute(
+            xmlrec:TalxmlNode;
+            Const NodeName: ansiString;
+            Const AttributeName, AttributeValue: AnsiString;
+            Const Recurse: Boolean = False): TalxmlNode;
 var I : integer;
 Begin
   result := nil;
@@ -3812,11 +3833,12 @@ Begin
       break;
     end;
     if Recurse then begin
-      result := ALFindXmlNodeByNameAndAttribute(xmlrec.ChildNodes[I],
-                                                NodeName,
-                                                AttributeName,
-                                                AttributeValue,
-                                                Recurse);
+      result := ALFindXmlNodeByNameAndAttribute(
+                  xmlrec.ChildNodes[I],
+                  NodeName,
+                  AttributeName,
+                  AttributeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;

@@ -309,6 +309,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.WebRTC.JPeerConnection_TlsCertPolicy', TypeInfo(Alcinoe.AndroidApi.WebRTC.JPeerConnection_TlsCertPolicy));

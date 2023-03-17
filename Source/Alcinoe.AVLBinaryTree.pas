@@ -18,10 +18,11 @@ type
   TALBaseAVLBinaryTree = class;
 
   {iterate function--------------------------------------------------}
-  TALAVLBinaryTreeIterateFunc = procedure(aTree: TALBaseAVLBinaryTree;
-                                          aNode: TALBaseAVLBinaryTreeNode;
-                                          aExtData: Pointer;
-                                          Var aContinue: Boolean);
+  TALAVLBinaryTreeIterateFunc = procedure(
+                                  aTree: TALBaseAVLBinaryTree;
+                                  aNode: TALBaseAVLBinaryTreeNode;
+                                  aExtData: Pointer;
+                                  Var aContinue: Boolean);
 
   {TALBaseAVLBinaryTreeNode---------------}
   TALBaseAVLBinaryTreeNode = class(Tobject)
@@ -244,10 +245,11 @@ begin
   else Result := 0;
 end;
 
-{***********************************************************************}
-procedure AlAVLBinaryTree_DelBalance(var aNode: TALBaseAVLBinaryTreeNode;
-                                     var SubTreeDec: Boolean;
-                                     CmpRes: Integer);
+{***********************************}
+procedure AlAVLBinaryTree_DelBalance(
+            var aNode: TALBaseAVLBinaryTreeNode;
+            var SubTreeDec: Boolean;
+            CmpRes: Integer);
 var N1, N2: TALBaseAVLBinaryTreeNode;
     B1, B2: Integer;
     LR: Boolean;
@@ -295,10 +297,11 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure AlAVLBinaryTree_InsBalance(var aNode: TALBaseAVLBinaryTreeNode;
-                                     var SubTreeInc: Boolean;
-                                     CmpRes: Integer);
+{***********************************}
+procedure AlAVLBinaryTree_InsBalance(
+            var aNode: TALBaseAVLBinaryTreeNode;
+            var SubTreeInc: Boolean;
+            CmpRes: Integer);
 var N1: TALBaseAVLBinaryTreeNode;
     N2: TALBaseAVLBinaryTreeNode;
     LR: Boolean;
@@ -335,11 +338,12 @@ begin
   end;
 end;
 
-{***************************************************************************}
-procedure AlAVLBinaryTree_IterateDestroyNodeFunc(aTree: TALBaseAVLBinaryTree;
-                                                 aNode: TALBaseAVLBinaryTreeNode;
-                                                 aExtData: Pointer;
-                                                 Var aContinue: Boolean);
+{***********************************************}
+procedure AlAVLBinaryTree_IterateDestroyNodeFunc(
+            aTree: TALBaseAVLBinaryTree;
+            aNode: TALBaseAVLBinaryTreeNode;
+            aExtData: Pointer;
+            Var aContinue: Boolean);
 
 begin
   aTree.FreeNodeObj(aNode);
@@ -382,10 +386,11 @@ begin
   Inherited;
 end;
 
-{*********************************************************************************}
-procedure TALBaseAVLBinaryTree.InternalIterate(Action: TALAVLBinaryTreeIterateFunc;
-                                               Up: Boolean;
-                                               ExtData: Pointer);
+{*********************************************}
+procedure TALBaseAVLBinaryTree.InternalIterate(
+            Action: TALAVLBinaryTreeIterateFunc;
+            Up: Boolean;
+            ExtData: Pointer);
 var N1: TALBaseAVLBinaryTreeNode;
     N2: TALBaseAVLBinaryTreeNode;
     StackPos: Integer;
@@ -481,9 +486,10 @@ end;
 {*******************************************}
 procedure TALBaseAVLBinaryTree.InternalClear;
 begin
-  InternalIterate(AlAVLBinaryTree_IterateDestroyNodeFunc,
-                  True,
-                  nil);
+  InternalIterate(
+    AlAVLBinaryTree_IterateDestroyNodeFunc,
+    True,
+    nil);
   FHead := nil;
   FNodeCount := 0;
 end;

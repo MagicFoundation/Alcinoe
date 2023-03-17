@@ -1093,10 +1093,11 @@ var DeviceSrv: IFMXDeviceService;
 begin
   if SupportsPlatformService(IFMXDeviceService, DeviceSrv) and
     (TDeviceFeature.HasTouchScreen in DeviceSrv.GetFeatures) then
-    Result := TRectF.Create(DefaultTouchTargetExpansion,
-                            DefaultTouchTargetExpansion,
-                            DefaultTouchTargetExpansion,
-                            DefaultTouchTargetExpansion)
+    Result := TRectF.Create(
+                DefaultTouchTargetExpansion,
+                DefaultTouchTargetExpansion,
+                DefaultTouchTargetExpansion,
+                DefaultTouchTargetExpansion)
   else
     Result := inherited ;
 end;
@@ -1338,10 +1339,11 @@ var DeviceSrv: IFMXDeviceService;
 begin
   if SupportsPlatformService(IFMXDeviceService, DeviceSrv) and
     (TDeviceFeature.HasTouchScreen in DeviceSrv.GetFeatures) then
-    Result := TRectF.Create(DefaultTouchTargetExpansion,
-                            DefaultTouchTargetExpansion,
-                            DefaultTouchTargetExpansion,
-                            DefaultTouchTargetExpansion)
+    Result := TRectF.Create(
+                DefaultTouchTargetExpansion,
+                DefaultTouchTargetExpansion,
+                DefaultTouchTargetExpansion,
+                DefaultTouchTargetExpansion)
   else
     Result := inherited ;
 end;
@@ -1837,16 +1839,18 @@ begin
   if FHighlight <> nil then begin
     case Orientation of
       TOrientation.Horizontal: begin
-        FHighlight.setbounds(Round((rMin.Left + rMin.Right) / 2),
-                             FHighlight.Position.y,
-                             Round((rMax.Left + rMax.Right) / 2) - Round((rMin.Left + rMin.Right) / 2),
-                             FHighlight.Height);
+        FHighlight.setbounds(
+          Round((rMin.Left + rMin.Right) / 2),
+          FHighlight.Position.y,
+          Round((rMax.Left + rMax.Right) / 2) - Round((rMin.Left + rMin.Right) / 2),
+          FHighlight.Height);
       end;
       TOrientation.Vertical: begin
-        FHighlight.setbounds(FHighlight.Position.x,
-                             Round((rMin.Top + rMin.Bottom) / 2),
-                             FHighlight.width,
-                             Round((rMax.Top + rMax.Bottom) / 2) - Round((rMin.Top + rMin.Bottom) / 2));
+        FHighlight.setbounds(
+          FHighlight.Position.x,
+          Round((rMin.Top + rMin.Bottom) / 2),
+          FHighlight.width,
+          Round((rMax.Top + rMax.Bottom) / 2) - Round((rMin.Top + rMin.Bottom) / 2));
       end;
     end;
   end;
@@ -2633,6 +2637,7 @@ begin
   end;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton, TALSwitch]);

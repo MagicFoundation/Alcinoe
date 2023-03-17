@@ -83,7 +83,7 @@ implementation
 var
   uTrayIconClass : TALWinTrayIcon = nil;
 
-{**********************************************************************************}
+{*******************************************************************************************}
 function NewWinProc(hWd: HWND; uMsg: UINT; wParam: wParam; lParam: lParam): LRESULT; stdcall;
 begin
   case uMsg of

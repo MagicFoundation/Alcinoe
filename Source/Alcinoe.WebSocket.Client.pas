@@ -50,8 +50,9 @@ type
     //-----
     procedure Connect(const aUrl:AnsiString); virtual; abstract;
     procedure Disconnect; virtual; abstract;
-    procedure Send(const aData: AnsiString;
-                   const aIsUTF8: Boolean = True); virtual; abstract;
+    procedure Send(
+                const aData: AnsiString;
+                const aIsUTF8: Boolean = True); virtual; abstract;
     //-----
     property  ConnectTimeout: Integer read FConnectTimeout write FConnectTimeout default 0;
     property  SendTimeout: Integer read FSendTimeout write FSendTimeout default 0;

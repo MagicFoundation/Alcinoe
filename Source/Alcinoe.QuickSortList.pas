@@ -832,7 +832,7 @@ end;
 function TALCardinalList.Find(item: Cardinal; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {---------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _CompareCardinal(D1,D2: Cardinal): Integer; inline
   Begin
     if D1 < D2 then result := -1
@@ -1172,7 +1172,7 @@ begin
   PALInt64ListItem(Get(index))^.FObject := AObject;
 end;
 
-{**********************************************}
+{*********************************************}
 function TALInt64List.Push(Item: int64): int64;
 begin
   Add(Item);
@@ -1271,7 +1271,7 @@ end;
 function TALNativeIntList.Find(item: NativeInt; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _CompareNativeInt(D1,D2: NativeInt): Integer; inline;
   Begin
     if D1 < D2 then result := -1

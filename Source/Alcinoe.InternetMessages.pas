@@ -418,7 +418,7 @@ procedure TALEmailHeader.SetRawHeaderText(const aRawHeaderText: AnsiString);
 
 Var LRawHeaderLst: TALStringListA;
 
-  {-----------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _extractHeader(const aName: AnsiString): AnsiString;
   Var I: Integer;
       Str: AnsiString;
@@ -587,7 +587,7 @@ procedure TALNewsArticleHeader.SetRawHeaderText(const aRawHeaderText: AnsiString
 
 Var LRawHeaderLst: TALStringListA;
 
-  {-----------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _extractHeader(const aName: AnsiString): AnsiString;
   Var I: Integer;
       Str: AnsiString;
@@ -672,7 +672,7 @@ end;
 {$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: AnsiString): boolean;
 
- {------------------------------------------------------}
+ {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedName(const s: AnsiString): boolean;
  var I: integer;
  begin
@@ -684,7 +684,7 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
    Result:= true;
  end;
 
- {----------------------------------------------------------}
+ {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedHostname(const s: AnsiString): boolean;
  var I: integer;
  begin
@@ -696,7 +696,7 @@ function AlIsValidEmail(const Value: AnsiString): boolean;
    Result:= true;
  end;
 
- {-----------------------------------------------------}
+ {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedExt(const s: AnsiString): boolean;
  var I: integer;
  begin
@@ -758,7 +758,7 @@ end;
 {$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: String): boolean;
 
- {--------------------------------------------------}
+ {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedName(const s: String): boolean;
  var I: integer;
  begin
@@ -770,7 +770,7 @@ function AlIsValidEmail(const Value: String): boolean;
    Result:= true;
  end;
 
- {------------------------------------------------------}
+ {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedHostname(const s: String): boolean;
  var I: integer;
  begin
@@ -782,7 +782,7 @@ function AlIsValidEmail(const Value: String): boolean;
    Result:= true;
  end;
 
- {-------------------------------------------------}
+ {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
  function CheckAllowedExt(const s: String): boolean;
  var I: integer;
  begin

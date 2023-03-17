@@ -54,8 +54,8 @@ type
     //@method     canSendText
     //@abstract   Returns <tt>YES</tt> if the user has set up the device for sending text only messages.
     //@discussion If the return value is YES, the client can set the recipients and body of the message.
-		//      If the return value is NO, the client may notify the user of the failure, or the
-		//      client may open an SMS URL via <tt>-[UIApplication openURL:]</tt>.
+    //      If the return value is NO, the client may notify the user of the failure, or the
+    //      client may open an SMS URL via <tt>-[UIApplication openURL:]</tt>.
     //+ (BOOL)canSendText  __OSX_AVAILABLE_STARTING(__MAC_NA,__IPHONE_4_0);
     {classe} function canSendText: Boolean; cdecl;
 

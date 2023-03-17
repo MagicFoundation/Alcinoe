@@ -31,10 +31,11 @@ type
 
   {*************************************************************************************************************************}
   TALTabPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
-  TALTabAniTransitionInit = procedure(const sender: TObject;
-                                      const ATransition: TALTabTransition;
-                                      const aVelocity: Double;
-                                      const aAnimation: TALFloatPropertyAnimation) of object;
+  TALTabAniTransitionInit = procedure(
+                              const sender: TObject;
+                              const ATransition: TALTabTransition;
+                              const aVelocity: Double;
+                              const aAnimation: TALFloatPropertyAnimation) of object;
 
   {**************************}
   TALTabItem = class(TControl)
@@ -167,10 +168,11 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function SetActiveTabWithTransition(const ATab: TALTabItem;
-                                        const ATransition: TALTabTransition;
-                                        const AVelocity: double=0;
-                                        const ALaunchAniStartEvent: boolean = True): boolean; overload;
+    function SetActiveTabWithTransition(
+               const ATab: TALTabItem;
+               const ATransition: TALTabTransition;
+               const AVelocity: double=0;
+               const ALaunchAniStartEvent: boolean = True): boolean; overload;
     function SetActiveTabWithTransition(const ATabIndex: integer; ATransition: TALTabTransition): boolean; overload;
     function FindVisibleTab(var Index: Integer; const FindKind: TFindKind): Boolean; overload;
     function FindVisibleTab(const FindKind: TFindKind): Integer; overload;
@@ -1046,11 +1048,12 @@ begin
     fOnAniStop(Self);
 end;
 
-{***********************************************************************}
-function TALTabControl.SetActiveTabWithTransition(const ATab: TALTabItem;
-                                                  const ATransition: TALTabTransition;
-                                                  const AVelocity: double=0;
-                                                  const ALaunchAniStartEvent: boolean = True): boolean;
+{************************************************}
+function TALTabControl.SetActiveTabWithTransition(
+           const ATab: TALTabItem;
+           const ATransition: TALTabTransition;
+           const AVelocity: double=0;
+           const ALaunchAniStartEvent: boolean = True): boolean;
 begin
 
   ALFreeAndNil(FAniTransitionOverlay);
@@ -1074,10 +1077,11 @@ begin
     FAniTransition.AnimationType := TAnimationType.In;
     FAniTransition.Interpolation := TInterpolationType.Linear;
     if assigned(fOnAniTransitionInit) then
-      fOnAniTransitionInit(self,
-                           ATransition,
-                           AVelocity,
-                           FAniTransition);
+      fOnAniTransitionInit(
+        self,
+        ATransition,
+        AVelocity,
+        FAniTransition);
 
     if (ALaunchAniStartEvent) and
        (assigned(fOnAniStart)) then fOnAniStart(self);
@@ -1108,10 +1112,11 @@ begin
     FAniTransition.AnimationType := TAnimationType.out;
     FAniTransition.Interpolation := TInterpolationType.Linear;
     if assigned(fOnAniTransitionInit) then
-      fOnAniTransitionInit(self,
-                           ATransition,
-                           AVelocity,
-                           FAniTransition);
+      fOnAniTransitionInit(
+        self,
+        ATransition,
+        AVelocity,
+        FAniTransition);
 
     if (ALaunchAniStartEvent) and
        (assigned(fOnAniStart)) then fOnAniStart(self);
@@ -1280,6 +1285,7 @@ begin
 end;
 
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALTabControl]);

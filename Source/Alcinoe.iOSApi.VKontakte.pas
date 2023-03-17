@@ -126,6 +126,7 @@ type
 
 implementation
 
+{*************************************************************************}
 procedure VKSdkFrameworkLoader; cdecl; external framework 'VKSdkFramework';
 
 end.

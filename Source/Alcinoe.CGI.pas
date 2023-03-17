@@ -1,4 +1,4 @@
-{*******************************************************************************
+{**********************************************************}
 Function to run CGI application like PHP-CGI.exe or Perl.exe
 *******************************************************************************}
 unit Alcinoe.CGI;
@@ -12,27 +12,31 @@ uses
   Alcinoe.StringList;
 
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStringsA); overload;
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                        ServerVariables: TALStringsA;
-                                                        const ScriptName,
-                                                              ScriptFileName: AnsiString;
-                                                        const Url: AnsiString); overload;
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(
+            WebRequest: TALWebRequest;
+            ServerVariables: TALStringsA;
+            const ScriptName,
+                  ScriptFileName: AnsiString;
+            const Url: AnsiString); overload;
 Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStringsA); overload;
-Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStringsA;
-                                          const ScriptName,
-                                                ScriptFileName: AnsiString;
-                                          const Url: AnsiString); overload;
-Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                 ServerVariables: TALStringsA;
-                                                 const ScriptName,
-                                                       ScriptFileName: AnsiString;
-                                                 const Url: AnsiString); overload;
+Procedure AlCGIInitDefaultServerVariables(
+            ServerVariables: TALStringsA;
+            const ScriptName,
+                  ScriptFileName: AnsiString;
+            const Url: AnsiString); overload;
+Procedure AlCGIInitServerVariablesFromWebRequest(
+            WebRequest: TALWebRequest;
+            ServerVariables: TALStringsA;
+            const ScriptName,
+                  ScriptFileName: AnsiString;
+            const Url: AnsiString); overload;
 
-Procedure AlCGIExec(const InterpreterFilename: AnsiString;
-                    ServerVariables: TALStringsA;
-                    RequestContentStream: Tstream;
-                    ResponseContentStream: Tstream;
-                    ResponseHeader: TALHTTPResponseHeader); overload;
+Procedure AlCGIExec(
+            const InterpreterFilename: AnsiString;
+            ServerVariables: TALStringsA;
+            RequestContentStream: Tstream;
+            ResponseContentStream: Tstream;
+            ResponseHeader: TALHTTPResponseHeader); overload;
 
 implementation
 
@@ -41,7 +45,7 @@ uses
   Alcinoe.Execute,
   Alcinoe.StringUtils;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStringsA);
 Begin
   ServerVariables.Clear;
@@ -61,12 +65,13 @@ Begin
   ServerVariables.Add('HTTP_ACCEPT=*/*');                                                               //HTTP_ACCEPT=*/* | List of acceptable content type
 end;
 
-{********************************************************************************}
-Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                        ServerVariables: TALStringsA;
-                                                        const ScriptName,
-                                                              ScriptFileName: AnsiString;
-                                                        const Url: AnsiString);
+{******************************************************}
+Procedure AlCGIInitDefaultServerVariablesFromWebRequest(
+            WebRequest: TALWebRequest;
+            ServerVariables: TALStringsA;
+            const ScriptName,
+                  ScriptFileName: AnsiString;
+            const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables);
   {----------}
@@ -79,7 +84,7 @@ Begin
   ServerVariables.Values['REQUEST_URI']     := URL;                //REQUEST_URI=/vbseo.php?vbseourl=forum4/discussion98851/showthread.php&bleubleu=24
 end;
 
-{*********************************************************************}
+{**********************************************************************}
 Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStringsA);
 Begin
   ServerVariables.Clear;
@@ -99,11 +104,12 @@ Begin
   ServerVariables.Add('HTTP_ACCEPT=*/*');                           //HTTP_ACCEPT=*/* | List of acceptable content type
 end;
 
-{********************************************************************}
-Procedure AlCGIInitDefaultServerVariables(ServerVariables: TALStringsA;
-                                          const ScriptName,
-                                                ScriptFileName: AnsiString;
-                                          const Url: AnsiString);
+{****************************************}
+Procedure AlCGIInitDefaultServerVariables(
+            ServerVariables: TALStringsA;
+            const ScriptName,
+                  ScriptFileName: AnsiString;
+            const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariables(ServerVariables);
   {----------}
@@ -116,12 +122,13 @@ Begin
   ServerVariables.Values['REQUEST_URI']     := URL;                //REQUEST_URI=/vbseo.php?vbseourl=forum4/discussion98851/showthread.php&bleubleu=24
 end;
 
-{*************************************************************************}
-Procedure AlCGIInitServerVariablesFromWebRequest(WebRequest: TALWebRequest;
-                                                 ServerVariables: TALStringsA;
-                                                 const ScriptName,
-                                                       ScriptFileName: AnsiString;
-                                                 const Url: AnsiString);
+{***********************************************}
+Procedure AlCGIInitServerVariablesFromWebRequest(
+            WebRequest: TALWebRequest;
+            ServerVariables: TALStringsA;
+            const ScriptName,
+                  ScriptFileName: AnsiString;
+            const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables, ScriptName, ScriptFileName, Url);
   {----------}
@@ -153,12 +160,13 @@ Begin
   //ServerVariables.Add('LOGON_USER='+            WebRequest.GetFieldByName('LOGON_USER'));             //LOGON_USER=
 end;
 
-{********************************************************}
-Procedure AlCGIExec(const InterpreterFilename: AnsiString;
-                    ServerVariables: TALStringsA;
-                    RequestContentStream: Tstream;
-                    ResponseContentStream: Tstream;
-                    ResponseHeader: TALHTTPResponseHeader);
+{******************}
+Procedure AlCGIExec(
+            const InterpreterFilename: AnsiString;
+            ServerVariables: TALStringsA;
+            RequestContentStream: Tstream;
+            ResponseContentStream: Tstream;
+            ResponseHeader: TALHTTPResponseHeader);
 
 const EnvironmentTemplate = '%s=%s'#0;
 
@@ -232,11 +240,12 @@ begin
     Environment := Environment + #0;
 
     {----------}
-    ALWinExecA(ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
-              ALExtractFileDir(InterpreterFilename),
-              Environment,
-              RequestContentStream,
-              LStream);
+    ALWinExecA(
+      ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
+      ALExtractFileDir(InterpreterFilename),
+      Environment,
+      RequestContentStream,
+      LStream);
 
     {----------}
     S1 := LStream.DataString;

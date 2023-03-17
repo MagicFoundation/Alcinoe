@@ -336,10 +336,12 @@ type
     function GetBSON: AnsiString;
     procedure SetBSON(const Value: AnsiString);
     function NestingLevel: Integer;
-    procedure SaveToBson(const Stream: TStream;
-                         Var buffer: ansiString);
-    procedure SaveToJson(const Stream: TStream;
-                         Var buffer: ansiString);
+    procedure SaveToBson(
+                const Stream: TStream;
+                Var buffer: ansiString);
+    procedure SaveToJson(
+                const Stream: TStream;
+                Var buffer: ansiString);
   public
     constructor Create(const NodeName: AnsiString); virtual;
     procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
@@ -576,12 +578,14 @@ type
     procedure DoParseEndObject(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseStartArray(const Path: AnsiString; const Name: AnsiString);
     procedure DoParseEndArray(const Path: AnsiString; const Name: AnsiString);
-    Procedure ParseJSON(const RawJSONStream: TStream;
-                        const RawJSONString: AnsiString;
-                        const ContainerNode: TALJSONNodeA);
-    Procedure ParseBSON(const RawBSONStream: TStream;
-                        const RawBSONString: AnsiString;
-                        const ContainerNode: TALJSONNodeA);
+    Procedure ParseJSON(
+                const RawJSONStream: TStream;
+                const RawJSONString: AnsiString;
+                const ContainerNode: TALJSONNodeA);
+    Procedure ParseBSON(
+                const RawBSONStream: TStream;
+                const RawBSONString: AnsiString;
+                const ContainerNode: TALJSONNodeA);
     procedure ReleaseDoc;
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
@@ -712,43 +716,50 @@ var
   ALJsonISODateFormatSettingsA: TALFormatSettingsA;
 
 {misc function}
-Procedure ALJSONToTStringsA(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettingsA;
-                           const aPath: AnsiString;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false'); overload;
-Procedure ALJSONToTStringsA(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettingsA;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false'); overload;
-Procedure ALJSONToTStringsA(const aJsonNode: TALJSONNodeA;
-                           Const aPath: AnsiString;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false'); overload;
-Procedure ALJSONToTStringsA(const aJsonNode: TALJSONNodeA;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false'); overload;
-procedure ALTStringsToJsonA(const aLst: TALStringsA;
-                           const aJsonNode: TALJSONNodeA;
-                           Const aPath: AnsiString = '';
-                           Const aNameToLowerCase: boolean = false;
-                           Const aNullStr: AnsiString = 'null');
+Procedure ALJSONToTStringsA(
+            const AJsonStr: AnsiString;
+            const aFormatSettings: TALFormatSettingsA;
+            const aPath: AnsiString;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false'); overload;
+Procedure ALJSONToTStringsA(
+            const AJsonStr: AnsiString;
+            const aFormatSettings: TALFormatSettingsA;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false'); overload;
+Procedure ALJSONToTStringsA(
+            const aJsonNode: TALJSONNodeA;
+            Const aPath: AnsiString;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false'); overload;
+Procedure ALJSONToTStringsA(
+            const aJsonNode: TALJSONNodeA;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false'); overload;
+procedure ALTStringsToJsonA(
+            const aLst: TALStringsA;
+            const aJsonNode: TALJSONNodeA;
+            Const aPath: AnsiString = '';
+            Const aNameToLowerCase: boolean = false;
+            Const aNullStr: AnsiString = 'null');
 
-Procedure ALJSONToXMLA(const aJSONNode: TALJSONNodeA;
-                      const aXMLNode: TALXmlNode;
-                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName
-                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
-Procedure ALJSONToXMLA(const aJSONNode: TALJSONNodeA;
-                      const aXMLNode: TALXmlNode;
-                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
+Procedure ALJSONToXMLA(
+            const aJSONNode: TALJSONNodeA;
+            const aXMLNode: TALXmlNode;
+            const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName
+            const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
+Procedure ALJSONToXMLA(
+            const aJSONNode: TALJSONNodeA;
+            const aXMLNode: TALXmlNode;
+            const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec'); overload;
 
 function ALJsonEncodeFloatWithNodeSubTypeHelperA(const aValue: double): AnsiString;
 function ALJsonEncodeTextWithNodeSubTypeHelperA(const aValue: AnsiString): AnsiString;
@@ -760,9 +771,10 @@ function ALJsonEncodeJavascriptWithNodeSubTypeHelperA(const aValue: AnsiString):
 function ALJsonEncodeInt64WithNodeSubTypeHelperA(const aValue: int64): AnsiString;
 function ALJsonEncodeInt32WithNodeSubTypeHelperA(const aValue: int32): AnsiString;
 function ALJsonEncodeNullWithNodeSubTypeHelperA: AnsiString;
-function ALJsonEncodeWithNodeSubTypeHelperA(const aValue: AnsiString;
-                                           const aNodeSubType: TALJSONNodeSubType;
-                                           const aFormatSettings: TALFormatSettingsA): AnsiString;
+function ALJsonEncodeWithNodeSubTypeHelperA(
+           const aValue: AnsiString;
+           const aNodeSubType: TALJSONNodeSubType;
+           const aFormatSettings: TALFormatSettingsA): AnsiString;
 
 function ALJSONTryStrToRegExA(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): boolean;
 function ALJSONTryStrToBinaryA(const S: AnsiString; out Data: AnsiString; out Subtype: byte): boolean; // return a "byte" string
@@ -772,14 +784,16 @@ function ALJSONTryStrToTimestampA(const S: AnsiString; out Value: TALBSONTimesta
 function ALJSONTryStrToInt32A(const S: AnsiString; out Value: integer): Boolean;
 function ALJSONTryStrToInt64A(const S: AnsiString; out Value: int64): Boolean;
 
-Function ALFindJsonNodeByInt32ChildNodeValueA(const JsonNode:TALJSONNodeA;
-                                             Const ChildNodeName: AnsiString;
-                                             Const ChildNodeValue : Int32;
-                                             Const Recurse: Boolean = False): TALJSONNodeA;
-Function ALFindJsonNodeByTextChildNodeValueA(const JsonNode:TALJSONNodeA;
-                                            Const ChildNodeName: AnsiString;
-                                            Const ChildNodeValue : AnsiString;
-                                            Const Recurse: Boolean = False): TALJSONNodeA;
+Function ALFindJsonNodeByInt32ChildNodeValueA(
+           const JsonNode:TALJSONNodeA;
+           Const ChildNodeName: AnsiString;
+           Const ChildNodeValue : Int32;
+           Const Recurse: Boolean = False): TALJSONNodeA;
+Function ALFindJsonNodeByTextChildNodeValueA(
+           const JsonNode:TALJSONNodeA;
+           Const ChildNodeName: AnsiString;
+           Const ChildNodeValue : AnsiString;
+           Const Recurse: Boolean = False): TALJSONNodeA;
 
 type
 
@@ -889,11 +903,13 @@ type
     function GetBSON: Tbytes;
     procedure SetBSON(const Value: Tbytes);
     function NestingLevel: Integer;
-    procedure SaveToBson(const Stream: TStream;
-                         Var buffer: Tbytes);
-    procedure SaveToJson(const Stream: TStream;
-                         const StreamEncoding: TEncoding;
-                         Var buffer: String);
+    procedure SaveToBson(
+                const Stream: TStream;
+                Var buffer: Tbytes);
+    procedure SaveToJson(
+                const Stream: TStream;
+                const StreamEncoding: TEncoding;
+                Var buffer: String);
   public
     constructor Create(const NodeName: String); virtual;
     procedure MultiThreadPrepare(const aOnlyChildList: Boolean = False);
@@ -1128,10 +1144,12 @@ type
     procedure DoParseEndObject(const Path: String; const Name: String);
     procedure DoParseStartArray(const Path: String; const Name: String);
     procedure DoParseEndArray(const Path: String; const Name: String);
-    Procedure ParseJSON(const Buffer: String;
-                        const ContainerNode: TALJSONNodeW);
-    Procedure ParseBSON(const Buffer: Tbytes;
-                        const ContainerNode: TALJSONNodeW);
+    Procedure ParseJSON(
+                const Buffer: String;
+                const ContainerNode: TALJSONNodeW);
+    Procedure ParseBSON(
+                const Buffer: Tbytes;
+                const ContainerNode: TALJSONNodeW);
     procedure ReleaseDoc;
     function GetActive: Boolean;
     procedure SetActive(const Value: Boolean);
@@ -1260,35 +1278,40 @@ var
   ALJsonISODateFormatSettingsW: TALFormatSettingsW;
 
 {misc function}
-Procedure ALJSONToTStringsW(const AJsonStr: String;
-                            const aFormatSettings: TALFormatSettingsW;
-                            const aPath: String;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false'); overload;
-Procedure ALJSONToTStringsW(const AJsonStr: String;
-                            const aFormatSettings: TALFormatSettingsW;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false'); overload;
-Procedure ALJSONToTStringsW(const aJsonNode: TALJSONNodeW;
-                            Const aPath: String;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false'); overload;
-Procedure ALJSONToTStringsW(const aJsonNode: TALJSONNodeW;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false'); overload;
-procedure ALTStringsToJsonW(const aLst: TALStringsW;
-                            const aJsonNode: TALJSONNodeW;
-                            Const aPath: String = '';
-                            Const aNameToLowerCase: boolean = false;
-                            Const aNullStr: String = 'null');
+Procedure ALJSONToTStringsW(
+            const AJsonStr: String;
+            const aFormatSettings: TALFormatSettingsW;
+            const aPath: String;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false'); overload;
+Procedure ALJSONToTStringsW(
+            const AJsonStr: String;
+            const aFormatSettings: TALFormatSettingsW;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false'); overload;
+Procedure ALJSONToTStringsW(
+            const aJsonNode: TALJSONNodeW;
+            Const aPath: String;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false'); overload;
+Procedure ALJSONToTStringsW(
+            const aJsonNode: TALJSONNodeW;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false'); overload;
+procedure ALTStringsToJsonW(
+            const aLst: TALStringsW;
+            const aJsonNode: TALJSONNodeW;
+            Const aPath: String = '';
+            Const aNameToLowerCase: boolean = false;
+            Const aNullStr: String = 'null');
 
 function ALJsonEncodeFloatWithNodeSubTypeHelperW(const aValue: double): String;
 function ALJsonEncodeTextWithNodeSubTypeHelperW(const aValue: String): String;
@@ -1300,9 +1323,10 @@ function ALJsonEncodeJavascriptWithNodeSubTypeHelperW(const aValue: String): Str
 function ALJsonEncodeInt64WithNodeSubTypeHelperW(const aValue: int64): String;
 function ALJsonEncodeInt32WithNodeSubTypeHelperW(const aValue: int32): String;
 function ALJsonEncodeNullWithNodeSubTypeHelperW: String;
-function ALJsonEncodeWithNodeSubTypeHelperW(const aValue: String;
-                                            const aNodeSubType: TALJSONNodeSubType;
-                                            const aFormatSettings: TALFormatSettingsW): String;
+function ALJsonEncodeWithNodeSubTypeHelperW(
+           const aValue: String;
+           const aNodeSubType: TALJSONNodeSubType;
+           const aFormatSettings: TALFormatSettingsW): String;
 
 function ALJSONTryStrToRegExW(const S: String; out RegEx: String; out RegExOptions: TALPerlRegExOptions): boolean;
 function ALJSONTryStrToBinaryW(const S: String; out Data: String; out Subtype: byte): boolean; // return a base64 encoded string
@@ -1312,14 +1336,16 @@ function ALJSONTryStrToTimestampW(const S: String; out Value: TALBSONTimestamp):
 function ALJSONTryStrToInt32W(const S: String; out Value: integer): Boolean;
 function ALJSONTryStrToInt64W(const S: String; out Value: int64): Boolean;
 
-Function ALFindJsonNodeByInt32ChildNodeValueW(const JsonNode:TALJSONNodeW;
-                                              Const ChildNodeName: String;
-                                              Const ChildNodeValue : Int32;
-                                              Const Recurse: Boolean = False): TALJSONNodeW;
-Function ALFindJsonNodeByTextChildNodeValueW(const JsonNode:TALJSONNodeW;
-                                             Const ChildNodeName: String;
-                                             Const ChildNodeValue : String;
-                                             Const Recurse: Boolean = False): TALJSONNodeW;
+Function ALFindJsonNodeByInt32ChildNodeValueW(
+           const JsonNode:TALJSONNodeW;
+           Const ChildNodeName: String;
+           Const ChildNodeValue : Int32;
+           Const Recurse: Boolean = False): TALJSONNodeW;
+Function ALFindJsonNodeByTextChildNodeValueW(
+           const JsonNode:TALJSONNodeW;
+           Const ChildNodeName: String;
+           Const ChildNodeValue : String;
+           Const Recurse: Boolean = False): TALJSONNodeW;
 
 implementation
 
@@ -1333,11 +1359,12 @@ uses
   Alcinoe.HTML,
   Alcinoe.Common;
 
-{*********************************************************************}
-Function ALFindJsonNodeByInt32ChildNodeValueA(const JsonNode:TALJSONNodeA;
-                                             Const ChildNodeName: AnsiString;
-                                             Const ChildNodeValue : Int32;
-                                             Const Recurse: Boolean = False): TALJSONNodeA;
+{********************************************}
+Function ALFindJsonNodeByInt32ChildNodeValueA(
+           const JsonNode:TALJSONNodeA;
+           Const ChildNodeName: AnsiString;
+           Const ChildNodeValue : Int32;
+           Const Recurse: Boolean = False): TALJSONNodeA;
 var I, J : integer;
 Begin
   result := nil;
@@ -1353,20 +1380,22 @@ Begin
       end;
     end;
     if Recurse then begin
-      result := ALFindJsonNodeByInt32ChildNodeValueA(JsonNode.ChildNodes[I],
-                                                    ChildNodeName,
-                                                    ChildNodeValue,
-                                                    Recurse);
+      result := ALFindJsonNodeByInt32ChildNodeValueA(
+                  JsonNode.ChildNodes[I],
+                  ChildNodeName,
+                  ChildNodeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
 end;
 
-{*********************************************************************}
-Function ALFindJsonNodeByTextChildNodeValueA(const JsonNode:TALJSONNodeA;
-                                            Const ChildNodeName: AnsiString;
-                                            Const ChildNodeValue : AnsiString;
-                                            Const Recurse: Boolean = False): TALJSONNodeA;
+{*******************************************}
+Function ALFindJsonNodeByTextChildNodeValueA(
+           const JsonNode:TALJSONNodeA;
+           Const ChildNodeName: AnsiString;
+           Const ChildNodeValue : AnsiString;
+           Const Recurse: Boolean = False): TALJSONNodeA;
 var I, J : integer;
 Begin
   result := nil;
@@ -1382,16 +1411,17 @@ Begin
       end;
     end;
     if Recurse then begin
-      result := ALFindJsonNodeByTextChildNodeValueA(JsonNode.ChildNodes[I],
-                                                   ChildNodeName,
-                                                   ChildNodeValue,
-                                                   Recurse);
+      result := ALFindJsonNodeByTextChildNodeValueA(
+                  JsonNode.ChildNodes[I],
+                  ChildNodeName,
+                  ChildNodeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
 end;
 
-{***********************************************************************************************************************}
+{************************************************************************************************************************}
 function ALJSONTryStrToRegExA(const S: AnsiString; out RegEx: AnsiString; out RegExOptions: TALPerlRegExOptions): boolean;
 var P1: integer;
     I: integer;
@@ -1448,7 +1478,7 @@ begin
 
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************}
 function ALJSONTryStrToBinaryA(const S: AnsiString; out Data: AnsiString; out Subtype: byte): boolean;
 var LInt: integer;
     Ln: integer;
@@ -1523,7 +1553,7 @@ begin
 
 end;
 
-{**********************************************************************************}
+{***********************************************************************************}
 function ALJSONTryStrToDateTimeA(const S: AnsiString; out Value: TDateTime): Boolean;
 var LQuoteChar: ansiChar;
     LTmpStr: AnsiString;
@@ -1646,7 +1676,7 @@ begin
 
 end;
 
-{******************************************************************************************}
+{*******************************************************************************************}
 function ALJSONTryStrToTimestampA(const S: AnsiString; out Value: TALBSONTimestamp): Boolean;
 var P1, P2: integer;
     LArgs: AnsiString;
@@ -1681,7 +1711,7 @@ begin
   Value.W2 := LArg2; // lower  4 bytes - timestamp
 end;
 
-{*****************************************************************************}
+{******************************************************************************}
 function ALJSONTryStrToInt32A(const S: AnsiString; out Value: integer): Boolean;
 var LTmpStr: AnsiString;
     LQuoteChar: ansiChar;
@@ -1744,7 +1774,7 @@ begin
 
 end;
 
-{***************************************************************************}
+{****************************************************************************}
 function ALJSONTryStrToInt64A(const S: AnsiString; out Value: int64): Boolean;
 var LTmpStr: AnsiString;
     LQuoteChar: ansiChar;
@@ -1846,7 +1876,7 @@ begin
   end;
 end;
 
-{****************************************************************}
+{*****************************************************************}
 constructor TALJSONDocumentA.create(const aActive: Boolean = True);
 begin
   inherited create;
@@ -1868,7 +1898,7 @@ begin
   SetActive(aActive);
 end;
 
-{**********************************************************************************************************}
+{************************************************************************************************************}
 constructor TALJSONDocumentA.Create(const aFormatSettings: TALFormatSettingsA; const aActive: Boolean = True);
 begin
   create(aActive);
@@ -1878,7 +1908,7 @@ begin
   end;
 end;
 
-{*********************************}
+{**********************************}
 destructor TALJSONDocumentA.Destroy;
 begin
   if fFormatSettings <> @ALDefaultFormatSettingsA then dispose(fFormatSettings);
@@ -1892,7 +1922,7 @@ begin
   node.MultiThreadPrepare(aOnlyChildList);
 end;
 
-{******************************}
+{*******************************}
 procedure TALJSONDocumentA.Clear;
 begin
   releaseDoc;
@@ -1942,9 +1972,10 @@ end;
  *Each member of an object or each array value must be followed by a comma if it's not the last one
  *The common extension for json files is '.json'
  *The mime type for json files is 'application/json'}
-Procedure TALJSONDocumentA.ParseJSON(const RawJSONStream: TStream;
-                                    const RawJSONString: AnsiString;
-                                    const ContainerNode: TALJSONNodeA);
+Procedure TALJSONDocumentA.ParseJSON(
+            const RawJSONStream: TStream;
+            const RawJSONString: AnsiString;
+            const ContainerNode: TALJSONNodeA);
 
 Const BufferSize: integer = 8192;
 
@@ -1960,7 +1991,7 @@ Var Buffer: AnsiString;
     ObjectPaths: TALIntegerList;
     DecodeJSONReferences: boolean;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ExpandBuffer: boolean; overload;
   Var ByteReaded, Byte2Read: Integer;
   Begin
@@ -1972,9 +2003,10 @@ Var Buffer: AnsiString;
     If (BufferLength > 0) and (BufferPos > 1) then begin
       if (BufferPos > BufferLength) then RawJSONStream.Position := RawJSONStream.Position - BufferLength + BufferPos - 1;
       Byte2Read := min(BufferPos - 1, BufferLength);
-      if BufferPos <= length(Buffer) then ALMove(Pbyte(Buffer)[BufferPos - 1],
-                                                 pointer(Buffer)^,
-                                                 BufferLength-BufferPos+1);
+      if BufferPos <= length(Buffer) then ALMove(
+                                            Pbyte(Buffer)[BufferPos - 1],
+                                            pointer(Buffer)^,
+                                            BufferLength-BufferPos+1);
       BufferPos := 1;
     end
     else begin
@@ -1995,7 +2027,7 @@ Var Buffer: AnsiString;
     else result := True;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ExpandBuffer(var PosToKeepSync: Integer): boolean; overload;
   var P1: integer;
   begin
@@ -2040,27 +2072,30 @@ Var Buffer: AnsiString;
     setlength(result,P-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithIndex(const index: integer;
-                                  const Args: array of const;
-                                  const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithIndex(
+              const index: integer;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     DoParseText(GetPathStr('[' + ALIntToStrA(index) + ']'), '', Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithName(const name: AnsiString;
-                                 const Args: array of const;
-                                 const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithName(
+              const name: AnsiString;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     DoParseText(GetPathStr(Name), Name, Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseText(const Index: integer;
-                         const Name: AnsiString;
-                         const Args: array of const;
-                         const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseText(
+              const Index: integer;
+              const Name: AnsiString;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     if Assigned(fonParseText) then begin
       if notSaxMode then begin
@@ -3188,9 +3223,10 @@ end;
 
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
-procedure TALJSONDocumentA.ParseBSON(const RawBSONStream: TStream;
-                                    const RawBSONString: AnsiString;
-                                    const ContainerNode: TALJSONNodeA);
+procedure TALJSONDocumentA.ParseBSON(
+            const RawBSONStream: TStream;
+            const RawBSONString: AnsiString;
+            const ContainerNode: TALJSONNodeA);
 
 Const BufferSize: integer = 8192;
 
@@ -3203,7 +3239,7 @@ Var Buffer: AnsiString;
     NamePaths: TALStringListA;
     ObjectPaths: TObjectList<TALJSONNodeA>;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ExpandBuffer: boolean; overload;
   Var ByteReaded, Byte2Read: Integer;
   Begin
@@ -3215,9 +3251,10 @@ Var Buffer: AnsiString;
     If (BufferLength > 0) and (BufferPos > 1) then begin
       if (BufferPos > BufferLength) then RawBSONStream.Position := RawBSONStream.Position - BufferLength + BufferPos - 1;
       Byte2Read := min(BufferPos - 1, BufferLength);
-      if BufferPos <= length(Buffer) then ALMove(Pbyte(Buffer)[BufferPos - 1],
-                                                 pointer(Buffer)^,
-                                                 BufferLength-BufferPos+1);
+      if BufferPos <= length(Buffer) then ALMove(
+                                            Pbyte(Buffer)[BufferPos - 1],
+                                            pointer(Buffer)^,
+                                            BufferLength-BufferPos+1);
       BufferPos := 1;
     end
     else begin
@@ -3238,7 +3275,7 @@ Var Buffer: AnsiString;
     else result := True;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ExpandBuffer(var PosToKeepSync: Integer): boolean; overload;
   var P1: integer;
   begin
@@ -3283,26 +3320,29 @@ Var Buffer: AnsiString;
     setlength(result,P-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithIndex(const index: AnsiString;
-                                  const Args: array of const;
-                                  const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithIndex(
+              const index: AnsiString;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     DoParseText(GetPathStr('[' + index + ']'), '', Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithName(const name: AnsiString;
-                                 const Args: array of const;
-                                 const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithName(
+              const name: AnsiString;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     DoParseText(GetPathStr(Name), Name, Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseText(const NameOrIndex: AnsiString;
-                         const Args: array of const;
-                         const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseText(
+              const NameOrIndex: AnsiString;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     if Assigned(fonParseText) then begin
       if notSaxMode then begin
@@ -3369,9 +3409,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createInt64Node(const name: AnsiString;
-                             const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createInt64Node(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LInt64: Int64;
   begin
@@ -3400,9 +3441,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createInt32Node(const name: AnsiString;
-                             const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createInt32Node(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LInt32: Int32;
   begin
@@ -3431,9 +3473,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createTextNode(const name: AnsiString;
-                            const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createTextNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LInt32: Int32;
       LText: ansiString;
@@ -3467,9 +3510,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createFloatNode(const name: AnsiString;
-                             const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createFloatNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LDouble: Double;
   begin
@@ -3498,9 +3542,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createBinaryNode(const name: AnsiString;
-                              const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createBinaryNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LInt32: Int32;
       LBinSubtype: byte;
@@ -3547,9 +3592,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createObjectIDNode(const name: AnsiString;
-                                const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createObjectIDNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LObjectID: AnsiString;
   begin
@@ -3579,9 +3625,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createBooleanNode(const name: AnsiString;
-                               const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createBooleanNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LBool: Boolean;
   begin
@@ -3615,9 +3662,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createDateTimeNode(const name: AnsiString;
-                                const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createDateTimeNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LDateTime: TdateTime;
       LInt64: Int64;
@@ -3648,9 +3696,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createTimestampNode(const name: AnsiString;
-                                 const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createTimestampNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LTimestamp: TALBSONTimestamp;
       LInt64: Int64;
@@ -3681,9 +3730,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createnullNode(const name: AnsiString;
-                            const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createnullNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
   begin
     if NotSaxMode then begin
@@ -3704,9 +3754,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createRegExNode(const name: AnsiString;
-                             const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createRegExNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LRegEx: ansiString;
       LRegExOptions: TALPerlRegExOptions;
@@ -3762,9 +3813,10 @@ Var Buffer: AnsiString;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createJavascriptNode(const name: AnsiString;
-                                  const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createJavascriptNode(
+              const name: AnsiString;
+              const NodeSubType: TALJSONNodeSubType);
   var LNode: TALJSONNodeA;
       LJavascript: ansiString;
       LInt32: Int32;
@@ -4107,7 +4159,7 @@ Begin
 
 end;
 
-{***********************************}
+{************************************}
 procedure TALJSONDocumentA.ReleaseDoc;
 begin
   if assigned(FDocumentNode) then FreeAndNil(FDocumentNode);
@@ -4162,13 +4214,13 @@ begin
   end;
 end;
 
-{********************************************************************************************************************************************}
+{*********************************************************************************************************************************************}
 procedure TALJSONDocumentA.LoadFromJSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   LoadFromJSONFile(String(FileName), saxMode, ClearChildNodes);
 end;
 
-{*****************************************************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALJSONDocumentA.LoadFromBSONString(const Str: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   if saxMode then SetActive(False)
@@ -4179,7 +4231,7 @@ begin
   ParseBSON(nil, Str, FDocumentNode)
 end;
 
-{*****************************************************************************************************************************************}
+{******************************************************************************************************************************************}
 procedure TALJSONDocumentA.LoadFromBSONStream(const Stream: TStream; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   if saxMode then SetActive(False)
@@ -4190,7 +4242,7 @@ begin
   ParseBSON(Stream, '', FDocumentNode)
 end;
 
-{****************************************************************************************************************************************}
+{*****************************************************************************************************************************************}
 procedure TALJSONDocumentA.LoadFromBSONFile(const FileName: String; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 var FileStream: TFileStream;
 begin
@@ -4202,7 +4254,7 @@ begin
   end;
 end;
 
-{********************************************************************************************************************************************}
+{*********************************************************************************************************************************************}
 procedure TALJSONDocumentA.LoadFromBSONFile(const FileName: AnsiString; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   LoadFromBSONFile(String(FileName), saxMode, ClearChildNodes);
@@ -4227,7 +4279,7 @@ begin
   node.SaveToJSONFile(FileName);
 end;
 
-{*******************************************************************}
+{********************************************************************}
 procedure TALJSONDocumentA.SaveToJSONFile(const FileName: AnsiString);
 begin
   SaveToJSONFile(String(FileName));
@@ -4244,27 +4296,27 @@ begin
   node.SaveToJSONString(Str);
 end;
 
-{****************************************************************}
+{*****************************************************************}
 procedure TALJSONDocumentA.SaveToBsonStream(const Stream: TStream);
 begin
   CheckActive;
   node.SaveToBsonStream(Stream);
 end;
 
-{***************************************************************}
+{****************************************************************}
 procedure TALJSONDocumentA.SaveToBsonFile(const FileName: String);
 begin
   CheckActive;
   node.SaveToBsonFile(FileName);
 end;
 
-{*******************************************************************}
+{********************************************************************}
 procedure TALJSONDocumentA.SaveToBsonFile(const FileName: AnsiString);
 begin
   SaveToBsonFile(String(FileName));
 end;
 
-{**************************************************************}
+{***************************************************************}
 procedure TALJSONDocumentA.SaveToBsonString(var str: AnsiString);
 begin
   CheckActive;
@@ -4305,25 +4357,25 @@ begin
   LoadFromBSONString(Value, False{saxMode}, true{ClearChildNodes});
 end;
 
-{************************************}
+{*************************************}
 procedure TALJSONDocumentA.CheckActive;
 begin
   if not Assigned(FDocumentNode) then AlJSONDocErrorA(CALJSONNotActive);
 end;
 
-{**********************************************************************************************************************************************}
+{************************************************************************************************************************************************}
 function TALJSONDocumentA.AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA;
 begin
   Result := Node.AddChild(NodeName, NodeType, Index);
 end;
 
-{***************************************************************************************************************************************************}
+{*****************************************************************************************************************************************************}
 function TALJSONDocumentA.AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA;
 begin
   Result := Node.AddChild(Path, NodeType, Index);
 end;
 
-{******************************************************************************************************}
+{********************************************************************************************************}
 function TALJSONDocumentA.CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNodeA;
 begin
   Result := ALCreateJSONNodeA(NodeName, NodeType);
@@ -4337,355 +4389,355 @@ begin
   Result := Node.ChildNodes;
 end;
 
-{*****************************************************************************}
+{*******************************************************************************}
 function TALJSONDocumentA.GetChildNode(const nodeName: ansiString): TALJSONNodeA;
 begin
   result := Node.GetChildNode(nodeName);
 end;
 
-{****************************************************************************************************************}
+{*****************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString;
 begin
   result := Node.GetChildNodeValueText(nodeName, default);
 end;
 
-{*********************************************************************************************************}
+{**********************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double;
 begin
   result := Node.GetChildNodeValueFloat(nodeName, default);
 end;
 
-{******************************************************************************************************************}
+{*******************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime;
 begin
   result := Node.GetChildNodeValueDateTime(nodeName, default);
 end;
 
-{*********************************************************************************************************************************}
+{**********************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
 begin
   result := Node.GetChildNodeValueTimestamp(nodeName, default);
 end;
 
-{********************************************************************************************************************}
+{*************************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString;   // return a "byte" string
 begin
   result := Node.GetChildNodeValueObjectID(nodeName, default);
 end;
 
-{***********************************************************************************************************}
+{************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueInt32(const nodeName: ansiString; const default: Integer): Integer;
 begin
   result := Node.GetChildNodeValueInt32(nodeName, default);
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueInt64(const nodeName: ansiString; const default: Int64): Int64;
 begin
   result := Node.GetChildNodeValueInt64(nodeName, default);
 end;
 
-{**********************************************************************************************************}
+{***********************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueBool(const nodeName: ansiString; const default: Boolean): Boolean;
 begin
   result := Node.GetChildNodeValueBool(nodeName, default);
 end;
 
-{**********************************************************************************************************************}
+{***********************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString;
 begin
   result := Node.GetChildNodeValueJavascript(nodeName, default);
 end;
 
-{*****************************************************************************************************************}
+{******************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString;
 begin
   result := Node.GetChildNodeValueRegEx(nodeName, default);
 end;
 
-{******************************************************************************************************************************************}
+{*******************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 begin
   result := Node.GetChildNodeValueRegExOptions(nodeName, default);
 end;
 
-{******************************************************************************************************************}
+{***********************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString;   // return a "byte" string
 begin
   result := Node.GetChildNodeValueBinary(nodeName, default);
 end;
 
-{*************************************************************************************************************}
+{**************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte;
 begin
   result := Node.GetChildNodeValueBinarySubType(nodeName, default);
 end;
 
-{**********************************************************************************}
+{***********************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueNull(const nodeName: ansiString): Boolean;
 begin
   result := Node.GetChildNodeValueNull(nodeName);
 end;
 
-{**********************************************************************************}
+{************************************************************************************}
 function TALJSONDocumentA.GetChildNode(const path: array of ansiString): TALJSONNodeA;
 begin
   result := Node.GetChildNode(path);
 end;
 
-{*********************************************************************************************************************}
+{**********************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString;
 begin
   result := Node.GetChildNodeValueText(path, default);
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double;
 begin
   result := Node.GetChildNodeValueFloat(path, default);
 end;
 
-{***********************************************************************************************************************}
+{************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime;
 begin
   result := Node.GetChildNodeValueDateTime(path, default);
 end;
 
-{**************************************************************************************************************************************}
+{***************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
 begin
   result := Node.GetChildNodeValueTimestamp(path, default);
 end;
 
-{*************************************************************************************************************************}
+{******************************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString;   // return a "byte" string
 begin
   result := Node.GetChildNodeValueObjectID(path, default);
 end;
 
-{****************************************************************************************************************}
+{*****************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueInt32(const path: array of ansiString; const default: Integer): Integer;
 begin
   result := Node.GetChildNodeValueInt32(path, default);
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueInt64(const path: array of ansiString; const default: Int64): Int64;
 begin
   result := Node.GetChildNodeValueInt64(path, default);
 end;
 
-{***************************************************************************************************************}
+{****************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueBool(const path: array of ansiString; const default: Boolean): Boolean;
 begin
   result := Node.GetChildNodeValueBool(path, default);
 end;
 
-{***************************************************************************************************************************}
+{****************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString;
 begin
   result := Node.GetChildNodeValueJavascript(path, default);
 end;
 
-{**********************************************************************************************************************}
+{***********************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueRegEx(const path: array of ansiString; const default: ansiString): ansiString;
 begin
   result := Node.GetChildNodeValueRegEx(path, default);
 end;
 
-{***********************************************************************************************************************************************}
+{************************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 begin
   result := Node.GetChildNodeValueRegExOptions(path, default);
 end;
 
-{***********************************************************************************************************************}
+{****************************************************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString;   // return a "byte" string
 begin
   result := Node.GetChildNodeValueBinary(path, default);
 end;
 
-{******************************************************************************************************************}
+{*******************************************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte;
 begin
   result := Node.GetChildNodeValueBinarySubType(path, default);
 end;
 
-{***************************************************************************************}
+{****************************************************************************************}
 function TALJSONDocumentA.GetChildNodeValueNull(const path: array of ansiString): Boolean;
 begin
   result := Node.GetChildNodeValueNull(path);
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueText(const nodeName: ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueText(nodeName, value);
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueFloat(const nodeName: ansiString; const value: Double);
 begin
   Node.SetChildNodeValueFloat(nodeName, value);
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueDateTime(const nodeName: ansiString; const value: TDateTime);
 begin
   Node.SetChildNodeValueDateTime(nodeName, value);
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueTimestamp(const nodeName: ansiString; const value: TALBSONTimestamp);
 begin
   Node.SetChildNodeValueTimestamp(nodeName, value);
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueObjectID(const nodeName: ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueObjectID(nodeName, value);
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueInt32(const nodeName: ansiString; const value: Integer);
 begin
   Node.SetChildNodeValueInt32(nodeName, value);
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueInt64(const nodeName: ansiString; const value: Int64);
 begin
   Node.SetChildNodeValueInt64(nodeName, value);
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueBool(const nodeName: ansiString; const value: Boolean);
 begin
   Node.SetChildNodeValueBool(nodeName, value);
 end;
 
-{*********************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueJavascript(const nodeName: ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueJavascript(nodeName, value);
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueRegEx(const nodeName: ansiString; const value: ansiString);
 begin
   Node.SetChildNodeValueRegEx(nodeName, value);
 end;
 
-{********************************************************************************************************************}
+{*********************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions);
 begin
   Node.SetChildNodeValueRegExOptions(nodeName, value);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueBinary(const nodeName: ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueBinary(nodeName, value);
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueBinarySubType(const nodeName: ansiString; const value: byte);
 begin
   Node.SetChildNodeValueBinarySubType(nodeName, value);
 end;
 
-{**************************************************************************}
+{***************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueNull(const nodeName: ansiString);
 begin
   Node.SetChildNodeValueNull(nodeName);
 end;
 
-{********************************************************************************************************}
+{*********************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueText(const path: array of ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueText(path, value);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueFloat(const path: array of ansiString; const value: Double);
 begin
   Node.SetChildNodeValueFloat(path, value);
 end;
 
-{***********************************************************************************************************}
+{************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueDateTime(const path: array of ansiString; const value: TDateTime);
 begin
   Node.SetChildNodeValueDateTime(path, value);
 end;
 
-{*******************************************************************************************************************}
+{********************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueTimestamp(const path: array of ansiString; const value: TALBSONTimestamp);
 begin
   Node.SetChildNodeValueTimestamp(path, value);
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueObjectID(const path: array of ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueObjectID(path, value);
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueInt32(const path: array of ansiString; const value: Integer);
 begin
   Node.SetChildNodeValueInt32(path, value);
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueInt64(const path: array of ansiString; const value: Int64);
 begin
   Node.SetChildNodeValueInt64(path, value);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueBool(const path: array of ansiString; const value: Boolean);
 begin
   Node.SetChildNodeValueBool(path, value);
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueJavascript(const path: array of ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueJavascript(path, value);
 end;
 
-{*********************************************************************************************************}
+{**********************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueRegEx(const path: array of ansiString; const value: ansiString);
 begin
   Node.SetChildNodeValueRegEx(path, value);
 end;
 
-{*************************************************************************************************************************}
+{**************************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions);
 begin
   Node.SetChildNodeValueRegExOptions(path, value);
 end;
 
-{**********************************************************************************************************}
+{***********************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueBinary(const path: array of ansiString; const value: AnsiString);
 begin
   Node.SetChildNodeValueBinary(path, value);
 end;
 
-{***********************************************************************************************************}
+{************************************************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueBinarySubType(const path: array of ansiString; const value: byte);
 begin
   Node.SetChildNodeValueBinarySubType(path, value);
 end;
 
-{*******************************************************************************}
+{********************************************************************************}
 procedure TALJSONDocumentA.SetChildNodeValueNull(const path: array of ansiString);
 begin
   Node.SetChildNodeValueNull(path);
 end;
 
-{************************************************}
+{**************************************************}
 function TALJSONDocumentA.ExtractNode: TALJSONNodeA;
 begin
   if assigned(FDocumentNode) then begin
@@ -4732,7 +4784,7 @@ begin
   FNodeIndentStr := Value;
 end;
 
-{****************************************************************}
+{*****************************************************************}
 procedure TALJSONDocumentA.SetDuplicates(const Value: TDuplicates);
 begin
   if FDuplicates <> Value then begin
@@ -4783,55 +4835,55 @@ begin
   FParseOptions := Value;
 end;
 
-{****************************************************************}
+{*****************************************************************}
 procedure TALJSONDocumentA.SetPathSeparator(const Value: ansiChar);
 begin
   FPathSeparator := Value;
 end;
 
-{**************************************************}
+{***************************************************}
 function TALJSONDocumentA.GetPathSeparator: ansiChar;
 begin
   result := fPathSeparator;
 end;
 
-{*********************************************}
+{**********************************************}
 procedure TALJSONDocumentA.DoParseStartDocument;
 begin
   if Assigned(fonParseStartDocument) then fonParseStartDocument(Self);
 end;
 
-{*******************************************}
+{********************************************}
 procedure TALJSONDocumentA.DoParseEndDocument;
 begin
   if Assigned(fonParseEndDocument) then fonParseEndDocument(Self);
 end;
 
-{*************************************************************************************************************************************************}
+{**************************************************************************************************************************************************}
 procedure TALJSONDocumentA.DoParseText(const Path: AnsiString; const name: AnsiString; const Args: array of const; NodeSubType: TALJSONNodeSubType);
 begin
   if Assigned(fonParseText) then fonParseText(Self, Path, name, Args, NodeSubType);
 end;
 
-{*******************************************************************************************}
+{********************************************************************************************}
 procedure TALJSONDocumentA.DoParseStartObject(const Path: AnsiString; const Name: AnsiString);
 begin
   if Assigned(fonParseStartObject) then fonParseStartObject(Self, Path, name);
 end;
 
-{*****************************************************************************************}
+{******************************************************************************************}
 procedure TALJSONDocumentA.DoParseEndObject(const Path: AnsiString; const Name: AnsiString);
 begin
   if Assigned(fonParseEndObject) then fonParseEndObject(Self, Path, name);
 end;
 
-{******************************************************************************************}
+{*******************************************************************************************}
 procedure TALJSONDocumentA.DoParseStartArray(const Path: AnsiString; const Name: AnsiString);
 begin
   if Assigned(fonParseStartArray) then fonParseStartArray(Self, Path, name);
 end;
 
-{****************************************************************************************}
+{*****************************************************************************************}
 procedure TALJSONDocumentA.DoParseEndArray(const Path: AnsiString; const Name: AnsiString);
 begin
   if Assigned(fonParseEndArray) then fonParseEndArray(Self, Path, name);
@@ -4851,26 +4903,26 @@ begin
   Result := nil; //virtual;
 end;
 
-{**************************************************}
+{****************************************************}
 function TALJSONNodeA.GetChildNodes: TALJSONNodeListA;
 begin
   Result := nil; // hide warning
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType)
 end;
 
-{****************************************************************}
+{******************************************************************}
 procedure TALJSONNodeA.SetChildNodes(const Value: TALJSONNodeListA);
 begin
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType)
 end;
 
-{*************************************************************************}
+{***************************************************************************}
 function TALJSONNodeA.GetChildNode(const nodeName: ansiString): TALJSONNodeA;
 begin
   result := ChildNodes.findNode(nodeName);
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueText(const nodeName: ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
 begin
@@ -4879,7 +4931,7 @@ begin
   else result := LNode.GetText(default);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueFloat(const nodeName: ansiString; const default: Double): Double;
 var LNode: TALJSONNodeA;
 begin
@@ -4888,7 +4940,7 @@ begin
   else result := LNode.GetFloat(default);
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueDateTime(const nodeName: ansiString; const default: TDateTime): TDateTime;
 var LNode: TALJSONNodeA;
 begin
@@ -4897,7 +4949,7 @@ begin
   else result := LNode.GetDateTime(default);
 end;
 
-{*****************************************************************************************************************************}
+{******************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueTimestamp(const nodeName: ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
 var LNode: TALJSONNodeA;
 begin
@@ -4906,7 +4958,7 @@ begin
   else result := LNode.GetTimestamp(default);
 end;
 
-{****************************************************************************************************************}
+{********************************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueObjectID(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
 begin
@@ -4915,7 +4967,7 @@ begin
   else result := LNode.GetObjectID(default);
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueInt32(const nodeName: ansiString; const default: Integer): Integer;
 var LNode: TALJSONNodeA;
 begin
@@ -4924,7 +4976,7 @@ begin
   else result := LNode.GetInt32(default);
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueInt64(const nodeName: ansiString; const default: Int64): Int64;
 var LNode: TALJSONNodeA;
 begin
@@ -4933,7 +4985,7 @@ begin
   else result := LNode.GetInt64(default);
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueBool(const nodeName: ansiString; const default: Boolean): Boolean;
 var LNode: TALJSONNodeA;
 begin
@@ -4942,7 +4994,7 @@ begin
   else result := LNode.GetBool(default);
 end;
 
-{******************************************************************************************************************}
+{*******************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueJavascript(const nodeName: ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
 begin
@@ -4951,7 +5003,7 @@ begin
   else result := LNode.GetJavascript(default);
 end;
 
-{*************************************************************************************************************}
+{**************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueRegEx(const nodeName: ansiString; const default: ansiString): ansiString;
 var LNode: TALJSONNodeA;
 begin
@@ -4960,7 +5012,7 @@ begin
   else result := LNode.GetRegEx(default);
 end;
 
-{**************************************************************************************************************************************}
+{***************************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueRegExOptions(const nodeName: ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 var LNode: TALJSONNodeA;
 begin
@@ -4969,7 +5021,7 @@ begin
   else result := LNode.GetRegExOptions(default);
 end;
 
-{**************************************************************************************************************}
+{******************************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueBinary(const nodeName: ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
 begin
@@ -4978,7 +5030,7 @@ begin
   else result := LNode.GetBinary(default);
 end;
 
-{*********************************************************************************************************}
+{**********************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueBinarySubType(const nodeName: ansiString; const default: byte): byte;
 var LNode: TALJSONNodeA;
 begin
@@ -4987,7 +5039,7 @@ begin
   else result := LNode.GetBinarySubType(default);
 end;
 
-{******************************************************************************}
+{*******************************************************************************}
 function TALJSONNodeA.GetChildNodeValueNull(const nodeName: ansiString): Boolean;
 var LNode: TALJSONNodeA;
 begin
@@ -4996,7 +5048,7 @@ begin
   else result := LNode.GetNull;
 end;
 
-{******************************************************************************}
+{********************************************************************************}
 function TALJSONNodeA.GetChildNode(const path: array of ansiString): TALJSONNodeA;
 var I: integer;
 begin
@@ -5007,7 +5059,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************************************}
+{******************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueText(const path: array of ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5025,7 +5077,7 @@ begin
   else result := LNode.GetText(default);
 end;
 
-{**********************************************************************************************************}
+{***********************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueFloat(const path: array of ansiString; const default: Double): Double;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5043,7 +5095,7 @@ begin
   else result := LNode.GetFloat(default);
 end;
 
-{*******************************************************************************************************************}
+{********************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueDateTime(const path: array of ansiString; const default: TDateTime): TDateTime;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5061,7 +5113,7 @@ begin
   else result := LNode.GetDateTime(default);
 end;
 
-{**********************************************************************************************************************************}
+{***********************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueTimestamp(const path: array of ansiString; const default: TALBSONTimestamp): TALBSONTimestamp;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5079,7 +5131,7 @@ begin
   else result := LNode.GetTimestamp(default);
 end;
 
-{*********************************************************************************************************************}
+{*************************************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueObjectID(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5097,7 +5149,7 @@ begin
   else result := LNode.GetObjectID(default);
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueInt32(const path: array of ansiString; const default: Integer): Integer;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5133,7 +5185,7 @@ begin
   else result := LNode.GetInt64(default);
 end;
 
-{***********************************************************************************************************}
+{************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueBool(const path: array of ansiString; const default: Boolean): Boolean;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5151,7 +5203,7 @@ begin
   else result := LNode.GetBool(default);
 end;
 
-{***********************************************************************************************************************}
+{************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueJavascript(const path: array of ansiString; const default: AnsiString): AnsiString;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5169,7 +5221,7 @@ begin
   else result := LNode.GetJavascript(default);
 end;
 
-{******************************************************************************************************************}
+{*******************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueRegEx(const path: array of ansiString; const default: ansiString): ansiString;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5187,7 +5239,7 @@ begin
   else result := LNode.GetRegEx(default);
 end;
 
-{*******************************************************************************************************************************************}
+{********************************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueRegExOptions(const path: array of ansiString; const default: TALPerlRegExOptions): TALPerlRegExOptions;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5205,7 +5257,7 @@ begin
   else result := LNode.GetRegExOptions(default);
 end;
 
-{*******************************************************************************************************************}
+{***********************************************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueBinary(const path: array of ansiString; const default: AnsiString): AnsiString;  // return a "byte" string
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5223,7 +5275,7 @@ begin
   else result := LNode.GetBinary(default);
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueBinarySubType(const path: array of ansiString; const default: byte): byte;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5241,7 +5293,7 @@ begin
   else result := LNode.GetBinarySubType(default);
 end;
 
-{***********************************************************************************}
+{************************************************************************************}
 function TALJSONNodeA.GetChildNodeValueNull(const path: array of ansiString): Boolean;
 var LNode: TALJSONNodeA;
     I: integer;
@@ -5259,7 +5311,7 @@ begin
   else result := LNode.GetNull;
 end;
 
-{***********************************************************************************************}
+{************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueText(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
@@ -5268,7 +5320,7 @@ begin
   else LNode.SetText(value);
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueFloat(const nodeName: ansiString; const value: Double);
 var LNode: TALJSONNodeA;
 begin
@@ -5277,7 +5329,7 @@ begin
   else LNode.SetFloat(value);
 end;
 
-{**************************************************************************************************}
+{***************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueDateTime(const nodeName: ansiString; const value: TDateTime);
 var LNode: TALJSONNodeA;
 begin
@@ -5286,7 +5338,7 @@ begin
   else LNode.SetDateTime(value);
 end;
 
-{**********************************************************************************************************}
+{***********************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueTimestamp(const nodeName: ansiString; const value: TALBSONTimestamp);
 var LNode: TALJSONNodeA;
 begin
@@ -5295,7 +5347,7 @@ begin
   else LNode.SetTimestamp(value);
 end;
 
-{***************************************************************************************************}
+{****************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueObjectID(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
@@ -5304,7 +5356,7 @@ begin
   else LNode.SetObjectID(value);
 end;
 
-{*********************************************************************************************}
+{**********************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueInt32(const nodeName: ansiString; const value: Integer);
 var LNode: TALJSONNodeA;
 begin
@@ -5313,7 +5365,7 @@ begin
   else LNode.SetInt32(value);
 end;
 
-{*******************************************************************************************}
+{********************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueInt64(const nodeName: ansiString; const value: Int64);
 var LNode: TALJSONNodeA;
 begin
@@ -5322,7 +5374,7 @@ begin
   else LNode.SetInt64(value);
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueBool(const nodeName: ansiString; const value: Boolean);
 var LNode: TALJSONNodeA;
 begin
@@ -5331,7 +5383,7 @@ begin
   else LNode.SetBool(value);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueJavascript(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
@@ -5340,7 +5392,7 @@ begin
   else LNode.SetJavascript(value);
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueRegEx(const nodeName: ansiString; const value: ansiString);
 var LNode: TALJSONNodeA;
 begin
@@ -5349,7 +5401,7 @@ begin
   else LNode.SetRegEx(value);
 end;
 
-{****************************************************************************************************************}
+{*****************************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueRegExOptions(const nodeName: ansiString; const value: TALPerlRegExOptions);
 var LNode: TALJSONNodeA;
 begin
@@ -5358,7 +5410,7 @@ begin
   else LNode.SetRegExOptions(value);
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueBinary(const nodeName: ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
 begin
@@ -5367,7 +5419,7 @@ begin
   else LNode.SetBinary(value);
 end;
 
-{**************************************************************************************************}
+{***************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueBinarySubType(const nodeName: ansiString; const value: byte);
 var LNode: TALJSONNodeA;
 begin
@@ -5376,7 +5428,7 @@ begin
   else LNode.SetBinarySubType(value);
 end;
 
-{**********************************************************************}
+{***********************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueNull(const nodeName: ansiString);
 var LNode: TALJSONNodeA;
 begin
@@ -5385,7 +5437,7 @@ begin
   else LNode.SetNull(true);
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueText(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5402,7 +5454,7 @@ begin
   else LTmpNode.SetText(value);
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueFloat(const path: array of ansiString; const value: Double);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5419,7 +5471,7 @@ begin
   else LTmpNode.SetFloat(value);
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueDateTime(const path: array of ansiString; const value: TDateTime);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5436,7 +5488,7 @@ begin
   else LTmpNode.SetDateTime(value);
 end;
 
-{***************************************************************************************************************}
+{****************************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueTimestamp(const path: array of ansiString; const value: TALBSONTimestamp);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5453,7 +5505,7 @@ begin
   else LTmpNode.SetTimestamp(value);
 end;
 
-{********************************************************************************************************}
+{*********************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueObjectID(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5470,7 +5522,7 @@ begin
   else LTmpNode.SetObjectID(value);
 end;
 
-{**************************************************************************************************}
+{***************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueInt32(const path: array of ansiString; const value: Integer);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5487,7 +5539,7 @@ begin
   else LTmpNode.SetInt32(value);
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueInt64(const path: array of ansiString; const value: Int64);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5504,7 +5556,7 @@ begin
   else LTmpNode.SetInt64(value);
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueBool(const path: array of ansiString; const value: Boolean);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5521,7 +5573,7 @@ begin
   else LTmpNode.SetBool(value);
 end;
 
-{**********************************************************************************************************}
+{***********************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueJavascript(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5538,7 +5590,7 @@ begin
   else LTmpNode.SetJavascript(value);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueRegEx(const path: array of ansiString; const value: ansiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5555,7 +5607,7 @@ begin
   else LTmpNode.SetRegEx(value);
 end;
 
-{*********************************************************************************************************************}
+{**********************************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueRegExOptions(const path: array of ansiString; const value: TALPerlRegExOptions);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5572,7 +5624,7 @@ begin
   else LTmpNode.SetRegExOptions(value);
 end;
 
-{******************************************************************************************************}
+{*******************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueBinary(const path: array of ansiString; const value: AnsiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5589,7 +5641,7 @@ begin
   else LTmpNode.SetBinary(value);
 end;
 
-{*******************************************************************************************************}
+{********************************************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueBinarySubType(const path: array of ansiString; const value: byte);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5606,7 +5658,7 @@ begin
   else LTmpNode.SetBinarySubType(value);
 end;
 
-{***************************************************************************}
+{****************************************************************************}
 procedure TALJSONNodeA.SetChildNodeValueNull(const path: array of ansiString);
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -5632,39 +5684,39 @@ begin
   Result := assigned(LNodeList) and (LNodeList.Count > 0);
 end;
 
-{***********************************************}
+{************************************************}
 function TALJSONNodeA.GetNodeValueStr: ansiString;
 begin
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
   result := ''; // hide warning
 end;
 
-{********************************************}
+{*********************************************}
 function TALJSONNodeA.GetNodeValueInt64: int64;
 begin
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
   result := 0; // hide warning
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALJSONNodeA.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************}
 procedure TALJSONNodeA.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
 end;
 
-{*****************************************************************************************************************************}
+{******************************************************************************************************************************}
 procedure TALJSONNodeA.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
   AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
 end;
 
-{************************************************************}
+{*************************************************************}
 procedure TALJSONNodeA.SetNodeName(const NodeName: AnsiString);
 begin
   if fNodeName <> NodeName then begin
@@ -5713,7 +5765,7 @@ begin
 
 end;
 
-{******************************************************************}
+{*******************************************************************}
 function TALJSONNodeA.GetText(const default: AnsiString): AnsiString;
 begin
   if NodeSubType = nstNull then result := default
@@ -5735,36 +5787,42 @@ end;
 // used when saving the json document.
 function TALJSONNodeA.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolean = False): AnsiString;
 
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetObjectID;
   begin
     if SkipNodeSubTypeHelper then result := '"'+ALBinToHexA(ObjectID)+'"'
     else result := 'ObjectId("'+ALBinToHexA(ObjectID)+'")';
   end;
 
+  {~~~~~~~~~~~~~~~~~~~}
   procedure _GetBinary;
   begin
     if SkipNodeSubTypeHelper then result := '"'+ALBase64EncodeString(Binary)+'"'
     else result := 'BinData('+ALIntToStrA(BinarySubType)+', "'+ALBase64EncodeString(Binary)+'")';
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetDateTime;
   begin
     if SkipNodeSubTypeHelper then result := ALFormatDateTimeA('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsA)
     else result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsA)
   end;
 
+  {~~~~~~~~~~~~~~~~~~}
   procedure _Getint32;
   begin
     if SkipNodeSubTypeHelper then result := text
     else result := 'NumberInt(' + text + ')'
   end;
 
+  {~~~~~~~~~~~~~~~~~~}
   procedure _Getint64;
   begin
     if SkipNodeSubTypeHelper then result := text
     else result := 'NumberLong(' + text + ')';
   end;
 
+  {~~~~~~~~~~~~~~~~~~}
   procedure _GetRegEx;
   var LRegExOptions: TALPerlRegExOptions;
       LRegExOptionsStr: ansiString;
@@ -5781,6 +5839,7 @@ function TALJSONNodeA.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
     if not SkipNodeSubTypeHelper then result := '"' + ALJavascriptEncode(result) + '"';
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetTimestamp;
   begin
     if SkipNodeSubTypeHelper then result := '"Timestamp('+ALIntToStrA(GetTimeStamp.W1)+', '+ALIntToStrA(GetTimeStamp.W2)+')"'
@@ -5809,7 +5868,7 @@ begin
 
 end;
 
-{************************************}
+{*************************************}
 function TALJSONNodeA.GetFloat: Double;
 begin
   case NodeSubType of
@@ -5823,20 +5882,20 @@ begin
   end;
 end;
 
-{***********************************************************}
+{************************************************************}
 function TALJSONNodeA.GetFloat(const default: Double): Double;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetFloat;
 end;
 
-{**************************************************}
+{***************************************************}
 procedure TALJSONNodeA.SetFloat(const Value: Double);
 begin
   setNodeValue(PInt64(@Value)^, nstFloat);
 end;
 
-{******************************************}
+{*******************************************}
 function TALJSONNodeA.GetDateTime: TDateTime;
 begin
   if NodeSubType = nstDateTime then PInt64(@result)^ := GetNodeValueInt64
@@ -5846,20 +5905,20 @@ begin
   end;
 end;
 
-{********************************************************************}
+{*********************************************************************}
 function TALJSONNodeA.GetDateTime(const default: TDateTime): TDateTime;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetDateTime;
 end;
 
-{********************************************************}
+{*********************************************************}
 procedure TALJSONNodeA.SetDateTime(const Value: TDateTime);
 begin
   setNodeValue(PInt64(@Value)^, nstDateTime);
 end;
 
-{**************************************************}
+{***************************************************}
 function TALJSONNodeA.GetTimestamp: TALBSONTimestamp;
 begin
   if NodeSubType = nstTimestamp then result.I64 := GetNodeValueInt64
@@ -5869,20 +5928,20 @@ begin
   end;
 end;
 
-{***********************************************************************************}
+{************************************************************************************}
 function TALJSONNodeA.GetTimestamp(const default: TALBSONTimestamp): TALBSONTimestamp;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetTimestamp;
 end;
 
-{***************************************************************}
+{*****************************************************************}
 procedure TALJSONNodeA.SetTimestamp(const Value: TALBSONTimestamp);
 begin
   setNodeValue(Value.I64, nstTimestamp);
 end;
 
-{*******************************************}
+{********************************************}
 function TALJSONNodeA.GetObjectID: ansiString;
 begin
   if NodeSubType = nstObjectID then result := GetNodeValueStr
@@ -5892,21 +5951,21 @@ begin
   end;
 end;
 
-{**********************************************************************}
+{***********************************************************************}
 function TALJSONNodeA.GetObjectID(const default: AnsiString): AnsiString;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetObjectID;
 end;
 
-{*********************************************************}
+{**********************************************************}
 procedure TALJSONNodeA.SetObjectID(const Value: AnsiString);
 begin
   if length(Value) <> 12 {div sizeof(ansiChar)} then AlJSONDocErrorA('ObjectID must have 12 bytes');
   setNodeValue(Value, nstObjectID);
 end;
 
-{*************************************}
+{**************************************}
 function TALJSONNodeA.GetInt32: Integer;
 var LDouble: Double;
     LInt64: system.int64;
@@ -5937,20 +5996,20 @@ begin
   end;
 end;
 
-{*************************************************************}
+{**************************************************************}
 function TALJSONNodeA.GetInt32(const default: Integer): Integer;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetInt32;
 end;
 
-{***************************************************}
+{****************************************************}
 procedure TALJSONNodeA.SetInt32(const Value: Integer);
 begin
   setNodeValue(Value, nstInt32);
 end;
 
-{***********************************}
+{************************************}
 function TALJSONNodeA.GetInt64: Int64;
 var LDouble: Double;
 begin
@@ -5972,20 +6031,20 @@ begin
   end;
 end;
 
-{*********************************************************}
+{**********************************************************}
 function TALJSONNodeA.GetInt64(const default: Int64): Int64;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetInt64;
 end;
 
-{*************************************************}
+{**************************************************}
 procedure TALJSONNodeA.SetInt64(const Value: Int64);
 begin
   setNodeValue(Value, nstInt64);
 end;
 
-{************************************}
+{*************************************}
 function TALJSONNodeA.GetBool: Boolean;
 begin
   if NodeSubType = nstBoolean then begin
@@ -5998,34 +6057,34 @@ begin
   end;
 end;
 
-{************************************************************}
+{*************************************************************}
 function TALJSONNodeA.GetBool(const default: Boolean): Boolean;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetBool;
 end;
 
-{**************************************************}
+{***************************************************}
 procedure TALJSONNodeA.SetBool(const Value: Boolean);
 begin
   if Value then setNodeValue(1, nstBoolean)
   else setNodeValue(0, nstBoolean);
 end;
 
-{************************************}
+{*************************************}
 function TALJSONNodeA.GetNull: Boolean;
 begin
   result := NodeSubType = nstNull;
 end;
 
-{**************************************************}
+{***************************************************}
 procedure TALJSONNodeA.SetNull(const Value: Boolean);
 begin
   if Value then setNodeValue(0, nstNull)
   else AlJSONDocErrorA('Only "true" is allowed for setNull property');
 end;
 
-{*********************************************}
+{**********************************************}
 function TALJSONNodeA.GetJavascript: AnsiString;
 begin
   if NodeSubType = nstJavascript then result := GetNodeValueStr
@@ -6035,20 +6094,20 @@ begin
   end;
 end;
 
-{************************************************************************}
+{*************************************************************************}
 function TALJSONNodeA.GetJavascript(const default: AnsiString): AnsiString;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetJavascript;
 end;
 
-{***********************************************************}
+{************************************************************}
 procedure TALJSONNodeA.SetJavascript(const Value: AnsiString);
 begin
   setNodeValue(Value, nstJavascript);
 end;
 
-{****************************************}
+{*****************************************}
 function TALJSONNodeA.GetRegEx: ansiString;
 begin
   if NodeSubType = nstRegEx then result := GetNodeValueStr
@@ -6058,26 +6117,26 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{********************************************************************}
 function TALJSONNodeA.GetRegEx(const default: ansiString): ansiString;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetRegEx;
 end;
 
-{********************************************************}
+{*********************************************************}
 procedure TALJSONNodeA.SetRegEx(const Pattern: ansiString);
 begin
   setNodeValue(Pattern, 0, nstRegEx);
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************}
 procedure TALJSONNodeA.SetRegEx(const Pattern: ansiString; const Options: TALPerlRegExOptions);
 begin
   setNodeValue(Pattern, byte(Options), nstRegEx);
 end;
 
-{********************************************************}
+{*********************************************************}
 function TALJSONNodeA.GetRegExOptions: TALPerlRegExOptions;
 begin
   if NodeSubType = nstRegEx then result := TALPerlRegExOptions(byte(GetNodeValueInt64))
@@ -6087,21 +6146,21 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+{*********************************************************************************************}
 function TALJSONNodeA.GetRegExOptions(const default: TALPerlRegExOptions): TALPerlRegExOptions;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetRegExOptions;
 end;
 
-{**********************************************************************}
+{***********************************************************************}
 procedure TALJSONNodeA.SetRegExOptions(const Value: TALPerlRegExOptions);
 begin
   if NodeSubType <> nstRegEx then AlJSONDocErrorA('You can set regex options only to a regex node');
   setNodeValue(byte(Value), nstRegEx);
 end;
 
-{*****************************************}
+{******************************************}
 function TALJSONNodeA.GetBinary: AnsiString;
 begin
   if NodeSubType = nstBinary then result := GetNodeValueStr
@@ -6111,26 +6170,26 @@ begin
   end;
 end;
 
-{********************************************************************}
+{*********************************************************************}
 function TALJSONNodeA.GetBinary(const default: AnsiString): AnsiString;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetBinary;
 end;
 
-{******************************************************}
+{*******************************************************}
 procedure TALJSONNodeA.SetBinary(const Data: AnsiString);
 begin
   setNodeValue(Data, 0, nstBinary); // 0 = Default BSON type
 end;
 
-{***************************************************************************}
+{****************************************************************************}
 procedure TALJSONNodeA.SetBinary(const Data: AnsiString; const Subtype: byte);
 begin
   setNodeValue(Data, Subtype, nstBinary);
 end;
 
-{******************************************}
+{*******************************************}
 function TALJSONNodeA.GetBinarySubType: byte;
 begin
   if NodeSubType = nstBinary then result := byte(GetNodeValueInt64)
@@ -6140,14 +6199,14 @@ begin
   end;
 end;
 
-{***************************************************************}
+{****************************************************************}
 function TALJSONNodeA.GetBinarySubType(const default: byte): byte;
 begin
   if NodeSubType = nstNull then result := default
   else result := GetBinarySubType;
 end;
 
-{**********************************************************}
+{***********************************************************}
 procedure TALJSONNodeA.SetBinarySubType(const Subtype: byte);
 begin
   if NodeSubType <> nstBinary then AlJSONDocErrorA('You can set binary subtype only to a binary node');
@@ -6161,7 +6220,7 @@ begin
   Result := FDocument;
 end;
 
-{*******************************************************************}
+{*********************************************************************}
 procedure TALJSONNodeA.SetOwnerDocument(const Value: TALJSONDocumentA);
 var I: Integer;
     LNodeList: TALJSONNodeListA;
@@ -6242,7 +6301,7 @@ begin
   end;
 end;
 
-{*********************************************************}
+{**********************************************************}
 constructor TALJSONNodeA.Create(const NodeName: AnsiString);
 Begin
   FDocument := nil;
@@ -6300,7 +6359,7 @@ begin
   end;
 end;
 
-{******************************************************************************************************************************************}
+{********************************************************************************************************************************************}
 function TALJSONNodeA.AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA;
 begin
   Result := ALCreateJSONNodeA(NodeName,NodeType);
@@ -6312,7 +6371,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************************************************}
+{*************************************************************************************************************************************************}
 function TALJSONNodeA.AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA;
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -6327,13 +6386,13 @@ begin
   result := LNode.addChild(path[high(path)], NodeType, Index);
 end;
 
-{**************************************************************************************************************}
+{****************************************************************************************************************}
 function TALJSONNodeA.AddChild(const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA;
 begin
   Result := AddChild('', NodeType, Index);
 end;
 
-{********************************************************************}
+{*********************************************************************}
 function TALJSONNodeA.DeleteChild(const NodeName: AnsiString): boolean;
 var I: integer;
 begin
@@ -6345,7 +6404,7 @@ begin
   else result := False;
 end;
 
-{*************************************************************************}
+{**************************************************************************}
 function TALJSONNodeA.DeleteChild(const Path: array of AnsiString): boolean;
 var LNode: TALJSONNodeA;
     LTmpNode: TALJSONNodeA;
@@ -6385,9 +6444,10 @@ begin
   else Result := nil;
 end;
 
-{*****************************************************}
-procedure TALJSONNodeA.SaveToJson(const Stream: TStream;
-                                 Var buffer: ansiString);
+{********************************}
+procedure TALJSONNodeA.SaveToJson(
+            const Stream: TStream;
+            Var buffer: ansiString);
 
 Const BufferSize: integer = 8192;
 
@@ -6432,7 +6492,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     _Write2Buffer(pointer(str)^,L);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteTextNode2Buffer(aTextNode:TALJSONNodeA);
   Begin
     with aTextNode do begin
@@ -6476,7 +6536,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStartObjectNode2Buffer(aObjectNode:TALJSONNodeA);
   var LNodeList: TALJSONNodeListA;
       LEmptyNode: Boolean;
@@ -6524,7 +6584,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteEndObjectNode2Buffer(aObjectNode:TALJSONNodeA);
   Begin
     if AutoIndentNode then begin
@@ -6535,7 +6595,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     _WriteStr2Buffer('}');
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStartArrayNode2Buffer(aArrayNode:TALJSONNodeA);
   var LNodeList: TALJSONNodeListA;
       LEmptyNode: Boolean;
@@ -6583,7 +6643,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteEndArrayNode2Buffer(aArrayNode:TALJSONNodeA);
   Begin
     if AutoIndentNode then begin
@@ -6688,7 +6748,7 @@ begin
   end;
 end;
 
-{***************************************************************}
+{****************************************************************}
 procedure TALJSONNodeA.SaveToJSONFile(const FileName: AnsiString);
 begin
   SaveToJSONFile(String(FileName));
@@ -6704,9 +6764,10 @@ begin
   SaveToJson(nil, Str);
 end;
 
-{*****************************************************}
-procedure TALJSONNodeA.SaveToBson(const Stream: TStream;
-                                 Var buffer: ansiString);
+{********************************}
+procedure TALJSONNodeA.SaveToBson(
+            const Stream: TStream;
+            Var buffer: ansiString);
 
 Const BufferSize: integer = 8192;
 
@@ -6740,13 +6801,13 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     if BufferPos >= 32768 then _WriteBuffer2Stream(Buffer,BufferPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStr2Buffer(const str:AnsiString); overload;
   Begin
     _Write2Buffer(pointer(str)^,length(Str));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStr2Buffer(const index:integer); overload;
   Begin
     _WriteStr2Buffer(ALIntToStrA(index));
@@ -6888,7 +6949,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     _Write2Buffer(LInt64, sizeOf(LInt64));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteTextNode2Buffer(aTextNode:TALJSONNodeA; aNodeIndex: integer);
   Begin
     with aTextNode do begin
@@ -6948,7 +7009,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStartObjectNode2Buffer(aObjectNode:TALJSONNodeA; aNodeIndex: integer);
   var LNodeList: TALJSONNodeListA;
       LEmptyNode: Boolean;
@@ -6997,14 +7058,14 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteEndObjectNode2Buffer(aObjectNode:TALJSONNodeA; aNodeStartPos: system.Int64);
   Begin
     _WriteStr2Buffer(#$00);
     _WriteInt2Pos(StreamPos + BufferPos - aNodeStartPos, aNodeStartPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStartArrayNode2Buffer(aArrayNode:TALJSONNodeA; aNodeIndex: integer);
   var LNodeList: TALJSONNodeListA;
       LEmptyNode: Boolean;
@@ -7052,7 +7113,7 @@ Var NodeStack: Tstack<TALJSONNodeA>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteEndArrayNode2Buffer(aArrayNode:TALJSONNodeA; aNodeStartPos: system.Int64);
   Begin
     _WriteStr2Buffer(#$00);
@@ -7114,14 +7175,14 @@ begin
   end;
 end;
 
-{************************************************************}
+{*************************************************************}
 procedure TALJSONNodeA.SaveToBsonStream(const Stream: TStream);
 var buffer: ansiString;
 begin
   SaveToBson(Stream, buffer);
 end;
 
-{***********************************************************}
+{************************************************************}
 procedure TALJSONNodeA.SaveToBsonFile(const FileName: String);
 Var LfileStream: TfileStream;
     LTmpFilename: String;
@@ -7150,19 +7211,19 @@ begin
   end;
 end;
 
-{***************************************************************}
+{****************************************************************}
 procedure TALJSONNodeA.SaveToBsonFile(const FileName: AnsiString);
 begin
   SaveToBsonFile(String(FileName));
 end;
 
-{**********************************************************}
+{***********************************************************}
 procedure TALJSONNodeA.SaveToBsonString(var str: AnsiString);
 begin
   SaveToBson(nil, Str);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.LoadFromJSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
 Begin
   If NodeType <> ntObject then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
@@ -7175,7 +7236,7 @@ Begin
   end;
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.LoadFromJSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
 Begin
   If NodeType <> ntObject then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
@@ -7188,7 +7249,7 @@ Begin
   end;
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALJSONNodeA.LoadFromJSONFile(const FileName: String; Const ClearChildNodes: Boolean = True);
 Var LfileStream: TfileStream;
 Begin
@@ -7200,13 +7261,13 @@ Begin
   end;
 end;
 
-{********************************************************************************************************}
+{*********************************************************************************************************}
 procedure TALJSONNodeA.LoadFromJSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
 Begin
   LoadFromJSONFile(String(FileName), ClearChildNodes);
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.LoadFromBSONString(const Str: AnsiString; Const ClearChildNodes: Boolean = True);
 Begin
   If NodeType <> ntObject then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
@@ -7219,7 +7280,7 @@ Begin
   end;
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONNodeA.LoadFromBSONStream(const Stream: TStream; Const ClearChildNodes: Boolean = True);
 Begin
   If NodeType <> ntObject then AlJSONDocErrorA(CALJsonOperationError,GetNodeType);
@@ -7232,7 +7293,7 @@ Begin
   end;
 end;
 
-{****************************************************************************************************}
+{*****************************************************************************************************}
 procedure TALJSONNodeA.LoadFromBSONFile(const FileName: String; Const ClearChildNodes: Boolean = True);
 Var LfileStream: TfileStream;
 Begin
@@ -7244,47 +7305,47 @@ Begin
   end;
 end;
 
-{********************************************************************************************************}
+{*********************************************************************************************************}
 procedure TALJSONNodeA.LoadFromBSONFile(const FileName: AnsiString; Const ClearChildNodes: Boolean = True);
 Begin
   LoadFromBSONFile(String(FileName), ClearChildNodes);
 end;
 
-{********************************************************************}
+{*********************************************************************}
 constructor TALJSONObjectNodeA.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
   FChildNodes := nil;
 end;
 
-{***********************************}
+{************************************}
 destructor TALJSONObjectNodeA.Destroy;
 begin
   If assigned(FChildNodes) then FreeAndNil(FchildNodes);
   inherited;
 end;
 
-{*******************************************************}
+{**********************************************************}
 function TALJSONObjectNodeA.GetChildNodes: TALJSONNodeListA;
 begin
   if not Assigned(FChildNodes) then SetChildNodes(CreateChildList);
   Result := FChildNodes;
 end;
 
-{*********************************************************************}
+{************************************************************************}
 procedure TALJSONObjectNodeA.SetChildNodes(const Value: TALJSONNodeListA);
 begin
   If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
 
-{******************************************************}
+{*******************************************************}
 function TALJSONObjectNodeA.GetNodeType: TALJSONNodeType;
 begin
   Result := NtObject;
 end;
 
-{************************************************************}
+{*************************************************************}
 function TALJSONObjectNodeA.GetNodeSubType: TALJSONNodeSubType;
 begin
   Result := NstObject;
@@ -7297,7 +7358,7 @@ begin
   Result := FChildNodes;
 end;
 
-{*******************************************************************}
+{********************************************************************}
 constructor TALJSONArrayNodeA.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
@@ -7311,27 +7372,27 @@ begin
   inherited;
 end;
 
-{*******************************************************}
+{*********************************************************}
 function TALJSONArrayNodeA.GetChildNodes: TALJSONNodeListA;
 begin
   if not Assigned(FChildNodes) then SetChildNodes(CreateChildList);
   Result := FChildNodes;
 end;
 
-{*********************************************************************}
+{***********************************************************************}
 procedure TALJSONArrayNodeA.SetChildNodes(const Value: TALJSONNodeListA);
 begin
   If Assigned(FChildNodes) then FreeAndNil(FchildNodes);
   FChildNodes := Value;
 end;
 
-{***************************************************}
+{******************************************************}
 function TALJSONArrayNodeA.GetNodeType: TALJSONNodeType;
 begin
   Result := NtArray;
 end;
 
-{***********************************************************}
+{************************************************************}
 function TALJSONArrayNodeA.GetNodeSubType: TALJSONNodeSubType;
 begin
   Result := NstArray;
@@ -7344,7 +7405,7 @@ begin
   Result := FChildNodes;
 end;
 
-{******************************************************************}
+{*******************************************************************}
 constructor TALJSONTextNodeA.Create(const NodeName: AnsiString = '');
 begin
   inherited create(NodeName);
@@ -7354,19 +7415,19 @@ begin
   fRawNodeValueDefined := [nvStr];
 end;
 
-{****************************************************}
+{*****************************************************}
 function TALJSONTextNodeA.GetNodeType: TALJSONNodeType;
 begin
   Result := NtText;
 end;
 
-{**********************************************************}
+{***********************************************************}
 function TALJSONTextNodeA.GetNodeSubType: TALJSONNodeSubType;
 begin
   Result := fNodeSubType;
 end;
 
-{***************************************************}
+{****************************************************}
 function TALJSONTextNodeA.GetNodeValueStr: ansiString;
 begin
   if nvStr in fRawNodeValueDefined then result := fRawNodeValueStr
@@ -7398,7 +7459,7 @@ begin
   end;
 end;
 
-{************************************************}
+{*************************************************}
 function TALJSONTextNodeA.GetNodeValueInt64: int64;
 var LDouble: Double;
     LBool: boolean;
@@ -7454,7 +7515,7 @@ begin
   end;
 end;
 
-{*****************************************************************************************************}
+{******************************************************************************************************}
 procedure TALJSONTextNodeA.SetNodeValue(const Value: AnsiString; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
@@ -7462,7 +7523,7 @@ begin
   fRawNodeValueDefined := [nvStr];
 end;
 
-{************************************************************************************************}
+{*************************************************************************************************}
 procedure TALJSONTextNodeA.SetNodeValue(const Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
@@ -7471,7 +7532,7 @@ begin
   else fRawNodeValueDefined := [nvInt64];
 end;
 
-{*********************************************************************************************************************************}
+{**********************************************************************************************************************************}
 procedure TALJSONTextNodeA.SetNodeValue(const StrValue: AnsiString; const Int64Value: int64; const NodeSubType: TALJSONNodeSubType);
 begin
   fNodeSubType := NodeSubType;
@@ -7480,7 +7541,7 @@ begin
   fRawNodeValueDefined := [nvStr, nvInt64];
 end;
 
-{*****************************************************}
+{*******************************************************}
 constructor TALJSONNodeListA.Create(Owner: TALJSONNodeA);
 begin
   FList:= nil;
@@ -7498,7 +7559,7 @@ begin
   end;
 end;
 
-{*********************************}
+{**********************************}
 destructor TALJSONNodeListA.Destroy;
 begin
   Clear;
@@ -7583,7 +7644,7 @@ begin
   else if not Find(Name, Result) then Result := -1;
 end;
 
-{******************************************************************************************************************************}
+{*******************************************************************************************************************************}
 function TALJSONNodeListA.IndexOfValue(const Value: ansiString; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
   if Direction = TDirection.FromBeginning then begin
@@ -7597,7 +7658,7 @@ begin
   Result := -1;
 end;
 
-{***************************************************************************************************************************}
+{****************************************************************************************************************************}
 function TALJSONNodeListA.IndexOfValue(const Value: integer; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
   if Direction = TDirection.FromBeginning then begin
@@ -7611,7 +7672,7 @@ begin
   Result := -1;
 end;
 
-{*************************************************************************************************************************}
+{**************************************************************************************************************************}
 function TALJSONNodeListA.IndexOfValue(const Value: int64; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
   if Direction = TDirection.FromBeginning then begin
@@ -7625,7 +7686,7 @@ begin
   Result := -1;
 end;
 
-{**************************************************************************************************************************}
+{***************************************************************************************************************************}
 function TALJSONNodeListA.IndexOfValue(const Value: Double; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
   if Direction = TDirection.FromBeginning then begin
@@ -7639,7 +7700,7 @@ begin
   Result := -1;
 end;
 
-{*****************************************************************************************************************************}
+{******************************************************************************************************************************}
 function TALJSONNodeListA.IndexOfValue(const Value: TDateTime; const Direction: TDirection = TDirection.FromBeginning): Integer;
 begin
   if Direction = TDirection.FromBeginning then begin
@@ -7737,13 +7798,13 @@ begin
   if not Assigned(Result) then AlJSONDocErrorA(CALJSONNodeNotFound, [Name]);
 end;
 
-{***************************************************************************}
+{****************************************************************************}
 function TALJSONNodeListA.CompareNodeNames(const S1, S2: AnsiString): Integer;
 begin
   Result := ALCompareStrA(S1, S2)
 end;
 
-{***************************************************************************************}
+{*****************************************************************************************}
 procedure TALJSONNodeListA.QuickSort(L, R: Integer; ACompare: TALJSONNodeListSortCompareA);
 var
   I, J, P: Integer;
@@ -7797,13 +7858,13 @@ begin
               List[Index2].NodeName);
 end;
 
-{*****************************}
+{******************************}
 procedure TALJSONNodeListA.Sort;
 begin
   CustomSort(ALJSONNodeListCompareNodeNameA);
 end;
 
-{************************************************************************}
+{**************************************************************************}
 procedure TALJSONNodeListA.CustomSort(Compare: TALJSONNodeListSortCompareA);
 begin
   if (not Sorted) and (FList <> nil) and (Count > 1) then
@@ -7831,7 +7892,7 @@ begin
   InternalInsert(Result, Node);
 end;
 
-{********************************************************************************}
+{**********************************************************************************}
 procedure TALJSONNodeListA.InternalInsert(Index: Integer; const Node: TALJSONNodeA);
 begin
   if FCount = FCapacity then Grow;
@@ -7874,9 +7935,10 @@ begin
   FList[Index] := nil; // to decrease the refcount of Node
   Dec(FCount);
   if Index < FCount then begin
-    ALMove(FList[Index + 1],
-           FList[Index],
-           (FCount - Index) * SizeOf(Pointer));
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
     Pointer(FList[FCount]) := nil;
   end;
   if assigned(Node) then FreeAndNil(Node);
@@ -7917,7 +7979,7 @@ begin
   if I >= 0 then result := Extract(i);
 end;
 
-{*********************************************************}
+{***********************************************************}
 procedure TALJSONNodeListA.Exchange(Index1, Index2: Integer);
 var Item: Pointer;
 begin
@@ -7966,7 +8028,7 @@ begin
   SetCapacity(0);
 end;
 
-{*****************************}
+{******************************}
 procedure TALJSONNodeListA.Grow;
 {$IF CompilerVersion <= 32}{tokyo}
 var Delta: Integer;
@@ -7982,7 +8044,7 @@ begin
   {$endif}
 end;
 
-{**********************************************************}
+{***********************************************************}
 procedure TALJSONNodeListA.SetCapacity(NewCapacity: Integer);
 begin
   if (NewCapacity < FCount) then AlJSONDocErrorA(CALJSONListCapacityError, [NewCapacity]);
@@ -7992,7 +8054,7 @@ begin
   end;
 end;
 
-{****************************************************************************}
+{*****************************************************************************}
 procedure TALJSONNodeListA.SetDuplicates(Value: TDuplicates; Recurse: Boolean);
 begin
   FDuplicates := Value;
@@ -8004,13 +8066,13 @@ begin
   end;
 end;
 
-{**********************************************************}
+{***********************************************************}
 procedure TALJSONNodeListA.SetDuplicates(Value: TDuplicates);
 begin
   SetDuplicates(Value, False);
 end;
 
-{********************************************************************}
+{*********************************************************************}
 procedure TALJSONNodeListA.SetSorted(Value: Boolean; Recurse: Boolean);
 begin
   if FSorted <> Value then
@@ -8029,13 +8091,13 @@ begin
   end;
 end;
 
-{**************************************************}
+{***************************************************}
 procedure TALJSONNodeListA.SetSorted(Value: Boolean);
 begin
   SetSorted(Value, False);
 end;
 
-{****************************************************}
+{*****************************************************}
 procedure TALJSONNodeListA.SetCount(NewCount: Integer);
 var I: Integer;
 begin
@@ -8046,14 +8108,15 @@ begin
   FCount := NewCount;
 end;
 
-{****************************************************}
-Procedure ALJSONToTStringsA(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettingsA;
-                           const aPath: AnsiString;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false');
+{**************************}
+Procedure ALJSONToTStringsA(
+            const AJsonStr: AnsiString;
+            const aFormatSettings: TALFormatSettingsA;
+            const aPath: AnsiString;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false');
 
 var LJsonDocument: TALJSONDocumentA;
     LContainChilds: boolean;
@@ -8097,13 +8160,14 @@ begin
   end;
 end;
 
-{****************************************************}
-Procedure ALJSONToTStringsA(const AJsonStr: AnsiString;
-                           const aFormatSettings: TALFormatSettingsA;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false');
+{**************************}
+Procedure ALJSONToTStringsA(
+            const AJsonStr: AnsiString;
+            const aFormatSettings: TALFormatSettingsA;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false');
 begin
   ALJSONToTStringsA(
     AJsonStr,
@@ -8115,13 +8179,14 @@ begin
     aFalseStr);
 end;
 
-{******************************************************}
-Procedure ALJSONToTStringsA(const aJsonNode: TALJSONNodeA;
-                           Const aPath: AnsiString;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false');
+{**************************}
+Procedure ALJSONToTStringsA(
+            const aJsonNode: TALJSONNodeA;
+            Const aPath: AnsiString;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false');
 var LTmpPath: AnsiString;
     I: integer;
 begin
@@ -8136,19 +8201,21 @@ begin
 
       case aJsonNode.ChildNodes[I].NodeType of
 
-        ntObject: ALJSONToTStringsA(aJsonNode.ChildNodes[I],
-                                   LTmpPath,
-                                   aLst,
-                                   aNullStr,
-                                   aTrueStr,
-                                   aFalseStr);
+        ntObject: ALJSONToTStringsA(
+                    aJsonNode.ChildNodes[I],
+                    LTmpPath,
+                    aLst,
+                    aNullStr,
+                    aTrueStr,
+                    aFalseStr);
 
-        ntArray: ALJSONToTStringsA(aJsonNode.ChildNodes[I],
-                                  LTmpPath,
-                                  aLst,
-                                  aNullStr,
-                                  aTrueStr,
-                                  aFalseStr);
+        ntArray: ALJSONToTStringsA(
+                   aJsonNode.ChildNodes[I],
+                   LTmpPath,
+                   aLst,
+                   aNullStr,
+                   aTrueStr,
+                   aFalseStr);
 
         ntText: begin
                   if (aJsonNode.ChildNodes[I].NodeSubType = nstBoolean) then   aLst.Add(LTmpPath + aLst.NameValueSeparator + ALBoolToStrA(aJsonNode.ChildNodes[I].Bool,aTrueStr,aFalseStr))
@@ -8167,27 +8234,30 @@ begin
   end;
 end;
 
-{******************************************************}
-Procedure ALJSONToTStringsA(const aJsonNode: TALJSONNodeA;
-                           const aLst: TALStringsA;
-                           Const aNullStr: AnsiString = 'null';
-                           Const aTrueStr: AnsiString = 'true';
-                           Const aFalseStr: AnsiString = 'false');
+{**************************}
+Procedure ALJSONToTStringsA(
+            const aJsonNode: TALJSONNodeA;
+            const aLst: TALStringsA;
+            Const aNullStr: AnsiString = 'null';
+            Const aTrueStr: AnsiString = 'true';
+            Const aFalseStr: AnsiString = 'false');
 begin
-  ALJSONToTStringsA(aJsonNode,
-                   '',
-                   aLst,
-                   aNullStr,
-                   aTrueStr,
-                   aFalseStr)
+  ALJSONToTStringsA(
+    aJsonNode,
+    '',
+    aLst,
+    aNullStr,
+    aTrueStr,
+    aFalseStr)
 end;
 
-{************************************************}
-procedure ALTStringsToJsonA(const aLst: TALStringsA;
-                           const aJsonNode: TALJSONNodeA;
-                           Const aPath: AnsiString = '';
-                           Const aNameToLowerCase: boolean = false;
-                           Const aNullStr: AnsiString = 'null');
+{**************************}
+procedure ALTStringsToJsonA(
+            const aLst: TALStringsA;
+            const aJsonNode: TALJSONNodeA;
+            Const aPath: AnsiString = '';
+            Const aNameToLowerCase: boolean = false;
+            Const aNullStr: AnsiString = 'null');
 
 var LIndex: Integer;
     LNames:  TALStringListA;
@@ -8225,17 +8295,20 @@ begin
         //   [3]
         //   translations
         //   usa
-        if (aPath <> '') then LNames.Text := ALStringReplaceA(ALStringReplaceA(aLst.Names[I],
-                                                                             aPath + '.',
-                                                                             '',
-                                                                             [rfIgnoreCase]),
-                                                             '[',
-                                                             '.[',
-                                                             [rfReplaceAll])
-        else LNames.Text := ALStringReplaceA(aLst.Names[I],
-                                            '[',
-                                            '.[',
-                                            [rfReplaceAll]);
+        if (aPath <> '') then LNames.Text := ALStringReplaceA(
+                                               ALStringReplaceA(
+                                                 aLst.Names[I],
+                                                 aPath + '.',
+                                                 '',
+                                                 [rfIgnoreCase]),
+                                               '[',
+                                               '.[',
+                                               [rfReplaceAll])
+        else LNames.Text := ALStringReplaceA(
+                              aLst.Names[I],
+                              '[',
+                              '.[',
+                              [rfReplaceAll]);
 
         //loop on all the name
         LCurrJsonNode := aJsonNode;
@@ -8287,11 +8360,12 @@ begin
 
 end;
 
-{*************************************************}
-Procedure ALJSONToXMLA(const aJSONNode: TALJSONNodeA;
-                      const aXMLNode: TALXmlNode;
-                      const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName
-                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
+{*********************}
+Procedure ALJSONToXMLA(
+            const aJSONNode: TALJSONNodeA;
+            const aXMLNode: TALXmlNode;
+            const aXMLElementNameForJSONArrayEntries: TALStringsA; // JSONArrayNodeName=XMLElementName
+            const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
 var LNodeName: AnsiString;
     I: integer;
 begin
@@ -8310,82 +8384,85 @@ begin
   end;
 end;
 
-{*************************************************}
-Procedure ALJSONToXMLA(const aJSONNode: TALJSONNodeA;
-                      const aXMLNode: TALXmlNode;
-                      const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
+{*********************}
+Procedure ALJSONToXMLA(
+            const aJSONNode: TALJSONNodeA;
+            const aXMLNode: TALXmlNode;
+            const aDefaultXMLElementNameForJSONArrayEntries: AnsiString = 'rec');
 begin
-  ALJSONToXMLA(aJSONNode,
-              aXMLNode,
-              nil,
-              aDefaultXMLElementNameForJSONArrayEntries);
+  ALJSONToXMLA(
+    aJSONNode,
+    aXMLNode,
+    nil,
+    aDefaultXMLElementNameForJSONArrayEntries);
 end;
 
-{********************************************************************************}
+{*********************************************************************************}
 function ALJsonEncodeFloatWithNodeSubTypeHelperA(const aValue: double): AnsiString;
 begin
   result := ALFloatToStrA(aValue, ALDefaultFormatSettingsA);
 end;
 
-{***********************************************************************************}
+{************************************************************************************}
 function ALJsonEncodeTextWithNodeSubTypeHelperA(const aValue: AnsiString): AnsiString;
 begin
   result := '"'+ALJavascriptEncode(aValue)+'"';
 end;
 
-{*************************************************************************************}
+{**************************************************************************************}
 function ALJsonEncodeBinaryWithNodeSubTypeHelperA(const aValue: AnsiString): AnsiString;
 begin
   result := 'BinData(0, "' + ALBase64EncodeString(aValue) + '")';
 end;
 
-{***************************************************************************************}
+{****************************************************************************************}
 function ALJsonEncodeObjectIDWithNodeSubTypeHelperA(const aValue: AnsiString): AnsiString;
 begin
   result := 'ObjectId("'+ALBinToHexA(aValue)+'")';
 end;
 
-{***********************************************************************************}
+{************************************************************************************}
 function ALJsonEncodeBooleanWithNodeSubTypeHelperA(const aValue: Boolean): AnsiString;
 begin
   if aValue then result := 'true'
   else result := 'false';
 end;
 
-{**************************************************************************************}
+{***************************************************************************************}
 function ALJsonEncodeDateTimeWithNodeSubTypeHelperA(const aValue: TdateTime): AnsiString;
 begin
   result := ALFormatDateTimeA('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', aValue, ALDefaultFormatSettingsA);
 end;
 
-{*****************************************************************************************}
+{******************************************************************************************}
 function ALJsonEncodeJavascriptWithNodeSubTypeHelperA(const aValue: AnsiString): AnsiString;
 begin
   result := aValue;
 end;
 
-{*******************************************************************************}
+{********************************************************************************}
 function ALJsonEncodeInt64WithNodeSubTypeHelperA(const aValue: int64): AnsiString;
 begin
   result := 'NumberLong(' + ALIntToStrA(aValue) + ')';
 end;
 
-{*******************************************************************************}
+{********************************************************************************}
 function ALJsonEncodeInt32WithNodeSubTypeHelperA(const aValue: int32): AnsiString;
 begin
   result := 'NumberInt(' + ALIntToStrA(aValue) + ')';
 end;
 
-{*********************************************************}
+{**********************************************************}
 function ALJsonEncodeNullWithNodeSubTypeHelperA: AnsiString;
 begin
   result := 'null';
 end;
 
-{******************************************************************}
-function ALJsonEncodeWithNodeSubTypeHelperA(const aValue: AnsiString;
-                                           const aNodeSubType: TALJSONNodeSubType;
-                                           const aFormatSettings: TALFormatSettingsA): AnsiString;
+{******************************************}
+function ALJsonEncodeWithNodeSubTypeHelperA(
+           const aValue: AnsiString;
+           const aNodeSubType: TALJSONNodeSubType;
+           const aFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   case aNodeSubType of
     nstFloat:      begin
@@ -8412,11 +8489,12 @@ begin
   end;
 end;
 
-{************************************************************************}
-Function ALFindJsonNodeByInt32ChildNodeValueW(const JsonNode:TALJSONNodeW;
-                                              Const ChildNodeName: String;
-                                              Const ChildNodeValue : Int32;
-                                              Const Recurse: Boolean = False): TALJSONNodeW;
+{********************************************}
+Function ALFindJsonNodeByInt32ChildNodeValueW(
+           const JsonNode:TALJSONNodeW;
+           Const ChildNodeName: String;
+           Const ChildNodeValue : Int32;
+           Const Recurse: Boolean = False): TALJSONNodeW;
 var I, J : integer;
 Begin
   result := nil;
@@ -8432,20 +8510,22 @@ Begin
       end;
     end;
     if Recurse then begin
-      result := ALFindJsonNodeByInt32ChildNodeValueW(JsonNode.ChildNodes[I],
-                                                     ChildNodeName,
-                                                     ChildNodeValue,
-                                                     Recurse);
+      result := ALFindJsonNodeByInt32ChildNodeValueW(
+                  JsonNode.ChildNodes[I],
+                  ChildNodeName,
+                  ChildNodeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
 end;
 
-{***********************************************************************}
-Function ALFindJsonNodeByTextChildNodeValueW(const JsonNode:TALJSONNodeW;
-                                             Const ChildNodeName: String;
-                                             Const ChildNodeValue : String;
-                                             Const Recurse: Boolean = False): TALJSONNodeW;
+{*******************************************}
+Function ALFindJsonNodeByTextChildNodeValueW(
+           const JsonNode:TALJSONNodeW;
+           Const ChildNodeName: String;
+           Const ChildNodeValue : String;
+           Const Recurse: Boolean = False): TALJSONNodeW;
 var I, J : integer;
 Begin
   result := nil;
@@ -8461,10 +8541,11 @@ Begin
       end;
     end;
     if Recurse then begin
-      result := ALFindJsonNodeByTextChildNodeValueW(JsonNode.ChildNodes[I],
-                                                    ChildNodeName,
-                                                    ChildNodeValue,
-                                                    Recurse);
+      result := ALFindJsonNodeByTextChildNodeValueW(
+                  JsonNode.ChildNodes[I],
+                  ChildNodeName,
+                  ChildNodeValue,
+                  Recurse);
       if assigned(Result) then break;
     end;
   end;
@@ -8930,19 +9011,19 @@ end;
   {$ZEROBASEDSTRINGS ON}
 {$IFEND}
 
-{*******************************************}
+{*****************************************************}
 procedure ALJSONDocErrorW(const Msg: String); overload;
 begin
   raise EALJSONDocError.Create(Msg);
 end;
 
-{***********************************************************************}
+{*********************************************************************************}
 procedure ALJSONDocErrorW(const Msg: String; const Args: array of const); overload;
 begin
   raise EALJSONDocError.CreateFmt(Msg, Args);
 end;
 
-{****************************************************************************}
+{**************************************************************************************}
 procedure ALJSONDocErrorW(const Msg: String; const NodeType: TalJsonNodeType); overload;
 begin
   case NodeType of
@@ -9009,7 +9090,7 @@ begin
   inherited;
 end;
 
-{************************************************************************************}
+{***********************************************************************************}
 procedure TALJSONDocumentW.MultiThreadPrepare(const aOnlyChildList: Boolean = False);
 begin
   node.MultiThreadPrepare(aOnlyChildList);
@@ -9067,8 +9148,9 @@ end;
  *The mime type for json files is 'application/json'}
 {$ZEROBASEDSTRINGS OFF}
 {$WARN WIDECHAR_REDUCED OFF}
-Procedure TALJSONDocumentW.ParseJSON(const Buffer: String;
-                                     const ContainerNode: TALJSONNodeW);
+Procedure TALJSONDocumentW.ParseJSON(
+            const Buffer: String;
+            const ContainerNode: TALJSONNodeW);
 
 Var BufferLength: Integer;
     BufferPos: Integer;
@@ -9117,27 +9199,30 @@ Var BufferLength: Integer;
     setlength(result,P-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithIndex(const index: integer;
-                                  const Args: array of const;
-                                  const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithIndex(
+              const index: integer;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     DoParseText(GetPathStr('[' + ALIntToStrW(index) + ']'), '', Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithName(const name: String;
-                                 const Args: array of const;
-                                 const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithName(
+              const name: String;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     DoParseText(GetPathStr(Name), Name, Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseText(const Index: integer;
-                         const Name: String;
-                         const Args: array of const;
-                         const NodeSubType: TALJSONNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseText(
+              const Index: integer;
+              const Name: String;
+              const Args: array of const;
+              const NodeSubType: TALJSONNodeSubType);
   begin
     if Assigned(fonParseText) then begin
       if notSaxMode then begin
@@ -10239,8 +10324,9 @@ end;
 
 {*************************************************************}
 {Last version of the spec: http://bsonspec.org/#/specification}
-procedure TALJSONDocumentW.ParseBSON(const Buffer: Tbytes;
-                                     const ContainerNode: TALJSONNodeW);
+procedure TALJSONDocumentW.ParseBSON(
+            const Buffer: Tbytes;
+            const ContainerNode: TALJSONNodeW);
 
 Var BufferLength: Integer;
     BufferPos: Integer;
@@ -10286,26 +10372,29 @@ Var BufferLength: Integer;
     setlength(result,P-1);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithIndex(const index: String;
-                                  const Args: array of const;
-                                  const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithIndex(
+              const index: String;
+              const Args: array of const;
+              const NodeSubType: TALJsonNodeSubType);
   begin
     DoParseText(GetPathStr('[' + index + ']'), '', Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseTextWithName(const name: String;
-                                 const Args: array of const;
-                                 const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseTextWithName(
+              const name: String;
+              const Args: array of const;
+              const NodeSubType: TALJsonNodeSubType);
   begin
     DoParseText(GetPathStr(Name), Name, Args, NodeSubType)
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DoParseText(const NameOrIndex: String;
-                         const Args: array of const;
-                         const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DoParseText(
+              const NameOrIndex: String;
+              const Args: array of const;
+              const NodeSubType: TALJsonNodeSubType);
   begin
     if Assigned(fonParseText) then begin
       if notSaxMode then begin
@@ -10372,9 +10461,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createInt64Node(const name: String;
-                             const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createInt64Node(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LInt64: Int64;
   begin
@@ -10400,9 +10490,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createInt32Node(const name: String;
-                             const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createInt32Node(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LInt32: Int32;
   begin
@@ -10428,9 +10519,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createTextNode(const name: String;
-                            const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createTextNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LInt32: Int32;
       LText: String;
@@ -10460,9 +10552,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createFloatNode(const name: String;
-                             const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createFloatNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LDouble: Double;
   begin
@@ -10488,9 +10581,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createBinaryNode(const name: String;
-                              const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createBinaryNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LInt32: Int32;
       LBinSubtype: byte;
@@ -10533,9 +10627,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createObjectIDNode(const name: String;
-                                const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createObjectIDNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LObjectID: Tbytes;
       LHexData: String;
@@ -10564,9 +10659,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createBooleanNode(const name: String;
-                               const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createBooleanNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LBool: Boolean;
   begin
@@ -10597,9 +10693,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createDateTimeNode(const name: String;
-                                const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createDateTimeNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LDateTime: TdateTime;
       LInt64: Int64;
@@ -10627,9 +10724,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createTimestampNode(const name: String;
-                                 const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createTimestampNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LTimestamp: TALBSONTimestamp;
       LInt64: Int64;
@@ -10657,9 +10755,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createnullNode(const name: String;
-                            const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createnullNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
   begin
     if NotSaxMode then begin
@@ -10680,9 +10779,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createRegExNode(const name: String;
-                             const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createRegExNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LRegEx: String;
       LRegExOptions: TALPerlRegExOptions;
@@ -10736,9 +10836,10 @@ Var BufferLength: Integer;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _createJavascriptNode(const name: String;
-                                  const NodeSubType: TALJsonNodeSubType);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _createJavascriptNode(
+              const name: String;
+              const NodeSubType: TALJsonNodeSubType);
   var LNode: TALJSONNodeW;
       LJavascript: String;
       LInt32: Int32;
@@ -11121,7 +11222,7 @@ begin
   end;
 end;
 
-{**************************************************************************************************************************************}
+{***************************************************************************************************************************************}
 procedure TALJSONDocumentW.LoadFromBSONBytes(const Bytes: Tbytes; const saxMode: Boolean = False; Const ClearChildNodes: Boolean = True);
 begin
   if saxMode then SetActive(False)
@@ -11314,7 +11415,7 @@ begin
   result := Node.GetChildNodeValueTimestamp(nodeName, default);
 end;
 
-{*********************************************************************************************************}
+{*********************************************************************************************************************************}
 function TALJSONDocumentW.GetChildNodeValueObjectID(const nodeName: String; const default: String): String;  // return a hex string
 begin
   result := Node.GetChildNodeValueObjectID(nodeName, default);
@@ -11356,7 +11457,7 @@ begin
   result := Node.GetChildNodeValueRegExOptions(nodeName, default);
 end;
 
-{*******************************************************************************************************}
+{*******************************************************************************************************************************************}
 function TALJSONDocumentW.GetChildNodeValueBinary(const nodeName: String; const default: String): String;   // return a base64 encoded string
 begin
   result := Node.GetChildNodeValueBinary(nodeName, default);
@@ -11404,7 +11505,7 @@ begin
   result := Node.GetChildNodeValueTimestamp(path, default);
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************************************}
 function TALJSONDocumentW.GetChildNodeValueObjectID(const path: array of String; const default: String): String;   // return a hex string
 begin
   result := Node.GetChildNodeValueObjectID(path, default);
@@ -11446,7 +11547,7 @@ begin
   result := Node.GetChildNodeValueRegExOptions(path, default);
 end;
 
-{************************************************************************************************************}
+{************************************************************************************************************************************************}
 function TALJSONDocumentW.GetChildNodeValueBinary(const path: array of String; const default: String): String;   // return a base64 encoded string
 begin
   result := Node.GetChildNodeValueBinary(path, default);
@@ -11853,7 +11954,7 @@ begin
   else result := LNode.GetTimestamp(default);
 end;
 
-{*****************************************************************************************************}
+{****************************************************************************************************************************}
 function TALJSONNodeW.GetChildNodeValueObjectID(const nodeName: String; const default: String): String; // return a hex string
 var LNode: TALJSONNodeW;
 begin
@@ -11916,7 +12017,7 @@ begin
   else result := LNode.GetRegExOptions(default);
 end;
 
-{***************************************************************************************************}
+{**************************************************************************************************************************************}
 function TALJSONNodeW.GetChildNodeValueBinary(const nodeName: String; const default: String): String;  // return a base64 encoded string
 var LNode: TALJSONNodeW;
 begin
@@ -12026,7 +12127,7 @@ begin
   else result := LNode.GetTimestamp(default);
 end;
 
-{**********************************************************************************************************}
+{*********************************************************************************************************************************}
 function TALJSONNodeW.GetChildNodeValueObjectID(const path: array of String; const default: String): String; // return a hex string
 var LNode: TALJSONNodeW;
     I: integer;
@@ -12152,7 +12253,7 @@ begin
   else result := LNode.GetRegExOptions(default);
 end;
 
-{********************************************************************************************************}
+{*******************************************************************************************************************************************}
 function TALJSONNodeW.GetChildNodeValueBinary(const path: array of String; const default: String): String;  // return a base64 encoded string
 var LNode: TALJSONNodeW;
     I: integer;
@@ -12682,36 +12783,42 @@ end;
 // used when saving the json document.
 function TALJSONNodeW.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boolean = False): String;
 
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetObjectID;
   begin
     if SkipNodeSubTypeHelper then result := '"'+ObjectID+'"'
     else result := 'ObjectId("'+ObjectID+'")';
   end;
 
+  {~~~~~~~~~~~~~~~~~~~}
   procedure _GetBinary;
   begin
     if SkipNodeSubTypeHelper then result := '"'+Binary+'"'
     else result := 'BinData('+ALIntToStrW(BinarySubType)+', "'+Binary+'")';
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetDateTime;
   begin
     if SkipNodeSubTypeHelper then result := ALFormatDateTimeW('''"''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z"''', DateTime, ALDefaultFormatSettingsW)
     else result := ALFormatDateTimeW('''ISODate("''yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z")''', DateTime, ALDefaultFormatSettingsW)
   end;
 
+  {~~~~~~~~~~~~~~~~~~}
   procedure _Getint32;
   begin
     if SkipNodeSubTypeHelper then result := text
     else result := 'NumberInt(' + text + ')'
   end;
 
+  {~~~~~~~~~~~~~~~~~~}
   procedure _Getint64;
   begin
     if SkipNodeSubTypeHelper then result := text
     else result := 'NumberLong(' + text + ')';
   end;
 
+  {~~~~~~~~~~~~~~~~~~}
   procedure _GetRegEx;
   var LRegExOptions: TALPerlRegExOptions;
       LRegExOptionsStr: String;
@@ -12728,6 +12835,7 @@ function TALJSONNodeW.GetNodeValueInterchange(const SkipNodeSubTypeHelper: boole
     if not SkipNodeSubTypeHelper then result := '"' + ALJavascriptEncode(result) + '"'
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~}
   procedure _GetTimestamp;
   begin
     if SkipNodeSubTypeHelper then result := '"Timestamp('+ALIntToStrW(GetTimeStamp.W1)+', '+ALIntToStrW(GetTimeStamp.W2)+')"'
@@ -13108,7 +13216,7 @@ begin
   Result := FDocument;
 end;
 
-{********************************************************************}
+{*********************************************************************}
 procedure TALJSONNodeW.SetOwnerDocument(const Value: TALJSONDocumentW);
 var I: Integer;
     LNodeList: TALJSONNodeListW;
@@ -13335,9 +13443,10 @@ end;
 {*********************}
 {$ZEROBASEDSTRINGS OFF}
 {$WARN WIDECHAR_REDUCED OFF}
-procedure TALJSONNodeW.SaveToJson(const Stream: TStream;
-                                  const StreamEncoding: TEncoding;
-                                  Var buffer: String);
+procedure TALJSONNodeW.SaveToJson(
+            const Stream: TStream;
+            const StreamEncoding: TEncoding;
+            Var buffer: String);
 
 Const BufferSize: integer = 8192;
 
@@ -13668,9 +13777,10 @@ begin
   SaveToJson(nil, nil, Str);
 end;
 
-{******************************************************}
-procedure TALJSONNodeW.SaveToBson(const Stream: TStream;
-                                  Var buffer: Tbytes);
+{********************************}
+procedure TALJSONNodeW.SaveToBson(
+            const Stream: TStream;
+            Var buffer: Tbytes);
 
 Const BufferSize: integer = 8192;
 
@@ -13704,7 +13814,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
     if BufferPos >= 32768 then _WriteBuffer2Stream(Buffer,BufferPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteUTF8Str2Buffer(const str:String); overload;
   var LBytes: Tbytes;
   Begin
@@ -13712,7 +13822,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
     _Write2Buffer(pointer(LBytes)^,length(LBytes));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteUTF8Str2Buffer(const index:integer); overload;
   Begin
     _WriteUTF8Str2Buffer(ALIntToStrW(index));
@@ -13867,7 +13977,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
     _Write2Buffer(LInt64, sizeOf(LInt64));
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteTextNode2Buffer(aTextNode:TALJSONNodeW; aNodeIndex: integer);
   Begin
     with aTextNode do begin
@@ -13927,7 +14037,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStartObjectNode2Buffer(aObjectNode:TALJSONNodeW; aNodeIndex: integer);
   var LNodeList: TALJSONNodeListW;
       LEmptyNode: Boolean;
@@ -13976,14 +14086,14 @@ Var NodeStack: Tstack<TALJSONNodeW>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteEndObjectNode2Buffer(aObjectNode:TALJSONNodeW; aNodeStartPos: system.Int64);
   Begin
     _WriteByte2Buffer($00);
     _WriteInt2Pos(StreamPos + BufferPos - aNodeStartPos, aNodeStartPos);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteStartArrayNode2Buffer(aArrayNode:TALJSONNodeW; aNodeIndex: integer);
   var LNodeList: TALJSONNodeListW;
       LEmptyNode: Boolean;
@@ -14031,7 +14141,7 @@ Var NodeStack: Tstack<TALJSONNodeW>;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _WriteEndArrayNode2Buffer(aArrayNode:TALJSONNodeW; aNodeStartPos: system.Int64);
   Begin
     _WriteByte2Buffer($00);
@@ -14835,9 +14945,10 @@ begin
   FList[Index] := nil; // to decrease the refcount of Node
   Dec(FCount);
   if Index < FCount then begin
-    ALMove(FList[Index + 1],
-           FList[Index],
-           (FCount - Index) * SizeOf(Pointer));
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
     Pointer(FList[FCount]) := nil;
   end;
   if assigned(Node) then ALFreeAndNil(Node);
@@ -15007,14 +15118,15 @@ begin
   FCount := NewCount;
 end;
 
-{*************************************************}
-Procedure ALJSONToTStringsW(const AJsonStr: String;
-                            const aFormatSettings: TALFormatSettingsW;
-                            const aPath: String;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false');
+{**************************}
+Procedure ALJSONToTStringsW(
+            const AJsonStr: String;
+            const aFormatSettings: TALFormatSettingsW;
+            const aPath: String;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false');
 
 var LJsonDocument: TALJSONDocumentW;
     LContainChilds: boolean;
@@ -15058,30 +15170,33 @@ begin
   end;
 end;
 
-{*************************************************}
-Procedure ALJSONToTStringsW(const AJsonStr: String;
-                            const aFormatSettings: TALFormatSettingsW;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false');
+{**************************}
+Procedure ALJSONToTStringsW(
+            const AJsonStr: String;
+            const aFormatSettings: TALFormatSettingsW;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false');
 begin
- ALJSONToTStringsW(AJsonStr,
-                   aFormatSettings,
-                   '',
-                   aLst,
-                   aNullStr,
-                   aTrueStr,
-                   aFalseStr);
+ ALJSONToTStringsW(
+   AJsonStr,
+   aFormatSettings,
+   '',
+   aLst,
+   aNullStr,
+   aTrueStr,
+   aFalseStr);
 end;
 
-{********************************************************}
-Procedure ALJSONToTStringsW(const aJsonNode: TALJSONNodeW;
-                            Const aPath: String;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false');
+{**************************}
+Procedure ALJSONToTStringsW(
+            const aJsonNode: TALJSONNodeW;
+            Const aPath: String;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false');
 var LTmpPath: String;
     I: integer;
 begin
@@ -15096,19 +15211,21 @@ begin
 
       case aJsonNode.ChildNodes[I].NodeType of
 
-        ntObject: ALJSONToTStringsW(aJsonNode.ChildNodes[I],
-                                    LTmpPath,
-                                    aLst,
-                                    aNullStr,
-                                    aTrueStr,
-                                    aFalseStr);
+        ntObject: ALJSONToTStringsW(
+                    aJsonNode.ChildNodes[I],
+                    LTmpPath,
+                    aLst,
+                    aNullStr,
+                    aTrueStr,
+                    aFalseStr);
 
-        ntArray: ALJSONToTStringsW(aJsonNode.ChildNodes[I],
-                                   LTmpPath,
-                                   aLst,
-                                   aNullStr,
-                                   aTrueStr,
-                                   aFalseStr);
+        ntArray: ALJSONToTStringsW(
+                   aJsonNode.ChildNodes[I],
+                   LTmpPath,
+                   aLst,
+                   aNullStr,
+                   aTrueStr,
+                   aFalseStr);
 
         ntText: begin
                   if (aJsonNode.ChildNodes[I].NodeSubType = nstBoolean) then   aLst.Add(LTmpPath + aLst.NameValueSeparator + ALBoolToStrW(aJsonNode.ChildNodes[I].Bool,aTrueStr,aFalseStr))
@@ -15127,27 +15244,30 @@ begin
   end;
 end;
 
-{********************************************************}
-Procedure ALJSONToTStringsW(const aJsonNode: TALJSONNodeW;
-                            const aLst: TALStringsW;
-                            Const aNullStr: String = 'null';
-                            Const aTrueStr: String = 'true';
-                            Const aFalseStr: String = 'false');
+{**************************}
+Procedure ALJSONToTStringsW(
+            const aJsonNode: TALJSONNodeW;
+            const aLst: TALStringsW;
+            Const aNullStr: String = 'null';
+            Const aTrueStr: String = 'true';
+            Const aFalseStr: String = 'false');
 begin
-  ALJSONToTStringsW(aJsonNode,
-                    '',
-                    aLst,
-                    aNullStr,
-                    aTrueStr,
-                    aFalseStr)
+  ALJSONToTStringsW(
+    aJsonNode,
+    '',
+    aLst,
+    aNullStr,
+    aTrueStr,
+    aFalseStr)
 end;
 
-{**************************************************}
-procedure ALTStringsToJsonW(const aLst: TALStringsW;
-                            const aJsonNode: TALJSONNodeW;
-                            Const aPath: String = '';
-                            Const aNameToLowerCase: boolean = false;
-                            Const aNullStr: String = 'null');
+{**************************}
+procedure ALTStringsToJsonW(
+            const aLst: TALStringsW;
+            const aJsonNode: TALJSONNodeW;
+            Const aPath: String = '';
+            Const aNameToLowerCase: boolean = false;
+            Const aNullStr: String = 'null');
 
 var LIndex: Integer;
     LNames:  TALStringListW;
@@ -15185,17 +15305,20 @@ begin
         //   [3]
         //   translations
         //   usa
-        if (aPath <> '') then LNames.Text := ALStringReplaceW(ALStringReplaceW(aLst.Names[I],
-                                                                              aPath + '.',
-                                                                              '',
-                                                                              [rfIgnoreCase]),
-                                                              '[',
-                                                              '.[',
-                                                              [rfReplaceAll])
-        else LNames.Text := ALStringReplaceW(aLst.Names[I],
-                                             '[',
-                                             '.[',
-                                             [rfReplaceAll]);
+        if (aPath <> '') then LNames.Text := ALStringReplaceW(
+                                               ALStringReplaceW(
+                                                 aLst.Names[I],
+                                                 aPath + '.',
+                                                 '',
+                                                 [rfIgnoreCase]),
+                                               '[',
+                                               '.[',
+                                               [rfReplaceAll])
+        else LNames.Text := ALStringReplaceW(
+                              aLst.Names[I],
+                              '[',
+                              '.[',
+                              [rfReplaceAll]);
 
         //loop on all the name
         LCurrJsonNode := aJsonNode;
@@ -15308,10 +15431,11 @@ begin
   result := 'null';
 end;
 
-{***************************************************************}
-function ALJsonEncodeWithNodeSubTypeHelperW(const aValue: String;
-                                            const aNodeSubType: TALJSONNodeSubType;
-                                            const aFormatSettings: TALFormatSettingsW): String;
+{******************************************}
+function ALJsonEncodeWithNodeSubTypeHelperW(
+           const aValue: String;
+           const aNodeSubType: TALJSONNodeSubType;
+           const aFormatSettings: TALFormatSettingsW): String;
 begin
   case aNodeSubType of
     nstFloat:      begin

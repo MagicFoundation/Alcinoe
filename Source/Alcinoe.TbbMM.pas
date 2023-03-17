@@ -50,6 +50,7 @@ type
 const
   tbbmallocDLL = 'tbbmalloc.dll';
 
+{****************************************************************************}
 function scalable_malloc(Size: size_t): Pointer; cdecl; external tbbmallocDLL;
 function scalable_realloc(P: Pointer; Size: size_t): Pointer; cdecl; external tbbmallocDLL;
 procedure scalable_free(P: Pointer); cdecl; external tbbmallocDLL;
@@ -100,6 +101,3 @@ initialization
   SetMemoryManager(MemoryManager);
 
 end.
-
-
-

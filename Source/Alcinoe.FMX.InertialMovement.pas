@@ -840,6 +840,7 @@ var
   EnableTargetX: Boolean;
   EnableTargetY: Boolean;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure UpdatePhysicalParameters(
               const Target: Double;
               var Pos, Velocity: Double;
@@ -908,6 +909,7 @@ var
       Pos := Pos + DX;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure UpdateParams;
   var
     LDecelerationRate: Double;
@@ -1246,6 +1248,7 @@ function TALAniCalculations.FindTarget(var Target: TTarget): Boolean;
 var
   MinR: Double;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindMinMaxTarget(var Target: TTarget): Boolean;
   var
     I: Integer;
@@ -1286,6 +1289,7 @@ var
       Target.TargetType := TTargetType.Min;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure UpdateResult(P: TALPointD);
   var
     R: Double;
@@ -1383,6 +1387,7 @@ end;
 {**********************************************************}
 procedure TALAniCalculations.UpdateViewportPositionByBounds;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function NotBoundsAni(const Vert: Boolean; const aBoundsAnimation: Boolean): Boolean;
   begin
     if Vert then
@@ -1478,8 +1483,10 @@ begin
   finally
     FViewportPosition := OldViewportPosition;
   end;
-  if Force or not IsSmall(TALPointD.Create(NewViewportPosition.X - OldViewportPosition.X,
-    NewViewportPosition.Y - OldViewportPosition.Y)) then
+  if Force or not IsSmall(
+                    TALPointD.Create(
+                      NewViewportPosition.X - OldViewportPosition.X,
+                      NewViewportPosition.Y - OldViewportPosition.Y)) then
   begin
     FCurrentVelocity := TALPointD.Create(0, 0);
     FViewportPosition := NewViewportPosition;

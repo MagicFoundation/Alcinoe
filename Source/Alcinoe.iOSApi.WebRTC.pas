@@ -218,20 +218,20 @@ type
 
 const
 
-	//MixWithOthers is only valid with AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and  AVAudioSessionCategoryMultiRoute
-	AVAudioSessionCategoryOptionMixWithOthers = $1;
-	//DuckOthers is only valid with AVAudioSessionCategoryAmbient, AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and AVAudioSessionCategoryMultiRoute
-	AVAudioSessionCategoryOptionDuckOthers = $2;
-	//AllowBluetooth is only valid with AVAudioSessionCategoryRecord and AVAudioSessionCategoryPlayAndRecord
-	AVAudioSessionCategoryOptionAllowBluetooth = $4;
-	//DefaultToSpeaker is only valid with AVAudioSessionCategoryPlayAndRecord
-	AVAudioSessionCategoryOptionDefaultToSpeaker = $8;
-	//InterruptSpokenAudioAndMixWithOthers is only valid with AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and AVAudioSessionCategoryMultiRoute
-	AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers = $11;
-	//AllowBluetoothA2DP is only valid with AVAudioSessionCategoryPlayAndRecord
-	AVAudioSessionCategoryOptionAllowBluetoothA2DP = $20;
-	//AllowAirPlay is only valid with AVAudioSessionCategoryPlayAndRecord
-	AVAudioSessionCategoryOptionAllowAirPlay = $40;
+  //MixWithOthers is only valid with AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and  AVAudioSessionCategoryMultiRoute
+  AVAudioSessionCategoryOptionMixWithOthers = $1;
+  //DuckOthers is only valid with AVAudioSessionCategoryAmbient, AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and AVAudioSessionCategoryMultiRoute
+  AVAudioSessionCategoryOptionDuckOthers = $2;
+  //AllowBluetooth is only valid with AVAudioSessionCategoryRecord and AVAudioSessionCategoryPlayAndRecord
+  AVAudioSessionCategoryOptionAllowBluetooth = $4;
+  //DefaultToSpeaker is only valid with AVAudioSessionCategoryPlayAndRecord
+  AVAudioSessionCategoryOptionDefaultToSpeaker = $8;
+  //InterruptSpokenAudioAndMixWithOthers is only valid with AVAudioSessionCategoryPlayAndRecord, AVAudioSessionCategoryPlayback, and AVAudioSessionCategoryMultiRoute
+  AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers = $11;
+  //AllowBluetoothA2DP is only valid with AVAudioSessionCategoryPlayAndRecord
+  AVAudioSessionCategoryOptionAllowBluetoothA2DP = $20;
+  //AllowAirPlay is only valid with AVAudioSessionCategoryPlayAndRecord
+  AVAudioSessionCategoryOptionAllowAirPlay = $40;
 
 //const
   //RTCH264PacketizationModeNonInterleaved = 0;

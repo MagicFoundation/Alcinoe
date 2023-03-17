@@ -91,25 +91,31 @@ type
     destructor Destroy; override;
     procedure CreateDirectory(const Directory: AnsiString); virtual;
     procedure DeleteFile(const FileName: AnsiString); virtual;
-    Function  FindFirst(const Path: AnsiString;
-                        const Attr: Integer;
-                        var F: TALFtpclientSearchRec): Integer; virtual;
+    Function  FindFirst(
+                const Path: AnsiString;
+                const Attr: Integer;
+                var F: TALFtpclientSearchRec): Integer; virtual;
     Function  FindNext(var F: TALFtpclientSearchRec): Integer; virtual;
     procedure FindClose(var F: TALFtpclientSearchRec); virtual;
     Function  GetCurrentDirectory: AnsiString; virtual;
-    Procedure GetFile(const RemoteFile: AnsiString;
-                      const LocalFile: AnsiString;
-                      const FailIfExists: Boolean); overload; virtual;
-    Procedure GetFile(const RemoteFile: AnsiString;
-                      const DataStream: Tstream); overload; virtual;
+    Procedure GetFile(
+                const RemoteFile: AnsiString;
+                const LocalFile: AnsiString;
+                const FailIfExists: Boolean); overload; virtual;
+    Procedure GetFile(
+                const RemoteFile: AnsiString;
+                const DataStream: Tstream); overload; virtual;
     Function  GetFileSize(const filename: AnsiString): Longword; virtual;
-    Procedure PutFile(const LocalFile: AnsiString;
-                      const Remotefile: AnsiString); overload; virtual;
-    Procedure PutFile(const DataStream: TStream;
-                      const Remotefile: AnsiString); overload; virtual;
+    Procedure PutFile(
+                const LocalFile: AnsiString;
+                const Remotefile: AnsiString); overload; virtual;
+    Procedure PutFile(
+                const DataStream: TStream;
+                const Remotefile: AnsiString); overload; virtual;
     Procedure RemoveDirectory(const Directory: AnsiString); virtual;
-    Procedure RenameFile(const ExistingFile: AnsiString;
-                         const NewFile: AnsiString); virtual;
+    Procedure RenameFile(
+                const ExistingFile: AnsiString;
+                const NewFile: AnsiString); virtual;
     Procedure SetCurrentDirectory(const Directory: AnsiString); virtual;
     procedure Connect; virtual;
     procedure Disconnect; virtual;
@@ -154,7 +160,7 @@ begin
   FProxyParams.OnChange := OnProxyParamsChange;
 end;
 
-{*******************************}
+{******************************}
 destructor TALFTPClient.Destroy;
 begin
   AlFreeAndNil(FProxyParams);
@@ -209,10 +215,11 @@ begin
 //virtual
 end;
 
-{*****************************************************}
-function TALFTPClient.FindFirst(const Path: AnsiString;
-                                const Attr: Integer;
-                                var F: TALFtpclientSearchRec): Integer;
+{******************************}
+function TALFTPClient.FindFirst(
+           const Path: AnsiString;
+           const Attr: Integer;
+           var F: TALFtpclientSearchRec): Integer;
 begin
   //virtual
   Result := 0;
@@ -238,17 +245,19 @@ begin
   Result := '';
 end;
 
-{**********************************************************}
-procedure TALFTPClient.GetFile(const RemoteFile: AnsiString;
-                               const DataStream: Tstream);
+{*****************************}
+procedure TALFTPClient.GetFile(
+            const RemoteFile: AnsiString;
+            const DataStream: Tstream);
 begin
   //virtual
 end;
 
-{**********************************************************}
-procedure TALFTPClient.GetFile(const RemoteFile: AnsiString;
-                               const LocalFile: AnsiString;
-                               const FailIfExists: Boolean);
+{*****************************}
+procedure TALFTPClient.GetFile(
+            const RemoteFile: AnsiString;
+            const LocalFile: AnsiString;
+            const FailIfExists: Boolean);
 begin
 //virtual
 end;
@@ -260,16 +269,18 @@ begin
   Result := 0;
 end;
 
-{*******************************************************}
-procedure TALFTPClient.PutFile(const DataStream: TStream;
-                               const Remotefile: AnsiString);
+{*****************************}
+procedure TALFTPClient.PutFile(
+            const DataStream: TStream;
+            const Remotefile: AnsiString);
 begin
 //virtual
 end;
 
-{*********************************************************}
-procedure TALFTPClient.PutFile(const LocalFile: AnsiString;
-                               const Remotefile: AnsiString);
+{*****************************}
+procedure TALFTPClient.PutFile(
+            const LocalFile: AnsiString;
+            const Remotefile: AnsiString);
 begin
 //virtual
 end;
@@ -280,9 +291,10 @@ begin
 //virtual
 end;
 
-{***************************************************************}
-procedure TALFTPClient.RenameFile(const ExistingFile: AnsiString;
-                                  const NewFile: AnsiString);
+{********************************}
+procedure TALFTPClient.RenameFile(
+            const ExistingFile: AnsiString;
+            const NewFile: AnsiString);
 begin
 //virtual
 end;

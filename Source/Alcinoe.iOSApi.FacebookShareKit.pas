@@ -116,6 +116,7 @@ implementation
 uses
   Alcinoe.iOSApi.FacebookCoreKit; // [MANDATORY] Because we need it's initialization/finalization section
 
+{***********************************************************************}
 procedure FBSDKShareKitLoader; cdecl; external framework 'FBSDKShareKit';
 
 end.

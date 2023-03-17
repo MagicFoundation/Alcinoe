@@ -1418,11 +1418,12 @@ begin
 
   //-----
   fTextureRef := 0;
-  if CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
-                                  nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
-                                  (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
-                                  nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
-                                  @fvideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVOpenGLESTextureCacheCreate failed!'); // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
+  if CVOpenGLESTextureCacheCreate(
+       kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
+       nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
+       (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
+       nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
+       @fvideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVOpenGLESTextureCacheCreate failed!'); // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
 
   //-----
   FFrameRefreshTimer := TTimer.Create(nil);
@@ -1575,76 +1576,78 @@ begin
   //-----
   //https://stackoverflow.com/questions/30363502/maintaining-good-scroll-performance-when-using-avplayer
   fPrepareThread := TThread.CreateAnonymousThread(
-    procedure
-    var LURL: NSUrl;
-        LLowerDataSource: String;
-        P: Pointer;
-    begin
+                      procedure
+                      var LURL: NSUrl;
+                          LLowerDataSource: String;
+                          P: Pointer;
+                      begin
 
-      try
+                        try
 
-        {$IFDEF DEBUG}
-        var LStopWatch := TstopWatch.StartNew;
-        {$ENDIF}
+                          {$IFDEF DEBUG}
+                          var LStopWatch := TstopWatch.StartNew;
+                          {$ENDIF}
 
-        LLowerDataSource := AlLowerCase(aDataSource);
-        if (ALPosW('http://',LLowerDataSource) = 1) or
-           (ALPosW('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
-        else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
-        if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
-        LURL := TNSUrl.Wrap(P);
-        FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL)); // return A new player item, prepared to use URL.
-                                                                                          // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
-                                                                                          // Associating the player item with an AVPlayer immediately begins enqueuing its media
-                                                                                          // and preparing it for playback. If the URL contains valid data that can be used by
-                                                                                          // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
-                                                                                          // URL contains no valid data or otherwise can't be used by the player item, its status
-                                                                                          // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
-                                                                                          // by querying the player item’s error property.
-        FPlayerItem.retain;
-        //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
-        //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
+                          LLowerDataSource := AlLowerCase(aDataSource);
+                          if (ALPosW('http://',LLowerDataSource) = 1) or
+                             (ALPosW('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+                          else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
+                          if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
+                          LURL := TNSUrl.Wrap(P);
+                          FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL)); // return A new player item, prepared to use URL.
+                                                                                                            // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
+                                                                                                            // Associating the player item with an AVPlayer immediately begins enqueuing its media
+                                                                                                            // and preparing it for playback. If the URL contains valid data that can be used by
+                                                                                                            // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
+                                                                                                            // URL contains no valid data or otherwise can't be used by the player item, its status
+                                                                                                            // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
+                                                                                                            // by querying the player item’s error property.
+                          FPlayerItem.retain;
+                          //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
+                          //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
 
-        //-----
-        FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
-        FPlayer.retain;
+                          //-----
+                          FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
+                          FPlayer.retain;
 
-        //-----
-        fNotificationsDelegate := TNotificationsDelegate.Create(self);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          //-----
+                          fNotificationsDelegate := TNotificationsDelegate.Create(self);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
 
-        //-----
-        FKVODelegate := TKVODelegate.Create(self);
-        FPlayer.addObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
+                          //-----
+                          FKVODelegate := TKVODelegate.Create(self);
+                          FPlayer.addObserver(
+                            TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
                             StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
                             NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
                             nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
-        FPlayerItem.addObserver(TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
-                                StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
-                                NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
-                                nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
+                          FPlayerItem.addObserver(
+                            TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
+                            StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
+                            NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
+                            nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
 
-        //-----
-        {$IFDEF DEBUG}
-        LStopWatch.Stop;
-        ALLog(
-          'TALIOSVideoPlayer.prepare',
-          'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
-          'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
-          'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status),
-          TalLogType.VERBOSE);
-        {$ENDIF}
+                          //-----
+                          {$IFDEF DEBUG}
+                          LStopWatch.Stop;
+                          ALLog(
+                            'TALIOSVideoPlayer.prepare',
+                            'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
+                            'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
+                            'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status),
+                            TalLogType.VERBOSE);
+                          {$ENDIF}
 
-      except
-        // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
-      end;
+                        except
+                          // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
+                        end;
 
-    end);
+                      end);
     fPrepareThread.FreeOnTerminate := False;
     fPrepareThread.Start;
 
@@ -1804,18 +1807,19 @@ begin
       //
       // The texture cache automatically flushes currently unused resources when you call the
       // CVOpenGLESTextureCacheCreateTextureFromImage function
-      if CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
-                                                      fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
-                                                      LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
-                                                      nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
-                                                      GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
-                                                      GL_RGBA,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
-                                                      LWidth, // width: The width of the texture image.
-                                                      LHeight, // height The height of the texture image.
-                                                      GL_BGRA_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
-                                                      GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
-                                                      0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
-                                                      @fTextureRef) <> kCVReturnSuccess then begin // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
+      if CVOpenGLESTextureCacheCreateTextureFromImage(
+           kCFAllocatorDefault, // allocator: The CFAllocator to use for allocating the texture object. This parameter can be NULL.
+           fvideoTextureCacheRef, // textureCache: The texture cache object that will manage the texture.
+           LPixelBuffer, // sourceImage: The CVImageBuffer that you want to create a texture from.
+           nil,  // textureAttributes: A CFDictionary containing the attributes to be used for creating the CVOpenGLESTexture objects. This parameter can be NULL.
+           GL_TEXTURE_2D, // target: The target texture. GL_TEXTURE_2D and GL_RENDERBUFFER are the only targets currently supported.
+           GL_RGBA,  // internalFormat: The number of color components in the texture. Examples are GL_RGBA, GL_LUMINANCE, GL_RGBA8_OES, GL_RED, and GL_RG.
+           LWidth, // width: The width of the texture image.
+           LHeight, // height The height of the texture image.
+           GL_BGRA_EXT,  // format: The format of the pixel data. Examples are GL_RGBA and GL_LUMINANCE.
+           GL_UNSIGNED_BYTE, // type: The data type of the pixel data. One example is GL_UNSIGNED_BYTE.
+           0,  // planeIndex: The plane of the CVImageBuffer to map bind. Ignored for non-planar CVImageBuffers.
+           @fTextureRef) <> kCVReturnSuccess then begin // textureOut: A pointer to a CVOpenGLESTexture where the newly created texture object will be placed.
         {$IFDEF DEBUG}
         ALLog('TALIOSVideoPlayer.FrameRefreshOnTimer', 'CVOpenGLESTextureCacheCreateTextureFromImage failed!', TalLogType.Error);
         {$ENDIF}
@@ -2483,6 +2487,7 @@ begin
 
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALVideoPlayerSurface]);

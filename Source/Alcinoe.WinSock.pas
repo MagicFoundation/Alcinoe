@@ -71,7 +71,7 @@ begin
   end;
 end;
 
-{*********************************}
+{**********************************}
 function ALgetLocalIPs: TALStringsA;
 type
   TaPInAddr = array[0..10] of PInAddr;

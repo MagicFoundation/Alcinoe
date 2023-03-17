@@ -48,6 +48,7 @@ uses
   System.AnsiStrings,
   Alcinoe.StringUtils;
 
+{****************************************************************************************************************}
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
 function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';
 function _GetPhoneNumberType(phoneNumber: Int64): integer; cdecl; external 'libphonenumber.dll';
@@ -64,6 +65,7 @@ end;
  converts this number to an Int64 representation looking like 33634541222 }
 function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _IsDecimal(const S: AnsiString): boolean;
   var i: integer;
   begin
@@ -124,4 +126,3 @@ begin
 end;
 
 end.
-

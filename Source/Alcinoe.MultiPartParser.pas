@@ -117,13 +117,13 @@ type
 ********************************************
 Mime-Version: 1.0
 Content-Type: multipart/alternative;
-	boundary="----=_NextPart_000_0189_01C81ED9.A3E50190"
+  boundary="----=_NextPart_000_0189_01C81ED9.A3E50190"
 
 This is a multi-part message in MIME format.
 
 ------=_NextPart_000_0189_01C81ED9.A3E50190
 Content-Type: text/plain;
-	charset="utf-8"
+  charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
 qsdqsd
@@ -131,7 +131,7 @@ qsdqsd
 qsdqsdqsd sqdqsds
 ------=_NextPart_000_0189_01C81ED9.A3E50190
 Content-Type: text/html;
-	charset="utf-8"
+  charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
 =EF=BB=BF<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
@@ -295,23 +295,23 @@ type
 ********************************************
 Mime-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_NextPart_000_0145_01C81ECF.27E4F8C0"
+  boundary="----=_NextPart_000_0145_01C81ECF.27E4F8C0"
 
 This is a multi-part message in MIME format.
 
 ------=_NextPart_000_0145_01C81ECF.27E4F8C0
 Content-Type: text/plain;
-	charset="utf-8"
+  charset="utf-8"
 Content-Transfer-Encoding: base64
 
 YyB1biB0ZXN0ICEhIQ==
 
 ------=_NextPart_000_0145_01C81ECF.27E4F8C0
 Content-Type: image/bmp;
-	name="Blue Lace 16.bmp"
+  name="Blue Lace 16.bmp"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment;
-	filename="Blue Lace 16.bmp"
+  filename="Blue Lace 16.bmp"
 
 Qk34BAAAAAAAAHYAAAAoAAAAMAAAADAAAAABAAQAAAAAAAAAAADDDgAAww4AAAAAAAAAAAAAAAAA
 AAAAgAAAgAAAAICAAIAAAACAAIAAgIAAAICAgADAwMAAAAD/AAD/AAAA//8A/wAAAP8A/wD//wAA
@@ -362,9 +362,10 @@ type
     Function CreateDataStream: TAlMultiPartBaseStream; override;
     function GetDataStream: TAlMultiPartMixedStream; reintroduce;
   public
-    procedure Encode(const aInlineText: AnsiString;
-                     const aInlineTextContentType: AnsiString;
-                     aAttachments: TALMultiPartMixedContents); overload;
+    procedure Encode(
+                const aInlineText: AnsiString;
+                const aInlineTextContentType: AnsiString;
+                aAttachments: TALMultiPartMixedContents); overload;
     property  DataStream: TAlMultiPartMixedStream read GetDataStream;
   end;
 
@@ -379,7 +380,7 @@ type
     property Contents: TALMultiPartMixedContents read GetContents;
   end;
 
-{---------------------------------------------------------------------------------------------}
+{*********************************************************************************************}
 Function ALMultipartExtractBoundaryFromContentType(const aContentType: AnsiString): AnsiString;
 Function ALMultipartExtractValueFromHeaderLine(const aHeaderLine: AnsiString; const aName: AnsiString): AnsiString;
 Function ALMultipartSetValueInHeaderLine(const aHeaderLine: AnsiString; const aName, AValue: AnsiString): AnsiString;
@@ -396,7 +397,7 @@ Uses
 {*****************************************************************************************************************}
 Function ALMultipartExtractValueFromHeaderLine(const aHeaderLine: AnsiString; const aName: AnsiString): AnsiString;
 
-  {-----------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _RemoveQuoteStr(const aStr: AnsiString): AnsiString;
   Begin
     Result := AStr;
@@ -519,7 +520,7 @@ procedure TALMultiPartBaseContent.SetRawHeaderText(const aRawHeaderText: AnsiStr
 
 Var LRawHeaderLst: TALStringListA;
 
-  {-------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _getHeader(const aName: AnsiString): AnsiString;
   Var I: Integer;
       Str: AnsiString;
@@ -993,7 +994,7 @@ begin
   ContentTransferEncoding := '';
 end;
 
-{**************************************************************************}
+{***************************************************************************}
 procedure TALMultiPartFormDataContent.SetfieldName(const aValue: AnsiString);
 begin
   ContentDisposition := ALMultipartSetValueInHeaderLine(ContentDisposition, 'name', aValue);
@@ -1117,7 +1118,7 @@ begin
   Result := TAlMultiPartFormDataStream(inherited GetDataStream);
 end;
 
-{********************************************************************************************************************}
+{*********************************************************************************************************************}
 procedure TALMultipartFormDataEncoder.Encode(aContentFields: TALStringsA; aContentFiles: TALMultiPartFormDataContents);
 Var I: Integer;
 begin
@@ -1170,10 +1171,11 @@ begin
   end;
 end;
 
-{*********************************************************************************}
-procedure TALMultipartFormDataDecoder.Decode(const aDataStr, aboundary: AnsiString;
-                                             aContentFields: TALStringsA;
-                                             aContentFiles: TALMultiPartFormDataContents);
+{*******************************************}
+procedure TALMultipartFormDataDecoder.Decode(
+            const aDataStr, aboundary: AnsiString;
+            aContentFields: TALStringsA;
+            aContentFiles: TALMultiPartFormDataContents);
 Var LContents: TALMultiPartFormDataContents;
 begin
   //Update the Fcontent
@@ -1212,7 +1214,7 @@ begin
   Result := TALMultiPartFormDataContents(inherited GetContents);
 end;
 
-{****************************************************************}
+{*****************************************************************}
 function TALMultipartFormDataDecoder.GetContentFields: TALStringsA;
 begin
   Result := fContentFields;
@@ -1253,7 +1255,7 @@ begin
   ContentDisposition := 'attachment; filename="'+LFilenameWithoutPath+'"';
 end;
 
-{**********************************************************************************}
+{*********************************************************************************}
 function TALMultiPartMixedContents.Add(AObject: TALMultiPartMixedContent): Integer;
 begin
   Result := inherited Add(AObject);
@@ -1371,10 +1373,11 @@ begin
   Result := TAlMultiPartMixedStream(inherited GetDataStream);
 end;
 
-{**********************************************************************}
-procedure TALMultipartMixedEncoder.Encode(const aInlineText: AnsiString;
-                                          const aInlineTextContentType: AnsiString;
-                                          aAttachments: TALMultiPartMixedContents);
+{****************************************}
+procedure TALMultipartMixedEncoder.Encode(
+            const aInlineText: AnsiString;
+            const aInlineTextContentType: AnsiString;
+            aAttachments: TALMultiPartMixedContents);
 Var I: Integer;
 begin
   with TAlMultiPartMixedStream(DataStream) do begin

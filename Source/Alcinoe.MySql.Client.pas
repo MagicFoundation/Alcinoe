@@ -33,9 +33,10 @@ Type
     FErrorCode: Integer;
     FSQLstate: AnsiString;
   public
-    constructor Create(const aErrorMsg: AnsiString;
-                       const aErrorCode: Integer;
-                       const aSqlState: AnsiString); overload;
+    constructor Create(
+                  const aErrorMsg: AnsiString;
+                  const aErrorCode: Integer;
+                  const aSqlState: AnsiString); overload;
     property ErrorCode: Integer read FErrorCode;
     property SQLState: AnsiString read FSQLState;
   end;
@@ -58,77 +59,90 @@ Type
     function  GetConnected: Boolean;
     function  GetInTransaction: Boolean;
   Protected
-    function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual;
-    Procedure SaveDataToCache(const Key: ansiString;
-                              const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual;
+    function loadCachedData(
+               const Key: AnsiString;
+               var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(
+                const Key: ansiString;
+                const CacheThreshold: integer;
+                const DataStr: ansiString); virtual;
     procedure CheckAPIError(Error: Boolean);
-    Function  GetFieldValue(aFieldValue: PAnsiChar;
-                            aFieldType: TMysqlFieldTypes;
-                            aFieldLength: integer;
-                            const aFormatSettings: TALFormatSettingsA): AnsiString;
+    Function  GetFieldValue(
+                aFieldValue: PAnsiChar;
+                aFieldType: TMysqlFieldTypes;
+                aFieldLength: integer;
+                const aFormatSettings: TALFormatSettingsA): AnsiString;
     procedure initObject; virtual;
-    procedure OnSelectDataDone(const SQL: AnsiString;
-                               const RowTag: AnsiString;
-                               const ViewTag: AnsiString;
-                               Skip: integer;
-                               First: Integer;
-                               CacheThreshold: Integer;
-                               TimeTaken: double); virtual;
-    procedure OnUpdateDataDone(const SQL: AnsiString;
-                               TimeTaken: double); virtual;
+    procedure OnSelectDataDone(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                const ViewTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                CacheThreshold: Integer;
+                TimeTaken: double); virtual;
+    procedure OnUpdateDataDone(
+                const SQL: AnsiString;
+                TimeTaken: double); virtual;
   Public
-    Constructor Create(ApiVer: TALMySqlVersion_API;
-                       const lib: AnsiString = 'libmysql.dll'); overload; virtual;
+    Constructor Create(
+                  ApiVer: TALMySqlVersion_API;
+                  const lib: AnsiString = 'libmysql.dll'); overload; virtual;
     Constructor Create(lib: TALMySqlLibrary); overload; virtual;
     Destructor Destroy; Override;
-    Procedure Connect(const Host: AnsiString;
-                      Port: integer;
-                      const DataBaseName,
-                            Login,
-                            Password,
-                            CharSet: AnsiString;
-                      Const ClientFlag: Cardinal = 0;
-                      Const Options: TALMySQLOptions = nil); virtual;
+    Procedure Connect(
+                const Host: AnsiString;
+                Port: integer;
+                const DataBaseName,
+                      Login,
+                      Password,
+                      CharSet: AnsiString;
+                Const ClientFlag: Cardinal = 0;
+                Const Options: TALMySQLOptions = nil); virtual;
     Procedure Disconnect;
     Procedure TransactionStart;
     Procedure TransactionCommit;
     Procedure TransactionRollback;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         const ViewTag: AnsiString;
-                         Skip: integer; // used only if value is > 0
-                         First: Integer; // used only if value is > 0
-                         CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                                  // cache or not. Values <= 0 deactivate the cache
-                         XMLDATA: TalXMLNode;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                const ViewTag: AnsiString;
+                Skip: integer; // used only if value is > 0
+                First: Integer; // used only if value is > 0
+                CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                         // cache or not. Values <= 0 deactivate the cache
+                XMLDATA: TalXMLNode;
+                OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                Skip: integer;
+                First: Integer;
+                OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
     procedure UpdateData(SQLs: TALStringsA); overload; virtual;
     procedure UpdateData(const SQL: AnsiString); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString); overload; virtual;
@@ -169,103 +183,117 @@ Type
     FOpenConnectionOptions: TALMySQLOptions;
     FNullString: AnsiString;
   Protected
-    function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual;
-    Procedure SaveDataToCache(const Key: ansiString;
-                              const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual;
+    function loadCachedData(
+               const Key: AnsiString;
+               var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(
+                const Key: ansiString;
+                const CacheThreshold: integer;
+                const DataStr: ansiString); virtual;
     procedure CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
     function  GetDataBaseName: AnsiString; virtual;
     function  GetHost: AnsiString; virtual;
     function  GetPort: integer; virtual;
-    Function  GetFieldValue(aFieldValue: PAnsiChar;
-                            aFieldType: TMysqlFieldTypes;
-                            aFieldLength: integer;
-                            const aFormatSettings: TALFormatSettingsA): AnsiString;
+    Function  GetFieldValue(
+                aFieldValue: PAnsiChar;
+                aFieldType: TMysqlFieldTypes;
+                aFieldLength: integer;
+                const aFormatSettings: TALFormatSettingsA): AnsiString;
     Function  AcquireConnection: PMySql; virtual;
     Procedure ReleaseConnection(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
-    procedure initObject(const aHost: AnsiString;
-                         aPort: integer;
-                         const aDataBaseName,
-                               aLogin,
-                               aPassword,
-                               aCharSet: AnsiString;
-                         Const aOpenConnectionClientFlag: Cardinal = 0;
-                         Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
-    procedure OnSelectDataDone(const SQL: AnsiString;
-                               const RowTag: AnsiString;
-                               const ViewTag: AnsiString;
-                               Skip: integer;
-                               First: Integer;
-                               CacheThreshold: Integer;
-                               TimeTaken: double); virtual;
-    procedure OnUpdateDataDone(const SQL: AnsiString;
-                               TimeTaken: double); virtual;
+    procedure initObject(
+                const aHost: AnsiString;
+                aPort: integer;
+                const aDataBaseName,
+                      aLogin,
+                      aPassword,
+                      aCharSet: AnsiString;
+                Const aOpenConnectionClientFlag: Cardinal = 0;
+                Const aOpenConnectionOptions: TALMySQLOptions = nil); virtual;
+    procedure OnSelectDataDone(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                const ViewTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                CacheThreshold: Integer;
+                TimeTaken: double); virtual;
+    procedure OnUpdateDataDone(
+                const SQL: AnsiString;
+                TimeTaken: double); virtual;
   Public
-    Constructor Create(const aHost: AnsiString;
-                       aPort: integer;
-                       const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       aApiVer: TALMySqlVersion_API;
-                       Const alib: AnsiString = 'libmysql.dll';
-                       Const aOpenConnectionClientFlag: Cardinal = 0;
-                       Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
-    Constructor Create(const aHost: AnsiString;
-                       aPort: integer;
-                       const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       alib: TALMySqlLibrary;
-                       Const aOpenConnectionClientFlag: Cardinal = 0;
-                       Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
+    Constructor Create(
+                  const aHost: AnsiString;
+                  aPort: integer;
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  aApiVer: TALMySqlVersion_API;
+                  Const alib: AnsiString = 'libmysql.dll';
+                  Const aOpenConnectionClientFlag: Cardinal = 0;
+                  Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
+    Constructor Create(
+                  const aHost: AnsiString;
+                  aPort: integer;
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  alib: TALMySqlLibrary;
+                  Const aOpenConnectionClientFlag: Cardinal = 0;
+                  Const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
     Destructor  Destroy; Override;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
     Procedure TransactionStart(Var ConnectionHandle: PMySql); virtual;
     Procedure TransactionCommit(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
     Procedure TransactionRollback(var ConnectionHandle: PMySql; const CloseConnection: Boolean = False); virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         const ViewTag: AnsiString;
-                         Skip: integer; // used only if value is > 0
-                         First: Integer; // used only if value is > 0
-                         CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                                  // cache or not. Values <= 0 deactivate the cache
-                         XMLDATA: TalXMLNode;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                const ViewTag: AnsiString;
+                Skip: integer; // used only if value is > 0
+                First: Integer; // used only if value is > 0
+                CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                         // cache or not. Values <= 0 deactivate the cache
+                XMLDATA: TalXMLNode;
+                OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                Skip: integer;
+                First: Integer;
+                OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const ConnectionHandle: PMySql = nil); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(SQLs: TALStringsA; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(const SQL: AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString; const ConnectionHandle: PMySql = nil); overload; virtual;
@@ -305,10 +333,11 @@ begin
   Result := '''' + Result + '''';
 end;
 
-{***********************************************************}
-constructor EALMySqlError.Create(const aErrorMsg: AnsiString;
-                                 const aErrorCode: Integer;
-                                 const aSqlState: AnsiString);
+{*******************************}
+constructor EALMySqlError.Create(
+              const aErrorMsg: AnsiString;
+              const aErrorCode: Integer;
+              const aSqlState: AnsiString);
 begin
   fErrorCode := aErrorCode;
   FSQLstate := aSqlState;
@@ -327,17 +356,19 @@ begin
   result := finTransaction;
 end;
 
-{***********************************************************}
-function TalMySqlClient.loadCachedData(const Key: AnsiString;
-                                       var DataStr: AnsiString): Boolean;
+{*************************************}
+function TalMySqlClient.loadCachedData(
+           const Key: AnsiString;
+           var DataStr: AnsiString): Boolean;
 begin
   result := false; //virtual need to be overriden
 end;
 
-{*************************************************************}
-Procedure TalMySqlClient.SaveDataToCache(const Key: ansiString;
-                                         const CacheThreshold: integer;
-                                         const DataStr: ansiString);
+{***************************************}
+Procedure TalMySqlClient.SaveDataToCache(
+            const Key: ansiString;
+            const CacheThreshold: integer;
+            const DataStr: ansiString);
 begin
   //virtual need to be overriden
 end;
@@ -346,20 +377,23 @@ end;
 procedure TalMySqlClient.CheckAPIError(Error: Boolean);
 Begin
   if Error then begin
-    if assigned(FMySql) then raise EALMySqlError.Create(fLibrary.mysql_error(fMySQL),
-                                                        fLibrary.mysql_errno(fMySQL),
-                                                        fLibrary.mysql_SqlState(fMySQL))
-    else raise EALMySqlError.Create('MySql error',
-                                    -1,
-                                    'HY000'); // The value 'HY000' (general error) is used for unmapped error numbers.
+    if assigned(FMySql) then raise EALMySqlError.Create(
+                                     fLibrary.mysql_error(fMySQL),
+                                     fLibrary.mysql_errno(fMySQL),
+                                     fLibrary.mysql_SqlState(fMySQL))
+    else raise EALMySqlError.Create(
+                 'MySql error',
+                 -1,
+                 'HY000'); // The value 'HY000' (general error) is used for unmapped error numbers.
   end;
 end;
 
-{***********************************************************}
-function TalMySqlClient.GetFieldValue(aFieldValue: PAnsiChar;
-                                      aFieldType: TMysqlFieldTypes;
-                                      aFieldLength: integer;
-                                      const aFormatSettings: TALFormatSettingsA): AnsiString;
+{************************************}
+function TalMySqlClient.GetFieldValue(
+           aFieldValue: PAnsiChar;
+           aFieldType: TMysqlFieldTypes;
+           aFieldLength: integer;
+           const aFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -391,9 +425,10 @@ begin
   fNullString := '';
 end;
 
-{************************************************************}
-constructor TalMySqlClient.Create(ApiVer: TALMySqlVersion_API;
-                                  const lib: AnsiString = 'libmysql.dll');
+{********************************}
+constructor TalMySqlClient.Create(
+              ApiVer: TALMySqlVersion_API;
+              const lib: AnsiString = 'libmysql.dll');
 begin
   fLibrary := TALMySqlLibrary.Create(ApiVer);
   try
@@ -424,14 +459,15 @@ end;
 
 {*************************************************************
 http://dev.mysql.com/doc/refman/5.1/en/mysql-real-connect.html}
-procedure TalMySqlClient.connect(const Host: AnsiString;
-                                 Port: integer;
-                                 const DataBaseName,
-                                       Login,
-                                       Password,
-                                       CharSet: AnsiString;
-                                 Const ClientFlag: Cardinal = 0;
-                                 const Options: TALMySQLOptions = nil);
+procedure TalMySqlClient.connect(
+            const Host: AnsiString;
+            Port: integer;
+            const DataBaseName,
+                  Login,
+                  Password,
+                  CharSet: AnsiString;
+            Const ClientFlag: Cardinal = 0;
+            const Options: TALMySQLOptions = nil);
 var I: integer;
 begin
   if connected then raise Exception.Create('Already connected');
@@ -445,27 +481,31 @@ begin
   Try
 
     //Allocates or initializes a MYSQL object suitable for mysql_real_connect()
-  	fMySQL := fLibrary.mysql_init(nil);
-  	CheckAPIError(fMySQL = nil);
+    fMySQL := fLibrary.mysql_init(nil);
+    CheckAPIError(fMySQL = nil);
 
     //set the The name of the character set to use as the default character set.
     If (CharSet <> '') then CheckAPIError(fLibrary.mysql_options(fMySQL, MYSQL_SET_CHARSET_NAME, PAnsiChar(CharSet)) <> 0);
 
     // set the options if they are existing
     for I := 0 to length(Options) - 1 do
-      CheckAPIError(FLibrary.mysql_options(FMySQL,
-                                           Options[I].Option,
-                                           Options[I].Value) <> 0);
+      CheckAPIError(
+        FLibrary.mysql_options(
+          FMySQL,
+          Options[I].Option,
+          Options[I].Value) <> 0);
 
     //attempts to establish a connection to a MySQL database engine running on host
-    CheckAPIError(fLibrary.mysql_real_connect(fMySQL,
-                                              PAnsiChar(Host),
-                                              PAnsiChar(Login),
-                                              PAnsiChar(Password),
-                                              PAnsiChar(DatabaseName),
-                                              Port,
-                                              nil,
-                                              ClientFlag) = nil);
+    CheckAPIError(
+      fLibrary.mysql_real_connect(
+        fMySQL,
+        PAnsiChar(Host),
+        PAnsiChar(Login),
+        PAnsiChar(Password),
+        PAnsiChar(DatabaseName),
+        Port,
+        nil,
+        ClientFlag) = nil);
 
   Except
 
@@ -542,37 +582,40 @@ begin
 
 end;
 
-{**************************************************************}
-procedure TalMySqlClient.OnSelectDataDone(const SQL: AnsiString;
-                                          const RowTag: AnsiString;
-                                          const ViewTag: AnsiString;
-                                          Skip: integer;
-                                          First: Integer;
-                                          CacheThreshold: Integer;
-                                          TimeTaken: Double);
+{****************************************}
+procedure TalMySqlClient.OnSelectDataDone(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            const ViewTag: AnsiString;
+            Skip: integer;
+            First: Integer;
+            CacheThreshold: Integer;
+            TimeTaken: Double);
 begin
   // virtual
 end;
 
-{**************************************************************}
-procedure TalMySqlClient.OnUpdateDataDone(const SQL: AnsiString;
-                                          TimeTaken: double);
+{****************************************}
+procedure TalMySqlClient.OnUpdateDataDone(
+            const SQL: AnsiString;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{********************************************************}
-procedure TalMySqlClient.SelectData(const SQL: AnsiString;
-                                    const RowTag: AnsiString;
-                                    const ViewTag: AnsiString;
-                                    Skip: integer; // used only if value is > 0
-                                    First: Integer; // used only if value is > 0
-                                    CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                                             // cache or not. Values <= 0 deactivate the cache
-                                    XMLDATA: TalXMLNode;
-                                    OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                    ExtData: Pointer;
-                                    const FormatSettings: TALFormatSettingsA);
+{**********************************}
+procedure TalMySqlClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            const ViewTag: AnsiString;
+            Skip: integer; // used only if value is > 0
+            First: Integer; // used only if value is > 0
+            CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                     // cache or not. Values <= 0 deactivate the cache
+            XMLDATA: TalXMLNode;
+            OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 Var LMySqlRes: PMYSQL_RES;
     LMySqlRow: PMYSQL_ROW;
     LMySqlFields: array of PMYSQL_FIELD;
@@ -620,11 +663,12 @@ begin
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      LCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    ALIntToStrA(Skip) + '#' +
-                                    ALIntToStrA(First) + '#' +
-                                    ALGetFormatSettingsID(FormatSettings) + '#' +
-                                    SQL);
+      LCacheKey := ALStringHashSHA1(
+                     RowTag + '#' +
+                     ALIntToStrA(Skip) + '#' +
+                     ALIntToStrA(First) + '#' +
+                     ALGetFormatSettingsID(FormatSettings) + '#' +
+                     SQL);
       if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
@@ -712,16 +756,18 @@ begin
                                                        FIELD_TYPE_MEDIUM_BLOB,
                                                        FIELD_TYPE_LONG_BLOB,
                                                        FIELD_TYPE_BLOB]) then LValueRec.ChildNodes.Add(
-                                                                                                       LValueRec.OwnerDocument.CreateNode(
-                                                                                                                                          GetFieldValue(LMySqlRow[LColumnIndex],
-                                                                                                                                                        LMySqlFields[LColumnIndex]._type,
-                                                                                                                                                        LMySqlFieldLengths[LColumnIndex],
-                                                                                                                                                        FormatSettings),
-                                                                                                                                          ntCData))
-              else LValueRec.Text := GetFieldValue(LMySqlRow[LColumnIndex],
-                                                   LMySqlFields[LColumnIndex]._type,
-                                                   LMySqlFieldLengths[LColumnIndex],
-                                                   FormatSettings);
+                                                                                LValueRec.OwnerDocument.CreateNode(
+                                                                                  GetFieldValue(
+                                                                                    LMySqlRow[LColumnIndex],
+                                                                                    LMySqlFields[LColumnIndex]._type,
+                                                                                    LMySqlFieldLengths[LColumnIndex],
+                                                                                    FormatSettings),
+                                                                                  ntCData))
+              else LValueRec.Text := GetFieldValue(
+                                       LMySqlRow[LColumnIndex],
+                                       LMySqlFields[LColumnIndex]._type,
+                                       LMySqlFieldLengths[LColumnIndex],
+                                       FormatSettings);
               if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
             end;
 
@@ -752,22 +798,24 @@ begin
 
     //do the OnSelectDataDone
     LStopWatch.Stop;
-    OnSelectDataDone(SQL,
-                     RowTag,
-                     ViewTag,
-                     Skip,
-                     First,
-                     CacheThreshold,
-                     LStopWatch.Elapsed.TotalMilliseconds);
+    OnSelectDataDone(
+      SQL,
+      RowTag,
+      ViewTag,
+      Skip,
+      First,
+      CacheThreshold,
+      LStopWatch.Elapsed.TotalMilliseconds);
 
     //save to the cache
     If LCacheKey <> '' then begin
 
       //save the data
       LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
-      SaveDataToCache(LCacheKey,
-                      CacheThreshold,
-                      LCacheStr);
+      SaveDataToCache(
+        LCacheKey,
+        CacheThreshold,
+        LCacheStr);
 
     end;
 
@@ -777,97 +825,107 @@ begin
 
 end;
 
-{********************************************************}
-procedure TalMySqlClient.SelectData(const SQL: AnsiString;
-                                    Skip: Integer;
-                                    First: Integer;
-                                    OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                    ExtData: Pointer;
-                                    const FormatSettings: TALFormatSettingsA);
+{**********************************}
+procedure TalMySqlClient.SelectData(
+            const SQL: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 begin
-  SelectData(SQL,
-             '', // RowTag,
-             '', //ViewTag,
-             Skip,
-             First,
-             -1, // CacheThreshold,
-             nil, // XMLDATA,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+  SelectData(
+    SQL,
+    '', // RowTag,
+    '', //ViewTag,
+    Skip,
+    First,
+    -1, // CacheThreshold,
+    nil, // XMLDATA,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings);
 end;
 
-{********************************************************}
-procedure TalMySqlClient.SelectData(const SQL: AnsiString;
-                                    OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                    ExtData: Pointer;
-                                    const FormatSettings: TALFormatSettingsA);
+{**********************************}
+procedure TalMySqlClient.SelectData(
+            const SQL: AnsiString;
+            OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 begin
-  SelectData(SQL,
-             '', // RowTag,
-             '', // ViewTag,
-             -1, // Skip,
-             -1, // First,
-             -1, // CacheThreshold,
-             nil, // XMLDATA,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+  SelectData(
+    SQL,
+    '', // RowTag,
+    '', // ViewTag,
+    -1, // Skip,
+    -1, // First,
+    -1, // CacheThreshold,
+    nil, // XMLDATA,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings);
 end;
 
-{********************************************************}
-procedure TalMySqlClient.SelectData(const SQL: AnsiString;
-                                    const RowTag: AnsiString;
-                                    Skip: Integer;
-                                    First: Integer;
-                                    XMLDATA: TalXMLNode;
-                                    const FormatSettings: TALFormatSettingsA);
+{**********************************}
+procedure TalMySqlClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 begin
-  SelectData(SQL,
-             RowTag,
-             '', // ViewTag,
-             Skip,
-             First,
-             -1, // CacheThreshold,
-             XMLDATA,
-             nil, // OnNewRowFunct,
-             nil, // ExtData,
-             FormatSettings);
+  SelectData(
+    SQL,
+    RowTag,
+    '', // ViewTag,
+    Skip,
+    First,
+    -1, // CacheThreshold,
+    XMLDATA,
+    nil, // OnNewRowFunct,
+    nil, // ExtData,
+    FormatSettings);
 end;
 
-{********************************************************}
-procedure TalMySqlClient.SelectData(const SQL: AnsiString;
-                                    const RowTag: AnsiString;
-                                    XMLDATA: TalXMLNode;
-                                    const FormatSettings: TALFormatSettingsA);
+{**********************************}
+procedure TalMySqlClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 begin
-  SelectData(SQL,
-             RowTag,
-             '', // ViewTag,
-             -1, // Skip,
-             -1, // First,
-             -1, // CacheThreshold,
-             XMLDATA,
-             nil, // OnNewRowFunct,
-             nil, // ExtData,
-             FormatSettings);
+  SelectData(
+    SQL,
+    RowTag,
+    '', // ViewTag,
+    -1, // Skip,
+    -1, // First,
+    -1, // CacheThreshold,
+    XMLDATA,
+    nil, // OnNewRowFunct,
+    nil, // ExtData,
+    FormatSettings);
 end;
 
-{********************************************************}
-procedure TalMySqlClient.SelectData(const SQL: AnsiString;
-                                    XMLDATA: TalXMLNode;
-                                    const FormatSettings: TALFormatSettingsA);
+{**********************************}
+procedure TalMySqlClient.SelectData(
+            const SQL: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 begin
-  SelectData(SQL,
-             '', // RowTag,
-             '', // ViewTag,
-             -1, // Skip,
-             -1, // First,
-             -1, // CacheThreshold,
-             XMLDATA,
-             nil, // OnNewRowFunct,
-             nil, // ExtData,
-             FormatSettings);
+  SelectData(
+    SQL,
+    '', // RowTag,
+    '', // ViewTag,
+    -1, // Skip,
+    -1, // First,
+    -1, // CacheThreshold,
+    XMLDATA,
+    nil, // OnNewRowFunct,
+    nil, // ExtData,
+    FormatSettings);
 end;
 
 {*********************************************************}
@@ -890,8 +948,9 @@ begin
 
   //do the OnUpdateDataDone
   LStopWatch.Stop;
-  OnUpdateDataDone(SQL,
-                   LStopWatch.Elapsed.TotalMilliseconds);
+  OnUpdateDataDone(
+    SQL,
+    LStopWatch.Elapsed.TotalMilliseconds);
 
 end;
 
@@ -903,7 +962,7 @@ begin
     UpdateData(SQLs[I]);
 end;
 
-{****************************************************}
+{*****************************************************}
 procedure TalMySqlClient.UpdateData(SQLs: TALStringsA);
 var I: integer;
 begin
@@ -932,17 +991,19 @@ begin
 
 end;
 
-{*************************************************************************}
-function TalMySqlConnectionPoolClient.loadCachedData(const Key: AnsiString;
-                                                     var DataStr: AnsiString): Boolean;
+{***************************************************}
+function TalMySqlConnectionPoolClient.loadCachedData(
+           const Key: AnsiString;
+           var DataStr: AnsiString): Boolean;
 begin
   result := false; //virtual need to be overriden
 end;
 
-{***************************************************************************}
-Procedure TalMySqlConnectionPoolClient.SaveDataToCache(const Key: ansiString;
-                                                       const CacheThreshold: integer;
-                                                       const DataStr: ansiString);
+{*****************************************************}
+Procedure TalMySqlConnectionPoolClient.SaveDataToCache(
+            const Key: ansiString;
+            const CacheThreshold: integer;
+            const DataStr: ansiString);
 begin
   //virtual need to be overriden
 end;
@@ -951,12 +1012,14 @@ end;
 procedure TalMySqlConnectionPoolClient.CheckAPIError(ConnectionHandle: PMySql; Error: Boolean);
 begin
   if Error then begin
-    if assigned(ConnectionHandle) then raise EALMySqlError.Create(fLibrary.mysql_error(ConnectionHandle),
-                                                                  fLibrary.mysql_errno(ConnectionHandle),
-                                                                  fLibrary.mysql_SqlState(ConnectionHandle))
-    else raise EALMySqlError.Create('MySql error',
-                                    -1,
-                                    'HY000'); // The value 'HY000' (general error) is used for unmapped error numbers.
+    if assigned(ConnectionHandle) then raise EALMySqlError.Create(
+                                               fLibrary.mysql_error(ConnectionHandle),
+                                               fLibrary.mysql_errno(ConnectionHandle),
+                                               fLibrary.mysql_SqlState(ConnectionHandle))
+    else raise EALMySqlError.Create(
+                 'MySql error',
+                 -1,
+                 'HY000'); // The value 'HY000' (general error) is used for unmapped error numbers.
   end;
 end;
 
@@ -978,11 +1041,12 @@ begin
   result := fPort;
 end;
 
-{*************************************************************************}
-function TalMySqlConnectionPoolClient.GetFieldValue(aFieldValue: PAnsiChar;
-                                                    aFieldType: TMysqlFieldTypes;
-                                                    aFieldLength: integer;
-                                                    const aFormatSettings: TALFormatSettingsA): AnsiString;
+{**************************************************}
+function TalMySqlConnectionPoolClient.GetFieldValue(
+           aFieldValue: PAnsiChar;
+           aFieldType: TMysqlFieldTypes;
+           aFieldLength: integer;
+           const aFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   //The lengths of the field values in the row may be obtained by calling mysql_fetch_lengths().
   //Empty fields and fields containing NULL both have length 0; you can distinguish these
@@ -1006,15 +1070,16 @@ begin
   end;
 end;
 
-{************************************************************************}
-procedure TalMySqlConnectionPoolClient.initObject(const aHost: AnsiString;
-                                                  aPort: integer;
-                                                  const aDataBaseName,
-                                                        aLogin,
-                                                        aPassword,
-                                                        aCharSet: AnsiString;
-                                                  Const aOpenConnectionClientFlag: Cardinal = 0;
-                                                  Const aOpenConnectionOptions: TALMySQLOptions = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.initObject(
+            const aHost: AnsiString;
+            aPort: integer;
+            const aDataBaseName,
+                  aLogin,
+                  aPassword,
+                  aCharSet: AnsiString;
+            Const aOpenConnectionClientFlag: Cardinal = 0;
+            Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
   fHost := aHost;
   fPort := aPort;
@@ -1035,57 +1100,61 @@ begin
   FNullString := '';
 end;
 
-{****************************************************************}
-constructor TalMySqlConnectionPoolClient.Create(const aHost: AnsiString;
-                                                aPort: integer;
-                                                const aDataBaseName,
-                                                      aLogin,
-                                                      aPassword,
-                                                      aCharSet: AnsiString;
-                                                aApiVer: TALMySqlVersion_API;
-                                                Const alib: AnsiString = 'libmysql.dll';
-                                                Const aOpenConnectionClientFlag: Cardinal = 0;
-                                                Const aOpenConnectionOptions: TALMySQLOptions = nil);
+{**********************************************}
+constructor TalMySqlConnectionPoolClient.Create(
+              const aHost: AnsiString;
+              aPort: integer;
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              aApiVer: TALMySqlVersion_API;
+              Const alib: AnsiString = 'libmysql.dll';
+              Const aOpenConnectionClientFlag: Cardinal = 0;
+              Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
   fLibrary := TALMySqlLibrary.Create(aApiVer);
   Try
     fLibrary.Load(alib);
     FownLibrary := True;
-    initObject(aHost,
-               aPort,
-               aDataBaseName,
-               aLogin,
-               aPassword,
-               aCharSet,
-               aOpenConnectionClientFlag,
-               aOpenConnectionOptions);
+    initObject(
+      aHost,
+      aPort,
+      aDataBaseName,
+      aLogin,
+      aPassword,
+      aCharSet,
+      aOpenConnectionClientFlag,
+      aOpenConnectionOptions);
   except
     FreeandNil(fLibrary);
     raise;
   End;
 end;
 
-{**********************************************************************}
-constructor TalMySqlConnectionPoolClient.Create(const aHost: AnsiString;
-                                                aPort: integer;
-                                                const aDataBaseName,
-                                                      aLogin,
-                                                      aPassword,
-                                                      aCharSet: AnsiString;
-                                                alib: TALMySqlLibrary;
-                                                Const aOpenConnectionClientFlag: Cardinal = 0;
-                                                Const aOpenConnectionOptions: TALMySQLOptions = nil);
+{**********************************************}
+constructor TalMySqlConnectionPoolClient.Create(
+              const aHost: AnsiString;
+              aPort: integer;
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              alib: TALMySqlLibrary;
+              Const aOpenConnectionClientFlag: Cardinal = 0;
+              Const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
   fLibrary := alib;
   FownLibrary := False;
-  initObject(aHost,
-             aPort,
-             aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aOpenConnectionClientFlag,
-             aOpenConnectionOptions);
+  initObject(
+    aHost,
+    aPort,
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aOpenConnectionClientFlag,
+    aOpenConnectionOptions);
 end;
 
 {**********************************************}
@@ -1191,22 +1260,25 @@ Begin
 
           // set the options if they are existing
           for i := 0 to length(FOpenConnectionOptions) - 1 do
-            CheckAPIError(Result,
-                          FLibrary.mysql_options(Result,
-                                                 FOpenConnectionOptions[i].Option,
-                                                 FOpenConnectionOptions[i].Value) <> 0);
+            CheckAPIError(
+              Result,
+              FLibrary.mysql_options(
+                Result,
+                FOpenConnectionOptions[i].Option,
+                FOpenConnectionOptions[i].Value) <> 0);
 
           //attempts to establish a connection to a MySQL database engine running on host
           CheckAPIError(
             Result,
-            fLibrary.mysql_real_connect(Result,
-                                        PAnsiChar(Host),
-                                        PAnsiChar(fLogin),
-                                        PAnsiChar(fPassword),
-                                        PAnsiChar(fDatabaseName),
-                                        Port,
-                                        nil,
-                                        fOpenConnectionClientFlag) = nil);
+            fLibrary.mysql_real_connect(
+              Result,
+              PAnsiChar(Host),
+              PAnsiChar(fLogin),
+              PAnsiChar(fPassword),
+              PAnsiChar(fDatabaseName),
+              Port,
+              nil,
+              fOpenConnectionClientFlag) = nil);
 
         Except
 
@@ -1432,38 +1504,41 @@ begin
 
 end;
 
-{****************************************************************************}
-procedure TalMySqlConnectionPoolClient.OnSelectDataDone(const SQL: AnsiString;
-                                                        const RowTag: AnsiString;
-                                                        const ViewTag: AnsiString;
-                                                        Skip: integer;
-                                                        First: Integer;
-                                                        CacheThreshold: Integer;
-                                                        TimeTaken: double);
+{******************************************************}
+procedure TalMySqlConnectionPoolClient.OnSelectDataDone(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            const ViewTag: AnsiString;
+            Skip: integer;
+            First: Integer;
+            CacheThreshold: Integer;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{****************************************************************************}
-procedure TalMySqlConnectionPoolClient.OnUpdateDataDone(const SQL: AnsiString;
-                                                        TimeTaken: double);
+{******************************************************}
+procedure TalMySqlConnectionPoolClient.OnUpdateDataDone(
+            const SQL: AnsiString;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                  const RowTag: AnsiString;
-                                                  const ViewTag: AnsiString;
-                                                  Skip: integer; // used only if value is > 0
-                                                  First: Integer; // used only if value is > 0
-                                                  CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
-                                                                           // cache or not. Values <= 0 deactivate the cache
-                                                  XMLDATA: TalXMLNode;
-                                                  OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                                  ExtData: Pointer;
-                                                  const FormatSettings: TALFormatSettingsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            const ViewTag: AnsiString;
+            Skip: integer; // used only if value is > 0
+            First: Integer; // used only if value is > 0
+            CacheThreshold: Integer; // The threshold value (in ms) determine whether we will use
+                                     // cache or not. Values <= 0 deactivate the cache
+            XMLDATA: TalXMLNode;
+            OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const ConnectionHandle: PMySql = nil);
 
 Var LMySqlRes: PMYSQL_RES;
     LMySqlRow: PMYSQL_ROW;
@@ -1511,11 +1586,12 @@ begin
         (ViewTag <> '')) then begin
 
       //try to load from from cache
-      LCacheKey := ALStringHashSHA1(RowTag + '#' +
-                                    ALIntToStrA(Skip) + '#' +
-                                    ALIntToStrA(First) + '#' +
-                                    ALGetFormatSettingsID(FormatSettings) + '#' +
-                                    SQL);
+      LCacheKey := ALStringHashSHA1(
+                     RowTag + '#' +
+                     ALIntToStrA(Skip) + '#' +
+                     ALIntToStrA(First) + '#' +
+                     ALGetFormatSettingsID(FormatSettings) + '#' +
+                     SQL);
       if loadcachedData(LCacheKey, LCacheStr) then begin
 
         //init the aViewRec
@@ -1609,16 +1685,18 @@ begin
                                                          FIELD_TYPE_MEDIUM_BLOB,
                                                          FIELD_TYPE_LONG_BLOB,
                                                          FIELD_TYPE_BLOB]) then LValueRec.ChildNodes.Add(
-                                                                                                         LValueRec.OwnerDocument.CreateNode(
-                                                                                                                                            GetFieldValue(LMySqlRow[LColumnIndex],
-                                                                                                                                                          LMySqlFields[LColumnIndex]._type,
-                                                                                                                                                          LMySqlFieldLengths[LColumnIndex],
-                                                                                                                                                          FormatSettings),
-                                                                                                                                            ntCData))
-                else LValueRec.Text := GetFieldValue(LMySqlRow[LColumnIndex],
-                                                     LMySqlFields[LColumnIndex]._type,
-                                                     LMySqlFieldLengths[LColumnIndex],
-                                                     FormatSettings);
+                                                                                  LValueRec.OwnerDocument.CreateNode(
+                                                                                    GetFieldValue(
+                                                                                      LMySqlRow[LColumnIndex],
+                                                                                      LMySqlFields[LColumnIndex]._type,
+                                                                                      LMySqlFieldLengths[LColumnIndex],
+                                                                                      FormatSettings),
+                                                                                    ntCData))
+                else LValueRec.Text := GetFieldValue(
+                                         LMySqlRow[LColumnIndex],
+                                         LMySqlFields[LColumnIndex]._type,
+                                         LMySqlFieldLengths[LColumnIndex],
+                                         FormatSettings);
                 if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
               end;
 
@@ -1649,22 +1727,24 @@ begin
 
       //do the OnSelectDataDone
       LStopWatch.Stop;
-      OnSelectDataDone(SQL,
-                       RowTag,
-                       ViewTag,
-                       Skip,
-                       First,
-                       CacheThreshold,
-                       LStopWatch.Elapsed.TotalMilliseconds);
+      OnSelectDataDone(
+        SQL,
+        RowTag,
+        ViewTag,
+        Skip,
+        First,
+        CacheThreshold,
+        LStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
       If LCacheKey <> '' then begin
 
         //save the data
         LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
-        SaveDataToCache(LCacheKey,
-                        CacheThreshold,
-                        LCacheStr);
+        SaveDataToCache(
+          LCacheKey,
+          CacheThreshold,
+          LCacheStr);
 
       end;
 
@@ -1693,107 +1773,117 @@ begin
 
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                  Skip: Integer;
-                                                  First: Integer;
-                                                  OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                                  ExtData: Pointer;
-                                                  const FormatSettings: TALFormatSettingsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const ConnectionHandle: PMySql = nil);
 begin
-  SelectData(SQL,
-             '', // RowTag,
-             '', // ViewTag,
-             Skip,
-             First,
-             -1, // CacheThreshold,
-             nil, // XMLDATA,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings,
-             ConnectionHandle);
+  SelectData(
+    SQL,
+    '', // RowTag,
+    '', // ViewTag,
+    Skip,
+    First,
+    -1, // CacheThreshold,
+    nil, // XMLDATA,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings,
+    ConnectionHandle);
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                  OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                                                  ExtData: Pointer;
-                                                  const FormatSettings: TALFormatSettingsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const ConnectionHandle: PMySql = nil);
 begin
-  SelectData(SQL,
-             '', // RowTag,
-             '', // ViewTag,
-             -1, // Skip,
-             -1, // First,
-             -1, // CacheThreshold,
-             nil, // XMLDATA,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings,
-             ConnectionHandle);
+  SelectData(
+    SQL,
+    '', // RowTag,
+    '', // ViewTag,
+    -1, // Skip,
+    -1, // First,
+    -1, // CacheThreshold,
+    nil, // XMLDATA,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings,
+    ConnectionHandle);
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                  const RowTag: AnsiString;
-                                                  Skip: Integer;
-                                                  First: Integer;
-                                                  XMLDATA: TalXMLNode;
-                                                  const FormatSettings: TALFormatSettingsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const ConnectionHandle: PMySql = nil);
 begin
-  SelectData(SQL,
-             RowTag,
-             '', // ViewTag,
-             Skip,
-             First,
-             -1, // CacheThreshold,
-             XMLDATA,
-             nil, // OnNewRowFunct,
-             nil, // ExtData,
-             FormatSettings,
-             ConnectionHandle);
+  SelectData(
+    SQL,
+    RowTag,
+    '', // ViewTag,
+    Skip,
+    First,
+    -1, // CacheThreshold,
+    XMLDATA,
+    nil, // OnNewRowFunct,
+    nil, // ExtData,
+    FormatSettings,
+    ConnectionHandle);
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                  const RowTag: AnsiString;
-                                                  XMLDATA: TalXMLNode;
-                                                  const FormatSettings: TALFormatSettingsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const ConnectionHandle: PMySql = nil);
 begin
-  SelectData(SQL,
-             RowTag,
-             '', // ViewTag,
-             -1, // Skip,
-             -1, // First,
-             -1, // CacheThreshold,
-             XMLDATA,
-             nil, // OnNewRowFunct,
-             nil, // ExtData,
-             FormatSettings,
-             ConnectionHandle);
+  SelectData(
+    SQL,
+    RowTag,
+    '', // ViewTag,
+    -1, // Skip,
+    -1, // First,
+    -1, // CacheThreshold,
+    XMLDATA,
+    nil, // OnNewRowFunct,
+    nil, // ExtData,
+    FormatSettings,
+    ConnectionHandle);
 end;
 
-{**********************************************************************}
-procedure TalMySqlConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                  XMLDATA: TalXMLNode;
-                                                  const FormatSettings: TALFormatSettingsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const ConnectionHandle: PMySql = nil);
 begin
-  SelectData(SQL,
-             '', // RowTag,
-             '', // ViewTag,
-             -1, // Skip,
-             -1, // First,
-             -1, // CacheThreshold,
-             XMLDATA,
-             nil, // OnNewRowFunct,
-             nil, // ExtData,
-             FormatSettings,
-             ConnectionHandle);
+  SelectData(
+    SQL,
+    '', // RowTag,
+    '', // ViewTag,
+    -1, // Skip,
+    -1, // First,
+    -1, // CacheThreshold,
+    XMLDATA,
+    nil, // OnNewRowFunct,
+    nil, // ExtData,
+    FormatSettings,
+    ConnectionHandle);
 end;
 
 {*************************************************************************************************************}
@@ -1821,8 +1911,9 @@ begin
 
     //do the OnUpdateDataDone
     LStopWatch.Stop;
-    OnUpdateDataDone(SQL,
-                     LStopWatch.Elapsed.TotalMilliseconds);
+    OnUpdateDataDone(
+      SQL,
+      LStopWatch.Elapsed.TotalMilliseconds);
 
     //commit the transaction and release the connection if owned
     if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
@@ -1845,9 +1936,10 @@ begin
 
 end;
 
-{********************************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(const SQLs: array of AnsiString;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(
+            const SQLs: array of AnsiString;
+            const ConnectionHandle: PMySql = nil);
 Var LTmpConnectionHandle: PMySql;
     LOwnConnection: Boolean;
     I: integer;
@@ -1861,8 +1953,9 @@ begin
 
     //update the data
     for I := Low(SQLs) to High(SQLs) do
-      UpdateData(SQLs[I],
-                 LTmpConnectionHandle);
+      UpdateData(
+        SQLs[I],
+        LTmpConnectionHandle);
 
     //commit the transaction and release the connection if owned
     if LOwnConnection then TransactionCommit(LTmpConnectionHandle);
@@ -1885,9 +1978,10 @@ begin
 
 end;
 
-{*****************************************************************}
-procedure TalMySqlConnectionPoolClient.UpdateData(SQLs: TALStringsA;
-                                                  const ConnectionHandle: PMySql = nil);
+{************************************************}
+procedure TalMySqlConnectionPoolClient.UpdateData(
+            SQLs: TALStringsA;
+            const ConnectionHandle: PMySql = nil);
 Var LTmpConnectionHandle: PMySql;
     LOwnConnection: Boolean;
     I: integer;
@@ -1901,8 +1995,9 @@ begin
 
     //update the data
     for I := 0 to SQLs.Count - 1 do
-      UpdateData(SQLs[I],
-                 LTmpConnectionHandle);
+      UpdateData(
+        SQLs[I],
+        LTmpConnectionHandle);
 
     //commit the transaction and release the connection if owned
     if LOwnConnection then TransactionCommit(LTmpConnectionHandle);

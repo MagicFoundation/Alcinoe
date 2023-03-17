@@ -770,6 +770,7 @@ implementation
 //  Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyJFIFDictionary');
 //end;
 
+{************************************************}
 function kCGImagePropertyExifDictionary: NSString;
 begin
   Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyExifDictionary');
@@ -880,6 +881,7 @@ end;
 //  Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyDepth');
 //end;
 
+{*********************************************}
 function kCGImagePropertyOrientation: NSString;
 begin
   Result := CocoaNSStringConst(libImageIO, 'kCGImagePropertyOrientation');

@@ -404,7 +404,7 @@ end;
 {$REGION ' IOS'}
 {$IF defined(ios)}
 
-{*********************************}
+{********************************}
 constructor TALIosTextView.Create;
 var LUIColor: UIColor;
 begin
@@ -416,14 +416,14 @@ begin
   //      so it's seam something acquire it
 end;
 
-{***********************************************************}
+{**********************************************************}
 constructor TALIosTextView.Create(const AControl: TControl);
 begin
   fMemoControl := TALIosMemo(AControl);
   inherited;
 end;
 
-{*********************************}
+{********************************}
 destructor TALIosTextView.Destroy;
 begin
   inherited;
@@ -435,7 +435,7 @@ begin
   Result := TALIosTextViewDelegate.Create(Self);
 end;
 
-{********************************************************}
+{*******************************************************}
 function TALIosTextView.canBecomeFirstResponder: Boolean;
 begin
   Result := Control.CanFocus and Control.HitTest;
@@ -449,7 +449,7 @@ begin
   else result := UIScrollView(Super).canPerformAction(action, withSender);
 end;
 
-{*****************************************************}
+{****************************************************}
 function TALIosTextView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IALUITextView);
@@ -1943,6 +1943,7 @@ begin
   result := FMemoControl.getLineCount;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALMemo]);

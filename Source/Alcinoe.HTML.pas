@@ -7,18 +7,21 @@ interface
 uses
   Alcinoe.StringList;
 
-procedure ALExtractHTMLText(HtmlContent: AnsiString;
-                            LstExtractedResourceText: TALStringsA;
-                            Const DecodeHTMLText: Boolean = True); overload;
-function  ALExtractHTMLText(const HtmlContent: AnsiString;
-                            Const DecodeHTMLText: Boolean = True): AnsiString; overload;
+procedure ALExtractHTMLText(
+            HtmlContent: AnsiString;
+            LstExtractedResourceText: TALStringsA;
+            Const DecodeHTMLText: Boolean = True); overload;
+function  ALExtractHTMLText(
+            const HtmlContent: AnsiString;
+            Const DecodeHTMLText: Boolean = True): AnsiString; overload;
 function  ALXMLCDataElementEncode(const Src: AnsiString): AnsiString;
 function  ALXMLTextElementEncode(const Src: AnsiString; const useNumericReference: boolean = True): AnsiString;
 procedure ALXMLTextElementDecodeV(var Str: AnsiString);
 function  ALXMLTextElementDecode(const Src: AnsiString): AnsiString;
-function  ALHTMLEncode(const Src: AnsiString;
-                       const EncodeASCIIHtmlEntities: Boolean = True;
-                       const useNumericReference: boolean = True): AnsiString;
+function  ALHTMLEncode(
+            const Src: AnsiString;
+            const EncodeASCIIHtmlEntities: Boolean = True;
+            const useNumericReference: boolean = True): AnsiString;
 function  ALHTMLDecode(const Src: AnsiString): AnsiString;
 function  ALJavascriptEncode(const Src: AnsiString; const useNumericReference: boolean = true): AnsiString; overload;
 function  ALJavascriptEncode(const Src: String; const useNumericReference: boolean = true): String; overload;
@@ -29,9 +32,10 @@ function  ALJavascriptDecode(const Src: String): String; overload;
 {$IFDEF MSWINDOWS}
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 {$ENDIF}
-procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
-                                                     Const DeleteBodyOfUnwantedTag: Boolean = False;
-                                                     const ReplaceUnwantedTagCharBy: AnsiChar = #1);
+procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(
+            Var HtmlContent: AnsiString;
+            Const DeleteBodyOfUnwantedTag: Boolean = False;
+            const ReplaceUnwantedTagCharBy: AnsiChar = #1);
 procedure ALCompactHtmlTagParams(TagParams: TALStringsA);
 
 
@@ -54,7 +58,7 @@ uses
 Var
   _ALHtmlEntities: TALStringsA;
 
-{************************************************************}
+{*************************************************************}
 procedure ALInitHtmlEntities(const aHtmlEntities: TALStringsA);
 Begin
 
@@ -414,7 +418,7 @@ var CurrPos: integer;
     Chars: array[1..10] of AnsiChar;
     IsUniqueString: boolean;
 
-    {------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _GenerateUniqueString;
     var Padding: integer;
     begin
@@ -425,13 +429,13 @@ var CurrPos: integer;
       IsUniqueString := true;
     end;
 
-    {--------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _DecimalToInt(I: integer; Ch: AnsiChar): integer;
     begin
       Result := I * 10 + Ord(Ch) - Ord('0');
     end;
 
-    {----------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _HexToInt(I: integer; Ch: AnsiChar): integer;
     begin
       case Ch of
@@ -442,7 +446,7 @@ var CurrPos: integer;
       end;
     end;
 
-    {---------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyCurrPosCharToResult;
     begin
       if IsUniqueString then PResTail^ := Str[CurrPos];
@@ -450,7 +454,7 @@ var CurrPos: integer;
       Inc(CurrPos);
     end;
 
-    {-----------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyAnsiCharToResult(aCharInt: integer; aNewCurrPos: integer);
     begin
       if not IsUniqueString then _GenerateUniqueString;
@@ -459,7 +463,7 @@ var CurrPos: integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {--------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyUnicodeCharToResult(aCharInt: integer; aNewCurrPos: integer);
     var LString: AnsiString;
         k: integer;
@@ -473,7 +477,7 @@ var CurrPos: integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {---------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyHexadecimalEntityToResult(aEntityLength: integer); // aEntityLength include the last ; but not the first &
     var i: integer;
         Res: integer;
@@ -488,7 +492,7 @@ var CurrPos: integer;
                                                                   //            ^CurrPos
     end;
 
-    {-----------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyDecimalEntityToResult(aEntityLength: integer); // aEntityLength include the last ; but not the first &
     var i: integer;
         Res: integer;
@@ -634,10 +638,11 @@ begin
   ALXMLTextElementDecodeV(result);
 end;
 
-{******************************************}
-function ALHTMLEncode(const Src: AnsiString;
-                      const EncodeASCIIHtmlEntities: Boolean = True;
-                      const useNumericReference: boolean = True): AnsiString;
+{********************}
+function ALHTMLEncode(
+           const Src: AnsiString;
+           const EncodeASCIIHtmlEntities: Boolean = True;
+           const useNumericReference: boolean = True): AnsiString;
 
 var i, k, l: integer;
     Buf, P: PAnsiChar;
@@ -784,7 +789,7 @@ function ALHTMLDecode(const Src: AnsiString): AnsiString;
 
 var CurrentSrcPos, CurrentResultPos : Integer;
 
-  {---------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CopyCurrentSrcPosCharToResult;
   Begin
     result[CurrentResultPos] := src[CurrentSrcPos];
@@ -792,7 +797,7 @@ var CurrentSrcPos, CurrentResultPos : Integer;
     inc(CurrentSrcPos);
   end;
 
-  {----------------------------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CopyCharToResult(aUnicodeOrdEntity: Integer; aNewCurrentSrcPos: integer);
   Var LString: AnsiString;
       K: integer;
@@ -834,10 +839,12 @@ begin
 
           {HTML entity is hexa}
           IF (Src[CurrentSrcPos+2] = 'x') then begin
-            if ALTryStrToInt('$' + ALCopyStr(Src,
-                                             CurrentSrcPos+3,
-                                             j-CurrentSrcPos-3),
-                             LTmpInteger)
+            if ALTryStrToInt(
+                 '$' + ALCopyStr(
+                         Src,
+                         CurrentSrcPos+3,
+                         j-CurrentSrcPos-3),
+                 LTmpInteger)
             then _CopyCharToResult(LTmpInteger, J+1)
             else _CopyCurrentSrcPosCharToResult;
           end
@@ -846,10 +853,12 @@ begin
           else begin
 
             {numeric HTML entity is valid}
-            if ALTryStrToInt(ALCopyStr(Src,
-                                       CurrentSrcPos+2,
-                                       j-CurrentSrcPos-2),
-                             LTmpInteger)
+            if ALTryStrToInt(
+                 ALCopyStr(
+                   Src,
+                   CurrentSrcPos+2,
+                   j-CurrentSrcPos-2),
+                 LTmpInteger)
             then _CopyCharToResult(LTmpInteger, J+1)
             else _CopyCurrentSrcPosCharToResult;
 
@@ -860,9 +869,11 @@ begin
         {HTML entity is litteral}
         else begin
 
-          LTmpInteger := _ALHtmlEntities.IndexOf(ALCopyStr(Src,
-                                                           CurrentSrcPos+1,
-                                                           j-CurrentSrcPos-1));
+          LTmpInteger := _ALHtmlEntities.IndexOf(
+                           ALCopyStr(
+                             Src,
+                             CurrentSrcPos+1,
+                             j-CurrentSrcPos-1));
           If LTmpInteger >= 0 then _CopyCharToResult(integer(_ALHtmlEntities.Objects[LTmpInteger]),J+1)
           else _CopyCurrentSrcPosCharToResult;
 
@@ -1152,7 +1163,7 @@ var CurrPos : Integer;
     Ch1, Ch2, Ch3, Ch4, Ch5: ansiChar;
     IsUniqueString: boolean;
 
-    {------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _GenerateUniqueString;
     var Padding: integer;
     begin
@@ -1163,13 +1174,13 @@ var CurrPos : Integer;
       IsUniqueString := true;
     end;
 
-    {----------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _OctToInt(I: integer; Ch: ansiChar): integer;
     begin
       Result := I * 8 + Ord(Ch) - Ord('0');
     end;
 
-    {----------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _HexToInt(I: integer; Ch: ansiChar): integer;
     begin
       case Ch of
@@ -1180,7 +1191,7 @@ var CurrPos : Integer;
       end;
     end;
 
-    {---------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyCurrPosCharToResult;
     Begin
       if IsUniqueString then pResTail^ := Str[CurrPos];
@@ -1188,7 +1199,7 @@ var CurrPos : Integer;
       inc(CurrPos);
     end;
 
-    {-----------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyAnsiCharToResult(aCharInt: Integer; aNewCurrPos: integer);
     begin
       if not IsUniqueString then _GenerateUniqueString;
@@ -1197,7 +1208,7 @@ var CurrPos : Integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {--------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
     var LString: AnsiString;
         K: integer;
@@ -1211,7 +1222,7 @@ var CurrPos : Integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {---------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyUnicodeCharToResult; overload;
     var I: integer;
     Begin
@@ -1222,19 +1233,20 @@ var CurrPos : Integer;
       _CopyUnicodeCharToResult(I, CurrPos+6);
     end;
 
-    {------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
     var LChar: WideChar;
         LString: AnsiString;
         K: integer;
     begin
       if not IsUniqueString then _GenerateUniqueString;
-      if UnicodeFromLocaleChars(28591, //CodePage,
-                                0, // Flags
-                                @aCharInt,// LocaleStr
-                                1, // LocaleStrLen
-                                @LChar, // UnicodeStr
-                                1)<> 1 then RaiseLastOSError; // UnicodeStrLen
+      if UnicodeFromLocaleChars(
+           28591, //CodePage,
+           0, // Flags
+           @aCharInt,// LocaleStr
+           1, // LocaleStrLen
+           @LChar, // UnicodeStr
+           1)<> 1 then RaiseLastOSError; // UnicodeStrLen
       LString := AnsiString(LChar);
       for k := low(LString) to high(LString) do begin
         pResTail^ := LString[k];
@@ -1243,7 +1255,7 @@ var CurrPos : Integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {-------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyHexIso88591CharToResult;
     var I: integer;
     Begin
@@ -1252,7 +1264,7 @@ var CurrPos : Integer;
       _CopyIso88591CharToResult(I, CurrPos+4);
     end;
 
-    {-------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyOctIso88591CharToResult;
     var I: integer;
     Begin
@@ -1376,7 +1388,7 @@ var CurrPos : Integer;
     Ch1, Ch2, Ch3, Ch4, Ch5: Char;
     IsUniqueString: boolean;
 
-    {------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _GenerateUniqueString;
     var Padding: integer;
     begin
@@ -1387,13 +1399,13 @@ var CurrPos : Integer;
       IsUniqueString := true;
     end;
 
-    {------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _OctToInt(I: integer; Ch: Char): integer;
     begin
       Result := I * 8 + Ord(Ch) - Ord('0');
     end;
 
-    {------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _HexToInt(I: integer; Ch: Char): integer;
     begin
       case Ch of
@@ -1404,7 +1416,7 @@ var CurrPos : Integer;
       end;
     end;
 
-    {---------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyCurrPosCharToResult;
     Begin
       if IsUniqueString then pResTail^ := Str[CurrPos];
@@ -1412,7 +1424,7 @@ var CurrPos : Integer;
       inc(CurrPos);
     end;
 
-    {-------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyCharToResult(aCharInt: Integer; aNewCurrPos: integer);
     begin
       if not IsUniqueString then _GenerateUniqueString;
@@ -1421,7 +1433,7 @@ var CurrPos : Integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {--------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyUnicodeCharToResult(aCharInt: Integer; aNewCurrPos: integer); overload;
     begin
       if not IsUniqueString then _GenerateUniqueString;
@@ -1430,7 +1442,7 @@ var CurrPos : Integer;
       CurrPos := aNewCurrPos;
     end;
 
-    {---------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyUnicodeCharToResult; overload;
     var I: integer;
     Begin
@@ -1441,23 +1453,24 @@ var CurrPos : Integer;
       _CopyUnicodeCharToResult(I, CurrPos+6);
     end;
 
-    {------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyIso88591CharToResult(aCharInt: byte; aNewCurrPos: integer);
     var LChar: WideChar;
     begin
       if not IsUniqueString then _GenerateUniqueString;
-      if UnicodeFromLocaleChars(28591, //CodePage,
-                                0, // Flags
-                                @aCharInt,// LocaleStr
-                                1, // LocaleStrLen
-                                @LChar, // UnicodeStr
-                                1) <> 1 then RaiseLastOSError; // UnicodeStrLen
+      if UnicodeFromLocaleChars(
+           28591, //CodePage,
+           0, // Flags
+           @aCharInt,// LocaleStr
+           1, // LocaleStrLen
+           @LChar, // UnicodeStr
+           1) <> 1 then RaiseLastOSError; // UnicodeStrLen
       pResTail^ := LChar;
       inc(pResTail);
       CurrPos := aNewCurrPos;
     end;
 
-    {-------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyHexIso88591CharToResult;
     var I: integer;
     Begin
@@ -1466,7 +1479,7 @@ var CurrPos : Integer;
       _CopyIso88591CharToResult(I, CurrPos+4);
     end;
 
-    {-------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _CopyOctIso88591CharToResult;
     var I: integer;
     Begin
@@ -1588,7 +1601,7 @@ begin
   ALJavascriptDecodeV(result);
 end;
 
-{*******************************************************}
+{******************************************************}
 function  ALJavascriptDecode(const Src: String): String;
 begin
   result := Src;
@@ -1639,10 +1652,11 @@ begin
 end;
 {$ENDIF}
 
-{*******************************************************************************}
-procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(Var HtmlContent: AnsiString;
-                                                     Const DeleteBodyOfUnwantedTag: Boolean = False;
-                                                     const ReplaceUnwantedTagCharBy: AnsiChar = #1); {this char is not use in html}
+{***************************************************}
+procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(
+            Var HtmlContent: AnsiString;
+            Const DeleteBodyOfUnwantedTag: Boolean = False;
+            const ReplaceUnwantedTagCharBy: AnsiChar = #1); {this char is not use in html}
 
 Var InDoubleQuote : Boolean;
     InSimpleQuote : Boolean;
@@ -1824,12 +1838,13 @@ Begin
   end;
 end;
 
-{**************************************************}
-procedure ALExtractHTMLText(HtmlContent: AnsiString;
-                            LstExtractedResourceText : TALStringsA;
-                            Const DecodeHTMLText: Boolean = True);
+{**************************}
+procedure ALExtractHTMLText(
+            HtmlContent: AnsiString;
+            LstExtractedResourceText : TALStringsA;
+            Const DecodeHTMLText: Boolean = True);
 
-  {-----------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _Add2LstExtractedResourceText(S: AnsiString);
   Begin
     If DecodeHTMLText then Begin
@@ -1848,39 +1863,45 @@ Var P1, P2: integer;
 
 Begin
   ALHideHtmlUnwantedTagForHTMLHandleTagfunct(HtmlContent, True);
-  HtmlContent := ALFastTagReplaceA(HtmlContent,
-                                  '<',
-                                  '>',
-                                  #2, {this char is not use in html}
-                                  [rfreplaceall]);
-  HtmlContent := ALStringReplaceA(HtmlContent,
-                                 #1, {default ReplaceUnwantedTagCharBy use by ALHideHtmlUnwantedTagForHTMLHandleTagfunct ; this char is not use in html}
-                                 '<',
-                                 [rfreplaceall]);
+  HtmlContent := ALFastTagReplaceA(
+                   HtmlContent,
+                   '<',
+                   '>',
+                   #2, {this char is not use in html}
+                   [rfreplaceall]);
+  HtmlContent := ALStringReplaceA(
+                   HtmlContent,
+                   #1, {default ReplaceUnwantedTagCharBy use by ALHideHtmlUnwantedTagForHTMLHandleTagfunct ; this char is not use in html}
+                   '<',
+                   [rfreplaceall]);
   HtmlContent := HtmlContent + #2;
 
   LstExtractedResourceText.Clear;
   P1 := 1;
   P2 := ALPosA(#2,HtmlContent);
   While P2 > 0 do begin
-    If P2 > P1 then _Add2LstExtractedResourceText(ALCopyStr(HtmlContent,
-                                                            P1,
-                                                            p2-P1));
+    If P2 > P1 then _Add2LstExtractedResourceText(
+                      ALCopyStr(
+                        HtmlContent,
+                        P1,
+                        p2-P1));
     P1 := P2+1;
     P2 := ALPosA(#2,HtmlContent, P1);
   end;
 end;
 
-{********************************************************}
-function  ALExtractHTMLText(const HtmlContent: AnsiString;
-                            Const DecodeHTMLText: Boolean = True): AnsiString;
+{**************************}
+function  ALExtractHTMLText(
+            const HtmlContent: AnsiString;
+            Const DecodeHTMLText: Boolean = True): AnsiString;
 Var LstExtractedResourceText: TALStringsA;
 Begin
   LstExtractedResourceText := TALStringListA.Create;
   Try
-    ALExtractHTMLText(HtmlContent,
-                      LstExtractedResourceText,
-                      DecodeHTMLText);
+    ALExtractHTMLText(
+      HtmlContent,
+      LstExtractedResourceText,
+      DecodeHTMLText);
     Result := ALTrim(
                 ALStringReplaceA(
                   LstExtractedResourceText.Text,

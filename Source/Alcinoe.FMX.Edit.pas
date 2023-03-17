@@ -119,10 +119,11 @@ type
     fPassword: boolean;
     fCheckSpelling: boolean;
     fIsMultiline: Boolean;
-    procedure DoSetInputType(const aKeyboardType: TVirtualKeyboardType;
-                             const aPassword: Boolean;
-                             const aCheckSpelling: Boolean;
-                             const aIsMultiline: Boolean);
+    procedure DoSetInputType(
+                const aKeyboardType: TVirtualKeyboardType;
+                const aPassword: Boolean;
+                const aCheckSpelling: Boolean;
+                const aIsMultiline: Boolean);
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
     procedure setPassword(const Value: Boolean);
@@ -683,9 +684,10 @@ begin
                 TAndroidHelper. // defStyleAttr: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
-                                    StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
+                        StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
   //-----
   else if (fDefStyleAttr = '') then
     Result := TJALEditText.JavaClass.init(
@@ -695,9 +697,10 @@ begin
                 TAndroidHelper. // defStyleRes: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
-                                    StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
+                        StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
   //-----
   else
     Result := TJALEditText.JavaClass.init(
@@ -706,15 +709,17 @@ begin
                 TAndroidHelper. // defStyleAttr: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
-                                    StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName()), // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
+                        StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName()), // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
                 TAndroidHelper. // defStyleRes: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
-                                    StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
+                        StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
 end;
 
 {************************************}
@@ -793,11 +798,12 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************}
-procedure TALAndroidEdit.DoSetInputType(const aKeyboardType: TVirtualKeyboardType;
-                                        const aPassword: Boolean;
-                                        const aCheckSpelling: Boolean;
-                                        const aIsMultiline: Boolean);
+{**************************************}
+procedure TALAndroidEdit.DoSetInputType(
+            const aKeyboardType: TVirtualKeyboardType;
+            const aPassword: Boolean;
+            const aCheckSpelling: Boolean;
+            const aIsMultiline: Boolean);
 var LInputType: integer;
 begin
 
@@ -928,7 +934,7 @@ begin
   result := fCheckSpelling;
 end;
 
-{*********************************************************************************}
+{********************************************************************************}
 procedure TALAndroidEdit.DoSetReturnKeyType(const aReturnKeyType: TReturnKeyType);
 var LImeOptions: integer;
 begin
@@ -2453,6 +2459,7 @@ begin
   {$ENDIF}
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALEdit]);

@@ -40,9 +40,10 @@ type
     ItemClass: TFmxObjectClass;
     CanContainSimilarItem: Boolean; // Can accept ItemClass Items
     ShowOnlyInMenu: Boolean;
-    constructor Create(const AItemClass: TFmxObjectClass;
-                       const ACanContaineSimilarItem: Boolean = False;
-                       const AShowOnlyInMenu: Boolean = False);
+    constructor Create(
+                  const AItemClass: TFmxObjectClass;
+                  const ACanContaineSimilarItem: Boolean = False;
+                  const AShowOnlyInMenu: Boolean = False);
   end;
 
   {**************************************}
@@ -104,10 +105,11 @@ uses
   fmx.controls,
   Alcinoe.FMX.TabControl;
 
-{********************************************************************}
-constructor TALItemClassDesc.Create(const AItemClass: TFmxObjectClass;
-                                    const ACanContaineSimilarItem: Boolean;
-                                    const AShowOnlyInMenu: Boolean);
+{**********************************}
+constructor TALItemClassDesc.Create(
+              const AItemClass: TFmxObjectClass;
+              const ACanContaineSimilarItem: Boolean;
+              const AShowOnlyInMenu: Boolean);
 begin
   Self.ItemClass := AItemClass;
   Self.CanContainSimilarItem := ACanContaineSimilarItem;
@@ -388,6 +390,7 @@ begin
   end;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponentEditor(TALTabControl, TALTabControlEditor);

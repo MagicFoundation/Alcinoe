@@ -77,20 +77,22 @@ type
   {************************************************}
   JALDatePickerDialogClass = interface(JObjectClass)
     ['{5CBB555C-9128-492E-BFE9-B0B6AE42F26B}']
-    {class} function init(context: JContext;
-                          button_positive_text: JCharSequence;
-	                        button_negative_text: JCharSequence;
-                          button_neutral_text: JCharSequence;
-                          title: JCharSequence): JALDatePickerDialog; cdecl;
+    {class} function init(
+                       context: JContext;
+                       button_positive_text: JCharSequence;
+                       button_negative_text: JCharSequence;
+                       button_neutral_text: JCharSequence;
+                       title: JCharSequence): JALDatePickerDialog; cdecl;
   end;
 
   {**********************************************************}
   [JavaSignature('com/alcinoe/datepicker/ALDatePickerDialog')]
   JALDatePickerDialog = interface(JObject)
     ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
-    procedure show(year: integer;
-                   month: integer;
-                   dayOfMonth: integer); cdecl;
+    procedure show(
+                year: integer;
+                month: integer;
+                dayOfMonth: integer); cdecl;
     procedure setListener(listener: JALDatePickerDialogListener); cdecl;
   end;
   TJALDatePickerDialog = class(TJavaGenericImport<JALDatePickerDialogClass, JALDatePickerDialog>) end;

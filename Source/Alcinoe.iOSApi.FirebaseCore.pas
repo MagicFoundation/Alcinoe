@@ -39,6 +39,7 @@ type
 
 implementation
 
+{*******************************************************************************************}
 procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
 procedure FirebaseCoreInternalLoader; cdecl; external framework 'FirebaseCoreInternal';
 procedure FirebaseCoreLoader; cdecl; external framework 'FirebaseCore';

@@ -398,4 +398,3 @@ finalization
   ALFreeAndNil(ALGlobalNetHttpClientPool);
 
 end.
-

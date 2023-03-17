@@ -3292,11 +3292,11 @@ begin
   if StringCodePage(S)=CP_UTF8 then begin
     while (Pos <= High(S)) and
           (ALUTF8CharToUtf16(
-            S, //const S: AnsiString;
-            Pos, // const AIndex: integer;
-            CharSize, // out AUTF8CharSize: integer;
-            HighSurrogate, // out AUTF16HighSurrogate: Char;
-            lowSurrogate)) and // out AUTF16lowSurrogate: Char): boolean;
+             S, //const S: AnsiString;
+             Pos, // const AIndex: integer;
+             CharSize, // out AUTF8CharSize: integer;
+             HighSurrogate, // out AUTF16HighSurrogate: Char;
+             lowSurrogate)) and // out AUTF16lowSurrogate: Char): boolean;
           (HighSurrogate.IsLetter or AnAbbr and (HighSurrogate = '.')) do
     begin
       //if IsLeadChar(S[Pos]) then

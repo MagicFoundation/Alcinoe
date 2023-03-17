@@ -268,7 +268,7 @@ begin
                 else break;
               end;
               inc(P1);
-              while (P1 < length(LSourceStr)) and (LSourceStr[P1] in ['.', '(', ')', '[', ']', '>', '<']) do
+              while (P1 < LRoundBracketStartAt) and (LSourceStr[P1] in ['.', '(', ')', '[', ']', '>', '<']) do
                 inc(P1);
               var P0 := P1;
               while (P0 > 0) and (LSourceStr[P0] <> #10) do dec(P0);

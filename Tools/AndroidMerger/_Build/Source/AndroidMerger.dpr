@@ -1465,15 +1465,15 @@ begin
         if not LIsGoodVersion then continue;
         var LVersionRelationShip: integer;
         if (CompareVersion(
-             LWorkDependencyVersionRequirements,
-             LVersion,
-             LVersionRelationShip,
-             false{ACanWriteError})) and (LVersionRelationShip <= 0) then begin
+              LWorkDependencyVersionRequirements,
+              LVersion,
+              LVersionRelationShip,
+              false{ACanWriteError})) and (LVersionRelationShip <= 0) then begin
          if LMostAdequateVersion = '' then LMostAdequateVersion := LVersion
          else if (CompareVersion(
-                   LVersion,
-                   LMostAdequateVersion,
-                   LVersionRelationShip)) and (LVersionRelationShip <= 0) then LMostAdequateVersion := LVersion
+                    LVersion,
+                    LMostAdequateVersion,
+                    LVersionRelationShip)) and (LVersionRelationShip <= 0) then LMostAdequateVersion := LVersion
         end;
       end;
       if LMostAdequateVersion = '' then raise Exception.Createfmt('Can not Expand %s:%s:%s', [aDependencyGroupId, aDependencyArtifactId, aDependencyVersionRequirements]);

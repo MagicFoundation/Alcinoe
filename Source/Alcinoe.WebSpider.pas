@@ -558,15 +558,15 @@ Begin
 
             {check the mime content type because some server send wrong mime content type}
             IF (FindMimeFromData(
-                  nil, // bind context - can be nil
-                  nil, // url - can be nil
-                  PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
-                  length(str), // size of buffer
-                  PWidechar(WideString(CurrentHttpResponseHeader.ContentType)), // proposed mime if - can be nil
-                  0, // will be defined
-                  pMimeTypeFromData, // the suggested mime
-                  0 // must be 0
-                 ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(CurrentHttpResponseHeader.ContentType));
+                   nil, // bind context - can be nil
+                   nil, // url - can be nil
+                   PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
+                   length(str), // size of buffer
+                   PWidechar(WideString(CurrentHttpResponseHeader.ContentType)), // proposed mime if - can be nil
+                   0, // will be defined
+                   pMimeTypeFromData, // the suggested mime
+                   0 // must be 0
+                  ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(CurrentHttpResponseHeader.ContentType));
 
             {lanche the analyze of the page if content type = text/html}
             If ALSameTextA(AnsiString(pMimeTypeFromData),'text/html') and
@@ -877,15 +877,15 @@ begin
   {we add a check here to be sure that the file is an http file (text file}
   {Some server send image with text/htm content type}
   IF (FindMimeFromData(
-        nil, // bind context - can be nil
-        nil, // url - can be nil
-        PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
-        length(str), // size of buffer
-        PWidechar(WideString(HTTPResponseHeader.ContentType)), // proposed mime if - can be nil
-        0, // will be defined
-        pMimeTypeFromData, // the suggested mime
-        0 // must be 0
-       ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(HTTPResponseHeader.ContentType));
+         nil, // bind context - can be nil
+         nil, // url - can be nil
+         PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
+         length(str), // size of buffer
+         PWidechar(WideString(HTTPResponseHeader.ContentType)), // proposed mime if - can be nil
+         0, // will be defined
+         pMimeTypeFromData, // the suggested mime
+         0 // must be 0
+        ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(HTTPResponseHeader.ContentType));
 
   {Get the FileName where to save the responseContent}
   LFileName := GetNextLocalFileName(AnsiString(pMimeTypeFromData));

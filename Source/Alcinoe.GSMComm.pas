@@ -844,13 +844,13 @@ begin
   else if (LDSCOctet[5] = '1') and (LDSCOctet[6] = '0') then begin
     while I <= LLength - 3 do begin
       aMessage := aMessage + ansiString(
-                                WideChar(
-                                  ALStrToInt(
-                                    ansiChar('$') +
-                                    ansiChar(aPDUMessage[I]) +
-                                    ansiChar(aPDUMessage[I+1]) +
-                                    ansiChar(aPDUMessage[I+2]) +
-                                    ansiChar(aPDUMessage[I+3]))));
+                               WideChar(
+                                 ALStrToInt(
+                                   ansiChar('$') +
+                                   ansiChar(aPDUMessage[I]) +
+                                   ansiChar(aPDUMessage[I+1]) +
+                                   ansiChar(aPDUMessage[I+2]) +
+                                   ansiChar(aPDUMessage[I+3]))));
       inc(I,4);
     end;
   end;

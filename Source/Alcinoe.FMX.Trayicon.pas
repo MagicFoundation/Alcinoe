@@ -9,7 +9,6 @@
 { QQ  ：1444386932                                                              }
 { E-mail：1444386932@qq.com                                                     }
 { *****************************************************************************}
-
 unit Alcinoe.FMX.Trayicon;
 
 interface
@@ -83,7 +82,7 @@ implementation
 var
   uTrayIconClass : TALWinTrayIcon = nil;
 
-{**********************************************************************************}
+{*******************************************************************************************}
 function NewWinProc(hWd: HWND; uMsg: UINT; wParam: wParam; lParam: lParam): LRESULT; stdcall;
 begin
   case uMsg of

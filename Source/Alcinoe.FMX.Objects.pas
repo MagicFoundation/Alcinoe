@@ -2829,6 +2829,7 @@ begin
     ALUnLockTexts(aParentControl.Controls[i]);
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALImage, TALRectangle, TALCircle, TALLine, TALText]);
@@ -2845,4 +2846,3 @@ initialization
   {$endif}
 
 end.
-

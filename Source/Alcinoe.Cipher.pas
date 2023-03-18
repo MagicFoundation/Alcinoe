@@ -261,12 +261,14 @@ function ALFnv1aInt64(const str: String; Const encoding: Tencoding): Int64; over
 ///////////////////////
 
 {$IF defined(MSWINDOWS)}
-function ALVerifyRSA256Signature(const aData: AnsiString; // bytes string
-                                 const aSignature: AnsiString; // bytes string
-                                 const aBase64PubKeyModulus: ansiString;
-                                 Const aBase64PubKeyExponent: ansiString): boolean;
-function ALRSA256Sign(const aData: AnsiString; // bytes string
-                      const aPemPrivateKey: AnsiString): ansiString; // byte string result
+function ALVerifyRSA256Signature(
+           const aData: AnsiString; // bytes string
+           const aSignature: AnsiString; // bytes string
+           const aBase64PubKeyModulus: ansiString;
+           Const aBase64PubKeyExponent: ansiString): boolean;
+function ALRSA256Sign(
+           const aData: AnsiString; // bytes string
+           const aPemPrivateKey: AnsiString): ansiString; // byte string result
 {$ENDIF}
 
 
@@ -417,82 +419,96 @@ type
     pszAlgId: LPCWSTR;
   end;
 
-function CryptStringToBinaryA(pszString: LPCSTR;
-                              cchString: DWORD;
-                              dwFlags: DWORD;
-                              pbBinary: pByte;
-                              pcbBinary: PDWORD;
-                              pdwSkip: PDWORD;
-                              pdwFlags: PDWORD): boolean; stdcall external crypt32 delayed;
-function CryptDecodeObjectEx(dwCertEncodingType: DWORD;
-                             lpszStructType: LPCSTR;
-                             const pbEncoded: PBYTE;
-                             cbEncoded: DWORD;
-                             dwFlags: DWORD;
-                             pDecodePara: PCRYPT_DECODE_PARA;
-                             pvStructInfo: Pointer;
-                             pcbStructInfo: PDWORD): BOOL; stdcall external crypt32 delayed;
-function CryptAcquireContextA(phProv: PHCRYPTPROV;
-                              szContainer: LPCSTR;
-                              szProvider: LPCSTR;
-                              dwProvType: DWORD;
-                              dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptReleaseContext(hProv: HCRYPTPROV;
-                             dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptGenRandom(hProv: HCRYPTPROV;
-                        dwLen: DWORD;
-                        pbBuffer: PBYTE): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptImportKey(hProv: HCRYPTPROV;
-                        const pbData: PBYTE;
-                        dwDataLen: DWORD;
-                        hPubKey: HCRYPTKEY;
-                        dwFlags: DWORD;
-                        phKey: PHCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptStringToBinaryA(
+           pszString: LPCSTR;
+           cchString: DWORD;
+           dwFlags: DWORD;
+           pbBinary: pByte;
+           pcbBinary: PDWORD;
+           pdwSkip: PDWORD;
+           pdwFlags: PDWORD): boolean; stdcall external crypt32 delayed;
+function CryptDecodeObjectEx(
+           dwCertEncodingType: DWORD;
+           lpszStructType: LPCSTR;
+           const pbEncoded: PBYTE;
+           cbEncoded: DWORD;
+           dwFlags: DWORD;
+           pDecodePara: PCRYPT_DECODE_PARA;
+           pvStructInfo: Pointer;
+           pcbStructInfo: PDWORD): BOOL; stdcall external crypt32 delayed;
+function CryptAcquireContextA(
+           phProv: PHCRYPTPROV;
+           szContainer: LPCSTR;
+           szProvider: LPCSTR;
+           dwProvType: DWORD;
+           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptReleaseContext(
+           hProv: HCRYPTPROV;
+           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptGenRandom(
+           hProv: HCRYPTPROV;
+           dwLen: DWORD;
+           pbBuffer: PBYTE): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptImportKey(
+           hProv: HCRYPTPROV;
+           const pbData: PBYTE;
+           dwDataLen: DWORD;
+           hPubKey: HCRYPTKEY;
+           dwFlags: DWORD;
+           phKey: PHCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
 function CryptDestroyKey(hKey: HCRYPTKEY): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptVerifySignatureA(hHash: HCRYPTHASH;
-                               const pbSignature: PBYTE;
-                               dwSigLen: DWORD;
-                               hPubKey: HCRYPTKEY;
-                               szDescription: LPCSTR;
-                               dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptCreateHash(hProv: HCRYPTPROV;
-                         Algid: ALG_ID;
-                         hKey: HCRYPTKEY;
-                         dwFlags: DWORD;
-                         phHash: PHCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptVerifySignatureA(
+           hHash: HCRYPTHASH;
+           const pbSignature: PBYTE;
+           dwSigLen: DWORD;
+           hPubKey: HCRYPTKEY;
+           szDescription: LPCSTR;
+           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptCreateHash(
+           hProv: HCRYPTPROV;
+           Algid: ALG_ID;
+           hKey: HCRYPTKEY;
+           dwFlags: DWORD;
+           phHash: PHCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
 function CryptDestroyHash(hHash: HCRYPTHASH): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptHashData(hHash: HCRYPTHASH;
-                       const pbData: PBYTE;
-                       dwDataLen: DWORD;
-                       dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function CryptSignHashA(hHash: HCRYPTHASH;
-                        dwKeySpec: DWORD;
-                        szDescription: LPCSTR;
-                        dwFlags: DWORD;
-                        pbSignature: PBYTE;
-                        pdwSigLen: PDWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
-function BCryptOpenAlgorithmProvider(out phAlgorithm: BCRYPT_ALG_HANDLE;
-                                     pszAlgId: LPCWSTR;
-                                     pszImplementation: LPCWSTR;
-                                     dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptCloseAlgorithmProvider(hAlgorithm: BCRYPT_ALG_HANDLE;
-                                      dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptImportKeyPair(hAlgorithm: BCRYPT_ALG_HANDLE;
-                             hImportKey: BCRYPT_KEY_HANDLE;
-                             pszBlobType: LPCWSTR;
-                             out phKey: BCRYPT_KEY_HANDLE;
-                             pbInput: PUCHAR;
-                             cbInput: ULONG;
-                             dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
+function CryptHashData(
+           hHash: HCRYPTHASH;
+           const pbData: PBYTE;
+           dwDataLen: DWORD;
+           dwFlags: DWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function CryptSignHashA(
+           hHash: HCRYPTHASH;
+           dwKeySpec: DWORD;
+           szDescription: LPCSTR;
+           dwFlags: DWORD;
+           pbSignature: PBYTE;
+           pdwSigLen: PDWORD): BOOL; stdcall external ADVAPI32 delayed; // deprecated;
+function BCryptOpenAlgorithmProvider(
+           out phAlgorithm: BCRYPT_ALG_HANDLE;
+           pszAlgId: LPCWSTR;
+           pszImplementation: LPCWSTR;
+           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
+function BCryptCloseAlgorithmProvider(
+           hAlgorithm: BCRYPT_ALG_HANDLE;
+           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
+function BCryptImportKeyPair(
+           hAlgorithm: BCRYPT_ALG_HANDLE;
+           hImportKey: BCRYPT_KEY_HANDLE;
+           pszBlobType: LPCWSTR;
+           out phKey: BCRYPT_KEY_HANDLE;
+           pbInput: PUCHAR;
+           cbInput: ULONG;
+           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
 function BCryptDestroyKey(hKey: BCRYPT_KEY_HANDLE): NTSTATUS; stdcall; external bcrypt delayed;
-function BCryptSignHash(hKey: BCRYPT_KEY_HANDLE;
-                        pPaddingInfo: Pointer;
-                        pbInput: PUCHAR;
-                        cbInput: ULONG;
-                        pbOutput: PUCHAR;
-                        cbOutput: ULONG;
-                        var pcbResult: ULONG;
-                        dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
+function BCryptSignHash(
+           hKey: BCRYPT_KEY_HANDLE;
+           pPaddingInfo: Pointer;
+           pbInput: PUCHAR;
+           cbInput: ULONG;
+           pbOutput: PUCHAR;
+           cbOutput: ULONG;
+           var pcbResult: ULONG;
+           dwFlags: ULONG): NTSTATUS; stdcall; external bcrypt delayed;
 
 {$WARN SYMBOL_PLATFORM ON}
 {$ENDIF MSWINDOWS}
@@ -608,7 +624,7 @@ begin
   ALMove(PByte(LBytes)^, Digest[0], length(LBytes)); // << LBytes can not be bigger than Digest
 end;
 
-{********************************************************************************}
+{******************************************************************************}
 function  ALStringHashMD5(const Str: String; Const encoding: Tencoding): String;
 Var LMD5: THashMD5;
     Lbytes: Tbytes;
@@ -634,7 +650,7 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
+{************************************************************************************************}
 procedure ALStringHashMD5(var Digest: TALMD5Digest; const Str: String; Const encoding: Tencoding);
 var LMD5: THashMD5;
     LBytes: Tbytes;
@@ -662,7 +678,7 @@ begin
   ALMove(PByte(LBytes)^, Digest[0], length(LBytes)); // << LBytes can not be bigger than Digest
 end;
 
-{****************************************************************************************************}
+{***************************************************************************************************}
 procedure ALStringHashSHA1(var Digest: TALSHA1Digest; const Str : String; Const encoding: Tencoding);
 var LSHA1: THashSHA1;
     LBytes: Tbytes;
@@ -688,7 +704,7 @@ begin
   end;
 end;
 
-{********************************************************************************}
+{*******************************************************************************}
 function  ALStringHashSHA1(const Str: String; Const encoding: Tencoding): String;
 Var LSHA1: THashSHA1;
     Lbytes: Tbytes;
@@ -714,7 +730,7 @@ begin
   Digest := LSHA2.HashAsBytes;
 end;
 
-{************************************************************************************************************************************************************************}
+{***********************************************************************************************************************************************************************}
 procedure ALStringHashSHA2(var Digest: Tbytes; const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256);
 var LSHA2: THashSHA2;
 begin
@@ -738,7 +754,7 @@ begin
   end;
 end;
 
-{************************************************************************************************************************************************************}
+{***********************************************************************************************************************************************************}
 function  ALStringHashSHA2(const Str: String; Const encoding: Tencoding; const AHashVersion: THashSHA2.TSHA2Version = THashSHA2.TSHA2Version.SHA256): String;
 var LSHA2: THashSHA2;
     LBytes: Tbytes;
@@ -1408,6 +1424,7 @@ class function TBCrypt.TryParseHashString(const hashString: AnsiString; out vers
 var s: AnsiString;
     n: Integer; //current index
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetNextToken(var index: Integer): AnsiString;
   var maxLen: Integer;
        startIndex, copyLen: Integer;
@@ -1570,6 +1587,7 @@ end;
 {****************************************************************************************************}
 class function TBCrypt.BsdBase64Encode(const data: array of Byte; BytesToEncode: Integer): AnsiString;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function EncodePacket(b1, b2, b3: Byte; Len: Integer): AnsiString;
   begin
     Result := '';
@@ -1622,6 +1640,7 @@ end;
 {******************************************************************}
 class function TBCrypt.BsdBase64Decode(const s: AnsiString): TBytes;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function Char64(character: ansiChar): Integer;
   begin
     if (Ord(character) > Length(BsdBase64DecodeTable)) then begin
@@ -1631,6 +1650,7 @@ class function TBCrypt.BsdBase64Decode(const s: AnsiString): TBytes;
     Result := BsdBase64DecodeTable[character];
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure Append(value: Byte);
   var i: Integer;
   begin
@@ -1920,6 +1940,7 @@ class function TBCrypt.SelfTestA: Boolean;
 var
   i: Integer;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure t(const password: AnsiString; const HashSalt: AnsiString; const ExpectedHashString: AnsiString);
   var
     version: Byte;
@@ -2030,6 +2051,7 @@ var
   sCopy: TBytes;
   salt: TBytes;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function BytesEqual(const data1, data2: array of Byte): Boolean;
   begin
     Result := True;
@@ -2684,10 +2706,11 @@ begin
   end;
 end;
 
-{******************************************************}
-procedure ALEncryptRDLCBC(const Context : TALRDLContext;
-                          const Prev : TALRDLBlock;
-                          var Block : TALRDLBlock);
+{************************}
+procedure ALEncryptRDLCBC(
+            const Context : TALRDLContext;
+            const Prev : TALRDLBlock;
+            var Block : TALRDLBlock);
   { encrypt/decrypt block CBC mode }
 begin
   if Context.Encrypt then begin
@@ -2699,11 +2722,12 @@ begin
   end;
 end;
 
-{***********************************}
-procedure ALInitEncryptRDL(const Key;
-                           const KeySize : FixedInt;
-                           var Context : TALRDLContext;
-                           const Encrypt : Boolean);
+{*************************}
+procedure ALInitEncryptRDL(
+            const Key;
+            const KeySize : FixedInt;
+            var Context : TALRDLContext;
+            const Encrypt : Boolean);
   { Rijndael key expansion }
 var
   i : Integer;
@@ -2743,11 +2767,12 @@ begin
   end;
 end;
 
-{***************************************************************}
-procedure AlRDLEncryptStream(const InStream, OutStream : TStream;
-                             const Key;
-                             const KeySize : FixedInt;
-                             const Encrypt : Boolean);
+{***************************}
+procedure AlRDLEncryptStream(
+            const InStream, OutStream : TStream;
+            const Key;
+            const KeySize : FixedInt;
+            const Encrypt : Boolean);
 var
   I          : FixedInt;
   Block      : TALRDLBlock;
@@ -2802,10 +2827,11 @@ end;
 
 {***********************}
 {$Q-} {Overflow Checking}
-procedure AlRDLEncryptStreamCBC(const InStream, OutStream : TStream;
-                                const Key;
-                                const KeySize : FixedInt;
-                                const Encrypt : Boolean);
+procedure AlRDLEncryptStreamCBC(
+            const InStream, OutStream : TStream;
+            const Key;
+            const KeySize : FixedInt;
+            const Encrypt : Boolean);
 var
   I          : FixedInt;
   Block      : TALRDLBlock;
@@ -2896,55 +2922,60 @@ end;
   {$Q+} {Overflow Checking}
 {$ENDIF}
 
-{******************************************************}
-procedure ALRDLEncryptStringA(const InString: AnsiString;
-                             var OutString: AnsiString;
-                             const Key;
-                             const KeySize : FixedInt;
-                             const Encrypt : Boolean);
+{****************************}
+procedure ALRDLEncryptStringA(
+            const InString: AnsiString;
+            var OutString: AnsiString;
+            const Key;
+            const KeySize : FixedInt;
+            const Encrypt : Boolean);
 begin
   OutString := ALRDLEncryptStringA(InString, Key, KeySize, Encrypt);
 end;
 
-{***************************************************}
-procedure ALRDLEncryptStringW(const InString: String;
-                              var OutString: String;
-                              const Key;
-                              const KeySize : FixedInt;
-                              const Encrypt : Boolean;
-                              const encoding: Tencoding;
-                              const UseBase64: boolean = false);
+{****************************}
+procedure ALRDLEncryptStringW(
+            const InString: String;
+            var OutString: String;
+            const Key;
+            const KeySize : FixedInt;
+            const Encrypt : Boolean;
+            const encoding: Tencoding;
+            const UseBase64: boolean = false);
 begin
   OutString := ALRDLEncryptStringW(InString, Key, KeySize, Encrypt, encoding, UseBase64);
 end;
 
-{*********************************************************}
-procedure ALRDLEncryptStringCBCA(const InString: AnsiString;
-                                var OutString: AnsiString;
-                                const Key;
-                                const KeySize : FixedInt;
-                                const Encrypt : Boolean);
+{*******************************}
+procedure ALRDLEncryptStringCBCA(
+            const InString: AnsiString;
+            var OutString: AnsiString;
+            const Key;
+            const KeySize : FixedInt;
+            const Encrypt : Boolean);
 begin
   OutString := ALRDLEncryptStringCBCA(InString, Key, KeySize, Encrypt);
 end;
 
-{******************************************************}
-procedure ALRDLEncryptStringCBCW(const InString: String;
-                                 var OutString: String;
-                                 const Key;
-                                 const KeySize : FixedInt;
-                                 const Encrypt : Boolean;
-                                 const encoding: Tencoding;
-                                 const UseBase64: boolean = false);
+{*******************************}
+procedure ALRDLEncryptStringCBCW(
+            const InString: String;
+            var OutString: String;
+            const Key;
+            const KeySize : FixedInt;
+            const Encrypt : Boolean;
+            const encoding: Tencoding;
+            const UseBase64: boolean = false);
 begin
   OutString := ALRDLEncryptStringCBCW(InString, Key, KeySize, Encrypt, encoding, UseBase64);
 end;
 
-{*****************************************************}
-function ALRDLEncryptStringA(const InString: AnsiString;
-                            const Key;
-                            const KeySize : FixedInt;
-                            const Encrypt : Boolean): AnsiString;
+{***************************}
+function ALRDLEncryptStringA(
+           const InString: AnsiString;
+           const Key;
+           const KeySize : FixedInt;
+           const Encrypt : Boolean): AnsiString;
 var
   InStream  : TMemoryStream;
   OutStream : TMemoryStream;
@@ -2964,13 +2995,14 @@ begin
   end;
 end;
 
-{**************************************************}
-function ALRDLEncryptStringW(const InString: String;
-                             const Key;
-                             const KeySize : FixedInt;
-                             const Encrypt : Boolean;
-                             const encoding: Tencoding;
-                             const UseBase64: boolean = false): String;
+{***************************}
+function ALRDLEncryptStringW(
+           const InString: String;
+           const Key;
+           const KeySize : FixedInt;
+           const Encrypt : Boolean;
+           const encoding: Tencoding;
+           const UseBase64: boolean = false): String;
 var
   InStream  : TMemoryStream;
   OutStream : TMemoryStream;
@@ -3001,11 +3033,12 @@ begin
   end;
 end;
 
-{********************************************************}
-function ALRDLEncryptStringCBCA(const InString: AnsiString;
-                               const Key;
-                               const KeySize : FixedInt;
-                               const Encrypt : Boolean) : AnsiString;
+{******************************}
+function ALRDLEncryptStringCBCA(
+           const InString: AnsiString;
+           const Key;
+           const KeySize : FixedInt;
+           const Encrypt : Boolean) : AnsiString;
 var
   InStream  : TMemoryStream;
   OutStream : TMemoryStream;
@@ -3025,13 +3058,14 @@ begin
   end;
 end;
 
-{*****************************************************}
-function ALRDLEncryptStringCBCW(const InString: String;
-                                const Key;
-                                const KeySize : FixedInt;
-                                const Encrypt : Boolean;
-                                const encoding: Tencoding;
-                                const UseBase64: boolean = false) : String;
+{******************************}
+function ALRDLEncryptStringCBCW(
+           const InString: String;
+           const Key;
+           const KeySize : FixedInt;
+           const Encrypt : Boolean;
+           const encoding: Tencoding;
+           const UseBase64: boolean = false) : String;
 var
   InStream  : TMemoryStream;
   OutStream : TMemoryStream;
@@ -3062,12 +3096,13 @@ begin
   end;
 end;
 
-{******************************************************}
-procedure ALRDLEncryptStringA(const InString: AnsiString;
-                             var OutString : AnsiString;
-                             const Key: AnsiString;
-                             const KeyDerivationFunction: TALkeyDerivationFunction;
-                             const Encrypt : Boolean);
+{****************************}
+procedure ALRDLEncryptStringA(
+            const InString: AnsiString;
+            var OutString : AnsiString;
+            const Key: AnsiString;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3082,14 +3117,15 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{***************************************************}
-procedure ALRDLEncryptStringW(const InString: String;
-                              var OutString : String;
-                              const Key: String;
-                              const KeyDerivationFunction: TALkeyDerivationFunction;
-                              const Encrypt : Boolean;
-                              const encoding: Tencoding;
-                              const UseBase64: boolean = false);
+{****************************}
+procedure ALRDLEncryptStringW(
+            const InString: String;
+            var OutString : String;
+            const Key: String;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean;
+            const encoding: Tencoding;
+            const UseBase64: boolean = false);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3104,12 +3140,13 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{*********************************************************}
-procedure ALRDLEncryptStringCBCA(const InString: AnsiString;
-                                var OutString : AnsiString;
-                                const Key: AnsiString;
-                                const KeyDerivationFunction: TALkeyDerivationFunction;
-                                const Encrypt : Boolean);
+{*******************************}
+procedure ALRDLEncryptStringCBCA(
+            const InString: AnsiString;
+            var OutString : AnsiString;
+            const Key: AnsiString;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3124,14 +3161,15 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{******************************************************}
-procedure ALRDLEncryptStringCBCW(const InString: String;
-                                 var OutString : String;
-                                 const Key: String;
-                                 const KeyDerivationFunction: TALkeyDerivationFunction;
-                                 const Encrypt : Boolean;
-                                 const encoding: Tencoding;
-                                 const UseBase64: boolean = false);
+{*******************************}
+procedure ALRDLEncryptStringCBCW(
+            const InString: String;
+            var OutString : String;
+            const Key: String;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean;
+            const encoding: Tencoding;
+            const UseBase64: boolean = false);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3146,11 +3184,12 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{******************************************************}
-function  ALRDLEncryptStringA(const InString: AnsiString;
-                             const Key: AnsiString;
-                             const KeyDerivationFunction: TALkeyDerivationFunction;
-                             const Encrypt : Boolean) : AnsiString;
+{****************************}
+function  ALRDLEncryptStringA(
+            const InString: AnsiString;
+            const Key: AnsiString;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean) : AnsiString;
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3165,13 +3204,14 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{***************************************************}
-function  ALRDLEncryptStringW(const InString: String;
-                              const Key: String;
-                              const KeyDerivationFunction: TALkeyDerivationFunction;
-                              const Encrypt : Boolean;
-                              const encoding: Tencoding;
-                              const UseBase64: boolean = false) : String;
+{****************************}
+function  ALRDLEncryptStringW(
+            const InString: String;
+            const Key: String;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean;
+            const encoding: Tencoding;
+            const UseBase64: boolean = false) : String;
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3186,11 +3226,12 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{*********************************************************}
-function  ALRDLEncryptStringCBCA(const InString: AnsiString;
-                                const Key: AnsiString;
-                                const KeyDerivationFunction: TALkeyDerivationFunction;
-                                const Encrypt : Boolean) : AnsiString;
+{*******************************}
+function  ALRDLEncryptStringCBCA(
+            const InString: AnsiString;
+            const Key: AnsiString;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean) : AnsiString;
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3205,13 +3246,14 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{******************************************************}
-function  ALRDLEncryptStringCBCW(const InString: String;
-                                 const Key: String;
-                                 const KeyDerivationFunction: TALkeyDerivationFunction;
-                                 const Encrypt : Boolean;
-                                 const encoding: Tencoding;
-                                 const UseBase64: boolean = false) : String;
+{*******************************}
+function  ALRDLEncryptStringCBCW(
+            const InString: String;
+            const Key: String;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean;
+            const encoding: Tencoding;
+            const UseBase64: boolean = false) : String;
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3226,11 +3268,12 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{**************************************************************}
-procedure AlRDLEncryptStream(const InStream, OutStream: TStream;
-                             const Key: AnsiString;
-                             const KeyDerivationFunction: TALkeyDerivationFunction;
-                             const Encrypt : Boolean);
+{***************************}
+procedure AlRDLEncryptStream(
+            const InStream, OutStream: TStream;
+            const Key: AnsiString;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3245,12 +3288,13 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{***************************************************************}
-procedure ALRDLEncryptStream(const InStream, OutStream: TStream;
-                              const Key: String;
-                              const KeyDerivationFunction: TALkeyDerivationFunction;
-                              const Encrypt : Boolean;
-                              const encoding: Tencoding);
+{***************************}
+procedure ALRDLEncryptStream(
+            const InStream, OutStream: TStream;
+            const Key: String;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean;
+            const encoding: Tencoding);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3265,11 +3309,12 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{*****************************************************************}
-procedure AlRDLEncryptStreamCBC(const InStream, OutStream: TStream;
-                                const Key: AnsiString;
-                                const KeyDerivationFunction: TALkeyDerivationFunction;
-                                const Encrypt : Boolean);
+{******************************}
+procedure AlRDLEncryptStreamCBC(
+            const InStream, OutStream: TStream;
+            const Key: AnsiString;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3284,12 +3329,13 @@ begin
   else raise EALCipherException.Create(cAlCryptKDFNotSupported);
 end;
 
-{******************************************************************}
-procedure ALRDLEncryptStreamCBC(const InStream, OutStream: TStream;
-                                 const Key: String;
-                                 const KeyDerivationFunction: TALkeyDerivationFunction;
-                                 const Encrypt : Boolean;
-                                 const encoding: Tencoding);
+{******************************}
+procedure ALRDLEncryptStreamCBC(
+            const InStream, OutStream: TStream;
+            const Key: String;
+            const KeyDerivationFunction: TALkeyDerivationFunction;
+            const Encrypt : Boolean;
+            const encoding: Tencoding);
 var LCipherKey128: TALCipherKey128;
     LCipherKey256: Tbytes;
 begin
@@ -3754,9 +3800,10 @@ end;
   {$Q+} {Overflow Checking}
 {$ENDIF}
 
-{*****************************************************************************}
-procedure ALEncryptBFCBC(const Context : TALBFContext; const Prev : TALBFBlock;
-  var Block : TALBFBlock; Encrypt : Boolean);
+{***********************}
+procedure ALEncryptBFCBC(
+            const Context : TALBFContext; const Prev : TALBFBlock;
+            var Block : TALBFBlock; Encrypt : Boolean);
 begin
   if Encrypt then begin
     ALCipherXorMemPrim(Block, Prev, SizeOf(Block));
@@ -3767,28 +3814,31 @@ begin
   end;
 end;
 
-{*****************************************************}
-procedure ALBFEncryptString(const InString: AnsiString;
-                            var OutString: AnsiString;
-                            const Key: TALCipherKey128;
-                            Encrypt : Boolean);
+{**************************}
+procedure ALBFEncryptString(
+            const InString: AnsiString;
+            var OutString: AnsiString;
+            const Key: TALCipherKey128;
+            Encrypt : Boolean);
 begin
   OutString := ALBFEncryptString(InString, Key, Encrypt);
 end;
 
-{********************************************************}
-procedure ALBFEncryptStringCBC(const InString: AnsiString;
-                               var OutString: AnsiString;
-                               const Key: TALCipherKey128;
-                               Encrypt : Boolean);
+{*****************************}
+procedure ALBFEncryptStringCBC(
+            const InString: AnsiString;
+            var OutString: AnsiString;
+            const Key: TALCipherKey128;
+            Encrypt : Boolean);
 begin
   OutString := ALBFEncryptStringCBC(InString, Key, Encrypt);
 end;
 
-{****************************************************}
-function ALBFEncryptString(const InString: AnsiString;
-                           const Key: TALCipherKey128;
-                           Encrypt : Boolean): AnsiString;
+{*************************}
+function ALBFEncryptString(
+           const InString: AnsiString;
+           const Key: TALCipherKey128;
+           Encrypt : Boolean): AnsiString;
 var
   InStream  : TMemoryStream;
   OutStream : TMemoryStream;
@@ -3810,10 +3860,11 @@ begin
   end;
 end;
 
-{*******************************************************}
-function ALBFEncryptStringCBC(const InString: AnsiString;
-                              const Key: TALCipherKey128;
-                              Encrypt : Boolean) : AnsiString;
+{****************************}
+function ALBFEncryptStringCBC(
+           const InString: AnsiString;
+           const Key: TALCipherKey128;
+           Encrypt : Boolean) : AnsiString;
 var
   InStream  : TMemoryStream;
   OutStream : TMemoryStream;
@@ -3973,62 +4024,68 @@ begin
   end;
 end;
 
-{*****************************************************}
-procedure ALBFEncryptString(const InString: AnsiString;
-                            var OutString : AnsiString;
-                            const Key: AnsiString;
-                            Encrypt : Boolean);
+{**************************}
+procedure ALBFEncryptString(
+            const InString: AnsiString;
+            var OutString : AnsiString;
+            const Key: AnsiString;
+            Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
 begin
   ALStringHashMD5(LCipherKey128, Key);
   ALBFEncryptString(InString,OutString, LCipherKey128, Encrypt);
 end;
 
-{********************************************************}
-procedure ALBFEncryptStringCBC(const InString: AnsiString;
-                               var OutString : AnsiString;
-                               const Key: AnsiString;
-                               Encrypt : Boolean);
+{*****************************}
+procedure ALBFEncryptStringCBC(
+            const InString: AnsiString;
+            var OutString : AnsiString;
+            const Key: AnsiString;
+            Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
 begin
   ALStringHashMD5(LCipherKey128, Key);
   ALBFEncryptStringCBC(InString, OutString, LCipherKey128, Encrypt);
 end;
 
-{*****************************************************}
-function  AlBFEncryptString(const InString: AnsiString;
-                            const Key: AnsiString;
-                            Encrypt : Boolean) : AnsiString;
+{**************************}
+function  AlBFEncryptString(
+            const InString: AnsiString;
+            const Key: AnsiString;
+            Encrypt : Boolean) : AnsiString;
 var LCipherKey128: TALCipherKey128;
 begin
   ALStringHashMD5(LCipherKey128, Key);
   Result := AlBFEncryptString(InString, LCipherKey128, Encrypt);
 end;
 
-{********************************************************}
-function  ALBFEncryptStringCBC(const InString: AnsiString;
-                               const Key: AnsiString;
-                               Encrypt : Boolean) : AnsiString;
+{*****************************}
+function  ALBFEncryptStringCBC(
+            const InString: AnsiString;
+            const Key: AnsiString;
+            Encrypt : Boolean) : AnsiString;
 var LCipherKey128: TALCipherKey128;
 begin
   ALStringHashMD5(LCipherKey128, Key);
   result := ALBFEncryptStringCBC(InString, LCipherKey128, Encrypt);
 end;
 
-{*******************************************************}
-procedure ALBFEncryptStream(InStream, OutStream: TStream;
-                            const Key: AnsiString;
-                            Encrypt : Boolean);
+{**************************}
+procedure ALBFEncryptStream(
+            InStream, OutStream: TStream;
+            const Key: AnsiString;
+            Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
 begin
   ALStringHashMD5(LCipherKey128, Key);
   ALBFEncryptStream(InStream, OutStream, LCipherKey128, Encrypt);
 end;
 
-{**********************************************************}
-procedure ALBFEncryptStreamCBC(InStream, OutStream: TStream;
-                               const Key: AnsiString;
-                               Encrypt : Boolean);
+{*****************************}
+procedure ALBFEncryptStreamCBC(
+            InStream, OutStream: TStream;
+            const Key: AnsiString;
+            Encrypt : Boolean);
 var LCipherKey128: TALCipherKey128;
 begin
   ALStringHashMD5(LCipherKey128, Key);
@@ -4048,11 +4105,12 @@ procedure ALRandomBytes(const Dest; const Len: Cardinal);
 var hProv: HCRYPTPROV;
 begin
   if Len = 0 then exit;
-  if (not CryptAcquireContextA(@hProv,
-                               nil,
-                               nil,
-                               PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
+  if (not CryptAcquireContextA(
+            @hProv,
+            nil,
+            nil,
+            PROV_RSA_FULL,
+            CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
   try
     if not CryptGenRandom(hProv,Len,@Dest) then raiselastOsError;
   finally
@@ -4068,11 +4126,12 @@ begin
     SetLength(Result,0);
     exit;
   end;
-  if (not CryptAcquireContextA(@hProv,
-                               nil,
-                               nil,
-                               PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
+  if (not CryptAcquireContextA(
+            @hProv,
+            nil,
+            nil,
+            PROV_RSA_FULL,
+            CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
   try
     SetLength(Result,Len);
     if not CryptGenRandom(hProv,Len,@Result[0]) then raiselastOsError;
@@ -4086,11 +4145,12 @@ function ALRandomByteStr(const Len: Cardinal): AnsiString;
 var hProv: HCRYPTPROV;
 begin
   if Len = 0 then exit('');
-  if (not CryptAcquireContextA(@hProv,
-                               nil,
-                               nil,
-                               PROV_RSA_FULL,
-                               CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
+  if (not CryptAcquireContextA(
+            @hProv,
+            nil,
+            nil,
+            PROV_RSA_FULL,
+            CRYPT_VERIFYCONTEXT or CRYPT_SILENT)) then raiselastOsError;
   try
     SetLength(Result,Len);
     if not CryptGenRandom(hProv,Len,@Result[low(result)]) then raiselastOsError;
@@ -4774,8 +4834,9 @@ end;
 {$IF defined(MSWINDOWS)}
 //taken from https://github.com/MattiaVicari/Crypt4Delphi
 //transform a PRIVATEKEYBLOB in BCRYPT_RSAKEY_BLOB immediately followed by the key data
-function _PrivateKeyBlob2BcryptRSAKeyBlobAndData(const APrivateKeyBlob: PRIVATEKEYBLOB;
-                                                 const AKeyType: _TRSAKeyType): TBytes;
+function _PrivateKeyBlob2BcryptRSAKeyBlobAndData(
+           const APrivateKeyBlob: PRIVATEKEYBLOB;
+           const AKeyType: _TRSAKeyType): TBytes;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _ReverseMemCopy(const Source; var Dest; Count: Integer);
@@ -4872,10 +4933,11 @@ end;
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-function ALVerifyRSA256Signature(const aData: AnsiString; // bytes string
-                                 const aSignature: AnsiString; // bytes string
-                                 const aBase64PubKeyModulus: ansiString;
-                                 Const aBase64PubKeyExponent: ansiString): boolean;
+function ALVerifyRSA256Signature(
+           const aData: AnsiString; // bytes string
+           const aSignature: AnsiString; // bytes string
+           const aBase64PubKeyModulus: ansiString;
+           Const aBase64PubKeyExponent: ansiString): boolean;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _bigEndianToLittleEndian(var aArr: TBytes);
@@ -4955,11 +5017,12 @@ begin
   move(pExponent[0], dwExponent, cbExponent);
 
   //acquire a handle to a particular key container
-  if (not CryptAcquireContextA(@hProv, // phProv: PHCRYPTPROV;
-                               nil, // pszContainer: PAnsiChar;
-                               nil, // pszProvider: PAnsiChar;
-                               PROV_RSA_AES, // dwProvType: DWORD;
-                               CRYPT_VERIFYCONTEXT)) then raiselastOsError; // dwFlags: DWORD
+  if (not CryptAcquireContextA(
+            @hProv, // phProv: PHCRYPTPROV;
+            nil, // pszContainer: PAnsiChar;
+            nil, // pszProvider: PAnsiChar;
+            PROV_RSA_AES, // dwProvType: DWORD;
+            CRYPT_VERIFYCONTEXT)) then raiselastOsError; // dwFlags: DWORD
   try
 
     // create the pKeyBlob
@@ -4984,38 +5047,42 @@ begin
     Move(pModulus[0],pKeyBlob[sizeof(PUBLICKEYSTRUC)+sizeof(RSAPUBKEY)],cbModulus);
 
     // Now import the key.
-    if not CryptImportKey(hProv, // hProv: HCRYPTPROV;
-                          @pKeyBlob[0], // const pbData: PBYTE;
-                          cbKeyBlob, // dwDataLen: DWORD;
-                          0, // hPubKey: HCRYPTKEY;
-                          0, // dwFlags: DWORD;
-                          @hRSAKey) then raiseLastOsError; // phKey: PHCRYPTKEY
+    if not CryptImportKey(
+             hProv, // hProv: HCRYPTPROV;
+             @pKeyBlob[0], // const pbData: PBYTE;
+             cbKeyBlob, // dwDataLen: DWORD;
+             0, // hPubKey: HCRYPTKEY;
+             0, // dwFlags: DWORD;
+             @hRSAKey) then raiseLastOsError; // phKey: PHCRYPTKEY
     try
 
       //initiates the hashing of a stream of data.
-      if not CryptCreateHash(hProv, // hProv: HCRYPTPROV;
-                             CALG_SHA_256, // Algid: ALG_ID;
-                             0, // hKey: HCRYPTKEY;
-                             0, // dwFlags: DWORD;
-                             @hHash) then raiseLastOsError;
+      if not CryptCreateHash(
+               hProv, // hProv: HCRYPTPROV;
+               CALG_SHA_256, // Algid: ALG_ID;
+               0, // hKey: HCRYPTKEY;
+               0, // dwFlags: DWORD;
+               @hHash) then raiseLastOsError;
       try
 
         //adds data to a specified hash object.
-        if not CryptHashData(hHash, // hHash: HCRYPTHASH;
-                             pbyte(aData), // const pbData: PBYTE;
-                             length(aData), // dwDataLen: DWORD;
-                             0) then raiseLastOsError; // dwFlags: DWORD
+        if not CryptHashData(
+                 hHash, // hHash: HCRYPTHASH;
+                 pbyte(aData), // const pbData: PBYTE;
+                 length(aData), // dwDataLen: DWORD;
+                 0) then raiseLastOsError; // dwFlags: DWORD
 
         //verifies the signature
         setlength(pSignature, length(aSignature));
         Move(Pointer(aSignature)^, Pointer(pSignature)^, Length(aSignature));
         _bigEndianToLittleEndian(pSignature);
-        if not CryptVerifySignatureA(hHash, // hHash: HCRYPTHASH;
-                                     @pSignature[0], // const pbSignature: PBYTE;
-                                     length(pSignature), // dwSigLen: DWORD;
-                                     hRSAKey, // hPubKey: HCRYPTKEY;
-                                     nil, // const sDescription: LPCSTR;
-                                     0) then begin // dwFlags: DWORD)
+        if not CryptVerifySignatureA(
+                 hHash, // hHash: HCRYPTHASH;
+                 @pSignature[0], // const pbSignature: PBYTE;
+                 length(pSignature), // dwSigLen: DWORD;
+                 hRSAKey, // hPubKey: HCRYPTKEY;
+                 nil, // const sDescription: LPCSTR;
+                 0) then begin // dwFlags: DWORD)
           if HRESULT(GetLastError) = NTE_BAD_SIGNATURE then exit(False)
           else raiseLastOsError;
         end;
@@ -5039,8 +5106,9 @@ end;
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-function ALRSA256Sign(const aData: AnsiString; // bytes string
-                      const aPemPrivateKey: AnsiString): ansiString; // byte string result
+function ALRSA256Sign(
+           const aData: AnsiString; // bytes string
+           const aPemPrivateKey: AnsiString): ansiString; // byte string result
 var
   PrivKey: TBytes;
   cbPrivKey: DWORD;
@@ -5077,10 +5145,11 @@ begin
     S1 := ALBase64DecodeString(S1);
     Delete(S1,1,26); // << !! on the pen I tested it's was 26 I m absolutely not sure it's will be always the case !!
     S1 := ALBase64EncodeString(S1);
-    result := ALRSA256Sign(aData,
-                           '-----BEGIN RSA PRIVATE KEY-----' +
-                           S1 +
-                           '-----END RSA PRIVATE KEY-----');
+    result := ALRSA256Sign(
+                aData,
+                '-----BEGIN RSA PRIVATE KEY-----' +
+                S1 +
+                '-----END RSA PRIVATE KEY-----');
     exit;
 
   end;
@@ -5157,14 +5226,15 @@ begin
 
       //sign the data
       _CheckNTStatusResult(
-        BCryptSignHash(KeyHandle, // hKey: BCRYPT_KEY_HANDLE;
-                       @PaddingInfo, // pPaddingInfo: Pointer;
-                       PUchar(HashData), // pbInput: PUCHAR;
-                       Length(HashData), // cbInput: ULONG;
-                       nil, // pbOutput: PUCHAR;
-                       0, // cbOutput: ULONG;
-                       cbResult, // var pcbResult: ULONG;
-                       BCRYPT_PAD_PKCS1)); // dwFlags: ULONG
+        BCryptSignHash(
+          KeyHandle, // hKey: BCRYPT_KEY_HANDLE;
+          @PaddingInfo, // pPaddingInfo: Pointer;
+          PUchar(HashData), // pbInput: PUCHAR;
+          Length(HashData), // cbInput: ULONG;
+          nil, // pbOutput: PUCHAR;
+          0, // cbOutput: ULONG;
+          cbResult, // var pcbResult: ULONG;
+          BCRYPT_PAD_PKCS1)); // dwFlags: ULONG
       SetLength(result, cbResult);
       _CheckNTStatusResult(
         BCryptSignHash(

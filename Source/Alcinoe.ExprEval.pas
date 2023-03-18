@@ -1263,12 +1263,14 @@ var
 begin
   { find symbol }
   if FContext = nil then
-    raise EALExprEvalError.CreateResFmt(@RsALExprEvalUnknownSymbol,
-      [Lexer.TokenAsString]);
+    raise EALExprEvalError.CreateResFmt(
+            @RsALExprEvalUnknownSymbol,
+            [Lexer.TokenAsString]);
   Sym := FContext.Find(Lexer.TokenAsString);
   if Sym = nil then
-    raise EALExprEvalError.CreateResFmt(@RsALExprEvalUnknownSymbol,
-      [Lexer.TokenAsString]);
+    raise EALExprEvalError.CreateResFmt(
+            @RsALExprEvalUnknownSymbol,
+            [Lexer.TokenAsString]);
 
   Lexer.NextTok;
 
@@ -1303,8 +1305,9 @@ begin
 
   if (Lexer.CurrTok <> etEof) then
   begin
-    raise EALExprEvalError.CreateResFmt(@RsALExprEvalUnknownSymbol,
-      [Lexer.TokenAsString]);
+    raise EALExprEvalError.CreateResFmt(
+            @RsALExprEvalUnknownSymbol,
+            [Lexer.TokenAsString]);
   end;
 end;
 
@@ -1570,12 +1573,14 @@ var
 begin
   { find symbol }
   if Context = nil then
-    raise EALExprEvalError.CreateResFmt(@RsALExprEvalUnknownSymbol,
-      [Lexer.TokenAsString]);
+    raise EALExprEvalError.CreateResFmt(
+            @RsALExprEvalUnknownSymbol,
+            [Lexer.TokenAsString]);
   Sym := FContext.Find(Lexer.TokenAsString);
   if Sym = nil then
-    raise EALExprEvalError.CreateResFmt(@RsALExprEvalUnknownSymbol,
-      [Lexer.TokenAsString]);
+    raise EALExprEvalError.CreateResFmt(
+            @RsALExprEvalUnknownSymbol,
+            [Lexer.TokenAsString]);
 
   Lexer.NextTok;
 
@@ -2894,8 +2899,9 @@ type
   private
     FUnaryClass: TALExprUnaryVmOpClass;
   public
-    constructor Create(AUnaryClass: TALExprUnaryVmOpClass;
-      const ADeps: array of TALExprNode);
+    constructor Create(
+                  AUnaryClass: TALExprUnaryVmOpClass;
+                  const ADeps: array of TALExprNode);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
@@ -2904,8 +2910,9 @@ type
   private
     FBinaryClass: TALExprBinaryVmOpClass;
   public
-    constructor Create(ABinaryClass: TALExprBinaryVmOpClass;
-      const ADeps: array of TALExprNode);
+    constructor Create(
+                  ABinaryClass: TALExprBinaryVmOpClass;
+                  const ADeps: array of TALExprNode);
     procedure GenCode(AVirtMach: TALExprVirtMach); override;
   end;
 
@@ -3116,8 +3123,8 @@ end;
 procedure TALExprBinaryVmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := FBinaryClass.Create(
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc);
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3714,8 +3721,8 @@ end;
 procedure TALExprCallUnaryVmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallUnaryVmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3730,8 +3737,8 @@ end;
 procedure TALExprCallUnary32VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallUnary32VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3746,8 +3753,8 @@ end;
 procedure TALExprCallUnary64VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallUnary64VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3762,8 +3769,8 @@ end;
 procedure TALExprCallUnary80VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallUnary80VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3778,9 +3785,9 @@ end;
 procedure TALExprCallBinaryVmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallBinaryVmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3795,9 +3802,9 @@ end;
 procedure TALExprCallBinary32VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallBinary32VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3812,9 +3819,9 @@ end;
 procedure TALExprCallBinary64VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallBinary64VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3829,9 +3836,9 @@ end;
 procedure TALExprCallBinary80VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallBinary80VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3846,10 +3853,10 @@ end;
 procedure TALExprCallTernaryVmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallTernaryVmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc,
-    VmDeps[2].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc,
+                   VmDeps[2].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3864,10 +3871,10 @@ end;
 procedure TALExprCallTernary32VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallTernary32VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc,
-    VmDeps[2].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc,
+                   VmDeps[2].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3882,10 +3889,10 @@ end;
 procedure TALExprCallTernary64VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallTernary64VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc,
-    VmDeps[2].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc,
+                   VmDeps[2].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -3900,10 +3907,10 @@ end;
 procedure TALExprCallTernary80VmNode.GenCode(AVirtMach: TALExprVirtMach);
 begin
   FExprVmCode := TALExprCallTernary80VmOp.Create(
-    FFunc,
-    VmDeps[0].ExprVmCode.OutputLoc,
-    VmDeps[1].ExprVmCode.OutputLoc,
-    VmDeps[2].ExprVmCode.OutputLoc);
+                   FFunc,
+                   VmDeps[0].ExprVmCode.OutputLoc,
+                   VmDeps[1].ExprVmCode.OutputLoc,
+                   VmDeps[2].ExprVmCode.OutputLoc);
   AVirtMach.Add(FExprVmCode);
 end;
 
@@ -4609,5 +4616,3 @@ begin
 end;
 
 end.
-
-

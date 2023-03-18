@@ -7,42 +7,48 @@ interface
 uses
   Alcinoe.Common;
 
-Function  AlEmptyDirectoryA(Directory: ansiString;
-                            SubDirectory: Boolean;
-                            const IgnoreFiles: Array of AnsiString;
-                            Const RemoveEmptySubDirectory: Boolean = True;
-                            Const FileNameMask: ansiString = '*';
-                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
-Function  AlEmptyDirectoryW(Directory: String;
-                            SubDirectory: Boolean;
-                            const IgnoreFiles: Array of String;
-                            Const RemoveEmptySubDirectory: Boolean = True;
-                            Const FileNameMask: String = '*';
-                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
-Function  AlEmptyDirectoryA(const Directory: ansiString;
-                            SubDirectory: Boolean;
-                            Const RemoveEmptySubDirectory: Boolean = True;
-                            Const FileNameMask: ansiString = '*';
-                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
-Function  AlEmptyDirectoryW(const Directory: String;
-                            SubDirectory: Boolean;
-                            Const RemoveEmptySubDirectory: Boolean = True;
-                            Const FileNameMask: String = '*';
-                            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
+Function  AlEmptyDirectoryA(
+            Directory: ansiString;
+            SubDirectory: Boolean;
+            const IgnoreFiles: Array of AnsiString;
+            Const RemoveEmptySubDirectory: Boolean = True;
+            Const FileNameMask: ansiString = '*';
+            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
+Function  AlEmptyDirectoryW(
+            Directory: String;
+            SubDirectory: Boolean;
+            const IgnoreFiles: Array of String;
+            Const RemoveEmptySubDirectory: Boolean = True;
+            Const FileNameMask: String = '*';
+            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
+Function  AlEmptyDirectoryA(
+            const Directory: ansiString;
+            SubDirectory: Boolean;
+            Const RemoveEmptySubDirectory: Boolean = True;
+            Const FileNameMask: ansiString = '*';
+            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
+Function  AlEmptyDirectoryW(
+            const Directory: String;
+            SubDirectory: Boolean;
+            Const RemoveEmptySubDirectory: Boolean = True;
+            Const FileNameMask: String = '*';
+            Const MinFileAge: TdateTime = ALNullDate): Boolean; overload;
 
 {$IF defined(MSWINDOWS)}
-Function  AlCopyDirectoryA(SrcDirectory,
-                           DestDirectory: ansiString;
-                           SubDirectory: Boolean;
-                           Const FileNameMask: ansiString = '*';
-                           Const FailIfExists: Boolean = True;
-                           Const SkipIfExists: Boolean = False): Boolean;
-Function  AlCopyDirectoryW(SrcDirectory,
-                           DestDirectory: String;
-                           SubDirectory: Boolean;
-                           Const FileNameMask: String = '*';
-                           Const FailIfExists: Boolean = True;
-                           Const SkipIfExists: Boolean = False): Boolean;
+Function  AlCopyDirectoryA(
+            SrcDirectory,
+            DestDirectory: ansiString;
+            SubDirectory: Boolean;
+            Const FileNameMask: ansiString = '*';
+            Const FailIfExists: Boolean = True;
+            Const SkipIfExists: Boolean = False): Boolean;
+Function  AlCopyDirectoryW(
+            SrcDirectory,
+            DestDirectory: String;
+            SubDirectory: Boolean;
+            Const FileNameMask: String = '*';
+            Const FailIfExists: Boolean = True;
+            Const SkipIfExists: Boolean = False): Boolean;
 function  ALGetModuleFileNameA(const AWithoutExtension: boolean = True): ansistring;
 function  ALGetModuleNameA: ansistring;
 function  ALGetModuleNameW: String;
@@ -97,13 +103,14 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.StringList;
 
-{************************************************}
-Function  AlEmptyDirectoryA(Directory: ansiString;
-                            SubDirectory: Boolean;
-                            const IgnoreFiles: Array of AnsiString;
-                            const RemoveEmptySubDirectory: Boolean = True;
-                            const FileNameMask: ansiString = '*';
-                            const MinFileAge: TdateTime = ALNullDate): Boolean;
+{**************************}
+Function  AlEmptyDirectoryA(
+            Directory: ansiString;
+            SubDirectory: Boolean;
+            const IgnoreFiles: Array of AnsiString;
+            const RemoveEmptySubDirectory: Boolean = True;
+            const FileNameMask: ansiString = '*';
+            const MinFileAge: TdateTime = ALNullDate): Boolean;
 var LIgnoreFilesW: Array of String;
 begin
   setlength(LIgnoreFilesW, length(IgnoreFiles));
@@ -118,13 +125,14 @@ begin
               MinFileAge);
 end;
 
-{********************************************}
-Function  AlEmptyDirectoryW(Directory: String;
-                            SubDirectory: Boolean;
-                            const IgnoreFiles: Array of String;
-                            const RemoveEmptySubDirectory: Boolean = True;
-                            const FileNameMask: String = '*';
-                            const MinFileAge: TdateTime = ALNullDate): Boolean;
+{**************************}
+Function  AlEmptyDirectoryW(
+            Directory: String;
+            SubDirectory: Boolean;
+            const IgnoreFiles: Array of String;
+            const RemoveEmptySubDirectory: Boolean = True;
+            const FileNameMask: String = '*';
+            const MinFileAge: TdateTime = ALNullDate): Boolean;
 var LSR: TSearchRec;
     LIgnoreFilesLst: TALStringListW;
     I: integer;
@@ -176,12 +184,13 @@ begin
   end;
 end;
 
-{****************************************************}
-Function AlEmptyDirectoryA(const Directory: ansiString;
-                           SubDirectory: Boolean;
-                           Const RemoveEmptySubDirectory: Boolean = True;
-                           Const FileNameMask: ansiString = '*';
-                           Const MinFileAge: TdateTime = ALNullDate): Boolean;
+{*************************}
+Function AlEmptyDirectoryA(
+           const Directory: ansiString;
+           SubDirectory: Boolean;
+           Const RemoveEmptySubDirectory: Boolean = True;
+           Const FileNameMask: ansiString = '*';
+           Const MinFileAge: TdateTime = ALNullDate): Boolean;
 begin
   result := AlEmptyDirectoryA(
               Directory,
@@ -192,12 +201,13 @@ begin
               MinFileAge);
 end;
 
-{*************************************************}
-Function AlEmptyDirectoryW(const Directory: String;
-                           SubDirectory: Boolean;
-                           Const RemoveEmptySubDirectory: Boolean = True;
-                           Const FileNameMask: String = '*';
-                           Const MinFileAge: TdateTime = 0): Boolean;
+{*************************}
+Function AlEmptyDirectoryW(
+           const Directory: String;
+           SubDirectory: Boolean;
+           Const RemoveEmptySubDirectory: Boolean = True;
+           Const FileNameMask: String = '*';
+           Const MinFileAge: TdateTime = 0): Boolean;
 begin
   result := AlEmptyDirectoryW(
               Directory,
@@ -210,12 +220,13 @@ end;
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-Function AlCopyDirectoryA(SrcDirectory,
-                          DestDirectory: ansiString;
-                          SubDirectory: Boolean;
-                          Const FileNameMask: ansiString = '*';
-                          Const FailIfExists: Boolean = True;
-                          Const SkipIfExists: Boolean = False): Boolean;
+Function AlCopyDirectoryA(
+           SrcDirectory,
+           DestDirectory: ansiString;
+           SubDirectory: Boolean;
+           Const FileNameMask: ansiString = '*';
+           Const FailIfExists: Boolean = True;
+           Const SkipIfExists: Boolean = False): Boolean;
 begin
   result := AlCopyDirectoryW(
               String(SrcDirectory),
@@ -229,12 +240,13 @@ end;
 
 {**********************}
 {$IF defined(MSWINDOWS)}
-Function AlCopyDirectoryW(SrcDirectory,
-                          DestDirectory: String;
-                          SubDirectory: Boolean;
-                          Const FileNameMask: String = '*';
-                          Const FailIfExists: Boolean = True;
-                          Const SkipIfExists: Boolean = False): Boolean;
+Function AlCopyDirectoryW(
+           SrcDirectory,
+           DestDirectory: String;
+           SubDirectory: Boolean;
+           Const FileNameMask: String = '*';
+           Const FailIfExists: Boolean = True;
+           Const SkipIfExists: Boolean = False): Boolean;
 var sr: TSearchRec;
 begin
   Result := True;
@@ -250,25 +262,28 @@ begin
       repeat
         If (sr.Name <> '.') and (sr.Name <> '..') Then Begin
           If ((sr.Attr and faDirectory) <> 0) then begin
-            If SubDirectory then Result := AlCopyDirectoryW(SrcDirectory + sr.Name,
-                                                            DestDirectory + sr.Name,
-                                                            SubDirectory,
-                                                            FileNameMask,
-                                                            FailIfExists,
-                                                            SkipIfExists);
+            If SubDirectory then Result := AlCopyDirectoryW(
+                                             SrcDirectory + sr.Name,
+                                             DestDirectory + sr.Name,
+                                             SubDirectory,
+                                             FileNameMask,
+                                             FailIfExists,
+                                             SkipIfExists);
           end
           else If (FileNameMask = '*') or
                   (ALMatchesMaskW(sr.Name, FileNameMask)) then begin
             if SkipIfExists then begin
               if not Tfile.Exists(DestDirectory + sr.Name) then
-                Result := CopyfileW(PChar(SrcDirectory + sr.Name),
-                                    PChar(DestDirectory + sr.Name),
-                                    True{FailIfExists});
+                Result := CopyfileW(
+                            PChar(SrcDirectory + sr.Name),
+                            PChar(DestDirectory + sr.Name),
+                            True{FailIfExists});
             end
             else begin
-              result := CopyfileW(PChar(SrcDirectory + sr.Name),
-                                  PChar(DestDirectory + sr.Name),
-                                  FailIfExists);
+              result := CopyfileW(
+                          PChar(SrcDirectory + sr.Name),
+                          PChar(DestDirectory + sr.Name),
+                          FailIfExists);
             end;
           end;
         end;

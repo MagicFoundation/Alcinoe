@@ -1,7 +1,7 @@
-{*******************************************************************************
-TALWinInetFTPClient is a is easy to use WinInet-based FTP client component.
-*******************************************************************************}
-
+{**************************************
+TALWinInetFTPClient is a is easy to use
+WinInet-based FTP client component.
+**************************************}
 unit Alcinoe.FTP.Client.WinINet;
 
 interface
@@ -136,25 +136,31 @@ type
     destructor Destroy; override;
     procedure CreateDirectory(const Directory: AnsiString); override;
     procedure DeleteFile(const FileName: AnsiString); override;
-    Function  FindFirst(const Path: AnsiString;
-                        const Attr: Integer;
-                        var F: TALFtpclientSearchRec): Integer; override;
+    Function  FindFirst(
+                const Path: AnsiString;
+                const Attr: Integer;
+                var F: TALFtpclientSearchRec): Integer; override;
     Function  FindNext(var F: TALFtpclientSearchRec): Integer; override;
     procedure FindClose(var F: TALFtpclientSearchRec); override;
     Function  GetCurrentDirectory: AnsiString; override;
-    Procedure GetFile(const RemoteFile: AnsiString;
-                      const LocalFile: AnsiString;
-                      const FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
-    Procedure GetFile(const RemoteFile: AnsiString;
-                      const DataStream: Tstream); overload; override;
+    Procedure GetFile(
+                const RemoteFile: AnsiString;
+                const LocalFile: AnsiString;
+                const FailIfExists: Boolean); overload; override; // warning: The onprogress will not work in that case !
+    Procedure GetFile(
+                const RemoteFile: AnsiString;
+                const DataStream: Tstream); overload; override;
     Function  GetFileSize(const filename: AnsiString): Longword; override;
-    Procedure PutFile(const LocalFile: AnsiString;
-                      const Remotefile: AnsiString); overload; override;
-    Procedure PutFile(const DataStream: TStream;
-                      const Remotefile: AnsiString); overload; override;
+    Procedure PutFile(
+                const LocalFile: AnsiString;
+                const Remotefile: AnsiString); overload; override;
+    Procedure PutFile(
+                const DataStream: TStream;
+                const Remotefile: AnsiString); overload; override;
     Procedure RemoveDirectory(const Directory: AnsiString); override;
-    Procedure RenameFile(const ExistingFile: AnsiString;
-                         const NewFile: AnsiString); override;
+    Procedure RenameFile(
+                const ExistingFile: AnsiString;
+                const NewFile: AnsiString); override;
     Procedure SetCurrentDirectory(const Directory: AnsiString); override;
     procedure Connect; override;
     procedure Disconnect; override;
@@ -177,20 +183,22 @@ uses
 {when we download url from a site that is a little "slow" (when the site is fast seam to work ok,
 {sometime we receive an AppCrash here. i thing it's simple a Windows Server 2008 R2 BUG
 {NB: i see this bug under WINHTTP, i don't know if it's the same under wininet}
-procedure ALWininetFTPCLientStatusCallback(InternetSession: hInternet;
-                                           Context,
-                                           InternetStatus: DWord;
-                                           StatusInformation: Pointer;
-                                           StatusInformationLength: DWord); stdcall;
+procedure ALWininetFTPCLientStatusCallback(
+            InternetSession: hInternet;
+            Context,
+            InternetStatus: DWord;
+            StatusInformation: Pointer;
+            StatusInformationLength: DWord); stdcall;
 begin
   with TALWinInetFTPClient(Context) do begin
 
     {fire the OnStatusChange event}
     if Assigned(FOnStatusChange) then
-      FOnStatusChange(TALWininetFTPClient(Context),
-                      InternetStatus,
-                      StatusInformation,
-                      StatusInformationLength);
+      FOnStatusChange(
+        TALWininetFTPClient(Context),
+        InternetStatus,
+        StatusInformation,
+        StatusInformationLength);
 
   end;
 end;
@@ -221,17 +229,18 @@ var ErrCode: DWord;
     ErrMsg: AnsiString;
     ErrMsgln: Dword;
 
-    {-----------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Procedure internalFormatMessageFromErrCode;
     Begin
       SetLength(ErrMsg, 256);
-      FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
-                     Pointer(GetModuleHandle('wininet.dll')),
-                     ErrCode,
-                     0,
-                     PAnsiChar(ErrMsg),
-                     Length(ErrMsg),
-                     nil);
+      FormatMessageA(
+        FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE,
+        Pointer(GetModuleHandle('wininet.dll')),
+        ErrCode,
+        0,
+        PAnsiChar(ErrMsg),
+        Length(ErrMsg),
+        nil);
       SetLength(ErrMsg, System.Ansistrings.StrLen(PAnsiChar(ErrMsg)));
     end;
 
@@ -241,15 +250,17 @@ begin
     If ErrCode = ERROR_INTERNET_EXTENDED_ERROR then begin
       ErrMsgLn := 0;
       ErrMsg := '';
-      if not InternetGetLastResponseInfoA(ErrCode,
-                                          PAnsiChar(ErrMsg),
-                                          ErrMsgln) then begin
+      if not InternetGetLastResponseInfoA(
+               ErrCode,
+               PAnsiChar(ErrMsg),
+               ErrMsgln) then begin
         ErrCode := GetLastError;
         if ErrCode=ERROR_INSUFFICIENT_BUFFER then begin
           SetLength(ErrMsg,ErrMsgLn);
-          InternetGetLastResponseInfoA(ErrCode,
-                                       PAnsiChar(ErrMsg),
-                                       ErrMsgln);
+          InternetGetLastResponseInfoA(
+            ErrCode,
+            PAnsiChar(ErrMsg),
+            ErrMsgln);
           SetLength(ErrMsg, System.Ansistrings.StrLen(PAnsiChar(ErrMsg)));
         end
         else internalFormatMessageFromErrCode;
@@ -293,14 +304,14 @@ end;
 {************************************}
 procedure TALWinInetFTPClient.Connect;
 
-  {---------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetProxyServerName: PAnsiChar;
   Begin
     If (ProxyParams.ProxyServer = '') then result := nil
     else result := PAnsiChar(ProxyParams.ProxyServer + ':' + ALIntToStrA(ProxyParams.ProxyPort));
   end;
 
-  {-----------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetProxyBypass: PAnsiChar;
   Begin
     {We should not use empty string for ProxyBypass because
@@ -309,7 +320,7 @@ procedure TALWinInetFTPClient.Connect;
     else result := PAnsiChar(ProxyParams.ProxyBypass);
   end;
 
-  {-------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetInternetOpenFlags: DWord;
   Begin
     Result := 0;
@@ -317,7 +328,7 @@ procedure TALWinInetFTPClient.Connect;
     if wFTPIo_Offline in InternetOptions then Result := result or INTERNET_FLAG_OFFLINE;
   end;
 
-  {----------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetInternetConnectFlags: DWord;
   Begin
     Result := 0;
@@ -344,11 +355,12 @@ begin
   if InternetAttemptConnect(0) <> ERROR_SUCCESS then System.SysUtils.Abort;
 
   {init FInetRoot}
-  FInetRoot := InternetOpenA(PAnsiChar(''),
-                             AccessTypeArr[FAccessType],
-                             InternalGetProxyServerName,
-                             InternalGetProxyBypass,
-                             InternalGetInternetOpenFlags);
+  FInetRoot := InternetOpenA(
+                 PAnsiChar(''),
+                 AccessTypeArr[FAccessType],
+                 InternalGetProxyServerName,
+                 InternalGetProxyBypass,
+                 InternalGetInternetOpenFlags);
   CheckError(not Assigned(FInetRoot));
 
   try
@@ -360,14 +372,15 @@ begin
     end;
 
     {init FInetConnect}
-    FInetConnect := InternetConnectA(FInetRoot,
-                                     PAnsiChar(ServerName),
-                                     ServerPort,
-                                     PAnsiChar(UserName),
-                                     PAnsiChar(Password),
-                                     INTERNET_SERVICE_FTP,
-                                     InternalGetInternetConnectFlags,
-                                     DWORD_PTR(Self));
+    FInetConnect := InternetConnectA(
+                      FInetRoot,
+                      PAnsiChar(ServerName),
+                      ServerPort,
+                      PAnsiChar(UserName),
+                      PAnsiChar(Password),
+                      INTERNET_SERVICE_FTP,
+                      InternalGetInternetConnectFlags,
+                      DWORD_PTR(Self));
     CheckError(not Assigned(FInetConnect));
 
     {Set FConnected to true}
@@ -430,12 +443,13 @@ begin
   Result := 0;
 end;
 
-{************************************************************}
-function TALWinInetFTPClient.FindFirst(const Path: AnsiString;
-                                       const Attr: Integer;
-                                       var F: TALFtpclientSearchRec): Integer;
+{*************************************}
+function TALWinInetFTPClient.FindFirst(
+           const Path: AnsiString;
+           const Attr: Integer;
+           var F: TALFtpclientSearchRec): Integer;
 
-  {-----------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetFtpFindFirstFileFlags: DWord;
   Begin
     Result := 0;
@@ -450,11 +464,12 @@ const faSpecial = faDirectory;
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
   F.ExcludeAttr := not Attr and faSpecial;
-  F.FindHandle := FtpFindFirstFileA(FInetConnect,
-                                    PAnsiChar(Path),
-                                    F.FindData,
-                                    InternalGetFtpFindFirstFileFlags,
-                                    DWORD_PTR(Self));
+  F.FindHandle := FtpFindFirstFileA(
+                    FInetConnect,
+                    PAnsiChar(Path),
+                    F.FindData,
+                    InternalGetFtpFindFirstFileFlags,
+                    DWORD_PTR(Self));
 
   if F.FindHandle <> nil then begin
     Result := FindMatchingFile(F);
@@ -489,22 +504,26 @@ begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
   Len := 0;
   Result := '';
-  If not FtpGetCurrentDirectoryA(FInetConnect,
-                                 PAnsiChar(Result),
-                                 Len) then begin
+  If not FtpGetCurrentDirectoryA(
+           FInetConnect,
+           PAnsiChar(Result),
+           Len) then begin
     CheckError(GetLastError <> ERROR_INSUFFICIENT_BUFFER);
     SetLength(Result,Len);
-    CheckError(not FtpGetCurrentDirectoryA(FInetConnect,
-                                           PAnsiChar(Result),
-                                           Len));
+    CheckError(
+      not FtpGetCurrentDirectoryA(
+            FInetConnect,
+            PAnsiChar(Result),
+            Len));
   end;
 end;
 
-{*****************************************************************}
-procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
-                                      const DataStream: Tstream);
+{************************************}
+procedure TALWinInetFTPClient.GetFile(
+            const RemoteFile: AnsiString;
+            const DataStream: Tstream);
 
-  {------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetFtpOpenFileFlags: DWord;
   Begin
     Result := 0;
@@ -527,11 +546,12 @@ var Size,
 
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  HFile := FtpOpenFileA(FInetConnect,
-                        PAnsiChar(RemoteFile),
-                        GENERIC_READ,
-                        InternalGetFtpOpenFileFlags,
-                        DWORD_PTR(Self));
+  HFile := FtpOpenFileA(
+             FInetConnect,
+             PAnsiChar(RemoteFile),
+             GENERIC_READ,
+             InternalGetFtpOpenFileFlags,
+             DWORD_PTR(Self));
   CheckError(not assigned(Hfile));
   Try
 
@@ -541,17 +561,21 @@ begin
     { Read data }
     ContentlengthDownloaded := 0;
     repeat
-      CheckError(not InternetQueryDataAvailable(hFile,
-                                                Size,
-                                                0,
-                                                0));
+      CheckError(
+        not InternetQueryDataAvailable(
+              hFile,
+              Size,
+              0,
+              0));
 
       if Size > 0 then begin
         SetLength(S, Size);
-        CheckError(not InternetReadFile(HFile,
-                                        @S[1],
-                                        Size,
-                                        Downloaded));
+        CheckError(
+          not InternetReadFile(
+                HFile,
+                @S[1],
+                Size,
+                Downloaded));
         DataStream.WriteBuffer(pointer(S)^, Size);
 
         { Receiving Data event }
@@ -566,12 +590,13 @@ begin
 
 end;
 
-{*****************************************************************}
-procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
-                                      const LocalFile: AnsiString;
-                                      const FailIfExists: Boolean);
+{************************************}
+procedure TALWinInetFTPClient.GetFile(
+            const RemoteFile: AnsiString;
+            const LocalFile: AnsiString;
+            const FailIfExists: Boolean);
 
-  {-----------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetFtpGetFileFlags: DWord;
   Begin
     Result := 0;
@@ -586,19 +611,21 @@ procedure TALWinInetFTPClient.GetFile(const RemoteFile: AnsiString;
 
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  CheckError(not FtpGetFileA(FInetConnect,
-                             PAnsiChar(RemoteFile),
-                             PAnsiChar(LocalFile),
-                             FailIfExists,
-                             FILE_ATTRIBUTE_NORMAL,
-                             InternalGetFtpGetFileFlags,
-                             DWORD_PTR(Self)));
+  CheckError(
+    not FtpGetFileA(
+          FInetConnect,
+          PAnsiChar(RemoteFile),
+          PAnsiChar(LocalFile),
+          FailIfExists,
+          FILE_ATTRIBUTE_NORMAL,
+          InternalGetFtpGetFileFlags,
+          DWORD_PTR(Self)));
 end;
 
 {*****************************************************************************}
 function TALWinInetFTPClient.GetFileSize(const filename: AnsiString): Longword;
 
-  {------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetFtpOpenFileFlags: DWord;
   Begin
     Result := 0;
@@ -615,11 +642,12 @@ Var hFile: HINTERNET;
     nFileSizeHigh: LongWord;
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  HFile := FtpOpenFileA(FInetConnect,
-                        PAnsiChar(filename),
-                        GENERIC_READ,
-                        InternalGetFtpOpenFileFlags,
-                        DWORD_PTR(Self));
+  HFile := FtpOpenFileA(
+             FInetConnect,
+             PAnsiChar(filename),
+             GENERIC_READ,
+             InternalGetFtpOpenFileFlags,
+             DWORD_PTR(Self));
   CheckError(not assigned(Hfile));
   Try
     Result := FtpGetFileSize(hFile, @nFileSizeHigh);
@@ -628,11 +656,12 @@ begin
   end;
 end;
 
-{**************************************************************}
-procedure TALWinInetFTPClient.PutFile(const DataStream: TStream;
-                                      const Remotefile: AnsiString);
+{************************************}
+procedure TALWinInetFTPClient.PutFile(
+            const DataStream: TStream;
+            const Remotefile: AnsiString);
 
-  {------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetFtpOpenFileFlags: DWord;
   Begin
     Result := 0;
@@ -652,11 +681,12 @@ var RetVal: DWord;
 
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  HFile := FtpOpenFileA(FInetConnect,
-                        PAnsiChar(RemoteFile),
-                        GENERIC_WRITE,
-                        InternalGetFtpOpenFileFlags,
-                        DWORD_PTR(Self));
+  HFile := FtpOpenFileA(
+             FInetConnect,
+             PAnsiChar(RemoteFile),
+             GENERIC_WRITE,
+             InternalGetFtpOpenFileFlags,
+             DWORD_PTR(Self));
   CheckError(not assigned(Hfile));
   Buffer := TMemoryStream.Create;
   Try
@@ -675,10 +705,12 @@ begin
       Len := DataStream.Read(Buffer.Memory^, Len);
       if Len = 0 then raise EALFtpClientException.CreateRes(@cALFTPCLient_MsgInvalidFtpRequest);
 
-      CheckError(not InternetWriteFile(HFile,
-                                       @Buffer.Memory^,
-                                       Len,
-                                       RetVal));
+      CheckError(
+        not InternetWriteFile(
+              HFile,
+              @Buffer.Memory^,
+              Len,
+              RetVal));
 
       { Posting Data Event }
       if Assigned(OnUploadProgress) then
@@ -692,11 +724,12 @@ begin
 
 end;
 
-{****************************************************************}
-procedure TALWinInetFTPClient.PutFile(const LocalFile: AnsiString;
-                                      const Remotefile: AnsiString);
+{************************************}
+procedure TALWinInetFTPClient.PutFile(
+            const LocalFile: AnsiString;
+            const Remotefile: AnsiString);
 
-  {-----------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetFtpPutFileFlags: DWord;
   Begin
     Result := 0;
@@ -711,11 +744,13 @@ procedure TALWinInetFTPClient.PutFile(const LocalFile: AnsiString;
 
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  CheckError(not FtpPutFileA(FInetConnect,
-                             PAnsiChar(LocalFile),
-                             PAnsiChar(RemoteFile),
-                             InternalGetFtpPutFileFlags,
-                             DWORD_PTR(Self)));
+  CheckError(
+    not FtpPutFileA(
+          FInetConnect,
+          PAnsiChar(LocalFile),
+          PAnsiChar(RemoteFile),
+          InternalGetFtpPutFileFlags,
+          DWORD_PTR(Self)));
 end;
 
 {*************************************************************************}
@@ -725,14 +760,17 @@ begin
   CheckError(not FtpRemoveDirectoryA(FInetConnect, PAnsiChar(Directory)));
 end;
 
-{**********************************************************************}
-procedure TALWinInetFTPClient.RenameFile(const ExistingFile: AnsiString;
-                                         const NewFile: AnsiString);
+{***************************************}
+procedure TALWinInetFTPClient.RenameFile(
+            const ExistingFile: AnsiString;
+            const NewFile: AnsiString);
 begin
   If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
-  CheckError(not FtpRenameFileA(FInetConnect,
-                                PAnsiChar(ExistingFile),
-                                PAnsiChar(NewFile)));
+  CheckError(
+    not FtpRenameFileA(
+          FInetConnect,
+          PAnsiChar(ExistingFile),
+          PAnsiChar(NewFile)));
 end;
 
 {*****************************************************************************}
@@ -804,4 +842,3 @@ begin
 end;
 
 end.
-

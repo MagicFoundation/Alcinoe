@@ -1,8 +1,7 @@
-{*******************************************************************************
+{*********************************************************************
 TALNNTPClient class implements the NNTP protocol (RFC-977 and RFC-850)
 Support authentification (RFC-977 Extension)
-*******************************************************************************}
-
+*********************************************************************}
 unit Alcinoe.NNTP.Client;
 
 interface
@@ -119,7 +118,7 @@ Uses
   Alcinoe.WinSock,
   Alcinoe.StringUtils;
 
-{*******************************************************************************}
+{********************************************************************************}
 Procedure ALNNTPClientSplitResponseLine(aResponse: AnsiString; ALst: TALStringsA);
 Begin
   aResponse := ALTrim(aResponse); // 211 111225 12861 362539 nzn.fr.delphi
@@ -199,7 +198,7 @@ end;
 {****************************************************************************************}
 Function TAlNNTPClient.Connect(const aHost: AnsiString; const APort: integer): AnsiString;
 
-  {--------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CallServer(const Server:AnsiString; const Port:word);
   var SockAddr:Sockaddr_in;
       IP: AnsiString;
@@ -470,7 +469,7 @@ begin
   Result := SendCmd('LIST',[215], True);
 end;
 
-{*********************************************}
+{**********************************************}
 procedure TAlNNTPClient.List(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(List));
@@ -499,7 +498,7 @@ begin
   Result := SendCmd('LIST DISTRIBUTIONS',[215], True);
 end;
 
-{**********************************************************}
+{***********************************************************}
 procedure TAlNNTPClient.ListDistributions(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListDISTRIBUTIONS));
@@ -535,7 +534,7 @@ begin
   Result := SendCmd('LIST NEWSGROUPS' + wildmat,[215], True);
 end;
 
-{**********************************************************************************}
+{***********************************************************************************}
 procedure TAlNNTPClient.ListNewsGroups(ALst: TALStringsA; const wildmat: AnsiString);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListNewsGroups(wildmat)));
@@ -577,7 +576,7 @@ begin
   Result := SendCmd('LISTGROUP' + NewsGroup,[211], True);
 end;
 
-{*******************************************************************************}
+{********************************************************************************}
 procedure TAlNNTPClient.ListGroup(ALst: TALStringsA; const NewsGroup: AnsiString);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(ListGroup(NewsGroup)));
@@ -621,7 +620,7 @@ begin
   Result := SendCmd('NEWGROUPS ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [231], True);
 end;
 
-{************************************************************************************************************}
+{*************************************************************************************************************}
 procedure TAlNNTPClient.NewsGroups(FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewsGroups(FromGMTDate,distributions)));
@@ -687,7 +686,7 @@ begin
   Result := SendCmd('NEWNEWS ' + newsgroups + ' ' + ALFormatDateTimeA('yymmdd" "hhnnss',FromGMTDate, ALDefaultFormatSettingsA) + ' GMT' + ALNNTPClientEnclosedInAngleBrackets(distributions), [230], True);
 end;
 
-{***************************************************************************************************************************************}
+{****************************************************************************************************************************************}
 procedure TAlNNTPClient.NewNews(const Newsgroups: AnsiString; FromGMTDate: TdateTime; const distributions: AnsiString; ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewNews(NewsGroups, FromGMTDate, distributions)));
@@ -732,11 +731,12 @@ begin
   Result := SendCmd('GROUP ' + ALTrim(NewsGroupName),[211], False); //211 111225 12861 362539 nzn.fr.delphi
 end;
 
-{************************************************************}
-Procedure TAlNNTPClient.Group(const NewsGroupName: AnsiString;
-                              Var EstimatedNumberArticles,
-                                  FirstArticleNumber,
-                                  LastArticleNumber: Integer);
+{****************************}
+Procedure TAlNNTPClient.Group(
+            const NewsGroupName: AnsiString;
+            Var EstimatedNumberArticles,
+                FirstArticleNumber,
+                LastArticleNumber: Integer);
 Var LLst: TALStringListA;
 Begin
   LLst := TALStringListA.Create;
@@ -842,10 +842,11 @@ begin
   ArticleContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByID(ArticleID));
 end;
 
-{**************************************************************}
-procedure TAlNNTPClient.ArticleByID(const ArticleID: AnsiString;
-                                    var ArticleBodyContent: AnsiString;
-                                    ArticleHeaderContent: TALNewsArticleHeader);
+{**********************************}
+procedure TAlNNTPClient.ArticleByID(
+            const ArticleID: AnsiString;
+            var ArticleBodyContent: AnsiString;
+            ArticleHeaderContent: TALNewsArticleHeader);
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByID(ArticleID));
@@ -867,10 +868,11 @@ begin
   ArticleContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByNumber(ArticleNumber));
 end;
 
-{*************************************************************}
-procedure TAlNNTPClient.ArticleByNumber(ArticleNumber: Integer;
-                                        var ArticleBodyContent: AnsiString;
-                                        ArticleHeaderContent: TALNewsArticleHeader);
+{**************************************}
+procedure TAlNNTPClient.ArticleByNumber(
+            ArticleNumber: Integer;
+            var ArticleBodyContent: AnsiString;
+            ArticleHeaderContent: TALNewsArticleHeader);
 Var P: integer;
 begin
   ArticleBodyContent := ALNNTPClientExtractTextFromMultilineResponse(ArticleByNumber(ArticleNumber));
@@ -1374,19 +1376,21 @@ begin
   Post(HeaderContent.RawHeaderText, BodyContent);
 end;
 
-{*****************************************************************************}
-procedure TAlNNTPClient.PostMultipartMixed(HeaderContent: TALNewsArticleHeader;
-                                           const InlineText,
-                                                 InlineTextContentType: AnsiString;
-                                           Attachments: TALMultiPartMixedContents);
+{*****************************************}
+procedure TAlNNTPClient.PostMultipartMixed(
+            HeaderContent: TALNewsArticleHeader;
+            const InlineText,
+                  InlineTextContentType: AnsiString;
+            Attachments: TALMultiPartMixedContents);
 Var LMultipartMixedEncoder: TALMultipartMixedEncoder;
     Str: AnsiString;
 begin
   LMultipartMixedEncoder := TALMultipartMixedEncoder.create;
   try
-    LMultipartMixedEncoder.Encode(InlineText,
-                                  InlineTextContentType,
-                                  Attachments);
+    LMultipartMixedEncoder.Encode(
+      InlineText,
+      InlineTextContentType,
+      Attachments);
     with LMultipartMixedEncoder do begin
       HeaderContent.ContentType := 'multipart/mixed; boundary="' + DataStream.Boundary + '"';
       SetLength(Str,DataStream.size);
@@ -1444,14 +1448,14 @@ end;
 {*************************************************************************************}
 function TAlNNTPClient.GetStatusCodeFromResponse(const aResponse: AnsiString): Integer;
 
-  {------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function Internalstpblk(PValue : PAnsiChar) : PAnsiChar;
   begin
     Result := PValue;
     while Result^ in [' ', #9, #10, #13] do Inc(Result);
   end;
 
-  {-----------------------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function InternalGetInteger(Data: PAnsiChar; var Number : Integer) : PAnsiChar;
   var bSign : Boolean;
   begin
@@ -1498,9 +1502,10 @@ end;
  trailing CR-LF (thus there are 510 characters maximum allowed for the
  command and its parameters).  There is no provision for continuation
  command lines.}
-function TAlNNTPClient.SendCmd(aCmd: AnsiString;
-                               const OkResponses: array of Word;
-                               Const MultilineResponse: Boolean=False): AnsiString;
+function TAlNNTPClient.SendCmd(
+           aCmd: AnsiString;
+           const OkResponses: array of Word;
+           Const MultilineResponse: Boolean=False): AnsiString;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;

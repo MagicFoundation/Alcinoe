@@ -105,7 +105,7 @@ Const SplitDirectoryAmount = 5000;
 {*************************************************}
 procedure TForm1.ButtonStartClick(Sender: TObject);
 
-  {------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalEnableControl;
   Begin
     ButtonStop.Enabled := False;
@@ -122,7 +122,7 @@ procedure TForm1.ButtonStartClick(Sender: TObject);
     BtnChooseSaveDirectory.Enabled := True;
   end;
 
-  {-------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalDisableControl;
   Begin
     ButtonStop.Enabled := True;
@@ -205,7 +205,7 @@ end;
 function TForm1.GetNextLocalFileName(const aContentType: AnsiString): AnsiString;
 Var aExt: AnsiString;
 
-  {-----------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function SplitPathMakeFilename: AnsiString;
   begin
     Result := AnsiString(EditSaveDirectory.Text) + ALIntToStrA((FCurrentLocalFileNameIndex div SplitDirectoryAmount) * SplitDirectoryAmount + SplitDirectoryAmount) + '\';
@@ -224,11 +224,12 @@ Begin
   else result := SplitPathMakeFilename;
 end;
 
-{***************************************************************}
-procedure TForm1.MainWebSpiderCrawlDownloadError(Sender: TObject;
-                                                 const URL, ErrorMessage: AnsiString;
-                                                 HTTPResponseHeader: TALHTTPResponseHeader;
-                                                 var StopCrawling: Boolean);
+{***********************************************}
+procedure TForm1.MainWebSpiderCrawlDownloadError(
+            Sender: TObject;
+            const URL, ErrorMessage: AnsiString;
+            HTTPResponseHeader: TALHTTPResponseHeader;
+            var StopCrawling: Boolean);
 Var aNode: TPageDownloadedBinTreeNode;
 begin
   {add the url to downloaded list}
@@ -248,11 +249,12 @@ begin
   StopCrawling := not ButtonStop.Enabled;
 end;
 
-{******************************************************************}
-procedure TForm1.MainWebSpiderCrawlDownloadRedirect(Sender: TObject;
-                                                    const Url, RedirectedTo: AnsiString;
-                                                    HTTPResponseHeader: TALHTTPResponseHeader;
-                                                    var StopCrawling: Boolean);
+{**************************************************}
+procedure TForm1.MainWebSpiderCrawlDownloadRedirect(
+            Sender: TObject;
+            const Url, RedirectedTo: AnsiString;
+            HTTPResponseHeader: TALHTTPResponseHeader;
+            var StopCrawling: Boolean);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
     RedirectedToWithoutAnchor: ansiString;
 begin
@@ -289,12 +291,13 @@ begin
   StopCrawling := not ButtonStop.Enabled;
 end;
 
-{*****************************************************************}
-procedure TForm1.MainWebSpiderCrawlDownloadSuccess(Sender: TObject;
-                                                   const Url: AnsiString;
-                                                   HTTPResponseHeader: TALHTTPResponseHeader;
-                                                   HttpResponseContent: TStream;
-                                                   var StopCrawling: Boolean);
+{*************************************************}
+procedure TForm1.MainWebSpiderCrawlDownloadSuccess(
+            Sender: TObject;
+            const Url: AnsiString;
+            HTTPResponseHeader: TALHTTPResponseHeader;
+            HttpResponseContent: TStream;
+            var StopCrawling: Boolean);
 Var aNode: TPageDownloadedBinTreeNode;
     Str: AnsiString;
     AFileName: AnsiString;
@@ -309,15 +312,15 @@ begin
   {we add a check here to be sure that the file is an http file (text file}
   {Some server send image with text/htm content type}
   IF (FindMimeFromData(
-                       nil, // bind context - can be nil
-                       nil, // url - can be nil
-                       PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
-                       length(str), // size of buffer
-                       PWidechar(WideString(HTTPResponseHeader.ContentType)), // proposed mime if - can be nil
-                       0, // will be defined
-                       pMimeTypeFromData, // the suggested mime
-                       0 // must be 0
-                      ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(HTTPResponseHeader.ContentType));
+         nil, // bind context - can be nil
+         nil, // url - can be nil
+         PAnsiChar(str), // buffer with data to sniff - can be nil (pwzUrl must be valid)
+         length(str), // size of buffer
+         PWidechar(WideString(HTTPResponseHeader.ContentType)), // proposed mime if - can be nil
+         0, // will be defined
+         pMimeTypeFromData, // the suggested mime
+         0 // must be 0
+        ) <> NOERROR) then pMimeTypeFromData := PWidechar(WideString(HTTPResponseHeader.ContentType));
 
   {Get the FileName where to save the responseContent}
   aFileName := GetNextLocalFileName(AnsiString(pMimeTypeFromData));
@@ -346,11 +349,12 @@ begin
   StopCrawling := not ButtonStop.Enabled;
 end;
 
-{**********************************************************}
-procedure TForm1.MainWebSpiderCrawlFindLink(Sender: TObject;
-                                            const HtmlTagString: AnsiString;
-                                            HtmlTagParams: TALStringsA;
-                                            const URL: AnsiString);
+{******************************************}
+procedure TForm1.MainWebSpiderCrawlFindLink(
+            Sender: TObject;
+            const HtmlTagString: AnsiString;
+            HtmlTagParams: TALStringsA;
+            const URL: AnsiString);
 Var aNode: TPageNotYetDownloadedBinTreeNode;
     aURLWithoutAnchor: AnsiString;
     Lst: TALStringListA;
@@ -430,13 +434,15 @@ begin
   end;
 end;
 
-{*************************************************************}
-procedure TForm1.MainWebSpiderCrawlGetNextLink(Sender: TObject;
-                                               var Url: AnsiString);
+{*********************************************}
+procedure TForm1.MainWebSpiderCrawlGetNextLink(
+            Sender: TObject;
+            var Url: AnsiString);
 
-    {-----------------------------------------------------------------------------}
-    function InternalfindNextUrlToDownload(aNode: TPageNotYetDownloadedBinTreeNode;
-                                           alowDeepLevel: Integer): TPageNotYetDownloadedBinTreeNode;
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    function InternalfindNextUrlToDownload(
+               aNode: TPageNotYetDownloadedBinTreeNode;
+               alowDeepLevel: Integer): TPageNotYetDownloadedBinTreeNode;
     Var aTmpNode1, aTmpNode2: TPageNotYetDownloadedBinTreeNode;
     Begin
       If (not assigned(Anode)) or (aNode.DeepLevel <= alowDeepLevel) then result := aNode
@@ -474,9 +480,9 @@ begin
 
     {Find next url with deeplevel closer to FCurrentDeepLevel}
     If UpDownMaxDeepLevel.Position >= 0 then aNode := InternalfindNextUrlToDownload(
-                                                                                    TPageNotYetDownloadedBinTreeNode(FPageNotYetDownloadedBinTree.head),
-                                                                                    FCurrentDeepLevel
-                                                                                   )
+                                                         TPageNotYetDownloadedBinTreeNode(FPageNotYetDownloadedBinTree.head),
+                                                         FCurrentDeepLevel
+                                                        )
 
     {Find next url without take care of FCurrentDeepLevel}
     else aNode := TPageNotYetDownloadedBinTreeNode(FPageNotYetDownloadedBinTree.head);
@@ -496,12 +502,13 @@ begin
   if not ButtonStop.Enabled then url := '';
 end;
 
-{**************************************************************************}
-procedure TForm1.MainWebSpiderUpdateLinkToLocalPathFindLink(Sender: TObject;
-                                                            const HtmlTagString: AnsiString;
-                                                            HtmlTagParams: TALStringsA;
-                                                            const URL: AnsiString;
-                                                            var LocalPath: AnsiString);
+{**********************************************************}
+procedure TForm1.MainWebSpiderUpdateLinkToLocalPathFindLink(
+            Sender: TObject;
+            const HtmlTagString: AnsiString;
+            HtmlTagParams: TALStringsA;
+            const URL: AnsiString;
+            var LocalPath: AnsiString);
 Var aNode: TALStringKeyAVLBinaryTreeNode;
     aTmpUrl: ansiString;
     aAnchorValue: AnsiString;
@@ -526,21 +533,22 @@ begin
     If LocalPath = '!' then localpath := ''
     else If LocalPath <> '' then begin
       LocalPath := ALStringReplaceA(
-                                   LocalPath,
-                                   '\',
-                                   '/',
-                                   [RfReplaceall]
-                                  ) + aAnchorValue;
+                      LocalPath,
+                      '\',
+                      '/',
+                      [RfReplaceall]
+                     ) + aAnchorValue;
       If (FCurrentLocalFileNameIndex >= 0) then LocalPath := '../' + LocalPath;
     end;
   end;
 end;
 
-{*****************************************************************************}
-procedure TForm1.MainWebSpiderUpdateLinkToLocalPathGetNextFile(Sender: TObject;
-                                                               var FileName, BaseHref: AnsiString);
+{*************************************************************}
+procedure TForm1.MainWebSpiderUpdateLinkToLocalPathGetNextFile(
+            Sender: TObject;
+            var FileName, BaseHref: AnsiString);
 
-  {-----------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function SplitPathMakeFilename: AnsiString;
   begin
     If FCurrentLocalFileNameIndex < 0 then result := ''
@@ -561,12 +569,12 @@ Begin
     {Extract the Base Href}
     BaseHref := AlGetStringFromFile(FileName);
     BaseHref := ALTrim(
-                     AlCopyStr(
-                               BaseHref,
-                               17,                        // '<!-- saved from ' + URL
-                               ALPosA(#13,BaseHref) - 21    // URL + ' -->' +#13#10
-                              )
-                    );
+                   AlCopyStr(
+                      BaseHref,
+                      17,                        // '<!-- saved from ' + URL
+                      ALPosA(#13,BaseHref) - 21    // URL + ' -->' +#13#10
+                     )
+                  );
 
   end
   else BaseHref := '';
@@ -611,4 +619,3 @@ initialization
   SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
-

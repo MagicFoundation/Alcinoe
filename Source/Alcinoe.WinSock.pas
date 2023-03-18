@@ -1,8 +1,7 @@
-{*******************************************************************************
-Misc function that use winsock (for exempple ALHostToIP, ALIPAddrToName or
-ALgetLocalIPs)
-*******************************************************************************}
-
+{*******************************************
+Misc function that use winsock (for exemple
+ALHostToIP, ALIPAddrToName or ALgetLocalIPs)
+*******************************************}
 unit Alcinoe.WinSock;
 
 interface
@@ -71,7 +70,7 @@ begin
   end;
 end;
 
-{*********************************}
+{**********************************}
 function ALgetLocalIPs: TALStringsA;
 type
   TaPInAddr = array[0..10] of PInAddr;

@@ -56,18 +56,19 @@ Type
     FParticules: TList<TParticule>;
     FTimer: {$IF defined(ANDROID)}TALChoreographerThread{$ELSEIF defined(IOS)}TALDisplayLinkThread{$ELSE}TTimer{$ENDIF};
     function updateParticule(const ACanvas: TCanvas; const ARect: TRectF; var AParticule: TParticule): boolean;
-    function randomPhysics(const AX: Single;
-                           const AY: Single;
-                           const AAngle: Single;
-                           const ASpread: Single;
-                           const AStartVelocity: Single;
-                           const AColor: TalphaColor;
-                           const AShape: TParticule.Tshape;
-                           const ATicks: Single;
-                           const ADecay: Single;
-                           const AGravity: Single;
-                           const ADrift: Single;
-                           const AScalar: Single): TParticule;
+    function randomPhysics(
+               const AX: Single;
+               const AY: Single;
+               const AAngle: Single;
+               const ASpread: Single;
+               const AStartVelocity: Single;
+               const AColor: TalphaColor;
+               const AShape: TParticule.Tshape;
+               const ATicks: Single;
+               const ADecay: Single;
+               const AGravity: Single;
+               const ADrift: Single;
+               const AScalar: Single): TParticule;
     procedure onTimer(Sender: TObject);
     procedure onPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
     function getParticuleCount: integer;
@@ -75,19 +76,20 @@ Type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     function isRunning: Boolean;
-    procedure Fire(const AOriginX: Single = 0.5; // The x position on the page where to start firing confetti from, with 0 being the left edge and 1 being the right edge.
-                   const AOriginY: Single = 0.5; // The y position on the page where to start firing confetti from, with 0 being the top edge and 1 being the bottom edge.
-                   const AParticleCount: Integer = 50; // The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
-                   const AAngle: Single = 90; // The angle in which to launch the confetti, in degrees. 90 is straight up.
-                   const ASpread: Single = 45; // How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined angle plus or minus 22.5 degrees.
-                   const AStartVelocity: Single = 45; // How fast the confetti will start going, in pixels.
-                   const AColors: TArray<TalphaColor> = []; // An array of color strings, in the HEX format... you know, like #bada55.
-                   const AShapes: TArray<TParticule.TShape> = []; // An array of shapes for the confetti. The possible values are square and circle. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as ['circle', 'circle', 'square'] to use two third circles and one third squares.
-                   const ATicks: Single = 200; // How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
-                   const ADecay: Single = 0.9; // How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
-                   const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
-                   const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
-                   const AScalar: Single = 1); // Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
+    procedure Fire(
+                const AOriginX: Single = 0.5; // The x position on the page where to start firing confetti from, with 0 being the left edge and 1 being the right edge.
+                const AOriginY: Single = 0.5; // The y position on the page where to start firing confetti from, with 0 being the top edge and 1 being the bottom edge.
+                const AParticleCount: Integer = 50; // The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
+                const AAngle: Single = 90; // The angle in which to launch the confetti, in degrees. 90 is straight up.
+                const ASpread: Single = 45; // How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined angle plus or minus 22.5 degrees.
+                const AStartVelocity: Single = 45; // How fast the confetti will start going, in pixels.
+                const AColors: TArray<TalphaColor> = []; // An array of color strings, in the HEX format... you know, like #bada55.
+                const AShapes: TArray<TParticule.TShape> = []; // An array of shapes for the confetti. The possible values are square and circle. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as ['circle', 'circle', 'square'] to use two third circles and one third squares.
+                const ATicks: Single = 200; // How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
+                const ADecay: Single = 0.9; // How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
+                const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
+                const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
+                const AScalar: Single = 1); // Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
     Property ParticuleCount: integer read getParticuleCount;
   published
     property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
@@ -161,9 +163,9 @@ begin
       var LRadiusX := abs(x2 - x1) * AParticule.ovalScalar;
       var LRadiusY := abs(y2 - y1) * AParticule.ovalScalar;
       Var LDestRectF := TRectF.Create(
-                      TpointF.Create(AParticule.x, AParticule.y),
-                      LRadiusX * 2,
-                      LRadiusY * 2);
+                          TpointF.Create(AParticule.x, AParticule.y),
+                          LRadiusX * 2,
+                          LRadiusY * 2);
       if ARect.IntersectsWith(LDestRectF) then begin
         var LSavedMatrix := aCanvas.Matrix;
         try
@@ -201,19 +203,20 @@ begin
   result := AParticule.tick < AParticule.totalTicks;
 end;
 
-{**************************************************}
-function TALConfetti.randomPhysics(const AX: Single;
-                                   const AY: Single;
-                                   const AAngle: Single;
-                                   const ASpread: Single;
-                                   const AStartVelocity: Single;
-                                   const AColor: TalphaColor;
-                                   const AShape: TParticule.Tshape;
-                                   const ATicks: Single;
-                                   const ADecay: Single;
-                                   const AGravity: Single;
-                                   const ADrift: Single;
-                                   const AScalar: Single): TParticule;
+{*********************************}
+function TALConfetti.randomPhysics(
+           const AX: Single;
+           const AY: Single;
+           const AAngle: Single;
+           const ASpread: Single;
+           const AStartVelocity: Single;
+           const AColor: TalphaColor;
+           const AShape: TParticule.Tshape;
+           const ATicks: Single;
+           const ADecay: Single;
+           const AGravity: Single;
+           const ADrift: Single;
+           const AScalar: Single): TParticule;
 begin
   var LRadAngle := AAngle * (PI / 180);
   var LRadSpread := ASpread * (PI / 180);
@@ -266,20 +269,21 @@ begin
   end;
 end;
 
-{******************************************************}
-procedure TALConfetti.Fire(const AOriginX: Single = 0.5; // The x position on the page where to start firing confetti from, with 0 being the left edge and 1 being the right edge.
-                           const AOriginY: Single = 0.5; // The y position on the page where to start firing confetti from, with 0 being the top edge and 1 being the bottom edge.
-                           const AParticleCount: Integer = 50; // The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
-                           const AAngle: Single = 90; // The angle in which to launch the confetti, in degrees. 90 is straight up.
-                           const ASpread: Single = 45; // How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined angle plus or minus 22.5 degrees.
-                           const AStartVelocity: Single = 45; // How fast the confetti will start going, in pixels.
-                           const AColors: TArray<TalphaColor> = []; // An array of color strings, in the HEX format... you know, like #bada55.
-                           const AShapes: TArray<TParticule.TShape> = []; // An array of shapes for the confetti. The possible values are square and circle. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as ['circle', 'circle', 'square'] to use two third circles and one third squares.
-                           const ATicks: Single = 200; // How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
-                           const ADecay: Single = 0.9; // How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
-                           const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
-                           const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
-                           const AScalar: Single = 1); // Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
+{*************************}
+procedure TALConfetti.Fire(
+            const AOriginX: Single = 0.5; // The x position on the page where to start firing confetti from, with 0 being the left edge and 1 being the right edge.
+            const AOriginY: Single = 0.5; // The y position on the page where to start firing confetti from, with 0 being the top edge and 1 being the bottom edge.
+            const AParticleCount: Integer = 50; // The number of confetti to launch. More is always fun... but be cool, there's a lot of math involved.
+            const AAngle: Single = 90; // The angle in which to launch the confetti, in degrees. 90 is straight up.
+            const ASpread: Single = 45; // How far off center the confetti can go, in degrees. 45 means the confetti will launch at the defined angle plus or minus 22.5 degrees.
+            const AStartVelocity: Single = 45; // How fast the confetti will start going, in pixels.
+            const AColors: TArray<TalphaColor> = []; // An array of color strings, in the HEX format... you know, like #bada55.
+            const AShapes: TArray<TParticule.TShape> = []; // An array of shapes for the confetti. The possible values are square and circle. The default is to use both shapes in an even mix. You can even change the mix by providing a value such as ['circle', 'circle', 'square'] to use two third circles and one third squares.
+            const ATicks: Single = 200; // How many times the confetti will move. This is abstract... but play with it if the confetti disappear too quickly for you.
+            const ADecay: Single = 0.9; // How quickly the confetti will lose speed. Keep this number between 0 and 1, otherwise the confetti will gain speed. Better yet, just never change it.
+            const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
+            const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
+            const AScalar: Single = 1); // Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
 begin
 
   var LStartX: single;
@@ -354,6 +358,7 @@ begin
   result := FTimer.Enabled;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALConfetti]);

@@ -292,10 +292,10 @@ begin
 
     end;
 
-    Writeln('');
-    Writeln('Finished');
     if not LNoInteraction then begin
-      Writeln('Press any key to exit');
+      Writeln('');
+      Writeln('Finished');
+      Writeln('Press <Enter> key to quit');
       Readln;
     end;
 
@@ -321,7 +321,7 @@ begin
       Writeln('');
       Writeln('');
       Writeln('DeployMan failed!');
-      Writeln('Press any key to exit');
+      Writeln('Press <Enter> key to quit');
       Readln;
       halt(1);
     end;

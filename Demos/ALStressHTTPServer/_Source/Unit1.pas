@@ -181,10 +181,11 @@ type
     Rank: integer;
     procedure Execute; override;
     procedure OnHttpDownloadProgress(sender: Tobject; Read: Integer; Total: Integer);
-    procedure OnHttpStatus(sender: Tobject;
-                           InternetStatus: DWord;
-                           StatusInformation: Pointer;
-                           StatusInformationLength: DWord);
+    procedure OnHttpStatus(
+                sender: Tobject;
+                InternetStatus: DWord;
+                StatusInformation: Pointer;
+                StatusInformationLength: DWord);
   Public
     constructor Create(CreateSuspended: Boolean; aRank: integer);
     destructor Destroy; override;
@@ -314,7 +315,7 @@ end;
 {**********************************************}
 procedure TForm1.WMUpdateGUI(var Msg: TMessage);
 
-  {----------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function internalInttoVariant(aInt: Integer): Variant;
   begin
     if aInt >= 0 then result := aint
@@ -669,11 +670,12 @@ begin
   FBytesRead := Read;
 end;
 
-{*******************************************************}
-procedure TStressHttpThread.OnHttpStatus(sender: Tobject;
-                                         InternetStatus: DWord;
-                                         StatusInformation: Pointer;
-                                         StatusInformationLength: DWord);
+{***************************************}
+procedure TStressHttpThread.OnHttpStatus(
+            sender: Tobject;
+            InternetStatus: DWord;
+            StatusInformation: Pointer;
+            StatusInformationLength: DWord);
 begin
   if InternetStatus = WINHTTP_CALLBACK_STATUS_RESOLVING_NAME then FHttpStatusStartTime := GettickCount64
   else if InternetStatus = WINHTTP_CALLBACK_STATUS_NAME_RESOLVED then begin

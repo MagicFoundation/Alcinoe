@@ -1,20 +1,17 @@
 (*******************************************************************************
-Contributors:
-Igor Ivkin (igor@arkadia.com)
+Contributors: Igor Ivkin (igor@arkadia.com)
 
-Alcinoe.LibPhoneNumber is a wrapper for a several functions that use
-Google's C++ library libphonenumber to parse and format
-phone numbers written in a free form.
-This wrapper requires few DLLs to be working correctly.
-These DLLs are distributed in the folder "Lib/dll".
+Alcinoe.LibPhoneNumber is a wrapper for a several functions that use Google's
+C++ library libphonenumber to parse and format phone numbers written in a free
+form. This wrapper requires few DLLs to be working correctly. These DLLs are
+distributed in the folder "Lib/dll".
 
-This wrapper is based on a custom DLL-modification that provides three
-main functions:
+This wrapper is based on a custom DLL-modification that provides three main
+functions:
 1. To convert a given string phone written in a free form to Int64.
 2. To convert phone given as Int64 to international format defined for its country.
 3. To define a type of the phone (landing line, mobile, toll-free etc).
 *******************************************************************************)
-
 unit Alcinoe.LibPhoneNumber;
 
 interface
@@ -48,6 +45,7 @@ uses
   System.AnsiStrings,
   Alcinoe.StringUtils;
 
+{****************************************************************************************************************}
 function _StrPhoneNumberToInt64(phoneNumber, countryCode: PAnsiChar): Int64; cdecl; external 'libphonenumber.dll';
 function _Int64PhoneNumberToStr(phoneNumber: Int64; buffer: PAnsiChar): Cardinal; cdecl; external 'libphonenumber.dll';
 function _GetPhoneNumberType(phoneNumber: Int64): integer; cdecl; external 'libphonenumber.dll';
@@ -64,6 +62,7 @@ end;
  converts this number to an Int64 representation looking like 33634541222 }
 function ALStrPhoneNumberToInt64(PhoneNumber: AnsiString): Int64;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _IsDecimal(const S: AnsiString): boolean;
   var i: integer;
   begin
@@ -124,4 +123,3 @@ begin
 end;
 
 end.
-

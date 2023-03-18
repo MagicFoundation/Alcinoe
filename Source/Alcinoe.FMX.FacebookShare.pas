@@ -46,7 +46,6 @@ Setup (IOS)
 https://developers.facebook.com/docs/sharing/ios/
 
 1) follow the step described in Alcinoe.FMX.FacebookCore
-
 *******************************************************************************)
 unit Alcinoe.FMX.FacebookShare;
 

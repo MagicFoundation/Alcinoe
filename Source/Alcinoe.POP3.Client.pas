@@ -1,8 +1,7 @@
-{*******************************************************************************
-TALPOP3Client class implements the POP3 protocol (Post Office Protocol - Version 3)
+{***********************************************
+TALPOP3Client class implements the POP3 protocol
 http://www.ietf.org/rfc/rfc1939.txt
-*******************************************************************************}
-
+***********************************************}
 unit Alcinoe.POP3.Client;
 
 interface
@@ -72,7 +71,7 @@ Uses
   Alcinoe.WinSock,
   Alcinoe.StringUtils;
 
-{*******************************************************************************}
+{********************************************************************************}
 Procedure ALPOP3ClientSplitResponseLine(aResponse: AnsiString; ALst: TALStringsA);
 Begin
   aResponse := ALTrim(aResponse); // +OK 2 320
@@ -153,7 +152,7 @@ end;
 {****************************************************************************************}
 Function TAlPOP3Client.Connect(const aHost: AnsiString; const APort: integer): AnsiString;
 
-  {--------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CallServer(const Server:AnsiString; const Port:word);
   var SockAddr:Sockaddr_in;
       IP: AnsiString;
@@ -353,7 +352,7 @@ begin
   Result := SendCmd('LIST', True);
 end;
 
-{*********************************************}
+{**********************************************}
 procedure TAlPOP3Client.List(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALStringReplaceA(ALPOP3ClientExtractTextFromMultilineResponse(List), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
@@ -431,7 +430,7 @@ begin
   Result := SendCmd('UIDL', True);
 end;
 
-{*********************************************}
+{**********************************************}
 procedure TAlPOP3Client.UIDL(ALst: TALStringsA);
 begin
   ALst.Text := ALTrim(ALStringReplaceA(ALPOP3ClientExtractTextFromMultilineResponse(Uidl), ' ', ALst.NameValueSeparator, [rfReplaceAll]));
@@ -739,8 +738,9 @@ end;
  trailing CR-LF (thus there are 510 characters maximum allowed for the
  command and its parameters).  There is no provision for continuation
  command lines.}
-function TAlPOP3Client.SendCmd(aCmd: AnsiString;
-                               Const MultilineResponse: Boolean=False): AnsiString;
+function TAlPOP3Client.SendCmd(
+           aCmd: AnsiString;
+           Const MultilineResponse: Boolean=False): AnsiString;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;

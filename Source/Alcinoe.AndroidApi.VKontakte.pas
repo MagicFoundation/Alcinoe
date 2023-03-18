@@ -157,6 +157,7 @@ type
 
 implementation
 
+{**********************}
 procedure RegisterTypes;
 begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.VKontakte.JUserId', TypeInfo(Alcinoe.AndroidApi.VKontakte.JUserId));

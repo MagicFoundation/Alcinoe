@@ -244,10 +244,11 @@ type
     procedure Button22Click(Sender: TObject);
     procedure Button21Click(Sender: TObject);
     procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
-    procedure ALTabControl1AniTransitionInit(const sender: TObject;
-                                             const ATransition: TALTabTransition;
-                                             const aVelocity: Double;
-                                             const aAnimation: TALFloatPropertyAnimation);
+    procedure ALTabControl1AniTransitionInit(
+                const sender: TObject;
+                const ATransition: TALTabTransition;
+                const aVelocity: Double;
+                const aAnimation: TALFloatPropertyAnimation);
     procedure ALTabControl1Resize(Sender: TObject);
     procedure ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
     procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
@@ -264,8 +265,9 @@ type
     procedure ALEditExit(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ALMemo1Exit(Sender: TObject);
-    procedure ALVideoPlayerSurface1VideoSizeChanged(const Sender: TObject;
-      const width, height: Integer);
+    procedure ALVideoPlayerSurface1VideoSizeChanged(
+                const Sender: TObject;
+                const width, height: Integer);
     procedure Button11Click(Sender: TObject);
     procedure ALSwitch1Change(Sender: TObject);
     procedure Button23Click(Sender: TObject);
@@ -311,21 +313,25 @@ uses
 
 {$R *.fmx}
 
+{********************************************}
 procedure TForm1.ALEditEnter(Sender: TObject);
 begin
   ALLog('ALEditEnter', 'ALEditEnter');
 end;
 
+{*******************************************}
 procedure TForm1.ALEditExit(Sender: TObject);
 begin
   ALLog('ALEditExit', 'ALEditExit');
 end;
 
+{********************************************}
 procedure TForm1.ALMemo1Exit(Sender: TObject);
 begin
  //
 end;
 
+{************************************************}
 procedure TForm1.ALSwitch1Change(Sender: TObject);
 begin
   if ALSwitch1.IsChecked then begin
@@ -341,15 +347,18 @@ begin
 
 end;
 
+{******************************************************}
 procedure TForm1.ALVertScrollBox1Click(Sender: TObject);
 begin
   SetFocused(nil);
 end;
 
-procedure TForm1.ALTabControl1AniTransitionInit(const sender: TObject;
-                                                const ATransition: TALTabTransition;
-                                                const aVelocity: Double;
-                                                const aAnimation: TALFloatPropertyAnimation);
+{**********************************************}
+procedure TForm1.ALTabControl1AniTransitionInit(
+            const sender: TObject;
+            const ATransition: TALTabTransition;
+            const aVelocity: Double;
+            const aAnimation: TALFloatPropertyAnimation);
 begin
   // aVelocity = pixels per seconds given by the anicalculations
   // ALTabControl1.Width - abs(ALTabControl1.activeTab.Position.X) = the number of pixel we need to scroll
@@ -362,8 +371,10 @@ begin
   aAnimation.Interpolation := TInterpolationType.circular;
 end;
 
+{****************************************************}
 procedure TForm1.ALTabControl1Resize(Sender: TObject);
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _updateLabels(const aTab: TalTabItem);
   var aText1, aText2: TalText;
       aControl1: Tcontrol;
@@ -386,11 +397,13 @@ begin
   if ALTabControl1.TabIndex < ALTabControl1.Tabcount - 1 then _updateLabels(ALTabControl1.tabs[ALTabControl1.TabIndex + 1]);
 end;
 
+{*****************************************************************************************************************************}
 procedure TForm1.ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
 begin
   ALTabControl1Resize(nil);
 end;
 
+{*******************************************************************************************************}
 procedure TForm1.ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
 begin
   //special case for windows
@@ -404,6 +417,7 @@ begin
   end;
 end;
 
+{*******************************************************************************************************************************}
 procedure TForm1.ALVertScrollBox1ViewportPositionChange(Sender: TObject;const OldViewportPosition, NewViewportPosition: TPointF);
 begin
 
@@ -502,6 +516,7 @@ begin
 
 end;
 
+{**********************************************}
 procedure TForm1.Button24Click(Sender: TObject);
 begin
   BandedSwirlEffect1.Enabled := false;
@@ -541,11 +556,13 @@ begin
   end;
 end;
 
+{**********************************************************************************************************}
 procedure TForm1.ALVideoPlayerSurface1VideoSizeChanged(const Sender: TObject; const width, height: Integer);
 begin
   ALVideoPlayerSurface1.Height := height * (ClientWidth/Width)
 end;
 
+{*******************************************************************************************}
 procedure TForm1.VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
 begin
   if not ALVertScrollBox1.HasTouchScreen then begin
@@ -561,6 +578,7 @@ begin
   end;
 end;
 
+{**********************************************************}
 procedure TForm1.VScrollBarThumbMouseLeave(Sender: TObject);
 begin
   if not ALVertScrollBox1.HasTouchScreen then begin
@@ -576,6 +594,7 @@ begin
   end;
 end;
 
+{*****************************************************************************************************************}
 procedure TForm1.VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not ALVertScrollBox1.HasTouchScreen then begin
@@ -590,6 +609,7 @@ begin
   end;
 end;
 
+{***************************************************************************************************************}
 procedure TForm1.VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   if not ALVertScrollBox1.HasTouchScreen then begin
@@ -607,17 +627,20 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button11Click(Sender: TObject);
 begin
   ALSwitch1.IsChecked := not ALSwitch1.IsChecked;
 end;
 
+{**********************************************}
 procedure TForm1.Button13Click(Sender: TObject);
 begin
   fline.Repaint;
   Text10.Text := 'Paint: ' + FormatFloat('0.#####',fline.PaintMs) + ' ms';
 end;
 
+{**********************************************}
 procedure TForm1.Button15Click(Sender: TObject);
 begin
   fALText.clearBufBitmap;
@@ -634,6 +657,7 @@ begin
     end).Start;
 end;
 
+{**********************************************}
 procedure TForm1.Button16Click(Sender: TObject);
 begin
   fALLine.clearBufBitmap;
@@ -650,6 +674,7 @@ begin
     end).Start;
 end;
 
+{**********************************************}
 procedure TForm1.Button17Click(Sender: TObject);
 begin
   fALcheckbox2.clearBufBitmap;
@@ -666,6 +691,7 @@ begin
     end).Start;
 end;
 
+{**********************************************}
 procedure TForm1.Button18Click(Sender: TObject);
 begin
   fcheckbox2.Repaint;
@@ -673,6 +699,7 @@ begin
 end;
 
 
+{*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
 Var aDemoForm: TDemoForm;
     aRectangle: TALRectangle;
@@ -915,6 +942,7 @@ begin
   ALFmxMakeBufBitmaps(aVertScrollBox);
 end;
 
+{*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
 Var aDemoForm: TDemoForm;
     aRectangle: TRectangle;
@@ -1157,36 +1185,42 @@ begin
   //ALFmxMakeBufBitmaps(aVertScrollBox);
 end;
 
+{*********************************************}
 procedure TForm1.Button3Click(Sender: TObject);
 begin
   fText.Repaint;
   Text4.Text := 'Paint: ' + FormatFloat('0.#####',fText.PaintMs) + ' ms';
 end;
 
+{*********************************************}
 procedure TForm1.Button4Click(Sender: TObject);
 begin
   fRectangle1.Repaint;
   Text1.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle1.PaintMs) + ' ms';
 end;
 
+{*********************************************}
 procedure TForm1.Button7Click(Sender: TObject);
 begin
   fRectangle2.Repaint;
   Text2.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle2.PaintMs) + ' ms';
 end;
 
+{*********************************************}
 procedure TForm1.Button9Click(Sender: TObject);
 begin
   fRectangle3.Repaint;
   Text5.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle3.PaintMs) + ' ms';
 end;
 
+{**********************************************}
 procedure TForm1.Button21Click(Sender: TObject);
 begin
   fCircle1.Repaint;
   Text9.Text := 'Paint: ' + FormatFloat('0.#####',fCircle1.PaintMs) + ' ms';
 end;
 
+{**********************************************}
 procedure TForm1.Button22Click(Sender: TObject);
 begin
   fALCircle1.clearBufBitmap;
@@ -1203,6 +1237,7 @@ begin
     end).Start;
 end;
 
+{**********************************************}
 procedure TForm1.Button23Click(Sender: TObject);
 begin
   ALFreeAndNil(fDatePickerDialog);
@@ -1211,12 +1246,14 @@ begin
                          'Cancel', // const aBtnCancelCaption: string;
                          '', // const aBtnClearCaption: string
                          'Title');// const aTitle: String = ''
-  fDatePickerDialog.show(YearOf(now), // const aYear: integer;
-                         MonthOf(now), // const aMonth: integer;
-                         DayOfTheMonth(now)); // const aDayOfMonth: integer);
+  fDatePickerDialog.show(
+    YearOf(now), // const aYear: integer;
+    MonthOf(now), // const aMonth: integer;
+    DayOfTheMonth(now)); // const aDayOfMonth: integer);
 
 end;
 
+{***********************************************}
 procedure TForm1.Button255Click(Sender: TObject);
 begin
   fALRectangle1.clearBufBitmap;
@@ -1233,6 +1270,7 @@ begin
     end).Start;
 end;
 
+{*********************************************}
 procedure TForm1.Button6Click(Sender: TObject);
 begin
   fALRectangle2.clearBufBitmap;
@@ -1249,6 +1287,7 @@ begin
     end).Start;
 end;
 
+{*********************************************}
 procedure TForm1.Button8Click(Sender: TObject);
 begin
   fALRectangle3.clearBufBitmap;
@@ -1265,6 +1304,7 @@ begin
     end).Start;
 end;
 
+{*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
@@ -1449,6 +1489,7 @@ begin
   ALTabControl1Resize(nil);
 end;
 
+{********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
 
@@ -1471,10 +1512,10 @@ begin
     procedure
     begin
       TThread.Synchronize(nil,
-      procedure
-      begin
-        Halt(1); // << This is the only way i found to crash the app :(
-      end);
+        procedure
+        begin
+          Halt(1); // << This is the only way i found to crash the app :(
+        end);
     end).Start;
   {$ELSE}
   Application.Terminate;
@@ -1490,6 +1531,7 @@ begin
 end;
 {$ENDIF}
 
+{*******************************************}
 procedure TForm1.FormResize(Sender: TObject);
 begin
   ALLog('FormResize', 'width: ' + FloatToStr(width) + ' - ' + FloatToStr(height));
@@ -1503,8 +1545,10 @@ begin
 
 end;
 
-procedure TForm1.FormVirtualKeyboardHidden(Sender: TObject;
-  KeyboardVisible: Boolean; const Bounds: TRect);
+{*****************************************}
+procedure TForm1.FormVirtualKeyboardHidden(
+            Sender: TObject;
+            KeyboardVisible: Boolean; const Bounds: TRect);
 begin
   ALLog('FormVirtualKeyboardHidden', 'FormVirtualKeyboardHidden');
   FVKKeyboardOpen := False;
@@ -1512,8 +1556,10 @@ begin
   AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
 end;
 
-procedure TForm1.FormVirtualKeyboardShown(Sender: TObject;
-  KeyboardVisible: Boolean; const Bounds: TRect);
+{****************************************}
+procedure TForm1.FormVirtualKeyboardShown(
+            Sender: TObject;
+            KeyboardVisible: Boolean; const Bounds: TRect);
 begin
   ALLog('FormVirtualKeyboardShown', 'FormVirtualKeyboardShown');
   FVKKeyboardOpen := True;
@@ -1540,6 +1586,7 @@ begin
   else result := inherited MakeBufBitmap;
 end;
 
+{*******************************}
 procedure TALTextStopWatch.Paint;
 var aStopWatch: TstopWatch;
     aRemovebufCreatePaintMs: boolean;
@@ -1557,6 +1604,7 @@ end;
 
 { TTextStopWatch }
 
+{*****************************}
 procedure TTextStopWatch.Paint;
 var aStopWatch: TstopWatch;
 begin
@@ -1569,6 +1617,7 @@ end;
 
 { TRectangleStopWatch }
 
+{**********************************}
 procedure TRectangleStopWatch.Paint;
 var aStopWatch: TstopWatch;
 begin
@@ -1597,6 +1646,7 @@ begin
   else result := inherited MakeBufBitmap;
 end;
 
+{************************************}
 procedure TALRectangleStopWatch.Paint;
 var aStopWatch: TstopWatch;
     aRemovebufCreatePaintMs: boolean;
@@ -1612,6 +1662,7 @@ end;
 
 { TCheckBoxStopWatch }
 
+{*****************************************}
 procedure TCheckBoxStopWatch.PaintChildren;
 var aStopWatch: TstopWatch;
 begin
@@ -1640,6 +1691,7 @@ begin
   else result := inherited MakeBufBitmap;
 end;
 
+{***********************************}
 procedure TALCheckBoxStopWatch.Paint;
 var aStopWatch: TstopWatch;
     aRemovebufCreatePaintMs: boolean;
@@ -1655,6 +1707,7 @@ end;
 
 { TLineStopWatch }
 
+{*****************************}
 procedure TLineStopWatch.Paint;
 var aStopWatch: TstopWatch;
 begin
@@ -1683,6 +1736,7 @@ begin
   else result := inherited MakeBufBitmap;
 end;
 
+{*******************************}
 procedure TALLineStopWatch.Paint;
 var aStopWatch: TstopWatch;
     aRemovebufCreatePaintMs: boolean;
@@ -1698,6 +1752,7 @@ end;
 
 { TALRangeTrackBarStopWatch }
 
+{************************************************}
 procedure TALRangeTrackBarStopWatch.PaintChildren;
 var aStopWatch: TstopWatch;
 begin
@@ -1726,6 +1781,7 @@ begin
   else result := inherited MakeBufBitmap;
 end;
 
+{*********************************}
 procedure TALCircleStopWatch.Paint;
 var aStopWatch: TstopWatch;
     aRemovebufCreatePaintMs: boolean;
@@ -1741,6 +1797,7 @@ end;
 
 { TCircleStopWatch }
 
+{*******************************}
 procedure TCircleStopWatch.Paint;
 var aStopWatch: TstopWatch;
 begin

@@ -58,6 +58,7 @@ type
 
 implementation
 
+{***********************************************************************}
 procedure FBSDKLoginKitLoader; cdecl; external framework 'FBSDKLoginKit';
 
 end.

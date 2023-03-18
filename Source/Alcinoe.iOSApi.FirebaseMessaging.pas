@@ -60,6 +60,7 @@ implementation
 uses
   Alcinoe.iOSApi.FirebaseCore; // [MANDATORY] Because we need it's initialization/finalization section
 
+{*******************************************************************************}
 procedure FirebaseMessagingLoader; cdecl; external framework 'FirebaseMessaging';
 
 end.

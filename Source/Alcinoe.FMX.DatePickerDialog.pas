@@ -122,14 +122,16 @@ type
     {$ENDREGION}
 
   public
-    constructor create(const aBtnOKCaption: string;
-                       const aBtnCancelCaption: string = '';
-                       const aBtnClearCaption: string = '';
-                       const aTitle: String = '');
+    constructor create(
+                  const aBtnOKCaption: string;
+                  const aBtnCancelCaption: string = '';
+                  const aBtnClearCaption: string = '';
+                  const aTitle: String = '');
     destructor Destroy; override;
-    procedure show(const aYear: integer;
-                   const aMonth: integer;
-                   const aDayOfMonth: integer);
+    procedure show(
+                const aYear: integer;
+                const aMonth: integer;
+                const aDayOfMonth: integer);
     property OnClose: TALDatePickerDialogCloseEvent read fOnClose write fOnClose;
   End;
 
@@ -210,11 +212,12 @@ const
 {$ENDIF}
 {$ENDREGION}
 
-{*****************************************************************}
-constructor TALDatePickerDialog.create(const aBtnOKCaption: string;
-                                       const aBtnCancelCaption: string = '';
-                                       const aBtnClearCaption: string = '';
-                                       const aTitle: String = '');
+{*************************************}
+constructor TALDatePickerDialog.create(
+              const aBtnOKCaption: string;
+              const aBtnCancelCaption: string = '';
+              const aBtnClearCaption: string = '';
+              const aTitle: String = '');
 begin
 
   inherited create;
@@ -224,11 +227,12 @@ begin
   {$IF defined(android)}
 
   fDatePickerDialogListener := TDatePickerDialogListener.Create(Self);
-  fDatePickerDialog := TJALDatePickerDialog.JavaClass.init(TAndroidHelper.Context,
-                                                           StrToJCharSequence(aBtnOKCaption),
-                                                           StrToJCharSequence(aBtnCancelCaption),
-                                                           StrToJCharSequence(aBtnClearCaption),
-                                                           StrToJCharSequence(aTitle));
+  fDatePickerDialog := TJALDatePickerDialog.JavaClass.init(
+                         TAndroidHelper.Context,
+                         StrToJCharSequence(aBtnOKCaption),
+                         StrToJCharSequence(aBtnCancelCaption),
+                         StrToJCharSequence(aBtnClearCaption),
+                         StrToJCharSequence(aTitle));
   fDatePickerDialog.setListener(fDatePickerDialogListener);
 
   {$ENDIF}
@@ -253,12 +257,13 @@ begin
   FUIOverlayView := TUIView.Create;
   var LUIColor := AlphaColorToUIColor($32000000);
   FUIOverlayView.setBackgroundColor(LUIColor);
-  FUIOverlayView.setAutoresizingMask(UIViewAutoresizingFlexibleWidth or
-                                     UIViewAutoresizingFlexibleHeight or
-                                     UIViewAutoresizingFlexibleLeftMargin or
-                                     UIViewAutoresizingFlexibleRightMargin or
-                                     UIViewAutoresizingFlexibleTopMargin or
-                                     UIViewAutoresizingFlexibleBottomMargin);
+  FUIOverlayView.setAutoresizingMask(
+    UIViewAutoresizingFlexibleWidth or
+    UIViewAutoresizingFlexibleHeight or
+    UIViewAutoresizingFlexibleLeftMargin or
+    UIViewAutoresizingFlexibleRightMargin or
+    UIViewAutoresizingFlexibleTopMargin or
+    UIViewAutoresizingFlexibleBottomMargin);
   FUIOverlayView.setFrame(CGRect.Create(0, 0, screen.Size.Width, screen.Size.Height));
   var LSingleTapGestureRecognizer := TUITapGestureRecognizer.Wrap(TUITapGestureRecognizer.Alloc.initWithTarget(GetObjectID, sel_getUid('HandleTap')));
   try
@@ -272,9 +277,10 @@ begin
   { Creating Root view container for picker }
   FUIContainerView := TUIView.Create;
   FUIContainerView.setBackgroundColor(TUIColor.Wrap(TUIColor.OCClass.whiteColor));
-  FUIContainerView.setAutoresizingMask(UIViewAutoresizingFlexibleWidth or
-                                       UIViewAutoresizingFlexibleLeftMargin or
-                                       UIViewAutoresizingFlexibleRightMargin);
+  FUIContainerView.setAutoresizingMask(
+    UIViewAutoresizingFlexibleWidth or
+    UIViewAutoresizingFlexibleLeftMargin or
+    UIViewAutoresizingFlexibleRightMargin);
   FUIContainerView.layer.setMasksToBounds(true);
   FUIContainerView.layer.setCornerRadius(12);
 
@@ -476,10 +482,11 @@ begin
 
 end;
 
-{******************************************************}
-procedure TALDatePickerDialog.show(const aYear: integer;
-                                   const aMonth: integer;
-                                   const aDayOfMonth: integer);
+{*********************************}
+procedure TALDatePickerDialog.show(
+            const aYear: integer;
+            const aMonth: integer;
+            const aDayOfMonth: integer);
 
   {$REGION ' IOS'}
   {$IF defined(ios)}

@@ -1,7 +1,7 @@
-{*******************************************************************************
-TALIntegerList or TALDoubleList that work exactly like TstringList but with integer or Double.
-*******************************************************************************}
-
+{************************************************
+TALIntegerList or TALDoubleList that work exactly
+like TstringList but with integer or Double.
+************************************************}
 unit Alcinoe.QuickSortList;
 
 interface
@@ -305,7 +305,9 @@ procedure TALBaseQuickSortList.InsertItem(Index: Integer; Item: Pointer);
 begin
   if FCount = FCapacity then Grow;
   if Index < FCount then
-    ALMove(FList[Index], FList[Index + 1],
+    ALMove(
+      FList[Index],
+      FList[Index + 1],
       (FCount - Index) * SizeOf(Pointer));
   Pointer(FList[Index]) := nil;
   FList[Index] := Item;
@@ -335,9 +337,10 @@ begin
   Dec(FCount);
   if Index < FCount then begin
     FList[Index] := nil;
-    ALMove(FList[Index + 1],
-           FList[Index],
-          (FCount - Index) * SizeOf(Pointer));
+    ALMove(
+      FList[Index + 1],
+      FList[Index],
+      (FCount - Index) * SizeOf(Pointer));
     Pointer(FList[FCount]) := nil;
   end;
   if (Temp <> nil) then
@@ -829,7 +832,7 @@ end;
 function TALCardinalList.Find(item: Cardinal; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {---------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _CompareCardinal(D1,D2: Cardinal): Integer; inline
   Begin
     if D1 < D2 then result := -1
@@ -1169,7 +1172,7 @@ begin
   PALInt64ListItem(Get(index))^.FObject := AObject;
 end;
 
-{**********************************************}
+{*********************************************}
 function TALInt64List.Push(Item: int64): int64;
 begin
   Add(Item);
@@ -1268,7 +1271,7 @@ end;
 function TALNativeIntList.Find(item: NativeInt; var Index: Integer): Boolean;
 var L, H, I, C: Integer;
 
-  {------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function _CompareNativeInt(D1,D2: NativeInt): Integer; inline;
   Begin
     if D1 < D2 then result := -1

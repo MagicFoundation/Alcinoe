@@ -73,7 +73,7 @@ begin
   inherited;
 end;
 
-{**************************************************************************************************************************************}
+{***************************************************************************************************************************************}
 class procedure TCommandHandler.DoCommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
 var aUserID: int64;
     aLiveChat: TLiveChat;
@@ -280,5 +280,5 @@ begin
     ALFreeAndNil(Server);
     ALFreeAndNil(LiveChats);
   end;
-  
+
 end.

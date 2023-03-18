@@ -1,20 +1,16 @@
 {*******************************************************************************
 Delphi Client for memcached database.
 
-What is Memcached?  Free & open source, high-performance,
-distributed memory object caching system, generic in
-nature, but intended for use in speeding up dynamic web
-applications by alleviating database load.
+What is Memcached?  Free & open source, high-performance, distributed memory
+object caching system, generic in nature, but intended for use in speeding up
+dynamic web applications by alleviating database load.
 
-Memcached is an in-memory key-value store for small chunks
-of arbitrary data (strings, objects) from results of
-database calls, API calls, or page rendering.
+Memcached is an in-memory key-value store for small chunks of arbitrary data
+(strings, objects) from results of database calls, API calls, or page rendering.
 
-Memcached is simple yet powerful. Its simple design promotes
-quick deployment, ease of development, and solves many
-problems facing large data caches.
+Memcached is simple yet powerful. Its simple design promotes quick deployment,
+ease of development, and solves many problems facing large data caches.
 *******************************************************************************}
-
 unit Alcinoe.MemCached.Client;
 
 interface
@@ -56,9 +52,10 @@ type
       FCloseConnection: Boolean;
     public
       constructor Create(const aMsg: AnsiString; const aCloseConnection: Boolean = False);
-      constructor CreateFmt(const aMsg: ansistring;
-                            const aArgs: array of const;
-                            const aCloseConnection: Boolean = False);
+      constructor CreateFmt(
+                    const aMsg: ansistring;
+                    const aArgs: array of const;
+                    const aCloseConnection: Boolean = False);
       property CloseConnection: Boolean read FCloseConnection write FCloseConnection;
     end;
 
@@ -80,88 +77,111 @@ type
       procedure SetTCPNoDelay(const Value: boolean); virtual;
       procedure CheckError(Error: Boolean);
       procedure CheckKey(Const Key: ansiString);
-      procedure DoConnect(var aSocketDescriptor: TSocket;
-                          const aHost: AnsiString;
-                          const APort: integer;
-                          const aSendTimeout: Integer;
-                          const aReceiveTimeout: Integer;
-                          const aKeepAlive: Boolean;
-                          const aTCPNoDelay: Boolean);
+      procedure DoConnect(
+                  var aSocketDescriptor: TSocket;
+                  const aHost: AnsiString;
+                  const APort: integer;
+                  const aSendTimeout: Integer;
+                  const aReceiveTimeout: Integer;
+                  const aKeepAlive: Boolean;
+                  const aTCPNoDelay: Boolean);
       Procedure DoDisconnect(var aSocketDescriptor: TSocket); virtual;
       Function SocketWrite(aSocketDescriptor: TSocket; const Buf; len: Integer): Integer; Virtual;
       Function SocketRead(aSocketDescriptor: TSocket; var buf; len: Integer): Integer; Virtual;
-      Function SendCmd(aSocketDescriptor: TSocket;
-                       const aCmd: AnsiString;
-                       aResponseType: TAlMemCachedClient_responseType;
-                       var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString; overload; virtual;
-      Function SendCmd(aSocketDescriptor: TSocket;
-                       const aCmd: AnsiString;
-                       aResponseType: TAlMemCachedClient_responseType): AnsiString; overload; virtual;
-      Function GetResponse(aSocketDescriptor: TSocket;
-                           aResponseType: TAlMemCachedClient_responseType;
-                           var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
-      function DoGet(aSocketDescriptor: TSocket;
-                     const key: ansiString;
-                     var flags: integer;
-                     var data: ansiString): boolean; overload; virtual;
-      function DoGet(aSocketDescriptor: TSocket;
-                     const key: ansiString): AnsiString; overload; virtual;
-      function DoGet(aSocketDescriptor: TSocket;
-                     const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
-      function DoGets(aSocketDescriptor: TSocket;
-                      const key: ansiString;
-                      var flags: integer;
-                      var cas_id: int64;
-                      var data: ansiString): boolean; overload; virtual;
-      function DoGets(aSocketDescriptor: TSocket;
-                      const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
-      Procedure DoSet(aSocketDescriptor: TSocket;
-                      const key: ansiString;
-                      const flags: integer;
-                      const exptime:integer;
-                      const data: ansiString); virtual;
-      procedure DoAdd(aSocketDescriptor: TSocket;
-                      const key: ansiString;
-                      const flags: integer;
-                      const exptime:integer;
-                      const data: ansiString); virtual;
-      procedure DoReplace(aSocketDescriptor: TSocket;
-                          const key: ansiString;
-                          const flags: integer;
-                          const exptime:integer;
-                          const data: ansiString); virtual;
-      procedure DoAppend(aSocketDescriptor: TSocket;
-                         const key: ansiString;
-                         const data: ansiString); virtual;
-      procedure DoPrepend(aSocketDescriptor: TSocket;
-                          const key: ansiString;
-                          const data: ansiString); virtual;
-      function DoCas(aSocketDescriptor: TSocket;
-                     const key: ansiString;
-                     const flags: integer;
-                     const exptime:integer;
-                     const cas_id: int64;
-                     const data: ansiString): boolean; virtual;
-      function DoDelete(aSocketDescriptor: TSocket;
-                        const key: ansiString): boolean; virtual;
-      function DoIncr(aSocketDescriptor: TSocket;
-                       const key: ansiString;
-                       const Value: int64): int64; virtual;
-      function DoDecr(aSocketDescriptor: TSocket;
-                      const key: ansiString;
-                      const Value: int64): int64; virtual;
-      Procedure DoTouch(aSocketDescriptor: TSocket;
-                        const key: ansiString;
-                        const exptime:integer); virtual;
-      Function DoStats(aSocketDescriptor: TSocket;
-                       const args: AnsiString): AnsiString; virtual;
-      procedure DoFlush_all(aSocketDescriptor: TSocket;
-                            delay: integer); virtual;
+      Function SendCmd(
+                 aSocketDescriptor: TSocket;
+                 const aCmd: AnsiString;
+                 aResponseType: TAlMemCachedClient_responseType;
+                 var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString; overload; virtual;
+      Function SendCmd(
+                 aSocketDescriptor: TSocket;
+                 const aCmd: AnsiString;
+                 aResponseType: TAlMemCachedClient_responseType): AnsiString; overload; virtual;
+      Function GetResponse(
+                 aSocketDescriptor: TSocket;
+                 aResponseType: TAlMemCachedClient_responseType;
+                 var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
+      function DoGet(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString;
+                 var flags: integer;
+                 var data: ansiString): boolean; overload; virtual;
+      function DoGet(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString): AnsiString; overload; virtual;
+      function DoGet(
+                 aSocketDescriptor: TSocket;
+                 const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
+      function DoGets(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString;
+                 var flags: integer;
+                 var cas_id: int64;
+                 var data: ansiString): boolean; overload; virtual;
+      function DoGets(
+                 aSocketDescriptor: TSocket;
+                 const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
+      Procedure DoSet(
+                  aSocketDescriptor: TSocket;
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure DoAdd(
+                  aSocketDescriptor: TSocket;
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure DoReplace(
+                  aSocketDescriptor: TSocket;
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure DoAppend(
+                  aSocketDescriptor: TSocket;
+                  const key: ansiString;
+                  const data: ansiString); virtual;
+      procedure DoPrepend(
+                  aSocketDescriptor: TSocket;
+                  const key: ansiString;
+                  const data: ansiString); virtual;
+      function DoCas(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString;
+                 const flags: integer;
+                 const exptime:integer;
+                 const cas_id: int64;
+                 const data: ansiString): boolean; virtual;
+      function DoDelete(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString): boolean; virtual;
+      function DoIncr(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString;
+                 const Value: int64): int64; virtual;
+      function DoDecr(
+                 aSocketDescriptor: TSocket;
+                 const key: ansiString;
+                 const Value: int64): int64; virtual;
+      Procedure DoTouch(
+                  aSocketDescriptor: TSocket;
+                  const key: ansiString;
+                  const exptime:integer); virtual;
+      Function DoStats(
+                 aSocketDescriptor: TSocket;
+                 const args: AnsiString): AnsiString; virtual;
+      procedure DoFlush_all(
+                  aSocketDescriptor: TSocket;
+                  delay: integer); virtual;
       Function DoVersion(aSocketDescriptor: TSocket): AnsiString; virtual;
-      procedure DoVerbosity(aSocketDescriptor: TSocket;
-                            level: integer); virtual;
-      procedure OnCmdDone(const aCmd: AnsiString;
-                          TimeTaken: double); virtual;
+      procedure DoVerbosity(
+                  aSocketDescriptor: TSocket;
+                  level: integer); virtual;
+      procedure OnCmdDone(
+                  const aCmd: AnsiString;
+                  TimeTaken: double); virtual;
     public
       constructor Create; virtual;
       destructor Destroy; override;
@@ -186,44 +206,55 @@ type
       destructor Destroy; override;
       Procedure Connect(const aHost: AnsiString; const APort: integer); virtual;
       Procedure Disconnect; virtual;
-      function Get(const key: ansiString;
-                   var flags: integer;
-                   var data: ansiString): boolean; overload; virtual;
+      function Get(
+                 const key: ansiString;
+                 var flags: integer;
+                 var data: ansiString): boolean; overload; virtual;
       function Get(const key: ansiString): AnsiString; overload; virtual;
       function Get(const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
-      function Gets(const key: ansiString;
-                    var flags: integer;
-                    var cas_id: int64;
-                    var data: ansiString): boolean; overload; virtual;
+      function Gets(
+                 const key: ansiString;
+                 var flags: integer;
+                 var cas_id: int64;
+                 var data: ansiString): boolean; overload; virtual;
       function Gets(const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
-      Procedure _Set(const key: ansiString;
-                    const flags: integer;
-                    const exptime:integer;
-                    const data: ansiString); virtual;
-      procedure Add(const key: ansiString;
-                    const flags: integer;
-                    const exptime:integer;
-                    const data: ansiString); virtual;
-      procedure Replace(const key: ansiString;
-                        const flags: integer;
-                        const exptime:integer;
-                        const data: ansiString); virtual;
-      procedure Append(const key: ansiString;
-                       const data: ansiString); virtual;
-      procedure Prepend(const key: ansiString;
-                        const data: ansiString); virtual;
-      function Cas(const key: ansiString;
-                   const flags: integer;
-                   const exptime:integer;
-                   const cas_id: int64;
-                   const data: ansiString): boolean; virtual;
+      Procedure _Set(
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure Add(
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure Replace(
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure Append(
+                  const key: ansiString;
+                  const data: ansiString); virtual;
+      procedure Prepend(
+                  const key: ansiString;
+                  const data: ansiString); virtual;
+      function Cas(
+                 const key: ansiString;
+                 const flags: integer;
+                 const exptime:integer;
+                 const cas_id: int64;
+                 const data: ansiString): boolean; virtual;
       function Delete(const key: ansiString): boolean; virtual;
-      function Incr(const key: ansiString;
-                     const Value: int64): int64; virtual;
-      function Decr(const key: ansiString;
-                    const Value: int64): int64; virtual;
-      Procedure Touch(const key: ansiString;
-                      const exptime:integer); virtual;
+      function Incr(
+                 const key: ansiString;
+                 const Value: int64): int64; virtual;
+      function Decr(
+                 const key: ansiString;
+                 const Value: int64): int64; virtual;
+      Procedure Touch(
+                  const key: ansiString;
+                  const exptime:integer); virtual;
       Function Stats(const args: AnsiString): AnsiString; virtual;
       procedure Flush_all(delay: integer); virtual;
       Function Version: AnsiString; virtual;
@@ -258,50 +289,62 @@ type
       procedure SetKeepAlive(const Value: boolean); override;
       procedure SetTCPNoDelay(const Value: boolean); override;
       Function  AcquireConnection: TSocket; virtual;
-      Procedure ReleaseConnection(var SocketDescriptor: TSocket;
-                                  const CloseConnection: Boolean = False); virtual;
+      Procedure ReleaseConnection(
+                  var SocketDescriptor: TSocket;
+                  const CloseConnection: Boolean = False); virtual;
     public
       constructor Create(const aHost: AnsiString; const APort: integer); reintroduce;
       destructor Destroy; override;
       Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
-      function Get(const key: ansiString;
-                   var flags: integer;
-                   var data: ansiString): boolean; overload; virtual;
+      function Get(
+                 const key: ansiString;
+                 var flags: integer;
+                 var data: ansiString): boolean; overload; virtual;
       function Get(const key: ansiString): AnsiString; overload; virtual;
       function Get(const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
-      function Gets(const key: ansiString;
-                    var flags: integer;
-                    var cas_id: int64;
-                    var data: ansiString): boolean; overload; virtual;
+      function Gets(
+                 const key: ansiString;
+                 var flags: integer;
+                 var cas_id: int64;
+                 var data: ansiString): boolean; overload; virtual;
       function Gets(const keys: array of ansiString): TAlMemCachedClient_StoredItems; overload; virtual;
-      Procedure _Set(const key: ansiString;
-                    const flags: integer;
-                    const exptime:integer;
-                    const data: ansiString); virtual;
-      procedure Add(const key: ansiString;
-                    const flags: integer;
-                    const exptime:integer;
-                    const data: ansiString); virtual;
-      procedure Replace(const key: ansiString;
-                        const flags: integer;
-                        const exptime:integer;
-                        const data: ansiString); virtual;
-      procedure Append(const key: ansiString;
-                       const data: ansiString); virtual;
-      procedure Prepend(const key: ansiString;
-                        const data: ansiString); virtual;
-      function Cas(const key: ansiString;
-                   const flags: integer;
-                   const exptime:integer;
-                   const cas_id: int64;
-                   const data: ansiString): boolean; virtual;
+      Procedure _Set(
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure Add(
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure Replace(
+                  const key: ansiString;
+                  const flags: integer;
+                  const exptime:integer;
+                  const data: ansiString); virtual;
+      procedure Append(
+                  const key: ansiString;
+                  const data: ansiString); virtual;
+      procedure Prepend(
+                  const key: ansiString;
+                  const data: ansiString); virtual;
+      function Cas(
+                 const key: ansiString;
+                 const flags: integer;
+                 const exptime:integer;
+                 const cas_id: int64;
+                 const data: ansiString): boolean; virtual;
       function Delete(const key: ansiString): boolean; virtual;
-      function Incr(const key: ansiString;
-                     const Value: int64): int64; virtual;
-      function Decr(const key: ansiString;
-                    const Value: int64): int64; virtual;
-      Procedure Touch(const key: ansiString;
-                      const exptime:integer); virtual;
+      function Incr(
+                 const key: ansiString;
+                 const Value: int64): int64; virtual;
+      function Decr(
+                 const key: ansiString;
+                 const Value: int64): int64; virtual;
+      Procedure Touch(
+                  const key: ansiString;
+                  const exptime:integer); virtual;
       Function Stats(const args: AnsiString): AnsiString; virtual;
       procedure Flush_all(delay: integer); virtual;
       Function Version: AnsiString; virtual;
@@ -327,10 +370,11 @@ begin
   inherited Create(aMsg);
 end;
 
-{***********************************************************************}
-constructor EAlMemCachedClientException.CreateFmt(const aMsg: ansistring;
-                                                  const aArgs: array of const;
-                                                  const aCloseConnection: Boolean = False);
+{************************************************}
+constructor EAlMemCachedClientException.CreateFmt(
+              const aMsg: ansistring;
+              const aArgs: array of const;
+              const aCloseConnection: Boolean = False);
 begin
   fCloseConnection := aCloseConnection;
   inherited CreateFmt(aMsg, aArgs);
@@ -376,16 +420,17 @@ begin
     if (Key[I] in [#0..#32]) then raise EAlMemCachedClientException.CreateFmt('The key must not include control characters or whitespace, key: %s', [Key]);
 end;
 
-{************************************************************************}
-procedure TAlBaseMemCachedClient.DoConnect(var aSocketDescriptor: TSocket;
-                                           const aHost: AnsiString;
-                                           const APort: integer;
-                                           const aSendTimeout: Integer;
-                                           const aReceiveTimeout: Integer;
-                                           const aKeepAlive: Boolean;
-                                           const aTCPNoDelay: Boolean);
+{*****************************************}
+procedure TAlBaseMemCachedClient.DoConnect(
+            var aSocketDescriptor: TSocket;
+            const aHost: AnsiString;
+            const APort: integer;
+            const aSendTimeout: Integer;
+            const aReceiveTimeout: Integer;
+            const aKeepAlive: Boolean;
+            const aTCPNoDelay: Boolean);
 
-  {--------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CallServer(const Server:AnsiString; const Port:word);
   var SockAddr:Sockaddr_in;
       IP: AnsiString;
@@ -431,11 +476,12 @@ begin
   end;
 end;
 
-{*****************************************************************}
-Function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
-                                        const aCmd: AnsiString;
-                                        aResponseType: TAlMemCachedClient_responseType;
-                                        var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
+{**************************************}
+Function TAlBaseMemCachedClient.SendCmd(
+           aSocketDescriptor: TSocket;
+           const aCmd: AnsiString;
+           aResponseType: TAlMemCachedClient_responseType;
+           var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
 Var P: PAnsiChar;
     L: Integer;
     ByteSent: integer;
@@ -453,9 +499,10 @@ begin
     dec(l,ByteSent);
   end;
 
-  if aResponseType <> rpNone then Result := GetResponse(aSocketDescriptor,
-                                                        aResponseType,
-                                                        aGETStoredItems)
+  if aResponseType <> rpNone then Result := GetResponse(
+                                              aSocketDescriptor,
+                                              aResponseType,
+                                              aGETStoredItems)
   else begin
     setlength(aGETStoredItems, 0);
     result := '';
@@ -466,16 +513,18 @@ begin
 
 end;
 
-{*****************************************************************}
-function TAlBaseMemCachedClient.SendCmd(aSocketDescriptor: TSocket;
-                                        const aCmd: AnsiString;
-                                        aResponseType: TAlMemCachedClient_responseType): AnsiString;
+{**************************************}
+function TAlBaseMemCachedClient.SendCmd(
+           aSocketDescriptor: TSocket;
+           const aCmd: AnsiString;
+           aResponseType: TAlMemCachedClient_responseType): AnsiString;
 Var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
-  result := SendCmd(aSocketDescriptor,
-                    aCmd,
-                    aResponseType,
-                    LGETStoredItems);
+  result := SendCmd(
+              aSocketDescriptor,
+              aCmd,
+              aResponseType,
+              LGETStoredItems);
 end;
 
 {*******************************************************************}
@@ -505,9 +554,10 @@ end;
 // In the descriptions of individual commands below, these error lines
 // are not again specifically mentioned, but clients must allow for their
 // possibility.
-function TAlBaseMemCachedClient.GetResponse(aSocketDescriptor: TSocket;
-                                            aResponseType: TAlMemCachedClient_responseType;
-                                            var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
+function TAlBaseMemCachedClient.GetResponse(
+           aSocketDescriptor: TSocket;
+           aResponseType: TAlMemCachedClient_responseType;
+           var aGETStoredItems: TAlMemCachedClient_StoredItems): AnsiString;
 Var LBytesReceived: Integer;
     LResultPos: Integer;
     LHeaderStartPos: Integer;
@@ -829,10 +879,11 @@ end;
 // hold items with such keys (because they were never stored, or stored
 // but deleted to make space for more items, or expired, or explicitly
 // deleted by a client).
-function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
-                                      const key: ansiString;
-                                      var flags: integer;
-                                      var data: ansiString): boolean;
+function TAlBaseMemCachedClient.DoGet(
+           aSocketDescriptor: TSocket;
+           const key: ansiString;
+           var flags: integer;
+           var data: ansiString): boolean;
 var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
@@ -849,9 +900,10 @@ begin
   end;
 end;
 
-{***************************************************************}
-function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
-                                      const key: ansiString): AnsiString;
+{************************************}
+function TAlBaseMemCachedClient.DoGet(
+           aSocketDescriptor: TSocket;
+           const key: ansiString): AnsiString;
 var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
@@ -860,9 +912,10 @@ begin
   result := LGETStoredItems[0].data;
 end;
 
-{***************************************************************}
-function TAlBaseMemCachedClient.DoGet(aSocketDescriptor: TSocket;
-                                      const keys: array of ansiString): TAlMemCachedClient_StoredItems;
+{************************************}
+function TAlBaseMemCachedClient.DoGet(
+           aSocketDescriptor: TSocket;
+           const keys: array of ansiString): TAlMemCachedClient_StoredItems;
 var LStrKeys: AnsiString;
     I: integer;
 begin
@@ -875,12 +928,13 @@ begin
   SendCmd(aSocketDescriptor, 'get ' + AlTrim(LStrKeys) + #13#10, rpRetrieval, result);
 end;
 
-{****************************************************************}
-function TAlBaseMemCachedClient.DoGets(aSocketDescriptor: TSocket;
-                                       const key: ansiString;
-                                       var flags: integer;
-                                       var cas_id: int64;
-                                       var data: ansiString): boolean;
+{*************************************}
+function TAlBaseMemCachedClient.DoGets(
+           aSocketDescriptor: TSocket;
+           const key: ansiString;
+           var flags: integer;
+           var cas_id: int64;
+           var data: ansiString): boolean;
 var LGETStoredItems: TAlMemCachedClient_StoredItems;
 begin
   CheckKey(key);
@@ -899,9 +953,10 @@ begin
   end;
 end;
 
-{****************************************************************}
-function TAlBaseMemCachedClient.DoGets(aSocketDescriptor: TSocket;
-                                       const keys: array of ansiString): TAlMemCachedClient_StoredItems;
+{*************************************}
+function TAlBaseMemCachedClient.DoGets(
+           aSocketDescriptor: TSocket;
+           const keys: array of ansiString): TAlMemCachedClient_StoredItems;
 var LStrKeys: AnsiString;
     I: integer;
 begin
@@ -971,66 +1026,72 @@ end;
 // with a "cas" command did not exist.
 //
 // "set" means "store this data".
-procedure TAlBaseMemCachedClient.DoSet(aSocketDescriptor: TSocket;
-                                       const key: ansiString;
-                                       const flags: integer;
-                                       const exptime:integer;
-                                       const data: ansiString);
+procedure TAlBaseMemCachedClient.DoSet(
+            aSocketDescriptor: TSocket;
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  LResultCode := SendCmd(aSocketDescriptor,
-                         'set '+Key+' '+
-                                ALIntToStrA(flags)+' '+
-                                ALIntToStrA(exptime) + ' ' +
-                                ALIntToStrA(length(data)) + #13#10 +
-                                data + #13#10,
-                         rpStorage);
+  LResultCode := SendCmd(
+                   aSocketDescriptor,
+                   'set '+Key+' '+
+                          ALIntToStrA(flags)+' '+
+                          ALIntToStrA(exptime) + ' ' +
+                          ALIntToStrA(length(data)) + #13#10 +
+                          data + #13#10,
+                   rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {************************************************************************}
 // "add" means "store this data, but only if the server *doesn't* already
 // hold data for this key".
-procedure TAlBaseMemCachedClient.DoAdd(aSocketDescriptor: TSocket;
-                                       const key: ansiString;
-                                       const flags: integer;
-                                       const exptime:integer;
-                                       const data: ansiString);
+procedure TAlBaseMemCachedClient.DoAdd(
+            aSocketDescriptor: TSocket;
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  LResultCode := SendCmd(aSocketDescriptor,
-                         'add '+Key+' '+
-                                ALIntToStrA(flags)+' '+
-                                ALIntToStrA(exptime) + ' ' +
-                                ALIntToStrA(length(data)) + #13#10 +
-                                data + #13#10,
-                         rpStorage);
+  LResultCode := SendCmd(
+                   aSocketDescriptor,
+                   'add '+Key+' '+
+                          ALIntToStrA(flags)+' '+
+                          ALIntToStrA(exptime) + ' ' +
+                          ALIntToStrA(length(data)) + #13#10 +
+                          data + #13#10,
+                   rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {****************************************************************}
 // "replace" means "store this data, but only if the server *does*
 // already hold data for this key".
-procedure TAlBaseMemCachedClient.DoReplace(aSocketDescriptor: TSocket;
-                                           const key: ansiString;
-                                           const flags: integer;
-                                           const exptime:integer;
-                                           const data: ansiString);
+procedure TAlBaseMemCachedClient.DoReplace(
+            aSocketDescriptor: TSocket;
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  LResultCode := SendCmd(aSocketDescriptor,
-                         'replace '+Key+' '+
-                                    ALIntToStrA(flags)+' '+
-                                    ALIntToStrA(exptime) + ' ' +
-                                    ALIntToStrA(length(data)) + #13#10 +
-                                    data + #13#10,
-                         rpStorage);
+  LResultCode := SendCmd(
+                   aSocketDescriptor,
+                   'replace '+Key+' '+
+                              ALIntToStrA(flags)+' '+
+                              ALIntToStrA(exptime) + ' ' +
+                              ALIntToStrA(length(data)) + #13#10 +
+                              data + #13#10,
+                   rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
@@ -1039,19 +1100,21 @@ end;
 // The append and prepend commands do not accept flags or exptime.
 // They update existing data portions, and ignore new flag and exptime
 // settings.
-procedure TAlBaseMemCachedClient.DoAppend(aSocketDescriptor: TSocket;
-                                          const key: ansiString;
-                                          const data: ansiString);
+procedure TAlBaseMemCachedClient.DoAppend(
+            aSocketDescriptor: TSocket;
+            const key: ansiString;
+            const data: ansiString);
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  LResultCode := SendCmd(aSocketDescriptor,
-                         'append '+Key+' '+
-                                   '0 '+
-                                   '0 ' +
-                                   ALIntToStrA(length(data)) + #13#10 +
-                                   data + #13#10,
-                         rpStorage);
+  LResultCode := SendCmd(
+                   aSocketDescriptor,
+                   'append '+Key+' '+
+                             '0 '+
+                             '0 ' +
+                             ALIntToStrA(length(data)) + #13#10 +
+                             data + #13#10,
+                   rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
@@ -1060,43 +1123,47 @@ end;
 // The append and prepend commands do not accept flags or exptime.
 // They update existing data portions, and ignore new flag and exptime
 // settings.
-procedure TAlBaseMemCachedClient.DoPrepend(aSocketDescriptor: TSocket;
-                                           const key: ansiString;
-                                           const data: ansiString);
+procedure TAlBaseMemCachedClient.DoPrepend(
+            aSocketDescriptor: TSocket;
+            const key: ansiString;
+            const data: ansiString);
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
-  LResultCode := SendCmd(aSocketDescriptor,
-                         'prepend '+Key+' '+
-                                    '0 '+
-                                    '0 ' +
-                                    ALIntToStrA(length(data)) + #13#10 +
-                                    data + #13#10,
-                         rpStorage);
+  LResultCode := SendCmd(
+                   aSocketDescriptor,
+                   'prepend '+Key+' '+
+                              '0 '+
+                              '0 ' +
+                              ALIntToStrA(length(data)) + #13#10 +
+                              data + #13#10,
+                   rpStorage);
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
 {*********************************************************************}
 // "cas" is a check and set operation which means "store this data but
 // only if no one else has updated since I last fetched it."
-function TAlBaseMemCachedClient.DoCas(aSocketDescriptor: TSocket;
-                                      const key: ansiString;
-                                      const flags: integer;
-                                      const exptime:integer;
-                                      const cas_id: int64;
-                                      const data: ansiString): boolean;
+function TAlBaseMemCachedClient.DoCas(
+           aSocketDescriptor: TSocket;
+           const key: ansiString;
+           const flags: integer;
+           const exptime:integer;
+           const cas_id: int64;
+           const data: ansiString): boolean;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
   if flags < 0 then raise EAlMemCachedClientException.Create('flags must be upper or equal to 0');
-  LResultCode := SendCmd(aSocketDescriptor,
-                         'cas '+Key+' '+
-                                ALIntToStrA(flags)+' '+
-                                ALIntToStrA(exptime) + ' ' +
-                                ALIntToStrA(length(data)) + ' ' +
-                                ALIntToStrA(cas_id) + #13#10 +
-                                data + #13#10,
-                         rpStorage);
+  LResultCode := SendCmd(
+                   aSocketDescriptor,
+                   'cas '+Key+' '+
+                          ALIntToStrA(flags)+' '+
+                          ALIntToStrA(exptime) + ' ' +
+                          ALIntToStrA(length(data)) + ' ' +
+                          ALIntToStrA(cas_id) + #13#10 +
+                          data + #13#10,
+                   rpStorage);
   if LResultCode = 'EXISTS' then result := False
   else if LResultCode = 'STORED' then result := True
   else raise EAlMemCachedClientException.Create(LResultCode);
@@ -1122,8 +1189,9 @@ end;
 //
 // See the "flush_all" command below for immediate invalidation
 // of all existing items.
-function TAlBaseMemCachedClient.DoDelete(aSocketDescriptor: TSocket;
-                                         const key: ansiString): boolean;
+function TAlBaseMemCachedClient.DoDelete(
+           aSocketDescriptor: TSocket;
+           const key: ansiString): boolean;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
@@ -1175,9 +1243,10 @@ end;
 // guaranteed to decrement its returned length.  The number MAY be
 // space-padded at the end, but this is purely an implementation
 // optimization, so you also shouldn't rely on that.
-function TAlBaseMemCachedClient.DoIncr(aSocketDescriptor: TSocket;
-                                       const key: ansiString;
-                                       const Value: int64): int64;
+function TAlBaseMemCachedClient.DoIncr(
+           aSocketDescriptor: TSocket;
+           const key: ansiString;
+           const Value: int64): int64;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
@@ -1185,10 +1254,11 @@ begin
   if not ALTryStrToInt64(LResultCode, Result) then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
-{****************************************************************}
-function TAlBaseMemCachedClient.DoDecr(aSocketDescriptor: TSocket;
-                                       const key: ansiString;
-                                       const Value: int64): int64;
+{*************************************}
+function TAlBaseMemCachedClient.DoDecr(
+           aSocketDescriptor: TSocket;
+           const key: ansiString;
+           const Value: int64): int64;
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
@@ -1219,9 +1289,10 @@ end;
 //
 // - "NOT_FOUND\r\n" to indicate that the item with this key was not
 //   found.
-procedure TAlBaseMemCachedClient.DoTouch(aSocketDescriptor: TSocket;
-                                         const key: ansiString;
-                                         const exptime:integer);
+procedure TAlBaseMemCachedClient.DoTouch(
+            aSocketDescriptor: TSocket;
+            const key: ansiString;
+            const exptime:integer);
 var LResultCode: AnsiString;
 begin
   CheckKey(key);
@@ -1253,8 +1324,9 @@ end;
 // The delay option allows you to have them reset in e.g. 10 second
 // intervals (by passing 0 to the first, 10 to the second, 20 to the
 // third, etc. etc.).
-procedure TAlBaseMemCachedClient.DoFlush_all(aSocketDescriptor: TSocket;
-                                             delay: integer);
+procedure TAlBaseMemCachedClient.DoFlush_all(
+            aSocketDescriptor: TSocket;
+            delay: integer);
 begin
   if delay > 0 then SendCmd(aSocketDescriptor, 'flush_all ' + ALIntToStrA(delay) + #13#10, rpOK)
   else SendCmd(aSocketDescriptor, 'flush_all' + #13#10, rpOK);
@@ -1550,8 +1622,9 @@ end;
 //   slab. (total_chunks * chunk_size) - mem_requested shows memory
 //   wasted in a slab class.  If you see a lot of waste, consider tuning
 //   the slab factor.
-Function TAlBaseMemCachedClient.DoStats(aSocketDescriptor: TSocket;
-                                        const args: AnsiString): AnsiString;
+Function TAlBaseMemCachedClient.DoStats(
+           aSocketDescriptor: TSocket;
+           const args: AnsiString): AnsiString;
 begin
   if args <> '' then result := SendCmd(aSocketDescriptor, 'stats ' + args + #13#10, rpEND)
   else result := SendCmd(aSocketDescriptor, 'stats' + #13#10, rpEND);
@@ -1575,15 +1648,17 @@ end;
 // and the server sends "OK\r\n" in response (unless "noreply" is given
 // as the last parameter). Its effect is to set the verbosity level of
 // the logging output.
-Procedure TAlBaseMemCachedClient.DoVerbosity(aSocketDescriptor: TSocket;
-                                             level: integer);
+Procedure TAlBaseMemCachedClient.DoVerbosity(
+            aSocketDescriptor: TSocket;
+            level: integer);
 begin
   SendCmd(aSocketDescriptor, 'verbosity ' + ALIntToStrA(level) + #13#10, rpOK);
 end;
 
-{****************************************************************}
-procedure TAlBaseMemCachedClient.OnCmdDone(const aCmd: AnsiString;
-                                           TimeTaken: double);
+{*****************************************}
+procedure TAlBaseMemCachedClient.OnCmdDone(
+            const aCmd: AnsiString;
+            TimeTaken: double);
 begin
   // virtual
 end;
@@ -1712,13 +1787,14 @@ procedure TAlMemCachedClient.Connect(const aHost: AnsiString; const APort: integ
 begin
 
   if FConnected then raise EALException.Create('MemCached component already connected');
-  DoConnect(fSocketDescriptor,
-            aHost,
-            APort,
-            fSendTimeout,
-            fReceiveTimeout,
-            fKeepAlive,
-            fTCPNoDelay);
+  DoConnect(
+    fSocketDescriptor,
+    aHost,
+    APort,
+    fSendTimeout,
+    fReceiveTimeout,
+    fKeepAlive,
+    fTCPNoDelay);
   fConnected := True;
 
 end;
@@ -1732,15 +1808,17 @@ begin
   end;
 end;
 
-{****************************************************}
-function TAlMemCachedClient.Get(const key: ansiString;
-                                var flags: integer;
-                                var data: ansiString): boolean;
+{******************************}
+function TAlMemCachedClient.Get(
+           const key: ansiString;
+           var flags: integer;
+           var data: ansiString): boolean;
 begin
-  result := DoGet(FSocketDescriptor,
-                  key,
-                  flags,
-                  data);
+  result := DoGet(
+              FSocketDescriptor,
+              key,
+              flags,
+              data);
 end;
 
 {*****************************************************************}
@@ -1755,17 +1833,19 @@ begin
   result := DoGet(FSocketDescriptor, keys);
 end;
 
-{*****************************************************}
-function TAlMemCachedClient.Gets(const key: ansiString;
-                                 var flags: integer;
-                                 var cas_id: int64;
-                                 var data: ansiString): boolean;
+{*******************************}
+function TAlMemCachedClient.Gets(
+           const key: ansiString;
+           var flags: integer;
+           var cas_id: int64;
+           var data: ansiString): boolean;
 begin
-  result := DoGets(FSocketDescriptor,
-                   key,
-                   flags,
-                   cas_id,
-                   data);
+  result := DoGets(
+              FSocketDescriptor,
+              key,
+              flags,
+              cas_id,
+              data);
 end;
 
 {************************************************************************************************}
@@ -1774,76 +1854,88 @@ begin
   result := DoGets(FSocketDescriptor, keys);
 end;
 
-{******************************************************}
-Procedure TAlMemCachedClient._Set(const key: ansiString;
-                                  const flags: integer;
-                                  const exptime:integer;
-                                  const data: ansiString);
+{********************************}
+Procedure TAlMemCachedClient._Set(
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 begin
-  DoSet(FSocketDescriptor,
-        key,
-        flags,
-        exptime,
-        data);
+  DoSet(
+    FSocketDescriptor,
+    key,
+    flags,
+    exptime,
+    data);
 end;
 
-{*****************************************************}
-procedure TAlMemCachedClient.Add(const key: ansiString;
-                                 const flags: integer;
-                                 const exptime:integer;
-                                 const data: ansiString);
+{*******************************}
+procedure TAlMemCachedClient.Add(
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 begin
-  DoAdd(FSocketDescriptor,
-        key,
-        flags,
-        exptime,
-        data);
+  DoAdd(
+    FSocketDescriptor,
+    key,
+    flags,
+    exptime,
+    data);
 end;
 
-{*********************************************************}
-procedure TAlMemCachedClient.Replace(const key: ansiString;
-                                     const flags: integer;
-                                     const exptime:integer;
-                                     const data: ansiString);
+{***********************************}
+procedure TAlMemCachedClient.Replace(
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 begin
-  DoReplace(FSocketDescriptor,
-            key,
-            flags,
-            exptime,
-            data);
+  DoReplace(
+    FSocketDescriptor,
+    key,
+    flags,
+    exptime,
+    data);
 end;
 
-{********************************************************}
-procedure TAlMemCachedClient.Append(const key: ansiString;
-                                    const data: ansiString);
+{**********************************}
+procedure TAlMemCachedClient.Append(
+            const key: ansiString;
+            const data: ansiString);
 begin
-  DoAppend(FSocketDescriptor,
-           key,
-           data);
+  DoAppend(
+    FSocketDescriptor,
+    key,
+    data);
 end;
 
-{*********************************************************}
-procedure TAlMemCachedClient.Prepend(const key: ansiString;
-                                     const data: ansiString);
+{***********************************}
+procedure TAlMemCachedClient.Prepend(
+            const key: ansiString;
+            const data: ansiString);
 begin
-  DoPrepend(FSocketDescriptor,
-            key,
-            data);
+  DoPrepend(
+    FSocketDescriptor,
+    key,
+    data);
 end;
 
-{****************************************************}
-function TAlMemCachedClient.Cas(const key: ansiString;
-                                const flags: integer;
-                                const exptime:integer;
-                                const cas_id: int64;
-                                const data: ansiString): boolean;
+{******************************}
+function TAlMemCachedClient.Cas(
+           const key: ansiString;
+           const flags: integer;
+           const exptime:integer;
+           const cas_id: int64;
+           const data: ansiString): boolean;
 begin
-  result := DoCas(FSocketDescriptor,
-                  key,
-                  flags,
-                  exptime,
-                  Cas_ID,
-                  data);
+  result := DoCas(
+              FSocketDescriptor,
+              key,
+              flags,
+              exptime,
+              Cas_ID,
+              data);
 end;
 
 {*****************************************************************}
@@ -1852,27 +1944,31 @@ begin
   result := DoDelete(FSocketDescriptor, key);
 end;
 
-{*****************************************************}
-function TAlMemCachedClient.Incr(const key: ansiString;
-                                 const Value: int64): int64;
+{*******************************}
+function TAlMemCachedClient.Incr(
+           const key: ansiString;
+           const Value: int64): int64;
 begin
   result := DoIncr(FSocketDescriptor, key, Value);
 end;
 
-{*****************************************************}
-function TAlMemCachedClient.Decr(const key: ansiString;
-                                 const Value: int64): int64;
+{*******************************}
+function TAlMemCachedClient.Decr(
+           const key: ansiString;
+           const Value: int64): int64;
 begin
   result := DoDecr(FSocketDescriptor, key, Value);
 end;
 
-{*******************************************************}
-procedure TAlMemCachedClient.Touch(const key: ansiString;
-                                   const exptime:integer);
+{*********************************}
+procedure TAlMemCachedClient.Touch(
+            const key: ansiString;
+            const exptime:integer);
 begin
-  DoTouch(FSocketDescriptor,
-          key,
-          exptime);
+  DoTouch(
+    FSocketDescriptor,
+    key,
+    exptime);
 end;
 
 {********************************************************************}
@@ -1989,7 +2085,9 @@ Begin
           Dec(FConnectionPoolCount);
           if  FConnectionPoolCount > 0 then
           begin
-            System.Move(FConnectionPool[1], FConnectionPool[0],
+            ALMove(
+              FConnectionPool[1],
+              FConnectionPool[0],
               (FConnectionPoolCount) * SizeOf(TAlMemCachedConnectionPoolContainer));
           end;
 
@@ -2021,13 +2119,14 @@ Begin
   //create a new connection if pool was empty
   if result = INVALID_SOCKET then begin
     try
-      Doconnect(result,
-                fHost,//aHost,
-                fPort,//APort,
-                fSendTimeout,
-                fReceiveTimeout,
-                fKeepAlive,
-                fTCPNoDelay);
+      Doconnect(
+        result,
+        fHost,//aHost,
+        fPort,//APort,
+        fSendTimeout,
+        fReceiveTimeout,
+        fKeepAlive,
+        fTCPNoDelay);
     except
       FConnectionPoolCS.Acquire;
       dec(FWorkingConnectionCount);
@@ -2038,9 +2137,10 @@ Begin
 
 End;
 
-{*****************************************************************************************}
-procedure TAlMemCachedConnectionPoolClient.ReleaseConnection(var SocketDescriptor: TSocket;
-                                                             const CloseConnection: Boolean = False);
+{***********************************************************}
+procedure TAlMemCachedConnectionPoolClient.ReleaseConnection(
+            var SocketDescriptor: TSocket;
+            const CloseConnection: Boolean = False);
 begin
 
   //security check
@@ -2153,24 +2253,27 @@ begin
 
 end;
 
-{******************************************************************}
-function TAlMemCachedConnectionPoolClient.Get(const key: ansiString;
-                                              var flags: integer;
-                                              var data: ansiString): boolean;
+{********************************************}
+function TAlMemCachedConnectionPoolClient.Get(
+           const key: ansiString;
+           var flags: integer;
+           var data: ansiString): boolean;
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    result := DoGet(LSocketDescriptor,
-                    key,
-                    flags,
-                    data);
+    result := DoGet(
+                LSocketDescriptor,
+                key,
+                flags,
+                data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2186,9 +2289,10 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2204,34 +2308,38 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{*******************************************************************}
-function TAlMemCachedConnectionPoolClient.Gets(const key: ansiString;
-                                               var flags: integer;
-                                               var cas_id: int64;
-                                               var data: ansiString): boolean;
+{*********************************************}
+function TAlMemCachedConnectionPoolClient.Gets(
+           const key: ansiString;
+           var flags: integer;
+           var cas_id: int64;
+           var data: ansiString): boolean;
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    result := DoGets(LSocketDescriptor,
-                     key,
-                     flags,
-                     cas_id,
-                     data);
+    result := DoGets(
+                LSocketDescriptor,
+                key,
+                flags,
+                cas_id,
+                data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2247,153 +2355,172 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{********************************************************************}
-Procedure TAlMemCachedConnectionPoolClient._Set(const key: ansiString;
-                                                const flags: integer;
-                                                const exptime:integer;
-                                                const data: ansiString);
+{**********************************************}
+Procedure TAlMemCachedConnectionPoolClient._Set(
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    DoSet(LSocketDescriptor,
-          key,
-          flags,
-          exptime,
-          data);
+    DoSet(
+      LSocketDescriptor,
+      key,
+      flags,
+      exptime,
+      data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{*******************************************************************}
-procedure TAlMemCachedConnectionPoolClient.Add(const key: ansiString;
-                                               const flags: integer;
-                                               const exptime:integer;
-                                               const data: ansiString);
+{*********************************************}
+procedure TAlMemCachedConnectionPoolClient.Add(
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    DoAdd(LSocketDescriptor,
-          key,
-          flags,
-          exptime,
-          data);
+    DoAdd(
+      LSocketDescriptor,
+      key,
+      flags,
+      exptime,
+      data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{***********************************************************************}
-procedure TAlMemCachedConnectionPoolClient.Replace(const key: ansiString;
-                                                   const flags: integer;
-                                                   const exptime:integer;
-                                                   const data: ansiString);
+{*************************************************}
+procedure TAlMemCachedConnectionPoolClient.Replace(
+            const key: ansiString;
+            const flags: integer;
+            const exptime:integer;
+            const data: ansiString);
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    DoReplace(LSocketDescriptor,
-              key,
-              flags,
-              exptime,
-              data);
+    DoReplace(
+      LSocketDescriptor,
+      key,
+      flags,
+      exptime,
+      data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{**********************************************************************}
-procedure TAlMemCachedConnectionPoolClient.Append(const key: ansiString;
-                                                  const data: ansiString);
+{************************************************}
+procedure TAlMemCachedConnectionPoolClient.Append(
+            const key: ansiString;
+            const data: ansiString);
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    DoAppend(LSocketDescriptor,
-             key,
-             data);
+    DoAppend(
+      LSocketDescriptor,
+      key,
+      data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{***********************************************************************}
-procedure TAlMemCachedConnectionPoolClient.Prepend(const key: ansiString;
-                                                   const data: ansiString);
+{*************************************************}
+procedure TAlMemCachedConnectionPoolClient.Prepend(
+            const key: ansiString;
+            const data: ansiString);
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    DoPrepend(LSocketDescriptor,
-              key,
-              data);
+    DoPrepend(
+      LSocketDescriptor,
+      key,
+      data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{******************************************************************}
-function TAlMemCachedConnectionPoolClient.Cas(const key: ansiString;
-                                              const flags: integer;
-                                              const exptime:integer;
-                                              const cas_id: int64;
-                                              const data: ansiString): boolean;
+{********************************************}
+function TAlMemCachedConnectionPoolClient.Cas(
+           const key: ansiString;
+           const flags: integer;
+           const exptime:integer;
+           const cas_id: int64;
+           const data: ansiString): boolean;
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    result := DoCas(LSocketDescriptor,
-                    key,
-                    flags,
-                    exptime,
-                    Cas_ID,
-                    data);
+    result := DoCas(
+                LSocketDescriptor,
+                key,
+                flags,
+                exptime,
+                Cas_ID,
+                data);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2409,17 +2536,19 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{*******************************************************************}
-function TAlMemCachedConnectionPoolClient.Incr(const key: ansiString;
-                                               const Value: int64): int64;
+{*********************************************}
+function TAlMemCachedConnectionPoolClient.Incr(
+           const key: ansiString;
+           const Value: int64): int64;
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
@@ -2428,17 +2557,19 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{*******************************************************************}
-function TAlMemCachedConnectionPoolClient.Decr(const key: ansiString;
-                                               const Value: int64): int64;
+{*********************************************}
+function TAlMemCachedConnectionPoolClient.Decr(
+           const key: ansiString;
+           const Value: int64): int64;
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
@@ -2447,30 +2578,34 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
 end;
 
-{*********************************************************************}
-procedure TAlMemCachedConnectionPoolClient.Touch(const key: ansiString;
-                                                 const exptime:integer);
+{***********************************************}
+procedure TAlMemCachedConnectionPoolClient.Touch(
+            const key: ansiString;
+            const exptime:integer);
 var LSocketDescriptor: TSocket;
 begin
   LSocketDescriptor := AcquireConnection;
   try
-    DoTouch(LSocketDescriptor,
-            key,
-            exptime);
+    DoTouch(
+      LSocketDescriptor,
+      key,
+      exptime);
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2486,9 +2621,10 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2504,9 +2640,10 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2522,9 +2659,10 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;
@@ -2540,9 +2678,10 @@ begin
     ReleaseConnection(LSocketDescriptor);
   except
     On E: Exception do begin
-      ReleaseConnection(LSocketDescriptor,
-                        (not (E Is EAlMemCachedClientException)) or
-                        (E as EAlMemCachedClientException).CloseConnection);
+      ReleaseConnection(
+        LSocketDescriptor,
+        (not (E Is EAlMemCachedClientException)) or
+        (E as EAlMemCachedClientException).CloseConnection);
       raise;
     end;
   end;

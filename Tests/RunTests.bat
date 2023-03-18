@@ -86,7 +86,7 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\_Source" -CreateBackup="false"
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\_Source" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%ALBaseDir%\Tests\_Source\ALTests.dproj" -CreateBackup="false"

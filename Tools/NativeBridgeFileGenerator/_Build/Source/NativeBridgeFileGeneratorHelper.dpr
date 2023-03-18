@@ -25,7 +25,7 @@ uses
 {******************************************************************************************************}
 function MergeInterfaceSrc(const AMasterSrc: AnsiString; const aCompareWithSrc: AnsiString): AnsiString;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure _InitSignatures(const aSrc: AnsiString; const aSignatures: TALStringListA);
   begin
     var LSrcLst := TALStringListA.Create;
@@ -236,9 +236,9 @@ begin
             if (TDirectory.Exists(LdestDir)) and
                (not AlEmptyDirectoryW(LdestDir, true)) then RaiseLastOsError;
             if not AlCopyDirectoryW(
-                 LDirectory, // SrcDirectory,
-                 LFrameworksDir + '\' + ALExtractFileName(LDirectory), // DestDirectory: ansiString;
-                 true) then // SubDirectory: Boolean;
+                     LDirectory, // SrcDirectory,
+                     LFrameworksDir + '\' + ALExtractFileName(LDirectory), // DestDirectory: ansiString;
+                     true) then // SubDirectory: Boolean;
             raise Exception.Createfmt('Cannot copy %s to %s', [LDirectory, LFrameworksDir + '\' + ALExtractFileName(LDirectory)]);
           end;
         end;
@@ -492,7 +492,7 @@ begin
       Writeln('');
       Writeln('');
       Writeln('NativeBridgeFileGeneratorHelper failed!');
-      Writeln('Press any key to exit');
+      Writeln('Press <Enter> key to quit');
       Readln;
       halt(1);
     end;

@@ -119,10 +119,11 @@ type
     fPassword: boolean;
     fCheckSpelling: boolean;
     fIsMultiline: Boolean;
-    procedure DoSetInputType(const aKeyboardType: TVirtualKeyboardType;
-                             const aPassword: Boolean;
-                             const aCheckSpelling: Boolean;
-                             const aIsMultiline: Boolean);
+    procedure DoSetInputType(
+                const aKeyboardType: TVirtualKeyboardType;
+                const aPassword: Boolean;
+                const aCheckSpelling: Boolean;
+                const aIsMultiline: Boolean);
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
     procedure setPassword(const Value: Boolean);
@@ -530,11 +531,19 @@ end;
 function TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
-  if event <> nil then ALLog('TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                                                    ' - keyCode: ' + inttostr(keyCode) +
-                                                                                    ' - event: ' + JstringToString(event.toString), TalLogType.VERBOSE)
-  else ALLog('TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                                    ' - keyCode: ' + inttostr(keyCode), TalLogType.VERBOSE);
+  if event <> nil then
+    ALLog(
+      'TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme',
+      'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+      'keyCode: ' + inttostr(keyCode) + ' | ' +
+      'event: ' + JstringToString(event.toString),
+      TalLogType.VERBOSE)
+  else
+    ALLog(
+      'TALAndroidEditText.TALKeyPreImeListener.onKeyPreIme',
+      'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+      'keyCode: ' + inttostr(keyCode),
+      TalLogType.VERBOSE);
   {$ENDIF}
   if ((event = nil) or (event.getAction = AKEY_EVENT_ACTION_UP)) and
      (keyCode = AKEYCODE_BACK) then begin
@@ -590,11 +599,19 @@ end;
 function TALAndroidEditText.TALEditorActionListener.onEditorAction(v: JTextView; actionId: Integer; event: JKeyEvent): Boolean;
 begin
   {$IF defined(DEBUG)}
-   if event <> nil then ALLog('TALAndroidEditText.TALEditorActionListener.onEditorAction', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                                                           ' - actionId: ' + inttostr(actionId) +
-                                                                                           ' - event: ' + JstringToString(event.toString), TalLogType.VERBOSE)
-   else ALLog('TALAndroidEditText.TALEditorActionListener.onEditorAction', 'control.name: ' + FEditText.FEditControl.parent.Name +
-                                                                           ' - actionId: ' + inttostr(actionId), TalLogType.VERBOSE);
+   if event <> nil then
+     ALLog(
+       'TALAndroidEditText.TALEditorActionListener.onEditorAction',
+       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+       'actionId: ' + inttostr(actionId) + ' | ' +
+       'event: ' + JstringToString(event.toString),
+       TalLogType.VERBOSE)
+   else
+     ALLog(
+       'TALAndroidEditText.TALEditorActionListener.onEditorAction',
+       'control.name: ' + FEditText.FEditControl.parent.Name + ' | ' +
+       'actionId: ' + inttostr(actionId),
+       TalLogType.VERBOSE);
   {$ENDIF}
   //IME_ACTION_DONE: the action key performs a "done" operation, typically meaning there is nothing more to input and the IME will be closed.
   //IME_ACTION_GO: the action key performs a "go" operation to take the user to the target of the text they typed. Typically used, for example, when entering a URL.
@@ -667,9 +684,10 @@ begin
                 TAndroidHelper. // defStyleAttr: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
-                                    StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
+                        StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
   //-----
   else if (fDefStyleAttr = '') then
     Result := TJALEditText.JavaClass.init(
@@ -679,9 +697,10 @@ begin
                 TAndroidHelper. // defStyleRes: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
-                                    StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
+                        StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
   //-----
   else
     Result := TJALEditText.JavaClass.init(
@@ -690,15 +709,17 @@ begin
                 TAndroidHelper. // defStyleAttr: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
-                                    StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName()), // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleAttr), // name	String: The name of the desired resource.
+                        StringToJstring('attr'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName()), // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
                 TAndroidHelper. // defStyleRes: Integer
                   Context.
                     getResources().
-                      getIdentifier(StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
-                                    StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-                                    TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                      getIdentifier(
+                        StringToJstring(fDefStyleRes), // name	String: The name of the desired resource.
+                        StringToJstring('style'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                        TAndroidHelper.Context.getPackageName())) // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
 end;
 
 {************************************}
@@ -777,11 +798,12 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************}
-procedure TALAndroidEdit.DoSetInputType(const aKeyboardType: TVirtualKeyboardType;
-                                        const aPassword: Boolean;
-                                        const aCheckSpelling: Boolean;
-                                        const aIsMultiline: Boolean);
+{**************************************}
+procedure TALAndroidEdit.DoSetInputType(
+            const aKeyboardType: TVirtualKeyboardType;
+            const aPassword: Boolean;
+            const aCheckSpelling: Boolean;
+            const aIsMultiline: Boolean);
 var LInputType: integer;
 begin
 
@@ -912,7 +934,7 @@ begin
   result := fCheckSpelling;
 end;
 
-{*********************************************************************************}
+{********************************************************************************}
 procedure TALAndroidEdit.DoSetReturnKeyType(const aReturnKeyType: TReturnKeyType);
 var LImeOptions: integer;
 begin
@@ -1294,15 +1316,16 @@ begin
   inherited DoExit;
   FEditText.ResetFocus;
   ALVirtualKeyboardVisible := False;
-  TThread.ForceQueue(nil, procedure
-  begin
-    If not ALVirtualKeyboardVisible then begin
-      {$IF defined(DEBUG)}
-      ALLog('TalAndroidEdit.hideVirtualKeyboard', TalLogType.VERBOSE);
-      {$ENDIF}
-      MainActivity.getVirtualKeyboard.hide;
-    end;
-  end);
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      If not ALVirtualKeyboardVisible then begin
+        {$IF defined(DEBUG)}
+        ALLog('TalAndroidEdit.hideVirtualKeyboard', TalLogType.VERBOSE);
+        {$ENDIF}
+        MainActivity.getVirtualKeyboard.hide;
+      end;
+    end);
 end;
 
 {***********************************}
@@ -1409,8 +1432,11 @@ function TALIosTextFieldDelegate.textField(textField: UITextField; shouldChangeC
 var LText: NSString;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALIosTextFieldDelegate.textField', 'control.name: ' + FTextField.fEditControl.parent.Name +
-                                             ' - replacementString: ' + NSStrToStr(replacementString), TalLogType.VERBOSE);
+  ALLog(
+    'TALIosTextFieldDelegate.textField',
+    'control.name: ' + FTextField.fEditControl.parent.Name + ' | ' +
+    'replacementString: ' + NSStrToStr(replacementString),
+    TalLogType.VERBOSE);
   {$ENDIF}
   if FTextField.FEditControl.maxLength > 0 then begin
 
@@ -2433,6 +2459,7 @@ begin
   {$ENDIF}
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALEdit]);

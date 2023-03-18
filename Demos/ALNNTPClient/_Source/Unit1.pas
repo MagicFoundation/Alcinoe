@@ -105,7 +105,7 @@ begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.Connect(AnsiString(HostEdit.Text), StrToInt(PortEdit.Text)))));
 end;
 
-{************************************************}
+{****************************************************}
 procedure TForm1.AuthInfoButtonClick(Sender: TObject);
 begin
   FNNTPCLient.AUTHINFO(AnsiString(UsernameEdit.Text), AnsiString(PasswordEdit.text));
@@ -118,25 +118,25 @@ begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPCLient.List)));
 end;
 
-{************************************************}
+{*************************************************}
 procedure TForm1.GroupButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.Group(AnsiString(NewsGroupEdit.Text)))));
 end;
 
-{****************************************************}
+{*******************************************************}
 procedure TForm1.ArticleByIDButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.ArticleByID(AnsiString(ArticleIDEdit.Text)))));
 end;
 
-{**************************************************}
+{****************************************************}
 procedure TForm1.HeadByIDButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.HeadByID(AnsiString(ArticleIDEdit.Text)))));
 end;
 
-{************************************************}
+{****************************************************}
 procedure TForm1.BodyByIDButtonClick(Sender: TObject);
 begin
   DisplayMemo.Lines.Add(String(ALTrim(FNNTPClient.BodyByID(AnsiString(ArticleIDEdit.Text)))));
@@ -207,4 +207,3 @@ initialization
   SetMultiByteConversionCodePage(CP_UTF8);
 
 end.
-

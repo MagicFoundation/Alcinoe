@@ -426,10 +426,11 @@ begin
           TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         end;
       end;
-      TJGLUtils.JavaClass.texImage2D(GL_TEXTURE_2D, // target: Integer;
-                                     0, // level: Integer;
-                                     Source, // bitmap: JBitmap;
-                                     0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
+      TJGLUtils.JavaClass.texImage2D(
+        GL_TEXTURE_2D, // target: Integer;
+        0, // level: Integer;
+        Source, // bitmap: JBitmap;
+        0); // border: Integer  => glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
       glBindTexture(GL_TEXTURE_2D, 0);
       ITextureAccess(self).Handle := Tex;
       TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [ClassName]);

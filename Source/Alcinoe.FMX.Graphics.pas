@@ -233,72 +233,78 @@ type
 procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
 {$ENDIF}
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-procedure ALPaintRectangle({$IF defined(ANDROID)}
-                           const aCanvas: Jcanvas;
-                           {$ELSEIF defined(IOS)}
-                           const aContext: CGContextRef;
-                           const aColorSpace: CGColorSpaceRef;
-                           const aGridHeight: Single;
-                           {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                           const aCanvas: Tcanvas;
-                           {$ENDIF}
-                           const dstRect: TrectF;
-                           const Fill: TBrush;
-                           const Stroke: TStrokeBrush;
-                           const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
-                           const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
-                           const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
-                           const XRadius: Single = 0;
-                           const YRadius: Single = 0);
+{*************************}
+procedure ALPaintRectangle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
+            const Fill: TBrush;
+            const Stroke: TStrokeBrush;
+            const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
+            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
+            const XRadius: Single = 0;
+            const YRadius: Single = 0);
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-procedure ALPaintCircle({$IF defined(ANDROID)}
-                        const aCanvas: Jcanvas;
-                        {$ELSEIF defined(IOS)}
-                        const aContext: CGContextRef;
-                        const aColorSpace: CGColorSpaceRef;
-                        const aGridHeight: Single;
-                        {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                        const aCanvas: Tcanvas;
-                        {$ENDIF}
-                        const dstRect: TrectF;
-                        const Fill: TBrush;
-                        const Stroke: TStrokeBrush;
-                        const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+{**********************}
+procedure ALPaintCircle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
+            const Fill: TBrush;
+            const Stroke: TStrokeBrush;
+            const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
-                                 Var aBitmap: Jbitmap;
-                                 var aCanvas: Jcanvas;
-                                 {$ELSEIF defined(IOS)}
-                                 var aBitmapSurface: TbitmapSurface;
-                                 Var aContext: CGContextRef;
-                                 Var aColorSpace: CGColorSpaceRef;
-                                 {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                                 Var aBitmap: Tbitmap;
-                                 const aClearBitmap: boolean;
-                                 {$ENDIF}
-                                 const w: integer;
-                                 const h: integer);
-procedure ALFreeDrawingSurface({$IF defined(ANDROID)}
-                               Var aBitmap: Jbitmap;
-                               var aCanvas: Jcanvas
-                               {$ELSEIF defined(IOS)}
-                               var aBitmapSurface: TbitmapSurface;
-                               Var aContext: CGContextRef;
-                               Var aColorSpace: CGColorSpaceRef
-                               {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                               Var aBitmap: Tbitmap
-                               {$ENDIF});
+{*******************************}
+Procedure ALCreateDrawingSurface(
+            {$IF defined(ANDROID)}
+            Var aBitmap: Jbitmap;
+            var aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef;
+            Var aColorSpace: CGColorSpaceRef;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            Var aBitmap: Tbitmap;
+            const aClearBitmap: boolean;
+            {$ENDIF}
+            const w: integer;
+            const h: integer);
+procedure ALFreeDrawingSurface(
+            {$IF defined(ANDROID)}
+            Var aBitmap: Jbitmap;
+            var aCanvas: Jcanvas
+            {$ELSEIF defined(IOS)}
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef;
+            Var aColorSpace: CGColorSpaceRef
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            Var aBitmap: Tbitmap
+            {$ENDIF});
 {$IF defined(IOS)}
-Procedure ALCreateDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
-                                   Var aContext: CGContextRef;
-                                   Var aColorSpace: CGColorSpaceRef;
-                                   const w: integer;
-                                   const h: integer);
-procedure ALFreeDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
-                                 Var aContext: CGContextRef);
+Procedure ALCreateDrawingSurfaceV2(
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef;
+            Var aColorSpace: CGColorSpaceRef;
+            const w: integer;
+            const h: integer);
+procedure ALFreeDrawingSurfaceV2(
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef);
 {$ENDIF}
 
 type
@@ -462,11 +468,12 @@ begin
         Result.Canvas.Fill.Bitmap.Bitmap.Assign(LBitmap);
         Result.Canvas.Fill.bitmap.WrapMode := TWrapMode.TileStretch;
         Result.Canvas.Fill.Kind := TbrushKind.Bitmap;
-        Result.Canvas.FillRect(TRectF.Create(0,0, W, H),
-                                   XRadius,
-                                   YRadius,
-                                   AllCorners,
-                                   1 {AOpacity});
+        Result.Canvas.FillRect(
+          TRectF.Create(0,0, W, H),
+          XRadius,
+          YRadius,
+          AllCorners,
+          1 {AOpacity});
       finally
         Result.Canvas.EndScene;
       end;
@@ -566,7 +573,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -619,9 +626,11 @@ var LImage: UIimage;
     w, h: Single;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -637,54 +646,60 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(W), // width: The width, in pixels, of the required bitmap.
-                                                round(H), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(W), // width: The width, in pixels, of the required bitmap.
+                            round(H), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextClipToMask(LContext,
-                                      ALLowerLeftCGRect(TpointF.Create(0, 0),
-                                                        w,
-                                                        h,
-                                                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                      aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextClipToMask(
+                    LContext,
+                    ALLowerLeftCGRect(
+                      TpointF.Create(0, 0),
+                      w,
+                      h,
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -760,9 +775,11 @@ var LImage: UIimage;
     w, h: Single;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -782,55 +799,61 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(W), // width: The width, in pixels, of the required bitmap.
-                                                  round(H), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(W), // width: The width, in pixels, of the required bitmap.
+                              round(H), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextClipToMask(LContext,
-                                        ALLowerLeftCGRect(TpointF.Create(0, 0),
-                                                          w,
-                                                          h,
-                                                          h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                        aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextClipToMask(
+                      LContext,
+                      ALLowerLeftCGRect(
+                        TpointF.Create(0, 0),
+                        w,
+                        h,
+                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -1022,54 +1045,60 @@ begin
       LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
       if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
         try
-          LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                 //       memory block should be at least (bytesPerRow*height) bytes.
-                                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                            round(W), // width: The width, in pixels, of the required bitmap.
-                                            round(H), // height: The height, in pixels, of the required bitmap.
-                                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                               //                   chapter of Quartz 2D Programming Guide.
-                                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                               //              a value of 0 causes the value to be calculated automatically.
-                                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                  //             bitmap graphics contexts.
-                                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                      // kCGBitmapByteOrder32Little = Little-endian
-                                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                      //             values. The constants for specifying the alpha channel information are declared with the
-                                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                      //             and CGImageAlphaInfo constants.)
-                                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+          LContext := CGBitmapContextCreate(
+                        nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                             //       memory block should be at least (bytesPerRow*height) bytes.
+                             //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                             //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                        round(W), // width: The width, in pixels, of the required bitmap.
+                        round(H), // height: The height, in pixels, of the required bitmap.
+                        8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                           //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                           //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                           //                   chapter of Quartz 2D Programming Guide.
+                           //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                        0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                           //              a value of 0 causes the value to be calculated automatically.
+                           //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                        LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                              //             bitmap graphics contexts.
+                        kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                          // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                          // kCGImageAlphaPremultipliedNone =  For example, RGB
+                        kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                  // kCGBitmapByteOrder32Little = Little-endian
+                                                  // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                  //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                  //             values. The constants for specifying the alpha channel information are declared with the
+                                                  //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                  //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                  //             and CGImageAlphaInfo constants.)
+                                                  //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                  //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                  //             Graphics Contexts chapter of Quartz 2D Programming Guide.
           if LContext <> nil then begin
             try
               CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
               CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
               CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-              CGContextClipToMask(LContext,
-                                  ALLowerLeftCGRect(TpointF.Create(0, 0),
-                                                   w,
-                                                   h,
-                                                   h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                  aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
-              CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                 ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                  0-(LSrcRect.top*LRatio)),
-                                                   w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LCGImageRef)-LSrcRect.right)*LRatio),
-                                                   h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LCGImageRef)-LSrcRect.bottom)*LRatio),
-                                                   h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                 LCGImageRef); // image The image to draw.
+              CGContextClipToMask(
+                LContext,
+                ALLowerLeftCGRect(
+                  TpointF.Create(0, 0),
+                  w,
+                  h,
+                  h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
+              CGContextDrawImage(
+                LContext, // c: The graphics context in which to draw the image.
+                ALLowerLeftCGRect(
+                  TpointF.Create(
+                    0-(LSrcRect.Left*LRatio),
+                    0-(LSrcRect.top*LRatio)),
+                  w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LCGImageRef)-LSrcRect.right)*LRatio),
+                  h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LCGImageRef)-LSrcRect.bottom)*LRatio),
+                  h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                LCGImageRef); // image The image to draw.
               result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                               // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                               // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -1158,55 +1187,61 @@ begin
         LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
         if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
           try
-            LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                              round(W), // width: The width, in pixels, of the required bitmap.
-                                              round(H), // height: The height, in pixels, of the required bitmap.
-                                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                 //                   chapter of Quartz 2D Programming Guide.
-                                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                    //              a value of 0 causes the value to be calculated automatically.
-                                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                           //             bitmap graphics contexts.
-                                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                        // kCGBitmapByteOrder32Little = Little-endian
-                                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                        //             values. The constants for specifying the alpha channel information are declared with the
-                                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                        //             and CGImageAlphaInfo constants.)
-                                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            LContext := CGBitmapContextCreate(
+                          LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                          round(W), // width: The width, in pixels, of the required bitmap.
+                          round(H), // height: The height, in pixels, of the required bitmap.
+                          8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                             //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                             //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                             //                   chapter of Quartz 2D Programming Guide.
+                             //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                          LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                //              a value of 0 causes the value to be calculated automatically.
+                                                //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                          LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                       //             bitmap graphics contexts.
+                          kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                            // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                            // kCGImageAlphaPremultipliedNone =  For example, RGB
+                          kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                    // kCGBitmapByteOrder32Little = Little-endian
+                                                    // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                    //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                    //             values. The constants for specifying the alpha channel information are declared with the
+                                                    //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                    //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                    //             and CGImageAlphaInfo constants.)
+                                                    //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                    //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                    //             Graphics Contexts chapter of Quartz 2D Programming Guide.
             if LContext <> nil then begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                 CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                 CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                CGContextClipToMask(LContext,
-                                    ALLowerLeftCGRect(TpointF.Create(0, 0),
-                                                     w,
-                                                     h,
-                                                     h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                    aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
-                CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                   ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                    0-(LSrcRect.top*LRatio)),
-                                                     w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LCGImageRef)-LSrcRect.right)*LRatio),
-                                                     h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LCGImageRef)-LSrcRect.bottom)*LRatio),
-                                                     h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                   LCGImageRef); // image The image to draw.
+                CGContextClipToMask(
+                  LContext,
+                  ALLowerLeftCGRect(
+                    TpointF.Create(0, 0),
+                    w,
+                    h,
+                    h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  aMask); // Maps a mask into the specified rectangle and intersects it with the current clipping area of the graphics context.
+                CGContextDrawImage(
+                  LContext, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    TpointF.Create(
+                      0-(LSrcRect.Left*LRatio),
+                      0-(LSrcRect.top*LRatio)),
+                    w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LCGImageRef)-LSrcRect.right)*LRatio),
+                    h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LCGImageRef)-LSrcRect.bottom)*LRatio),
+                    h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LCGImageRef); // image The image to draw.
               finally
                 CGContextRelease(LContext);
               end;
@@ -1344,7 +1379,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -1362,10 +1397,11 @@ begin
       LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
       LCanvas := TJCanvas.JavaClass.init(result);
       LPaint.setStyle(TJPaint_Style.JavaClass.FILL);
-      LCanvas.drawRoundRect(LJDestRectf{rect},
-                            xRadius {rx},
-                            yRadius {ry},
-                            LPaint);
+      LCanvas.drawRoundRect(
+        LJDestRectf{rect},
+        xRadius {rx},
+        yRadius {ry},
+        LPaint);
       LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
       LPaint.setXfermode(LPorterDuffXfermode);
       LCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
@@ -1413,11 +1449,12 @@ var LImage: UIimage;
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
     begin
-      CGContextAddQuadCurveToPoint(LContext,
-                                   LCurPoint.X + dx1{cpx},
-                                   LGridHeight - (LCurPoint.Y + dy1){cpy},
-                                   LCurPoint.X + dx2{x},
-                                   LGridHeight - (LCurPoint.Y + dy2){y});
+      CGContextAddQuadCurveToPoint(
+        LContext,
+        LCurPoint.X + dx1{cpx},
+        LGridHeight - (LCurPoint.Y + dy1){cpy},
+        LCurPoint.X + dx2{x},
+        LGridHeight - (LCurPoint.Y + dy2){y});
       LCurPoint.X := LCurPoint.X + dx2;
       LCurPoint.Y := LCurPoint.Y + dy2;
     end;
@@ -1432,9 +1469,11 @@ var LImage: UIimage;
 
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -1447,36 +1486,37 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(W), // width: The width, in pixels, of the required bitmap.
-                                                round(H), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(W), // width: The width, in pixels, of the required bitmap.
+                            round(H), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
@@ -1515,13 +1555,16 @@ begin
                                            // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                            // save the graphics state before you clip and restore the graphics state after you’ve completed
                                            // any clipped drawing.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -1612,11 +1655,12 @@ var LImage: UIimage;
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
     begin
-      CGContextAddQuadCurveToPoint(LContext,
-                                   LCurPoint.X + dx1{cpx},
-                                   LGridHeight - (LCurPoint.Y + dy1){cpy},
-                                   LCurPoint.X + dx2{x},
-                                   LGridHeight - (LCurPoint.Y + dy2){y});
+      CGContextAddQuadCurveToPoint(
+        LContext,
+        LCurPoint.X + dx1{cpx},
+        LGridHeight - (LCurPoint.Y + dy1){cpy},
+        LCurPoint.X + dx2{x},
+        LGridHeight - (LCurPoint.Y + dy2){y});
       LCurPoint.X := LCurPoint.X + dx2;
       LCurPoint.Y := LCurPoint.Y + dy2;
     end;
@@ -1631,9 +1675,11 @@ var LImage: UIimage;
 
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -1650,36 +1696,37 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(W), // width: The width, in pixels, of the required bitmap.
-                                                  round(H), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(W), // width: The width, in pixels, of the required bitmap.
+                              round(H), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
@@ -1719,13 +1766,16 @@ begin
                                              // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                              // save the graphics state before you clip and restore the graphics state after you’ve completed
                                              // any clipped drawing.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -1828,7 +1878,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -1879,9 +1929,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -1894,59 +1946,66 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(W), // width: The width, in pixels, of the required bitmap.
-                                                round(H), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(W), // width: The width, in pixels, of the required bitmap.
+                            round(H), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
-                  CGContextAddEllipseInRect(LContext, ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
-                                                                        LDestRect.Width,
-                                                                        LDestRect.Height,
-                                                                        h)); // Adds an ellipse that fits inside the specified rectangle.
+                  CGContextAddEllipseInRect(
+                    LContext,
+                    ALLowerLeftCGRect(
+                      TPointF.Create(LDestRect.Left, LDestRect.Top),
+                      LDestRect.Width,
+                      LDestRect.Height,
+                      h)); // Adds an ellipse that fits inside the specified rectangle.
                   CGContextClosePath(LContext); // Closes and terminates the current path’s subpath.
                   CGContextClip(LContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                            // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                                            // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                            // save the graphics state before you clip and restore the graphics state after you’ve completed
                                            // any clipped drawing.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -2021,9 +2080,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -2040,36 +2101,37 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(W), // width: The width, in pixels, of the required bitmap.
-                                                  round(H), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(W), // width: The width, in pixels, of the required bitmap.
+                              round(H), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
@@ -2077,23 +2139,29 @@ begin
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
-                    CGContextAddEllipseInRect(LContext, ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
-                                                                          LDestRect.Width,
-                                                                          LDestRect.Height,
-                                                                          LBitmapSurface.Height)); // Adds an ellipse that fits inside the specified rectangle.
+                    CGContextAddEllipseInRect(
+                      LContext,
+                      ALLowerLeftCGRect(
+                        TPointF.Create(LDestRect.Left, LDestRect.Top),
+                        LDestRect.Width,
+                        LDestRect.Height,
+                        LBitmapSurface.Height)); // Adds an ellipse that fits inside the specified rectangle.
                     CGContextClosePath(LContext); // Closes and terminates the current path’s subpath.
                     CGContextClip(LContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                              // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                                              // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                              // save the graphics state before you clip and restore the graphics state after you’ve completed
                                              // any clipped drawing.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -2212,7 +2280,7 @@ begin
   end;
 end;
 
-{******************************************************************************************************************************************************************************************}
+{*******************************************************************************************************************************************************************************************}
 function ALBlurFitIntoAndCropAsCircleImageV1(const aStream: TCustomMemoryStream; const W, H: single; const aCropCenter: TPointF; aBlurRadius: single; const aBlurW, aBlurH: single): Tbitmap;
 var LBitmap: TBitmap;
 begin
@@ -2324,59 +2392,66 @@ begin
       LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
       if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
         try
-          LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                 //       memory block should be at least (bytesPerRow*height) bytes.
-                                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                            round(W), // width: The width, in pixels, of the required bitmap.
-                                            round(H), // height: The height, in pixels, of the required bitmap.
-                                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                               //                   chapter of Quartz 2D Programming Guide.
-                                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                               //              a value of 0 causes the value to be calculated automatically.
-                                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                  //             bitmap graphics contexts.
-                                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                      // kCGBitmapByteOrder32Little = Little-endian
-                                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                      //             values. The constants for specifying the alpha channel information are declared with the
-                                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                      //             and CGImageAlphaInfo constants.)
-                                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+          LContext := CGBitmapContextCreate(
+                        nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                             //       memory block should be at least (bytesPerRow*height) bytes.
+                             //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                             //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                        round(W), // width: The width, in pixels, of the required bitmap.
+                        round(H), // height: The height, in pixels, of the required bitmap.
+                        8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                           //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                           //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                           //                   chapter of Quartz 2D Programming Guide.
+                           //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                        0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                           //              a value of 0 causes the value to be calculated automatically.
+                           //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                        LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                              //             bitmap graphics contexts.
+                        kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                          // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                          // kCGImageAlphaPremultipliedNone =  For example, RGB
+                        kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                  // kCGBitmapByteOrder32Little = Little-endian
+                                                  // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                  //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                  //             values. The constants for specifying the alpha channel information are declared with the
+                                                  //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                  //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                  //             and CGImageAlphaInfo constants.)
+                                                  //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                  //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                  //             Graphics Contexts chapter of Quartz 2D Programming Guide.
           if LContext <> nil then begin
             try
               CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
               CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
               CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
               CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
-              CGContextAddEllipseInRect(LContext, ALLowerLeftCGRect(TPointF.Create(LDestRect.Left, LDestRect.Top),
-                                                                    LDestRect.Width,
-                                                                    LDestRect.Height,
-                                                                    h)); // Adds an ellipse that fits inside the specified rectangle.
+              CGContextAddEllipseInRect(
+                LContext,
+                ALLowerLeftCGRect(
+                  TPointF.Create(LDestRect.Left, LDestRect.Top),
+                  LDestRect.Width,
+                  LDestRect.Height,
+                  h)); // Adds an ellipse that fits inside the specified rectangle.
               CGContextClosePath(LContext); // Closes and terminates the current path’s subpath.
               CGContextClip(LContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                        // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                                        // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
                                        // save the graphics state before you clip and restore the graphics state after you’ve completed
                                        // any clipped drawing.
-              CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                 ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                  0-(LSrcRect.top*LRatio)),
-                                                   w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LCGImageRef)-LSrcRect.right)*LRatio),
-                                                   h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LCGImageRef)-LSrcRect.bottom)*LRatio),
-                                                   h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                 LCGImageRef); // image The image to draw.
+              CGContextDrawImage(
+                LContext, // c: The graphics context in which to draw the image.
+                ALLowerLeftCGRect(
+                  TpointF.Create(
+                    0-(LSrcRect.Left*LRatio),
+                    0-(LSrcRect.top*LRatio)),
+                  w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LCGImageRef)-LSrcRect.right)*LRatio),
+                  h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LCGImageRef)-LSrcRect.bottom)*LRatio),
+                  h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                LCGImageRef); // image The image to draw.
               result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                               // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                               // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -2455,48 +2530,51 @@ begin
         LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
         if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
           try
-            LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                              LBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
-                                              LBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
-                                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                 //                   chapter of Quartz 2D Programming Guide.
-                                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                    //              a value of 0 causes the value to be calculated automatically.
-                                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                           //             bitmap graphics contexts.
-                                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                        // kCGBitmapByteOrder32Little = Little-endian
-                                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                        //             values. The constants for specifying the alpha channel information are declared with the
-                                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                        //             and CGImageAlphaInfo constants.)
-                                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            LContext := CGBitmapContextCreate(
+                          LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                          LBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                          LBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                          8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                             //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                             //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                             //                   chapter of Quartz 2D Programming Guide.
+                             //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                          LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                //              a value of 0 causes the value to be calculated automatically.
+                                                //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                          LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                       //             bitmap graphics contexts.
+                          kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                            // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                            // kCGImageAlphaPremultipliedNone =  For example, RGB
+                          kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                    // kCGBitmapByteOrder32Little = Little-endian
+                                                    // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                    //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                    //             values. The constants for specifying the alpha channel information are declared with the
+                                                    //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                    //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                    //             and CGImageAlphaInfo constants.)
+                                                    //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                    //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                    //             Graphics Contexts chapter of Quartz 2D Programming Guide.
             if LContext <> nil then begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                 CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                 CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                   ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                     LBitmapSurface.Width,
-                                                     LBitmapSurface.Height,
-                                                     LBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                   LCGImageRef); // image The image to draw.
+                CGContextDrawImage(
+                  LContext, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    TpointF.Create(0,0),
+                    LBitmapSurface.Width,
+                    LBitmapSurface.Height,
+                    LBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LCGImageRef); // image The image to draw.
               finally
                 CGContextRelease(LContext);
               end;
@@ -2561,11 +2639,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -2599,11 +2678,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -2640,7 +2720,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -2674,9 +2754,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -2690,48 +2772,52 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
-                                                round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
+                            round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -2781,7 +2867,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -2813,9 +2899,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -2828,48 +2916,52 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(W), // width: The width, in pixels, of the required bitmap.
-                                                round(H), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(W), // width: The width, in pixels, of the required bitmap.
+                            round(H), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -2946,9 +3038,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -2966,49 +3060,53 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
-                                                  round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
+                              round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -3084,9 +3182,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -3103,49 +3203,53 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(W), // width: The width, in pixels, of the required bitmap.
-                                                  round(H), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(W), // width: The width, in pixels, of the required bitmap.
+                              round(H), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -3214,11 +3318,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -3252,11 +3357,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -3299,7 +3405,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -3358,9 +3464,11 @@ var LImage: UIimage;
     LRadius: single;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -3374,48 +3482,52 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
-                                                round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
+                            round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   LCGImageRef := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                        // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                        // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -3493,7 +3605,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -3549,9 +3661,11 @@ var LImage: UIimage;
     LBlurFilter : CIFilter;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -3564,48 +3678,52 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(W), // width: The width, in pixels, of the required bitmap.
-                                                round(H), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(W), // width: The width, in pixels, of the required bitmap.
+                            round(H), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   LCGImageRef := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                        // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                        // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -3712,48 +3830,51 @@ begin
         LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
         if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
           try
-            LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                              LBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
-                                              LBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
-                                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                 //                   chapter of Quartz 2D Programming Guide.
-                                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                    //              a value of 0 causes the value to be calculated automatically.
-                                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                           //             bitmap graphics contexts.
-                                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                        // kCGBitmapByteOrder32Little = Little-endian
-                                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                        //             values. The constants for specifying the alpha channel information are declared with the
-                                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                        //             and CGImageAlphaInfo constants.)
-                                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            LContext := CGBitmapContextCreate(
+                          LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                          LBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                          LBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                          8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                             //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                             //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                             //                   chapter of Quartz 2D Programming Guide.
+                             //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                          LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                //              a value of 0 causes the value to be calculated automatically.
+                                                //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                          LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                       //             bitmap graphics contexts.
+                          kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                            // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                            // kCGImageAlphaPremultipliedNone =  For example, RGB
+                          kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                    // kCGBitmapByteOrder32Little = Little-endian
+                                                    // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                    //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                    //             values. The constants for specifying the alpha channel information are declared with the
+                                                    //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                    //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                    //             and CGImageAlphaInfo constants.)
+                                                    //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                    //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                    //             Graphics Contexts chapter of Quartz 2D Programming Guide.
             if LContext <> nil then begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                 CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                 CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                   ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                     LBitmapSurface.Width,
-                                                     LBitmapSurface.Height,
-                                                     LBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                   LCGImageRef); // image The image to draw.
+                CGContextDrawImage(
+                  LContext, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    TpointF.Create(0,0),
+                    LBitmapSurface.Width,
+                    LBitmapSurface.Height,
+                    LBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LCGImageRef); // image The image to draw.
               finally
                 CGContextRelease(LContext);
               end;
@@ -3834,48 +3955,51 @@ begin
         LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
         if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
           try
-            LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                              LBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
-                                              LBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
-                                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                 //                   chapter of Quartz 2D Programming Guide.
-                                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                    //              a value of 0 causes the value to be calculated automatically.
-                                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                           //             bitmap graphics contexts.
-                                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                        // kCGBitmapByteOrder32Little = Little-endian
-                                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                        //             values. The constants for specifying the alpha channel information are declared with the
-                                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                        //             and CGImageAlphaInfo constants.)
-                                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            LContext := CGBitmapContextCreate(
+                          LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                          LBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                          LBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                          8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                             //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                             //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                             //                   chapter of Quartz 2D Programming Guide.
+                             //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                          LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                //              a value of 0 causes the value to be calculated automatically.
+                                                //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                          LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                       //             bitmap graphics contexts.
+                          kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                            // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                            // kCGImageAlphaPremultipliedNone =  For example, RGB
+                          kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                    // kCGBitmapByteOrder32Little = Little-endian
+                                                    // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                    //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                    //             values. The constants for specifying the alpha channel information are declared with the
+                                                    //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                    //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                    //             and CGImageAlphaInfo constants.)
+                                                    //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                    //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                    //             Graphics Contexts chapter of Quartz 2D Programming Guide.
             if LContext <> nil then begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                 CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                 CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                   ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                     LBitmapSurface.Width,
-                                                     LBitmapSurface.Height,
-                                                     LBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                   LCGImageRef); // image The image to draw.
+                CGContextDrawImage(
+                  LContext, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    TpointF.Create(0,0),
+                    LBitmapSurface.Width,
+                    LBitmapSurface.Height,
+                    LBitmapSurface.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LCGImageRef); // image The image to draw.
               finally
                 CGContextRelease(LContext);
               end;
@@ -4096,11 +4220,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -4142,11 +4267,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -4183,7 +4309,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -4222,9 +4348,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -4243,48 +4371,52 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
-                                                round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
+                            round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -4334,7 +4466,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -4372,9 +4504,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -4394,48 +4528,52 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                round(W), // width: The width, in pixels, of the required bitmap.
-                                                round(H), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            round(W), // width: The width, in pixels, of the required bitmap.
+                            round(H), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                      0-(LSrcRect.top*LRatio)),
-                                                       w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                       h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                       h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(
+                        0-(LSrcRect.Left*LRatio),
+                        0-(LSrcRect.top*LRatio)),
+                      w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                      h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                      h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -4512,9 +4650,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -4537,49 +4677,53 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
-                                                  round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(LDestSize.x), // width: The width, in pixels, of the required bitmap.
+                              round(LDestSize.y), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        LDestSize.x + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        LDestSize.y + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        LDestSize.y), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -4655,9 +4799,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -4680,49 +4826,53 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(W), // width: The width, in pixels, of the required bitmap.
-                                                  round(H), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(W), // width: The width, in pixels, of the required bitmap.
+                              round(H), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0-(LSrcRect.Left*LRatio),
-                                                                        0-(LSrcRect.top*LRatio)),
-                                                         w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
-                                                         h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
-                                                         h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(
+                          0-(LSrcRect.Left*LRatio),
+                          0-(LSrcRect.top*LRatio)),
+                        w + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(LImage.cgImage)-LSrcRect.right)*LRatio),
+                        h + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(LImage.cgImage)-LSrcRect.bottom)*LRatio),
+                        h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -4943,11 +5093,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -4985,11 +5136,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -5019,7 +5171,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5054,9 +5206,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -5072,47 +5226,50 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                            ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                       LDestRect.width,
-                                                       LDestRect.Height,
-                                                       ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(0,0),
+                      LDestRect.width,
+                      LDestRect.Height,
+                      ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -5161,7 +5318,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5194,9 +5351,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -5211,47 +5370,50 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                            ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                       LDestRect.width,
-                                                       LDestRect.Height,
-                                                       ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(0,0),
+                      LDestRect.width,
+                      LDestRect.Height,
+                      ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -5321,9 +5483,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -5343,48 +5507,51 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                  ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                              ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                         LDestRect.width,
-                                                         LDestRect.Height,
-                                                         ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(0,0),
+                        LDestRect.width,
+                        LDestRect.Height,
+                        ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -5459,9 +5626,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -5480,48 +5649,51 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                  ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                              ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                         LDestRect.width,
-                                                         LDestRect.Height,
-                                                         ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(0,0),
+                        LDestRect.width,
+                        LDestRect.Height,
+                        ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -5658,11 +5830,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -5697,11 +5870,12 @@ begin
       Result.Clear(TAlphaColorRec.Null);
       if Result.Canvas.BeginScene then
       try
-        Result.Canvas.DrawBitmap(LBitmap, // const ABitmap: TBitmap;
-                                 LSrcRect, //const SrcRect,
-                                 LDestRect, //const DstRect: TRectF;
-                                 1, //const AOpacity: Single;
-                                 false); // const HighSpeed: Boolean => disable interpolation
+        Result.Canvas.DrawBitmap(
+          LBitmap, // const ABitmap: TBitmap;
+          LSrcRect, //const SrcRect,
+          LDestRect, //const DstRect: TRectF;
+          1, //const AOpacity: Single;
+          false); // const HighSpeed: Boolean => disable interpolation
       finally
         Result.Canvas.EndScene;
       end;
@@ -5731,7 +5905,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5764,9 +5938,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -5780,47 +5956,50 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                            ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                       LDestRect.width,
-                                                       LDestRect.Height,
-                                                       ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(0,0),
+                      LDestRect.width,
+                      LDestRect.Height,
+                      ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -5869,7 +6048,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -5900,9 +6079,11 @@ var LImage: UIimage;
     LColorSpace: CGColorSpaceRef;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -5915,47 +6096,50 @@ begin
           LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
           if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
             try
-              LContext := CGBitmapContextCreate(nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                     //       memory block should be at least (bytesPerRow*height) bytes.
-                                                     //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                     //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                   //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                   //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                   //                   chapter of Quartz 2D Programming Guide.
-                                                   //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                   //              a value of 0 causes the value to be calculated automatically.
-                                                   //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                      //             bitmap graphics contexts.
-                                                kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                  // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                  // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                          // kCGBitmapByteOrder32Little = Little-endian
-                                                                          // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                          //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                          //             values. The constants for specifying the alpha channel information are declared with the
-                                                                          //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                          //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                          //             and CGImageAlphaInfo constants.)
-                                                                          //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                          //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                          //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+              LContext := CGBitmapContextCreate(
+                            nil, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                 //       memory block should be at least (bytesPerRow*height) bytes.
+                                 //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                 //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                            ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                            ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                            8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                               //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                               //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                               //                   chapter of Quartz 2D Programming Guide.
+                               //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                            0, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                               //              a value of 0 causes the value to be calculated automatically.
+                               //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                            LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                  //             bitmap graphics contexts.
+                            kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                              // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                              // kCGImageAlphaPremultipliedNone =  For example, RGB
+                            kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                      // kCGBitmapByteOrder32Little = Little-endian
+                                                      // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                      //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                      //             values. The constants for specifying the alpha channel information are declared with the
+                                                      //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                      //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                      //             and CGImageAlphaInfo constants.)
+                                                      //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                      //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                      //             Graphics Contexts chapter of Quartz 2D Programming Guide.
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                   CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                   CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                  CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                     ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                       LDestRect.width,
-                                                       LDestRect.Height,
-                                                       ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                     LImage.CGImage); // image The image to draw.
+                  CGContextDrawImage(
+                    LContext, // c: The graphics context in which to draw the image.
+                    ALLowerLeftCGRect(
+                      TpointF.Create(0,0),
+                      LDestRect.width,
+                      LDestRect.Height,
+                      ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                    LImage.CGImage); // image The image to draw.
                   result := CGBitmapContextCreateImage(LContext); // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
                                                                   // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
                                                                   // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
@@ -6025,9 +6209,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -6045,48 +6231,51 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                  ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                              ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                         LDestRect.width,
-                                                         LDestRect.Height,
-                                                         ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(0,0),
+                        LDestRect.width,
+                        LDestRect.Height,
+                        ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -6161,9 +6350,11 @@ var LImage: UIimage;
     LBitmapSurface: TBitmapSurface;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -6180,48 +6371,51 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
-                                                  ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                               //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              ceil(LDestRect.width), // width: The width, in pixels, of the required bitmap.
+                              ceil(LDestRect.height), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                           //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
                     CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
                     CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
-                    CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(TpointF.Create(0,0),
-                                                         LDestRect.width,
-                                                         LDestRect.Height,
-                                                         ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      LContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        TpointF.Create(0,0),
+                        LDestRect.width,
+                        LDestRect.Height,
+                        ceil(LDestRect.height)), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -6359,7 +6553,7 @@ var LArray: TJavaArray<Byte>;
 begin
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then Exit(nil);
     try
@@ -6381,9 +6575,11 @@ var LImage: UIimage;
     LData: NSData;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -6444,9 +6640,11 @@ var LImage: UIimage;
     w, h: Single;
 begin
   result := nil;
-  LData := TNSData.Wrap(TNSData.alloc.initWithBytesNoCopy(aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
-                                                          astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
-                                                          False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+  LData := TNSData.Wrap(
+             TNSData.alloc.initWithBytesNoCopy(
+               aStream.Memory, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+               astream.Size,   // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+               False));        // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
   try
     if LData.length > 0 then begin
       LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
@@ -6537,36 +6735,37 @@ begin
             LColorSpace := CGColorSpaceCreateDeviceRGB;  // Return Value: A device-dependent RGB color space. You are responsible for releasing this object by
             if LColorSpace <> nil then begin             // calling CGColorSpaceRelease. If unsuccessful, returns NULL.
               try
-                LContext := CGBitmapContextCreate(LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                       //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                  round(W), // width: The width, in pixels, of the required bitmap.
-                                                  round(H), // height: The height, in pixels, of the required bitmap.
-                                                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                     //                   chapter of Quartz 2D Programming Guide.
-                                                     //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
-                                                  LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                        //              a value of 0 causes the value to be calculated automatically.
-                                                                        //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
-                                                  LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                                                        //             bitmap graphics contexts.
-                                                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                            // kCGBitmapByteOrder32Little = Little-endian
-                                                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                            //             values. The constants for specifying the alpha channel information are declared with the
-                                                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                            //             and CGImageAlphaInfo constants.)
-                                                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+                LContext := CGBitmapContextCreate(
+                              LBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                                   //       memory block should be at least (bytesPerRow*height) bytes.
+                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                              round(W), // width: The width, in pixels, of the required bitmap.
+                              round(H), // height: The height, in pixels, of the required bitmap.
+                              8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                 //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                 //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                 //                   chapter of Quartz 2D Programming Guide.
+                                 //                   we can also use CGImageGetBitsPerComponent(LImage.CGImage) but 8 it's what we need
+                              LBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                    //              a value of 0 causes the value to be calculated automatically.
+                                                    //              we could also use CGImageGetBytesPerRow(LImage.CGImage) or W * 4
+                              LColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                                                    //             bitmap graphics contexts.
+                              kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                                // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                                // kCGImageAlphaPremultipliedNone =  For example, RGB
+                              kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                        // kCGBitmapByteOrder32Little = Little-endian
+                                                        // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                        //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                        //             values. The constants for specifying the alpha channel information are declared with the
+                                                        //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                        //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                        //             and CGImageAlphaInfo constants.)
+                                                        //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                        //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                        //             Graphics Contexts chapter of Quartz 2D Programming Guide.
                 if LContext <> nil then begin
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
@@ -6576,12 +6775,14 @@ begin
                     if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
                                                 TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
                                                 TalExifOrientationInfo.ROTATE_90, {UIImageOrientationRight}
-                                                TalExifOrientationInfo.TRANSVERSE{UIImageOrientationRightMirrored}] then CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                                                                                                                            CGRectMake(0, 0, h, w), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                                                                                                                            LImage.CGImage) // image The image to draw.
-                    else CGContextDrawImage(LContext, // c: The graphics context in which to draw the image.
-                                            CGRectMake(0, 0, w, h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                            LImage.CGImage); // image The image to draw.
+                                                TalExifOrientationInfo.TRANSVERSE{UIImageOrientationRightMirrored}] then CGContextDrawImage(
+                                                                                                                           LContext, // c: The graphics context in which to draw the image.
+                                                                                                                           CGRectMake(0, 0, h, w), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                                                                                                                           LImage.CGImage) // image The image to draw.
+                    else CGContextDrawImage(
+                           LContext, // c: The graphics context in which to draw the image.
+                           CGRectMake(0, 0, w, h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                           LImage.CGImage); // image The image to draw.
                   finally
                     CGContextRelease(LContext);
                   end;
@@ -6675,7 +6876,7 @@ begin
   end;
   LArray := TJavaArray<Byte>.Create(aStream.Size);
   try
-    system.Move(aStream.Memory^, LArray.Data^, aStream.Size);
+    ALMove(aStream.Memory^, LArray.Data^, aStream.Size);
     LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, aStream.Size);
     if LBitmap = nil then begin
       result := TSize.create(0,0);
@@ -7302,12 +7503,13 @@ end;
   {$MESSAGE WARN 'Check if FMX.Objects.GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
 {$ENDIF}
 //duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
-function ALGetDrawingShapeRectAndSetThickness(const Rect: TrectF;
-                                              const Fill: TBrush;
-                                              const Stroke: TStrokeBrush;
-                                              const Fit: Boolean;
-                                              var FillShape, DrawShape: Boolean;
-                                              var StrokeThicknessRestoreValue: Single): TRectF;
+function ALGetDrawingShapeRectAndSetThickness(
+           const Rect: TrectF;
+           const Fill: TBrush;
+           const Stroke: TStrokeBrush;
+           const Fit: Boolean;
+           var FillShape, DrawShape: Boolean;
+           var StrokeThicknessRestoreValue: Single): TRectF;
 const
   MinRectAreaSize = 0.01;
 begin
@@ -7346,31 +7548,33 @@ begin
   end;
 end;
 
-{***********************************************}
-procedure ALPaintRectangle({$IF defined(ANDROID)}
-                           const aCanvas: Jcanvas;
-                           {$ELSEIF defined(IOS)}
-                           const aContext: CGContextRef;
-                           const aColorSpace: CGColorSpaceRef;
-                           const aGridHeight: Single;
-                           {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                           const aCanvas: Tcanvas;
-                           {$ENDIF}
-                           const dstRect: TrectF;
-                           const Fill: TBrush;
-                           const Stroke: TStrokeBrush;
-                           const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
-                           const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
-                           const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
-                           const XRadius: Single = 0;
-                           const YRadius: Single = 0);
+{*************************}
+procedure ALPaintRectangle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
+            const Fill: TBrush;
+            const Stroke: TStrokeBrush;
+            const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
+            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
+            const XRadius: Single = 0;
+            const YRadius: Single = 0);
 
   {$REGION ' _drawRect (ANDROID)'}
   {$IF defined(ANDROID)}
-  procedure _drawRect(const aCanvas: Jcanvas;
-                      const aPaint: JPaint;
-                      const aRect: TrectF;
-                      Const aDrawOnlyBorder: Boolean);
+  procedure _drawRect(
+              const aCanvas: Jcanvas;
+              const aPaint: JPaint;
+              const aRect: TrectF;
+              Const aDrawOnlyBorder: Boolean);
 
   var LJRect: JRectF;
       LPath: JPath;
@@ -7393,10 +7597,11 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
          (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
 
       LJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
-      aCanvas.drawRoundRect(LJRect{rect},
-                            xRadius {rx},
-                            yRadius {ry},
-                            apaint);
+      aCanvas.drawRoundRect(
+        LJRect{rect},
+        xRadius {rx},
+        yRadius {ry},
+        apaint);
       LJRect := nil;
 
       if (not aDrawOnlyBorder) and
@@ -7415,11 +7620,12 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
          (Shadow <> nil) and
          (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
 
-      aCanvas.drawRect(aRect.left{left},
-                       aRect.top{top},
-                       aRect.right{right},
-                       aRect.bottom{bottom},
-                       apaint);
+      aCanvas.drawRect(
+        aRect.left{left},
+        aRect.top{top},
+        aRect.right{right},
+        aRect.bottom{bottom},
+        apaint);
 
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
@@ -7587,8 +7793,9 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
 
   {$REGION ' _DrawPath (IOS)'}
   {$IF defined(IOS)}
-  procedure _DrawPath(const aRect: TrectF;
-                      Const aDrawOnlyBorder: Boolean);
+  procedure _DrawPath(
+              const aRect: TrectF;
+              Const aDrawOnlyBorder: Boolean);
 
   var LXRadius: single;
       LYradius: Single;
@@ -7609,11 +7816,12 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
     begin
-      CGContextAddQuadCurveToPoint(aContext,
-                                   LCurPoint.X + dx1{cpx},
-                                   aGridHeight - (LCurPoint.Y + dy1){cpy},
-                                   LCurPoint.X + dx2{x},
-                                   aGridHeight - (LCurPoint.Y + dy2){y});
+      CGContextAddQuadCurveToPoint(
+        aContext,
+        LCurPoint.X + dx1{cpx},
+        aGridHeight - (LCurPoint.Y + dy1){cpy},
+        LCurPoint.X + dx2{x},
+        aGridHeight - (LCurPoint.Y + dy2){y});
       LCurPoint.X := LCurPoint.X + dx2;
       LCurPoint.Y := LCurPoint.Y + dy2;
     end;
@@ -7645,10 +7853,13 @@ procedure ALPaintRectangle({$IF defined(ANDROID)}
         (corners=[])) and
        (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
      //-----
-     CGContextAddRect(aContext, ALLowerLeftCGRect(aRect.TopLeft,
-                                                  aRect.Width,
-                                                  aRect.Height,
-                                                  aGridHeight));
+     CGContextAddRect(
+       aContext,
+       ALLowerLeftCGRect(
+         aRect.TopLeft,
+         aRect.Width,
+         aRect.Height,
+         aGridHeight));
      //-----
     end
 
@@ -7856,10 +8067,11 @@ begin
 
   //init LRect
   if Stroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(dstRect.Left + (Stroke.Thickness / 2),
-                           dstRect.Top + (Stroke.Thickness / 2),
-                           dstRect.right - (Stroke.Thickness / 2),
-                           dstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    LRect := TrectF.Create(
+               dstRect.Left + (Stroke.Thickness / 2),
+               dstRect.Top + (Stroke.Thickness / 2),
+               dstRect.right - (Stroke.Thickness / 2),
+               dstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
   end
   else LRect := dstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
 
@@ -7929,7 +8141,7 @@ begin
           try
             if fill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
             try
-              System.Move(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
+              ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
             finally
               fill.Bitmap.Bitmap.Unmap(LBitmapData);
             end;
@@ -7991,10 +8203,11 @@ begin
 
   //init LRect
   if Stroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(DstRect.Left + (Stroke.Thickness / 2),
-                           DstRect.Top + (Stroke.Thickness / 2),
-                           DstRect.right - (Stroke.Thickness / 2),
-                           DstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    LRect := TrectF.Create(
+               DstRect.Left + (Stroke.Thickness / 2),
+               DstRect.Top + (Stroke.Thickness / 2),
+               DstRect.right - (Stroke.Thickness / 2),
+               DstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
   end
   else LRect := DstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
 
@@ -8010,32 +8223,37 @@ begin
         LCallback.version := 0;
         LCallback.evaluate := @ALGradientEvaluateCallback;
         LCallback.releaseInfo:= nil;
-        LFunc := CGFunctionCreate(fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
-                                  1, // domainDimension - The number of inputs.
-                                  @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
-                                  4, // rangeDimension - The number of outputs.
-                                  nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
-                                  @LCallback); // callbacks - A pointer to a callback function table.
+        LFunc := CGFunctionCreate(
+                   fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
+                   1, // domainDimension - The number of inputs.
+                   @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                   4, // rangeDimension - The number of outputs.
+                   nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
+                   @LCallback); // callbacks - A pointer to a callback function table.
         try
           if Fill.Gradient.Style = TGradientStyle.Radial then begin
-            LShading := CGShadingCreateRadial(aColorSpace, // colorspace
-                                              CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.height / 2))), // start - The center of the starting circle, in the shading's target coordinate space.
-                                              LRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
-                                              CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.Height / 2))), // end - The center of the ending circle, in the shading's target coordinate space.
-                                              0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
-                                              LFunc, // function
-                                              {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                                              {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+            LShading := CGShadingCreateRadial(
+                          aColorSpace, // colorspace
+                          CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.height / 2))), // start - The center of the starting circle, in the shading's target coordinate space.
+                          LRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
+                          CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.Height / 2))), // end - The center of the ending circle, in the shading's target coordinate space.
+                          0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
+                          LFunc, // function
+                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
           end
           else begin
-            LShading := CGShadingCreateAxial(aColorSpace, // colorspace
-                                             CGPointMake(LRect.Left + (Fill.Gradient.StartPosition.X * LRect.Width),
-                                                         aGridHeight - LRect.top - (Fill.Gradient.StartPosition.Y * LRect.Height)), // start - The starting point of the axis, in the shading's target coordinate space.
-                                             CGPointMake(LRect.Left + (Fill.Gradient.StopPosition.X * LRect.Width),
-                                                         aGridHeight - LRect.top - (Fill.Gradient.StopPosition.Y * LRect.Height)), // end - The ending point of the axis, in the shading's target coordinate space.
-                                             LFunc, // function
-                                             {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
-                                             {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
+            LShading := CGShadingCreateAxial(
+                          aColorSpace, // colorspace
+                          CGPointMake(
+                            LRect.Left + (Fill.Gradient.StartPosition.X * LRect.Width),
+                            aGridHeight - LRect.top - (Fill.Gradient.StartPosition.Y * LRect.Height)), // start - The starting point of the axis, in the shading's target coordinate space.
+                          CGPointMake(
+                            LRect.Left + (Fill.Gradient.StopPosition.X * LRect.Width),
+                            aGridHeight - LRect.top - (Fill.Gradient.StopPosition.Y * LRect.Height)), // end - The ending point of the axis, in the shading's target coordinate space.
+                          LFunc, // function
+                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
+                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
           end;
           try
             _DrawPath(LRect, false{aDrawOnlyBorder});
@@ -8050,10 +8268,11 @@ begin
               LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
               LColor := CGColorCreate(aColorSpace, @LAlphaColor);
               try
-                CGContextSetShadowWithColor(aContext,
-                                            CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
-                                            Shadow.blur, // blur
-                                            LColor); // color
+                CGContextSetShadowWithColor(
+                  aContext,
+                  CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                  Shadow.blur, // blur
+                  LColor); // color
               finally
                 CGColorRelease(LColor);
               end;
@@ -8063,10 +8282,11 @@ begin
             //-----
             if (Shadow <> nil) and
                (Shadow.enabled) then begin
-              CGContextSetShadowWithColor(aContext,
-                                          CGSizeMake(0, 0), // offset
-                                          0, // blur
-                                          nil); // color
+              CGContextSetShadowWithColor(
+                aContext,
+                CGSizeMake(0, 0), // offset
+                0, // blur
+                nil); // color
             end;
             //-----
           finally
@@ -8086,34 +8306,35 @@ begin
         if fill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
           if fill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
           try
-            LTmpContext := CGBitmapContextCreate(LBitmapData.Data, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                 LBitmapData.Width, // width: The width, in pixels, of the required bitmap.
-                                                 LBitmapData.Height, // height: The height, in pixels, of the required bitmap.
-                                                 8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                    //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                    //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                    //                   chapter of Quartz 2D Programming Guide.
-                                                 LBitmapData.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                               //              a value of 0 causes the value to be calculated automatically.
-                                                 aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                              //             bitmap graphics contexts.
-                                                 kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                   // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                   // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                 kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                           // kCGBitmapByteOrder32Little = Little-endian
-                                                                           // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                           //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                           //             values. The constants for specifying the alpha channel information are declared with the
-                                                                           //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                           //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                           //             and CGImageAlphaInfo constants.)
-                                                                           //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                           //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                           //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            LTmpContext := CGBitmapContextCreate(
+                             LBitmapData.Data, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                             LBitmapData.Width, // width: The width, in pixels, of the required bitmap.
+                             LBitmapData.Height, // height: The height, in pixels, of the required bitmap.
+                             8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                //                   chapter of Quartz 2D Programming Guide.
+                             LBitmapData.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                           //              a value of 0 causes the value to be calculated automatically.
+                             aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                          //             bitmap graphics contexts.
+                             kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                               // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                               // kCGImageAlphaPremultipliedNone =  For example, RGB
+                             kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                       // kCGBitmapByteOrder32Little = Little-endian
+                                                       // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                       //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                       //             values. The constants for specifying the alpha channel information are declared with the
+                                                       //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                       //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                       //             and CGImageAlphaInfo constants.)
+                                                       //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                       //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                       //             Graphics Contexts chapter of Quartz 2D Programming Guide.
             if aContext <> nil then begin
               try
                 LImageRef := CGBitmapContextCreateImage(LTmpContext);
@@ -8136,28 +8357,32 @@ begin
                       LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
                       LColor := CGColorCreate(aColorSpace, @LAlphaColor);
                       try
-                        CGContextSetShadowWithColor(aContext,
-                                                    CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
-                                                    Shadow.blur, // blur
-                                                    LColor); // color
+                        CGContextSetShadowWithColor(
+                          aContext,
+                          CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                          Shadow.blur, // blur
+                          LColor); // color
                       finally
                         CGColorRelease(LColor);
                       end;
                     end;
                     //-----
-                    CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(LRect.TopLeft,
-                                                         LRect.Width,
-                                                         LRect.Height,
-                                                         aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      aContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        LRect.TopLeft,
+                        LRect.Width,
+                        LRect.Height,
+                        aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                     //-----
                     if (Shadow <> nil) and
                        (Shadow.enabled) then begin
-                      CGContextSetShadowWithColor(aContext,
-                                                  CGSizeMake(0, 0), // offset
-                                                  0, // blur
-                                                  nil); // color
+                      CGContextSetShadowWithColor(
+                        aContext,
+                        CGSizeMake(0, 0), // offset
+                        0, // blur
+                        nil); // color
                     end;
                     //-----
                     CGContextRestoreGState(aContext);
@@ -8189,10 +8414,11 @@ begin
         LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
         LColor := CGColorCreate(aColorSpace, @LAlphaColor);
         try
-          CGContextSetShadowWithColor(aContext,
-                                      CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
-                                      Shadow.blur, // blur
-                                      LColor); // color
+          CGContextSetShadowWithColor(
+            aContext,
+            CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+            Shadow.blur, // blur
+            LColor); // color
         finally
           CGColorRelease(LColor);
         end;
@@ -8202,10 +8428,11 @@ begin
       //-----
       if (Shadow <> nil) and
          (Shadow.enabled) then begin
-        CGContextSetShadowWithColor(aContext,
-                                    CGSizeMake(0, 0), // offset
-                                    0, // blur
-                                    nil); // color
+        CGContextSetShadowWithColor(
+          aContext,
+          CGSizeMake(0, 0), // offset
+          0, // blur
+          nil); // color
       end;
     end;
 
@@ -8263,20 +8490,21 @@ begin
 
 end;
 
-{********************************************}
-procedure ALPaintCircle({$IF defined(ANDROID)}
-                        const aCanvas: Jcanvas;
-                        {$ELSEIF defined(IOS)}
-                        const aContext: CGContextRef;
-                        const aColorSpace: CGColorSpaceRef;
-                        const aGridHeight: Single;
-                        {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                        const aCanvas: Tcanvas;
-                        {$ENDIF}
-                        const dstRect: TrectF;
-                        const Fill: TBrush;
-                        const Stroke: TStrokeBrush;
-                        const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+{**********************}
+procedure ALPaintCircle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
+            const Fill: TBrush;
+            const Stroke: TStrokeBrush;
+            const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
 
 {$IF defined(IOS)}
 const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
@@ -8325,10 +8553,11 @@ begin
 
   //init LRect
   if Stroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(dstRect.Left + (Stroke.Thickness / 2),
-                           dstRect.Top + (Stroke.Thickness / 2),
-                           dstRect.right - (Stroke.Thickness / 2),
-                           dstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    LRect := TrectF.Create(
+               dstRect.Left + (Stroke.Thickness / 2),
+               dstRect.Top + (Stroke.Thickness / 2),
+               dstRect.right - (Stroke.Thickness / 2),
+               dstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
   end
   else LRect := dstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
 
@@ -8374,7 +8603,7 @@ begin
           try
             if fill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
             try
-              System.Move(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
+              ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
             finally
               fill.Bitmap.Bitmap.Unmap(LBitmapData);
             end;
@@ -8444,10 +8673,11 @@ begin
 
   //init LRect
   if Stroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(DstRect.Left + (Stroke.Thickness / 2),
-                           DstRect.Top + (Stroke.Thickness / 2),
-                           DstRect.right - (Stroke.Thickness / 2),
-                           DstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+    LRect := TrectF.Create(
+               DstRect.Left + (Stroke.Thickness / 2),
+               DstRect.Top + (Stroke.Thickness / 2),
+               DstRect.right - (Stroke.Thickness / 2),
+               DstRect.bottom - (Stroke.Thickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
   end
   else LRect := DstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
 
@@ -8462,27 +8692,32 @@ begin
         LCallback.version := 0;
         LCallback.evaluate := @ALGradientEvaluateCallback;
         LCallback.releaseInfo:= nil;
-        LFunc := CGFunctionCreate(fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
-                                  1, // domainDimension - The number of inputs.
-                                  @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
-                                  4, // rangeDimension - The number of outputs.
-                                  nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
-                                  @LCallback); // callbacks - A pointer to a callback function table.
+        LFunc := CGFunctionCreate(
+                   fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
+                   1, // domainDimension - The number of inputs.
+                   @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                   4, // rangeDimension - The number of outputs.
+                   nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
+                   @LCallback); // callbacks - A pointer to a callback function table.
         try
-          LShading := CGShadingCreateRadial(aColorSpace, // colorspace
-                                            CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.height / 2)), // start - The center of the starting circle, in the shading's target coordinate space.
-                                            LRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
-                                            CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.Height / 2)), // end - The center of the ending circle, in the shading's target coordinate space.
-                                            0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
-                                            LFunc, // function
-                                            {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                                            {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+          LShading := CGShadingCreateRadial(
+                        aColorSpace, // colorspace
+                        CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.height / 2)), // start - The center of the starting circle, in the shading's target coordinate space.
+                        LRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
+                        CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.Height / 2)), // end - The center of the ending circle, in the shading's target coordinate space.
+                        0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
+                        LFunc, // function
+                        {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                        {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
           try
             CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
-            CGContextAddEllipseInRect(aContext, ALLowerLeftCGRect(LRect.TopLeft,
-                                                                  LRect.Width,
-                                                                  LRect.Height,
-                                                                  aGridHeight));
+            CGContextAddEllipseInRect(
+              aContext,
+              ALLowerLeftCGRect(
+                LRect.TopLeft,
+                LRect.Width,
+                LRect.Height,
+                aGridHeight));
             CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
             CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                      // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
@@ -8495,10 +8730,11 @@ begin
               LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
               LColor := CGColorCreate(aColorSpace, @LAlphaColor);
               try
-                CGContextSetShadowWithColor(aContext,
-                                            CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
-                                            Shadow.blur, // blur
-                                            LColor); // color
+                CGContextSetShadowWithColor(
+                  aContext,
+                  CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                  Shadow.blur, // blur
+                  LColor); // color
               finally
                 CGColorRelease(LColor);
               end;
@@ -8508,10 +8744,11 @@ begin
             //-----
             if (Shadow <> nil) and
                (Shadow.enabled) then begin
-              CGContextSetShadowWithColor(aContext,
-                                          CGSizeMake(0, 0), // offset
-                                          0, // blur
-                                          nil); // color
+              CGContextSetShadowWithColor(
+                aContext,
+                CGSizeMake(0, 0), // offset
+                0, // blur
+                nil); // color
             end;
             //-----
           finally
@@ -8531,34 +8768,35 @@ begin
         if fill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
           if fill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
           try
-            LTmpContext := CGBitmapContextCreate(LBitmapData.Data, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                                   //       memory block should be at least (bytesPerRow*height) bytes.
-                                                                   //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                                   //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                                 LBitmapData.Width, // width: The width, in pixels, of the required bitmap.
-                                                 LBitmapData.Height, // height: The height, in pixels, of the required bitmap.
-                                                 8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                                    //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                                    //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                                    //                   chapter of Quartz 2D Programming Guide.
-                                                 LBitmapData.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                                               //              a value of 0 causes the value to be calculated automatically.
-                                                 aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                              //             bitmap graphics contexts.
-                                                 kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                                   // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                                   // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                                 kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                           // kCGBitmapByteOrder32Little = Little-endian
-                                                                           // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                           //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                           //             values. The constants for specifying the alpha channel information are declared with the
-                                                                           //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                           //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                           //             and CGImageAlphaInfo constants.)
-                                                                           //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                           //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                           //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+            LTmpContext := CGBitmapContextCreate(
+                             LBitmapData.Data, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                               //       memory block should be at least (bytesPerRow*height) bytes.
+                                               //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                               //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                             LBitmapData.Width, // width: The width, in pixels, of the required bitmap.
+                             LBitmapData.Height, // height: The height, in pixels, of the required bitmap.
+                             8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                                //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                                //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                                //                   chapter of Quartz 2D Programming Guide.
+                             LBitmapData.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                                           //              a value of 0 causes the value to be calculated automatically.
+                             aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                          //             bitmap graphics contexts.
+                             kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                               // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                               // kCGImageAlphaPremultipliedNone =  For example, RGB
+                             kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                                       // kCGBitmapByteOrder32Little = Little-endian
+                                                       // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                                       //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                                       //             values. The constants for specifying the alpha channel information are declared with the
+                                                       //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                                       //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                                       //             and CGImageAlphaInfo constants.)
+                                                       //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                                       //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                                       //             Graphics Contexts chapter of Quartz 2D Programming Guide.
             if aContext <> nil then begin
               try
                 LImageRef := CGBitmapContextCreateImage(LTmpContext);
@@ -8570,10 +8808,13 @@ begin
                     CGContextSaveGState(aContext);
                     //-----
                     CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
-                    CGContextAddEllipseInRect(aContext, ALLowerLeftCGRect(LRect.TopLeft,
-                                                                          LRect.Width,
-                                                                          LRect.Height,
-                                                                          aGridHeight)); // Adds an ellipse that fits inside the specified rectangle.
+                    CGContextAddEllipseInRect(
+                      aContext,
+                      ALLowerLeftCGRect(
+                        LRect.TopLeft,
+                        LRect.Width,
+                        LRect.Height,
+                        aGridHeight)); // Adds an ellipse that fits inside the specified rectangle.
                     CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
                     CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
                                              // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
@@ -8586,28 +8827,32 @@ begin
                       LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
                       LColor := CGColorCreate(aColorSpace, @LAlphaColor);
                       try
-                        CGContextSetShadowWithColor(aContext,
-                                                    CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
-                                                    Shadow.blur, // blur
-                                                    LColor); // color
+                        CGContextSetShadowWithColor(
+                          aContext,
+                          CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+                          Shadow.blur, // blur
+                          LColor); // color
                       finally
                         CGColorRelease(LColor);
                       end;
                     end;
                     //-----
-                    CGContextDrawImage(aContext, // c: The graphics context in which to draw the image.
-                                       ALLowerLeftCGRect(LRect.TopLeft,
-                                                         LRect.Width,
-                                                         LRect.Height,
-                                                         aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                                       LImage.CGImage); // image The image to draw.
+                    CGContextDrawImage(
+                      aContext, // c: The graphics context in which to draw the image.
+                      ALLowerLeftCGRect(
+                        LRect.TopLeft,
+                        LRect.Width,
+                        LRect.Height,
+                        aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                      LImage.CGImage); // image The image to draw.
                     //-----
                     if (Shadow <> nil) and
                        (Shadow.enabled) then begin
-                      CGContextSetShadowWithColor(aContext,
-                                                  CGSizeMake(0, 0), // offset
-                                                  0, // blur
-                                                  nil); // color
+                      CGContextSetShadowWithColor(
+                        aContext,
+                        CGSizeMake(0, 0), // offset
+                        0, // blur
+                        nil); // color
                     end;
                     //-----
                     CGContextRestoreGState(aContext);
@@ -8638,26 +8883,31 @@ begin
         LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
         LColor := CGColorCreate(aColorSpace, @LAlphaColor);
         try
-          CGContextSetShadowWithColor(aContext,
-                                      CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
-                                      Shadow.blur, // blur
-                                      LColor); // color
+          CGContextSetShadowWithColor(
+            aContext,
+            CGSizeMake(Shadow.OffsetX, Shadow.OffsetY), // offset
+            Shadow.blur, // blur
+            LColor); // color
         finally
           CGColorRelease(LColor);
         end;
       end;
       //-----
-      CGContextFillEllipseInRect(aContext, ALLowerLeftCGRect(LRect.TopLeft,
-                                                             LRect.Width,
-                                                             LRect.Height,
-                                                             aGridHeight));
+      CGContextFillEllipseInRect(
+        aContext,
+        ALLowerLeftCGRect(
+          LRect.TopLeft,
+          LRect.Width,
+          LRect.Height,
+          aGridHeight));
       //-----
       if (Shadow <> nil) and
          (Shadow.enabled) then begin
-        CGContextSetShadowWithColor(aContext,
-                                    CGSizeMake(0, 0), // offset
-                                    0, // blur
-                                    nil); // color
+        CGContextSetShadowWithColor(
+          aContext,
+          CGSizeMake(0, 0), // offset
+          0, // blur
+          nil); // color
       end;
       //-----
     end;
@@ -8672,10 +8922,13 @@ begin
       LAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
       CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
       CGContextSetLineWidth(aContext, Stroke.Thickness);
-      CGContextStrokeEllipseInRect(aContext, ALLowerLeftCGRect(LRect.TopLeft,
-                                                               LRect.Width,
-                                                               LRect.Height,
-                                                               aGridHeight));
+      CGContextStrokeEllipseInRect(
+        aContext,
+        ALLowerLeftCGRect(
+          LRect.TopLeft,
+          LRect.Width,
+          LRect.Height,
+          aGridHeight));
     end;
 
   end;
@@ -8698,20 +8951,21 @@ begin
 
 end;
 
-{*****************************************************}
-Procedure ALCreateDrawingSurface({$IF defined(ANDROID)}
-                                 Var aBitmap: Jbitmap;
-                                 var aCanvas: Jcanvas;
-                                 {$ELSEIF defined(IOS)}
-                                 var aBitmapSurface: TbitmapSurface;
-                                 Var aContext: CGContextRef;
-                                 Var aColorSpace: CGColorSpaceRef;
-                                 {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                                 Var aBitmap: Tbitmap;
-                                 const aClearBitmap: boolean;
-                                 {$ENDIF}
-                                 const w: integer;
-                                 const h: integer);
+{*******************************}
+Procedure ALCreateDrawingSurface(
+            {$IF defined(ANDROID)}
+            Var aBitmap: Jbitmap;
+            var aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef;
+            Var aColorSpace: CGColorSpaceRef;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            Var aBitmap: Tbitmap;
+            const aClearBitmap: boolean;
+            {$ENDIF}
+            const w: integer;
+            const h: integer);
 begin
 
   {$IFDEF ANDROID}
@@ -8737,34 +8991,35 @@ begin
     try
 
       //create the context
-      aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                             //       memory block should be at least (bytesPerRow*height) bytes.
-                                                             //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                             //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                        aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
-                                        aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
-                                        8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                           //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                           //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                           //                   chapter of Quartz 2D Programming Guide.
-                                        aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                              //              a value of 0 causes the value to be calculated automatically.
-                                        aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                     //             bitmap graphics contexts.
-                                        kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                          // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                          // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                        kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                  // kCGBitmapByteOrder32Little = Little-endian
-                                                                  // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                  //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                  //             values. The constants for specifying the alpha channel information are declared with the
-                                                                  //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                  //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                  //             and CGImageAlphaInfo constants.)
-                                                                  //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                  //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                  //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+      aContext := CGBitmapContextCreate(
+                    aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                         //       memory block should be at least (bytesPerRow*height) bytes.
+                                         //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                         //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                    aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                    aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                    8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                       //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                       //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                       //                   chapter of Quartz 2D Programming Guide.
+                    aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                          //              a value of 0 causes the value to be calculated automatically.
+                    aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                                 //             bitmap graphics contexts.
+                    kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                      // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                      // kCGImageAlphaPremultipliedNone =  For example, RGB
+                    kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                              // kCGBitmapByteOrder32Little = Little-endian
+                                              // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                              //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                              //             values. The constants for specifying the alpha channel information are declared with the
+                                              //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                              //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                              //             and CGImageAlphaInfo constants.)
+                                              //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                              //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                              //             Graphics Contexts chapter of Quartz 2D Programming Guide.
       if aContext = nil then Raise Exception.Create('Call to CGBitmapContextCreate failed');
       try
 
@@ -8838,17 +9093,18 @@ begin
 
 end;
 
-{***************************************************}
-procedure ALFreeDrawingSurface({$IF defined(ANDROID)}
-                               Var aBitmap: Jbitmap;
-                               var aCanvas: Jcanvas
-                               {$ELSEIF defined(IOS)}
-                               var aBitmapSurface: TbitmapSurface;
-                               Var aContext: CGContextRef;
-                               Var aColorSpace: CGColorSpaceRef
-                               {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-                               Var aBitmap: Tbitmap
-                               {$ENDIF});
+{*****************************}
+procedure ALFreeDrawingSurface(
+            {$IF defined(ANDROID)}
+            Var aBitmap: Jbitmap;
+            var aCanvas: Jcanvas
+            {$ELSEIF defined(IOS)}
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef;
+            Var aColorSpace: CGColorSpaceRef
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            Var aBitmap: Tbitmap
+            {$ENDIF});
 begin
 
   {$IFDEF ANDROID}
@@ -8873,11 +9129,12 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-Procedure ALCreateDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
-                                   Var aContext: CGContextRef;
-                                   Var aColorSpace: CGColorSpaceRef;
-                                   const w: integer;
-                                   const h: integer);
+Procedure ALCreateDrawingSurfaceV2(
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef;
+            Var aColorSpace: CGColorSpaceRef;
+            const w: integer;
+            const h: integer);
 begin
 
   //create the bitmapSurface
@@ -8888,34 +9145,35 @@ begin
     aBitmapSurface.SetSize(W,H);
 
     //create the context
-    aContext := CGBitmapContextCreate(aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
-                                                           //       memory block should be at least (bytesPerRow*height) bytes.
-                                                           //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
-                                                           //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
-                                      aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
-                                      aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
-                                      8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
-                                         //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
-                                         //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
-                                         //                   chapter of Quartz 2D Programming Guide.
-                                      aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
-                                                            //              a value of 0 causes the value to be calculated automatically.
-                                      aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
-                                                   //             bitmap graphics contexts.
-                                      kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
-                                                                        // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
-                                                                        // kCGImageAlphaPremultipliedNone =  For example, RGB
-                                      kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
-                                                                // kCGBitmapByteOrder32Little = Little-endian
-                                                                // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
-                                                                //             location in a pixel, and information about whether the pixel components are floating-point or integer
-                                                                //             values. The constants for specifying the alpha channel information are declared with the
-                                                                //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
-                                                                //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
-                                                                //             and CGImageAlphaInfo constants.)
-                                                                //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
-                                                                //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
-                                                                //             Graphics Contexts chapter of Quartz 2D Programming Guide.
+    aContext := CGBitmapContextCreate(
+                  aBitmapSurface.Bits, // data: A pointer to the destination in memory where the drawing is to be rendered. The size of this
+                                       //       memory block should be at least (bytesPerRow*height) bytes.
+                                       //       In iOS 4.0 and later, and OS X v10.6 and later, you can pass NULL if you want Quartz to allocate
+                                       //       memory for the bitmap. This frees you from managing your own memory, which reduces memory leak issues.
+                  aBitmapSurface.Width, // width: The width, in pixels, of the required bitmap.
+                  aBitmapSurface.Height, // height: The height, in pixels, of the required bitmap.
+                  8, // bitsPerComponent: The number of bits to use for each component of a pixel in memory. For example, for a 32-bit
+                     //                   pixel format and an RGB color space, you would specify a value of 8 bits per component. For
+                     //                   the list of supported pixel formats, see “Supported Pixel Formats” in the Graphics Contexts
+                     //                   chapter of Quartz 2D Programming Guide.
+                  aBitmapSurface.Pitch, // bytesPerRow: The number of bytes of memory to use per row of the bitmap. If the data parameter is NULL, passing
+                                        //              a value of 0 causes the value to be calculated automatically.
+                  aColorSpace, // colorspace: The color space to use for the bi1tmap context. Note that indexed color spaces are not supported for
+                               //             bitmap graphics contexts.
+                  kCGImageAlphaPremultipliedLast or // kCGImageAlphaPremultipliedLast =  For example, premultiplied RGBA
+                                                    // kCGImageAlphaPremultipliedFirst =  For example, premultiplied ARGB
+                                                    // kCGImageAlphaPremultipliedNone =  For example, RGB
+                  kCGBitmapByteOrder32Big); // kCGBitmapByteOrder32Big = Big-endian
+                                            // kCGBitmapByteOrder32Little = Little-endian
+                                            // bitmapInfo: Constants that specify whether the bitmap should contain an alpha channel, the alpha channel’s relative
+                                            //             location in a pixel, and information about whether the pixel components are floating-point or integer
+                                            //             values. The constants for specifying the alpha channel information are declared with the
+                                            //             CGImageAlphaInfo type but can be passed to this parameter safely. You can also pass the other constants
+                                            //             associated with the CGBitmapInfo type. (See CGImage Reference for a description of the CGBitmapInfo
+                                            //             and CGImageAlphaInfo constants.)
+                                            //             For an example of how to specify the color space, bits per pixel, bits per pixel component, and bitmap
+                                            //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
+                                            //             Graphics Contexts chapter of Quartz 2D Programming Guide.
     if aContext = nil then Raise Exception.Create('Call to CGBitmapContextCreate failed');
     try
 
@@ -8980,8 +9238,9 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-procedure ALFreeDrawingSurfaceV2(var aBitmapSurface: TbitmapSurface;
-                                 Var aContext: CGContextRef);
+procedure ALFreeDrawingSurfaceV2(
+            var aBitmapSurface: TbitmapSurface;
+            Var aContext: CGContextRef);
 begin
 
   CGContextRelease(aContext);

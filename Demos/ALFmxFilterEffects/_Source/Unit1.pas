@@ -73,82 +73,96 @@ implementation
 uses Grijjy.ErrorReporting,
      Alcinoe.Common;
 
+{****************************************************}
 procedure TForm2.ALTrackBar2Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar2.Value);
   fColorAdjustEffect.contrast := ALTrackBar2.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar3Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar3.Value);
   fColorAdjustEffect.Highlights := ALTrackBar3.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar4Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar4.Value);
   fColorAdjustEffect.Saturation := ALTrackBar4.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar5Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar5.Value);
   fColorAdjustEffect.Vibrance := ALTrackBar5.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar6Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar6.Value);
   fColorAdjustEffect.Whites := ALTrackBar6.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar7Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar7.Value);
   fColorAdjustEffect.Blacks := ALTrackBar7.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar8Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar8.Value);
   fColorAdjustEffect.temperature := ALTrackBar8.Value;
 end;
 
+{****************************************************}
 procedure TForm2.ALTrackBar9Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar9.Value);
   fColorAdjustEffect.tint := ALTrackBar9.Value;
 end;
 
+{************************************************}
 procedure TForm2.ALLayout1Resize(Sender: TObject);
 begin
   ALLayout1.Height := ALLayout1.Width / (720 / 404)
 end;
 
+{*****************************************************}
 procedure TForm2.ALTrackBar10Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar10.Value);
   fColorAdjustEffect.Exposure := ALTrackBar10.Value;
 end;
 
+{*****************************************************}
 procedure TForm2.ALTrackBar11Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar11.Value);
   fColorAdjustEffect.gamma := ALTrackBar11.Value;
 end;
 
+{*****************************************************}
 procedure TForm2.ALTrackBar12Tracking(Sender: TObject);
 begin
   Label1.Text := FloatToStr(ALTrackBar12.Value);
   fColorAdjustEffect.Shadows := ALTrackBar12.Value;
 end;
 
+{*********************************************}
 procedure TForm2.Button1Click(Sender: TObject);
 begin
   fColorAdjustEffect.Enabled := not fColorAdjustEffect.Enabled;
 end;
 
+{*******************************************}
 procedure TForm2.FormCreate(Sender: TObject);
 begin
   fColorAdjustEffect := TALColorAdjustEffect.Create(Image1);
@@ -176,10 +190,10 @@ begin
     procedure
     begin
       TThread.Synchronize(nil,
-      procedure
-      begin
-        Halt(1); // << This is the only way i found to crash the app :(
-      end);
+        procedure
+        begin
+          Halt(1); // << This is the only way i found to crash the app :(
+        end);
     end).Start;
   {$ELSE}
   Application.Terminate;

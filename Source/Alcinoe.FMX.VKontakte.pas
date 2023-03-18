@@ -545,9 +545,9 @@ end;
 
 {*********************************************************}
 class function TALVKontakteShareDialog.ShowShareLinkDialog(
-                                         const aLinkUrl: String;
-                                         const aLinkText: String;
-                                         const aLinkImageUrl: String): boolean;
+                 const aLinkUrl: String;
+                 const aLinkText: String;
+                 const aLinkImageUrl: String): boolean;
 begin
 
   // the VK sdk api is a TRUE PIECE OF SHEET regarding

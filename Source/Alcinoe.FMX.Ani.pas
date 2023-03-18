@@ -505,7 +505,7 @@ begin
   end;
 end;
 
-{******************************************************************}
+{****************************************************************}
 procedure TALDisplayLinkThread.SetInterval(const Value: Cardinal);
 begin
   FInterval := Max(Value, 1);
@@ -1568,6 +1568,7 @@ begin
   fColorAnimation.StopAtCurrent;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALFloatPropertyAnimation]);
@@ -1585,4 +1586,3 @@ finalization
   TALAnimation.Uninitialize;
 
 end.
-

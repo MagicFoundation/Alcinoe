@@ -353,8 +353,10 @@ type
     /// <param name="AVertAlign"> The vertical arrangement, if the height of the rectangle is smaller than the height
     /// of the designated area. The <b>Center</b> by default </param>
     /// <returns> The current rectangle after transformation </returns>
-    function PlaceInto(const ADesignatedArea: TALRectD; const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
-      const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TALRectD;
+    function PlaceInto(
+               const ADesignatedArea: TALRectD;
+               const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
+               const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TALRectD;
 
     /// <summary> Rounds the location and size of the current rectangle to the specified value
     /// <param name="AScale"> The scale of scene </param>
@@ -458,20 +460,22 @@ function ALRectCenter(var R: TALRectD; const Bounds: TALRectD): TALRectD; overlo
 function ALIntersectRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 function ALUnionRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{**************************************************************************************************************************}
 function ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF; overload;
 function ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
 function ALRectFitInto(const R: TRectf; const Bounds: TRectF; out Ratio: Single): TRectF; overload;
 function ALRectFitInto(const R: TRectf; const Bounds: TRectF): TRectF; overload;
-function ALRectPlaceInto(const R: TRectf;
-                         const Bounds: TRectf;
-                         const CenterAt: TpointF;
-                         out Ratio: Single): TRectF; overload;
+function ALRectPlaceInto(
+           const R: TRectf;
+           const Bounds: TRectf;
+           const CenterAt: TpointF;
+           out Ratio: Single): TRectF; overload;
 function ALRectPlaceInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF): TRectF; overload;
-function ALRectPlaceInto(const R: TRectf;
-                         const Bounds: TRectF;
-                         const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
-                         const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF; overload;
+function ALRectPlaceInto(
+           const R: TRectf;
+           const Bounds: TRectF;
+           const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
+           const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF; overload;
 
 type
 
@@ -505,12 +509,12 @@ Procedure ALFreeAndNil(const [ref] Obj: TObject; const ADelayed: boolean = false
 Procedure ALFreeAndNil(var Obj; const ADelayed: boolean = false); inline;
 {$ENDIF}
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{******************************************}
 Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{**************************************************************************************************************}
 function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer = 0): Integer; overload; inline;
 function  ALIfThen(AValue: Boolean; const ATrue: Int64; const AFalse: Int64 = 0): Int64; overload; inline;
 function  ALIfThen(AValue: Boolean; const ATrue: UInt64; const AFalse: UInt64 = 0): UInt64; overload; inline;
@@ -757,7 +761,7 @@ begin
   fRequests:= TObjectList<TALWorkerThreadRequest>.create(true{aOwnObjects});
 end;
 
-{**************************************}
+{*************************************}
 destructor TALWorkerThreadPool.Destroy;
 begin
   ALFreeandNil(fThreads);
@@ -1321,10 +1325,11 @@ end;
 //   and height) to fit in the Bounds rectangle and centers the scaled rectangle in Bounds at CenterAt.
 // * Otherwise, PlaceInto just center the current rectangle in the Bounds rectangle according to CenterAt
 // * PlaceInto returns the current rectangle if any of the Bounds dimensions is zero.
-function ALRectPlaceInto(const R: TRectf;
-                         const Bounds: TRectf;
-                         const CenterAt: TpointF; // << this is used only when we need to fit the result
-                         out Ratio: Single): TRectF;
+function ALRectPlaceInto(
+           const R: TRectf;
+           const Bounds: TRectf;
+           const CenterAt: TpointF; // << this is used only when we need to fit the result
+           out Ratio: Single): TRectF;
 begin
 
   if (R.Width > Bounds.Width) or (R.Height > Bounds.Height) then Result := ALRectFitInto(R, Bounds, CenterAt, Ratio)
@@ -1351,10 +1356,11 @@ end;
 
 {********************************************************************************************************************}
 //this is the same as TRectf.PlaceInto but it is here for old delphi version (like xe4) with don't have it implemented
-function ALRectPlaceInto(const R: TRectf;
-                         const Bounds: TRectF;
-                         const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
-                         const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF;
+function ALRectPlaceInto(
+           const R: TRectf;
+           const Bounds: TRectF;
+           const AHorzAlign: THorzRectAlign = THorzRectAlign.Center;
+           const AVertAlign: TVertRectAlign = TVertRectAlign.Center): TRectF;
 var
   LLocation: TPointF;
 begin
@@ -1828,9 +1834,11 @@ begin
   ALRectCenter(Result, ADesignatedArea);
 end;
 
-{********************************************************************************************}
-function TALRectD.PlaceInto(const ADesignatedArea: TALRectD; const AHorzAlign: THorzRectAlign;
-  const AVertAlign: TVertRectAlign): TALRectD;
+{**************************}
+function TALRectD.PlaceInto(
+           const ADesignatedArea: TALRectD;
+           const AHorzAlign: THorzRectAlign;
+           const AVertAlign: TVertRectAlign): TALRectD;
 var
   LLocation: TALPointD;
 begin
@@ -2336,7 +2344,7 @@ begin
   inherited CreateFmt(Msg, Args);
 end;
 
-{*****************************************************}
+{****************************************************}
 procedure ALAddCallStackCustomLog(Const aLog: String);
 var LCallStackCustomLog: _TALCallStackCustomLog;
 begin
@@ -2355,7 +2363,7 @@ begin
   End;
 end;
 
-{**************************************************************************************************************************}
+{*************************************************************************************************************************}
 function ALGetCallStackCustomLogs(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
 Var i: integer;
 begin

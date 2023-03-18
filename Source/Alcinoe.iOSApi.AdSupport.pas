@@ -39,29 +39,11 @@ type
   PASIdentifierManager = Pointer;
 
 const
-
    libAdSupport = '/System/Library/Frameworks/AdSupport.framework/AdSupport';
 
 implementation
 
-{$IF defined(CPUARM)}
-
-procedure StubProc1; cdecl; external libAdSupport name 'OBJC_CLASS_$_ASIdentifierManager'; // else I have class not found when i call TASIdentifierManager.ocClass.sharedManager.advertisingIdentifier.UUIDString
-
-{$ELSEIF defined(IOS) and NOT defined(CPUARM)}
-
-uses
-  Posix.Dlfcn;
-
-var
-  AdSupportModule: THandle;
-
-initialization
-  AdSupportModule := dlopen(MarshaledAString(libAdSupport), RTLD_LAZY);
-
-finalization
-  dlclose(AdSupportModule);
-
-{$ENDIF IOS}
+{****************************************************************************************}
+procedure StubProc1; cdecl; external libAdSupport name 'OBJC_CLASS_$_ASIdentifierManager';
 
 end.

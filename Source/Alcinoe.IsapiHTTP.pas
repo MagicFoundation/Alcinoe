@@ -179,12 +179,13 @@ type
     procedure SendRedirect(const URI: AnsiString); virtual; abstract;
     procedure SendStream(AStream: TStream); virtual; abstract;
     function Sent: Boolean; virtual;
-    procedure SetCookieField(Values: TALStringsA;
-                             const ADomain, APath: AnsiString;
-                             AExpires: TDateTime;
-                             ASecure: Boolean;
-                             const AHttpOnly: Boolean = False;
-                             const ASameSite: AnsiString = '');
+    procedure SetCookieField(
+                Values: TALStringsA;
+                const ADomain, APath: AnsiString;
+                AExpires: TDateTime;
+                ASecure: Boolean;
+                const AHttpOnly: Boolean = False;
+                const ASameSite: AnsiString = '');
     procedure SetCustomHeader(const Name, Value: AnsiString);
     property Cookies: TALHttpCookieCollection read FCookies;
     property HTTPRequest: TALWebRequest read FHTTPRequest;
@@ -312,49 +313,51 @@ begin
   FMaxContentSize := -1;
 end;
 
-{**************************************************************}
+{***************************************************************}
 procedure TALWebRequest.ExtractCookieFields(Fields: TALStringsA);
 begin
-  ALExtractHeaderFields([';'],  // Separators
-                        [' '],  // WhiteSpace
-                        [],     // Quotes
-                        PAnsiChar(Cookie), // Content
-                        Fields,  // Strings
-                        True);   // Decode - Cookie encoding:
-                                 // There is some confusion over encoding of a cookie value. The commonly held belief
-                                 // is that cookie values must be URL-encoded, but this is a fallacy even though it is
-                                 // the de facto implementation. The original specification indicates that only three
-                                 // types of characters must be encoded: semicolon, comma, and white space. The specification
-                                 // indicates that URL encoding may be used but stops short of requiring it. The RFC makes
-                                 // no mention of encoding whatsoever. Still, almost all implementations perform
-                                 // some sort of URL encoding on cookie values. In the case of name=value formats, the
-                                 // name and value are typically encoded separately while the equals sign is left as is.
-
+  ALExtractHeaderFields(
+    [';'],  // Separators
+    [' '],  // WhiteSpace
+    [],     // Quotes
+    PAnsiChar(Cookie), // Content
+    Fields,  // Strings
+    True);   // Decode - Cookie encoding:
+             // There is some confusion over encoding of a cookie value. The commonly held belief
+             // is that cookie values must be URL-encoded, but this is a fallacy even though it is
+             // the de facto implementation. The original specification indicates that only three
+             // types of characters must be encoded: semicolon, comma, and white space. The specification
+             // indicates that URL encoding may be used but stops short of requiring it. The RFC makes
+             // no mention of encoding whatsoever. Still, almost all implementations perform
+             // some sort of URL encoding on cookie values. In the case of name=value formats, the
+             // name and value are typically encoded separately while the equals sign is left as is.
 end;
 
-{*************************************************************}
+{**************************************************************}
 procedure TALWebRequest.ExtractQueryFields(Fields: TALStringsA);
 begin
-  ALExtractHTTPFields(['&'], // Separators
-                      [],    // WhiteSpace
-                      [],    // Quotes
-                      PAnsiChar(Query), // Content
-                      Fields,  // Strings
-                      True);   // Decode
+  ALExtractHTTPFields(
+    ['&'], // Separators
+    [],    // WhiteSpace
+    [],    // Quotes
+    PAnsiChar(Query), // Content
+    Fields,  // Strings
+    True);   // Decode
 end;
 
-{*************************************************************************}
+{**************************************************************************}
 procedure TALWebRequest.ExtractUrlEncodedContentFields(Fields: TALStringsA);
 begin
-  ALExtractHTTPFields(['&'], // Separators
-                      [],    // WhiteSpace
-                      [],    // Quotes
-                      PAnsiChar(Content), // Content
-                      Fields,  // Strings
-                      True);   // Decode
+  ALExtractHTTPFields(
+    ['&'], // Separators
+    [],    // WhiteSpace
+    [],    // Quotes
+    PAnsiChar(Content), // Content
+    Fields,  // Strings
+    True);   // Decode
 end;
 
-{**************************************************************************************************************}
+{***************************************************************************************************************}
 procedure TALWebRequest.ExtractMultipartFormDataFields(Fields: TALStringsA; Files: TALMultiPartFormDataContents);
 var LBoundary: AnsiString;
     LMultipartFormDataDecoder: TALMultipartFormDataDecoder;
@@ -363,10 +366,11 @@ begin
   If LBoundary='' then raise Exception.Create('Bad multipart/form-data Content-Type');
   LMultipartFormDataDecoder := TALMultipartFormDataDecoder.Create;
   Try
-    LMultipartFormDataDecoder.Decode(Content,
-                                     LBoundary,
-                                     Fields,
-                                     Files);
+    LMultipartFormDataDecoder.Decode(
+      Content,
+      LBoundary,
+      Fields,
+      Files);
   Finally
     AlFreeAndNil(LMultipartFormDataDecoder);
   End;
@@ -473,14 +477,16 @@ var Buffer: array[0..4095] of AnsiChar;
     Size: DWORD;
 begin
   Size := SizeOf(Buffer);
-  if ECB.GetServerVariable(ECB.ConnID,
-                           PAnsiChar(Name),
-                           @Buffer,
-                           Size) or
-     ECB.GetServerVariable(ECB.ConnID,
-                           PAnsiChar(AnsiString('HTTP_') + Name),
-                           @Buffer,
-                           Size)
+  if ECB.GetServerVariable(
+       ECB.ConnID,
+       PAnsiChar(Name),
+       @Buffer,
+       Size) or
+     ECB.GetServerVariable(
+       ECB.ConnID,
+       PAnsiChar(AnsiString('HTTP_') + Name),
+       @Buffer,
+       Size)
   then begin
     if Size > 0 then Dec(Size);
     SetString(Result, Buffer, Size);
@@ -521,11 +527,12 @@ begin
   // but IIS takes a small amount of time to handle the threads in the thread pool
   // before the connection can be completely removed.
   if fConnectionClosed then exit;
-  if not ECB.ServerSupportFunction(ECB.ConnID,
-                                   HSE_REQ_CLOSE_CONNECTION,
-                                   nil,
-                                   nil,
-                                   nil) then raiseLastOsError;
+  if not ECB.ServerSupportFunction(
+           ECB.ConnID,
+           HSE_REQ_CLOSE_CONNECTION,
+           nil,
+           nil,
+           nil) then raiseLastOsError;
   fConnectionClosed := true;
 
 end;
@@ -574,14 +581,15 @@ begin
   aStream.Position := 0;
 
   if ContentLength > aStream.Size then
-    raise EALIsapiRequestConnectionDropped.Createfmt('Client Dropped Connection.'#13#10 +
-      'Total Bytes indicated by Header: %d' + #13#10 +
-      'Total Bytes Read: %d',
-      [ContentLength, aStream.Size]);
+    raise EALIsapiRequestConnectionDropped.Createfmt(
+            'Client Dropped Connection.'#13#10 +
+            'Total Bytes indicated by Header: %d' + #13#10 +
+            'Total Bytes Read: %d',
+            [ContentLength, aStream.Size]);
 
 end;
 
-{*********************************************************}
+{**********************************************************}
 function TALISAPIRequest.GetContentStream: TALStringStreamA;
 begin
   if not assigned(FcontentStream) then begin
@@ -641,11 +649,12 @@ var PathBuffer: array[0..1023] of AnsiChar;
 begin
   System.Ansistrings.StrCopy(PathBuffer, PAnsiChar(URI));
   Size := SizeOf(PathBuffer);
-  if not ECB.ServerSupportFunction(ECB.ConnID,
-                                   HSE_REQ_MAP_URL_TO_PATH,
-                                   @PathBuffer,
-                                   @Size,
-                                   nil) then raiseLastOsError;
+  if not ECB.ServerSupportFunction(
+           ECB.ConnID,
+           HSE_REQ_MAP_URL_TO_PATH,
+           @PathBuffer,
+           @Size,
+           nil) then raiseLastOsError;
   Result := PathBuffer;
 end;
 
@@ -662,17 +671,19 @@ begin
   Result := WriteClient(Pointer(AString)^, Length(AString)) = Length(AString);
 end;
 
-{********************************************************}
-function TALISAPIRequest.WriteHeaders(StatusCode: Integer;
-                                      const StatusString, Headers: AnsiString): Boolean;
+{************************************}
+function TALISAPIRequest.WriteHeaders(
+           StatusCode: Integer;
+           const StatusString, Headers: AnsiString): Boolean;
 begin
   TALISAPIRequest(Self).ECB.dwHttpStatusCode := StatusCode;
   with TALISAPIRequest(Self) do
-    if not ECB.ServerSupportFunction(ECB.ConnID,
-                                     HSE_REQ_SEND_RESPONSE_HEADER,
-                                     PAnsiChar(StatusString),
-                                     nil,
-                                     LPDWORD(Headers)) then raiseLastOsError;
+    if not ECB.ServerSupportFunction(
+             ECB.ConnID,
+             HSE_REQ_SEND_RESPONSE_HEADER,
+             PAnsiChar(StatusString),
+             nil,
+             LPDWORD(Headers)) then raiseLastOsError;
   Result := True;
 end;
 
@@ -727,13 +738,14 @@ begin
   end;
 end;
 
-{*********************************************************}
-procedure TALWebResponse.SetCookieField(Values: TALStringsA;
-                                        const ADomain, APath: AnsiString;
-                                        AExpires: TDateTime;
-                                        ASecure: Boolean;
-                                        const AHttpOnly: Boolean = False;
-                                        const ASameSite: AnsiString = '');
+{**************************************}
+procedure TALWebResponse.SetCookieField(
+            Values: TALStringsA;
+            const ADomain, APath: AnsiString;
+            AExpires: TDateTime;
+            ASecure: Boolean;
+            const AHttpOnly: Boolean = False;
+            const ASameSite: AnsiString = '');
 var
   I: Integer;
 begin
@@ -756,7 +768,7 @@ begin
   FCustomHeaders.Values[Name] := Value;
 end;
 
-{***********************************************************}
+{************************************************************}
 procedure TALWebResponse.SetCustomHeaders(Value: TALStringsA);
 begin
   FCustomHeaders.Assign(Value);
@@ -931,7 +943,7 @@ var StatusString: AnsiString;
     Headers: AnsiString;
     I: Integer;
 
-  {---------------------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AddHeaderItem(const Item: AnsiString; const FormatStr: AnsiString);
   begin
     if Item <> '' then Headers := Headers + ALFormatA(FormatStr, [Item]);
@@ -950,19 +962,25 @@ begin
       AddHeaderItem(Cookies[I].HeaderValue, 'Set-Cookie: %s'#13#10);
     AddHeaderItem(DerivedFrom, 'Derived-From: %s'#13#10);
     if Expires > 0 then
-      AddHeaderItem(ALFormatA(ALFormatDateTimeA('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
-                                              Expires,
-                                              ALDefaultFormatSettingsA),
-                             [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
-                              ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]),
-                    'Expires: %s'#13#10);
+      AddHeaderItem(
+        ALFormatA(
+          ALFormatDateTimeA(
+            '"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+            Expires,
+            ALDefaultFormatSettingsA),
+          [AlRfc822DayOfWeekNames[DayOfWeek(Expires)],
+           ALRfc822MonthOfTheYearNames[MonthOf(Expires)]]),
+        'Expires: %s'#13#10);
     if LastModified > 0 then
-      AddHeaderItem(ALFormatA(ALFormatDateTimeA('"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
-                                              LastModified,
-                                              ALDefaultFormatSettingsA),
-                             [AlRfc822DayOfWeekNames[DayOfWeek(LastModified)],
-                              ALRfc822MonthOfTheYearNames[MonthOf(LastModified)]]),
-                    'Last-Modified: %s'#13#10);
+      AddHeaderItem(
+        ALFormatA(
+          ALFormatDateTimeA(
+            '"%s", dd "%s" yyyy hh":"nn":"ss "GMT"',
+            LastModified,
+            ALDefaultFormatSettingsA),
+          [AlRfc822DayOfWeekNames[DayOfWeek(LastModified)],
+           ALRfc822MonthOfTheYearNames[MonthOf(LastModified)]]),
+        'Last-Modified: %s'#13#10);
     AddHeaderItem(Title, 'Title: %s'#13#10);
     AddHeaderItem(FormatAuthenticate, 'WWW-Authenticate: %s'#13#10);
     AddCustomHeaders(Headers);
@@ -976,11 +994,12 @@ begin
   fSentInAsync := False;
   if fTransmitFileInfo.hFile <> Invalid_handle_value then begin
     with TALISAPIRequest(FHTTPRequest) do
-      if not ECB.ServerSupportFunction(ECB.ConnID,
-                                       HSE_REQ_TRANSMIT_FILE,
-                                       @fTransmitFileInfo,
-                                       nil,
-                                       nil) then raiseLastOsError;
+      if not ECB.ServerSupportFunction(
+               ECB.ConnID,
+               HSE_REQ_TRANSMIT_FILE,
+               @fTransmitFileInfo,
+               nil,
+               nil) then raiseLastOsError;
     fSentInAsync := True;
   end
   else if ContentStream = nil then begin
@@ -1000,11 +1019,12 @@ end;
 procedure TALISAPIResponse.SendRedirect(const URI: AnsiString);
 begin
   with TALISAPIRequest(FHTTPRequest) do
-    if not ECB.ServerSupportFunction(ECB.ConnID,
-                                     HSE_REQ_SEND_URL_REDIRECT_RESP,
-                                     PAnsiChar(URI),
-                                     nil,
-                                     nil) then raiseLastOsError;
+    if not ECB.ServerSupportFunction(
+             ECB.ConnID,
+             HSE_REQ_SEND_URL_REDIRECT_RESP,
+             PAnsiChar(URI),
+             nil,
+             nil) then raiseLastOsError;
   FSent := True;
 end;
 

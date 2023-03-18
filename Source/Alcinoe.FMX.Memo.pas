@@ -404,7 +404,7 @@ end;
 {$REGION ' IOS'}
 {$IF defined(ios)}
 
-{*********************************}
+{********************************}
 constructor TALIosTextView.Create;
 var LUIColor: UIColor;
 begin
@@ -416,14 +416,14 @@ begin
   //      so it's seam something acquire it
 end;
 
-{***********************************************************}
+{**********************************************************}
 constructor TALIosTextView.Create(const AControl: TControl);
 begin
   fMemoControl := TALIosMemo(AControl);
   inherited;
 end;
 
-{*********************************}
+{********************************}
 destructor TALIosTextView.Destroy;
 begin
   inherited;
@@ -435,7 +435,7 @@ begin
   Result := TALIosTextViewDelegate.Create(Self);
 end;
 
-{********************************************************}
+{*******************************************************}
 function TALIosTextView.canBecomeFirstResponder: Boolean;
 begin
   Result := Control.CanFocus and Control.HitTest;
@@ -449,7 +449,7 @@ begin
   else result := UIScrollView(Super).canPerformAction(action, withSender);
 end;
 
-{*****************************************************}
+{****************************************************}
 function TALIosTextView.GetObjectiveCClass: PTypeInfo;
 begin
   Result := TypeInfo(IALUITextView);
@@ -623,11 +623,14 @@ begin
   if compareValue(LLineHeight, 0, Tepsilon.Position) > 0 then result := round(FTextView.View.contentSize.height / LLineHeight)
   else result := 0;
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.getLineCount', 'ContentBounds.Height: ' + floattostr(FTextView.View.contentSize.height) +
-                                   ' - LineHeight: ' + floattostr(LLineHeight) +
-                                   ' - LineCount: ' + inttostr(result) +
-                                   ' - Width: ' + floattostr(Width) +
-                                   ' - Height: ' + floattostr(Height), TalLogType.VERBOSE);
+  ALLog(
+    'TALIosMemo.getLineCount',
+    'ContentBounds.Height: ' + floattostr(FTextView.View.contentSize.height) + ' | ' +
+    'LineHeight: ' + floattostr(LLineHeight) + ' | ' +
+    'LineCount: ' + inttostr(result) + ' | ' +
+    'Width: ' + floattostr(Width) + ' | ' +
+    'Height: ' + floattostr(Height),
+    TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
@@ -876,9 +879,12 @@ var LTextAttr: NSMutableAttributedString;
 begin
 
   {$IF defined(DEBUG)}
-  ALLog('TALIosMemo.DoFontChanged', 'TextPromptVisible: ' + BoolToStr(fTextPromptVisible, true) +
-                                    ' - TextPrompt: ' + fTextPrompt +
-                                    ' - TextPromptColor: ' + inttostr(fTextPromptColor), TalLogType.VERBOSE);
+  ALLog(
+    'TALIosMemo.DoFontChanged',
+    'TextPromptVisible: ' + BoolToStr(fTextPromptVisible, true) + ' | ' +
+    'TextPrompt: ' + fTextPrompt + ' | ' +
+    'TextPromptColor: ' + inttostr(fTextPromptColor),
+    TalLogType.VERBOSE);
   {$ENDIF}
 
   if fTextPromptVisible then LStr := StrToNsStr(fTextPrompt)
@@ -1937,6 +1943,7 @@ begin
   result := FMemoControl.getLineCount;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALMemo]);

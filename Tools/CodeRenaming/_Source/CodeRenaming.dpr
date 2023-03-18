@@ -542,7 +542,7 @@ begin
     Writeln('Alcinoe.XMLDoc.vALDefaultNodeIndent=ALDefaultXMLNodeIndent');
 
     Writeln('');
-    Writeln('Press any key to exit');
+    Writeln('Press <Enter> key to quit');
     Readln;
 
   except

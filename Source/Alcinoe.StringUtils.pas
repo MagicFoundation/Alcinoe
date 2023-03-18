@@ -898,13 +898,15 @@ begin
   if WithoutBracket then begin
     if WithoutHyphen then begin
       SetLength(Result, 32);
-      System.Ansistrings.StrLFmt(PAnsiChar(Result), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+      System.Ansistrings.StrLFmt(
+        PAnsiChar(Result), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end
     else begin
       SetLength(Result, 36);
-      System.Ansistrings.StrLFmt(PAnsiChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+      System.Ansistrings.StrLFmt(
+        PAnsiChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end;
@@ -912,13 +914,15 @@ begin
   else begin
     if WithoutHyphen then begin
       SetLength(Result, 34);
-      System.Ansistrings.StrLFmt(PAnsiChar(Result), 34,'{%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+      System.Ansistrings.StrLFmt(
+        PAnsiChar(Result), 34,'{%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end
     else begin
       SetLength(Result, 38);
-      System.Ansistrings.StrLFmt(PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+      System.Ansistrings.StrLFmt(
+        PAnsiChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end;
@@ -931,13 +935,15 @@ begin
   if WithoutBracket then begin
     if WithoutHyphen then begin
       SetLength(Result, 32);
-      StrLFmt(PChar(Result), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+      StrLFmt(
+        PChar(Result), 32,'%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end
     else begin
       SetLength(Result, 36);
-      StrLFmt(PChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
+      StrLFmt(
+        PChar(Result), 36,'%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end;
@@ -945,13 +951,15 @@ begin
   else begin
     if WithoutHyphen then begin
       SetLength(Result, 34);
-      StrLFmt(PChar(Result), 34,'{%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+      StrLFmt(
+        PChar(Result), 34,'{%.8x%.4x%.4x%.2x%.2x%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end
     else begin
       SetLength(Result, 38);
-      StrLFmt(PChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
+      StrLFmt(
+        PChar(Result), 38,'{%.8x-%.4x-%.4x-%.2x%.2x-%.2x%.2x%.2x%.2x%.2x%.2x}',   // do not localize
         [Guid.D1, Guid.D2, Guid.D3, Guid.D4[0], Guid.D4[1], Guid.D4[2], Guid.D4[3],
         Guid.D4[4], Guid.D4[5], Guid.D4[6], Guid.D4[7]]);
     end;
@@ -994,12 +1002,15 @@ var
   CharSet: TMaskSet;
   Cards: Integer;
 
+  {~~~~~~~~~~~~~~~~~~~~}
   procedure InvalidMask;
   begin
-    raise EALMaskException.CreateResFmt(@SInvalidMask, [Mask,
-      P - PansiChar(Mask) + 1]);
+    raise EALMaskException.CreateResFmt(
+            @SInvalidMask,
+            [Mask, P - PansiChar(Mask) + 1]);
   end;
 
+  {~~~~~~~~~~~~~~}
   procedure Reset;
   begin
     SkipTo := False;
@@ -1007,6 +1018,7 @@ var
     CharSet := [];
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure WriteScan(MaskState: TMaskStates);
   begin
     if I <= High(FMaskStates) then
@@ -1037,6 +1049,7 @@ var
     Reset;
   end;
 
+  {~~~~~~~~~~~~~~~~}
   procedure ScanSet;
   var
     LastChar: ansiChar;
@@ -1119,6 +1132,7 @@ var
   I: Integer;
   P: PansiChar;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure Push(P: PansiChar; I: Integer);
   begin
     S[T].sP := P;
@@ -1126,6 +1140,7 @@ var
     Inc(T);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function Pop(var P: PansiChar; var I: Integer): Boolean;
   begin
     if T = 0 then
@@ -1139,6 +1154,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function Matches(P: PansiChar; Start: Integer): Boolean;
   var
     I: Integer;
@@ -1312,13 +1328,13 @@ end;
 {$IFEND}
 {$R-} {Range-Checking}
 function ALInternalFloatToText(
-  ABuffer: PByte;
-  //ABufferIsUnicode: Boolean;
-  const AValue;
-  AValueType: TFloatValue;
-  AFormat: TFloatFormat;
-  APrecision, ADigits: Integer;
-  const AFormatSettings: TALFormatSettingsA): Integer;
+           ABuffer: PByte;
+           //ABufferIsUnicode: Boolean;
+           const AValue;
+           AValueType: TFloatValue;
+           AFormat: TFloatFormat;
+           APrecision, ADigits: Integer;
+           const AFormatSettings: TALFormatSettingsA): Integer;
 const
   CMinExtPrecision = 2;
 {$IFDEF EXTENDEDHAS10BYTES}
@@ -1356,6 +1372,7 @@ var
   LFloatRecDigit: Integer;
   LNextThousand: Integer;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendChar(const AChar: AnsiChar);
   begin
     //if ABufferIsUnicode then
@@ -1373,6 +1390,7 @@ var
     Inc(Result);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendString(const AStr: AnsiString);
   var
     {I,} L: Integer;
@@ -1402,6 +1420,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~}
   function GetDigit: Byte;
   begin
     Result := FloatRec.Digits[LFloatRecDigit];
@@ -1412,6 +1431,7 @@ var
       Inc(LFloatRecDigit);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~}
   procedure FormatNumber;
   var
     K: Integer;
@@ -1480,6 +1500,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~}
   procedure FormatExponent;
   var
     LMinCnt, LExponent: Integer;
@@ -1706,9 +1727,10 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.AnsiStrings.FormatBuf is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALFormatBuf(var Buffer; BufLen: Cardinal; const Format;
-  FmtLen: Cardinal; const Args: array of const;
-  const AFormatSettings: TALFormatSettingsA): Cardinal;
+function ALFormatBuf(
+           var Buffer; BufLen: Cardinal; const Format;
+           FmtLen: Cardinal; const Args: array of const;
+           const AFormatSettings: TALFormatSettingsA): Cardinal;
 var
   BufPtr: PAnsiChar;
   FormatPtr: PAnsiChar;
@@ -1729,6 +1751,7 @@ var
   CurrentArg: TVarRec;
   FloatVal: TFloatValue;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ApplyWidth(NumChar, Negitive: Integer): Boolean;
   var
     I: Integer;
@@ -1755,6 +1778,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function AddBuf(const AItem: PAnsiChar; ItemLen: Integer = -1; StringLen: Integer = -1): Boolean;
   var
     NumChar: Integer;
@@ -1830,6 +1854,7 @@ var
       Result := ApplyWidth(NumChar, Negitive);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function VariantToAnsiString(V: TVarData): AnsiString;
   begin
     Result := '';
@@ -2133,16 +2158,18 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if System.AnsiStrings.FmtStr is still the same and adjust the IFDEF'}
 {$IFEND}
-procedure ALFmtStr(var Result: AnsiString; const Format: AnsiString;
-  const Args: array of const; const AFormatSettings: TALFormatSettingsA);
+procedure ALFmtStr(
+            var Result: AnsiString; const Format: AnsiString;
+            const Args: array of const; const AFormatSettings: TALFormatSettingsA);
 var
   Len, BufLen: Integer;
   Buffer: array[0..4095] of AnsiChar;
 begin
   BufLen := SizeOf(Buffer);
   if Length(Format) < (sizeof(Buffer) - (sizeof(Buffer) div 4)) then
-    Len := ALFormatBuf(Buffer, sizeof(Buffer) - 1, Pointer(Format)^, Length(Format),
-      Args, AFormatSettings)
+    Len := ALFormatBuf(
+             Buffer, sizeof(Buffer) - 1, Pointer(Format)^, Length(Format),
+             Args, AFormatSettings)
   else
   begin
     BufLen := Length(Format);
@@ -2155,8 +2182,9 @@ begin
       Inc(BufLen, BufLen);
       Result := '';          // prevent copying of existing data, for speed
       SetLength(Result, BufLen);
-      Len := ALFormatBuf(Pointer(Result)^, BufLen - 1, Pointer(Format)^,
-        Length(Format), Args, AFormatSettings);
+      Len := ALFormatBuf(
+               Pointer(Result)^, BufLen - 1, Pointer(Format)^,
+               Length(Format), Args, AFormatSettings);
     end;
     SetLength(Result, Len);
   end
@@ -2188,7 +2216,7 @@ begin
   ALFmtStr(Result, Format, Args, AFormatSettings);
 end;
 
-{**************************************************************************}
+{***************************************************************************}
 function ALFormatW(const Format: String; const Args: array of const): String;
 begin
   Result := ALFormatW(Format, Args, ALDefaultFormatSettingsW);
@@ -2277,7 +2305,7 @@ begin
   else result := falseStr;
 end;
 
-{******************************************************************************************************************}
+{*******************************************************************************************************************}
 procedure ALBoolToStrA(var s: ansiString; B: Boolean; const trueStr: ansistring='1'; const falseStr: ansistring='0');
 begin
   if B then s := trueStr
@@ -2319,8 +2347,10 @@ type
 {**********************************************}
 constructor TCFString.Create(const Val: string);
 begin
-  Value := CFStringCreateWithCharacters(kCFAllocatorDefault,
-    PChar(Val), Length(Val));
+  Value := CFStringCreateWithCharacters(
+             kCFAllocatorDefault,
+             PChar(Val),
+             Length(Val));
 end;
 
 {************************************************************}
@@ -2384,14 +2414,16 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.DateTimeToString is still the same and adjust the IFDEF'}
 {$IFEND}
-procedure ALDateTimeToString(var Result: AnsiString; const Format: AnsiString;
-  DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA);
+procedure ALDateTimeToString(
+            var Result: AnsiString; const Format: AnsiString;
+            DateTime: TDateTime; const AFormatSettings: TALFormatSettingsA);
 var
   BufPos, AppendLevel: Integer;
   Buffer: array[0..255] of AnsiChar;
   DynBuffer: array of AnsiChar;
   Sb: TArray<ansiChar>;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendChars(P: PAnsiChar; Count: Integer);
   var
     N, I: Integer;
@@ -2417,21 +2449,31 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendString(const S: AnsiString);
   begin
     AppendChars(Pointer(S), Length(S));
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendNumber(Number, Digits: Integer);
   const
     Format: array[0..3] of AnsiChar = '%.*d';
   var
     NumBuf: array[0..15] of AnsiChar;
   begin
-    AppendChars(NumBuf, ALFormatBuf(NumBuf, Length(NumBuf), Format,
-      Length(Format), [Digits, Number], AFormatSettings));
+    AppendChars(
+      NumBuf,
+      ALFormatBuf(
+        NumBuf,
+        Length(NumBuf),
+        Format,
+        Length(Format),
+        [Digits, Number],
+        AFormatSettings));
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendFormat(Format: PAnsiChar);
   var
     Starter, Token, LastToken: AnsiChar;
@@ -2441,6 +2483,7 @@ var
     Count: Integer;
     Year, Month, Day, Hour, Min, Sec, MSec, H: Word;
 
+    {~~~~~~~~~~~~~~~~~}
     procedure GetCount;
     var
       P: PAnsiChar;
@@ -2450,6 +2493,7 @@ var
       Count := Format - P + 1;
     end;
 
+    {~~~~~~~~~~~~~~~~}
     procedure GetDate;
     begin
       if not DateDecoded then
@@ -2459,6 +2503,7 @@ var
       end;
     end;
 
+    {~~~~~~~~~~~~~~~~}
     procedure GetTime;
     begin
       if not TimeDecoded then
@@ -2482,8 +2527,9 @@ var
       SystemTime.wDay   := Day;
 
       FormatStr := 'gg';
-      if GetDateFormatA(GetThreadLocale, DATE_USE_ALT_CALENDAR, @SystemTime,
-        PAnsiChar(FormatStr), Buffer, SizeOf(Buffer)) <> 0 then
+      if GetDateFormatA(
+           GetThreadLocale, DATE_USE_ALT_CALENDAR, @SystemTime,
+           PAnsiChar(FormatStr), Buffer, SizeOf(Buffer)) <> 0 then
       begin
         Result := Buffer;
         if Count = 1 then
@@ -2503,6 +2549,7 @@ var
       end;
     end;
 
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function ConvertYearString(const Count: Integer): AnsiString;
     var
       FormatStr: AnsiString;
@@ -2519,8 +2566,9 @@ var
       else
         FormatStr := 'yyyy';
 
-      if GetDateFormatA(GetThreadLocale, DATE_USE_ALT_CALENDAR, @SystemTime,
-        PAnsiChar(FormatStr), Buffer, SizeOf(Buffer)) <> 0 then
+      if GetDateFormatA(
+           GetThreadLocale, DATE_USE_ALT_CALENDAR, @SystemTime,
+           PAnsiChar(FormatStr), Buffer, SizeOf(Buffer)) <> 0 then
       begin
         Result := Buffer;
         if (Count = 1) and (Result[Low(AnsiString)] = '0') then
@@ -2544,6 +2592,7 @@ var
     end;
     {$ENDIF !MACOS}
 
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function ConvertEraString(const Count: Integer) : AnsiString;
     var
       {$IFDEF MACOS}
@@ -2567,17 +2616,19 @@ var
       try
         Locale := CFLocaleCopyCurrent;
         DefaultTZ := CFTimeZoneCopyDefault;
-        Formatter := CFDateFormatterCreate(kCFAllocatorDefault, Locale,
-                        kCFDateFormatterFullStyle, kCFDateFormatterNoStyle);
+        Formatter := CFDateFormatterCreate(
+                       kCFAllocatorDefault, Locale,
+                       kCFDateFormatterFullStyle, kCFDateFormatterNoStyle);
         FormatString := TCFString.Create('GG');
         CFDateFormatterSetFormat(Formatter, FormatString.Value);
         DecodeDate(DateTime, LYear, LMonth, LDay);
         LDate.year := LYear; LDate.month := ShortInt(LMonth); LDate.day := ShortInt(LDay);
         LDate.hour := 0; LDate.minute := 0; LDate.second := 0;
-        Result := TCFString(CFDateFormatterCreateStringWithAbsoluteTime(
-                              kCFAllocatorDefault, Formatter,
-                              CFGregorianDateGetAbsoluteTime(LDate, DefaultTZ))
-                           ).AsAnsiString(true);
+        Result := TCFString(
+                    CFDateFormatterCreateStringWithAbsoluteTime(
+                      kCFAllocatorDefault,
+                      Formatter,
+                      CFGregorianDateGetAbsoluteTime(LDate, DefaultTZ))).AsAnsiString(true);
       finally
         if FormatString.Value <> nil then
           CFRelease(FormatString.Value);
@@ -2595,6 +2646,7 @@ var
       {$ENDIF MACOS}
     end;
 
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function ConvertYearString(const Count: Integer) : AnsiString;
     var
       S : AnsiString;
@@ -2620,10 +2672,12 @@ var
           TimeZone := CFTimeZoneCopyDefault;
           TargetDate := CFGregorianDateGetAbsoluteTime(LDate, TimeZone);
           CurrentCalendar := CFCalendarCopyCurrent;
-          Calendar := CFCalendarCreateWithIdentifier(kCFAllocatorDefault,
-                                  CFCalendarGetIdentifier(CurrentCalendar));
-          if CFCalendarGetTimeRangeOfUnit(Calendar, kCFCalendarUnitEra,
-                                          TargetDate, @StartEra, @LengthEra) then
+          Calendar := CFCalendarCreateWithIdentifier(
+                        kCFAllocatorDefault,
+                        CFCalendarGetIdentifier(CurrentCalendar));
+          if CFCalendarGetTimeRangeOfUnit(
+               Calendar, kCFCalendarUnitEra,
+               TargetDate, @StartEra, @LengthEra) then
           begin
             LDate := CFAbsoluteTimeGetGregorianDate(StartEra, TimeZone);
             Result := LDate.Year - 1;
@@ -2888,39 +2942,46 @@ begin
   end;
 end;
 
-{**********************************************}
-function ALDateToStrA(const DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+{********************}
+function ALDateToStrA(
+           const DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 begin
-  ALDateTimeToString(Result, AFormatSettings.ShortDateFormat, DateTime,
+  ALDateTimeToString(
+    Result, AFormatSettings.ShortDateFormat, DateTime,
     AFormatSettings);
 end;
 
-{**********************************************}
-function ALDateToStrW(const DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): string;
+{********************}
+function ALDateToStrW(
+           const DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.DateToStr(DateTime, AFormatSettings);
 end;
 
-{**********************************************}
-function ALTimeToStrA(const DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+{********************}
+function ALTimeToStrA(
+           const DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 begin
-  ALDateTimeToString(Result, AFormatSettings.LongTimeFormat, DateTime,
+  ALDateTimeToString(
+    Result, AFormatSettings.LongTimeFormat, DateTime,
     AFormatSettings);
 end;
 
-{**********************************************}
-function ALTimeToStrW(const DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): string;
+{********************}
+function ALTimeToStrW(
+           const DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.TimeToStr(DateTime, AFormatSettings);
 end;
 
-{**************************************************}
-function ALDateTimeToStrA(const DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+{************************}
+function ALDateTimeToStrA(
+           const DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   ALDateTimeToString(Result, '', DateTime, AFormatSettings);
 end;
@@ -2931,29 +2992,34 @@ begin
   ALDateTimeToString(s, '', DateTime, AFormatSettings);
 end;
 
-{**************************************************}
-function ALDateTimeToStrW(const DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): String;
+{************************}
+function ALDateTimeToStrW(
+           const DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): String;
 begin
   Result := system.sysutils.DateTimeToStr(DateTime, AFormatSettings);
 end;
 
-{*************************************************************************************************************}
+{**************************************************************************************************************}
 procedure ALDateTimeToStrW(const DateTime: TDateTime; var s: String; const AFormatSettings: TALFormatSettingsW);
 begin
   s := system.sysutils.DateTimeToStr(DateTime, AFormatSettings);
 end;
 
-{***********************************************************************}
-function ALFormatDateTimeA(const Format: AnsiString; DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+{*************************}
+function ALFormatDateTimeA(
+           const Format: AnsiString;
+           DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 begin
   ALDateTimeToString(Result, Format, DateTime, AFormatSettings);
 end;
 
-{*******************************************************************}
-function ALFormatDateTimeW(const Format: string; DateTime: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): string;
+{*************************}
+function ALFormatDateTimeW(
+           const Format: string;
+           DateTime: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatDateTime(Format, DateTime, AFormatSettings);
 end;
@@ -3256,8 +3322,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanDate is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALScanDate(const S: AnsiString; var Pos: Integer; var Date: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function ALScanDate(
+           const S: AnsiString; var Pos: Integer; var Date: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean; overload;
 type
   TNamesArray = array[1..12] of AnsiString;
   PNamesArray =^TNamesArray;
@@ -3272,6 +3339,7 @@ var
   EraYearOffset: Integer;
   Was: TSpecifiedParts;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function EraToYear(Year: Integer): Integer;
   begin
 {$IFDEF MSWINDOWS}
@@ -3468,8 +3536,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTimeRegular is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALScanTimeRegular(const S: AnsiString; var Pos: Integer; var Time: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALScanTimeRegular(
+           const S: AnsiString; var Pos: Integer; var Time: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   BaseHour: Integer;
   Hour, Min, Sec, MSec: Word;
@@ -3515,8 +3584,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTimeUsingShortTimeFormat is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALScanTimeUsingShortTimeFormat(const S: AnsiString; var Pos: Integer; var Time: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALScanTimeUsingShortTimeFormat(
+           const S: AnsiString; var Pos: Integer; var Time: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 type
   TSpecifiedParts = set of (spHour, spMin, spSec, spMSec);
 var
@@ -3621,8 +3691,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTime is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALScanTime(const S: AnsiString; var Pos: Integer; var Time: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean; overload;
+function ALScanTime(
+           const S: AnsiString; var Pos: Integer; var Time: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean; overload;
 var
   OrigPos: Integer;
 begin
@@ -3639,8 +3710,10 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDate is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALTryStrToDate(const S: AnsiString; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTryStrToDate(
+           const S: AnsiString;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   Pos: Integer;
 begin
@@ -3648,9 +3721,11 @@ begin
   Result := ALScanDate(S, Pos, Value, AFormatSettings) and (Pos > High(S));
 end;
 
-{************************************************************}
-function ALTryStrToDate(const S: string; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): Boolean;
+{**********************}
+function ALTryStrToDate(
+           const S: string;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToDate(S, Value, AFormatSettings);
 end;
@@ -3659,16 +3734,18 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToDate is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALStrToDate(const S: AnsiString;
-  const AFormatSettings: TALFormatSettingsA): TDateTime;
+function ALStrToDate(
+           const S: AnsiString;
+           const AFormatSettings: TALFormatSettingsA): TDateTime;
 begin
   if not ALTryStrToDate(S, Result, AFormatSettings) then
     ALConvertErrorFmt(@System.SysConst.SInvalidDate, [S]);
 end;
 
-{***********************************}
-function ALStrToDate(const S: string;
-  const AFormatSettings: TALFormatSettingsW): TDateTime;
+{*******************}
+function ALStrToDate(
+           const S: string;
+           const AFormatSettings: TALFormatSettingsW): TDateTime;
 begin
   result := system.sysutils.StrToDate(S, AFormatSettings);
 end;
@@ -3677,8 +3754,10 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToTime is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALTryStrToTime(const S: AnsiString; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTryStrToTime(
+           const S: AnsiString;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   Pos: Integer;
 begin
@@ -3686,9 +3765,11 @@ begin
   Result := ALScanTime(S, Pos, Value, AFormatSettings) and (Pos > High(S));
 end;
 
-{*************************************************************}
-function  ALTryStrToTime(const S: string; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): Boolean;
+{***********************}
+function  ALTryStrToTime(
+            const S: string;
+            out Value: TDateTime;
+            const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToTime(S, Value, AFormatSettings);
 end;
@@ -3697,16 +3778,18 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToTime is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALStrToTime(const S: AnsiString;
-  const AFormatSettings: TALFormatSettingsA): TDateTime;
+function ALStrToTime(
+           const S: AnsiString;
+           const AFormatSettings: TALFormatSettingsA): TDateTime;
 begin
   if not ALTryStrToTime(S, Result, AFormatSettings) then
     ALConvertErrorFmt(@System.SysConst.SInvalidTime, [S]);
 end;
 
-{***********************************}
-function ALStrToTime(const S: string;
-  const AFormatSettings: TALFormatSettingsW): TDateTime;
+{*******************}
+function ALStrToTime(
+           const S: string;
+           const AFormatSettings: TALFormatSettingsW): TDateTime;
 begin
   result := system.sysutils.StrToTime(S, AFormatSettings);
 end;
@@ -3716,8 +3799,10 @@ end;
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
 {$R-} {Range-Checking}
-function ALTryStrToDateTime(const S: AnsiString; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTryStrToDateTime(
+           const S: AnsiString;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 var
   Pos: Integer;
   NumberPos: Integer;
@@ -3809,9 +3894,11 @@ end;
   {$R+} {Range-Checking}
 {$ENDIF}
 
-{****************************************************************}
-function ALTryStrToDateTime(const S: string; out Value: TDateTime;
-  const AFormatSettings: TALFormatSettingsW): Boolean;
+{**************************}
+function ALTryStrToDateTime(
+           const S: string;
+           out Value: TDateTime;
+           const AFormatSettings: TALFormatSettingsW): Boolean;
 begin
   result := system.sysutils.TryStrToDateTime(S, Value, AFormatSettings);
 end;
@@ -3820,16 +3907,18 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALStrToDateTime(const S: AnsiString;
-  const AFormatSettings: TALFormatSettingsA): TDateTime;
+function ALStrToDateTime(
+           const S: AnsiString;
+           const AFormatSettings: TALFormatSettingsA): TDateTime;
 begin
   if not ALTryStrToDateTime(S, Result, AFormatSettings) then
     ALConvertErrorFmt(@System.SysConst.SInvalidDateTime, [S]);
 end;
 
-{****************************************}
-function  ALStrToDateTime(const S: string;
-  const AFormatSettings: TALFormatSettingsW): TDateTime;
+{************************}
+function  ALStrToDateTime(
+            const S: string;
+            const AFormatSettings: TALFormatSettingsW): TDateTime;
 begin
   Result := system.sysutils.StrToDateTime(S, AFormatSettings);
 end;
@@ -4690,9 +4779,10 @@ Function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean;
 begin
   if aBin = '' then exit(false);
   setlength(Value,length(aBin) * 2);
-  _ALBinToHex(PByte(@aBin[low(aBin)]),
-              PByte(@Value[low(Value)]),
-              length(aBin));
+  _ALBinToHex(
+    PByte(@aBin[low(aBin)]),
+    PByte(@Value[low(Value)]),
+    length(aBin));
   result := true;
 end;
 
@@ -4701,9 +4791,10 @@ Function  ALTryBinToHex(const aBin; aBinSize : Cardinal; out Value: AnsiString):
 begin
   if aBinSize = 0 then exit(false);
   setlength(Value, aBinSize * 2);
-  _ALBinToHex(PByte(@aBin),
-              PByte(@Value[low(Value)]),
-              aBinSize);
+  _ALBinToHex(
+    PByte(@aBin),
+    PByte(@Value[low(Value)]),
+    aBinSize);
   result := true;
 end;
 
@@ -4713,9 +4804,10 @@ var bufOut: TBytes;
 begin
   if length(aBin) = 0 then exit(false);
   setlength(bufOut,length(aBin) * 2);
-  _ALBintoHex(Pbyte(@aBin[0]), // Buffer: TBytes
-              Pbyte(@bufOut[0]), // Text: TBytes;
-              length(aBin)); // Count: Integer
+  _ALBintoHex(
+    Pbyte(@aBin[0]), // Buffer: TBytes
+    Pbyte(@bufOut[0]), // Text: TBytes;
+    length(aBin)); // Count: Integer
   Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
   result := true;
 end;
@@ -4726,9 +4818,10 @@ var bufOut: TBytes;
 begin
   if aBinSize = 0 then exit(false);
   setlength(bufOut,aBinSize * 2);
-  _ALBintoHex(Pbyte(@aBin), // Buffer: TBytes
-              Pbyte(@bufOut[0]), // Text: TBytes;
-              aBinSize); // Count: Integer
+  _ALBintoHex(
+    Pbyte(@aBin), // Buffer: TBytes
+    Pbyte(@bufOut[0]), // Text: TBytes;
+    aBinSize); // Count: Integer
   Value := Tencoding.UTF8.GetString(bufOut); // UTF8 is good because bufOut must contain only low ascii chars
   result := true;
 end;
@@ -4778,11 +4871,12 @@ begin
   l := length(aHex);
   if (l = 0) or (l mod 2 <> 0) then exit(False);
   setlength(Value,l div 2);
-  result := HexToBin(PChar(aHex), // Text
-                     0, // TextOffset
-                     Value, //Buffer
-                     0, // BufOffset
-                     length(Value)) = l div 2;
+  result := HexToBin(
+              PChar(aHex), // Text
+              0, // TextOffset
+              Value, //Buffer
+              0, // BufOffset
+              length(Value)) = l div 2;
 end;
 
 {*******************************************************}
@@ -5387,8 +5481,17 @@ function ALFloatToStrA(Value: Extended; const AFormatSettings: TALFormatSettings
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(Result, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvExtended,
-    ffGeneral, 15, 0, AFormatSettings));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      ffGeneral,
+      15,
+      0,
+      AFormatSettings));
 end;
 
 {*****************************************************************************************************}
@@ -5396,8 +5499,17 @@ procedure ALFloatToStrA(Value: Extended; var S: ansiString; const AFormatSetting
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(S, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvExtended,
-    ffGeneral, 15, 0, AFormatSettings));
+  SetString(
+    S,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      ffGeneral,
+      15,
+      0,
+      AFormatSettings));
 end;
 
 {*****************************************************************************************}
@@ -5412,19 +5524,34 @@ begin
   S := FloatToStr(Value, AFormatSettings);
 end;
 
-{************************************************************}
-function ALFloatToStrFA(Value: Extended; Format: TFloatFormat;
-  Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsA): AnsiString;
+{**********************}
+function ALFloatToStrFA(
+           Value: Extended;
+           Format: TFloatFormat;
+           Precision, Digits: Integer;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(Result, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvExtended,
-    Format, Precision, Digits, AFormatSettings));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      Format,
+      Precision,
+      Digits,
+      AFormatSettings));
 end;
 
-{************************************************************}
-function ALFloatToStrFW(Value: Extended; Format: TFloatFormat;
-  Precision, Digits: Integer; const AFormatSettings: TALFormatSettingsW): String;
+{**********************}
+function ALFloatToStrFW(
+           Value: Extended;
+           Format: TFloatFormat;
+           Precision, Digits: Integer;
+           const AFormatSettings: TALFormatSettingsW): String;
 begin
   result := System.sysUtils.FloatToStrF(Value, Format, Precision, Digits, AFormatSettings);
 end;
@@ -5434,8 +5561,17 @@ function  ALCurrToStrA(Value: Currency; const AFormatSettings: TALFormatSettings
 var
   Buffer: array[0..63] of AnsiChar;
 begin
-  SetString(Result, Buffer, ALInternalFloatToText(PByte(@Buffer), Value, fvCurrency,
-    ffGeneral, 0, 0, AFormatSettings));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToText(
+      PByte(@Buffer),
+      Value,
+      fvCurrency,
+      ffGeneral,
+      0,
+      0,
+      AFormatSettings));
 end;
 
 {*****************************************************************************************}
@@ -5529,9 +5665,9 @@ end;
 //this function is not threadsafe because of Set8087CW / SetMXCSR
 //https://quality.embarcadero.com/browse/RSP-39428
 function ALInternalTextToExtended(
-  ABuffer: PAnsiChar;
-  var AValue: Extended;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+           ABuffer: PAnsiChar;
+           var AValue: Extended;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 const
 {$IFDEF EXTENDEDHAS10BYTES}
   CMaxExponent = 4999;
@@ -5561,12 +5697,14 @@ var
   LResult: Extended;
   LCurrChar: AnsiChar;
 
+  {~~~~~~~~~~~~~~~~~}
   procedure NextChar;
   begin
     LCurrChar := PAnsiChar(ABuffer)^;
     Inc(PAnsiChar(ABuffer));
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure SkipWhitespace();
   begin
     { Skip white spaces }
@@ -5574,6 +5712,7 @@ var
       NextChar;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadSign(): SmallInt;
   begin
     Result := 1;
@@ -5586,6 +5725,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadNumber(var AOut: Extended): Integer;
   begin
     Result := 0;
@@ -5599,6 +5739,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadExponent(var ExponentNumber: Integer): Integer;
   var
     LSign: Integer;
@@ -5752,9 +5893,9 @@ end;
 //this function is not threadsafe because of Set8087CW / SetMXCSR
 //https://quality.embarcadero.com/browse/RSP-39428
 function ALInternalTextToCurrency(
-  ABuffer: PAnsiChar;
-  var AValue: Currency;
-  const AFormatSettings: TALFormatSettingsA): Boolean;
+           ABuffer: PAnsiChar;
+           var AValue: Currency;
+           const AFormatSettings: TALFormatSettingsA): Boolean;
 {$IF Defined(EXTENDEDHAS10BYTES) and not Defined(Linux64)}
 const
   CMaxExponent = 4999;
@@ -5778,12 +5919,14 @@ var
   LResult: Extended;
   LCurrChar: AnsiChar;
 
+  {~~~~~~~~~~~~~~~~~}
   procedure NextChar;
   begin
     LCurrChar := ABuffer^;
     Inc(ABuffer);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure SkipWhitespace();
   begin
     { Skip white spaces }
@@ -5791,6 +5934,7 @@ var
       NextChar;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadSign(): SmallInt;
   begin
     Result := 1;
@@ -5803,6 +5947,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadNumber(var AOut: Extended): Integer;
   begin
     Result := 0;
@@ -5816,6 +5961,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadExponent: SmallInt;
   var
     LSign: SmallInt;
@@ -5945,6 +6091,7 @@ var
   LSign: SmallInt;
   BufIndex: Integer;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~}
   procedure SkipWhitespace;
   begin
     { Skip white spaces }
@@ -5952,6 +6099,7 @@ var
       Inc(BufIndex);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadSign: SmallInt;
   begin
     Result := 1;
@@ -5964,6 +6112,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadNumberPart: AnsiString;
   begin
     Result := '';
@@ -5977,6 +6126,7 @@ var
       Inc(BufIndex);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ReadExponent: Integer;
   var
     LSign: Integer;
@@ -6103,8 +6253,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.TextToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALTextToFloat(Buffer: PAnsiChar; var Value;
-  ValueType: TFloatValue; const AFormatSettings: TALFormatSettingsA): Boolean;
+function ALTextToFloat(
+           Buffer: PAnsiChar; var Value;
+           ValueType: TFloatValue; const AFormatSettings: TALFormatSettingsA): Boolean;
 begin
   if ValueType = fvExtended then
     Result := ALInternalTextToExtended(Buffer, Extended(Value), AFormatSettings)
@@ -6116,8 +6267,9 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalFloatToTextFmt is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALInternalFloatToTextFmt(Buf: PByte; const Value; ValueType: TFloatValue; Format: PByte;
-  const AFormatSettings: TALFormatSettingsA{; const Unicode: Boolean}): Integer;
+function ALInternalFloatToTextFmt(
+           Buf: PByte; const Value; ValueType: TFloatValue; Format: PByte;
+           const AFormatSettings: TALFormatSettingsA{; const Unicode: Boolean}): Integer;
 const
   CMinExtPrecision = 2;
 {$IFDEF EXTENDEDHAS10BYTES}
@@ -6143,6 +6295,7 @@ var
   ThousandsSep: ansiString;
   FormatLength: Integer;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendChar(const AChar: ansiChar);
   begin
     //if Unicode then
@@ -6158,6 +6311,7 @@ var
     Inc(Result);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetLength(const ABuf: PByte): Integer;
   var
     //AWide: PChar;
@@ -6183,6 +6337,7 @@ var
     //end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function GetCharIndex(const ABuf: PByte; const Index: Integer): ansiChar;
   begin
     //if Unicode then
@@ -6191,6 +6346,7 @@ var
       Result := ansiChar(PByte(ABuf)[Index]);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure AppendString(const AStr: ansiString);
   var
     {I,} L: Integer;
@@ -6220,6 +6376,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindSection(AIndex: Integer): Integer;
   var
     Section: Integer;
@@ -6262,6 +6419,7 @@ var
       Result := C;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function ScanSection(APos: Integer): ansiString;
   var
     C: Integer;
@@ -6353,6 +6511,7 @@ var
       Result := Result + GetCharIndex(Format, I);
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function DigitsLength: Integer;
   var
     C: Integer;
@@ -6366,6 +6525,7 @@ var
     end;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~}
   procedure ApplyFormat;
   var
     C: Integer;
@@ -6377,6 +6537,7 @@ var
     Sign: ansiChar;
     Zeros: Integer;
 
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure WriteDigit(ADigit: ansiChar);
     begin
       if DigitPlace = 0 then
@@ -6394,6 +6555,7 @@ var
       end;
     end;
 
+    {~~~~~~~~~~~~~~~~~}
     procedure AddDigit;
     var
       AChar: ansiChar;
@@ -6413,6 +6575,7 @@ var
       end;
     end;
 
+    {~~~~~~~~~~~~~~~~~~~~}
     procedure PutFmtDigit;
     begin
       if DigitDelta < 0 then
@@ -6439,6 +6602,7 @@ var
       end;
     end;
 
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure PutExponent(EChar: ansiChar; Sign: ansiChar; Zeros: Integer; Exponent: Integer);
     var
       Exp: ansiString;
@@ -6596,18 +6760,31 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatFloat is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALFormatFloatA(const Format: AnsiString; Value: Extended;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+function ALFormatFloatA(
+           const Format: AnsiString;
+           Value: Extended;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 var
   Buffer: array[0..255] of AnsiChar;
 begin
   if Length(Format) > Length(Buffer) - 32 then ALConvertError(@SFormatTooLong);
-  SetString(Result, Buffer, ALInternalFloatToTextFmt(PByte(@Buffer), Value, fvExtended,
-    PByte(Format), AFormatSettings{, False}));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToTextFmt(
+      PByte(@Buffer),
+      Value,
+      fvExtended,
+      PByte(Format),
+      AFormatSettings
+      {, False}));
 end;
 
-{****************************************************************************************************************}
-function  ALFormatFloatW(const Format: string; Value: Extended; const AFormatSettings: TALFormatSettingsW): string;
+{***********************}
+function  ALFormatFloatW(
+            const Format: string;
+            Value: Extended;
+            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatFloat(Format, Value, AFormatSettings);
 end;
@@ -6616,18 +6793,31 @@ end;
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatCurr is still the same and adjust the IFDEF'}
 {$IFEND}
-function ALFormatCurrA(const Format: AnsiString; Value: Currency;
-  const AFormatSettings: TALFormatSettingsA): AnsiString;
+function ALFormatCurrA(
+           const Format: AnsiString;
+           Value: Currency;
+           const AFormatSettings: TALFormatSettingsA): AnsiString;
 var
   Buffer: array[0..255] of AnsiChar;
 begin
   if Length(Format) > Length(Buffer) - 32 then ALConvertError(@SFormatTooLong);
-  SetString(Result, Buffer, ALInternalFloatToTextFmt(PByte(@Buffer), Value, fvCurrency,
-    PByte(Format), AFormatSettings{, False}));
+  SetString(
+    Result,
+    Buffer,
+    ALInternalFloatToTextFmt(
+      PByte(@Buffer),
+      Value,
+      fvCurrency,
+      PByte(Format),
+      AFormatSettings
+      {, False}));
 end;
 
-{***************************************************************************************************************}
-function  ALFormatCurrW(const Format: string; Value: Currency; const AFormatSettings: TALFormatSettingsW): string;
+{**********************}
+function  ALFormatCurrW(
+            const Format: string;
+            Value: Currency;
+            const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatCurr(Format, Value, AFormatSettings);
 end;
@@ -7942,7 +8132,7 @@ end;
 {remove accented character}
 Function ALRemoveDiacritic(const S: Widestring): Widestring;
 
-  {----------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function internalGetCompositeCharSize(aChar: WideString): integer;
   Begin
     //max(1,xxx) in case FoldString return on error mean result = 0
@@ -8071,20 +8261,22 @@ begin
     result := '';
     exit;
   end;
-  OutputLength := MultiByteToWideChar(aCodePage,     // UINT CodePage,
-                                      0,             // DWORD dwFlags
-                                      PAnsiChar(S),  // LPCSTR lpMultiByteStr
-                                      InputLength,   // int cbMultiByte
-                                      nil,           // LPWSTR lpWideCharStr
-                                      0);            // int cchWideChar
+  OutputLength := MultiByteToWideChar(
+                    aCodePage,     // UINT CodePage,
+                    0,             // DWORD dwFlags
+                    PAnsiChar(S),  // LPCSTR lpMultiByteStr
+                    InputLength,   // int cbMultiByte
+                    nil,           // LPWSTR lpWideCharStr
+                    0);            // int cchWideChar
   if OutputLength = 0 then raiseLastOsError;
   SetLength(Result, OutputLength);
-  if MultiByteToWideChar(aCodePage,
-                         0,
-                         PAnsiChar(S),
-                         InputLength,
-                         PWideChar(Result),
-                         OutputLength) = 0 then raiseLastOsError;
+  if MultiByteToWideChar(
+       aCodePage,
+       0,
+       PAnsiChar(S),
+       InputLength,
+       PWideChar(Result),
+       OutputLength) = 0 then raiseLastOsError;
 end;
 {$IFEND}
 
@@ -8099,24 +8291,26 @@ begin
     result := '';
     exit;
   end;
-  OutputLength := WideCharToMultiByte(aCodePage,      // UINT CodePage
-                                      0,              // DWORD dwFlags,
-                                      PWideChar(WS),  // LPCWSTR lpWideCharStr,
-                                      InputLength,    // int cchWideChar
-                                      nil,            // LPSTR lpMultiByteStr,
-                                      0,              // int cbMultiByte
-                                      nil,            // LPCSTR lpDefaultChar (Pointer to the character to use if a character cannot be represented in the specified code page)
-                                      nil);           // LPBOOL lpUsedDefaultChar (Pointer to a flag that indicates if the function has used a default character in the conversion)
+  OutputLength := WideCharToMultiByte(
+                    aCodePage,      // UINT CodePage
+                    0,              // DWORD dwFlags,
+                    PWideChar(WS),  // LPCWSTR lpWideCharStr,
+                    InputLength,    // int cchWideChar
+                    nil,            // LPSTR lpMultiByteStr,
+                    0,              // int cbMultiByte
+                    nil,            // LPCSTR lpDefaultChar (Pointer to the character to use if a character cannot be represented in the specified code page)
+                    nil);           // LPBOOL lpUsedDefaultChar (Pointer to a flag that indicates if the function has used a default character in the conversion)
   if OutputLength = 0 then raiseLastOsError;
   SetLength(Result, OutputLength);
-  if WideCharToMultiByte(aCodePage,
-                         0,
-                         PWideChar(WS),
-                         InputLength,
-                         PAnsiChar(Result),
-                         OutputLength,
-                         nil,
-                         nil) = 0 then raiseLastOsError;
+  if WideCharToMultiByte(
+       aCodePage,
+       0,
+       PWideChar(WS),
+       InputLength,
+       PAnsiChar(Result),
+       OutputLength,
+       nil,
+       nil) = 0 then raiseLastOsError;
 end;
 {$IFEND}
 
@@ -8253,7 +8447,7 @@ Var
   LLatinWideStr: WideString;
   LLatinWideStrCurrentPos: Integer;
 
-  {-----------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalAddCharsToResult(aArrayOfChar: Array of Integer);
   var I: integer;
   begin
@@ -8477,7 +8671,7 @@ Var
   LLatinWideStr: WideString;
   LLatinWideStrCurrentPos: Integer;
 
-  {-----------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalAddCharsToResult(aArrayOfChar: Array of Integer);
   var I: integer;
   begin
@@ -8487,7 +8681,7 @@ Var
     end;
   end;
 
-  {-------------------------------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function InternalCheckInRange(aChar: integer; aArrayOfChar: Array of Integer): boolean;
   var I: integer;
   begin
@@ -8523,37 +8717,39 @@ Begin
       $0415 {Е} : begin
                     {The character e should be romanized ye initially, after the vowel characters a, e, ё, и, о, у, ы, э, ю, and я,
                      and after й, ъ, and ь. In all other instances, it should be romanized e.}
-                    if (i > 1) and InternalCheckInRange(ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
-                                                                                    $0415 {Е}, $0435 {е},
-                                                                                    $0401 {Ё}, $0451 {ё},
-                                                                                    $0418 {И}, $0438 {и},
-                                                                                    $041E {О}, $043E {о},
-                                                                                    $0423 {У}, $0443 {у},
-                                                                                    $042B {Ы}, $044B {ы},
-                                                                                    $042D {Э}, $044D {э},
-                                                                                    $042E {Ю}, $044E {ю},
-                                                                                    $042F {Я}, $044F {я},
-                                                                                    $0419 {Й}, $0439 {й},
-                                                                                    $042A {Ъ}, $044A {ъ},
-                                                                                    $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0059, $0065]) {Ye}
+                    if (i > 1) and InternalCheckInRange(
+                                     ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
+                                     $0415 {Е}, $0435 {е},
+                                     $0401 {Ё}, $0451 {ё},
+                                     $0418 {И}, $0438 {и},
+                                     $041E {О}, $043E {о},
+                                     $0423 {У}, $0443 {у},
+                                     $042B {Ы}, $044B {ы},
+                                     $042D {Э}, $044D {э},
+                                     $042E {Ю}, $044E {ю},
+                                     $042F {Я}, $044F {я},
+                                     $0419 {Й}, $0439 {й},
+                                     $042A {Ъ}, $044A {ъ},
+                                     $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0059, $0065]) {Ye}
                     else InternalAddCharsToResult([$0045]); {E}
                   end;
       $0435 {е} : begin
                     {The character e should be romanized ye initially, after the vowel characters a, e, ё, и, о, у, ы, э, ю, and я,
                      and after й, ъ, and ь. In all other instances, it should be romanized e.}
-                    if (i > 1) and InternalCheckInRange(ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
-                                                                                    $0415 {Е}, $0435 {е},
-                                                                                    $0401 {Ё}, $0451 {ё},
-                                                                                    $0418 {И}, $0438 {и},
-                                                                                    $041E {О}, $043E {о},
-                                                                                    $0423 {У}, $0443 {у},
-                                                                                    $042B {Ы}, $044B {ы},
-                                                                                    $042D {Э}, $044D {э},
-                                                                                    $042E {Ю}, $044E {ю},
-                                                                                    $042F {Я}, $044F {я},
-                                                                                    $0419 {Й}, $0439 {й},
-                                                                                    $042A {Ъ}, $044A {ъ},
-                                                                                    $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0079, $0065]) {ye}
+                    if (i > 1) and InternalCheckInRange(
+                                     ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
+                                     $0415 {Е}, $0435 {е},
+                                     $0401 {Ё}, $0451 {ё},
+                                     $0418 {И}, $0438 {и},
+                                     $041E {О}, $043E {о},
+                                     $0423 {У}, $0443 {у},
+                                     $042B {Ы}, $044B {ы},
+                                     $042D {Э}, $044D {э},
+                                     $042E {Ю}, $044E {ю},
+                                     $042F {Я}, $044F {я},
+                                     $0419 {Й}, $0439 {й},
+                                     $042A {Ъ}, $044A {ъ},
+                                     $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0079, $0065]) {ye}
                     else InternalAddCharsToResult([$0065]); {e}
                   end;
       $0401 {Ё} : begin
@@ -8561,19 +8757,20 @@ Begin
                     When the dieresis is shown, the character should be romanized yë initially, after the vowel characters a, e, ё, и, о, у, ы, э, ю, and я,
                     and after й, ъ, and ь. In all other instances, it should be romanized ё. When the dieresis is not shown, the character may still be
                     romanized in the preceding manner or, alternatively, in accordance with note 1.}
-                    if (i > 1) and InternalCheckInRange(ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
-                                                                                    $0415 {Е}, $0435 {е},
-                                                                                    $0401 {Ё}, $0451 {ё},
-                                                                                    $0418 {И}, $0438 {и},
-                                                                                    $041E {О}, $043E {о},
-                                                                                    $0423 {У}, $0443 {у},
-                                                                                    $042B {Ы}, $044B {ы},
-                                                                                    $042D {Э}, $044D {э},
-                                                                                    $042E {Ю}, $044E {ю},
-                                                                                    $042F {Я}, $044F {я},
-                                                                                    $0419 {Й}, $0439 {й},
-                                                                                    $042A {Ъ}, $044A {ъ},
-                                                                                    $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0059, $00EB]) {Yë}
+                    if (i > 1) and InternalCheckInRange(
+                                     ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
+                                     $0415 {Е}, $0435 {е},
+                                     $0401 {Ё}, $0451 {ё},
+                                     $0418 {И}, $0438 {и},
+                                     $041E {О}, $043E {о},
+                                     $0423 {У}, $0443 {у},
+                                     $042B {Ы}, $044B {ы},
+                                     $042D {Э}, $044D {э},
+                                     $042E {Ю}, $044E {ю},
+                                     $042F {Я}, $044F {я},
+                                     $0419 {Й}, $0439 {й},
+                                     $042A {Ъ}, $044A {ъ},
+                                     $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0059, $00EB]) {Yë}
                     else InternalAddCharsToResult([$00CB]); {Ë}
                   end;
       $0451 {ё} : begin
@@ -8581,19 +8778,20 @@ Begin
                     When the dieresis is shown, the character should be romanized yë initially, after the vowel characters a, e, ё, и, о, у, ы, э, ю, and я,
                     and after й, ъ, and ь. In all other instances, it should be romanized ё. When the dieresis is not shown, the character may still be
                     romanized in the preceding manner or, alternatively, in accordance with note 1.}
-                    if (i > 1) and InternalCheckInRange(ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
-                                                                                    $0415 {Е}, $0435 {е},
-                                                                                    $0401 {Ё}, $0451 {ё},
-                                                                                    $0418 {И}, $0438 {и},
-                                                                                    $041E {О}, $043E {о},
-                                                                                    $0423 {У}, $0443 {у},
-                                                                                    $042B {Ы}, $044B {ы},
-                                                                                    $042D {Э}, $044D {э},
-                                                                                    $042E {Ю}, $044E {ю},
-                                                                                    $042F {Я}, $044F {я},
-                                                                                    $0419 {Й}, $0439 {й},
-                                                                                    $042A {Ъ}, $044A {ъ},
-                                                                                    $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0079, $00EB]) {yë}
+                    if (i > 1) and InternalCheckInRange(
+                                     ord(LCyrillicWideStr[i-1]),[$0410 {А}, $0430 {а},
+                                     $0415 {Е}, $0435 {е},
+                                     $0401 {Ё}, $0451 {ё},
+                                     $0418 {И}, $0438 {и},
+                                     $041E {О}, $043E {о},
+                                     $0423 {У}, $0443 {у},
+                                     $042B {Ы}, $044B {ы},
+                                     $042D {Э}, $044D {э},
+                                     $042E {Ю}, $044E {ю},
+                                     $042F {Я}, $044F {я},
+                                     $0419 {Й}, $0439 {й},
+                                     $042A {Ъ}, $044A {ъ},
+                                     $042C {Ь}, $044C {ь}]) then InternalAddCharsToResult([$0079, $00EB]) {yë}
                     else InternalAddCharsToResult([$00EB]); {ë}
                   end;
       $0416 {Ж} : InternalAddCharsToResult([$005A,$0068]); {Zh}
@@ -9434,7 +9632,7 @@ begin
   inherited;
 end;
 
-{***************************************************}
+{****************************************************}
 function TALPrecompiledTagA.GetTagParams: TALStringsA;
 begin
   result := fTagParams;
@@ -9469,7 +9667,7 @@ var ReplaceString: AnsiString;
 
 Const ResultBuffSize: integer = 16384;
 
-    {------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Function _ExtractTokenStr: AnsiString;
     var x: Integer;
     Begin
@@ -9480,13 +9678,13 @@ Const ResultBuffSize: integer = 16384;
       else Result := AlcopyStr(ReplaceString,1,x-1);
     end;
 
-    {-----------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Function _ExtractParamsStr(const TokenStr: ansiString): AnsiString;
     Begin
       Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
     end;
 
-    {-----------------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _MoveStr2Result(const aSourceString: AnsiString; aStart, aLength: Integer);
     var LSourceStringLn: Integer;
     begin
@@ -9507,7 +9705,7 @@ Const ResultBuffSize: integer = 16384;
       ResultCurrentPos := ResultCurrentPos + aLength;
     end;
 
-    {---------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function  _ObjAddressToStr(Const Obj: Tobject): AnsiString;
     begin
       result := ALIntToHexA(NativeInt(Obj), sizeof(pointer) * 2);
@@ -9568,13 +9766,14 @@ begin
       ParamList := TALStringListA.Create;
       try
         ParamList.Duplicates := dupIgnore;
-        ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
-                                              [' ', #9, #13, #10],
-                                              ['"', ''''],
-                                              PAnsiChar(ParamStr),
-                                              ParamList,
-                                              False,
-                                              StripParamQuotes);
+        ALExtractHeaderFieldsWithQuoteEscaped(
+          [' ', #9, #13, #10],
+          [' ', #9, #13, #10],
+          ['"', ''''],
+          PAnsiChar(ParamStr),
+          ParamList,
+          False,
+          StripParamQuotes);
 
         T2 := T2 - T1;
         PrecompiledTag := PrecompileProc(TokenStr, ParamList, ExtData, SourceString, T1, T2);
@@ -9593,13 +9792,14 @@ begin
       try
         PrecompiledTag.TagString := _ExtractTokenStr;
         ParamStr := _ExtractParamsStr(PrecompiledTag.TagString);
-        ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
-                                              [' ', #9, #13, #10],
-                                              ['"', ''''],
-                                              PAnsiChar(ParamStr),
-                                              PrecompiledTag.TagParams,
-                                              False,
-                                              StripParamQuotes);
+        ALExtractHeaderFieldsWithQuoteEscaped(
+          [' ', #9, #13, #10],
+          [' ', #9, #13, #10],
+          ['"', ''''],
+          PAnsiChar(ParamStr),
+          PrecompiledTag.TagParams,
+          False,
+          StripParamQuotes);
         TagsContainer.Add(PrecompiledTag);
         ReplaceString := TagStart + #2{start of text} + _ObjAddressToStr(PrecompiledTag) + #3{end of text} + TagEnd;
       except
@@ -9687,7 +9887,7 @@ var ReplaceString: AnsiString;
 
 Const ResultBuffSize: integer = 16384;
 
-    {------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Function _ExtractTokenStr: AnsiString;
     var x: Integer;
     Begin
@@ -9698,13 +9898,13 @@ Const ResultBuffSize: integer = 16384;
       else Result := AlcopyStr(ReplaceString,1,x-1);
     end;
 
-    {-------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Function _ExtractParamsStr: AnsiString;
     Begin
       Result := ALTrim(AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt));
     end;
 
-    {-----------------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _MoveStr2Result(const aSourceString: AnsiString; aStart, aLength: Integer);
     var LSourceStringLn: Integer;
     begin
@@ -9725,7 +9925,7 @@ Const ResultBuffSize: integer = 16384;
       ResultCurrentPos := ResultCurrentPos + aLength;
     end;
 
-    {-----------------------------------------------------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     function _HexToInt(const aSourceString: ansistring; Start, Length: Integer): integer;
     begin
       Result := 0;
@@ -9823,13 +10023,14 @@ begin
       ParamStr := _ExtractParamsStr;
       ParamList := TagParamsClass.Create;
       try
-        ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
-                                              [' ', #9, #13, #10],
-                                              ['"', ''''],
-                                              PAnsiChar(ParamStr),
-                                              ParamList,
-                                              False,
-                                              StripParamQuotes);
+        ALExtractHeaderFieldsWithQuoteEscaped(
+          [' ', #9, #13, #10],
+          [' ', #9, #13, #10],
+          ['"', ''''],
+          PAnsiChar(ParamStr),
+          ParamList,
+          False,
+          StripParamQuotes);
         if assigned(ReplaceExtendedProc) then begin
           T2 := T2 - T1;
           ReplaceString := ReplaceExtendedProc(TokenStr, ParamList, ExtData, TagHandled, SourceString, T1, T2);
@@ -9948,11 +10149,12 @@ Begin
               TagReplaceProcResult);
 end;
 
-{************************************************************}
-function ALFastTagReplaceWithFunc(const TagString: AnsiString;
-                                  TagParams: TALStringsA;
-                                  ExtData: pointer;
-                                  Var Handled: Boolean): AnsiString;
+{********************************}
+function ALFastTagReplaceWithFunc(
+           const TagString: AnsiString;
+           TagParams: TALStringsA;
+           ExtData: pointer;
+           Var Handled: Boolean): AnsiString;
 begin
   Handled := true;
   result := AnsiString(ExtData);
@@ -10000,7 +10202,7 @@ var ReplaceString: AnsiString;
     PosFunct: Function(const SubStr, S: AnsiString; const Offset: Integer = 1): Integer;
     T1,T2: Integer;
 
-    {------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Function _ExtractTokenStr: AnsiString;
     var x: Integer;
     Begin
@@ -10011,7 +10213,7 @@ var ReplaceString: AnsiString;
       else Result := AlcopyStr(ReplaceString,1,x-1);
     end;
 
-    {-------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Function _ExtractParamsStr: AnsiString;
     Begin
       Result := ALTrim( AlcopyStr(ReplaceString,length(TokenStr) + 1, MaxInt) );
@@ -10053,13 +10255,14 @@ begin
     ReplaceString := AlCopyStr(SourceString,T1 + TagStartLength,T2 - T1 - TagStartLength);
     TokenStr := _ExtractTokenStr;
     ParamStr := _ExtractParamsStr;
-    ALExtractHeaderFieldsWithQuoteEscaped([' ', #9, #13, #10],
-                                          [' ', #9, #13, #10],
-                                          ['"', ''''],
-                                          PAnsiChar(ParamStr),
-                                          TagParams,
-                                          False,
-                                          StripParamQuotes);
+    ALExtractHeaderFieldsWithQuoteEscaped(
+      [' ', #9, #13, #10],
+      [' ', #9, #13, #10],
+      ['"', ''''],
+      PAnsiChar(ParamStr),
+      TagParams,
+      False,
+      StripParamQuotes);
     Result := True
   end;
 end;

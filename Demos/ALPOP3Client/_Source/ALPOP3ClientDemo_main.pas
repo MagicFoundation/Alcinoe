@@ -102,7 +102,7 @@ begin
   MemoDebug.Lines.Add(String(ALTrim(FPOP3Client.List)));
 end;
 
-{************************************************}
+{*************************************************}
 procedure TForm1.LoginButtonClick(Sender: TObject);
 begin
   if UsernameEdit.Text = '' then raise Exception.Create('Username cannot be empty')

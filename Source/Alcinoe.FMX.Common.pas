@@ -65,7 +65,7 @@ var
 
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{*************************************************************************************************}
 function  ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
 function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
@@ -685,6 +685,7 @@ end;
 
 var _RenderScript: JRenderScript;
 
+{**************************************}
 function getRenderScript: JRenderScript;
 begin
   if _RenderScript = nil then begin

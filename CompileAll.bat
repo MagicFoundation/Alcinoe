@@ -114,8 +114,20 @@ REM -------------------
 REM Normalize all units
 REM -------------------
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -CreateBackup="false"
+echo -------------------
+echo Normalize all units
+echo -------------------
+echo.
+
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.FBX.Lib.pas;Alcinoe.FBX.Base.pas" -CreateBackup="false" -NoInteraction=true
+IF ERRORLEVEL 1 goto ERROR
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\" -CreateBackup="false" -NoInteraction=true
+IF ERRORLEVEL 1 goto ERROR
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tools\" -CreateBackup="false" -NoInteraction=true
+IF ERRORLEVEL 1 goto ERROR
+echo.
 
 
 REM -----------------
@@ -390,9 +402,6 @@ SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
-
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%~1\%~2" -CreateBackup="false"
-IF ERRORLEVEL 1 goto ERROR
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR

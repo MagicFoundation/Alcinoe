@@ -1,6 +1,5 @@
-{*******************************************************************************
-Author(s):
-Sergey Seroukhov (Zeos Database Objects)
+{**********************************************************
+Author(s): Sergey Seroukhov (Zeos Database Objects)
 based on Mysql-direct library by Cristian Nicola
 
 MysQL libmysql.dll Version 5 API Interface Unit
@@ -8,8 +7,7 @@ MysQL libmysql.dll Version 5 API Interface Unit
 Link :
 http://www.sourceforge.net/projects/zeoslib
 http://dev.mysql.com/doc/refman/5.0/en/c-api-functions.html
-*******************************************************************************}
-
+**********************************************************}
 unit Alcinoe.MySql.Wrapper;
 
 interface
@@ -1044,5 +1042,3 @@ Begin
 end;
 
 end.
-
-

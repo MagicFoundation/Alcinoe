@@ -4,6 +4,8 @@ program DProjNormalizer;
 
 {$R *.res}
 
+{$I ..\..\..\Source\Alcinoe.inc}
+
 uses
   system.IOUtils,
   System.AnsiStrings,
@@ -87,7 +89,7 @@ begin
 
   try
 
-    //Init project params 
+    //Init project params
     {$IFDEF DEBUG}
     ReportMemoryleaksOnSHutdown := True;
     {$ENDIF}
@@ -173,18 +175,21 @@ begin
         _SortChildNodesByNodeNameAndAttributes(LDeploymentNode);
       end;
 
+      //remove <Disabled/> node from JavaReference node
       //<JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
-      //  <ContainerId>ClassesdexFile</ContainerId>
+      //  <ContainerId>ClassesdexFile64</ContainerId>
       //  <Disabled/>
       //</JavaReference>
       // =>
-      //<JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar" />
+      //<JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
+      //  <ContainerId>ClassesdexFile64</ContainerId>
+      //</JavaReference>
+      {$IFNDEF ALCompilerVersionSupported}
+        {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40709 is corrected and update the code below'}
+      {$IFEND}
       for var I := LItemGroupNode.ChildNodes.Count - 1 downto 0 do begin
         var LJavaReferenceNode := LItemGroupNode.ChildNodes[i];
         if ALSameTextA(LJavaReferenceNode.NodeName, 'JavaReference') then begin
-          var LContainerIdNode := LJavaReferenceNode.ChildNodes.FindNode('ContainerId');
-          if (LContainerIdNode <> nil) and (ALSameTextA(LContainerIdNode.Text, 'ClassesdexFile')) then
-            LJavaReferenceNode.ChildNodes.Remove(LContainerIdNode);
           var LDisabledNode := LJavaReferenceNode.ChildNodes.FindNode('Disabled');
           if (LDisabledNode <> nil) and (ALSameTextA(LDisabledNode.Text, 'false') or (LDisabledNode.Text='')) then
             LJavaReferenceNode.ChildNodes.Remove(LDisabledNode);

@@ -181,25 +181,7 @@ begin
   Result := CocoaPointerConst(libBackgroundTasks, 'BGTaskSchedulerErrorDomain');
 end;
 
-
-{$IF defined(CPUARM)}
-
-procedure StubProc1; cdecl; external libBackgroundTasks name 'OBJC_CLASS_$_BGTaskScheduler'; // else I have class not found when i call TBGTaskScheduler.OCClass.sharedScheduler
-
-{$ELSEIF defined(IOS) and NOT defined(CPUARM)}
-
-uses
-  Posix.Dlfcn;
-
-var
-  BackgroundTasksModule: THandle;
-
-initialization
-  BackgroundTasksModule := dlopen(MarshaledAString(libBackgroundTasks), RTLD_LAZY);
-
-finalization
-  dlclose(BackgroundTasksModule);
-
-{$ENDIF IOS}
+{******************************************************************************************}
+procedure StubProc1; cdecl; external libBackgroundTasks name 'OBJC_CLASS_$_BGTaskScheduler';
 
 end.

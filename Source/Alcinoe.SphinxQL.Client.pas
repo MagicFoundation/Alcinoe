@@ -1,8 +1,7 @@
-{*******************************************************************************
-An Object to query Sphinx full text search engine using SphinxQL protocol
-(MySql Clone Protocol)
-*******************************************************************************}
-
+{************************************************
+An Object to query Sphinx full text search engine
+using SphinxQL protocol (MySql Clone Protocol)
+************************************************}
 unit Alcinoe.SphinxQL.Client;
 
 interface
@@ -16,27 +15,30 @@ Type
   {---------------------------------------}
   TalSphinxQlClient = Class(TalMySqlClient)
   Public
-    Procedure Connect(const Host: AnsiString;
-                      Port: integer;
-                      Const Options: TALMySQLOptions = nil); reintroduce;
+    Procedure Connect(
+                const Host: AnsiString;
+                Port: integer;
+                Const Options: TALMySQLOptions = nil); reintroduce;
   end;
 
   {-------------------------------------------------------------------}
   TalSphinxQlConnectionPoolClient = Class(TalMySqlConnectionPoolClient)
   Private
   Public
-    Constructor Create(const aHost: AnsiString;
-                       aPort: integer;
-                       aApiVer: TALMySqlVersion_API;
-                       const alib: AnsiString = 'libmysql.dll';
-                       const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
-    Constructor Create(const aHost: AnsiString;
-                       aPort: integer;
-                       alib: TALMySqlLibrary;
-                       const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
+    Constructor Create(
+                  const aHost: AnsiString;
+                  aPort: integer;
+                  aApiVer: TALMySqlVersion_API;
+                  const alib: AnsiString = 'libmysql.dll';
+                  const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
+    Constructor Create(
+                  const aHost: AnsiString;
+                  aPort: integer;
+                  alib: TALMySqlLibrary;
+                  const aOpenConnectionOptions: TALMySQLOptions = nil); overload; virtual;
   end;
 
-{---------------------------------------------------------------}
+{***************************************************************}
 function AlSphinxEscapeString(const src: ansiString): ansiString;
 
 
@@ -46,61 +48,67 @@ uses
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
-{*********************************************************}
-procedure TalSphinxQlClient.Connect(const Host: AnsiString;
-                                    Port: integer;
-                                    Const Options: TALMySQLOptions = nil);
+{**********************************}
+procedure TalSphinxQlClient.Connect(
+            const Host: AnsiString;
+            Port: integer;
+            Const Options: TALMySQLOptions = nil);
 begin
 
-  inherited Connect(Host,
-                    Port,
-                    '',       // DataBaseName
-                    '',       // Login
-                    '',       // Password
-                    '',       // CharSet
-                    0,        // ClientFlag
-                    Options); // Options
+  inherited Connect(
+              Host,
+              Port,
+              '',       // DataBaseName
+              '',       // Login
+              '',       // Password
+              '',       // CharSet
+              0,        // ClientFlag
+              Options); // Options
 
 end;
 
-{*************************************************************************}
-constructor TalSphinxQlConnectionPoolClient.Create(const aHost: AnsiString;
-                                                   aPort: integer;
-                                                   aApiVer: TALMySqlVersion_API;
-                                                   const alib: AnsiString = 'libmysql.dll';
-                                                   const aOpenConnectionOptions: TALMySQLOptions = nil);
+{*************************************************}
+constructor TalSphinxQlConnectionPoolClient.Create(
+              const aHost: AnsiString;
+              aPort: integer;
+              aApiVer: TALMySqlVersion_API;
+              const alib: AnsiString = 'libmysql.dll';
+              const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
 
-  inherited Create(aHost,
-                   aPort,
-                   '', // aDataBaseName,
-                   '', // aLogin,
-                   '', // aPassword,
-                   '', // aCharSet: String;
-                   aApiVer,
-                   alib,
-                   0,  // aOpenConnectionClientFlag: Cardinal = 0);
-                   aOpenConnectionOptions); // aOpenConnectionOptions
+  inherited Create(
+              aHost,
+              aPort,
+              '', // aDataBaseName,
+              '', // aLogin,
+              '', // aPassword,
+              '', // aCharSet: String;
+              aApiVer,
+              alib,
+              0,  // aOpenConnectionClientFlag: Cardinal = 0);
+              aOpenConnectionOptions); // aOpenConnectionOptions
 
 
 end;
 
-{*************************************************************************}
-constructor TalSphinxQlConnectionPoolClient.Create(const aHost: AnsiString;
-                                                   aPort: integer;
-                                                   alib: TALMySqlLibrary;
-                                                   const aOpenConnectionOptions: TALMySQLOptions = nil);
+{*************************************************}
+constructor TalSphinxQlConnectionPoolClient.Create(
+              const aHost: AnsiString;
+              aPort: integer;
+              alib: TALMySqlLibrary;
+              const aOpenConnectionOptions: TALMySQLOptions = nil);
 begin
 
-  inherited Create(aHost,
-                   aPort,
-                   '', // aDataBaseName,
-                   '', // aLogin,
-                   '', // aPassword,
-                   '', // aCharSet: String;
-                   alib,
-                   0,  // aOpenConnectionClientFlag: Cardinal = 0);
-                   aOpenConnectionOptions); // aOpenConnectionOptions
+  inherited Create(
+              aHost,
+              aPort,
+              '', // aDataBaseName,
+              '', // aLogin,
+              '', // aPassword,
+              '', // aCharSet: String;
+              alib,
+              0,  // aOpenConnectionClientFlag: Cardinal = 0);
+              aOpenConnectionOptions); // aOpenConnectionOptions
 
 end;
 

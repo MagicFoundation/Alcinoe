@@ -56,7 +56,7 @@ uses
 
 {$R *.dfm}
 
-{***********************************************}
+{**********************************************}
 procedure TForm1.Button11Click(Sender: TObject);
 var LRTTIType: TALRTTIType;
     LRttiProperty: TALRttiProperty;
@@ -78,7 +78,7 @@ begin
   Showmessage(intToStr(Lcount) + ' ALGetEnumName in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
 
-{***********************************************}
+{**********************************************}
 procedure TForm1.Button12Click(Sender: TObject);
 var LRTTIType: TALRTTIType;
     LRttiProperty: TALRttiProperty;

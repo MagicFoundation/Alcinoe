@@ -113,10 +113,10 @@ begin
     procedure
     begin
       TThread.Synchronize(nil,
-      procedure
-      begin
-        Halt(1); // << This is the only way i found to crash the app :(
-      end);
+        procedure
+        begin
+          Halt(1); // << This is the only way i found to crash the app :(
+        end);
     end).Start;
   {$ELSE}
   Application.Terminate;

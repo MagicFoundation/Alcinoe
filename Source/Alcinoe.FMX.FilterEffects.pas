@@ -1105,6 +1105,7 @@ begin
   end;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALColorAdjustEffect]);

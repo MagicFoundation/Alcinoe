@@ -1,7 +1,6 @@
-{*******************************************************************************
-Description:  Windows API function not (yet) in the windows.pas
-*******************************************************************************}
-
+{************************************************
+Windows API function not (yet) in the windows.pas
+************************************************}
 unit Alcinoe.WinApi.Common;
 
 interface
@@ -30,17 +29,18 @@ type
 function GetTickCount64: UInt64; stdcall; external kernel32; // Windows Vista / Windows Server 2008
 {$ENDIF}
 function GlobalMemoryStatusEx(var lpBuffer : TMEMORYSTATUSEX): BOOL; stdcall; external kernel32; // Windows XP / Windows Server 2003
-function CreateProcessWithLogonW(lpUsername: LPCWSTR;  // LPCWSTR
-                                 lpDomain: LPCWSTR;  // LPCWSTR
-                                 lpPassword: LPCWSTR; // LPCWSTR
-                                 dwLogonFlags: DWORD; // DWORD
-                                 lpApplicationName: LPCWSTR; // LPCWSTR
-                                 lpCommandLine: LPWSTR;  // LPWSTR
-                                 dwCreationFlags: DWORD; // DWORD
-                                 lpEnvironment: LPVOID; // LPVOID
-                                 lpCurrentDirectory: LPCWSTR;  // LPCWSTR
-                                 const lpStartupInfo: TStartupInfoW;  // LPSTARTUPINFOW
-                                 var lpProcessInfo: TProcessInformation): BOOL; stdcall; external advapi32; // LPPROCESS_INFORMATION
+function CreateProcessWithLogonW(
+           lpUsername: LPCWSTR;  // LPCWSTR
+           lpDomain: LPCWSTR;  // LPCWSTR
+           lpPassword: LPCWSTR; // LPCWSTR
+           dwLogonFlags: DWORD; // DWORD
+           lpApplicationName: LPCWSTR; // LPCWSTR
+           lpCommandLine: LPWSTR;  // LPWSTR
+           dwCreationFlags: DWORD; // DWORD
+           lpEnvironment: LPVOID; // LPVOID
+           lpCurrentDirectory: LPCWSTR;  // LPCWSTR
+           const lpStartupInfo: TStartupInfoW;  // LPSTARTUPINFOW
+           var lpProcessInfo: TProcessInformation): BOOL; stdcall; external advapi32; // LPPROCESS_INFORMATION
 function AttachConsole(dwProcessId: DWORD): BOOL; stdcall; external kernel32;
 function ALUserExists(const aUserName: AnsiString): boolean;
 
@@ -86,11 +86,12 @@ Type
   FS_INFORMATION_CLASS = _FSINFOCLASS;
   PFS_INFORMATION_CLASS = ^FS_INFORMATION_CLASS;
 
-function NtQueryVolumeInformationFile(FileHandle: THANDLE;
-                                      IoStatusBlock: PIO_STATUS_BLOCK;
-                                      FsInformation: PVOID;
-                                      Length: ULONG;
-                                      FsInformationClass: FS_INFORMATION_CLASS): NTSTATUS; stdcall; external 'ntdll.dll'; // Available starting with Windows XP.
+function NtQueryVolumeInformationFile(
+           FileHandle: THANDLE;
+           IoStatusBlock: PIO_STATUS_BLOCK;
+           FsInformation: PVOID;
+           Length: ULONG;
+           FsInformationClass: FS_INFORMATION_CLASS): NTSTATUS; stdcall; external 'ntdll.dll'; // Available starting with Windows XP.
 
 const
   STATUS_SUCCESS = $00000000;
@@ -126,13 +127,14 @@ begin
   cbDomain := 0;
 
   // first attempt to get the buffer sizes
-  LookupAccountNameA(nil,  // lpSystemName
-                     PAnsiChar(aUserName), // lpAccountName: PAnsiChar;
-                     SID, //  Sid: PSID;
-                     cbSID,  // var cbSid: DWORD;
-                     szDomain, // ReferencedDomainName: PAnsiChar;
-                     cbDomain, // var cbReferencedDomainName: DWORD;
-                     NameUse); // var peUse: SID_NAME_USE
+  LookupAccountNameA(
+    nil,  // lpSystemName
+    PAnsiChar(aUserName), // lpAccountName: PAnsiChar;
+    SID, //  Sid: PSID;
+    cbSID,  // var cbSid: DWORD;
+    szDomain, // ReferencedDomainName: PAnsiChar;
+    cbDomain, // var cbReferencedDomainName: DWORD;
+    NameUse); // var peUse: SID_NAME_USE
 
   // init buffers according to retrieved data
   szDomain := System.Ansistrings.AnsiStrAlloc(cbDomain);
@@ -140,13 +142,14 @@ begin
   try
 
     // check if user exists
-    result := LookupAccountNameA(nil,
-                                 PAnsiChar(aUserName),
-                                 SID,
-                                 cbSID,
-                                 szDomain,
-                                 cbDomain,
-                                 NameUse);
+    result := LookupAccountNameA(
+                nil,
+                PAnsiChar(aUserName),
+                SID,
+                cbSID,
+                szDomain,
+                cbDomain,
+                NameUse);
 
   finally
     System.Ansistrings.StrDispose(szDomain);

@@ -439,11 +439,36 @@
     <DCCReference Include="main.pas">
       <Form>Form1</Form>
     </DCCReference>
-    <JavaReference Include="android\Merged\libs\androidx.annotation-annotation-1.3.0.jar"/>
-    <JavaReference Include="android\Merged\libs\com.alcinoe-alcinoe-webrtc-1.0.0.jar"/>
-    <JavaReference Include="android\Merged\libs\com.google.code.findbugs-jsr305-3.0.2.jar"/>
-    <JavaReference Include="android\Merged\libs\org.webrtc-google-webrtc-1.0.25331.jar"/>
-    <JavaReference Include="android\Merged\libs\r.jar"/>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.annotation-annotation-1.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.alcinoe-alcinoe-webrtc-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.google.code.findbugs-jsr305-3.0.2.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\org.webrtc-google-webrtc-1.0.25331.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\r.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\64bit\androidx.annotation-annotation-1.3.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\64bit\com.alcinoe-alcinoe-webrtc-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\64bit\com.google.code.findbugs-jsr305-3.0.2.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\64bit\org.webrtc-google-webrtc-1.0.25331.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\64bit\r.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
     <BuildConfiguration Include="Base">
       <Key>Base</Key>
     </BuildConfiguration>

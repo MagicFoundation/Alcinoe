@@ -250,10 +250,10 @@ begin
 
           if not ButtonHangUp.Enabled then begin
             TThread.Synchronize(nil,
-            procedure
-            begin
-              ButtonCall.Enabled := True;
-            end);
+              procedure
+              begin
+                ButtonCall.Enabled := True;
+              end);
             exit;
           end;
 
@@ -562,13 +562,15 @@ begin
   aDestRect := canvas.AlignToPixel(
                  TRectF.Create(0, 0, fWebRTC.Remotebitmap.Width, fWebRTC.Remotebitmap.Height).
                    FitInto(RemoteCameraLayout.LocalRect));
-  TCustomCanvasGpu(Canvas).DrawTexture(aDestRect, // ATexRect
-                                       TRectF.Create(0,
-                                                     0,
-                                                     fWebRTC.RemoteBitmap.Width,
-                                                     fWebRTC.RemoteBitmap.Height), // ARect
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, RemoteCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fWebRTC.RemoteBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    aDestRect, // ATexRect
+    TRectF.Create(
+      0,
+      0,
+      fWebRTC.RemoteBitmap.Width,
+      fWebRTC.RemoteBitmap.Height), // ARect
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, RemoteCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fWebRTC.RemoteBitmap);
   {$ENDIF}
 end;
 
@@ -583,13 +585,15 @@ begin
   aDestRect := canvas.AlignToPixel(
                  TRectF.Create(0, 0, fWebRTC.LocalBitmap.Width, fWebRTC.LocalBitmap.Height).
                    FitInto(LocalCameraLayout.LocalRect));
-  TCustomCanvasGpu(Canvas).DrawTexture(aDestRect, // ATexRect
-                                       TRectF.Create(0,
-                                                     0,
-                                                     fWebRTC.LocalBitmap.Width,
-                                                     fWebRTC.LocalBitmap.Height), // ARect
-                                       ALPrepareColor(TCustomCanvasGpu.ModulateColor, LocalCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
-                                       fWebRTC.LocalBitmap);
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    aDestRect, // ATexRect
+    TRectF.Create(
+      0,
+      0,
+      fWebRTC.LocalBitmap.Width,
+      fWebRTC.LocalBitmap.Height), // ARect
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, LocalCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fWebRTC.LocalBitmap);
   {$ENDIF}
 end;
 
@@ -607,10 +611,10 @@ begin
     procedure
     begin
       TThread.Synchronize(nil,
-      procedure
-      begin
-        Halt(1); // << This is the only way i found to crash the app :(
-      end);
+        procedure
+        begin
+          Halt(1); // << This is the only way i found to crash the app :(
+        end);
     end).Start;
   {$ELSE}
   Application.Terminate;

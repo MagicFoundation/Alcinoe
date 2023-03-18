@@ -1,7 +1,7 @@
-{*******************************************************************************
-Description:  TALWinHTTPWebSocketClient is a easy to use WinHTTP-based
-Web Socket client component
-*******************************************************************************}
+{*****************************************
+TALWinHTTPWebSocketClient is a easy to use
+WinHTTP-based Web Socket client component
+*****************************************}
 unit Alcinoe.WebSocket.Client.WinHTTP;
 
 interface
@@ -23,8 +23,9 @@ type
   TALWinHTTPWebSocketClientSendQueueItem = Record
     Data: AnsiString;
     IsUTF8: Boolean;
-    class function Create(const aData: AnsiString;
-                          const aIsUTF8: Boolean = True): TALWinHTTPWebSocketClientSendQueueItem; static; inline;
+    class function Create(
+                     const aData: AnsiString;
+                     const aIsUTF8: Boolean = True): TALWinHTTPWebSocketClientSendQueueItem; static; inline;
   end;
 
   {--------------------------------}
@@ -64,9 +65,10 @@ type
     FSendqueue: Tqueue<TALWinHTTPWebSocketClientSendQueueItem>;
     procedure SetAccessType(const Value: TALWinHTTPClientInternetOpenAccessType);
     procedure Reconnect;
-    function DoSend(const aData: AnsiString;
-                    const aIsUTF8: Boolean = True;
-                    const aEnqueue: Boolean = True): boolean;
+    function DoSend(
+               const aData: AnsiString;
+               const aIsUTF8: Boolean = True;
+               const aEnqueue: Boolean = True): boolean;
     procedure DoDisconnect(Const ClearSendQueue: Boolean = True);
   protected
     function Receive: boolean; virtual;
@@ -83,8 +85,9 @@ type
     destructor Destroy; override;
     procedure Connect(const aUrl:AnsiString); override;
     procedure Disconnect; override;
-    procedure Send(const aData: AnsiString;
-                   const aIsUTF8: Boolean = True); override;
+    procedure Send(
+                const aData: AnsiString;
+                const aIsUTF8: Boolean = True); override;
     property  AccessType: TALWinHTTPClientInternetOpenAccessType read FAccessType write SetAccessType default wHttpAt_NO_PROXY;
     property  InternetOptions: TALWinHTTPClientInternetOptionSet read FInternetOptions write FInternetOptions default [wHttpIo_Keep_connection];
     property  OnStatus: TALWinHttpClientStatusEvent read FOnStatus write fOnStatus;
@@ -96,15 +99,17 @@ type
 {$ENDIF}
 
 function WinHttpWebSocketCompleteUpgrade(hRequest: HINTERNET; pContext: DWORD_PTR): HINTERNET; stdcall; external 'winhttp.dll';
-function WinHttpWebSocketSend(hWebSocket: HINTERNET;
-                              eBufferType: DWORD;
-                              pvBuffer: PVOID;
-                              dwBufferLength: DWORD): DWORD; stdcall; external 'winhttp.dll';
-function WinHttpWebSocketReceive(hWebSocket: HINTERNET;
-                                 pvBuffer: PVOID;
-                                 dwBufferLength: DWORD;
-                                 var pdwBytesRead: DWORD;
-                                 var peBufferType: DWORD): DWORD; stdcall; external 'winhttp.dll';
+function WinHttpWebSocketSend(
+           hWebSocket: HINTERNET;
+           eBufferType: DWORD;
+           pvBuffer: PVOID;
+           dwBufferLength: DWORD): DWORD; stdcall; external 'winhttp.dll';
+function WinHttpWebSocketReceive(
+           hWebSocket: HINTERNET;
+           pvBuffer: PVOID;
+           dwBufferLength: DWORD;
+           var pdwBytesRead: DWORD;
+           var peBufferType: DWORD): DWORD; stdcall; external 'winhttp.dll';
 
 const
   WINHTTP_OPTION_UPGRADE_TO_WEB_SOCKET = 114;
@@ -129,12 +134,13 @@ uses
   Alcinoe.Common,
   Alcinoe.StringUtils;
 
-{*********************************************************************************}
-procedure ALWinHTTPWebSocketClientInetWebSocketStatusCallback(hInternet: HINTERNET;
-                                                              dwContext: DWORD_PTR;
-                                                              dwInternetStatus: DWORD;
-                                                              lpvStatusInformation: LPVOID;
-                                                              dwStatusInformationLength: DWORD); stdcall;
+{************************************************************}
+procedure ALWinHTTPWebSocketClientInetWebSocketStatusCallback(
+            hInternet: HINTERNET;
+            dwContext: DWORD_PTR;
+            dwInternetStatus: DWORD;
+            lpvStatusInformation: LPVOID;
+            dwStatusInformationLength: DWORD); stdcall;
 begin
 
   TThread.Synchronize(nil, // << As we use WINHTTP_FLAG_ASYNC we must synch the event with the main thread
@@ -227,12 +233,13 @@ begin
 
 end;
 
-{****************************************************************************}
-procedure ALWinHTTPWebSocketClientInetRootStatusCallback(hInternet: HINTERNET;
-                                                         dwContext: DWORD_PTR;
-                                                         dwInternetStatus: DWORD;
-                                                         lpvStatusInformation: LPVOID;
-                                                         dwStatusInformationLength: DWORD); stdcall;
+{*******************************************************}
+procedure ALWinHTTPWebSocketClientInetRootStatusCallback(
+            hInternet: HINTERNET;
+            dwContext: DWORD_PTR;
+            dwInternetStatus: DWORD;
+            lpvStatusInformation: LPVOID;
+            dwStatusInformationLength: DWORD); stdcall;
 begin
 
   TThread.Synchronize(nil, // << As we use WINHTTP_FLAG_ASYNC we must synch the event with the main thread
@@ -277,10 +284,11 @@ begin
           {Register the callback function}
           LDWordPtrOption := DWORD_PTR(LWebSocketClient.fContext);
           LWebSocketClient.CheckError(not WinHttpSetOption(LWebSocketClient.FInetWebSocket, WINHTTP_OPTION_CONTEXT_VALUE, Pointer(@LDWordPtrOption), sizeof(LDWordPtrOption)));
-          LSetStatusCallbackResult := WinHttpSetStatusCallback(LWebSocketClient.FInetWebSocket, // _In_       HINTERNET               hInternet,
-                                                               @ALWinHTTPWebSocketClientInetWebSocketStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
-                                                               WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
-                                                               0); // _Reserved_ DWORD_PTR               dwReserved
+          LSetStatusCallbackResult := WinHttpSetStatusCallback(
+                                        LWebSocketClient.FInetWebSocket, // _In_       HINTERNET               hInternet,
+                                        @ALWinHTTPWebSocketClientInetWebSocketStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
+                                        WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
+                                        0); // _Reserved_ DWORD_PTR               dwReserved
           LWebSocketClient.CheckError(@LSetStatusCallbackResult = @WINHTTP_INVALID_STATUS_CALLBACK);
 
           {start to read the socket}
@@ -328,9 +336,10 @@ begin
 
 end;
 
-{***********************************************************************************}
-class function TALWinHTTPWebSocketClientSendQueueItem.Create(const aData: AnsiString;
-                                                             const aIsUTF8: Boolean = True): TALWinHTTPWebSocketClientSendQueueItem;
+{***********************************************************}
+class function TALWinHTTPWebSocketClientSendQueueItem.Create(
+                 const aData: AnsiString;
+                 const aIsUTF8: Boolean = True): TALWinHTTPWebSocketClientSendQueueItem;
 begin
   result.Data := aData;
   result.IsUTF8 := aIsUTF8;
@@ -382,13 +391,14 @@ var ln: DWORD;
 begin
   if ErrCode <> 0 then begin
     SetLength(S, 256);
-    ln := FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE, //  _In_     DWORD   dwFlags,
-                         Pointer(GetModuleHandle('winhttp.dll')), // _In_opt_ LPCVOID lpSource,
-                         ErrCode, // _In_     DWORD   dwMessageId,
-                         0, // _In_     DWORD   dwLanguageId,
-                         PAnsiChar(S), // _Out_    LPTSTR  lpBuffer,
-                         Length(S), // _In_     DWORD   nSize,
-                         nil); // _In_opt_ va_list *Arguments
+    ln := FormatMessageA(
+            FORMAT_MESSAGE_FROM_SYSTEM or FORMAT_MESSAGE_FROM_HMODULE, //  _In_     DWORD   dwFlags,
+            Pointer(GetModuleHandle('winhttp.dll')), // _In_opt_ LPCVOID lpSource,
+            ErrCode, // _In_     DWORD   dwMessageId,
+            0, // _In_     DWORD   dwLanguageId,
+            PAnsiChar(S), // _Out_    LPTSTR  lpBuffer,
+            Length(S), // _In_     DWORD   nSize,
+            nil); // _In_opt_ va_list *Arguments
     if ln = 0 then raiseLastOsError;
     SetLength(S, ln);
     raise EALWebSocketClientException.CreateFmt('%s - URL:%s', [ALTrim(S), URL]);      { Do not localize }
@@ -445,7 +455,7 @@ end;
 {*****************************************************************}
 procedure TALWinHTTPWebSocketClient.Connect(const aUrl:AnsiString);
 
-  {---------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetProxyServerName: PWideChar;
   Begin
     If (FaccessType <> wHTTPat_NAMED_PROXY) or
@@ -453,7 +463,7 @@ procedure TALWinHTTPWebSocketClient.Connect(const aUrl:AnsiString);
     else result := PWideChar(string(ProxyParams.ProxyServer) + ':' + String(ALIntToStrA(ProxyParams.ProxyPort)));
   end;
 
-  {-----------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetProxyBypass: PWideChar;
   Begin
     {We should not use empty string for ProxyBypass because
@@ -463,7 +473,7 @@ procedure TALWinHTTPWebSocketClient.Connect(const aUrl:AnsiString);
     else result := PWidechar(String(ProxyParams.ProxyBypass));
   end;
 
-  {----------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Function InternalGetHttpOpenRequestFlags: DWord;
   Begin
     Result := 0;
@@ -506,25 +516,28 @@ begin
     ActiveWebSocketClient.TryAdd(DWORD_PTR(fContext), True);
 
     {init FInetRoot}
-    FInetRoot := WinHttpOpen(nil, // _In_opt_ LPCWSTR pwszUserAgent,
-                             AccessTypeArr[FAccessType], // _In_     DWORD   dwAccessType,
-                             InternalGetProxyServerName, // _In_     LPCWSTR pwszProxyName,
-                             InternalGetProxyBypass, // _In_     LPCWSTR pwszProxyBypass,
-                             WINHTTP_FLAG_ASYNC); // _In_     DWORD   dwFlags
+    FInetRoot := WinHttpOpen(
+                   nil, // _In_opt_ LPCWSTR pwszUserAgent,
+                   AccessTypeArr[FAccessType], // _In_     DWORD   dwAccessType,
+                   InternalGetProxyServerName, // _In_     LPCWSTR pwszProxyName,
+                   InternalGetProxyBypass, // _In_     LPCWSTR pwszProxyBypass,
+                   WINHTTP_FLAG_ASYNC); // _In_     DWORD   dwFlags
     CheckError(not Assigned(FInetRoot));
 
     {Register the callback function}
-    LSetStatusCallbackResult := WinHttpSetStatusCallback(FInetRoot, // _In_       HINTERNET               hInternet,
-                                                         @ALWinHTTPWebSocketClientInetRootStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
-                                                         WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
-                                                         0); // _Reserved_ DWORD_PTR               dwReserved
+    LSetStatusCallbackResult := WinHttpSetStatusCallback(
+                                  FInetRoot, // _In_       HINTERNET               hInternet,
+                                  @ALWinHTTPWebSocketClientInetRootStatusCallback, // _In_       WINHTTP_STATUS_CALLBACK lpfnInternetCallback,
+                                  WINHTTP_CALLBACK_FLAG_ALL_NOTIFICATIONS, // _In_       DWORD                   dwNotificationFlags,
+                                  0); // _Reserved_ DWORD_PTR               dwReserved
     CheckError(@LSetStatusCallbackResult = @WINHTTP_INVALID_STATUS_CALLBACK);
 
     {init FInetConnect}
-    FInetConnect := WinHttpConnect(FInetRoot, // _In_       HINTERNET     hSession,
-                                   PWideChar(String(FURLHost)), // _In_       LPCWSTR       pswzServerName,
-                                   FURLPort, // _In_       INTERNET_PORT nServerPort,
-                                   0); //  _Reserved_ DWORD         dwReserved
+    FInetConnect := WinHttpConnect(
+                      FInetRoot, // _In_       HINTERNET     hSession,
+                      PWideChar(String(FURLHost)), // _In_       LPCWSTR       pswzServerName,
+                      FURLPort, // _In_       INTERNET_PORT nServerPort,
+                      0); //  _Reserved_ DWORD         dwReserved
     CheckError(not Assigned(FInetConnect));
 
     {init ProtocolVersion}
@@ -537,13 +550,14 @@ begin
     LAcceptTypes[1] := nil;
 
     {init AcceptTypes}
-    FInetRequest := WinHttpOpenRequest(FInetConnect, // _In_ HINTERNET hConnect,
-                                       PWideChar('GET'), //  _In_ LPCWSTR   pwszVerb,
-                                       PWideChar(String(FURLPath)), // _In_ LPCWSTR   pwszObjectName,
-                                       PWideChar(LStrProtocolVersion), // _In_ LPCWSTR   pwszVersion,
-                                       PWideChar(String(requestHeader.Referer)), // _In_ LPCWSTR   pwszReferrer,
-                                       pointer(LAcceptTypes), // _In_ LPCWSTR   *ppwszAcceptTypes,
-                                       InternalGetHttpOpenRequestFlags); // _In_ DWORD     dwFlags
+    FInetRequest := WinHttpOpenRequest(
+                      FInetConnect, // _In_ HINTERNET hConnect,
+                      PWideChar('GET'), //  _In_ LPCWSTR   pwszVerb,
+                      PWideChar(String(FURLPath)), // _In_ LPCWSTR   pwszObjectName,
+                      PWideChar(LStrProtocolVersion), // _In_ LPCWSTR   pwszVersion,
+                      PWideChar(String(requestHeader.Referer)), // _In_ LPCWSTR   pwszReferrer,
+                      pointer(LAcceptTypes), // _In_ LPCWSTR   *ppwszAcceptTypes,
+                      InternalGetHttpOpenRequestFlags); // _In_ DWORD     dwFlags
     CheckError(not Assigned(FInetRequest));
 
     { Timeouts }
@@ -583,20 +597,23 @@ begin
 
     {set the header}
     LHeader := String(requestHeader.RawHeaderText);
-    CheckError(not WinHttpAddRequestHeaders(FInetRequest, // _In_ HINTERNET hRequest,
-                                            PWideChar(LHeader), // _In_ LPCWSTR   pwszHeaders,
-                                            Length(LHeader),  // _In_ DWORD     dwHeadersLength,
-                                            WINHTTP_ADDREQ_FLAG_REPLACE or WINHTTP_ADDREQ_FLAG_ADD)); // _In_ DWORD     dwModifiers
+    CheckError(
+      not WinHttpAddRequestHeaders(
+            FInetRequest, // _In_ HINTERNET hRequest,
+            PWideChar(LHeader), // _In_ LPCWSTR   pwszHeaders,
+            Length(LHeader),  // _In_ DWORD     dwHeadersLength,
+            WINHTTP_ADDREQ_FLAG_REPLACE or WINHTTP_ADDREQ_FLAG_ADD)); // _In_ DWORD     dwModifiers
 
     LCertContextSet := False;
     repeat
-      if not WinHttpSendRequest(FInetRequest, // _In_     HINTERNET hRequest,
-                                WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
-                                0, // _In_     DWORD     dwHeadersLength,
-                                nil, // _In_opt_ LPVOID    lpOptional,
-                                0, //  _In_     DWORD     dwOptionalLength,
-                                0, // _In_     DWORD     dwTotalLength,
-                                DWORD_PTR(fContext)) then begin // _In_     DWORD_PTR dwContext
+      if not WinHttpSendRequest(
+               FInetRequest, // _In_     HINTERNET hRequest,
+               WINHTTP_NO_ADDITIONAL_HEADERS, // _In_opt_ LPCWSTR   pwszHeaders,
+               0, // _In_     DWORD     dwHeadersLength,
+               nil, // _In_opt_ LPVOID    lpOptional,
+               0, //  _In_     DWORD     dwOptionalLength,
+               0, // _In_     DWORD     dwTotalLength,
+               DWORD_PTR(fContext)) then begin // _In_     DWORD_PTR dwContext
         LErrCode := GetLastError;
         if (not LCertContextSet) and (LErrCode = ERROR_WINHTTP_CLIENT_AUTH_CERT_NEEDED) then begin
           CheckError(not WinHttpSetOption(FInetRequest, WINHTTP_OPTION_CLIENT_CERT_CONTEXT, WINHTTP_NO_CLIENT_CERT_CONTEXT, 0));
@@ -685,10 +702,11 @@ begin
   {$ENDIF}
 end;
 
-{****************************************************************}
-function TALWinHTTPWebSocketClient.DoSend(const aData: AnsiString;
-                                          const aIsUTF8: Boolean = True;
-                                          const aEnqueue: Boolean = True): Boolean;
+{****************************************}
+function TALWinHTTPWebSocketClient.DoSend(
+           const aData: AnsiString;
+           const aIsUTF8: Boolean = True;
+           const aEnqueue: Boolean = True): Boolean;
 begin
   result := True;
   //-----
@@ -716,9 +734,10 @@ begin
   end;
 end;
 
-{***************************************************************}
-procedure TALWinHTTPWebSocketClient.Send(const aData: AnsiString;
-                                         const aIsUTF8: Boolean = True);
+{***************************************}
+procedure TALWinHTTPWebSocketClient.Send(
+            const aData: AnsiString;
+            const aIsUTF8: Boolean = True);
 begin
   doSend(aData, aIsUTF8, true{aEnqueue});
 end;

@@ -1,34 +1,27 @@
 {*******************************************************************************
-The TAlGSMComm component implements SMS text messaging
-through the text-mode interface defined in the GSM
-Technical Specification 07.05, version 5.1.0, dated
-December 1996.  There are several variations of this spec,
-used throughout Nokia, Siemens, Ericsson, etc models.
-We have tested the Nokia 6230 in-house, but the Nokia 7190,
-8890, 6210 and 9110 models should work as well.  Phones
-from other manufacturers will also work, as long as they
-implement the text-mode interface.  About 1/4 of the
-current phones are capable of being connected to a PC
-(through IR or serial cable), about 1/3 of those are
-text-mode only, 1/3 are PDU mode only, and the other 1/3
-support both text and PDU mode.  Some phones (such as the
-Nokia 5190) support SMS, but they use a proprietary protocol,
-which TALGSMComm does not support.
+The TAlGSMComm component implements SMS text messaging through the text-mode
+interface defined in the GSM Technical Specification 07.05, version 5.1.0,
+dated December 1996.  There are several variations of this spec, used
+throughout Nokia, Siemens, Ericsson, etc models. We have tested the Nokia 6230
+in-house, but the Nokia 7190, 8890, 6210 and 9110 models should work as well.
+Phones from other manufacturers will also work, as long as they implement the
+text-mode interface.  About 1/4 of the current phones are capable of being
+connected to a PC (through IR or serial cable), about 1/3 of those are
+text-mode only, 1/3 are PDU mode only, and the other 1/3 support both text and
+PDU mode.  Some phones (such as the Nokia 5190) support SMS, but they use a
+proprietary protocol, which TALGSMComm does not support.
 
-To test your phone, connect the phone to your PC through
-the serial cable or IR device (consult your phone's documentation
-for details on how to connect). Enter "AT"<CR> into a terminal
-window to verify the connection is established (you should receive
-"OK" from the phone), then enter "AT+CMGF=?"<CR>. The response
-should contain a "1", indicating that it supports text-mode.
-If both of these tests pass, then your phone meets the basic
-requirements.
+To test your phone, connect the phone to your PC through the serial cable or
+IR device (consult your phone's documentation for details on how to connect).
+Enter "AT"<CR> into a terminal window to verify the connection is established
+(you should receive "OK" from the phone), then enter "AT+CMGF=?"<CR>. The
+response should contain a "1", indicating that it supports text-mode. If both
+of these tests pass, then your phone meets the basic requirements.
 
 http://www.nobbi.com/pduspy.htm
 http://rednaxela.net/pdu.php
 http://www.dreamfabric.com/sms/
 *******************************************************************************}
-
 unit Alcinoe.GSMComm;
 
 interface
@@ -73,7 +66,7 @@ Type
     Property Timeout: Cardinal read Ftimeout write Settimeout default 60000;
   end;
 
-{---------------------------------------------------------------------------------------------------------------}
+{***************************************************************************************************************}
 function  AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress: ansiString; const aMessage: AnsiString): AnsiString;
 Procedure AlGSMComm_DecodePDUMessage(const aPDUMessage: AnsiString; Var aSMSCenter, aSMSAddress, AMessage: AnsiString);
 function  AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;
@@ -90,10 +83,11 @@ uses
 {*****************************************************************************************}
 function AlGSMComm_UnicodeToGSM7BitDefaultAlphabet(const aMessage: WideString): AnsiString;
 
-  {-------------------------------------------------}
-  Function InternalLookupChar(aUnicodeChar: WideChar;
-                              Var aGSMString: AnsiString;
-                              Var aGSMStringCurrentIndex: integer): Boolean;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function InternalLookupChar(
+             aUnicodeChar: WideChar;
+             Var aGSMString: AnsiString;
+             Var aGSMStringCurrentIndex: integer): Boolean;
   Begin
     Result := True;
     Case ord(aUnicodeChar) of
@@ -304,14 +298,16 @@ Begin
   LResultCurrentIndex := 1;
 
   For i := 1 to length(aMessage) do begin
-    If not InternalLookupChar(aMessage[i],
-                              Result,
-                              LResultCurrentIndex) then begin
+    If not InternalLookupChar(
+             aMessage[i],
+             Result,
+             LResultCurrentIndex) then begin
       LWideString := ALRemoveDiacritic(aMessage[i]);
       If (LWideString = '') or
-         (not InternalLookupChar(LWideString[1],
-                                 Result,
-                                 LResultCurrentIndex))
+         (not InternalLookupChar(
+                LWideString[1],
+                Result,
+                LResultCurrentIndex))
       then Begin
         Result[LResultCurrentIndex] := AnsiChar($20); // SPACE
         inc(LResultCurrentIndex);
@@ -322,15 +318,17 @@ Begin
   SetLength(result,LResultCurrentIndex - 1);
 end;
 
-{****************************************************************************}
-function AlGSMComm_GSM7BitDefaultAlphabetToUnicode(const aMessage: AnsiString;
-                                                   Const UseGreekAlphabet: Boolean= False): Widestring;
+{*************************************************}
+function AlGSMComm_GSM7BitDefaultAlphabetToUnicode(
+           const aMessage: AnsiString;
+           Const UseGreekAlphabet: Boolean= False): Widestring;
 
-  {-------------------------------------------------------}
-  Function InternalLookupChar(const aGSMString: AnsiString;
-                              Var aGSMStringCurrentIndex: integer;
-                              Var aUnicodeString: WideString;
-                              Var aUnicodeStringCurrentIndex: integer): Boolean;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  Function InternalLookupChar(
+             const aGSMString: AnsiString;
+             Var aGSMStringCurrentIndex: integer;
+             Var aUnicodeString: WideString;
+             Var aUnicodeStringCurrentIndex: integer): Boolean;
   Begin
     Result := True;
     Case ord(aGSMString[aGSMStringCurrentIndex]) of
@@ -543,10 +541,11 @@ Begin
   LMessageCurrentIndex := 1;
 
   While LMessageCurrentIndex <= length(aMessage) do begin
-    If not InternalLookupChar(aMessage,
-                              LMessageCurrentIndex,
-                              Result,
-                              LResultCurrentIndex) then begin
+    If not InternalLookupChar(
+             aMessage,
+             LMessageCurrentIndex,
+             Result,
+             LResultCurrentIndex) then begin
       Result[LResultCurrentIndex] := WideChar($0020); // SPACE
       inc(LResultCurrentIndex);
     end;
@@ -560,7 +559,7 @@ end;
 {aMessage need to be in GSM 7 bit charset}
 function AlGSMComm_BuildPDUMessage(aSMSCenter, aSMSAddress: ansiString; const aMessage: AnsiString): AnsiString;
 
-  {------------------------------------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function InternalStringToPDU(const v: AnsiString): AnsiString;
   var I, InLen, OutLen, OutPos : Integer;
       RoundUp : Boolean;
@@ -837,11 +836,14 @@ begin
   // 16-bit alphabet
   else if (LDSCOctet[5] = '1') and (LDSCOctet[6] = '0') then begin
     while I <= LLength - 3 do begin
-      aMessage := aMessage + ansiString( WideChar(ALStrToInt(ansiChar('$') +
-                                                             ansiChar(aPDUMessage[I]) +
-                                                             ansiChar(aPDUMessage[I+1]) +
-                                                             ansiChar(aPDUMessage[I+2]) +
-                                                             ansiChar(aPDUMessage[I+3]))));
+      aMessage := aMessage + ansiString(
+                               WideChar(
+                                 ALStrToInt(
+                                   ansiChar('$') +
+                                   ansiChar(aPDUMessage[I]) +
+                                   ansiChar(aPDUMessage[I+1]) +
+                                   ansiChar(aPDUMessage[I+2]) +
+                                   ansiChar(aPDUMessage[I+3]))));
       inc(I,4);
     end;
   end;
@@ -865,13 +867,14 @@ begin
     Fconnected := True;
 
     {Create the file}
-    fSerial := CreateFileA(PAnsiChar(Serial),
-                           GENERIC_READ or GENERIC_WRITE,
-                           0, (* comm devices must be opened w/exclusive-access *)
-                           NIL, (* no security attrs *)
-                           OPEN_EXISTING, (* comm devices must use OPEN_EXISTING *)
-                           0, (* Ansynchronous or Synchronous I/O *)
-                           0); (* hTemplate must be NULL for comm devices *)
+    fSerial := CreateFileA(
+                 PAnsiChar(Serial),
+                 GENERIC_READ or GENERIC_WRITE,
+                 0, (* comm devices must be opened w/exclusive-access *)
+                 NIL, (* no security attrs *)
+                 OPEN_EXISTING, (* comm devices must use OPEN_EXISTING *)
+                 0, (* Ansynchronous or Synchronous I/O *)
+                 0); (* hTemplate must be NULL for comm devices *)
     CheckError(fSerial=INVALID_HANDLE_VALUE);
 
     {init the timeout for serial}
@@ -919,11 +922,13 @@ end;
 function TAlGSMComm.SerialRead(var Buffer; Count: Integer): Longint;
 var NumberOfBytesRead : DWORD;
 begin
-  CheckError(not ReadFile(fSerial,
-                          Buffer,
-                          Count,
-                          NumberOfBytesRead,
-                          NIL));
+  CheckError(
+    not ReadFile(
+          fSerial,
+          Buffer,
+          Count,
+          NumberOfBytesRead,
+          NIL));
   Result := NumberOfBytesRead;
 end;
 
@@ -931,11 +936,13 @@ end;
 function TAlGSMComm.SerialWrite(var Buffer; Count: Integer): Longint;
 Var NumberOfBytesWritten: Dword;
 begin
-  checkError(Not WriteFile(fSerial,
-                           buffer,
-                           count,
-                           NumberOfBytesWritten,
-                           NIL));
+  checkError(
+    Not WriteFile(
+          fSerial,
+          buffer,
+          count,
+          NumberOfBytesWritten,
+          NIL));
   Result := NumberOfBytesWritten;
 end;
 
@@ -985,11 +992,12 @@ begin
   end;
 end;
 
-{*****************************************************}
-procedure TAlGSMComm.SendSMSinPDUMode(const aSMSCenter, //Service Center Address. leave empty to use the default configuration
-                                            aSMSAddress: AnsiString; //phone number of the recipient
-                                      aMessage: AnsiString; //The body of the message, can be in PDU (EncodeMessageInPDU need to be false) or in GSM 7 bit charset (EncodeMessageInPDU need to be true)
-                                      const EncodeMessageInPDU: Boolean=True); //if we need to encode the aMessage in PDU
+{************************************}
+procedure TAlGSMComm.SendSMSinPDUMode(
+            const aSMSCenter, //Service Center Address. leave empty to use the default configuration
+                  aSMSAddress: AnsiString; //phone number of the recipient
+            aMessage: AnsiString; //The body of the message, can be in PDU (EncodeMessageInPDU need to be false) or in GSM 7 bit charset (EncodeMessageInPDU need to be true)
+            const EncodeMessageInPDU: Boolean=True); //if we need to encode the aMessage in PDU
 Var LLength: Integer;
     Str: AnsiString;
 begin
@@ -1013,9 +1021,10 @@ begin
   end;
 
   {Send Message}
-  If EncodeMessageInPDU then aMessage := AlGSMComm_BuildPDUMessage(aSMSCenter,
-                                                                   aSMSAddress,
-                                                                   aMessage);
+  If EncodeMessageInPDU then aMessage := AlGSMComm_BuildPDUMessage(
+                                           aSMSCenter,
+                                           aSMSAddress,
+                                           aMessage);
 
   Str := AlCopyStr(aMessage,1,2);
   If not ALTryStrToInt(str,LLength) then LLength := 0;
@@ -1027,11 +1036,12 @@ begin
   GetATCmdOkResponse('AT+CMGS command error!');
 end;
 
-{******************************************************}
-procedure TAlGSMComm.SendSMSinTextMode(const aSMSCenter,  //Service Center Address. leave empty to use the default configuration
-                                             aSMSAddress, //phone number of the recipient
-                                             aMessage,    //The body of the message
-                                             aCharset: AnsiString); //The Charset use in the message. leave empty to use the default charset
+{*************************************}
+procedure TAlGSMComm.SendSMSinTextMode(
+            const aSMSCenter,  //Service Center Address. leave empty to use the default configuration
+            aSMSAddress, //phone number of the recipient
+            aMessage,    //The body of the message
+            aCharset: AnsiString); //The Charset use in the message. leave empty to use the default charset
 begin
   If Not Fconnected then raise EALException.Create('Not Connected!');
 
@@ -1069,7 +1079,7 @@ end;
 {give result with on each lines Index=PDUMessage}
 procedure TAlGSMComm.ListAllSMSinPDUMode(aLstMessage: TALStringsA; MemStorage: AnsiString);
 
-  {-----------------------------------}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalFulfillLstMessage;
   Var P1, P2: Integer;
       LIndex: Integer;
@@ -1242,4 +1252,3 @@ Begin
 end;
 
 end.
-

@@ -144,9 +144,7 @@ https://developers.facebook.com/docs/ios/getting-started
    you when you will use any facebook functions below), you can set
    ALInitFacebookSDKAtStartup := false
    in the begin .. end section of your dpr
-
 *******************************************************************************)
-
 unit Alcinoe.FMX.FacebookCore;
 
 interface

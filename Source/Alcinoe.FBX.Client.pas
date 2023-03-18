@@ -3,7 +3,6 @@ product:      Alcinoe.FBX.Client (Alcinoe FireBird Express Client)
 Description:  Retrieving Data as XML from Firebird Server.
 Link :        http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
-
 unit Alcinoe.FBX.Client;
 
 interface
@@ -24,10 +23,11 @@ uses
 Type
 
   {----------------------------------------------------------------------------------}
-  TALFBXClientSelectDataOnNewRowFunct = reference to Procedure(XMLRowData: TalXmlNode;
-                                                               const ViewTag: AnsiString;
-                                                               ExtData: Pointer;
-                                                               Var Continue: Boolean);
+  TALFBXClientSelectDataOnNewRowFunct = reference to Procedure(
+                                                       XMLRowData: TalXmlNode;
+                                                       const ViewTag: AnsiString;
+                                                       ExtData: Pointer;
+                                                       Var Continue: Boolean);
 
   {----------------------------}
   TALFBXClientSQLParam = record
@@ -109,50 +109,58 @@ Type
     function  GetConnectionID: Integer;
     function  GetTransactionID: Cardinal;
   Protected
-    function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual;
-    Procedure SaveDataToCache(const Key: ansiString;
-                              const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual;
-    function GetFieldValue(aSQLDA: TALFBXSQLResult;
-                           aDBHandle: IscDbHandle;
-                           aTraHandle: IscTrHandle;
-                           aIndex: Integer;
-                           const aFormatSettings: TALFormatSettingsA): AnsiString;
+    function loadCachedData(
+               const Key: AnsiString;
+               var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(
+                const Key: ansiString;
+                const CacheThreshold: integer;
+                const DataStr: ansiString); virtual;
+    function GetFieldValue(
+               aSQLDA: TALFBXSQLResult;
+               aDBHandle: IscDbHandle;
+               aTraHandle: IscTrHandle;
+               aIndex: Integer;
+               const aFormatSettings: TALFormatSettingsA): AnsiString;
     procedure initObject; virtual;
-    procedure OnSelectDataDone(const Query: TALFBXClientSelectDataQUERY;
-                               TimeTaken: double); virtual;
-    procedure OnUpdateDataDone(const Query: TALFBXClientUpdateDataQUERY;
-                               TimeTaken: double); virtual;
+    procedure OnSelectDataDone(
+                const Query: TALFBXClientSelectDataQUERY;
+                TimeTaken: double); virtual;
+    procedure OnUpdateDataDone(
+                const Query: TALFBXClientUpdateDataQUERY;
+                TimeTaken: double); virtual;
   Public
     Constructor Create(ApiVer: TALFBXVersion_API; const lib: AnsiString = GDS32DLL); overload; virtual;
     Constructor Create(lib: TALFBXLibrary); overload; virtual;
     Destructor Destroy; Override;
-    procedure GetMonitoringInfos(ConnectionID,
-                                 TransactionID: int64;
-                                 const StatementSQL: AnsiString;
-                                 Var IOStats: TALFBXClientMonitoringIOStats;
-                                 Var RecordStats: TALFBXClientMonitoringRecordStats;
-                                 Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
-                                 Const SkipIOStats: Boolean = False;
-                                 Const SkipRecordStats: Boolean = False;
-                                 Const SkipMemoryUsage: Boolean = False);
+    procedure GetMonitoringInfos(
+                ConnectionID,
+                TransactionID: int64;
+                const StatementSQL: AnsiString;
+                Var IOStats: TALFBXClientMonitoringIOStats;
+                Var RecordStats: TALFBXClientMonitoringRecordStats;
+                Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
+                Const SkipIOStats: Boolean = False;
+                Const SkipRecordStats: Boolean = False;
+                Const SkipMemoryUsage: Boolean = False);
     function  GetDataBaseInfoInt(const item: Integer): Integer;
     function  GetDataBaseInfoString(const item: Integer): AnsiString;
     function  GetDataBaseInfoDateTime(const item: Integer): TDateTime;
     procedure GetUserNames(UserNames: TALStringsA);
     procedure CreateDatabase(const SQL: AnsiString);
     procedure DropDatabase;
-    Procedure Connect(const DataBaseName,
-                            Login,
-                            Password,
-                            CharSet: AnsiString;
-                      const ExtraParams: AnsiString = ''); overload;
-    Procedure Connect(const DataBaseName,
-                            Login,
-                            Password,
-                            CharSet: AnsiString;
-                      Numbuffers: integer); overload;
+    Procedure Connect(
+                const DataBaseName,
+                      Login,
+                      Password,
+                      CharSet: AnsiString;
+                const ExtraParams: AnsiString = ''); overload;
+    Procedure Connect(
+                const DataBaseName,
+                      Login,
+                      Password,
+                      CharSet: AnsiString;
+                Numbuffers: integer); overload;
     Procedure Disconnect;
     Procedure TransactionStart(const TPB: AnsiString);
     Procedure TransactionCommit;
@@ -160,66 +168,79 @@ Type
     Procedure TransactionRollback;
     Procedure TransactionRollbackRetaining;
     Function  Prepare(const SQL: AnsiString): TALFBXStatementType;
-    Procedure SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                         XMLDATA: TalXMLNode;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         const RowTag: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         const RowTag: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const Queries: TALFBXClientSelectDataQUERIES;
+                XMLDATA: TalXMLNode;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const Query: TALFBXClientSelectDataQUERY;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                Skip: integer;
+                First: Integer;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const Queries: TALFBXClientSelectDataQUERIES;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const Query: TALFBXClientSelectDataQUERY;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                const RowTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                const RowTag: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA); overload; virtual;
     procedure UpdateData(const Queries: TALFBXClientUpdateDataQUERIES); overload; virtual;
     procedure UpdateData(const Query: TALFBXClientUpdateDataQUERY); overload; virtual;
     procedure UpdateData(SQLs: TALStringsA); overload; virtual;
     procedure UpdateData(const SQL: AnsiString); overload; virtual;
-    procedure UpdateData(const SQL: AnsiString;
-                         const Params: Array of AnsiString); overload; virtual;
+    procedure UpdateData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString); overload; virtual;
     procedure UpdateData(const SQLs: array of AnsiString); overload; virtual;
     Property  Connected: Boolean Read GetConnected;
     property  SqlDialect: word read FSqlDialect;
@@ -341,253 +362,297 @@ Type
     fDefaultReadTPB: AnsiString;
     fDefaultWriteTPB: AnsiString;
   Protected
-    function loadCachedData(const Key: AnsiString;
-                            var DataStr: AnsiString): Boolean; virtual;
-    Procedure SaveDataToCache(const Key: ansiString;
-                              const CacheThreshold: integer;
-                              const DataStr: ansiString); virtual;
+    function loadCachedData(
+               const Key: AnsiString;
+               var DataStr: AnsiString): Boolean; virtual;
+    Procedure SaveDataToCache(
+                const Key: ansiString;
+                const CacheThreshold: integer;
+                const DataStr: ansiString); virtual;
     function GetCloseConnectionByErrCode(aGDSCode: Integer): Boolean; virtual;
     function GetDataBaseName: AnsiString; virtual;
-    function GetFieldValue(aSQLDA: TALFBXSQLResult;
-                           aDBHandle: IscDbHandle;
-                           aTraHandle: IscTrHandle;
-                           aIndex: Integer;
-                           const aFormatSettings: TALFormatSettingsA): AnsiString; virtual;
-    Procedure AcquireConnectionWithStmt(var DBHandle: IscDbHandle;
-                                        var StatementPool: TALFBXConnectionStatementPoolBinTree); virtual;
-    Procedure ReleaseConnectionWithStmt(var DBHandle: IscDbHandle;
-                                        var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                        const CloseConnection: Boolean = False); virtual;
+    function GetFieldValue(
+               aSQLDA: TALFBXSQLResult;
+               aDBHandle: IscDbHandle;
+               aTraHandle: IscTrHandle;
+               aIndex: Integer;
+               const aFormatSettings: TALFormatSettingsA): AnsiString; virtual;
+    Procedure AcquireConnectionWithStmt(
+                var DBHandle: IscDbHandle;
+                var StatementPool: TALFBXConnectionStatementPoolBinTree); virtual;
+    Procedure ReleaseConnectionWithStmt(
+                var DBHandle: IscDbHandle;
+                var StatementPool: TALFBXConnectionStatementPoolBinTree;
+                const CloseConnection: Boolean = False); virtual;
     Function  AcquireConnectionWithoutStmt: IscDbHandle; virtual;
-    Procedure ReleaseConnectionWithoutStmt(var DBHandle: IscDbHandle;
-                                            const CloseConnection: Boolean = False); virtual;
-    Procedure AcquireReadTransaction(var DBHandle: IscDbHandle;
-                                     var TraHandle: IscTrHandle;
-                                     const TPB: AnsiString); virtual;
-    Procedure ReleaseReadTransaction(var DBHandle: IscDbHandle;
-                                     var TraHandle: IscTrHandle;
-                                     const TPB: AnsiString;
-                                     const CloseConnection: Boolean = False); virtual;
-    Procedure AcquireReadStatement(const SQL: AnsiString;
-                                   var DBHandle: IscDbHandle;
-                                   var TraHandle: IscTrHandle;
-                                   var StmtHandle: IscStmtHandle;
-                                   var Sqlda: TALFBXSQLResult;
-                                   const TPB: AnsiString); virtual;
-    Procedure ReleaseReadStatement(const SQL: AnsiString;
-                                   var DBHandle: IscDbHandle;
-                                   var TraHandle: IscTrHandle;
-                                   var StmtHandle: IscStmtHandle;
-                                   var Sqlda: TALFBXSQLResult;
-                                   const TPB: AnsiString;
-                                   const CloseConnection: Boolean = False); virtual;
-    procedure initObject(const aDataBaseName,
-                               aLogin,
-                               aPassword,
-                               aCharSet: AnsiString;
-                         const aNumbuffers: integer = -1;
-                         const aOpenConnectionExtraParams: AnsiString = ''); virtual;
-    procedure OnSelectDataDone(const Query: TALFBXClientSelectDataQUERY;
-                               TimeTaken: double); virtual;
-    procedure OnUpdateDataDone(const Query: TALFBXClientUpdateDataQUERY;
-                               TimeTaken: double); virtual;
+    Procedure ReleaseConnectionWithoutStmt(
+                var DBHandle: IscDbHandle;
+                const CloseConnection: Boolean = False); virtual;
+    Procedure AcquireReadTransaction(
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                const TPB: AnsiString); virtual;
+    Procedure ReleaseReadTransaction(
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                const TPB: AnsiString;
+                const CloseConnection: Boolean = False); virtual;
+    Procedure AcquireReadStatement(
+                const SQL: AnsiString;
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                var StmtHandle: IscStmtHandle;
+                var Sqlda: TALFBXSQLResult;
+                const TPB: AnsiString); virtual;
+    Procedure ReleaseReadStatement(
+                const SQL: AnsiString;
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                var StmtHandle: IscStmtHandle;
+                var Sqlda: TALFBXSQLResult;
+                const TPB: AnsiString;
+                const CloseConnection: Boolean = False); virtual;
+    procedure initObject(
+                const aDataBaseName,
+                      aLogin,
+                      aPassword,
+                      aCharSet: AnsiString;
+                const aNumbuffers: integer = -1;
+                const aOpenConnectionExtraParams: AnsiString = ''); virtual;
+    procedure OnSelectDataDone(
+                const Query: TALFBXClientSelectDataQUERY;
+                TimeTaken: double); virtual;
+    procedure OnUpdateDataDone(
+                const Query: TALFBXClientUpdateDataQUERY;
+                TimeTaken: double); virtual;
   Public
-    Constructor Create(const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       aApiVer: TALFBXVersion_API;
-                       const alib: AnsiString = GDS32DLL;
-                       const aNumbuffers: integer = -1;
-                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
-    Constructor Create(const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       alib: TALFBXLibrary;
-                       const aNumbuffers: integer = -1;
-                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    Constructor Create(
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  aApiVer: TALFBXVersion_API;
+                  const alib: AnsiString = GDS32DLL;
+                  const aNumbuffers: integer = -1;
+                  const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    Constructor Create(
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  alib: TALFBXLibrary;
+                  const aNumbuffers: integer = -1;
+                  const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
     Destructor  Destroy; Override;
     Procedure ReleaseAllConnections(Const WaitWorkingConnections: Boolean = True); virtual;
-    procedure GetMonitoringInfos(ConnectionID,
-                                 TransactionID: int64;
-                                 const StatementSQL: AnsiString;
-                                 Var IOStats: TALFBXClientMonitoringIOStats;
-                                 Var RecordStats: TALFBXClientMonitoringRecordStats;
-                                 Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
-                                 Const SkipIOStats: Boolean = False;
-                                 Const SkipRecordStats: Boolean = False;
-                                 Const SkipMemoryUsage: Boolean = False);
+    procedure GetMonitoringInfos(
+                ConnectionID,
+                TransactionID: int64;
+                const StatementSQL: AnsiString;
+                Var IOStats: TALFBXClientMonitoringIOStats;
+                Var RecordStats: TALFBXClientMonitoringRecordStats;
+                Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
+                Const SkipIOStats: Boolean = False;
+                Const SkipRecordStats: Boolean = False;
+                Const SkipMemoryUsage: Boolean = False);
     function  GetConnectionID(DBHandle: IscDbHandle): Integer;
     function  GetTransactionID(TraHandle: IscTrHandle): Cardinal;
-    function  GetDataBaseInfoInt(const item: Integer;
-                                 const DBHandle: IscDbHandle= nil): Integer;
-    function  GetDataBaseInfoString(const item: Integer;
-                                    const DBHandle: IscDbHandle= nil): AnsiString;
-    function  GetDataBaseInfoDateTime(const item: Integer;
-                                      const DBHandle: IscDbHandle= nil): TDateTime;
-    Procedure TransactionStart(Var DBHandle: IscDbHandle;
-                               var TraHandle: IscTrHandle;
-                               var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                               const TPB: AnsiString); overload; virtual;
-    Procedure TransactionCommit(var DBHandle: IscDbHandle;
-                                var TraHandle: IscTrHandle;
-                                var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                const CloseConnection: Boolean = False); overload; virtual;
-    Procedure TransactionRollback(var DBHandle: IscDbHandle;
-                                  var TraHandle: IscTrHandle;
-                                  var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                  const CloseConnection: Boolean = False); overload; virtual;
-    Procedure TransactionStart(Var DBHandle: IscDbHandle;
-                               var TraHandle: IscTrHandle;
-                               const TPB: AnsiString); overload; virtual;
-    Procedure TransactionCommit(var DBHandle: IscDbHandle;
-                                var TraHandle: IscTrHandle;
-                                const CloseConnection: Boolean = False); overload; virtual;
-    Procedure TransactionRollback(var DBHandle: IscDbHandle;
-                                  var TraHandle: IscTrHandle;
-                                  const CloseConnection: Boolean = False); overload; virtual;
+    function  GetDataBaseInfoInt(
+                const item: Integer;
+                const DBHandle: IscDbHandle= nil): Integer;
+    function  GetDataBaseInfoString(
+                const item: Integer;
+                const DBHandle: IscDbHandle= nil): AnsiString;
+    function  GetDataBaseInfoDateTime(
+                const item: Integer;
+                const DBHandle: IscDbHandle= nil): TDateTime;
+    Procedure TransactionStart(
+                Var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                var StatementPool: TALFBXConnectionStatementPoolBinTree;
+                const TPB: AnsiString); overload; virtual;
+    Procedure TransactionCommit(
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                var StatementPool: TALFBXConnectionStatementPoolBinTree;
+                const CloseConnection: Boolean = False); overload; virtual;
+    Procedure TransactionRollback(
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                var StatementPool: TALFBXConnectionStatementPoolBinTree;
+                const CloseConnection: Boolean = False); overload; virtual;
+    Procedure TransactionStart(
+                Var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                const TPB: AnsiString); overload; virtual;
+    Procedure TransactionCommit(
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                const CloseConnection: Boolean = False); overload; virtual;
+    Procedure TransactionRollback(
+                var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                const CloseConnection: Boolean = False); overload; virtual;
     Procedure TransactionCommitRetaining(TraHandle: IscTrHandle); virtual;
     Procedure TransactionRollbackRetaining(TraHandle: IscTrHandle); virtual;
-    Function  Prepare(const SQL: AnsiString;
-                      Var DBHandle: IscDbHandle;
-                      var TraHandle: IscTrHandle;
-                      var StmtHandle: IscStmtHandle;
-                      var Sqlda: TALFBXSQLResult;
-                      const TPB: AnsiString = ''): TALFBXStatementType;
-    Procedure SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                         XMLDATA: TalXMLNode;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                         ExtData: Pointer;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const Query: TALFBXClientSelectDataQUERY;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const RowTag: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         const RowTag: AnsiString;
-                         Skip: integer;
-                         First: Integer;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         const RowTag: AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    Procedure SelectData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         XMLDATA: TalXMLNode;
-                         const FormatSettings: TALFormatSettingsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(const Queries: TALFBXClientUpdateDataQUERIES;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(const Query: TALFBXClientUpdateDataQUERY;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(SQLs: TALStringsA;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(const SQL: AnsiString;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(const SQL: AnsiString;
-                         const Params: Array of AnsiString;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
-    procedure UpdateData(const SQLs: array of AnsiString;
-                         const DBHandle: IscDbHandle = nil;
-                         const TraHandle: IscTrHandle = nil;
-                         const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                         const TPB: AnsiString = ''); overload; virtual;
+    Function  Prepare(
+                const SQL: AnsiString;
+                Var DBHandle: IscDbHandle;
+                var TraHandle: IscTrHandle;
+                var StmtHandle: IscStmtHandle;
+                var Sqlda: TALFBXSQLResult;
+                const TPB: AnsiString = ''): TALFBXStatementType;
+    Procedure SelectData(
+                const Queries: TALFBXClientSelectDataQUERIES;
+                XMLDATA: TalXMLNode;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const Query: TALFBXClientSelectDataQUERY;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                Skip: integer;
+                First: Integer;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+                ExtData: Pointer;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const Queries: TALFBXClientSelectDataQUERIES;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const Query: TALFBXClientSelectDataQUERY;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const RowTag: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                const RowTag: AnsiString;
+                Skip: integer;
+                First: Integer;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                const RowTag: AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    Procedure SelectData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                XMLDATA: TalXMLNode;
+                const FormatSettings: TALFormatSettingsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    procedure UpdateData(
+                const Queries: TALFBXClientUpdateDataQUERIES;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    procedure UpdateData(
+                const Query: TALFBXClientUpdateDataQUERY;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    procedure UpdateData(
+                SQLs: TALStringsA;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    procedure UpdateData(
+                const SQL: AnsiString;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    procedure UpdateData(
+                const SQL: AnsiString;
+                const Params: Array of AnsiString;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
+    procedure UpdateData(
+                const SQLs: array of AnsiString;
+                const DBHandle: IscDbHandle = nil;
+                const TraHandle: IscTrHandle = nil;
+                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+                const TPB: AnsiString = ''); overload; virtual;
     Function  ConnectionCount: Integer;
     Function  WorkingConnectionCount: Integer;
     property  SqlDialect: word read FSqlDialect;
@@ -630,61 +695,66 @@ Type
     fOnEvent: TALFBXEventThreadEvent;
     fOnException: TALFBXEventThreadException;
   protected
-    procedure initObject(const aDataBaseName,
-                               aLogin,
-                               aPassword,
-                               aCharSet: AnsiString;
-                         const aEventNames: AnsiString;
-                         aConnectionMaxIdleTime: integer;
-                         aNumbuffers: integer;
-                         const aOpenConnectionExtraParams: AnsiString;
-                         aOnEvent: TALFBXEventThreadEvent;
-                         aOnException: TALFBXEventThreadException); virtual;
+    procedure initObject(
+                const aDataBaseName,
+                      aLogin,
+                      aPassword,
+                      aCharSet: AnsiString;
+                const aEventNames: AnsiString;
+                aConnectionMaxIdleTime: integer;
+                aNumbuffers: integer;
+                const aOpenConnectionExtraParams: AnsiString;
+                aOnEvent: TALFBXEventThreadEvent;
+                aOnException: TALFBXEventThreadException); virtual;
     procedure DoEvent(const EventName: AnsiString; Count: Integer); virtual;
     procedure DoException(Error: Exception); virtual;
   public
-    constructor Create(const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                       aApiVer: TALFBXVersion_API;
-                       aOnEvent: TALFBXEventThreadEvent;
-                       aOnException: TALFBXEventThreadException;
-                       const alib: AnsiString = GDS32DLL;
-                       const aConnectionMaxIdleTime: integer = -1;
-                       const aNumbuffers: integer = -1;
-                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
-    Constructor Create(const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                       alib: TALFBXLibrary;
-                       aOnEvent: TALFBXEventThreadEvent;
-                       aOnException: TALFBXEventThreadException;
-                       const aConnectionMaxIdleTime: integer = -1;
-                       const aNumbuffers: integer = -1;
-                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
-    constructor Create(const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                       aApiVer: TALFBXVersion_API;
-                       const alib: AnsiString = GDS32DLL;
-                       const aConnectionMaxIdleTime: integer = -1;
-                       const aNumbuffers: integer = -1;
-                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
-    Constructor Create(const aDataBaseName,
-                             aLogin,
-                             aPassword,
-                             aCharSet: AnsiString;
-                       const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                       alib: TALFBXLibrary;
-                       const aConnectionMaxIdleTime: integer = -1;
-                       const aNumbuffers: integer = -1;
-                       const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    constructor Create(
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                  aApiVer: TALFBXVersion_API;
+                  aOnEvent: TALFBXEventThreadEvent;
+                  aOnException: TALFBXEventThreadException;
+                  const alib: AnsiString = GDS32DLL;
+                  const aConnectionMaxIdleTime: integer = -1;
+                  const aNumbuffers: integer = -1;
+                  const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    Constructor Create(
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                  alib: TALFBXLibrary;
+                  aOnEvent: TALFBXEventThreadEvent;
+                  aOnException: TALFBXEventThreadException;
+                  const aConnectionMaxIdleTime: integer = -1;
+                  const aNumbuffers: integer = -1;
+                  const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    constructor Create(
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                  aApiVer: TALFBXVersion_API;
+                  const alib: AnsiString = GDS32DLL;
+                  const aConnectionMaxIdleTime: integer = -1;
+                  const aNumbuffers: integer = -1;
+                  const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
+    Constructor Create(
+                  const aDataBaseName,
+                        aLogin,
+                        aPassword,
+                        aCharSet: AnsiString;
+                  const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+                  alib: TALFBXLibrary;
+                  const aConnectionMaxIdleTime: integer = -1;
+                  const aNumbuffers: integer = -1;
+                  const aOpenConnectionExtraParams: AnsiString = ''); overload; virtual;
     Destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure Execute; override;
@@ -952,16 +1022,17 @@ begin
   result := assigned(fTraHandle)
 end;
 
-{*****************************************************}
-procedure TALFBXClient.GetMonitoringInfos(ConnectionID,
-                                          TransactionID: int64;
-                                          const StatementSQL: AnsiString;
-                                          Var IOStats: TALFBXClientMonitoringIOStats;
-                                          Var RecordStats: TALFBXClientMonitoringRecordStats;
-                                          Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
-                                          Const SkipIOStats: Boolean = False;
-                                          Const SkipRecordStats: Boolean = False;
-                                          Const SkipMemoryUsage: Boolean = False);
+{****************************************}
+procedure TALFBXClient.GetMonitoringInfos(
+            ConnectionID,
+            TransactionID: int64;
+            const StatementSQL: AnsiString;
+            Var IOStats: TALFBXClientMonitoringIOStats;
+            Var RecordStats: TALFBXClientMonitoringRecordStats;
+            Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
+            Const SkipIOStats: Boolean = False;
+            Const SkipRecordStats: Boolean = False;
+            Const SkipMemoryUsage: Boolean = False);
 
 Var LXMLDATA: TalXmlDocument;
     LSelectPart: AnsiString;
@@ -991,22 +1062,28 @@ Begin
   if not Connected then raise Exception.Create('Not connected');
 
   //build the aSelectPart;
-  LSelectPart := ALIfThenA(not SkipIOStats,    'MON$PAGE_READS as PAGE_READS, '+
-                                               'MON$PAGE_WRITES as PAGE_WRITES, '+
-                                               'MON$PAGE_FETCHES as PAGE_FETCHES, '+
-                                               'MON$PAGE_MARKS as PAGE_MARKS, ') +
-                 ALIfThenA(not SkipRecordStats,'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
-                                               'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
-                                               'MON$RECORD_INSERTS as RECORD_INSERTS, '+
-                                               'MON$RECORD_UPDATES as RECORD_UPDATES, '+
-                                               'MON$RECORD_DELETES as RECORD_DELETES, '+
-                                               'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
-                                               'MON$RECORD_PURGES as RECORD_PURGES, '+
-                                               'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
-                 ALIfThenA(not SkipMemoryUsage,'MON$MEMORY_USED as MEMORY_USED, '+
-                                               'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
-                                               'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
-                                               'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
+  LSelectPart := ALIfThenA(
+                   not SkipIOStats,
+                   'MON$PAGE_READS as PAGE_READS, '+
+                   'MON$PAGE_WRITES as PAGE_WRITES, '+
+                   'MON$PAGE_FETCHES as PAGE_FETCHES, '+
+                   'MON$PAGE_MARKS as PAGE_MARKS, ') +
+                 ALIfThenA(
+                   not SkipRecordStats,
+                   'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                   'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
+                   'MON$RECORD_INSERTS as RECORD_INSERTS, '+
+                   'MON$RECORD_UPDATES as RECORD_UPDATES, '+
+                   'MON$RECORD_DELETES as RECORD_DELETES, '+
+                   'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
+                   'MON$RECORD_PURGES as RECORD_PURGES, '+
+                   'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
+                 ALIfThenA(
+                   not SkipMemoryUsage,
+                   'MON$MEMORY_USED as MEMORY_USED, '+
+                   'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
+                   'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
+                   'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
   if LSelectPart <> '' then delete(LSelectPart,length(LSelectPart) - 1, 1)
   else Exit;
 
@@ -1055,15 +1132,16 @@ Begin
       LXMLDATA := TALXmlDocument.create('root');
       try
 
-        SelectData('SELECT '+
-                     LSelectPart +
-                   'FROM ' +
-                     LFromPart + ' ' +
-                   LJoinPart +
-                   LWherePart,
-                   'rec',
-                   LXMLDATA.DocumentElement,
-                   ALDefaultFormatSettingsA);
+        SelectData(
+          'SELECT '+
+            LSelectPart +
+          'FROM ' +
+            LFromPart + ' ' +
+          LJoinPart +
+          LWherePart,
+          'rec',
+          LXMLDATA.DocumentElement,
+          ALDefaultFormatSettingsA);
 
         if LXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
         with LXMLDATA.DocumentElement.ChildNodes[0] do begin
@@ -1128,28 +1206,31 @@ Begin
 
 end;
 
-{*********************************************************}
-function TALFBXClient.loadCachedData(const Key: AnsiString;
-                                     var DataStr: AnsiString): Boolean;
+{***********************************}
+function TALFBXClient.loadCachedData(
+           const Key: AnsiString;
+           var DataStr: AnsiString): Boolean;
 begin
   result := false; //virtual need to be overriden
 end;
 
-{***********************************************************}
-Procedure TALFBXClient.SaveDataToCache(const Key: ansiString;
-                                       const CacheThreshold: integer;
-                                       const DataStr: ansiString);
+{*************************************}
+Procedure TALFBXClient.SaveDataToCache(
+            const Key: ansiString;
+            const CacheThreshold: integer;
+            const DataStr: ansiString);
 begin
   //virtual need to be overriden
 end;
 
-{*********************************************************}
-function TALFBXClient.GetFieldValue(aSQLDA:TALFBXSQLResult;
-                                    aDBHandle: IscDbHandle;
-                                    aTraHandle: IscTrHandle;
-                                    aIndex: Integer;
-                                    const aFormatSettings: TALFormatSettingsA): AnsiString;
-  {-------------------------}
+{**********************************}
+function TALFBXClient.GetFieldValue(
+           aSQLDA:TALFBXSQLResult;
+           aDBHandle: IscDbHandle;
+           aTraHandle: IscTrHandle;
+           aIndex: Integer;
+           const aFormatSettings: TALFormatSettingsA): AnsiString;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalReadBlob;
   var BlobHandle: IscBlobHandle;
   begin
@@ -1267,7 +1348,7 @@ begin
   result := FLibrary.DatabaseInfoDateTime(FDbHandle, item);
 end;
 
-{*********************************************************}
+{**********************************************************}
 procedure TALFBXClient.GetUserNames(UserNames: TALStringsA);
 var data: AnsiString;
     p: PAnsiChar;
@@ -1321,12 +1402,13 @@ begin
 
 end;
 
-{************************************************}
-procedure TALFBXClient.Connect(const DataBaseName,
-                                     Login,
-                                     Password,
-                                     CharSet: AnsiString;
-                               const ExtraParams: AnsiString = '');
+{*****************************}
+procedure TALFBXClient.Connect(
+            const DataBaseName,
+                  Login,
+                  Password,
+                  CharSet: AnsiString;
+            const ExtraParams: AnsiString = '');
 Var LParams: AnsiString;
 begin
   if connected then raise Exception.Create('Already connected');
@@ -1336,27 +1418,30 @@ begin
              'lc_ctype = '+CharSet;
   if ExtraParams <> '' then LParams := LParams + '; ' + ExtraParams;
   Try
-    FLibrary.AttachDatabase(DataBaseName,
-                            fDBHandle,
-                            LParams);
+    FLibrary.AttachDatabase(
+      DataBaseName,
+      fDBHandle,
+      LParams);
   Except
     fDBHandle := nil;
     raise;
   End;
 end;
 
-{************************************************}
-procedure TALFBXClient.connect(const DataBaseName,
-                                     Login,
-                                     Password,
-                                     CharSet: AnsiString;
-                               Numbuffers: integer);
+{*****************************}
+procedure TALFBXClient.connect(
+            const DataBaseName,
+                  Login,
+                  Password,
+                  CharSet: AnsiString;
+            Numbuffers: integer);
 begin
-  Connect(DataBaseName,
-          Login,
-          Password,
-          CharSet,
-          'num_buffers = '+ALIntToStrA(Numbuffers));
+  Connect(
+    DataBaseName,
+    Login,
+    Password,
+    CharSet,
+    'num_buffers = '+ALIntToStrA(Numbuffers));
 end;
 
 {********************************}
@@ -1385,9 +1470,10 @@ begin
 
   //Start the transaction
   Try
-    Flibrary.TransactionStart(fTraHandle,
-                              fDBHandle,
-                              TPB);
+    Flibrary.TransactionStart(
+      fTraHandle,
+      fDBHandle,
+      TPB);
   Except
     fTraHandle := nil;
     raise;
@@ -1519,26 +1605,29 @@ begin
 
 end;
 
-{*******************************************************************************}
-procedure TALFBXClient.OnSelectDataDone(const Query: TALFBXClientSelectDataQUERY;
-                                        TimeTaken: double);
+{**************************************}
+procedure TALFBXClient.OnSelectDataDone(
+            const Query: TALFBXClientSelectDataQUERY;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{*******************************************************************************}
-procedure TALFBXClient.OnUpdateDataDone(const Query: TALFBXClientUpdateDataQUERY;
-                                        TimeTaken: double);
+{**************************************}
+procedure TALFBXClient.OnUpdateDataDone(
+            const Query: TALFBXClientUpdateDataQUERY;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{*****************************************************************************}
-procedure TALFBXClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                                  XMLDATA: TalXMLNode;
-                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                  ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const Queries: TALFBXClientSelectDataQUERIES;
+            XMLDATA: TalXMLNode;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 
 Var LSqlpa: TALFBXSQLParams;
     LParamsIndex: integer;
@@ -1551,7 +1640,7 @@ Var LSqlpa: TALFBXSQLParams;
     LCacheKey: ansiString;
     LCacheStr: ansiString;
 
-    {------------------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Procedure InternalSelectDataFetchRows;
     var LColumnIndex: integer;
         LRecIndex: integer;
@@ -1590,20 +1679,20 @@ Var LSqlpa: TALFBXSQLParams;
           For LColumnIndex := 0 to fsqlda.FieldCount - 1 do begin
             LValueRec := LNewRec.AddChild(ALlowercase(fsqlda.AliasName[LColumnIndex]));
             if (fSQLDA.SQLType[LColumnIndex] = SQL_BLOB) then LValueRec.ChildNodes.Add(
-                                                                                       LValueRec.OwnerDocument.CreateNode(
-                                                                                                                          GetFieldValue(fsqlda,
-                                                                                                                                        fDBHandle,
-                                                                                                                                        fTRAHandle,
-                                                                                                                                        LColumnIndex,
-                                                                                                                                        FormatSettings),
-                                                                                                                          ntCData
-                                                                                                                         )
-                                                                                       )
-            else LValueRec.Text := GetFieldValue(fsqlda,
-                                                 fDBHandle,
-                                                 fTRAHandle,
-                                                 LColumnIndex,
-                                                 FormatSettings);
+                                                                LValueRec.OwnerDocument.CreateNode(
+                                                                  GetFieldValue(
+                                                                    fsqlda,
+                                                                    fDBHandle,
+                                                                    fTRAHandle,
+                                                                    LColumnIndex,
+                                                                    FormatSettings),
+                                                                  ntCData))
+            else LValueRec.Text := GetFieldValue(
+                                     fsqlda,
+                                     fDBHandle,
+                                     fTRAHandle,
+                                     LColumnIndex,
+                                     FormatSettings);
             if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
           end;
 
@@ -1662,11 +1751,12 @@ begin
           (Queries[LQueriesIndex].ViewTag <> '')) then begin
 
         //try to load from from cache
-        LCacheKey := ALStringHashSHA1(Queries[LQueriesIndex].RowTag + '#' +
-                                      ALIntToStrA(Queries[LQueriesIndex].Skip) + '#' +
-                                      ALIntToStrA(Queries[LQueriesIndex].First) + '#' +
-                                      ALGetFormatSettingsID(FormatSettings) + '#' +
-                                      Queries[LQueriesIndex].SQL);
+        LCacheKey := ALStringHashSHA1(
+                       Queries[LQueriesIndex].RowTag + '#' +
+                       ALIntToStrA(Queries[LQueriesIndex].Skip) + '#' +
+                       ALIntToStrA(Queries[LQueriesIndex].First) + '#' +
+                       ALGetFormatSettingsID(FormatSettings) + '#' +
+                       Queries[LQueriesIndex].SQL);
         if loadcachedData(LCacheKey, LCacheStr) then begin
 
           //init the aViewRec
@@ -1799,17 +1889,19 @@ begin
 
       //do the OnSelectDataDone
       LStopWatch.Stop;
-      OnSelectDataDone(Queries[LQueriesIndex],
-                       LStopWatch.Elapsed.TotalMilliseconds);
+      OnSelectDataDone(
+        Queries[LQueriesIndex],
+        LStopWatch.Elapsed.TotalMilliseconds);
 
       //save to the cache
       If LCacheKey <> '' then begin
 
         //save the data
         LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
-        SaveDataToCache(LCacheKey,
-                        Queries[LQueriesIndex].CacheThreshold,
-                        LCacheStr);
+        SaveDataToCache(
+          LCacheKey,
+          Queries[LQueriesIndex].CacheThreshold,
+          LCacheStr);
 
       end;
 
@@ -1821,29 +1913,32 @@ begin
 
 end;
 
-{*************************************************************************}
-procedure TALFBXClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
-                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                  ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const Query: TALFBXClientSelectDataQUERY;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := Query;
-  SelectData(LSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    nil,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  Skip: Integer;
-                                  First: Integer;
-                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                  ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1851,66 +1946,74 @@ begin
   LSelectDataQUERIES[0].Sql := Sql;
   LSelectDataQUERIES[0].skip := Skip;
   LSelectDataQUERIES[0].First := First;
-  SelectData(LSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    nil,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                  ExtData: Pointer;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
   LSelectDataQUERIES[0].Sql := Sql;
-  SelectData(LSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    nil,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings);
 end;
 
-{*****************************************************************************}
-procedure TALFBXClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const Queries: TALFBXClientSelectDataQUERIES;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 begin
 
-  SelectData(Queries,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    Queries,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 
 end;
 
-{*************************************************************************}
-procedure TALFBXClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const Query: TALFBXClientSelectDataQUERY;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := Query;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  const RowTag: AnsiString;
-                                  Skip: Integer;
-                                  First: Integer;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -1919,55 +2022,61 @@ begin
   LSelectDataQUERIES[0].RowTag := RowTag;
   LSelectDataQUERIES[0].skip := Skip;
   LSelectDataQUERIES[0].First := First;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  const RowTag: AnsiString;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
   LSelectDataQUERIES[0].Sql := Sql;
   LSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
   LSelectDataQUERIES[0].Sql := Sql;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  const Params: Array of AnsiString;
-                                  const RowTag: AnsiString;
-                                  Skip: Integer;
-                                  First: Integer;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            const Params: Array of AnsiString;
+            const RowTag: AnsiString;
+            Skip: Integer;
+            First: Integer;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -1983,19 +2092,21 @@ begin
   LSelectDataQUERIES[0].RowTag := RowTag;
   LSelectDataQUERIES[0].skip := Skip;
   LSelectDataQUERIES[0].First := First;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  const Params: Array of AnsiString;
-                                  const RowTag: AnsiString;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            const Params: Array of AnsiString;
+            const RowTag: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -2009,18 +2120,20 @@ begin
     LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
   LSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
-{******************************************************}
-procedure TALFBXClient.SelectData(const SQL: AnsiString;
-                                  const Params: Array of AnsiString;
-                                  XMLDATA: TalXMLNode;
-                                  const FormatSettings: TALFormatSettingsA);
+{********************************}
+procedure TALFBXClient.SelectData(
+            const SQL: AnsiString;
+            const Params: Array of AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA);
 var LSelectDataQUERIES: TALFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -2033,11 +2146,12 @@ begin
     LSelectDataQUERIES[0].params[I].Value := Params[I];
     LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings);
 end;
 
 {******************************************************************************}
@@ -2172,8 +2286,9 @@ begin
 
     //do the OnUpdateDataDone
     LStopWatch.Stop;
-    OnUpdateDataDone(Queries[LQueriesIndex],
-                     LStopWatch.Elapsed.TotalMilliseconds);
+    OnUpdateDataDone(
+      Queries[LQueriesIndex],
+      LStopWatch.Elapsed.TotalMilliseconds);
 
   end;
 
@@ -2188,7 +2303,7 @@ begin
   UpdateData(LUpdateDataQUERIES);
 end;
 
-{**************************************************}
+{***************************************************}
 procedure TALFBXClient.UpdateData(SQLs: TALStringsA);
 Var LSQLsIndex : integer;
     LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
@@ -2211,9 +2326,10 @@ begin
   UpdateData(LUpdateDataQUERIES);
 end;
 
-{******************************************************}
-procedure TALFBXClient.UpdateData(const SQL: AnsiString;
-                                  const Params: Array of AnsiString);
+{********************************}
+procedure TALFBXClient.UpdateData(
+            const SQL: AnsiString;
+            const Params: Array of AnsiString);
 Var LUpdateDataQUERIES: TALFBXClientUpdateDataQUERIES;
     i: integer;
 begin
@@ -2242,16 +2358,17 @@ begin
   UpdateData(LUpdateDataQUERIES);
 end;
 
-{*******************************************************************}
-procedure TALFBXConnectionPoolClient.GetMonitoringInfos(ConnectionID,
-                                                        TransactionID: int64;
-                                                        const StatementSQL: AnsiString;
-                                                        Var IOStats: TALFBXClientMonitoringIOStats;
-                                                        Var RecordStats: TALFBXClientMonitoringRecordStats;
-                                                        Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
-                                                        Const SkipIOStats: Boolean = False;
-                                                        Const SkipRecordStats: Boolean = False;
-                                                        Const SkipMemoryUsage: Boolean = False);
+{******************************************************}
+procedure TALFBXConnectionPoolClient.GetMonitoringInfos(
+            ConnectionID,
+            TransactionID: int64;
+            const StatementSQL: AnsiString;
+            Var IOStats: TALFBXClientMonitoringIOStats;
+            Var RecordStats: TALFBXClientMonitoringRecordStats;
+            Var MemoryUsage: TALFBXClientMonitoringMemoryUsage;
+            Const SkipIOStats: Boolean = False;
+            Const SkipRecordStats: Boolean = False;
+            Const SkipMemoryUsage: Boolean = False);
 
 Var LXMLDATA: TalXmlDocument;
     LSelectPart: AnsiString;
@@ -2276,22 +2393,28 @@ Begin
   //To refresh the snapshot, the current transaction should be finished and the monitoring tables should be queried in a new transaction context.
 
   //build the aSelectPart;
-  LSelectPart := ALIfThenA(not SkipIOStats,    'MON$PAGE_READS as PAGE_READS, '+
-                                               'MON$PAGE_WRITES as PAGE_WRITES, '+
-                                               'MON$PAGE_FETCHES as PAGE_FETCHES, '+
-                                               'MON$PAGE_MARKS as PAGE_MARKS, ') +
-                 ALIfThenA(not SkipRecordStats,'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
-                                               'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
-                                               'MON$RECORD_INSERTS as RECORD_INSERTS, '+
-                                               'MON$RECORD_UPDATES as RECORD_UPDATES, '+
-                                               'MON$RECORD_DELETES as RECORD_DELETES, '+
-                                               'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
-                                               'MON$RECORD_PURGES as RECORD_PURGES, '+
-                                               'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
-                 ALIfThenA(not SkipMemoryUsage,'MON$MEMORY_USED as MEMORY_USED, '+
-                                               'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
-                                               'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
-                                               'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
+  LSelectPart := ALIfThenA(
+                   not SkipIOStats,
+                   'MON$PAGE_READS as PAGE_READS, '+
+                   'MON$PAGE_WRITES as PAGE_WRITES, '+
+                   'MON$PAGE_FETCHES as PAGE_FETCHES, '+
+                   'MON$PAGE_MARKS as PAGE_MARKS, ') +
+                 ALIfThenA(
+                   not SkipRecordStats,
+                   'MON$RECORD_SEQ_READS as RECORD_SEQ_READS, '+
+                   'MON$RECORD_IDX_READS as RECORD_IDX_READS, '+
+                   'MON$RECORD_INSERTS as RECORD_INSERTS, '+
+                   'MON$RECORD_UPDATES as RECORD_UPDATES, '+
+                   'MON$RECORD_DELETES as RECORD_DELETES, '+
+                   'MON$RECORD_BACKOUTS as RECORD_BACKOUTS, '+
+                   'MON$RECORD_PURGES as RECORD_PURGES, '+
+                   'MON$RECORD_EXPUNGES as RECORD_EXPUNGES, ') +
+                 ALIfThenA(
+                   not SkipMemoryUsage,
+                   'MON$MEMORY_USED as MEMORY_USED, '+
+                   'MON$MEMORY_ALLOCATED as MEMORY_ALLOCATED, '+
+                   'MON$MAX_MEMORY_USED as MAX_MEMORY_USED, '+
+                   'MON$MAX_MEMORY_ALLOCATED as MAX_MEMORY_ALLOCATED, ');
   if LSelectPart <> '' then delete(LSelectPart,length(LSelectPart) - 1, 1)
   else Exit;
 
@@ -2324,26 +2447,28 @@ Begin
   LTraHandle := nil;
 
   //start the TMP transaction
-  TransactionStart(LDBHandle,
-                   LTraHandle,
-                   DefaultReadTPB);
+  TransactionStart(
+    LDBHandle,
+    LTraHandle,
+    DefaultReadTPB);
   Try
 
     //get the data from the monitoring table
     LXMLDATA := TALXmlDocument.create('root');
     try
 
-      SelectData('SELECT '+
-                   LSelectPart +
-                 'FROM ' +
-                   LFromPart + ' ' +
-                 LJoinPart +
-                 LWherePart,
-                 'rec',
-                 LXMLDATA.DocumentElement,
-                 ALDefaultFormatSettingsA,
-                 LDBHandle,
-                 LTraHandle);
+      SelectData(
+        'SELECT '+
+          LSelectPart +
+        'FROM ' +
+          LFromPart + ' ' +
+        LJoinPart +
+        LWherePart,
+        'rec',
+        LXMLDATA.DocumentElement,
+        ALDefaultFormatSettingsA,
+        LDBHandle,
+        LTraHandle);
 
       if LXMLDATA.DocumentElement.ChildNodes.Count <> 1 then raise Exception.Create('Can not get the monitoring stats');
       with LXMLDATA.DocumentElement.ChildNodes[0] do begin
@@ -2386,27 +2511,30 @@ Begin
     end;
 
     //commit the TMP transaction
-    TransactionCommit(LDBHandle,
-                      LTraHandle);
+    TransactionCommit(
+      LDBHandle,
+      LTraHandle);
 
   Except
 
     //roolback the TMP transaction
-    TransactionRollBack(LDBHandle,
-                        LTraHandle);
+    TransactionRollBack(
+      LDBHandle,
+      LTraHandle);
     Raise;
 
   End;
 
 end;
 
-{************************************************************************}
-function TALFBXConnectionPoolClient.GetFieldValue(aSQLDA: TALFBXSQLResult;
-                                                  aDBHandle: IscDbHandle;
-                                                  aTraHandle: IscTrHandle;
-                                                  aIndex: Integer;
-                                                  const aFormatSettings: TALFormatSettingsA): AnsiString;
-  {-------------------------}
+{************************************************}
+function TALFBXConnectionPoolClient.GetFieldValue(
+           aSQLDA: TALFBXSQLResult;
+           aDBHandle: IscDbHandle;
+           aTraHandle: IscTrHandle;
+           aIndex: Integer;
+           const aFormatSettings: TALFormatSettingsA): AnsiString;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
   Procedure InternalReadBlob;
   var BlobHandle: IscBlobHandle;
   begin
@@ -2443,13 +2571,14 @@ Begin
   else result := fNullString;
 end;
 
-{******************************************************************}
-procedure TALFBXConnectionPoolClient.initObject(const aDataBaseName,
-                                                      aLogin,
-                                                      aPassword,
-                                                      aCharSet: AnsiString;
-                                                const aNumbuffers: integer = -1;
-                                                const aOpenConnectionExtraParams: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.initObject(
+            const aDataBaseName,
+                  aLogin,
+                  aPassword,
+                  aCharSet: AnsiString;
+            const aNumbuffers: integer = -1;
+            const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fDefaultReadTPB := cALFbxClientDefaultReadNOWaitTPB;
   fDefaultWriteTPB := cALFbxClientDefaultWriteNOWaitTPB;
@@ -2486,44 +2615,48 @@ begin
   FNullString := '';
 end;
 
-{****************************************************************}
-constructor TALFBXConnectionPoolClient.Create(const aDataBaseName,
-                                                    aLogin,
-                                                    aPassword,
-                                                    aCharSet: AnsiString;
-                                              aApiVer: TALFBXVersion_API;
-                                              const alib: AnsiString = GDS32DLL;
-                                              const aNumbuffers: integer = -1;
-                                              const aOpenConnectionExtraParams: AnsiString = '');
+{********************************************}
+constructor TALFBXConnectionPoolClient.Create(
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              aApiVer: TALFBXVersion_API;
+              const alib: AnsiString = GDS32DLL;
+              const aNumbuffers: integer = -1;
+              const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fLibrary := TALFBXLibrary.Create(aApiVer);
   fLibrary.Load(alib);
   FownLibrary := True;
-  initObject(aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aNumbuffers,
-             aOpenConnectionExtraParams);
+  initObject(
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aNumbuffers,
+    aOpenConnectionExtraParams);
 end;
 
-{****************************************************************}
-constructor TALFBXConnectionPoolClient.Create(const aDataBaseName,
-                                                    aLogin,
-                                                    aPassword,
-                                                    aCharSet: AnsiString;
-                                              alib: TALFBXLibrary;
-                                              const aNumbuffers: integer = -1;
-                                              const aOpenConnectionExtraParams: AnsiString = '');
+{********************************************}
+constructor TALFBXConnectionPoolClient.Create(
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              alib: TALFBXLibrary;
+              const aNumbuffers: integer = -1;
+              const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fLibrary := alib;
   FownLibrary := False;
-  initObject(aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aNumbuffers,
-             aOpenConnectionExtraParams);
+  initObject(
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aNumbuffers,
+    aOpenConnectionExtraParams);
 end;
 
 {********************************************}
@@ -2549,9 +2682,10 @@ begin
 
 end;
 
-{**************************************************************************}
-function  TALFBXConnectionPoolClient.GetDataBaseInfoInt(const item: Integer;
-                                                        const DBHandle: IscDbHandle= nil): Integer;
+{******************************************************}
+function  TALFBXConnectionPoolClient.GetDataBaseInfoInt(
+            const item: Integer;
+            const DBHandle: IscDbHandle= nil): Integer;
 Var LTmpDBHandle: IscDbHandle;
 begin
   LTmpDBHandle := DBHandle;
@@ -2568,9 +2702,10 @@ begin
   end;
 end;
 
-{*****************************************************************************}
-function  TALFBXConnectionPoolClient.GetDataBaseInfoString(const item: Integer;
-                                                           const DBHandle: IscDbHandle= nil): AnsiString;
+{*********************************************************}
+function  TALFBXConnectionPoolClient.GetDataBaseInfoString(
+            const item: Integer;
+            const DBHandle: IscDbHandle= nil): AnsiString;
 Var LTmpDBHandle: IscDbHandle;
     LSize: byte;
     LData: AnsiString;
@@ -2598,9 +2733,10 @@ begin
   end;
 end;
 
-{*******************************************************************************}
-function  TALFBXConnectionPoolClient.GetDataBaseInfoDateTime(const item: Integer;
-                                                             const DBHandle: IscDbHandle= nil): TDateTime;
+{***********************************************************}
+function  TALFBXConnectionPoolClient.GetDataBaseInfoDateTime(
+            const item: Integer;
+            const DBHandle: IscDbHandle= nil): TDateTime;
 Var LTmpDBHandle: IscDbHandle;
 begin
   LTmpDBHandle := DBHandle;
@@ -2640,11 +2776,12 @@ Type
     LstBinaryTreeNodeToDelete: TobjectList;
   End;
 
-{**************************************************************************************************}
-procedure ALFBXConnectionPoolClient_ConnectionStatementPoolIterateFunct(aTree: TALBaseAVLBinaryTree;
-                                                                        aNode: TALBaseAVLBinaryTreeNode;
-                                                                        aExtData: Pointer;
-                                                                        Var aContinue: Boolean);
+{**********************************************************************}
+procedure ALFBXConnectionPoolClient_ConnectionStatementPoolIterateFunct(
+            aTree: TALBaseAVLBinaryTree;
+            aNode: TALBaseAVLBinaryTreeNode;
+            aExtData: Pointer;
+            Var aContinue: Boolean);
 begin
 
   //typecast the aExtData
@@ -2655,9 +2792,10 @@ begin
 
 end;
 
-{***************************************************************************************}
-Procedure TALFBXConnectionPoolClient.AcquireConnectionWithStmt(var DBHandle: IscDbHandle;
-                                                               var StatementPool: TALFBXConnectionStatementPoolBinTree);
+{*************************************************************}
+Procedure TALFBXConnectionPoolClient.AcquireConnectionWithStmt(
+            var DBHandle: IscDbHandle;
+            var StatementPool: TALFBXConnectionStatementPoolBinTree);
 Var LConnectionStatementPoolIterateExtData: TALFBXConnectionPoolClient_ConnectionStatementPoolIterateExtData;
     LConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
     LTickCount: int64;
@@ -2710,9 +2848,10 @@ Begin
     else begin
       DBHandle := nil;
       StatementPool := nil;
-      FLibrary.AttachDatabase(DataBaseName,
-                              DBHandle,
-                              fOpenConnectionParams);
+      FLibrary.AttachDatabase(
+        DataBaseName,
+        DBHandle,
+        fOpenConnectionParams);
       StatementPool := TALFBXConnectionStatementPoolBinTree.Create;
     end;
 
@@ -2736,9 +2875,10 @@ Begin
       LConnectionStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
       //iterate all StatementPool node
-      StatementPool.Iterate(ALFBXConnectionPoolClient_ConnectionStatementPoolIterateFunct,
-                            true,
-                            @LConnectionStatementPoolIterateExtData);
+      StatementPool.Iterate(
+        ALFBXConnectionPoolClient_ConnectionStatementPoolIterateFunct,
+        true,
+        @LConnectionStatementPoolIterateExtData);
 
       //delete all StatementPool node that have an empty pool
       for I := 0 to LConnectionStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
@@ -2755,10 +2895,11 @@ Begin
 
 End;
 
-{***************************************************************************************}
-Procedure TALFBXConnectionPoolClient.ReleaseConnectionWithStmt(var DBHandle: IscDbHandle;
-                                                               var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                                               const CloseConnection: Boolean = False);
+{*************************************************************}
+Procedure TALFBXConnectionPoolClient.ReleaseConnectionWithStmt(
+            var DBHandle: IscDbHandle;
+            var StatementPool: TALFBXConnectionStatementPoolBinTree;
+            const CloseConnection: Boolean = False);
 Var LConnectionWithStmtPoolContainer: TALFBXConnectionWithStmtPoolContainer;
 begin
 
@@ -2854,9 +2995,10 @@ Begin
     //create a new connection
     else begin
       Result := nil;
-      FLibrary.AttachDatabase(DataBaseName,
-                              Result,
-                              fOpenConnectionParams);
+      FLibrary.AttachDatabase(
+        DataBaseName,
+        Result,
+        fOpenConnectionParams);
     end;
 
     //increase the connection count
@@ -2869,9 +3011,10 @@ Begin
 
 End;
 
-{******************************************************************************************}
-procedure TALFBXConnectionPoolClient.ReleaseConnectionWithoutStmt(var DBHandle: IscDbHandle;
-                                                                   const CloseConnection: Boolean = False);
+{****************************************************************}
+procedure TALFBXConnectionPoolClient.ReleaseConnectionWithoutStmt(
+            var DBHandle: IscDbHandle;
+            const CloseConnection: Boolean = False);
 Var LConnectionWithoutStmtPoolContainer: TALFBXConnectionWithoutStmtPoolContainer;
 begin
 
@@ -2922,11 +3065,12 @@ Type
     LstBinaryTreeNodeToDelete: TobjectList;
   End;
 
-{**********************************************************************************************}
-procedure ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct(aTree: TALBaseAVLBinaryTree;
-                                                                    aNode: TALBaseAVLBinaryTreeNode;
-                                                                    aExtData: Pointer;
-                                                                    Var aContinue: Boolean);
+{******************************************************************}
+procedure ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct(
+            aTree: TALBaseAVLBinaryTree;
+            aNode: TALBaseAVLBinaryTreeNode;
+            aExtData: Pointer;
+            Var aContinue: Boolean);
 
 Var LReadTransactionPool: TobjectList;
     LReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
@@ -2951,19 +3095,22 @@ begin
         Try
 
           //commit the transaction and release the connection
-          ConnectionPoolClient.TransactionCommit(LReadTransactionPoolContainer.DBHandle,
-                                                 LReadTransactionPoolContainer.TraHandle);
+          ConnectionPoolClient.TransactionCommit(
+            LReadTransactionPoolContainer.DBHandle,
+            LReadTransactionPoolContainer.TraHandle);
 
         Except
 
           //roolback the transaction (and free the connection)
-          if assigned(LReadTransactionPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(LReadTransactionPoolContainer.DBHandle,
-                                                                                                             LReadTransactionPoolContainer.TraHandle,
-                                                                                                             True) // const CloseConnection: Boolean = False
+          if assigned(LReadTransactionPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(
+                                                                      LReadTransactionPoolContainer.DBHandle,
+                                                                      LReadTransactionPoolContainer.TraHandle,
+                                                                      True) // const CloseConnection: Boolean = False
 
           //simply free the connection
-          else if assigned(LReadTransactionPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(LReadTransactionPoolContainer.DBHandle,
-                                                                                                                           True); // const CloseConnection: Boolean = False
+          else if assigned(LReadTransactionPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(
+                                                                          LReadTransactionPoolContainer.DBHandle,
+                                                                          True); // const CloseConnection: Boolean = False
 
         End;
 
@@ -2984,10 +3131,11 @@ begin
 
 end;
 
-{************************************************************************************}
-procedure TALFBXConnectionPoolClient.AcquireReadTransaction(var DBHandle: IscDbHandle;
-                                                            var TraHandle: IscTrHandle;
-                                                            const TPB: AnsiString);
+{**********************************************************}
+procedure TALFBXConnectionPoolClient.AcquireReadTransaction(
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            const TPB: AnsiString);
 
 Var LReadTransactionPoolIterateExtData: TALFBXConnectionPoolClient_ReadTransactionPoolIterateExtData;
     LReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
@@ -3025,9 +3173,10 @@ Begin
         LReadTransactionPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
         //iterate all FReadTransactionPool node
-        FReadTransactionPool.Iterate(ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
-                                     true,
-                                     @LReadTransactionPoolIterateExtData);
+        FReadTransactionPool.Iterate(
+          ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
+          true,
+          @LReadTransactionPoolIterateExtData);
 
         //delete all FReadTransactionPool node that have an empty pool
         for I := 0 to LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
@@ -3067,9 +3216,10 @@ Begin
     else begin
       DBHandle := nil;
       TraHandle := nil;
-      TransactionStart(DBHandle,
-                       TraHandle,
-                       TPB);
+      TransactionStart(
+        DBHandle,
+        TraHandle,
+        TPB);
     end;
 
     //increase the Transaction count
@@ -3082,11 +3232,12 @@ Begin
 
 End;
 
-{************************************************************************************}
-procedure TALFBXConnectionPoolClient.ReleaseReadTransaction(var DBHandle: IscDbHandle;
-                                                            var TraHandle: IscTrHandle;
-                                                            const TPB: AnsiString;
-                                                            const CloseConnection: Boolean = False);
+{**********************************************************}
+procedure TALFBXConnectionPoolClient.ReleaseReadTransaction(
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            const TPB: AnsiString;
+            const CloseConnection: Boolean = False);
 
 Var LReadTransactionPoolContainer: TalFBXReadTransactionPoolContainer;
     LStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
@@ -3131,20 +3282,23 @@ begin
       Try
 
         //commit the transaction and release the connection
-        TransactionCommit(DBHandle,
-                          TraHandle,
-                          CloseConnection);
+        TransactionCommit(
+          DBHandle,
+          TraHandle,
+          CloseConnection);
 
       Except
 
         //roolback the transaction (and free the connection)
-        if assigned(TraHandle) then TransactionRollback(DBHandle,
-                                                        TraHandle,
-                                                        True) // const CloseConnection: Boolean = False
+        if assigned(TraHandle) then TransactionRollback(
+                                      DBHandle,
+                                      TraHandle,
+                                      True) // const CloseConnection: Boolean = False
 
         //simply free the connection
-        else if assigned(DBHandle) then ReleaseConnectionWithoutStmt(DBHandle,
-                                                                      True); // const CloseConnection: Boolean = False
+        else if assigned(DBHandle) then ReleaseConnectionWithoutStmt(
+                                          DBHandle,
+                                          True); // const CloseConnection: Boolean = False
 
       End;
 
@@ -3171,11 +3325,12 @@ Type
     LstBinaryTreeNodeToDelete: TobjectList;
   End;
 
-{********************************************************************************************}
-procedure ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct(aTree: TALBaseAVLBinaryTree;
-                                                                  aNode: TALBaseAVLBinaryTreeNode;
-                                                                  aExtData: Pointer;
-                                                                  Var aContinue: Boolean);
+{****************************************************************}
+procedure ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct(
+            aTree: TALBaseAVLBinaryTree;
+            aNode: TALBaseAVLBinaryTreeNode;
+            aExtData: Pointer;
+            Var aContinue: Boolean);
 
 Var LReadStatementPool: TobjectList;
     LReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
@@ -3211,19 +3366,22 @@ begin
           LReadStatementPoolContainer.Sqlda := nil;
 
           //commit and release the connection
-          ConnectionPoolClient.TransactionCommit(LReadStatementPoolContainer.DBHandle,
-                                                 LReadStatementPoolContainer.TraHandle);
+          ConnectionPoolClient.TransactionCommit(
+            LReadStatementPoolContainer.DBHandle,
+            LReadStatementPoolContainer.TraHandle);
 
         Except
 
           //roolback the transaction (and free the connection)
-          if assigned(LReadStatementPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(LReadStatementPoolContainer.DBHandle,
-                                                                                                           LReadStatementPoolContainer.TraHandle,
-                                                                                                           True) // const CloseConnection: Boolean = False
+          if assigned(LReadStatementPoolContainer.TraHandle) then ConnectionPoolClient.TransactionRollback(
+                                                                    LReadStatementPoolContainer.DBHandle,
+                                                                    LReadStatementPoolContainer.TraHandle,
+                                                                    True) // const CloseConnection: Boolean = False
 
           //simply free the connection
-          else if assigned(LReadStatementPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(LReadStatementPoolContainer.DBHandle,
-                                                                                                                         True); // const CloseConnection: Boolean = False
+          else if assigned(LReadStatementPoolContainer.DBHandle) then ConnectionPoolClient.ReleaseConnectionWithoutStmt(
+                                                                        LReadStatementPoolContainer.DBHandle,
+                                                                        True); // const CloseConnection: Boolean = False
 
         End;
 
@@ -3244,13 +3402,14 @@ begin
 
 end;
 
-{******************************************************************************}
-procedure TALFBXConnectionPoolClient.AcquireReadStatement(const SQL: AnsiString;
-                                                          var DBHandle: IscDbHandle;
-                                                          var TraHandle: IscTrHandle;
-                                                          var StmtHandle: IscStmtHandle;
-                                                          var Sqlda: TALFBXSQLResult;
-                                                          const TPB: AnsiString);
+{********************************************************}
+procedure TALFBXConnectionPoolClient.AcquireReadStatement(
+            const SQL: AnsiString;
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            var StmtHandle: IscStmtHandle;
+            var Sqlda: TALFBXSQLResult;
+            const TPB: AnsiString);
 
 Var LReadStatementPoolIterateExtData: TALFBXConnectionPoolClient_ReadStatementPoolIterateExtData;
     LReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
@@ -3291,9 +3450,10 @@ Begin
         LReadStatementPoolIterateExtData.TickCountCurrentdate := GetTickCount64;
 
         //iterate all FReadStatementPool node
-        FReadStatementPool.Iterate(ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
-                                   true,
-                                   @LReadStatementPoolIterateExtData);
+        FReadStatementPool.Iterate(
+          ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
+          true,
+          @LReadStatementPoolIterateExtData);
 
         //delete all FReadStatementPool node that have an empty pool
         for I := 0 to LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
@@ -3337,12 +3497,13 @@ Begin
       TraHandle := nil;
       StmtHandle := nil;
       Sqlda := nil;
-      Prepare(SQL,
-              DBHandle,
-              TraHandle,
-              StmtHandle,
-              Sqlda,
-              TPB);
+      Prepare(
+        SQL,
+        DBHandle,
+        TraHandle,
+        StmtHandle,
+        Sqlda,
+        TPB);
     end;
 
     //increase the Statement count
@@ -3355,14 +3516,15 @@ Begin
 
 End;
 
-{******************************************************************************}
-procedure TALFBXConnectionPoolClient.ReleaseReadStatement(const SQL: AnsiString;
-                                                          var DBHandle: IscDbHandle;
-                                                          var TraHandle: IscTrHandle;
-                                                          var StmtHandle: IscStmtHandle;
-                                                          var Sqlda: TALFBXSQLResult;
-                                                          const TPB: AnsiString;
-                                                          const CloseConnection: Boolean = False);
+{********************************************************}
+procedure TALFBXConnectionPoolClient.ReleaseReadStatement(
+            const SQL: AnsiString;
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            var StmtHandle: IscStmtHandle;
+            var Sqlda: TALFBXSQLResult;
+            const TPB: AnsiString;
+            const CloseConnection: Boolean = False);
 
 Var LReadStatementPoolContainer: TalFBXReadStatementPoolContainer;
     LStringKeyPoolBinTreeNode: TALStringKeyAVLBinaryTreeNode;
@@ -3427,19 +3589,22 @@ begin
         Sqlda.free;
 
         //commit and release the connection
-        TransactionCommit(DBHandle,
-                          TraHandle);
+        TransactionCommit(
+          DBHandle,
+          TraHandle);
 
       Except
 
         //roolback the transaction (and free the connection)
-        if assigned(TraHandle) then TransactionRollback(DBHandle,
-                                                        TraHandle,
-                                                        True) // const CloseConnection: Boolean = False
+        if assigned(TraHandle) then TransactionRollback(
+                                      DBHandle,
+                                      TraHandle,
+                                      True) // const CloseConnection: Boolean = False
 
         //simply free the connection
-        else if assigned(DBHandle) then ReleaseConnectionWithoutStmt(DBHandle,
-                                                                     True); // const CloseConnection: Boolean = False
+        else if assigned(DBHandle) then ReleaseConnectionWithoutStmt(
+                                          DBHandle,
+                                          True); // const CloseConnection: Boolean = False
 
       End;
 
@@ -3502,9 +3667,10 @@ begin
         LReadStatementPoolIterateExtData.TickCountCurrentdate :=  high(int64); //this will cause to delete all node
 
         //iterate all FReadStatementPool node
-        FReadStatementPool.Iterate(ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
-                                   true,
-                                   @LReadStatementPoolIterateExtData);
+        FReadStatementPool.Iterate(
+          ALFBXConnectionPoolClient_ReadStatementPoolIterateFunct,
+          true,
+          @LReadStatementPoolIterateExtData);
 
         //delete all FReadStatementPool node that have an empty pool
         for I := 0 to LReadStatementPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
@@ -3553,9 +3719,10 @@ begin
         LReadTransactionPoolIterateExtData.TickCountCurrentdate :=  high(int64); //this will cause to delete all node
 
         //iterate all FReadTransactionPool node
-        FReadTransactionPool.Iterate(ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
-                                     true,
-                                     @LReadTransactionPoolIterateExtData);
+        FReadTransactionPool.Iterate(
+          ALFBXConnectionPoolClient_ReadTransactionPoolIterateFunct,
+          true,
+          @LReadTransactionPoolIterateExtData);
 
         //delete all FReadTransactionPool node that have an empty pool
         for I := 0 to LReadTransactionPoolIterateExtData.LstBinaryTreeNodeToDelete.Count - 1 do
@@ -3673,11 +3840,12 @@ begin
 
 end;
 
-{******************************************************************************}
-procedure TALFBXConnectionPoolClient.TransactionStart(Var DBHandle: IscDbHandle;
-                                                      var TraHandle: IscTrHandle;
-                                                      var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                                      const TPB: AnsiString);
+{****************************************************}
+procedure TALFBXConnectionPoolClient.TransactionStart(
+            Var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            var StatementPool: TALFBXConnectionStatementPoolBinTree;
+            const TPB: AnsiString);
 begin
 
   //DBHandle, TraHandle and StatementPool must be null
@@ -3690,9 +3858,10 @@ begin
   try
 
     //Start the transaction
-    Flibrary.TransactionStart(TraHandle,
-                              DBHandle,
-                              TPB);
+    Flibrary.TransactionStart(
+      TraHandle,
+      DBHandle,
+      TPB);
 
   except
     ReleaseConnectionWithStmt(DBHandle, StatementPool, True);
@@ -3703,11 +3872,12 @@ begin
 
 end;
 
-{*******************************************************************************}
-procedure TALFBXConnectionPoolClient.TransactionCommit(var DBHandle: IscDbHandle;
-                                                       var TraHandle: IscTrHandle;
-                                                       var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                                       const CloseConnection: Boolean = False);
+{*****************************************************}
+procedure TALFBXConnectionPoolClient.TransactionCommit(
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            var StatementPool: TALFBXConnectionStatementPoolBinTree;
+            const CloseConnection: Boolean = False);
 begin
 
   //security check
@@ -3720,17 +3890,19 @@ begin
   TraHandle := nil;
 
   //release the connection
-  ReleaseConnectionWithStmt(DBHandle,
-                            StatementPool,
-                            CloseConnection);
+  ReleaseConnectionWithStmt(
+    DBHandle,
+    StatementPool,
+    CloseConnection);
 
 end;
 
-{*********************************************************************************}
-procedure TALFBXConnectionPoolClient.TransactionRollback(var DBHandle: IscDbHandle;
-                                                         var TraHandle: IscTrHandle;
-                                                         var StatementPool: TALFBXConnectionStatementPoolBinTree;
-                                                         const CloseConnection: Boolean = False);
+{*******************************************************}
+procedure TALFBXConnectionPoolClient.TransactionRollback(
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            var StatementPool: TALFBXConnectionStatementPoolBinTree;
+            const CloseConnection: Boolean = False);
 var LTmpCloseConnection: Boolean;
 begin
 
@@ -3756,18 +3928,20 @@ begin
 
     //release the connection
     TraHandle := nil;
-    ReleaseConnectionWithStmt(DBHandle,
-                              StatementPool,
-                              LTmpCloseConnection);
+    ReleaseConnectionWithStmt(
+      DBHandle,
+      StatementPool,
+      LTmpCloseConnection);
 
   End;
 
 end;
 
-{******************************************************************************}
-procedure TALFBXConnectionPoolClient.TransactionStart(Var DBHandle: IscDbHandle;
-                                                      var TraHandle: IscTrHandle;
-                                                      const TPB: AnsiString);
+{****************************************************}
+procedure TALFBXConnectionPoolClient.TransactionStart(
+            Var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            const TPB: AnsiString);
 begin
 
   //DBHandle, TraHandle and StatementPool must be null
@@ -3779,9 +3953,10 @@ begin
   try
 
     //Start the transaction
-    Flibrary.TransactionStart(TraHandle,
-                              DBHandle,
-                              TPB);
+    Flibrary.TransactionStart(
+      TraHandle,
+      DBHandle,
+      TPB);
 
   except
     ReleaseConnectionWithoutStmt(DBHandle, True);
@@ -3791,10 +3966,11 @@ begin
 
 end;
 
-{*******************************************************************************}
-procedure TALFBXConnectionPoolClient.TransactionCommit(var DBHandle: IscDbHandle;
-                                                       var TraHandle: IscTrHandle;
-                                                       const CloseConnection: Boolean = False);
+{*****************************************************}
+procedure TALFBXConnectionPoolClient.TransactionCommit(
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            const CloseConnection: Boolean = False);
 begin
 
   //security check
@@ -3810,10 +3986,11 @@ begin
 
 end;
 
-{*********************************************************************************}
-procedure TALFBXConnectionPoolClient.TransactionRollback(var DBHandle: IscDbHandle;
-                                                         var TraHandle: IscTrHandle;
-                                                         const CloseConnection: Boolean = False);
+{*******************************************************}
+procedure TALFBXConnectionPoolClient.TransactionRollback(
+            var DBHandle: IscDbHandle;
+            var TraHandle: IscTrHandle;
+            const CloseConnection: Boolean = False);
 var LTmpCloseConnection: Boolean;
 begin
 
@@ -3868,13 +4045,14 @@ begin
 
 end;
 
-{****************************************************************}
-function TALFBXConnectionPoolClient.Prepare(const SQL: AnsiString;
-                                            Var DBHandle: IscDbHandle;
-                                            var TraHandle: IscTrHandle;
-                                            var StmtHandle: IscStmtHandle;
-                                            var Sqlda: TALFBXSQLResult;
-                                            const TPB: AnsiString = ''): TALFBXStatementType;
+{******************************************}
+function TALFBXConnectionPoolClient.Prepare(
+           const SQL: AnsiString;
+           Var DBHandle: IscDbHandle;
+           var TraHandle: IscTrHandle;
+           var StmtHandle: IscStmtHandle;
+           var Sqlda: TALFBXSQLResult;
+           const TPB: AnsiString = ''): TALFBXStatementType;
 Var LReleaseConnectionHandleonError: Boolean;
 begin
 
@@ -3898,9 +4076,10 @@ begin
 
   //init the DBHandle and TraHandle
   if not assigned(DBHandle) then begin
-    TransactionStart(DBHandle,
-                     TraHandle,
-                     TPB);
+    TransactionStart(
+      DBHandle,
+      TraHandle,
+      TPB);
     LReleaseConnectionHandleonError := True;
   end
   else LReleaseConnectionHandleonError := False;
@@ -3937,38 +4116,42 @@ begin
     end;
 
   except
-    if LReleaseConnectionHandleonError then TransactionRollBack(DBHandle,
-                                                                TraHandle,
-                                                                true); // const CloseConnection: Boolean = False
+    if LReleaseConnectionHandleonError then TransactionRollBack(
+                                              DBHandle,
+                                              TraHandle,
+                                              true); // const CloseConnection: Boolean = False
     raise;
   end;
 
 end;
 
-{*********************************************************************************************}
-procedure TALFBXConnectionPoolClient.OnSelectDataDone(const Query: TALFBXClientSelectDataQUERY;
-                                                      TimeTaken: double);
+{****************************************************}
+procedure TALFBXConnectionPoolClient.OnSelectDataDone(
+            const Query: TALFBXClientSelectDataQUERY;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{*********************************************************************************************}
-procedure TALFBXConnectionPoolClient.OnUpdateDataDone(const Query: TALFBXClientUpdateDataQUERY;
-                                                      TimeTaken: double);
+{****************************************************}
+procedure TALFBXConnectionPoolClient.OnUpdateDataDone(
+            const Query: TALFBXClientUpdateDataQUERY;
+            TimeTaken: double);
 begin
   // virtual
 end;
 
-{*******************************************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                                                XMLDATA: TalXMLNode;
-                                                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                                ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const Queries: TALFBXClientSelectDataQUERIES;
+            XMLDATA: TalXMLNode;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 
   {$REGION 'Var Declarations'}
   Var LSqlpa: TALFBXSQLParams;
@@ -4032,20 +4215,20 @@ procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelec
         For LColumnIndex := 0 to LTmpSqlda.FieldCount - 1 do begin
           LValueRec := LNewRec.AddChild(ALlowercase(LTmpSqlda.AliasName[LColumnIndex]));
           if (LTmpSqlda.SQLType[LColumnIndex] = SQL_BLOB) then LValueRec.ChildNodes.Add(
-                                                                                        LValueRec.OwnerDocument.CreateNode(
-                                                                                                                           GetFieldValue(LTmpSqlda,
-                                                                                                                                         LTmpDBHandle,
-                                                                                                                                         LTmpTraHandle,
-                                                                                                                                         LColumnIndex,
-                                                                                                                                         FormatSettings),
-                                                                                                                           ntCData
-                                                                                                                          )
-                                                                                        )
-          else LValueRec.Text := GetFieldValue(LTmpSqlda,
-                                               LTmpDBHandle,
-                                               LTmpTraHandle,
-                                               LColumnIndex,
-                                               FormatSettings);
+                                                                 LValueRec.OwnerDocument.CreateNode(
+                                                                   GetFieldValue(
+                                                                     LTmpSqlda,
+                                                                     LTmpDBHandle,
+                                                                     LTmpTraHandle,
+                                                                     LColumnIndex,
+                                                                     FormatSettings),
+                                                                   ntCData))
+          else LValueRec.Text := GetFieldValue(
+                                   LTmpSqlda,
+                                   LTmpDBHandle,
+                                   LTmpTraHandle,
+                                   LColumnIndex,
+                                   FormatSettings);
           if LUpdateRowTagByFieldValue and (LValueRec.NodeName=LNewRec.NodeName) then LNewRec.NodeName := ALLowerCase(LValueRec.Text);
         end;
 
@@ -4141,11 +4324,12 @@ begin
             (Queries[LQueriesIndex].ViewTag <> '')) then begin
 
           //try to load from from cache
-          LCacheKey := ALStringHashSHA1(Queries[LQueriesIndex].RowTag + '#' +
-                                        ALIntToStrA(Queries[LQueriesIndex].Skip) + '#' +
-                                        ALIntToStrA(Queries[LQueriesIndex].First) + '#' +
-                                        ALGetFormatSettingsID(FormatSettings) + '#' +
-                                        Queries[LQueriesIndex].SQL);
+          LCacheKey := ALStringHashSHA1(
+                         Queries[LQueriesIndex].RowTag + '#' +
+                         ALIntToStrA(Queries[LQueriesIndex].Skip) + '#' +
+                         ALIntToStrA(Queries[LQueriesIndex].First) + '#' +
+                         ALGetFormatSettingsID(FormatSettings) + '#' +
+                         Queries[LQueriesIndex].SQL);
           if loadcachedData(LCacheKey, LCacheStr) then begin
 
             //init the aViewRec
@@ -4192,19 +4376,21 @@ begin
 
               //release previous connection if need
               if LTransactionWasAcquiredFromPool then begin
-                ReleaseReadTransaction(LTmpDBHandle,
-                                       LTmpTraHandle,
-                                       LTmpTPB);
+                ReleaseReadTransaction(
+                  LTmpDBHandle,
+                  LTmpTraHandle,
+                  LTmpTPB);
                 LTransactionWasAcquiredFromPool := False;
               end;
 
               //acquire a statement from the pool
-              AcquireReadStatement(Queries[LQueriesIndex].SQL,
-                                   LTmpDBHandle,
-                                   LTmpTraHandle,
-                                   LTmpStmtHandle,
-                                   LTmpSqlda,
-                                   LTmpTPB);
+              AcquireReadStatement(
+                Queries[LQueriesIndex].SQL,
+                LTmpDBHandle,
+                LTmpTraHandle,
+                LTmpStmtHandle,
+                LTmpSqlda,
+                LTmpTPB);
               LStatementWasAcquiredFromPool := True;
 
             end
@@ -4215,19 +4401,21 @@ begin
 
               //acquire a transaction in the pool
               if not LTransactionWasAcquiredFromPool then begin
-                AcquireReadTransaction(LTmpDBHandle,
-                                       LTmpTraHandle,
-                                       LTmpTPB);
+                AcquireReadTransaction(
+                  LTmpDBHandle,
+                  LTmpTraHandle,
+                  LTmpTPB);
                 LTransactionWasAcquiredFromPool := True;
               end;
 
               //Prepare the statement
-              Prepare(Queries[LQueriesIndex].SQL,
-                      LTmpDBHandle,
-                      LTmpTraHandle,
-                      LTmpStmtHandle,
-                      LTmpSqlda,
-                      LTmpTPB);
+              Prepare(
+                Queries[LQueriesIndex].SQL,
+                LTmpDBHandle,
+                LTmpTraHandle,
+                LTmpStmtHandle,
+                LTmpSqlda,
+                LTmpTPB);
               LStatementWasAcquiredFromPool := False;
 
             end;
@@ -4244,19 +4432,21 @@ begin
 
             //Start the transaction
             if not assigned(LTmpDBHandle) then begin
-              TransactionStart(LTmpDBHandle,
-                               LTmpTraHandle,
-                               LTmpTPB);
+              TransactionStart(
+                LTmpDBHandle,
+                LTmpTraHandle,
+                LTmpTPB);
               LConnectionWasAcquiredFromPool := True;
             end;
 
             //prepare the statement
-            Prepare(Queries[LQueriesIndex].SQL,
-                    LTmpDBHandle,
-                    LTmpTraHandle,
-                    LTmpStmtHandle,
-                    LTmpSqlda,
-                    LTmpTPB);
+            Prepare(
+              Queries[LQueriesIndex].SQL,
+              LTmpDBHandle,
+              LTmpTraHandle,
+              LTmpStmtHandle,
+              LTmpSqlda,
+              LTmpTPB);
             LStatementWasAcquiredFromPool := False;
 
           end;
@@ -4370,23 +4560,25 @@ begin
                 Flibrary.DSQLFreeStatement(LTmpStmtHandle, DSQL_Close);
 
                 //release the statement in the pool
-                ReleaseReadStatement(Queries[LQueriesIndex].SQL,
-                                     LTmpDBHandle,
-                                     LTmpTraHandle,
-                                     LTmpStmtHandle,
-                                     LTmpSqlda,
-                                     LTmpTPB);
+                ReleaseReadStatement(
+                  Queries[LQueriesIndex].SQL,
+                  LTmpDBHandle,
+                  LTmpTraHandle,
+                  LTmpStmtHandle,
+                  LTmpSqlda,
+                  LTmpTPB);
 
               Except
 
                 //free the statement in the pool
-                ReleaseReadStatement(Queries[LQueriesIndex].SQL,
-                                     LTmpDBHandle,
-                                     LTmpTraHandle,
-                                     LTmpStmtHandle,
-                                     LTmpSqlda,
-                                     LTmpTPB,
-                                     true); // CloseConnection
+                ReleaseReadStatement(
+                  Queries[LQueriesIndex].SQL,
+                  LTmpDBHandle,
+                  LTmpTraHandle,
+                  LTmpStmtHandle,
+                  LTmpSqlda,
+                  LTmpTPB,
+                  true); // CloseConnection
 
               end;
 
@@ -4471,8 +4663,9 @@ begin
 
         {$REGION 'do the OnSelectDataDone'}
         LStopWatch.Stop;
-        OnSelectDataDone(Queries[LQueriesIndex],
-                         LStopWatch.Elapsed.TotalMilliseconds);
+        OnSelectDataDone(
+          Queries[LQueriesIndex],
+          LStopWatch.Elapsed.TotalMilliseconds);
         {$ENDREGION}
 
         {$REGION 'save to the cache'}
@@ -4480,9 +4673,10 @@ begin
 
           //save the data
           LViewRec.SaveToXML(LCacheStr, true{SaveOnlyChildNodes});
-          SaveDataToCache(LCacheKey,
-                          Queries[LQueriesIndex].CacheThreshold,
-                          LCacheStr);
+          SaveDataToCache(
+            LCacheKey,
+            Queries[LQueriesIndex].CacheThreshold,
+            LCacheStr);
 
         end;
         {$ENDREGION}
@@ -4491,11 +4685,13 @@ begin
       {$ENDREGION}
 
       {$REGION 'Commit or release the transaction'}
-      if LTransactionWasAcquiredFromPool then ReleaseReadTransaction(LTmpDBHandle,
-                                                                     LTmpTraHandle,
-                                                                     LTmpTPB)
-      else if LConnectionWasAcquiredFromPool then TransactionCommit(LTmpDBHandle,
-                                                                    LTmpTraHandle);
+      if LTransactionWasAcquiredFromPool then ReleaseReadTransaction(
+                                                LTmpDBHandle,
+                                                LTmpTraHandle,
+                                                LTmpTPB)
+      else if LConnectionWasAcquiredFromPool then TransactionCommit(
+                                                    LTmpDBHandle,
+                                                    LTmpTraHandle);
       {$ENDREGION}
 
     Except
@@ -4508,13 +4704,15 @@ begin
         else LGDSCode := -1;
 
         //rollback the transaction and release the connection if owned
-        if LTransactionWasAcquiredFromPool then ReleaseReadTransaction(LTmpDBHandle,
-                                                                       LTmpTraHandle,
-                                                                       LTmpTPB,
-                                                                       GetCloseConnectionByErrCode(LGDSCode))
-        else if LConnectionWasAcquiredFromPool then TransactionRollback(LTmpDBHandle,
-                                                                        LTmpTraHandle,
-                                                                        GetCloseConnectionByErrCode(LGDSCode));
+        if LTransactionWasAcquiredFromPool then ReleaseReadTransaction(
+                                                  LTmpDBHandle,
+                                                  LTmpTraHandle,
+                                                  LTmpTPB,
+                                                  GetCloseConnectionByErrCode(LGDSCode))
+        else if LConnectionWasAcquiredFromPool then TransactionRollback(
+                                                      LTmpDBHandle,
+                                                      LTmpTraHandle,
+                                                      GetCloseConnectionByErrCode(LGDSCode));
 
         //Database @1 shutdown
         if (LGDSCode = isc_shutdown) or        // Database @1 shutdown
@@ -4539,41 +4737,44 @@ begin
 
 end;
 
-{***************************************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
-                                                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                                ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const Query: TALFBXClientSelectDataQUERY;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := Query;
-  SelectData(LSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    nil,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                Skip: integer;
-                                                First: Integer;
-                                                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                                ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            Skip: integer;
+            First: Integer;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -4581,98 +4782,106 @@ begin
   LSelectDataQUERIES[0].Sql := Sql;
   LSelectDataQUERIES[0].skip := Skip;
   LSelectDataQUERIES[0].First := First;
-  SelectData(LSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    nil,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
-                                                ExtData: Pointer;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            OnNewRowFunct: TALFBXClientSelectDataOnNewRowFunct;
+            ExtData: Pointer;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
   LSelectDataQUERIES[0].Sql := Sql;
-  SelectData(LSelectDataQUERIES,
-             nil,
-             OnNewRowFunct,
-             ExtData,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    nil,
+    OnNewRowFunct,
+    ExtData,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{*******************************************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const Queries: TALFBXClientSelectDataQUERIES;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const Queries: TALFBXClientSelectDataQUERIES;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 begin
 
-  SelectData(Queries,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    Queries,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 
 end;
 
-{***************************************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const Query: TALFBXClientSelectDataQUERY;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const Query: TALFBXClientSelectDataQUERY;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := Query;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                const RowTag: AnsiString;
-                                                Skip: integer;
-                                                First: Integer;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            Skip: integer;
+            First: Integer;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
@@ -4681,79 +4890,85 @@ begin
   LSelectDataQUERIES[0].RowTag := RowTag;
   LSelectDataQUERIES[0].skip := Skip;
   LSelectDataQUERIES[0].First := First;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                const RowTag: AnsiString;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const RowTag: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
   LSelectDataQUERIES[0].Sql := Sql;
   LSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
 begin
   setlength(LSelectDataQUERIES,1);
   LSelectDataQUERIES[0] := TALFBXClientSelectDataQUERY.Create;
   LSelectDataQUERIES[0].Sql := Sql;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                const Params: array of AnsiString;
-                                                const RowTag: AnsiString;
-                                                Skip: integer;
-                                                First: Integer;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const Params: array of AnsiString;
+            const RowTag: AnsiString;
+            Skip: integer;
+            First: Integer;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -4769,27 +4984,29 @@ begin
   LSelectDataQUERIES[0].RowTag := RowTag;
   LSelectDataQUERIES[0].skip := Skip;
   LSelectDataQUERIES[0].First := First;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                const Params: array of AnsiString;
-                                                const RowTag: AnsiString;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const Params: array of AnsiString;
+            const RowTag: AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -4803,26 +5020,28 @@ begin
     LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
   LSelectDataQUERIES[0].RowTag := RowTag;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.SelectData(const SQL: AnsiString;
-                                                const Params: array of AnsiString;
-                                                XMLDATA: TalXMLNode;
-                                                const FormatSettings: TALFormatSettingsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.SelectData(
+            const SQL: AnsiString;
+            const Params: array of AnsiString;
+            XMLDATA: TalXMLNode;
+            const FormatSettings: TALFormatSettingsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 var LSelectDataQUERIES: TalFBXClientSelectDataQUERIES;
     I: integer;
 begin
@@ -4835,23 +5054,25 @@ begin
     LSelectDataQUERIES[0].params[I].Value := Params[I];
     LSelectDataQUERIES[0].params[I].IsNull := Params[I] = fNullString;
   end;
-  SelectData(LSelectDataQUERIES,
-             XMLDATA,
-             nil,
-             nil,
-             FormatSettings,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  SelectData(
+    LSelectDataQUERIES,
+    XMLDATA,
+    nil,
+    nil,
+    FormatSettings,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{*******************************************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(const Queries: TALFBXClientUpdateDataQUERIES;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.UpdateData(
+            const Queries: TALFBXClientUpdateDataQUERIES;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 
   {$REGION 'Var Declarations'}
   Var LSqlpa: TALFBXSQLParams;
@@ -4903,10 +5124,11 @@ begin
   if LTmpTPB = '' then LTmpTPB := fDefaultWriteTPB;
   LTmpStatementPool := nil;
   if not assigned(LTmpDBHandle) then begin
-    TransactionStart(LTmpDBHandle,
-                     LTmpTraHandle,
-                     LTmpStatementPool,
-                     TPB);
+    TransactionStart(
+      LTmpDBHandle,
+      LTmpTraHandle,
+      LTmpStatementPool,
+      TPB);
     LConnectionWasAcquiredFromPool := true;
   end
   else begin
@@ -4949,12 +5171,13 @@ begin
 
         //if aTmpStatementPoolNode was not founded (prepare the statement)
         else begin
-          Prepare(Queries[LQueriesIndex].SQL,
-                  LTmpDBHandle,          //not nil => will not change
-                  LTmpTraHandle,         //not nil => will not change
-                  LTmpStmtHandle,        //nil => will be assigned
-                  LTmpSqlda,             //nil => will be assigned
-                  LTmpTPB);
+          Prepare(
+            Queries[LQueriesIndex].SQL,
+            LTmpDBHandle,          //not nil => will not change
+            LTmpTraHandle,         //not nil => will not change
+            LTmpStmtHandle,        //nil => will be assigned
+            LTmpSqlda,             //nil => will be assigned
+            LTmpTPB);
         end;
        {$ENDREGION}
 
@@ -5061,8 +5284,9 @@ begin
 
       {$REGION 'do the OnUpdateDataDone'}
       LStopWatch.Stop;
-      OnUpdateDataDone(Queries[LQueriesIndex],
-                       LStopWatch.Elapsed.TotalMilliseconds);
+      OnUpdateDataDone(
+        Queries[LQueriesIndex],
+        LStopWatch.Elapsed.TotalMilliseconds);
       {$ENDREGION}
 
     end;
@@ -5070,9 +5294,10 @@ begin
 
     {$REGION 'Commit the transaction'}
     if LConnectionWasAcquiredFromPool then begin
-      TransactionCommit(LTmpDBHandle,
-                        LTmpTraHandle,
-                        LTmpStatementPool);
+      TransactionCommit(
+        LTmpDBHandle,
+        LTmpTraHandle,
+        LTmpStatementPool);
     end;
     {$ENDREGION}
 
@@ -5087,10 +5312,11 @@ begin
 
       //rollback the transaction and release the connection if owned
       if LConnectionWasAcquiredFromPool then begin
-        TransactionRollback(LTmpDBHandle,
-                            LTmpTraHandle,
-                            LTmpStatementPool,
-                            GetCloseConnectionByErrCode(LGDSCode)); // const CloseConnection: Boolean = False
+        TransactionRollback(
+          LTmpDBHandle,
+          LTmpTraHandle,
+          LTmpStatementPool,
+          GetCloseConnectionByErrCode(LGDSCode)); // const CloseConnection: Boolean = False
       end;
 
       //Database @1 shutdown
@@ -5108,29 +5334,32 @@ begin
 
 end;
 
-{***************************************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(const Query: TALFBXClientUpdateDataQUERY;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.UpdateData(
+            const Query: TALFBXClientUpdateDataQUERY;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
 begin
   setlength(LUpdateDataQUERIES,1);
   LUpdateDataQUERIES[0] := Query;
-  UpdateData(LUpdateDataQUERIES,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  UpdateData(
+    LUpdateDataQUERIES,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{***************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(SQLs: TALStringsA;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.UpdateData(
+            SQLs: TALStringsA;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 Var LSQLsIndex : integer;
     LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
 begin
@@ -5139,38 +5368,42 @@ begin
     LUpdateDataQUERIES[LSQLsIndex] := TALFBXClientUpdateDataQUERY.Create;
     LUpdateDataQUERIES[LSQLsIndex].SQL := SQLs[LSQLsIndex];
   end;
-  UpdateData(LUpdateDataQUERIES,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  UpdateData(
+    LUpdateDataQUERIES,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(const SQL: AnsiString;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.UpdateData(
+            const SQL: AnsiString;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
 begin
   setlength(LUpdateDataQUERIES,1);
   LUpdateDataQUERIES[0] := TALFBXClientUpdateDataQUERY.Create;
   LUpdateDataQUERIES[0].SQL := SQL;
-  UpdateData(LUpdateDataQUERIES,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  UpdateData(
+    LUpdateDataQUERIES,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{********************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(const SQL: AnsiString;
-                                                const Params: Array of AnsiString;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.UpdateData(
+            const SQL: AnsiString;
+            const Params: Array of AnsiString;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
     i: integer;
 begin
@@ -5183,19 +5416,21 @@ begin
     LUpdateDataQUERIES[0].params[i].Value := Params[i];
     LUpdateDataQUERIES[0].params[i].IsNull := Params[i] = fNullString;
   end;
-  UpdateData(LUpdateDataQUERIES,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  UpdateData(
+    LUpdateDataQUERIES,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
-{******************************************************************************}
-procedure TALFBXConnectionPoolClient.UpdateData(const SQLs: array of AnsiString;
-                                                const DBHandle: IscDbHandle = nil;
-                                                const TraHandle: IscTrHandle = nil;
-                                                const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
-                                                const TPB: AnsiString = '');
+{**********************************************}
+procedure TALFBXConnectionPoolClient.UpdateData(
+            const SQLs: array of AnsiString;
+            const DBHandle: IscDbHandle = nil;
+            const TraHandle: IscTrHandle = nil;
+            const StatementPool: TALFBXConnectionStatementPoolBinTree = nil;
+            const TPB: AnsiString = '');
 Var LUpdateDataQUERIES: TalFBXClientUpdateDataQUERIES;
     i: integer;
 begin
@@ -5204,11 +5439,12 @@ begin
     LUpdateDataQUERIES[i] := TALFBXClientUpdateDataQUERY.Create;
     LUpdateDataQUERIES[i].SQL := SQLs[i];
   end;
-  UpdateData(LUpdateDataQUERIES,
-             DBHandle,
-             TraHandle,
-             StatementPool,
-             TPB);
+  UpdateData(
+    LUpdateDataQUERIES,
+    DBHandle,
+    TraHandle,
+    StatementPool,
+    TPB);
 end;
 
 {***********************************************************}
@@ -5245,17 +5481,19 @@ begin
   end;
 end;
 
-{***********************************************************************}
-function TALFBXConnectionPoolClient.loadCachedData(const Key: AnsiString;
-                                                   var DataStr: AnsiString): Boolean;
+{*************************************************}
+function TALFBXConnectionPoolClient.loadCachedData(
+           const Key: AnsiString;
+           var DataStr: AnsiString): Boolean;
 begin
   result := false; //virtual need to be overriden
 end;
 
-{*************************************************************************}
-Procedure TALFBXConnectionPoolClient.SaveDataToCache(const Key: ansiString;
-                                                     const CacheThreshold: integer;
-                                                     const DataStr: ansiString);
+{***************************************************}
+Procedure TALFBXConnectionPoolClient.SaveDataToCache(
+            const Key: ansiString;
+            const CacheThreshold: integer;
+            const DataStr: ansiString);
 begin
   //virtual need to be overriden
 end;
@@ -5367,17 +5605,18 @@ begin
   end;
 end;
 
-{*********************************************************}
-procedure TALFBXEventThread.initObject(const aDataBaseName,
-                                             aLogin,
-                                             aPassword,
-                                             aCharSet: AnsiString;
-                                       const aEventNames: AnsiString;
-                                       aConnectionMaxIdleTime: integer;
-                                       aNumbuffers: integer;
-                                       const aOpenConnectionExtraParams: AnsiString;
-                                       aOnEvent: TALFBXEventThreadEvent;
-                                       aOnException: TALFBXEventThreadException);
+{*************************************}
+procedure TALFBXEventThread.initObject(
+            const aDataBaseName,
+                  aLogin,
+                  aPassword,
+                  aCharSet: AnsiString;
+            const aEventNames: AnsiString;
+            aConnectionMaxIdleTime: integer;
+            aNumbuffers: integer;
+            const aOpenConnectionExtraParams: AnsiString;
+            aOnEvent: TALFBXEventThreadEvent;
+            aOnException: TALFBXEventThreadException);
 Var LLst: TALStringsA;
     i: integer;
 begin
@@ -5422,115 +5661,123 @@ begin
   End;
 end;
 
-{*******************************************************}
-constructor TALFBXEventThread.Create(const aDataBaseName,
-                                           aLogin,
-                                           aPassword,
-                                           aCharSet: AnsiString;
-                                     const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                                     aApiVer: TALFBXVersion_API;
-                                     aOnEvent: TALFBXEventThreadEvent;
-                                     aOnException: TALFBXEventThreadException;
-                                     const alib: AnsiString = GDS32DLL;
-                                     const aConnectionMaxIdleTime: integer = -1;
-                                     const aNumbuffers: integer = -1;
-                                     const aOpenConnectionExtraParams: AnsiString = '');
+{***********************************}
+constructor TALFBXEventThread.Create(
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+              aApiVer: TALFBXVersion_API;
+              aOnEvent: TALFBXEventThreadEvent;
+              aOnException: TALFBXEventThreadException;
+              const alib: AnsiString = GDS32DLL;
+              const aConnectionMaxIdleTime: integer = -1;
+              const aNumbuffers: integer = -1;
+              const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fLibrary := TALFBXLibrary.Create(aApiVer);
   fLibrary.Load(alib);
   FownLibrary := True;
-  initObject(aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aEventNames,
-             aConnectionMaxIdleTime,
-             aNumbuffers,
-             aOpenConnectionExtraParams,
-             aOnEvent,
-             aOnException);
+  initObject(
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aEventNames,
+    aConnectionMaxIdleTime,
+    aNumbuffers,
+    aOpenConnectionExtraParams,
+    aOnEvent,
+    aOnException);
   inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
-{*******************************************************}
-Constructor TALFBXEventThread.Create(const aDataBaseName,
-                                           aLogin,
-                                           aPassword,
-                                           aCharSet: AnsiString;
-                                     const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                                     alib: TALFBXLibrary;
-                                     aOnEvent: TALFBXEventThreadEvent;
-                                     aOnException: TALFBXEventThreadException;
-                                     const aConnectionMaxIdleTime: integer = -1;
-                                     const aNumbuffers: integer = -1;
-                                     const aOpenConnectionExtraParams: AnsiString = '');
+{***********************************}
+Constructor TALFBXEventThread.Create(
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+              alib: TALFBXLibrary;
+              aOnEvent: TALFBXEventThreadEvent;
+              aOnException: TALFBXEventThreadException;
+              const aConnectionMaxIdleTime: integer = -1;
+              const aNumbuffers: integer = -1;
+              const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fLibrary := alib;
   FownLibrary := False;
-  initObject(aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aEventNames,
-             aConnectionMaxIdleTime,
-             aNumbuffers,
-             aOpenConnectionExtraParams,
-             aOnEvent,
-             aOnException);
+  initObject(
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aEventNames,
+    aConnectionMaxIdleTime,
+    aNumbuffers,
+    aOpenConnectionExtraParams,
+    aOnEvent,
+    aOnException);
   inherited Create(False);  // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
-{*******************************************************}
-constructor TALFBXEventThread.Create(const aDataBaseName,
-                                           aLogin,
-                                           aPassword,
-                                           aCharSet: AnsiString;
-                                     const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                                     aApiVer: TALFBXVersion_API;
-                                     const alib: AnsiString = GDS32DLL;
-                                     const aConnectionMaxIdleTime: integer = -1;
-                                     const aNumbuffers: integer = -1;
-                                     const aOpenConnectionExtraParams: AnsiString = '');
+{***********************************}
+constructor TALFBXEventThread.Create(
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+              aApiVer: TALFBXVersion_API;
+              const alib: AnsiString = GDS32DLL;
+              const aConnectionMaxIdleTime: integer = -1;
+              const aNumbuffers: integer = -1;
+              const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fLibrary := TALFBXLibrary.Create(aApiVer);
   fLibrary.Load(alib);
   FownLibrary := True;
-  initObject(aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aEventNames,
-             aConnectionMaxIdleTime,
-             aNumbuffers,
-             aOpenConnectionExtraParams,
-             nil,
-             nil);
+  initObject(
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aEventNames,
+    aConnectionMaxIdleTime,
+    aNumbuffers,
+    aOpenConnectionExtraParams,
+    nil,
+    nil);
   inherited Create(False); // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
-{*******************************************************}
-constructor TALFBXEventThread.Create(const aDataBaseName,
-                                           aLogin,
-                                           aPassword,
-                                           aCharSet: AnsiString;
-                                     const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
-                                     alib: TALFBXLibrary;
-                                     const aConnectionMaxIdleTime: integer = -1;
-                                     const aNumbuffers: integer = -1;
-                                     const aOpenConnectionExtraParams: AnsiString = '');
+{***********************************}
+constructor TALFBXEventThread.Create(
+              const aDataBaseName,
+                    aLogin,
+                    aPassword,
+                    aCharSet: AnsiString;
+              const aEventNames: AnsiString; // ; separated value like EVENT1;EVENT2; etc...
+              alib: TALFBXLibrary;
+              const aConnectionMaxIdleTime: integer = -1;
+              const aNumbuffers: integer = -1;
+              const aOpenConnectionExtraParams: AnsiString = '');
 begin
   fLibrary := alib;
   FownLibrary := False;
-  initObject(aDataBaseName,
-             aLogin,
-             aPassword,
-             aCharSet,
-             aEventNames,
-             aConnectionMaxIdleTime,
-             aNumbuffers,
-             aOpenConnectionExtraParams,
-             nil,
-             nil);
+  initObject(
+    aDataBaseName,
+    aLogin,
+    aPassword,
+    aCharSet,
+    aEventNames,
+    aConnectionMaxIdleTime,
+    aNumbuffers,
+    aOpenConnectionExtraParams,
+    nil,
+    nil);
   inherited Create(False);  // see http://www.gerixsoft.com/blog/delphi/fixing-symbol-resume-deprecated-warning-delphi-2010
 end;
 
@@ -5583,7 +5830,7 @@ var LEventBuffer: PAnsiChar;
     LEventID: Integer;
     LStatusVector: TALFBXStatusVector;
 
-    {-----------------------------}
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     Procedure InternalFreeLocalVar;
     Begin
       //free the aEventID
@@ -5662,43 +5909,47 @@ begin
         InternalFreeLocalVar;
 
         //First init FDBHandle
-        FLibrary.AttachDatabase(FDataBaseName,
-                                FDBHandle,
-                                fOpenConnectionParams);
+        FLibrary.AttachDatabase(
+          FDataBaseName,
+          FDBHandle,
+          fOpenConnectionParams);
 
         //register the EventBlock
-        LEventBufferLen := FLibrary.EventBlock(LEventBuffer,
-                                               fResultBuffer,
-                                               fEventNamesCount,
-                                               PAnsiChar(fEventNamesArr[0]),
-                                               PAnsiChar(fEventNamesArr[1]),
-                                               PAnsiChar(fEventNamesArr[2]),
-                                               PAnsiChar(fEventNamesArr[3]),
-                                               PAnsiChar(fEventNamesArr[4]),
-                                               PAnsiChar(fEventNamesArr[5]),
-                                               PAnsiChar(fEventNamesArr[6]),
-                                               PAnsiChar(fEventNamesArr[7]),
-                                               PAnsiChar(fEventNamesArr[8]),
-                                               PAnsiChar(fEventNamesArr[9]),
-                                               PAnsiChar(fEventNamesArr[10]),
-                                               PAnsiChar(fEventNamesArr[11]),
-                                               PAnsiChar(fEventNamesArr[12]),
-                                               PAnsiChar(fEventNamesArr[13]),
-                                               PAnsiChar(fEventNamesArr[14]));
+        LEventBufferLen := FLibrary.EventBlock(
+                             LEventBuffer,
+                             fResultBuffer,
+                             fEventNamesCount,
+                             PAnsiChar(fEventNamesArr[0]),
+                             PAnsiChar(fEventNamesArr[1]),
+                             PAnsiChar(fEventNamesArr[2]),
+                             PAnsiChar(fEventNamesArr[3]),
+                             PAnsiChar(fEventNamesArr[4]),
+                             PAnsiChar(fEventNamesArr[5]),
+                             PAnsiChar(fEventNamesArr[6]),
+                             PAnsiChar(fEventNamesArr[7]),
+                             PAnsiChar(fEventNamesArr[8]),
+                             PAnsiChar(fEventNamesArr[9]),
+                             PAnsiChar(fEventNamesArr[10]),
+                             PAnsiChar(fEventNamesArr[11]),
+                             PAnsiChar(fEventNamesArr[12]),
+                             PAnsiChar(fEventNamesArr[13]),
+                             PAnsiChar(fEventNamesArr[14]));
 
         //the First EventQueue
         ResetEvent(Fsignal);
-        FLibrary.EventQueue(FdbHandle,
-                            LEventID,
-                            LEventBufferLen,
-                            LEventBuffer,
-                            @ALFBXEventCallback,
-                            self);
+        FLibrary.EventQueue(
+          FdbHandle,
+          LEventID,
+          LEventBufferLen,
+          LEventBuffer,
+          @ALFBXEventCallback,
+          self);
         if WaitForSingleObject(FSignal, 60000) <> WAIT_OBJECT_0 then raise Exception.Create('Timeout in the first call to isc_que_events');
-        FLibrary.EventCounts(LStatusVector,
-                             LEventBufferLen,
-                             LEventBuffer,
-                             fResultBuffer);
+        FLibrary.EventCounts(
+          LStatusVector,
+          LEventBufferLen,
+          LEventBuffer,
+          fResultBuffer);
 
         //set the FQueueEvent to false in case the next
         //WaitForSingleObject fired because of a timeout
@@ -5706,12 +5957,13 @@ begin
 
         //the 2nd EventQueue
         ResetEvent(Fsignal);
-        FLibrary.EventQueue(FdbHandle,
-                            LEventID,
-                            LEventBufferLen,
-                            LEventBuffer,
-                            @ALFBXEventCallback,
-                            self);
+        FLibrary.EventQueue(
+          FdbHandle,
+          LEventID,
+          LEventBufferLen,
+          LEventBuffer,
+          @ALFBXEventCallback,
+          self);
 
       end;
 
@@ -5734,10 +5986,11 @@ begin
       if (FQueueEvent) then begin
 
         //retrieve the list of event
-        FLibrary.EventCounts(LStatusVector,
-                             LEventBufferLen,
-                             LEventBuffer,
-                             fResultBuffer);
+        FLibrary.EventCounts(
+          LStatusVector,
+          LEventBufferLen,
+          LEventBuffer,
+          fResultBuffer);
 
         //if it was the event
         for LCurrentEventIdx := 0 to 14 do
@@ -5748,12 +6001,13 @@ begin
 
         //start to listen again
         ResetEvent(Fsignal);
-        FLibrary.EventQueue(FdbHandle,
-                            LEventID,
-                            LEventBufferLen,
-                            LEventBuffer,
-                            @ALFBXEventCallback,
-                            self);
+        FLibrary.EventQueue(
+          FdbHandle,
+          LEventID,
+          LEventBufferLen,
+          LEventBuffer,
+          @ALFBXEventCallback,
+          self);
 
       end
 

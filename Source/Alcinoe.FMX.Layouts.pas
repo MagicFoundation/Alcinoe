@@ -452,8 +452,9 @@ procedure TALScrollBoxAniCalculations.DoChanged;
   begin
     X := Round(ViewportPosition.X * FScreenScale) / FScreenScale;
     Y := Round(ViewportPosition.Y * FScreenScale) / FScreenScale;
-    Result := TPointF.Create(X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
-                             Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
+    Result := TPointF.Create(
+                X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
+                Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
   end;
 
 var LNewViewportPosition: TPointF;
@@ -661,10 +662,11 @@ procedure TALCustomScrollBox.DoRealign;
       finally
         fVScrollBar.ValueRange.EndUpdate;
       end;
-      fVScrollBar.SetBounds(width - fVScrollBar.Width - fVScrollBar.Margins.Right,
-                            fVScrollBar.Margins.top,
-                            fVScrollBar.Width,
-                            height-fVScrollBar.Margins.top-fVScrollBar.Margins.bottom);
+      fVScrollBar.SetBounds(
+        width - fVScrollBar.Width - fVScrollBar.Margins.Right,
+        fVScrollBar.Margins.top,
+        fVScrollBar.Width,
+        height-fVScrollBar.Margins.top-fVScrollBar.Margins.bottom);
     end;
   end;
 
@@ -683,10 +685,11 @@ procedure TALCustomScrollBox.DoRealign;
       finally
         fHScrollBar.ValueRange.EndUpdate;
       end;
-      fHScrollBar.SetBounds(fHScrollBar.Margins.left,
-                            height - fHScrollBar.Height - fHScrollBar.Margins.bottom,
-                            width - fHScrollBar.Margins.left - fHScrollBar.Margins.right,
-                            fHScrollBar.Height);
+      fHScrollBar.SetBounds(
+        fHScrollBar.Margins.left,
+        height - fHScrollBar.Height - fHScrollBar.Margins.bottom,
+        width - fHScrollBar.Margins.left - fHScrollBar.Margins.right,
+        fHScrollBar.Height);
     end;
   end;
 
@@ -718,10 +721,11 @@ begin
     LDoRealignAgain := False;
     if (FContent <> nil) then begin
       LContentRect := CalcContentBounds;
-      Content.SetBounds(LContentRect.Left + fAnchoredContentOffset.x,
-                        LContentRect.Top + fAnchoredContentOffset.y,
-                        LContentRect.Width,
-                        LContentRect.Height);
+      Content.SetBounds(
+        LContentRect.Left + fAnchoredContentOffset.x,
+        LContentRect.Top + fAnchoredContentOffset.y,
+        LContentRect.Width,
+        LContentRect.Height);
       if LContentRect.EqualsTo(CalcContentBounds, Tepsilon.Position) then  begin
         _UpdateVScrollBar(LContentRect);
         _UpdateHScrollBar(LContentRect);
@@ -1099,6 +1103,7 @@ begin
     DrawDesignBorder;
 end;
 
+{*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
@@ -1133,5 +1138,3 @@ initialization
   RegisterFmxClasses([TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
 
 end.
-
-

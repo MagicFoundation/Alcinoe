@@ -20,7 +20,6 @@ Link :
 https://uib.svn.sourceforge.net/svnroot/uib (current code is from the trunk rev 419)
 http://www.progdigy.com/modules.php?name=UIB
 *******************************************************************************}
-
 unit Alcinoe.FBX.Lib;
 
 {$IFNDEF CPUX64}

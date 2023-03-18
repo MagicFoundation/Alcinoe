@@ -6,8 +6,8 @@
     <MainSource>UnitNormalizer.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
-    <TargetedPlatforms>1</TargetedPlatforms>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
+    <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Console</AppType>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
@@ -65,6 +65,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
     <Cfg_1_Win32>true</Cfg_1_Win32>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <Cfg_1_Win64>true</Cfg_1_Win64>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
@@ -180,6 +186,8 @@
     <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+    <BT_BuildType>Debug</BT_BuildType>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -193,6 +201,9 @@
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
     <Manifest_File>(None)</Manifest_File>
     <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <Debugger_RunParams>-Dir=&#34;c:\Temp\tti\Source\&#34; -CreateBackup=False</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -243,7 +254,7 @@
         <Platform value="OSX64">False</Platform>
         <Platform value="OSXARM64">False</Platform>
         <Platform value="Win32">True</Platform>
-        <Platform value="Win64">False</Platform>
+        <Platform value="Win64">True</Platform>
       </Platforms>
     </BorlandProject>
     <ProjectFileVersion>12</ProjectFileVersion>

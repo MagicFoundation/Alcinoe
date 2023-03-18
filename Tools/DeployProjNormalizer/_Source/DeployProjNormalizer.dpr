@@ -74,9 +74,10 @@ begin
 
 end;
 
-{******************************************************}
-function _getProjectRoot(const aProjectName: ansiString;
-                         const aPlatFormName: AnsiString): ansiString;
+{***********************}
+function _getProjectRoot(
+           const aProjectName: ansiString;
+           const aPlatFormName: AnsiString): ansiString;
 begin
   result := aProjectName +
             ALifThenA(
@@ -90,12 +91,13 @@ begin
               '.app');
 end;
 
-{*****************************************************}
-function _getProperty(const aProperties: TALStringListA; // contain items like Cfg_1_iOSDevice64#xxxx=yyyyy
-                      const aConfigs: TALStringListA; // contain items like Cfg_1=Debug
-                      const aPlatFormName: ansiString;
-                      const aConfigName: AnsiString;
-                      const aPropertyName: ansiString): ansiString;
+{********************}
+function _getProperty(
+           const aProperties: TALStringListA; // contain items like Cfg_1_iOSDevice64#xxxx=yyyyy
+           const aConfigs: TALStringListA; // contain items like Cfg_1=Debug
+           const aPlatFormName: ansiString;
+           const aConfigName: AnsiString;
+           const aPropertyName: ansiString): ansiString;
 begin
   var LConfigKey := aConfigs.Values[aConfigName]; // Cfg_1
                     result := aProperties.Values[LConfigKey+'_'+aPlatFormName+'#'+aPropertyName]; // Cfg_1_iOSDevice64#xxxx
@@ -104,11 +106,12 @@ begin
   if result='' then result := aProperties.Values['Base#'+aPropertyName];                          // Base#xxxx
 end;
 
-{*********************************************************}
-function _getExeOutputDir(const aProperties: TALStringListA; // contain items like Cfg_1_iOSDevice64=..\..\$(Platform)\$(Config)
-                          const aConfigs: TALStringListA; // contain items like Cfg_1=Debug
-                          const aPlatFormName: ansiString;
-                          const aConfigName: AnsiString): ansiString;
+{************************}
+function _getExeOutputDir(
+           const aProperties: TALStringListA; // contain items like Cfg_1_iOSDevice64=..\..\$(Platform)\$(Config)
+           const aConfigs: TALStringListA; // contain items like Cfg_1=Debug
+           const aPlatFormName: ansiString;
+           const aConfigName: AnsiString): ansiString;
 begin
   result := _getProperty(
               aProperties, // const aProperties: TALStringListA; // contain items like Cfg_1_iOSDevice64=..\..\$(Platform)\$(Config)
@@ -122,20 +125,21 @@ begin
   if ALPosA('.\', result) = 1 then delete(Result, 1, 2);
 end;
 
-{******************************************************************}
-Procedure _addDeployFile(const aAlreadyDeployedFiles: TALStringListA;
-                         const aItemGroupNode: TalXmlNode;
-                         const aCondition: AnsiString; // ConfigName
-                         const aInclude: AnsiString;
-                         const aDeployClass: AnsiString;
-                         const aLocalCommand: AnsiString;
-                         const aOperation: AnsiString;
-                         aOverwrite: AnsiString;
-                         const aRemoteCommand: AnsiString;
-                         const aRemoteDir: AnsiString;
-                         const aRemoteName: AnsiString;
-                         aRequired: AnsiString;
-                         const aEnabled: Boolean = True); overload;
+{***********************}
+Procedure _addDeployFile(
+            const aAlreadyDeployedFiles: TALStringListA;
+            const aItemGroupNode: TalXmlNode;
+            const aCondition: AnsiString; // ConfigName
+            const aInclude: AnsiString;
+            const aDeployClass: AnsiString;
+            const aLocalCommand: AnsiString;
+            const aOperation: AnsiString;
+            aOverwrite: AnsiString;
+            const aRemoteCommand: AnsiString;
+            const aRemoteDir: AnsiString;
+            const aRemoteName: AnsiString;
+            aRequired: AnsiString;
+            const aEnabled: Boolean = True); overload;
 Begin
   var LPlatFormName := aItemGroupNode.Attributes['Condition']; // '$(Platform)'=='Android'
   //-----
@@ -188,23 +192,24 @@ Begin
   end;
 End;
 
-{******************************************************************}
-Procedure _addDeployFile(const aAlreadyDeployedFiles: TALStringListA;
-                         const aProperties: TALStringListA;
-                         const aConfigs: TALStringListA;
-                         const aPlatFormName: ansiString;
-                         const aConfigName: AnsiString;
-                         const aPropertyName: ansiString;
-                         const aItemGroupNode: TalXmlNode;
-                         const aDeployClass: AnsiString;
-                         const aLocalCommand: AnsiString;
-                         const aOperation: AnsiString;
-                         aOverwrite: AnsiString;
-                         const aRemoteCommand: AnsiString;
-                         const aRemoteDir: AnsiString;
-                         const aRemoteName: AnsiString;
-                         aRequired: AnsiString;
-                         const aEnabled: Boolean = True); overload;
+{***********************}
+Procedure _addDeployFile(
+            const aAlreadyDeployedFiles: TALStringListA;
+            const aProperties: TALStringListA;
+            const aConfigs: TALStringListA;
+            const aPlatFormName: ansiString;
+            const aConfigName: AnsiString;
+            const aPropertyName: ansiString;
+            const aItemGroupNode: TalXmlNode;
+            const aDeployClass: AnsiString;
+            const aLocalCommand: AnsiString;
+            const aOperation: AnsiString;
+            aOverwrite: AnsiString;
+            const aRemoteCommand: AnsiString;
+            const aRemoteDir: AnsiString;
+            const aRemoteName: AnsiString;
+            aRequired: AnsiString;
+            const aEnabled: Boolean = True); overload;
 Begin
   var LInclude := _getProperty(
                     aProperties, // const aProperties: TALStringListA;

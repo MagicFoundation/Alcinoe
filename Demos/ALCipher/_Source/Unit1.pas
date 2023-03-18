@@ -175,7 +175,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{************************************************}
 procedure TForm1.ALButton11Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
@@ -415,12 +415,13 @@ begin
   ALMemoDeCryptedData.Lines.Text := string(outString);
 end;
 
+{*******************************************************}
 procedure TForm1.ALMemoCollisionsChange(Sender: TObject);
 begin
 
 end;
 
-{*********************************************}
+{**********************************************}
 procedure TForm1.Button10Click(Sender: TObject);
 Var aData: AnsiString;
     aBase64Data: AnsiString;
@@ -469,6 +470,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button11Click(Sender: TObject);
 Var aData: AnsiString;
     aHash: ansiString;
@@ -517,6 +519,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button12Click(Sender: TObject);
 Var aData: ansiString;
     aTmpData: ansiString;
@@ -578,6 +581,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button13Click(Sender: TObject);
 Var aData: String;
     aTmpData: String;
@@ -639,6 +643,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button14Click(Sender: TObject);
 Var aData: String;
     aTmpData: String;
@@ -700,6 +705,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button15Click(Sender: TObject);
 Var aData: String;
     aBase64Data: String;
@@ -748,6 +754,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button16Click(Sender: TObject);
 Var aData: ansiString;
     aTmpData: ansiString;
@@ -809,6 +816,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button17Click(Sender: TObject);
 Var aData: String;
     aTmpData: String;
@@ -870,6 +878,7 @@ begin
   end;
 end;
 
+{**********************************************}
 procedure TForm1.Button18Click(Sender: TObject);
 Var aData: Tbytes;
     aData2: Tbytes;
@@ -921,6 +930,7 @@ begin
   end;
 end;
 
+{*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
@@ -1044,6 +1054,7 @@ begin
   end;
 end;
 
+{*********************************************}
 procedure TForm1.Button9Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;
@@ -1436,6 +1447,7 @@ begin
   end;
 end;
 
+{*********************************************}
 procedure TForm1.Button8Click(Sender: TObject);
 Var aData: AnsiString;
     aTmpData: ansiString;

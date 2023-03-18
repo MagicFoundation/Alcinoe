@@ -327,7 +327,9 @@
       <Form>TMainForm</Form>
       <FormType>fmx</FormType>
     </DCCReference>
-    <JavaReference Include="Android\Merged\libs\r.jar"/>
+    <JavaReference Include="Android\Merged\libs\r.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
     <BuildConfiguration Include="Base">
       <Key>Base</Key>
     </BuildConfiguration>

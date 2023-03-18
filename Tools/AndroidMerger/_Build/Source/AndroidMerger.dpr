@@ -3463,7 +3463,13 @@ begin
                ALSameTextW(ALExtractFileName(LLibsFiles[i]), 'r-aab.jar') then continue;
             if not ALSameTextW(ALExtractFileExt(LLibsFiles[i]),'.jar') then raise Exception.Create('Error E88BE4F0-B6E5-4EC4-B890-B9B6169FC58B');
             Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibsFiles[i])); // android\libs\r.jar
-            With LItemGroupNode.AddChild('JavaReference') do Attributes['Include'] := LLocalName;
+            With LItemGroupNode.AddChild('JavaReference') do begin
+              Attributes['Include'] := LLocalName;
+              {$IFNDEF ALCompilerVersionSupported}
+                {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40709 is corrected and update the code below'}
+              {$IFEND}
+              AddChild('ContainerId').Text := 'ClassesdexFile64';
+            end;
           end;
 
           //Update EnabledSysJars

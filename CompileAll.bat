@@ -403,9 +403,6 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%~1\%~2" -CreateBackup="false"
-IF ERRORLEVEL 1 goto ERROR
-
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR
 

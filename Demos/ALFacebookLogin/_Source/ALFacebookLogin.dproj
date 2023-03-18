@@ -436,160 +436,316 @@
     <DCCReference Include="Main.pas">
       <Form>Form1</Form>
     </DCCReference>
-    <JavaReference Include="android\Merged\libs\androidx.activity-activity-1.2.0.jar">
+    <JavaReference Include="android\Merged\libs\32bit\androidx.activity-activity-1.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.annotation-annotation-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.annotation-annotation-experimental-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.appcompat-appcompat-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.appcompat-appcompat-resources-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.arch.core-core-common-2.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.arch.core-core-runtime-2.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.asynclayoutinflater-asynclayoutinflater-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.browser-browser-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.cardview-cardview-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.collection-collection-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.coordinatorlayout-coordinatorlayout-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.core-core-1.3.2.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.core-core-ktx-1.3.2.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.cursoradapter-cursoradapter-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.customview-customview-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.documentfile-documentfile-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.drawerlayout-drawerlayout-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.fragment-fragment-1.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.interpolator-interpolator-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.legacy-legacy-support-core-ui-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.legacy-legacy-support-v4-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-common-2.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-livedata-2.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-livedata-core-2.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-runtime-2.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-viewmodel-2.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.loader-loader-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.media-media-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.print-print-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.savedstate-savedstate-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.slidingpanelayout-slidingpanelayout-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.tracing-tracing-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.vectordrawable-vectordrawable-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.versionedparcelable-versionedparcelable-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\androidx.viewpager-viewpager-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.alcinoe-alcinoe-facebook-share-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.android.installreferrer-installreferrer-1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.facebook.android-facebook-bolts-15.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.facebook.android-facebook-common-15.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.facebook.android-facebook-core-15.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.facebook.android-facebook-login-15.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\com.google.zxing-core-3.3.3.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\org.jetbrains-annotations-13.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\org.jetbrains.kotlin-kotlin-stdlib-1.5.10.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\org.jetbrains.kotlin-kotlin-stdlib-common-1.5.10.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\32bit\r.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="android\Merged\libs\64bit\androidx.activity-activity-1.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.annotation-annotation-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.annotation-annotation-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.annotation-annotation-experimental-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.annotation-annotation-experimental-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.appcompat-appcompat-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.appcompat-appcompat-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.appcompat-appcompat-resources-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.appcompat-appcompat-resources-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.arch.core-core-common-2.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.arch.core-core-common-2.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.arch.core-core-runtime-2.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.arch.core-core-runtime-2.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.asynclayoutinflater-asynclayoutinflater-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.asynclayoutinflater-asynclayoutinflater-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.browser-browser-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.browser-browser-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.cardview-cardview-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.cardview-cardview-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.collection-collection-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.collection-collection-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.coordinatorlayout-coordinatorlayout-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.coordinatorlayout-coordinatorlayout-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.core-core-1.3.2.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.core-core-1.3.2.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.core-core-ktx-1.3.2.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.core-core-ktx-1.3.2.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.cursoradapter-cursoradapter-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.customview-customview-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.customview-customview-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.documentfile-documentfile-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.documentfile-documentfile-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.drawerlayout-drawerlayout-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.fragment-fragment-1.3.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.fragment-fragment-1.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.interpolator-interpolator-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.interpolator-interpolator-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.legacy-legacy-support-core-ui-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.legacy-legacy-support-core-ui-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.legacy-legacy-support-v4-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.legacy-legacy-support-v4-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.lifecycle-lifecycle-common-2.3.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-common-2.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.lifecycle-lifecycle-livedata-2.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-livedata-2.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.3.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-livedata-core-2.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.3.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-runtime-2.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.3.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-viewmodel-2.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.3.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.loader-loader-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.loader-loader-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.media-media-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.media-media-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.print-print-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.print-print-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.savedstate-savedstate-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.savedstate-savedstate-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.slidingpanelayout-slidingpanelayout-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.slidingpanelayout-slidingpanelayout-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.tracing-tracing-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.vectordrawable-vectordrawable-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.versionedparcelable-versionedparcelable-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\androidx.viewpager-viewpager-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.alcinoe-alcinoe-facebook-share-1.0.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.alcinoe-alcinoe-facebook-share-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.android.installreferrer-installreferrer-1.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.android.installreferrer-installreferrer-1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.facebook.android-facebook-bolts-15.2.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.facebook.android-facebook-bolts-15.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.facebook.android-facebook-common-15.2.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.facebook.android-facebook-common-15.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.facebook.android-facebook-core-15.2.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.facebook.android-facebook-core-15.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.facebook.android-facebook-login-15.2.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.facebook.android-facebook-login-15.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\com.google.zxing-core-3.3.3.jar">
+    <JavaReference Include="android\Merged\libs\64bit\com.google.zxing-core-3.3.3.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\org.jetbrains-annotations-13.0.jar">
+    <JavaReference Include="android\Merged\libs\64bit\org.jetbrains-annotations-13.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.5.10.jar">
+    <JavaReference Include="android\Merged\libs\64bit\org.jetbrains.kotlin-kotlin-stdlib-1.5.10.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.5.10.jar">
+    <JavaReference Include="android\Merged\libs\64bit\org.jetbrains.kotlin-kotlin-stdlib-common-1.5.10.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\r.jar">
+    <JavaReference Include="android\Merged\libs\64bit\r.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <BuildConfiguration Include="Base">

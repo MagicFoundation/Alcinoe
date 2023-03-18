@@ -3455,19 +3455,49 @@ begin
               LItemGroupNode.ChildNodes.Delete(i);
           end;
 
-          //add to ItemGroup all items from local libs\ folder
+          //because of https://quality.embarcadero.com/browse/RSP-40709 we must duplicate all libs
+          //in 2 different subdirectories (32bit and 64bit) so that we can add them in Delphi in both
+          //android32 libraries and android64 libraries of the project
+          {$IFNDEF ALCompilerVersionSupported}
+            {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40709 is corrected and update the code below. !!Update also the tool RJarSwapper.bat!!'}
+          {$IFEND}
           var LLibsFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\r.jar
-          var LLibsRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\
+          Var LLibs32BitOutputDir := LLibsOutputDir + '32bit\';
+          TDirectory.CreateDirectory(LLibs32BitOutputDir);
+          Var LLibs64BitOutputDir := LLibsOutputDir + '64bit\';
+          TDirectory.CreateDirectory(LLibs64BitOutputDir);
           for Var I := Low(LLibsFiles) to High(LLibsFiles) do begin
             if ALSameTextW(ALExtractFileName(LLibsFiles[i]), 'r-apk.jar') or
                ALSameTextW(ALExtractFileName(LLibsFiles[i]), 'r-aab.jar') then continue;
             if not ALSameTextW(ALExtractFileExt(LLibsFiles[i]),'.jar') then raise Exception.Create('Error E88BE4F0-B6E5-4EC4-B890-B9B6169FC58B');
-            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibsFiles[i])); // android\libs\r.jar
+            Tfile.Copy(LLibsFiles[i], LLibs32BitOutputDir + ALExtractFileName(LLibsFiles[i]));
+            Tfile.Move(LLibsFiles[i], LLibs64BitOutputDir + ALExtractFileName(LLibsFiles[i]));
+          end;
+
+          //add to ItemGroup all items from local libs\32bit folder
+          var LLibs32bitFiles := TDirectory.GetFiles(LLibs32bitOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\32bit\r.jar
+          var LLibs32bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibs32bitOutputDir)); // android\libs\32bit\
+          for Var I := Low(LLibs32bitFiles) to High(LLibs32bitFiles) do begin
+            if ALSameTextW(ALExtractFileName(LLibs32bitFiles[i]), 'r-apk.jar') or
+               ALSameTextW(ALExtractFileName(LLibs32bitFiles[i]), 'r-aab.jar') then continue;
+            if not ALSameTextW(ALExtractFileExt(LLibs32bitFiles[i]),'.jar') then raise Exception.Create('Error F44A9437-4B53-4D12-A434-7FD978B4E6F1');
+            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibs32bitFiles[i])); // android\libs\32bit\r.jar
             With LItemGroupNode.AddChild('JavaReference') do begin
               Attributes['Include'] := LLocalName;
-              {$IFNDEF ALCompilerVersionSupported}
-                {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40709 is corrected and update the code below'}
-              {$IFEND}
+              AddChild('ContainerId').Text := 'ClassesdexFile';
+            end;
+          end;
+
+          //add to ItemGroup all items from local libs\64bit folder
+          var LLibs64bitFiles := TDirectory.GetFiles(LLibs64bitOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\64bit\r.jar
+          var LLibs64bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibs64bitOutputDir)); // android\libs\64bit\
+          for Var I := Low(LLibs64bitFiles) to High(LLibs64bitFiles) do begin
+            if ALSameTextW(ALExtractFileName(LLibs64bitFiles[i]), 'r-apk.jar') or
+               ALSameTextW(ALExtractFileName(LLibs64bitFiles[i]), 'r-aab.jar') then continue;
+            if not ALSameTextW(ALExtractFileExt(LLibs64bitFiles[i]),'.jar') then raise Exception.Create('Error 21B5091B-8149-4817-90E1-52A31C08FA1F');
+            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibs64bitFiles[i])); // android\libs\64bit\r.jar
+            With LItemGroupNode.AddChild('JavaReference') do begin
+              Attributes['Include'] := LLocalName;
               AddChild('ContainerId').Text := 'ClassesdexFile64';
             end;
           end;

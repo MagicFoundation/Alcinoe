@@ -60,6 +60,29 @@ and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https:
 to your search path.
 
 
+Propose a change using GitHub
+-----------------------------
+
+If you need to suggest a change to the Alcine directory, 
+please follow these steps:
+
+1. To make changes to the Alcinoe repository, you'll need 
+to fork it. Don't worry, forking simply involves creating 
+a copy of the Alcinoe source code that you can edit as 
+you wish.
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-27.jpg?raw=true" alt="" />
+
+2. Make the necessary edits to the source code, and then 
+commit and push the changes to your forked repository.
+
+3. Once you're satisfied with your changes, submit your 
+proposal. To do so, go to your forked repository, select 
+'Contribute,' and then choose 'Open a pull request.'
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true" alt="" />
+
+
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ---------------------------------------------------
                                  
@@ -104,34 +127,36 @@ Learn more at [{alcinoe}/Tools/DeployMan](https://github.com/MagicFoundation/Alc
 DeployProjNormalizer
 --------------------
 
-Create from the dproj a new deployproj file from scratch 
-and normalize it (ie: order the node so that you can 
-compare different revision with diff compare tools).
-Learn more at [{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)
+Create a new deployproj file from scratch using the dproj 
+as a reference, and then normalize it by ordering the nodes 
+in such a way that you can compare different revisions with 
+diff comparison tools. Learn more at 
+[{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)
 
 
 DProjNormalizer
 ---------------
 
-Order all nodes in a DProj so that the Dproj stay consistent 
-between each commit for easy diff compare. Learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer)
+Order the nodes in a DProj file to ensure consistency 
+across commits, making it easier to compare differences. 
+Learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer)
 
 
 Opengl video player for FireMonkey
 ----------------------------------
 
-ALVideoPlayer will render a video to a TEXTURE. This is really 
-important because you can fully integrate the video in the Delphi 
-form and you can place any controls you want on the top of it 
-as it's support Z-ORDER. Official Delphi video player are just 
-native video player window on the top of the form and thus not 
-supporting Z-ORDER.
+ALVideoPlayer renders video to a texture, which is 
+important for integrating the video into a Delphi form and 
+supporting Z-ORDER for placing controls on top of it. 
+Official Delphi video players are just native video player 
+windows on top of the form and do not support Z-ORDER.
 
-Under android Alcinoe use ExoPlayer. ExoPlayer supports features 
-like Dynamic adaptive streaming over HTTP (DASH), HLS, 
-SmoothStreaming and Common Encryption, which are not supported 
-by MediaPlayer. It's designed to be easy to customize and extend. 
-Under iOS I use AVPlayer with support also HLS like ExoPlayer does
+For Android, Alcinoe uses ExoPlayer, which supports 
+features such as dynamic adaptive streaming over 
+HTTP (DASH), HLS, SmoothStreaming, and common encryption 
+that are not supported by MediaPlayer. ExoPlayer is 
+designed to be easy to customize and extend. For iOS, I use 
+AVPlayer with support for HLS, similar to ExoPlayer.
 
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
@@ -159,20 +184,20 @@ or any other third-party software.
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
-TALWebRTC component makes it easy to add video and audio chat 
-into your applications, which opens up a whole new world of 
-interactivity. Learn more at [{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
+With the TALWebRTC component, you can easily incorporate video 
+and audio chat into your applications, giving your users a more 
+interactive and immersive experience! Learn more at 
+[{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
   
 
 Firemonkey native iOS/Android TEdit and TMemo
 ---------------------------------------------
 
-The spirit is to mix FireMonkey control with native platform control
-when the functionality on such control starts to be very hard to
-implement (like webbrowser, edit, memo, datepicker, etc.). But it's
-not to make several distinct forms for several platforms like 
-offer for example http://www.turbococoa.com/ (but this option is
-also a good alternative in some way, it's up to you to decide)
+The idea is to combine FireMonkey controls with native 
+platform controls when the functionality of a specific 
+control becomes difficult to implement solely with 
+FireMonkey (such as web browser, edit, memo, date picker, 
+etc.).
 
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-20.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
@@ -182,11 +207,6 @@ also a good alternative in some way, it's up to you to decide)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
 
-In Delphi (berlin) their is already IOS platform control that was 
-quite well implemented but close to none android platform control 
-and so I start to build native android/iOS controls like TEdit/TMemo. 
-These control work mostly like some windows that are placed on The
-top of the form (so off course no z-order with FireMonkey control). 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 
@@ -205,58 +225,65 @@ Fast/double-buffered FireMonkey controls with native draw
 
 #### The fact ####
 
-Painting of FireMonkey controls can be sometimes slow, or say 
-differently, not sufficiently fast for a fluid scrolling. For example if 
-you simply look the basic TRectangle with round corners, the paint procedure 
-can take around 3ms! So if you have around 20 visible TRectangles on your 
-screen, then it's will cost you around 60ms to repaint the full screen 
-(and normally you don't have only TRectangle, you also have TLabel, 
-TCheckbox, etc..). After it's just math, take 100ms to repaint the screen, 
-so you can only do around 10 frames per seconds (in reality you will have 
-much less even) so the scrolling can't be fluid :(
+Painting FireMonkey controls can be slow at times, which 
+can affect the scrolling fluidity. For instance, the basic 
+TRectangle with round corners takes approximately 3ms to 
+paint. If you have 20 visible TRectangles on your screen, 
+it would take around 60ms to repaint the entire screen 
+(assuming you only have TRectangles and not other controls 
+like TLabel or TCheckbox). Doing the math, if it takes 
+100ms to repaint the screen, you can only achieve around 10 
+frames per second (in reality, it would be much less). As a 
+result, scrolling can't be smooth.
 
 #### The solution #### 
  
-I didn't want to rebuild the FireMonkey controls, it's a too 
-huge job for me, and instead I try to find an intermediate solution. 
-This what I find by adding "double-buffered" property to the FireMonkey 
-controls. So instead to repaint and repaint (and repaint) the controls 
-for every single pixels move of the scrollbox, I first paint the control 
-on a "buffer" that I store directly in the GPU memory (through TTexture), 
-and when the system asks me to repaint the controls instead of calling 
-again the paint algorithm I simply redraw the buffer TTexture.
+I didn't want to rebuild the FireMonkey controls, which 
+would have been a huge job for me. Instead, I tried to find 
+an intermediate solution by adding a "double-buffered" 
+property to the FireMonkey controls. This approach involves 
+painting the control on a buffer stored directly in the GPU 
+memory (through TTexture) instead of repainting the controls 
+for every single pixel move of the scrollbox. When the 
+system asks me to repaint the controls, I simply redraw the 
+buffer TTexture, rather than calling the paint algorithm 
+again.
 
 #### The results ####  
 
-As I say before it's took 3ms just to paint a simple 
-TRectangle with round corners. With my double-buffered property 
-it's take now around 0.1ms! So now the scroll looks much more 
-fluid! 
+As I mentioned before, it used to take 3ms just to paint a 
+simple TRectangle with round corners. With my 
+double-buffered property, it now takes around 0.1ms! As a 
+result, the scrolling looks much more fluid now!
 
 #### OpenGL draw => Replaced by native iOS/android draw ####
 
-Most of the basic shape (like TRectangle, TCircle, etc.) use openGL to 
-draw. it's not very efficient, for example to draw a circle under 
-openGL you will in fact draw 50 triangles. This result often in poor 
-quality : https://quality.embarcadero.com/browse/RSP-15206
-For roundrect it's even worse because you must first calculate the 
-path and then later draw it (much more slow than TCircle)
+Most of the basic shapes in FireMonkey, such as TRectangle 
+and TCircle, use OpenGL for drawing. However, this is not 
+very efficient - for example, to draw a circle under 
+OpenGL, you actually need to draw 50 triangles. This often 
+results in poor quality. Drawing a round rectangle is even 
+worse because it requires calculating the path and then 
+drawing it, which is much slower than drawing a circle.
 
-Other problem is all of these draw depend of Form.quality. if you set 
-form.quality to highquality then everything you will do on the
-canvas will be multisample like drawing an image for example and that 
-could be problematic because the image will be anti-aliased. if you set 
-form.quality to highperformance then the draw will be very rough (no 
-anti aliasing). 
+Another problem is that all of these shapes depend on the 
+Form.quality setting. If you set form.quality to high 
+quality, then everything you draw on the canvas will be 
+anti-aliased, which can be problematic - for example, an 
+image may be anti-aliased even if you don't want it to be. 
+On the other hand, if you set form.quality to high 
+performance, then the draw will be very rough, with no 
+anti-aliasing.
 
-To resolve this, I build the buffer of my control using NATIVE 
-ANDROID/IOS API. In this way we will have a high quality draw at also
-a high speed without being dependent of the form.quality
+To resolve these issues, I built the buffer of my control 
+using the native Android/iOS API. In this way, we can have 
+high-quality drawing at high speed without being dependent 
+on the form.quality setting.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
   
-You can start exploring this feature 
-with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+You can start exploring this feature with the demo located 
+at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 
 Improved FireMonkey controls
@@ -283,7 +310,8 @@ Confetti Falling Animation
 --------------------------
 
 ALConfetti is a vanilla Delphi library for creating a configurable, 
-high-performance confetti falling animation. Learn more at [{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
+high-performance confetti falling animation. Learn more at 
+[{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 
@@ -291,35 +319,40 @@ high-performance confetti falling animation. Learn more at [{alcinoe}/Demos/ALCo
 Firebase cloud messaging
 ------------------------
 
-Delphi implementation of the latest Firebase cloud messaging (FCM) 
-with HTTP V1 protocol that will permit you to send alert notification 
-with image in Android and iOS. Learn more at [{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
+Delphi implementation of the latest version of Firebase 
+cloud messaging (FCM) with HTTP V1 protocol that will 
+permit you to send alert notifications with images in 
+Android and iOS. Learn more at 
+[{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
 
   
 Google OAuth 2.0 Access Token
 -----------------------------
 
-Google APIs use the OAuth 2.0 protocol for authentication and 
-authorization. You can use the function ALGenerateGoogleOAuth2AccessToken 
-to generate an OAuth 2.0 Access Token. Learn more at 
+Google APIs use the OAuth 2.0 protocol for authentication 
+and authorization. You can use the function 
+ALGenerateGoogleOAuth2AccessToken to generate an OAuth 2.0 
+Access Token. Learn more at 
 [{alcinoe}/Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
   
 
 Android/iOS VKontakte/Facebook SDK login
 ----------------------------------------
 
-The VKontakte/Facebook SDK for Android enables people to sign into 
-your app with VKontakte/Facebook Login. When people log into your 
-app with VKontakte/Facebook they can grant permissions to your app so 
-you can retrieve information or perform actions on VKontakte/Facebook 
-on their behalf. Learn more at [{alcinoe}\Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
+The VKontakte/Facebook SDK for Android enables users to 
+sign into your app using VKontakte/Facebook Login. Once 
+logged in, users can grant permissions to your app, 
+allowing you to retrieve information or perform actions on 
+VKontakte/Facebook on their behalf. Learn more at 
+[{alcinoe}\Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
 
 
 Photo Editor Filters for Android/iOS
 ------------------------------------
 
-With TALColorAdjustEffect, gorgeous photo filters with one-tap auto 
-enhance, make your photos beautiful and expressive in just minutes! 
+With TALColorAdjustEffect, you can apply gorgeous photo 
+filters that enhance your images with just one tap. Make 
+your photos beautiful and expressive in just minutes! 
 Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
@@ -332,12 +365,14 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 Json Parser
 -----------
 
-TALJSONDocumentA is a Delphi parser/writer for JSON / BSON data
-format. it's support DOM and SAX parser (Note a better name could 
-be SAJ for Simple API for JSON instead of SAX for Simple API for XML 
-but as the concept of SAX is well know I keep this name), support 
-BSON format, and use a similar syntax than TALXMLDocument / TXMLDocument.
-TALJSONDocumentA can also export Json / Bson data in TALStringListA.
+TALJSONDocumentA is a Delphi parser/writer for JSON/BSON 
+data formats. It supports both DOM and SAX parsers. (Note 
+that a better name for SAX could be SAJ for Simple API for 
+JSON instead of Simple API for XML, but as the concept of 
+SAX is well-known, I will keep this name.) TALJSONDocumentA 
+also supports BSON format and uses a syntax similar to 
+TALXMLDocument/TXMLDocument. Additionally, TALJSONDocumentA 
+can export Json/Bson data to TALStringListA.
 
 Example :
 
@@ -386,7 +421,7 @@ text, lines, polygons, ellipses and Bézier curves.
 Example :
 
 ```
-    var aWand: PMagickWand;
+    var LWand: PMagickWand;
     begin
     
       //Create the ImageMagick Library
@@ -394,26 +429,26 @@ Example :
       try
       
         //create the wand pointer
-        aWand := ALImageMagickLib.NewMagickWand;
+        LWand := ALImageMagickLib.NewMagickWand;
         try
       
           //load the image
-          if ALImageMagickLib.MagickReadImage(aWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(aWand);
+          if ALImageMagickLib.MagickReadImage(LWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(LWand);
           
           //Set the compression quality
-          if ALImageMagickLib.MagickSetImageCompressionQuality(aWand,80) <> MagickTrue then RaiseLastMagickWandError(aWand);
+          if ALImageMagickLib.MagickSetImageCompressionQuality(LWand,80) <> MagickTrue then RaiseLastMagickWandError(LWand);
       
           //autorate the image
-          if ALImageMagickLib.MagickAutoOrientImage(aWand) <> MagickTrue then RaiseLastMagickWandError(aWand);
+          if ALImageMagickLib.MagickAutoOrientImage(LWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
       
           //Resize the image using the Lanczos filter
-          if ALImageMagickLib.MagickResizeImage(aWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(aWand);
+          if ALImageMagickLib.MagickResizeImage(LWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
              
           //save the image
-          ALImageMagickLib.MagickWriteImage(aWand, pansiChar(aOutputFilename));
+          ALImageMagickLib.MagickWriteImage(LWand, pansiChar(aOutputFilename));
       
         finally
-          ALImageMagickLib.DestroyMagickWand(aWand);
+          ALImageMagickLib.DestroyMagickWand(LWand);
         end;
     
       finally
@@ -425,59 +460,67 @@ Example :
 
 Learn more at [{alcinoe}/Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
 
+
 MongoDb client
 --------------
 
-A Delphi driver (with connection pool) to access a
-mongoDB server. a connection pool is a cache of database
-connections maintained so that the connections can be reused
-when future requests to the database are required.
-In connection pooling, after a connection is created,
-it is placed in the pool and it is used over again so that a
-new connection does not have to be established. If all the
-connections are being used, a new connection is made and is
-added to the pool. Connection pooling also cuts down on the
-amount of time a user must wait to establish a connection
-to the database. Learn more at [{alcinoe}/Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
+This is a Delphi driver (with connection pooling) for 
+accessing a MongoDB server. Connection pooling is a cache 
+of database connections that are maintained so that they 
+can be reused when future requests to the database are 
+required. After a connection is created in connection 
+pooling, it is placed in the pool and is used over again so 
+that a new connection does not have to be established. If 
+all the connections are being used, a new connection is 
+made and added to the pool. Connection pooling also reduces 
+the amount of time a user must wait to establish a 
+connection to the database. Learn more at 
+[{alcinoe}/Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
 
 
 WebSocket client
 ----------------
 
-WebSocket Client for Delphi implemented on the top of WinHTTP.
-The WebSocket is a communication protocol, that makes it possible 
-to open a two-way interactive communication session between the 
-user’s browser and a server. With this, you can send messages to 
-a server and receive event-driven responses without having to 
-poll the server for a reply. Learn more at [{alcinoe}\Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
+The WebSocket client for Delphi is implemented on top of 
+WinHTTP. WebSocket is a communication protocol that enables 
+two-way interactive communication sessions between a user's 
+browser and a server. This allows you to send messages to a 
+server and receive event-driven responses without having to 
+poll the server for a reply. Learn more at 
+[{alcinoe}\Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
 
 
 Fast TStringList
 ----------------
 
-TALStringListA Work the same as Delphi TStringList except that it's
-allow to search a name=value using a quicksort algorithm when the
-list is sorted. Also TALStringListA use a locale independent
-algorithm (based on the 8-bit ordinal value of each character)
-instead of the AnsiCompareText and AnsiCompareStr used by the
-Delphi TStringList. at the end the sort in TALStringListA is up to
-10x more faster than in Delphi TStringList. Also TALStringListA is
-not an Unicode TStringList but an 100% Ansi StringList. You can 
-start exploring this feature with the demo located at 
+TALStringListA works the same as Delphi's TStringList, 
+except that it allows you to search for a name=value 
+using a quicksort algorithm when the list is sorted. 
+Additionally, TALStringListA uses a locale-independent 
+algorithm (based on the 8-bit ordinal value of each 
+character) instead of the AnsiCompareText and 
+AnsiCompareStr used by Delphi's TStringList. As a 
+result, sorting in TALStringListA is up to 10 times 
+faster than in Delphi's TStringList. Furthermore, 
+TALStringListA is not a Unicode TStringList, but a 100% 
+Ansi StringList. You can start exploring this feature 
+with the demo located at 
 [{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
 
 
 PHP runner
 ----------
 
-ALPHPRunnerEngine is a simple but useful component for
-easily use php (any version) as a scripting language
-in Delphi applications. ALPhpRunnerEngine allows to
-execute the PHP scripts within the Delphi program without
-a WebServer. ALPHPRunnerEngine use the CGI/FastCGI
-interface (php-cgi.exe) of PHP to communicate with PHP engine.
-Learn more at [{alcinoe}\Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
-  
+ALPHPRunnerEngine is a simple yet useful component that 
+allows you to easily use PHP (any version) as a scripting 
+language in Delphi applications. With ALPhpRunnerEngine, 
+you can execute PHP scripts within the Delphi program 
+without the need for a web server. The component uses 
+the CGI/FastCGI interface (php-cgi.exe) of PHP to 
+communicate with the PHP engine. Learn more at 
+[{alcinoe}\Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
+
+
 Memcached Client
 ----------------
 
@@ -491,23 +534,17 @@ applications by alleviating database load. Learn more at
 GSM component
 -------------
 
-The TAlGSMComm component implements SMS text messaging
-through the text-mode interface defined in the GSM
-Technical Specification 07.05, version 5.1.0, dated
-December 1996.  There are several variations of this spec,
-used throughout Nokia, Siemens, Ericsson, etc models.
-We have tested the Nokia 6230 in-house, but the Nokia 7190,
-8890, 6210 and 9110 models should work as well.  Phones
-from other manufacturers will also work, as long as they
-implement the text-mode interface. Learn more at 
+The TAlGSMComm component allows you to implement SMS text 
+messaging using the text-mode interface defined in the GSM 
+Technical Specification 07.05. Learn more at 
 [{alcinoe}/Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
 
 
 SQLite3 Client
 --------------
 
-Query Sqlite3 database and get the result In Xml format 
-or in Json/Bson format. Learn more at 
+Query the SQLite3 database and get the results in XML format
+or in JSON/BSON format. Learn more at 
 [{alcinoe}/Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
 
 
@@ -524,77 +561,36 @@ And much more
 * etc ...
 
 
-WIN64
------
-
-Unfortunately, in win64 we lost all the FastCode heritage. 
-(that was mostly based on ASM). That mean that most of 
-the functions will be around 2x to 10x more slower. 
-you can try to launch /demo/ALStringBenchMark/
-in win64 and Win32 to see the difference in speed.
-
-
 DELPHI D2009+ (UNICODE)
 -----------------------
 
 No mistake, Unicode was necessary for a product like Delphi. 
-But the way embarcadero decide to implement it’s questionable! 
-Indeed they decide to migrate the 8bit string to 16bit string 
-instead of choosing to implement Unicode through 8bit string 
-(UTF8).  This cause the migration of some Delphi app < d2009 
-very hard, especially on application that assume that string 
-is 8bit. Here a very good article about why to avoid to use 
-UFT-16: [utf8everywhere.org](http://www.utf8everywhere.org/)
+However, the way Embarcadero decided to implement it is 
+questionable. They chose to migrate from 8-bit strings to 
+16-bit strings instead of implementing Unicode through 
+8-bit strings (UTF-8). This made the migration of some 
+Delphi applications prior to D2009 very difficult, especially 
+for applications that assumed that strings were 8-bit. 
+Here's a very good article about why you should avoid 
+using UTF-16: [utf8everywhere.org](http://www.utf8everywhere.org/)
 
-So I was facing the need to choose: stay in D2007, move to 
-FreePascal (that implement Unicode through UTF8) or migrate 
-to Unicode. After studying the Unicode migration I discover 
-that it’s will be very hard to do on my own projects. 
-Also on lot of my applications the migration to Unicode was 
-really unnecessary, as they was already working in UTF8, 
-receive their input request in utf8 and output their response 
-in UTF8. Here the migration to UTF16 will mean: 
-Input (UTF8) => UTF16 => data processing => UTF16 => output(UTF8)
-plus off course all the migration job (that include debugging).
-In fact, except the input/output to the "visual interface", 
-most (if not all) of the input/output of most of the 
-application will be done in 8bit string (ex: file storage, 
-client/server protocol, HTTP, Smtp, tcp, xml, html, database, 
-etc.). So I decide to go in Delphi Xe2 but to stay in 
-AnsiString (8bit string). My first through was to replace 
-everywhere in my code all the String by AnsiString. 
-Unfortunately,  most of the usefull and needed string function 
-in D2009+ are not available in 8bit string like inttostr, 
-strtoint, strtofloat, Tstrings, TstringStream, etc. Of course 
-we can still do ansistring(inttostr(x)) but this is very 
-pity (and slow). So I decided to make my component 
-like a "framework" to help fully support of 8bit string 
-(mostly in UTF8). 
-
-You can also go in /demo/ALStringBenchMark/ to find an 
-application to benchmark ansiString vs Unicode String and 
-in /demo/ALSortedList/ to see the benchmark of TALStringListA 
-(ansiString) vs TStringList (UnicodeString). In fact, most 
-of the Unicode function (when they are implemented correctly, 
-thanks to fastcode) will be close to the same speed as their 
-ansi equivalent. But no mistake, Unicode string will still 
-use 2x more memory and depending on the application, this may 
-be not acceptable.
-
-Under D2009+, ansiString Have now a codepage, and some 
-transliteration (OldCodePage => UTF16 => NewCodePage) will 
-happen when assigning one ansiString with different codepage 
-to another ansistring with another codepage. To avoid this 
-it’s important to always set project option to the code page 
-you want (eg. 65001 for UTF8) and also to call at the 
-beginning of the program SetMultiByteConversionCodePage(CP_UTF8); 
-Also it’s very important to avoid using 2 different
-string types (eg UTF8string and aniString) even if they have 
-the same codepage, because compiler at compile time 
-don’t know that codepage is the same and will do a 
-transliteration (ex MyAnsiStringUTF8 := MyUTF8String will 
-result in UTF8 => UTF16 => UTF8). This is why we use in 
-all our code only AnsiString instead of UTF8String (even 
-when we assume that string contain only UTF8 char) to 
-avoid theses transliteration keep the rule to only use 
-AnsiString with SetMultiByteConversionCodePage.
+Starting with D2009, AnsiString now has a codepage, 
+and some transliteration (OldCodePage => UTF-16 => 
+NewCodePage) will occur when assigning one AnsiString 
+with a different codepage to another AnsiString with 
+a different codepage. To avoid this, it's important to 
+always set the project option to the code page you want 
+(e.g., 65001 for UTF-8) and also to call 
+SetMultiByteConversionCodePage(CP_UTF8) at the beginning 
+of the program. Additionally, it's crucial to avoid using 
+two different string types (e.g., UTF8String and 
+AnsiString) even if they have the same codepage because 
+the compiler, at compile time, doesn't know that the 
+codepage is the same and will do a transliteration 
+(e.g., MyAnsiStringUTF8 := MyUTF8String will result in 
+UTF-8 => UTF-16 => UTF-8). This is why we use only 
+AnsiString in all our code instead of UTF8String (even 
+when we assume that the string contains only UTF-8 
+characters) to avoid these transliterations. Always follow 
+the rule of using only AnsiString with 
+SetMultiByteConversionCodePage(CP_UTF8).

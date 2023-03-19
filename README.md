@@ -69,16 +69,14 @@ please follow these steps:
 1. To make changes to the Alcinoe repository, you'll need 
 to fork it. Don't worry, forking simply involves creating 
 a copy of the Alcinoe source code that you can edit as 
-you wish.
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-27.jpg?raw=true" alt="" />
+you wish. <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-27.jpg?raw=true" alt="" />
 
 2. Make the necessary edits to the source code, and then 
 commit and push the changes to your forked repository.
 
 3. Once you're satisfied with your changes, submit your 
 proposal. To do so, go to your forked repository, select 
-'Contribute,' and then choose 'Open a pull request.'
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true" alt="" />
+'Contribute,' and then choose 'Open a pull request.' <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true" alt="" />
 
 
 AndroidMerger: Integrate AAR SDK in FMX Android app

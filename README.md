@@ -69,7 +69,8 @@ please follow these steps:
 1. To make changes to the Alcinoe repository, you'll need 
    to fork it. Don't worry, forking simply involves 
    creating a copy of the Alcinoe source code that you can 
-   edit as you wish. 
+   edit as you wish.  
+   
    ![Fork](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-27.jpg?raw=true)
 
 2. Make the necessary edits to the source code, and then 
@@ -77,7 +78,8 @@ please follow these steps:
 
 3. Once you're satisfied with your changes, submit your 
    proposal. To do so, go to your forked repository, select 
-   'Contribute,' and then choose 'Open a pull request.' 
+   'Contribute,' and then choose 'Open a pull request.'  
+   
    ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
 
 

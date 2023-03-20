@@ -401,6 +401,7 @@ begin
       LOldToNewNames.add('ALJavascriptDecodeU=ALJavascriptDecode');
       LOldToNewNames.add('ALDecompressHttpResponseContentU=ALDecompressHttpResponseContent');
       LOldToNewNames.add('AlIsValidEmailU=AlIsValidEmail');
+      LOldToNewNames.add('AlDetectImageExtensionU=AlDetectImageExtension');
 
       //type names
       LOldToNewNames.add('pALFormatSettings=pALFormatSettingsA');

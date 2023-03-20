@@ -389,6 +389,7 @@ begin
                     var LTargetIndent := P1-P0+2;
                     for var J := 1 to LLst.Count - 1 do begin
                       var LLine := LLst[J];
+                      if ALTrim(LLine) = '' then continue;
                       Var LLineIndent := length(LLine) - length(ALTrimLeft(LLine));
                       var LDeltaIndent := LTargetIndent - LMinLineIndent;
                       while LDeltaIndent < 0 do begin

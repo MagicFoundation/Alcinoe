@@ -36,7 +36,7 @@ to retrieve and patch the original Delphi source code.
 The batch file assumes that the original source code is 
 located in c:\Program Files (x86)\Embarcadero\Studio\22.0\source\ 
 and that you have GIT in your path. Later, you will need to 
-include all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/).
+include all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/)
 in your project search path.
 
 You will also need to run [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat) 

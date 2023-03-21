@@ -1,0 +1,2 @@
+inherited MFAppDynamicScrollBoxFrame: TMFAppDynamicScrollBoxFrame
+end

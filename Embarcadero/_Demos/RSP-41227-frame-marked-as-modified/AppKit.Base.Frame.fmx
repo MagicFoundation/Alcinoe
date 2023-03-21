@@ -1,0 +1,7 @@
+object MFAppBaseFrame: TMFAppBaseFrame
+  Align = Client
+  Size.Width = 360.000000000000000000
+  Size.Height = 640.000000000000000000
+  Size.PlatformDefault = False
+  Visible = False
+end

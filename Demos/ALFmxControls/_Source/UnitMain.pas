@@ -316,13 +316,13 @@ uses
 {********************************************}
 procedure TForm1.ALEditEnter(Sender: TObject);
 begin
-  ALLog('ALEditEnter', 'ALEditEnter');
+  ALLog('ALEditEnter');
 end;
 
 {*******************************************}
 procedure TForm1.ALEditExit(Sender: TObject);
 begin
-  ALLog('ALEditExit', 'ALEditExit');
+  ALLog('ALEditExit');
 end;
 
 {********************************************}
@@ -1497,7 +1497,7 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
   {$ENDIF}
 
-  ALLog('FormDestroy', 'FormDestroy');
+  ALLog('FormDestroy');
 end;
 
 {$IF Defined(IOS) or Defined(ANDROID)}
@@ -1534,7 +1534,7 @@ end;
 {*******************************************}
 procedure TForm1.FormResize(Sender: TObject);
 begin
-  ALLog('FormResize', 'width: ' + FloatToStr(width) + ' - ' + FloatToStr(height));
+  ALLog('FormResize', 'width: ' + FloatToStr(width) + ' | ' + FloatToStr(height));
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
 
   {$IF Defined(ANDROID)}
@@ -1550,7 +1550,7 @@ procedure TForm1.FormVirtualKeyboardHidden(
             Sender: TObject;
             KeyboardVisible: Boolean; const Bounds: TRect);
 begin
-  ALLog('FormVirtualKeyboardHidden', 'FormVirtualKeyboardHidden');
+  ALLog('FormVirtualKeyboardHidden');
   FVKKeyboardOpen := False;
   AlVertScrollBox1.margins.Bottom := 0;
   AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
@@ -1561,7 +1561,7 @@ procedure TForm1.FormVirtualKeyboardShown(
             Sender: TObject;
             KeyboardVisible: Boolean; const Bounds: TRect);
 begin
-  ALLog('FormVirtualKeyboardShown', 'FormVirtualKeyboardShown');
+  ALLog('FormVirtualKeyboardShown');
   FVKKeyboardOpen := True;
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;

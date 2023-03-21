@@ -214,14 +214,14 @@ end;
 {*******************************************************}
 procedure TForm1.OnAuthorizationRefused(Sender: TObject);
 begin
-  ALLog('OnAuthorizationRefused', 'OnAuthorizationRefused');
+  ALLog('OnAuthorizationRefused');
   ShowLog('OnAuthorizationRefused');
 end;
 
 {*******************************************************}
 procedure TForm1.OnAuthorizationGranted(Sender: TObject);
 begin
-  ALLog('OnAuthorizationGranted', 'OnAuthorizationGranted');
+  ALLog('OnAuthorizationGranted');
 end;
 
 {*******************************************}

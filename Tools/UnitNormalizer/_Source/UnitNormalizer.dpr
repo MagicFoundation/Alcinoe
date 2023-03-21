@@ -283,6 +283,7 @@ begin
                 //___________________________________^LTargetIndent____List.FList[Index2].FValue)
                 //                                                                              ^P2
                 if (LCRPos > 0) and
+                   (AlPosIgnoreCaseA('[TWin_MongoDBFilerFieldAttributes(', LStr) <= 0) and
                    (AlposIgnoreCaseA('TShaderManager.RegisterShaderFromData', LStr) <= 0) and
                    (AlposIgnoreCaseA('TFilterRec.Create', LStr) <= 0) then begin
                   //
@@ -344,9 +345,11 @@ begin
                   //____________________responseFlags);
                   //
                   if (LCRPos > LRoundBracketStartAt - P0 + 2) and
-                     (AlPosIgnoreCaseA('TThread.Queue(nil,', LStr) <= 0) and
-                     (AlPosIgnoreCaseA('TThread.Synchronize(nil,', LStr) <= 0) and
-                     (AlPosIgnoreCaseA('TThread.ForceQueue(nil,', LStr) <= 0) then begin
+                     ((AlPosIgnoreCaseA('TThread.Queue(nil,', LStr) <= 0) or (AlPosIgnoreCaseA('TThread.Queue(nil,', LStr) <> LRoundBracketStartAt - P0 + 1 - length('TThread.Queue'))) and
+                     ((AlPosIgnoreCaseA('TThread.Synchronize(nil,', LStr) <= 0) or (AlPosIgnoreCaseA('TThread.Synchronize(nil,', LStr) <> LRoundBracketStartAt - P0 + 1 - length('TThread.Synchronize'))) and
+                     ((AlPosIgnoreCaseA('TThread.ForceQueue(nil,', LStr) <= 0) or (AlPosIgnoreCaseA('TThread.ForceQueue(nil,', LStr) <> LRoundBracketStartAt - P0 + 1 - length('TThread.ForceQueue'))) and
+                     ((AlPosIgnoreCaseA('MaxValue([', LStr) <= 0) or (AlPosIgnoreCaseA('MaxValue([', LStr) <> LRoundBracketStartAt - P0 + 1 - length('MaxValue'))) and
+                     ((AlPosIgnoreCaseA('MinValue([', LStr) <= 0) or (AlPosIgnoreCaseA('MinValue([', LStr) <> LRoundBracketStartAt - P0 + 1 - length('MinValue'))) then begin
                      var LIndentStr: AnsiString := '';
                      for var J := 1 to LMinLineIndent do
                        LIndentStr := LIndentStr + ' ';

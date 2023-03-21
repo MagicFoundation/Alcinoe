@@ -128,7 +128,7 @@ end;
 {*************************************}
 procedure TForm1.onFaceBookLoginCancel;
 begin
-  allog('FaceBookLogin:onCancel', 'FaceBookLogin:onCancel', TalLogType.warn);
+  allog('FaceBookLogin:onCancel', TalLogType.warn);
   memo1.lines.clear;
   memo1.lines.Add('FacebookLogin:onCancel');
 end;
@@ -136,7 +136,7 @@ end;
 {********************************************************}
 procedure TForm1.onFaceBookLoginError(const aMsg: String);
 begin
-  allog('FaceBookLogin:onError', 'FaceBookLogin:onError', TalLogType.error);
+  allog('FaceBookLogin:onError', TalLogType.error);
   memo1.lines.clear;
   memo1.lines.Add(aMsg);
 end;
@@ -146,7 +146,7 @@ procedure TForm1.onFaceBookLoginSuccess(const aUserID: String; const aToken: Str
 var S: string;
     i: integer;
 begin
-  allog('FaceBookLogin:onSuccess', 'FaceBookLogin:onSuccess', TalLogType.info);
+  allog('FaceBookLogin:onSuccess', TalLogType.info);
   memo1.lines.clear;
 
   memo1.lines.Add('UserId: ' + aUserID);
@@ -167,7 +167,7 @@ end;
 {****************************************************************************************************************************}
 procedure TForm1.onFaceBookGraphRequestCompleted(const aResponse: string; Const aErrorCode: integer; Const aErrorMsg: String);
 begin
-  allog('FaceBookGraphRequest:onCompleted', 'FaceBookGraphRequest:onCompleted', TalLogType.info);
+  allog('FaceBookGraphRequest:onCompleted', TalLogType.info);
   memo1.lines.clear;
   memo1.lines.Add('ErrorCode: ' + inttoStr(aErrorCode));
   memo1.lines.Add('ErrorMsg: ' + aErrorMsg);

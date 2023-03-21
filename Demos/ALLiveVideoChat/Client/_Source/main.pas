@@ -375,7 +375,7 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
-  ALLog('TForm1.FormCreate', 'TForm1.FormCreate', TalLogType.verbose);
+  ALLog('TForm1.FormCreate', TalLogType.verbose);
 
   {$IF Defined(IOS) or Defined(ANDROID)}
   Application.OnException := TgoExceptionReporter.ExceptionHandler;

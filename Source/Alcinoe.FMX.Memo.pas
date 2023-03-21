@@ -481,7 +481,7 @@ end;
 procedure TALIosTextViewDelegate.textViewDidChange(textView: UITextView);
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TALIosTextViewDelegate.textViewDidChange', '', TalLogType.VERBOSE);
+  //ALLog('TALIosTextViewDelegate.textViewDidChange', TalLogType.VERBOSE);
   {$ENDIF}
   if assigned(FTextView.fMemoControl.fOnChangeTracking) then
     FTextView.fMemoControl.fOnChangeTracking(FTextView.fMemoControl);
@@ -492,7 +492,7 @@ procedure TALIosTextViewDelegate.textViewDidChangeSelection(textView: UITextView
 var LSelectedTextRange: NSRange;
 begin
   {$IF defined(DEBUG)}
-  //ALLog('TALIosTextViewDelegate.textViewDidChangeSelection', '', TalLogType.VERBOSE);
+  //ALLog('TALIosTextViewDelegate.textViewDidChangeSelection', TalLogType.VERBOSE);
   {$ENDIF}
   if FTextView.FMemoControl.fTextPromptVisible then begin
     LSelectedTextRange := textView.selectedRange;
@@ -520,7 +520,7 @@ function TALIosTextViewDelegate.textViewShouldChangeTextInRangeReplacementText(t
 begin
 
   {$IF defined(DEBUG)}
-  //ALLog('TALIosTextViewDelegate.textViewShouldChangeTextInRangeReplacementText', '', TalLogType.VERBOSE);
+  //ALLog('TALIosTextViewDelegate.textViewShouldChangeTextInRangeReplacementText', TalLogType.VERBOSE);
   {$ENDIF}
 
   if FTextView.FMemoControl.maxLength > 0 then begin

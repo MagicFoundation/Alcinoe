@@ -177,10 +177,13 @@ begin
 
   {$IFDEF DEBUG}
   //i absolutly not understand why on berlin and android 6 i receive an error BUS ERROR 10 when i call allog ! this is big misterry
-  //allog('TALDatePickerDialog.TDatePickerDialogListener.onClick','which: ' + ALIntToStrW(which) +
-  //                                                              ' - year: ' + ALIntToStrW(year) +
-  //                                                              ' - month: ' + ALIntToStrW(month) +
-  //                                                              ' - dayOfMonth: ' + ALIntToStrW(dayOfMonth), TalLogType.VERBOSE);
+  //allog(
+  //  'TALDatePickerDialog.TDatePickerDialogListener.onClick',
+  //  'which: ' + ALIntToStrW(which) + ' | ' +
+  //  'year: ' + ALIntToStrW(year) + ' | ' +
+  //  'month: ' + ALIntToStrW(month) + ' | ' +
+  //  'dayOfMonth: ' + ALIntToStrW(dayOfMonth),
+  //  TalLogType.VERBOSE);
   {$ENDIF}
 
   if assigned(fDatePickerDialog.fOnClose) then begin

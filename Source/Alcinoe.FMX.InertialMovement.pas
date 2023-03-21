@@ -779,7 +779,7 @@ begin
 
   if FTimerActive then exit;
   {$IFDEF DEBUG}
-  //ALLog('TALAniCalculations.StartTimer', 'TALAniCalculations.StartTimer', TalLogType.verbose);
+  //ALLog('TALAniCalculations.StartTimer', TalLogType.verbose);
   {$ENDIF}
   InitPlatformTimer;
   FlastTickCalc := FPlatformTimer.getTick;
@@ -813,7 +813,7 @@ begin
 
   if not FTimerActive then exit;
   {$IFDEF DEBUG}
-  //ALLog('TALAniCalculations.StopTimer', 'TALAniCalculations.StopTimer', TalLogType.verbose);
+  //ALLog('TALAniCalculations.StopTimer', TalLogType.verbose);
   {$ENDIF}
   FTimerActive := False;
 
@@ -1758,8 +1758,11 @@ var
   P: TALPointD;
 begin
   {$IFDEF DEBUG}
-  //ALLog('TALAniCalculations.MouseMove', 'x: '  + ALFormatFloatW('0', x, ALDefaultFormatSettingsW) +
-  //                                      ' - y: '  + ALFormatFloatW('0', y, ALDefaultFormatSettingsW), TalLogType.verbose);
+  //ALLog(
+  //  'TALAniCalculations.MouseMove',
+  //  'x: '  + ALFormatFloatW('0', x, ALDefaultFormatSettingsW) + ' | ' +
+  //  'y: '  + ALFormatFloatW('0', y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
   {$ENDIF}
   if Down and ([ttVertical, ttHorizontal] * TouchTracking <> []) then
   begin

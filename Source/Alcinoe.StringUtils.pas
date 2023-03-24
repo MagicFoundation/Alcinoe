@@ -471,8 +471,10 @@ function  AlUpCase(const Ch: AnsiChar): AnsiChar; overload;
 function  AlUpCase(Ch: Char): Char; overload; inline;
 function  AlLoCase(const Ch: AnsiChar): AnsiChar; overload;
 function  AlLoCase(Ch: Char): Char; overload;
-function  ALUnicodeUpperCase(const s: AnsiString): AnsiString;
-function  ALUnicodeLowerCase(const s: AnsiString): AnsiString;
+function  ALUnicodeUpperCase(const s: AnsiString): AnsiString; overload; inline;
+function  ALUnicodeUpperCase(const s: String): String; overload; inline;
+function  ALUnicodeLowerCase(const s: AnsiString): AnsiString; overload; inline;
+function  ALUnicodeLowerCase(const s: String): String; overload; inline;
 {$IF defined(MSWINDOWS)}
 Function  ALUnicodeUpperCaseNoDiacritic(const S: AnsiString): AnsiString; overload;
 Function  ALUnicodeUpperCaseNoDiacritic(const S: Widestring): Widestring; overload;
@@ -8314,17 +8316,32 @@ begin
 end;
 {$IFEND}
 
+{***********************************************************}
+function ALUnicodeUpperCase(const s: AnsiString): AnsiString;
+begin
+  result := AnsiString(ALUnicodeUpperCase(String(s)));
+end;
+
 {*********************************}
-// this function use CharLowerBuffW
+// this function use CharUpperBuffW
 // The only problem I know that makes Unicode uppercase/lowercase conversion
 // locale-dependent is the case of dotless i (ı, $0131) and dotted I (İ, $0130).
 // In most languages the upper of i ($69) is I ($49), but in turkish locale i ($69)
 // maps to İ ($0130). Similarly in turkish the lower of I ($49) is ı ($0131).
 // CharUpperBuff/CharLowerBuffW always maps lowercase I ("i") to uppercase I,
-// even when the current language is Turkish or Azeri
-function ALUnicodeUpperCase(const s: AnsiString): AnsiString;
+// even when the current language is Turkish or Azeri and this is why I prefer
+// to use WideUppercase/WideLowerCase instead of str.toUpper/str.toLower string
+// helper (that use internaly LCMapString who depend of the localID) because I
+// want to stay consistant.
+function ALUnicodeUpperCase(const s: String): String;
 begin
-  result := AnsiString(WideUppercase(WideString(s)));
+  result := String(WideUppercase(WideString(s)));
+end;
+
+{***********************************************************}
+function ALUnicodeLowerCase(const s: AnsiString): AnsiString;
+begin
+  result := AnsiString(ALUnicodeLowerCase(String(s)));
 end;
 
 {*********************************}
@@ -8334,10 +8351,13 @@ end;
 // In most languages the upper of i ($69) is I ($49), but in turkish locale i ($69)
 // maps to İ ($0130). Similarly in turkish the lower of I ($49) is ı ($0131).
 // CharUpperBuff/CharLowerBuffW always maps lowercase I ("i") to uppercase I,
-// even when the current language is Turkish or Azeri
-function ALUnicodeLowerCase(const s: AnsiString): AnsiString;
+// even when the current language is Turkish or Azeri and this is why I prefer
+// to use WideUppercase/WideLowerCase instead of str.toUpper/str.toLower string
+// helper (that use internaly LCMapString who depend of the localID) because I
+// want to stay consistant.
+function ALUnicodeLowerCase(const s: String): String;
 begin
-  result := AnsiString(WideLowerCase(WideString(s)));
+  result := String(WideLowerCase(WideString(s)));
 end;
 
 {**********************}

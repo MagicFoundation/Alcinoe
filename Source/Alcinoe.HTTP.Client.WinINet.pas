@@ -407,9 +407,9 @@ const
 
 var
   LSetStatusCallbackResult: PFNInternetStatusCallback;
-  ProxyStr: AnsiString;
-  ProxyPtr: PAnsiChar;
-
+  LProxyStr: AnsiString;
+  LProxyPtr: PAnsiChar;
+  LUserAgent: AnsiString;
   LOption: DWORD;
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
@@ -421,18 +421,20 @@ begin
   { Also, could switch to new API introduced in IE4/Preview2}
   if InternetAttemptConnect(0) <> ERROR_SUCCESS then System.SysUtils.Abort;
 
-  ProxyStr := InternalGetProxyServerName;
-  if ProxyStr <> '' then begin
-    ProxyPtr := PAnsiChar(ProxyStr);
+  LProxyStr := InternalGetProxyServerName;
+  if LProxyStr <> '' then begin
+    LProxyPtr := PAnsiChar(LProxyStr);
   end else begin
-    ProxyPtr := nil;
+    LProxyPtr := nil;
   end;
+
+  LUserAgent := RequestHeader.UserAgent;
 
   {init FInetRoot}
   FInetRoot := InternetOpenA(
-                 PAnsiChar(RequestHeader.UserAgent),
+                 PAnsiChar(LUserAgent),
                  AccessTypeArr[FAccessType],
-                 ProxyPtr,
+                 LProxyPtr,
                  InternalGetProxyBypass,
                  InternalGetInternetOpenFlags or InternalGetInternetSecurityFlags);
   CheckError(not Assigned(FInetRoot));
@@ -537,6 +539,8 @@ var LNumberOfBytesWritten: DWord;
     LBuffSize, LLen: cardinal;
     LINBuffer: INTERNET_BUFFERSA;
     LBuffer: TMemoryStream;
+    LAccept: AnsiString;
+    LReferrer: AnsiString;
     LAcceptTypes: array of PAnsiChar;
     LHeader: AnsiString;
     LOption: DWord;
@@ -546,8 +550,11 @@ begin
   { Connect }
   Connect;
 
+  LAccept := RequestHeader.Accept;
+  LReferrer := RequestHeader.Referer;
+
   SetLength(LAcceptTypes, 2);
-  LAcceptTypes[0] := PAnsiChar(RequestHeader.Accept);
+  LAcceptTypes[0] := PAnsiChar(LAccept);
   LAcceptTypes[1] := nil;
 
   Result := HttpOpenRequestA(
@@ -555,7 +562,7 @@ begin
               InternalGetHttpOpenRequestVerb,
               PAnsiChar(FURLPath),
               InternalGetHttpProtocolVersion,
-              PAnsiChar(requestHeader.Referer),
+              PAnsiChar(LReferrer),
               Pointer(LAcceptTypes),
               InternalGetHttpOpenRequestFlags,
               DWORD_PTR(Self));

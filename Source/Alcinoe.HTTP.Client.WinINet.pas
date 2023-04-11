@@ -158,6 +158,7 @@ type
     FInetConnect: HINTERNET;
     FOnStatus: TAlWinInetHTTPClientStatusEvent;
     FIgnoreSecurityErrors: Boolean;
+    FAllowHttp2Protocol: Boolean;
     procedure SetAccessType(const Value: TALWinInetHttpInternetOpenAccessType);
     procedure SetInternetOptions(const Value: TAlWininetHTTPClientInternetOptionSet);
     procedure SetOnStatus(const Value: TAlWinInetHTTPClientStatusEvent);
@@ -193,6 +194,7 @@ type
     property  InternetOptions: TAlWininetHTTPClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wHttpIo_Keep_connection];
     property  OnStatus: TAlWinInetHTTPClientStatusEvent read FOnStatus write SetOnStatus;
     property  IgnoreSecurityErrors: Boolean read FIgnoreSecurityErrors write FIgnoreSecurityErrors;
+    property  AllowHttp2Protocol: Boolean read FAllowHttp2Protocol write FAllowHttp2Protocol;
   end;
 
 implementation
@@ -246,6 +248,7 @@ begin
   FInternetOptions := [wHttpIo_Keep_connection];
   RequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWinInetHTTPClient)';
   FIgnoreSecurityErrors := False;
+  FAllowHttp2Protocol := False;
 end;
 
 {**************************************}
@@ -383,12 +386,16 @@ const
                                                                          INTERNET_OPEN_TYPE_PRECONFIG,
                                                                          INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
                                                                          INTERNET_OPEN_TYPE_PROXY);
+const
+  HTTP_PROTOCOL_FLAG_HTTP2 = 2;
+  INTERNET_OPTION_ENABLE_HTTP_PROTOCOL = 148;
 
 var
   LSetStatusCallbackResult: PFNInternetStatusCallback;
   ProxyStr: AnsiString;
   ProxyPtr: PAnsiChar;
 
+  LOption: DWORD;
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
   { So take advantage of a cached handle, we'll assume that
@@ -421,6 +428,13 @@ begin
     if assigned(OnStatus) or assigned(OnRedirect) then begin
       LSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetHTTPCLientStatusCallback);
       CheckError(LSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
+    end;
+
+    {Enable HTTP/2 protocol (for Windows 10 and later)}
+    if FAllowHttp2Protocol and (FURLScheme = INTERNET_SCHEME_HTTPS) then begin
+      LOption := HTTP_PROTOCOL_FLAG_HTTP2;
+      // ignore any errors, because this protocol is optional
+      InternetSetOptionA(FInetRoot, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, Pointer(@LOption), SizeOf(LOption));
     end;
 
     {init FInetConnect}

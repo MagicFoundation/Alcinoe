@@ -381,6 +381,21 @@ procedure TALWinInetHTTPClient.Connect;
     if whttpIo_Offline in InternetOptions then Result := result or INTERNET_FLAG_OFFLINE;
   end;
 
+  Function InternalGetInternetSecurityFlags: DWord;
+  Begin
+    Result := 0;
+    if FURLScheme = INTERNET_SCHEME_HTTPS then begin
+      if FIgnoreSecurityErrors then begin
+        Result := Result or SECURITY_SET_MASK;
+      end else begin
+        if whttpIo_IGNORE_CERT_CN_INVALID in InternetOptions then
+          Result := Result or SECURITY_FLAG_IGNORE_CERT_CN_INVALID;
+        if whttpIo_IGNORE_CERT_DATE_INVALID in InternetOptions then
+          Result := Result or SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
+      end;
+    end;
+  end;
+
 const
   AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
                                                                          INTERNET_OPEN_TYPE_PRECONFIG,
@@ -419,7 +434,7 @@ begin
                  AccessTypeArr[FAccessType],
                  ProxyPtr,
                  InternalGetProxyBypass,
-                 InternalGetInternetOpenFlags);
+                 InternalGetInternetOpenFlags or InternalGetInternetSecurityFlags);
   CheckError(not Assigned(FInetRoot));
 
   try
@@ -480,8 +495,6 @@ function TALWinInetHTTPClient.Send(
     Result := 0;
     if whttpIo_CACHE_IF_NET_FAIL in InternetOptions then Result := result or INTERNET_FLAG_CACHE_IF_NET_FAIL;
     if whttpIo_HYPERLINK in InternetOptions then Result := result or INTERNET_FLAG_HYPERLINK;
-    if whttpIo_IGNORE_CERT_CN_INVALID in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_CERT_CN_INVALID;
-    if whttpIo_IGNORE_CERT_DATE_INVALID in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_CERT_DATE_INVALID;
     if whttpIo_IGNORE_REDIRECT_TO_HTTP in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP;
     if whttpIo_IGNORE_REDIRECT_TO_HTTPS in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS;
     if whttpIo_KEEP_CONNECTION in InternetOptions then Result := result or INTERNET_FLAG_KEEP_CONNECTION;
@@ -521,8 +534,6 @@ function TALWinInetHTTPClient.Send(
   end;
 
 var LNumberOfBytesWritten: DWord;
-    LDwFlags: DWORD;
-    LBuffLen: Cardinal;
     LBuffSize, LLen: cardinal;
     LINBuffer: INTERNET_BUFFERSA;
     LBuffer: TMemoryStream;
@@ -550,17 +561,6 @@ begin
               DWORD_PTR(Self));
   CheckError(not Assigned(Result));
   try
-
-    if FIgnoreSecurityErrors and (FURLScheme = INTERNET_SCHEME_HTTPS) then begin
-      LBuffLen := SizeOf(LDwFlags);
-      CheckError(not InternetQueryOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@LDwFlags), LBuffLen));
-      LDwFlags := LDwFlags or
-        SECURITY_FLAG_IGNORE_REVOCATION or
-        SECURITY_FLAG_IGNORE_UNKNOWN_CA or
-        SECURITY_FLAG_IGNORE_WRONG_USAGE;
-      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@LDwFlags), SizeOf(LDwFlags)));
-    end;
-
     { Timeouts }
     if ConnectTimeout > 0 then begin
       LOption := ConnectTimeout;

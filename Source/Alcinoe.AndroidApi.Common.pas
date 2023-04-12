@@ -31,7 +31,6 @@ type
   JALEditText = interface;
   JLog = interface;
   JStatFs = interface;
-  JPreferenceManager = interface;
   JAsyncTask_Status = interface;
   JAsyncTask = interface;
   JALBroadcastReceiverListener = interface;
@@ -194,19 +193,6 @@ type
     function getTotalBytes: int64; cdecl;
   end;
   TJStatFs = class(TJavaGenericImport<JStatFsClass, JStatFs>) end;
-
-  {***********************************************}
-  JPreferenceManagerClass = interface(JObjectClass)
-    ['{2BCBB8F6-B5EE-441E-B01B-5F7E37A783B5}']
-    {class} function getDefaultSharedPreferences(context: JContext): JSharedPreferences; cdecl;
-  end;
-
-  {*****************************************************}
-  [JavaSignature('android/preference/PreferenceManager')]
-  JPreferenceManager = interface(JObject)
-    ['{62FC9030-B469-461B-98AD-C5E3F9AAACBA}']
-  end;
-  TJPreferenceManager = class(TJavaGenericImport<JPreferenceManagerClass, JPreferenceManager>) end;
 
   {********************************************}
   JAsyncTask_StatusClass = interface(JEnumClass)
@@ -776,7 +762,6 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALEditText', TypeInfo(Alcinoe.AndroidApi.Common.JALEditText));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JLog', TypeInfo(Alcinoe.AndroidApi.Common.JLog));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JStatFs', TypeInfo(Alcinoe.AndroidApi.Common.JStatFs));
-  TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JPreferenceManager', TypeInfo(Alcinoe.AndroidApi.Common.JPreferenceManager));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask_Status', TypeInfo(Alcinoe.AndroidApi.Common.JAsyncTask_Status));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JAsyncTask', TypeInfo(Alcinoe.AndroidApi.Common.JAsyncTask));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.Common.JALBroadcastReceiverListener', TypeInfo(Alcinoe.AndroidApi.Common.JALBroadcastReceiverListener));

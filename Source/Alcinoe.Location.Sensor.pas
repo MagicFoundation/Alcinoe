@@ -61,17 +61,17 @@ Setup (IOS)
    Use this key if your iOS app accesses location information only when running
    in the foreground.
      <!-- Info.plist -->
-	   <key>NSLocationWhenInUseUsageDescription</key>
-	   <string>The reason for accessing the location information of the user</string>
+     <key>NSLocationWhenInUseUsageDescription</key>
+     <string>The reason for accessing the location information of the user</string>
 
 5) UIBackgroundModes
    Apps that receive location updates when running in the background must
    include the UIBackgroundModes key (with the location value) in their
    app’s Info.plist file.
      <key>UIBackgroundModes</key>
-	   <array>
+     <array>
        <string>location</string>
-	   </array>
+     </array>
 
 *******************************************************************************)
 unit Alcinoe.Location.Sensor;
@@ -239,9 +239,9 @@ type
                   const AIsForced: Boolean; // when true it's mean that the user denied the previous permission request with checking "Never ask again option"
                   const ARequestPermissionProc: TProc);
       function ShouldShowRequestPermissionRationale(
-                  const ACoarseLocation: Boolean;
-                  const APreciseLocation: Boolean;
-                  const AAlwaysAuthorization: Boolean): Boolean;
+                 const ACoarseLocation: Boolean;
+                 const APreciseLocation: Boolean;
+                 const AAlwaysAuthorization: Boolean): Boolean;
       procedure RequestPermissions(
                   const ACoarseLocation: Boolean;
                   const APreciseLocation: Boolean;
@@ -300,7 +300,7 @@ uses
   Alcinoe.stringutils,
   ALcinoe.common;
 
-{******************************************************************************************}
+{********************************************************************************************}
 constructor TALLocationSensor.Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True);
 begin
 
@@ -580,9 +580,9 @@ end;
 
 {**************************************************************}
 function TALLocationSensor.ShouldShowRequestPermissionRationale(
-            const ACoarseLocation: Boolean;
-            const APreciseLocation: Boolean;
-            const AAlwaysAuthorization: Boolean): Boolean;
+           const ACoarseLocation: Boolean;
+           const APreciseLocation: Boolean;
+           const AAlwaysAuthorization: Boolean): Boolean;
 begin
 
   {$REGION ' ANDROID'}
@@ -668,7 +668,7 @@ begin
       AToActivateGPS, // const AToActivateGPS: Boolean;
       AToRequestCoarseLocationPermission, // const AToRequestCoarseLocationPermission: Boolean;
       AToRequestPreciseLocationPermission, // const AToRequestPreciseLocationPermission: Boolean;
-      AToRequestAlwaysAuthorization, // const AToRequestAlwaysAuthorization: Boolean;                                             
+      AToRequestAlwaysAuthorization, // const AToRequestAlwaysAuthorization: Boolean;
       AIsForced, // const AIsForced: Boolean;
       // the procedure to launch when the user response positivelly to the rationale
       procedure
@@ -814,7 +814,7 @@ begin
     LRequestPreciseLocation := FRequestPreciseLocation;
     LRequestAlwaysAuthorization := False;
   end
-  else if (FRequestAlwaysAuthorization and (not LAuthorizedAlways)) then begin 
+  else if (FRequestAlwaysAuthorization and (not LAuthorizedAlways)) then begin
     LRequestCoarseLocation := False;
     LRequestPreciseLocation := False;
     LRequestAlwaysAuthorization := True;
@@ -871,10 +871,10 @@ begin
     //Android location permissions was made by true monkey!! their is no way to know
     //if a user dissmiss the permission dialog with "Never ask again". I try everything
     //and it's end up no way to know :( their is many situations, for exemple if
-    //user click on the shadow of the permission popup, then the popup close with denied 
-    //in PermissionsRequestResultHandler but it's not mean that the user denied it 
-    //but from shouldShowRequestPermissionRationale it's will look like he denied the 
-    //access with "never ask again" because if we call again shouldShowRequestPermissionRationale 
+    //user click on the shadow of the permission popup, then the popup close with denied
+    //in PermissionsRequestResultHandler but it's not mean that the user denied it
+    //but from shouldShowRequestPermissionRationale it's will look like he denied the
+    //access with "never ask again" because if we call again shouldShowRequestPermissionRationale
     //it's will return false like if the user denied the access with "never ask again".
 
     //shouldShowRequestPermissionRationale return on android:
@@ -901,7 +901,7 @@ begin
         False, // const AToActivateGPS: Boolean;
         LRequestCoarseLocation, // const AToRequestCoarseLocationPermission: Boolean;
         LRequestPreciseLocation, // const AToRequestPreciseLocationPermission: Boolean;
-        LRequestAlwaysAuthorization, // const AToRequestAlwaysAuthorization: Boolean;                                             
+        LRequestAlwaysAuthorization, // const AToRequestAlwaysAuthorization: Boolean;
         {$IF defined(IOS)}LShouldShowRequestPermissionRationale{$ELSE}AForceShowRequestPermissionRationale{$ENDIF}, // const AIsForced: Boolean;
         procedure
         begin
@@ -1070,7 +1070,7 @@ begin
 
 end;
 
-{*************************************************}
+{***********************************************}
 procedure TALLocationSensor.StartLocationUpdates(
             const aMinDistance: Integer; // minimum distance between location updates in meters
             const ACoarseLocation: boolean = true;  // when ACoarseLocation = true and APreciseLocation = true
@@ -1091,7 +1091,7 @@ begin
     AAlwaysAuthorization);
 end;
 
-{***********************************************}
+{**********************************************}
 procedure TALLocationSensor.StopLocationUpdates;
 begin
 

@@ -606,6 +606,38 @@ diff --git a/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.App.pas b/Em
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar', TypeInfo(Androidapi.JNI.App.JActionBar));
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_LayoutParams', TypeInfo(Androidapi.JNI.App.JActionBar_LayoutParams));
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener', TypeInfo(Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener));
+Index: Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.Location.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.Location.pas b/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.Location.pas
+--- a/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.Location.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/rtl/android/Androidapi.JNI.Location.pas	(working copy)
+@@ -582,7 +582,9 @@
+   [JavaSignature('android/location/LocationListener')]
+   JLocationListener = interface(IJavaInstance)
+     ['{D1CF3FB5-3BCB-4959-98D7-BD4D8F93D839}']
+-    procedure onLocationChanged(location: JLocation); cdecl;
++    procedure onFlushComplete(requestCode: Integer); cdecl; // https://quality.embarcadero.com/browse/RSP-41343
++    procedure onLocationChanged(location: JLocation); overload; cdecl; // https://quality.embarcadero.com/browse/RSP-41343
++    procedure onLocationChanged(locations: JList); overload; cdecl; // https://quality.embarcadero.com/browse/RSP-41343
+     procedure onProviderDisabled(provider: JString); cdecl;
+     procedure onProviderEnabled(provider: JString); cdecl;
+     procedure onStatusChanged(provider: JString; status: Integer; extras: JBundle); cdecl;
+@@ -592,6 +594,7 @@
+   JLocationManagerClass = interface(JObjectClass)
+     ['{031AE82C-2EEE-41E4-94F8-24C4D7059246}']
+     {class} function _GetGPS_PROVIDER: JString; cdecl;
++    {class} function _GetFUSED_PROVIDER: JString; cdecl; // https://quality.embarcadero.com/browse/RSP-41343
+     {class} function _GetKEY_LOCATION_CHANGED: JString; cdecl;
+     {class} function _GetKEY_PROVIDER_ENABLED: JString; cdecl;
+     {class} function _GetKEY_PROXIMITY_ENTERING: JString; cdecl;
+@@ -601,6 +604,7 @@
+     {class} function _GetPASSIVE_PROVIDER: JString; cdecl;
+     {class} function _GetPROVIDERS_CHANGED_ACTION: JString; cdecl;
+     {class} property GPS_PROVIDER: JString read _GetGPS_PROVIDER;
++    {class} property FUSED_PROVIDER: JString read _GetFUSED_PROVIDER; // https://quality.embarcadero.com/browse/RSP-41343
+     {class} property KEY_LOCATION_CHANGED: JString read _GetKEY_LOCATION_CHANGED;
+     {class} property KEY_PROVIDER_ENABLED: JString read _GetKEY_PROVIDER_ENABLED;
+     {class} property KEY_PROXIMITY_ENTERING: JString read _GetKEY_PROXIMITY_ENTERING;
 Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.AVFoundation.pas
@@ -657,24 +689,73 @@ Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas
 diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas
 --- a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas	(revision 1)
 +++ b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas	(working copy)
-@@ -33,7 +33,7 @@
+@@ -33,7 +33,9 @@
    kCLAuthorizationStatusNotDetermined = 0;
    kCLAuthorizationStatusRestricted = 1;
    kCLAuthorizationStatusAuthorizedAlways  = kCLAuthorizationStatusAuthorized ;
 -  kCLAuthorizationStatusAuthorizedWhenInUse = 4; 
 +  kCLAuthorizationStatusAuthorizedWhenInUse = 4;
++  CLAccuracyAuthorizationFullAccuracy = 0; // https://quality.embarcadero.com/browse/RSP-41352
++  CLAccuracyAuthorizationReducedAccuracy = 1; // https://quality.embarcadero.com/browse/RSP-41352
    kCLErrorDenied = 1;
    kCLErrorGeocodeCanceled = 10;
    kCLErrorGeocodeFoundNoResult = 8;
-@@ -110,6 +110,7 @@
+@@ -45,12 +47,12 @@
+   kCLErrorRegionMonitoringFailure = 5;
+   kCLErrorRegionMonitoringResponseDelayed = 7;
+   kCLErrorRegionMonitoringSetupDelayed = 6;
+-  kCLLocationAccuracyThreeKilometers: Double = 3000;
+-  kCLLocationAccuracyKilometer: Double = 1000;
+-  kCLLocationAccuracyHundredMeters: Double = 100;
+-  kCLLocationAccuracyNearestTenMeters: Double = 10;
+-  kCLLocationAccuracyBest: Double = -1;
+-  kCLLocationAccuracyBestForNavigation: Double = -1;
++  //kCLLocationAccuracyThreeKilometers: Double = 3000; //https://quality.embarcadero.com/browse/RSP-41388
++  //kCLLocationAccuracyKilometer: Double = 1000; //https://quality.embarcadero.com/browse/RSP-41388
++  //kCLLocationAccuracyHundredMeters: Double = 100; //https://quality.embarcadero.com/browse/RSP-41388
++  //kCLLocationAccuracyNearestTenMeters: Double = 10; //https://quality.embarcadero.com/browse/RSP-41388
++  //kCLLocationAccuracyBest: Double = -1; //https://quality.embarcadero.com/browse/RSP-41388
++  //kCLLocationAccuracyBestForNavigation: Double = -1; //https://quality.embarcadero.com/browse/RSP-41388
+   CLRegionStateUnknown = 0;
+   CLRegionStateInside = 1;
+   CLRegionStateOutside = 2;
+@@ -80,6 +82,7 @@
+ type
+ {$M+}
+   CLAuthorizationStatus = Integer;
++  CLAccuracyAuthorization = NSInteger; // https://quality.embarcadero.com/browse/RSP-41352
+   CLDeviceOrientation = Integer;
+   CLHeadingComponentValue = Double;
+   CLLocationAccuracy = Double;
+@@ -108,8 +111,10 @@
  
+   CLLocationManagerDelegate = interface;
+ 
++  CLBeaconIdentityConstraint = interface; // https://quality.embarcadero.com/browse/RSP-18621
    CLPlacemark = interface;
    CLRegion = interface;
 +  CLVisit = interface; // https://quality.embarcadero.com/browse/RSP-18621
    CLLocationManager = interface;
    CLGeocoder = interface;
    CLHeading = interface;
-@@ -144,6 +145,8 @@
+@@ -125,11 +130,16 @@
+     procedure locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation); overload; cdecl;
+     procedure locationManager(manager: CLLocationManager; monitoringDidFailForRegion: CLRegion; withError: NSError); overload; cdecl;
+     procedure locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus); overload; cdecl;
++    procedure locationManagerDidChangeAuthorization(manager: CLLocationManager); cdecl; // https://quality.embarcadero.com/browse/RSP-18621
+     [MethodName('locationManager:didUpdateLocations:')]
+     procedure locationManagerDidUpdateLocations(manager: CLLocationManager; locations: NSArray); cdecl;
+     function locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean; cdecl;
+     [MethodName('locationManager:didDetermineState:forRegion:')]
+     procedure locationManagerDidDetermineStateForRegion(manager: CLLocationManager; state: CLRegionState; region: CLRegion); cdecl;
++    [MethodName('locationManager:didRangeBeacons:satisfyingConstraint:')]  // https://quality.embarcadero.com/browse/RSP-18621
++    procedure locationManagerDidRangeBeaconsSatisfyingConstraint(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint); cdecl;  // https://quality.embarcadero.com/browse/RSP-18621
++    [MethodName('locationManager:didFailRangingBeaconsForConstraint:error:')]  // https://quality.embarcadero.com/browse/RSP-18621
++    procedure locationManagerDidFailRangingBeaconsForConstraintError(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError); cdecl;  // https://quality.embarcadero.com/browse/RSP-18621
+     [MethodName('locationManager:didRangeBeacons:inRegion:')]
+     procedure locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager; beacons: NSArray; region: CLBeaconRegion); cdecl;
+     [MethodName('locationManager:rangingBeaconsDidFailForRegion:withError:')]
+@@ -144,10 +154,30 @@
      procedure locationManagerDidResumeLocationUpdates(manager: CLLocationManager); cdecl;
      [MethodName('locationManager:didFinishDeferredUpdatesWithError:')]
      procedure locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError); cdecl;
@@ -683,7 +764,29 @@ diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embar
    end;
  
  // ===== Interface declarations =====
-@@ -190,6 +193,19 @@
+ 
++  // https://quality.embarcadero.com/browse/RSP-18621
++  CLBeaconIdentityConstraintClass = interface(NSObjectClass)
++    ['{60F2EA64-0E56-459B-8FCC-ABE5C7885429}']
++  end;
++  CLBeaconIdentityConstraint = interface(NSObject)
++    ['{67C0B6E9-BCFA-4C05-9ED1-C9AB032EC813}']
++    function UUID: NSUUID; cdecl;
++    function major: NSNumber; cdecl;
++    function minor: NSNumber; cdecl;
++    [MethodName('initWithUUID:')]
++    function initWithUUID(uuid: NSUUID): Pointer{instancetype}; cdecl; overload;
++    [MethodName('initWithUUID:major:')]
++    function initWithUUID(uuid: NSUUID; major: CLBeaconMajorValue): Pointer{instancetype}; cdecl; overload;
++    [MethodName('initWithUUID:major:minor:')]
++    function initWithUUID(uuid: NSUUID; major: CLBeaconMajorValue; minor: CLBeaconMinorValue): Pointer{instancetype}; cdecl; overload;
++  end;
++  TCLBeaconIdentityConstraint = class(TOCGenericImport<CLBeaconIdentityConstraintClass, CLBeaconIdentityConstraint>)  end;
++
+   CLPlacemarkClass = interface(NSObjectClass)
+     ['{A0539851-6F72-4A85-A6DF-5ACDAD4DC09E}']
+   end;
+@@ -190,6 +220,19 @@
    end;
    TCLRegion = class(TOCGenericImport<CLRegionClass, CLRegion>)  end;
  
@@ -703,7 +806,16 @@ diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embar
    CLLocationManagerClass = interface(NSObjectClass)
      ['{4422C248-523F-4237-8966-2A322F58A77C}']
      {class} function authorizationStatus: CLAuthorizationStatus; cdecl;
-@@ -248,6 +264,8 @@
+@@ -205,6 +248,8 @@
+ 
+   CLLocationManager = interface(NSObject)
+     ['{48C6C581-DA14-4444-A65D-896A0EF5E828}']
++    function authorizationStatus : CLAuthorizationStatus; cdecl; // https://quality.embarcadero.com/browse/RSP-41352
++    function accuracyAuthorization : CLAccuracyAuthorization; cdecl; // https://quality.embarcadero.com/browse/RSP-41352
+     function activityType : CLActivityType; cdecl;
+     procedure allowDeferredLocationUpdatesUntilTraveled(distance: CLLocationDistance; timeout: NSTimeInterval); cdecl;
+     function delegate: Pointer; cdecl;
+@@ -248,6 +293,8 @@
      procedure stopRangingBeaconsInRegion(region: CLBeaconRegion); cdecl;
      procedure stopUpdatingHeading; cdecl;
      procedure stopUpdatingLocation; cdecl;
@@ -712,7 +824,7 @@ diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embar
    end;
    TCLLocationManager = class(TOCGenericImport<CLLocationManagerClass, CLLocationManager>)  end;
  
-@@ -348,7 +366,7 @@
+@@ -348,7 +395,7 @@
  
    CLCircularRegion = interface(CLRegion)
      ['{FF4DCF91-376B-41BB-B60A-880BEBB5B4EE}']
@@ -721,6 +833,71 @@ diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embar
      function center: CLLocationCoordinate2D; cdecl;
      function radius: CLLocationDistance; cdecl;
      function containsCoordinate(coordinate: CLLocationCoordinate2D): Boolean; cdecl;
+@@ -358,6 +405,15 @@
+ function CLLocationCoordinate2DIsValid(coord: CLLocationCoordinate2D): Boolean; cdecl; external libCoreLocation name _PU + 'CLLocationCoordinate2DIsValid';
+ function CLLocationCoordinate2DMake(latitude: CLLocationDegrees; longitude: CLLocationDegrees): CLLocationCoordinate2D; cdecl; external libCoreLocation name _PU + 'CLLocationCoordinate2DMake';
+ 
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyBestForNavigation: Double;
++function kCLLocationAccuracyBest: Double;
++function kCLLocationAccuracyNearestTenMeters: Double;
++function kCLLocationAccuracyHundredMeters: Double;
++function kCLLocationAccuracyKilometer: Double;
++function kCLLocationAccuracyThreeKilometers: Double;
++function kCLLocationAccuracyReduced: Double;
++
+ implementation
+ 
+ {$IF defined(IOS) and NOT defined(CPUARM)}
+@@ -378,6 +434,48 @@
+   Result := CocoaNSStringConst(libCoreLocation, 'kCLErrorDomain');
+ end;
+ 
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyBestForNavigation: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyBestForNavigation'));
++end;
++
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyBest: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyBest'));
++end;
++
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyNearestTenMeters: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyNearestTenMeters'));
++end;
++
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyHundredMeters: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyHundredMeters'));
++end;
++
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyKilometer: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyKilometer'));
++end;
++
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyThreeKilometers: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyThreeKilometers'));
++end;
++
++//https://quality.embarcadero.com/browse/RSP-41388
++function kCLLocationAccuracyReduced: Double;
++begin
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyReduced'));
++end;
++
+ {$IF defined(IOS) and NOT defined(CPUARM)}
+ initialization
+   CLModule := dlopen(MarshaledAString(libCoreLocation), RTLD_LAZY);
 Index: Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.Foundation.pas

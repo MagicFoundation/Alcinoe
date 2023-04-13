@@ -146,6 +146,7 @@ uses
   Alcinoe.HTTP.Client.Net,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.JSONDoc,
+  Alcinoe.Location.Sensor,
   Alcinoe.QuickSortList,
   Alcinoe.StringList,
   Alcinoe.StringUtils,

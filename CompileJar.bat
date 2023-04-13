@@ -21,6 +21,30 @@ REM --------------
 if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 
+REM -------------------------
+REM Ask with library to build
+REM -------------------------
+
+set LibraryToBuild=
+if NOT "%Standalone%"=="1" GOTO SKIP_INTERACTION
+
+echo.
+echo 1) alcinoe-common
+echo 2) alcinoe-datepicker
+echo 3) alcinoe-edittext
+echo 4) alcinoe-facebook-share
+echo 5) alcinoe-firebase-messaging
+echo 6) alcinoe-installreferrer
+echo 7) alcinoe-launchscreen
+echo 8) alcinoe-webrtc
+
+set /P LibraryToBuild=Enter number to select a library (Empty for all): %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
+
+:SKIP_INTERACTION
+
+
 REM -----------------
 REM Update local vars
 REM -----------------
@@ -46,10 +70,12 @@ REM ---------------
 REM clean Libraries
 REM ---------------
 
+if NOT "%LibraryToBuild%"=="" GOTO SKIP_clean_Libraries
 SET FileName=%ALBaseDir%\Libraries\jar\com\alcinoe
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
+:SKIP_clean_Libraries
 
 
 REM --------------
@@ -65,10 +91,43 @@ SET TMPOutputDir=%TMPDir%\Output
 SET TMPDependenciesFile=%TMPDir%\Dependencies.txt
 
 
+REM ----------------------------------
+REM Go to the library we want to build
+REM ----------------------------------
+
+if "%LibraryToBuild%"=="" goto ALL_LIBRARIES
+if "%LibraryToBuild%"=="1" goto alcinoe_common
+if "%LibraryToBuild%"=="2" goto alcinoe_datepicker
+if "%LibraryToBuild%"=="3" goto alcinoe_edittext
+if "%LibraryToBuild%"=="4" goto alcinoe_facebook_share
+if "%LibraryToBuild%"=="5" goto alcinoe_firebase_messaging
+if "%LibraryToBuild%"=="6" goto alcinoe_installreferrer
+if "%LibraryToBuild%"=="7" goto alcinoe_launchscreen
+if "%LibraryToBuild%"=="8" goto alcinoe_webrtc
+goto FINISHED
+
+:ALL_LIBRARIES
+
+
+REM ------------------------
+REM Build alcinoe-common.jar
+REM ------------------------
+
+:alcinoe_common
+echo [36mBuild alcinoe-common[0m
+type nul > %TMPDependenciesFile%
+SET ClassPath="%SDKApiLevelPath%\android.jar"
+SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\util\*.java
+SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\com\alcinoe\content\*.java
+Call :BUILD_JAR "com.alcinoe" "alcinoe-common" "1.0.1"
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
+
+
 REM ------------------------------
 REM Build alcinoe-launchscreen.jar
 REM ------------------------------
 
+:alcinoe_launchscreen
 echo [36mBuild alcinoe-launchscreen[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar";"%FMXJAR%"
@@ -83,47 +142,40 @@ Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycl
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.savedstate" "savedstate" "1.2.0"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\launchscreen\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-launchscreen" "1.0.0" 
-
-
-REM ------------------------
-REM Build alcinoe-common.jar
-REM ------------------------
-
-echo [36mBuild alcinoe-common[0m
-type nul > %TMPDependenciesFile%
-SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\util\*.java
-SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\com\alcinoe\content\*.java
-SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\com\alcinoe\location\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-common" "1.0.0"
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
 REM ----------------------------
 REM Build alcinoe-datepicker.jar
 REM ----------------------------
 
+:alcinoe_datepicker
 echo [36mBuild alcinoe-datepicker[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\datepicker\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-datepicker" "1.0.0"
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
 REM --------------------------
 REM Build alcinoe-edittext.jar
 REM --------------------------
 
+:alcinoe_edittext
 echo [36mBuild alcinoe-edittext[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\edittext\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-edittext" "1.0.0"
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
 REM ------------------------
 REM Build alcinoe-webrtc.jar
 REM ------------------------
 
+:alcinoe_webrtc
 echo [36mBuild alcinoe-webrtc[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
@@ -131,12 +183,14 @@ Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotati
 Call :UPDATE_ClASSPATH "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\webrtc\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-webrtc" "1.0.0"
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
 REM ------------------------------------
 REM Build alcinoe-firebase-messaging.jar
 REM ------------------------------------
 
+:alcinoe_firebase_messaging
 echo [36mBuild alcinoe-firebase-messaging[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
@@ -150,7 +204,7 @@ Call :BUILD_JAR "com.alcinoe" "alcinoe-firebase-messaging" "1.0.0"
 SET FirebaseMessagingDir=%ALBaseDir%\Libraries\jar\com\alcinoe\alcinoe-firebase-messaging\1.0.0\
 SET FirebaseMessagingFilename=alcinoe-firebase-messaging-1.0.0
 SET AndroidManifestFilename=%FirebaseMessagingDir%\AndroidManifest.xml
-IF EXIST "%AndroidManifestFilename%" del "%AndroidManifestFilename%" /s
+IF EXIST "%AndroidManifestFilename%" del "%AndroidManifestFilename%" /s > nul
 IF EXIST "%AndroidManifestFilename%" goto ERROR
 
 @echo ^<?xml version="1.0" encoding="utf-8"?^>> %AndroidManifestFilename%
@@ -166,17 +220,24 @@ IF EXIST "%AndroidManifestFilename%" goto ERROR
 @echo   ^</application^>>> %AndroidManifestFilename%
 @echo ^</manifest^>>> %AndroidManifestFilename%
 
+IF EXIST "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.zip" del "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.zip" /s >nul
+IF EXIST "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.zip" goto ERROR
+IF EXIST "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.aar" del "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.aar" /s >nul
+IF EXIST "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.aar" goto ERROR
 rename "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.jar" classes.jar
 powershell -command "Compress-Archive -Path '%FirebaseMessagingDir%\AndroidManifest.xml','%FirebaseMessagingDir%\classes.jar' -DestinationPath '%FirebaseMessagingDir%\%FirebaseMessagingFilename%.zip'"
 rename "%FirebaseMessagingDir%\%FirebaseMessagingFilename%.zip" %FirebaseMessagingFilename%.aar
 del "%AndroidManifestFilename%" /s > nul
 del "%FirebaseMessagingDir%\classes.jar" /s > nul
 
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
-REM --------------------------
-REM Build alcinoe-facebook.jar
-REM --------------------------
 
+REM --------------------------------
+REM Build alcinoe-facebook-share.jar
+REM --------------------------------
+
+:alcinoe_facebook_share
 echo [36mBuild alcinoe-facebook-share[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
@@ -185,26 +246,26 @@ Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment
 Call :UPDATE_ClASSPATH "https://repo1.maven.org/maven2" "com.facebook.android" "facebook-common" "15.2.0"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\facebook\share\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-facebook-share" "1.0.0"
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
 REM ---------------------------------
 REM Build alcinoe-installreferrer.jar
 REM ---------------------------------
 
+:alcinoe_installreferrer
 echo [36mBuild alcinoe-installreferrer[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "com.android.installreferrer" "installreferrer" "2.2"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\installreferrer\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-installreferrer" "1.0.0"
- 
- 
-REM -------------
-REM Remove TmpDir
-REM -------------
+if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
-IF EXIST "%TMPDir%" rmdir /s /q "%TMPDir%"
-IF EXIST "%TMPDir%" goto ERROR
+ 
+REM -------------
+REM Goto Finished
+REM -------------
 
 GOTO FINISHED
 
@@ -313,11 +374,11 @@ SET GroupId4Directory=%GroupId4Directory:.=\%
 SET JARDirectory=%ALBaseDir%\Libraries\jar\%GroupId4Directory%\%~2\%~3\
 
 SET JARFilename=%JARDirectory%\%~2-%~3.jar
-IF EXIST "%JARFilename%" del "%JARFilename%" /s
+IF EXIST "%JARFilename%" del "%JARFilename%" /s >nul
 IF EXIST "%JARFilename%" goto ERROR
 
 SET POMFilename=%JARDirectory%\%~2-%~3.pom
-IF EXIST "%POMFilename%" del "%POMFilename%" /s
+IF EXIST "%POMFilename%" del "%POMFilename%" /s >nul
 IF EXIST "%POMFilename%" goto ERROR
 
 IF EXIST "%TMPOutputDir%" rmdir /s /q "%TMPOutputDir%"
@@ -332,6 +393,8 @@ mkdir "%TMPOutputDir%"
  %SourceFiles%
 IF ERRORLEVEL 1 goto ERROR
 
+IF EXIST "%JARDirectory%" rmdir /s /q "%JARDirectory%"
+IF EXIST "%JARDirectory%" goto ERROR
 MKDIR "%JARDirectory%"
 %JDKBinPath%\jar cf "%JARFilename%" -C "%TMPOutputDir%" %GroupId4Directory%
 IF ERRORLEVEL 1 goto ERROR
@@ -363,6 +426,8 @@ REM -------------------
 
 :FINISHED
 
+IF EXIST "%TMPDir%" rmdir /s /q "%TMPDir%"
+IF EXIST "%TMPDir%" goto ERROR
 echo.
 echo Jars created successfully
 if "%Standalone%"=="1" PAUSE 

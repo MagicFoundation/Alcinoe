@@ -856,43 +856,43 @@ diff --git a/Embarcadero/Alexandria/11_3/rtl/ios/iOSapi.CoreLocation.pas b/Embar
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyBestForNavigation: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyBestForNavigation'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyBestForNavigation'))^;
 +end;
 +
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyBest: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyBest'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyBest'))^;
 +end;
 +
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyNearestTenMeters: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyNearestTenMeters'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyNearestTenMeters'))^;
 +end;
 +
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyHundredMeters: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyHundredMeters'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyHundredMeters'))^;
 +end;
 +
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyKilometer: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyKilometer'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyKilometer'))^;
 +end;
 +
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyThreeKilometers: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyThreeKilometers'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyThreeKilometers'))^;
 +end;
 +
 +//https://quality.embarcadero.com/browse/RSP-41388
 +function kCLLocationAccuracyReduced: Double;
 +begin
-+  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyReduced'));
++  Result := PDouble(CocoaPointerConst(libCoreLocation, 'kCLLocationAccuracyReduced'))^;
 +end;
 +
  {$IF defined(IOS) and NOT defined(CPUARM)}

@@ -78,7 +78,7 @@ uses
   FMX.Helpers.Android,
   FMX.Platform.Android,
   fmx.Context.GLES.Android,
-  Alcinoe.AndroidApi.Common,
+  Alcinoe.AndroidApi.androidx,
   {$ENDIF}
   Alcinoe.StringUtils;
 

@@ -9,6 +9,7 @@ uses
   System.UITypes,
   System.Classes,
   System.Variants,
+  system.Messaging,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -19,17 +20,16 @@ uses
   FMX.Memo,
   FMX.Controls.Presentation,
   FMX.StdCtrls,
+  FMX.Memo.Types,
   {$IF Defined(IOS) or Defined(ANDROID)}
   Grijjy.ErrorReporting,
   {$ENDIF}
-  system.Messaging,
-  Alcinoe.Location.Sensor,
-  Alcinoe.StringUtils,
-  Alcinoe.StringList,
   Alcinoe.FMX.Common,
+  Alcinoe.FMX.Location.Sensor,
+  Alcinoe.FMX.Objects,
   Alcinoe.Common,
-  FMX.Memo.Types,
-  Alcinoe.FMX.Objects;
+  Alcinoe.StringUtils,
+  Alcinoe.StringList;
 
 type
   TForm1 = class(TForm)

@@ -74,9 +74,11 @@ Setup (IOS)
      </array>
 
 *******************************************************************************)
-unit Alcinoe.Location.Sensor;
+unit Alcinoe.FMX.Location.Sensor;
 
 interface
+
+{$I Alcinoe.inc}
 
 uses
   system.Classes,

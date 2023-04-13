@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Washa</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">%1$s haitafanya kazi isipokuwa uwashe huduma za Google Play.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Washa huduma za Google Play</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Sakinisha</string>
+    <string name="common_google_play_services_install_text">%1$s haitafanya kazi bila huduma za Google Play. Huduma hizi hazipatikani kwenye kifaa chako.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Pata huduma za Google Play</string>
+    <string name="common_google_play_services_notification_channel_name">Upatikanaji wa huduma za Google Play</string>
+    <string name="common_google_play_services_notification_ticker">Hitilafu kwenye huduma za Google Play</string>
+    <string name="common_google_play_services_unsupported_text">%1$s haitafanya kazi bila huduma za Google Play. Huduma hizi hazitumiki kwenye kifaa chako.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Sasisha</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">%1$s haitafanya kazi hadi usasishe huduma za Google Play.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Sasisha huduma za Google Play</string>
+    <string name="common_google_play_services_updating_text">%1$s haitafanya kazi bila huduma za Google Play. Huduma hizi zinasasishwa sasa.</string>
+    <string name="common_google_play_services_wear_update_text">Toleo jipya la huduma za Google Play linahitajika. Litajisasisha baada ya muda mfupi.</string>
+    <string name="common_open_on_phone">Fungua kwenye simu</string>
+    <string name="common_signin_button_text">Ingia katika akaunti</string>
+    <string name="common_signin_button_text_long">Ingia katika akaunti ukitumia Google</string>
+    <string name="common_google_play_services_unknown_issue">%1$s inakumbwa na hitilafu ya huduma za Google Play. Tafadhali jaribu tena.</string>
+</resources>

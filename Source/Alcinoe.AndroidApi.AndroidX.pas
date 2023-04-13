@@ -29,6 +29,7 @@ type
   Jlifecycle_Observer = interface;
   JLiveData = interface;
   JMutableLiveData = interface;
+  JPreferenceManager = interface;
 
   {*************************************************************************}
   //https://developer.android.com/reference/androidx/lifecycle/LifecycleOwner
@@ -100,6 +101,18 @@ type
   end;
   TJMutableLiveData = class(TJavaGenericImport<JMutableLiveDataClass, JMutableLiveData>) end;
 
+  {*****************************************************************************}
+  //https://developer.android.com/reference/androidx/preference/PreferenceManager
+  JPreferenceManagerClass = interface(JObjectClass)
+    ['{2BCBB8F6-B5EE-441E-B01B-5F7E37A783B5}']
+    {class} function getDefaultSharedPreferences(context: JContext): JSharedPreferences; cdecl;
+  end;
+  [JavaSignature('androidx/preference/PreferenceManager')]
+  JPreferenceManager = interface(JObject)
+    ['{62FC9030-B469-461B-98AD-C5E3F9AAACBA}']
+  end;
+  TJPreferenceManager = class(TJavaGenericImport<JPreferenceManagerClass, JPreferenceManager>) end;
+
 
 implementation
 
@@ -111,6 +124,7 @@ begin
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.Jlifecycle_Observer', TypeInfo(Alcinoe.AndroidApi.AndroidX.Jlifecycle_Observer));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.JLiveData', TypeInfo(Alcinoe.AndroidApi.AndroidX.JLiveData));
   TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.JMutableLiveData', TypeInfo(Alcinoe.AndroidApi.AndroidX.JMutableLiveData));
+  TRegTypes.RegisterType('Alcinoe.AndroidApi.AndroidX.JPreferenceManager', TypeInfo(Alcinoe.AndroidApi.AndroidX.JPreferenceManager));
 end;
 
 initialization

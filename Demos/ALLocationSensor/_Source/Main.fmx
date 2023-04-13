@@ -1,0 +1,85 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 718
+  ClientWidth = 463
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object Memo1: TMemo
+    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
+    DataDetectorTypes = []
+    ReadOnly = True
+    TextSettings.WordWrap = True
+    Align = Client
+    Size.Width = 463.000000000000000000
+    Size.Height = 496.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    Viewport.Width = 459.000000000000000000
+    Viewport.Height = 492.000000000000000000
+  end
+  object Button1: TButton
+    Align = Top
+    Size.Width = 463.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 2
+    Text = 'Request Approximate Location Access'
+    OnClick = Button1Click
+  end
+  object Button4: TButton
+    Align = Top
+    Position.Y = 74.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 1
+    Text = 'Request Background Location Access'
+    OnClick = Button4Click
+  end
+  object Button5: TButton
+    Align = Top
+    Position.Y = 37.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Request Precise Location Access'
+    OnClick = Button5Click
+  end
+  object Button6: TButton
+    Align = Top
+    Position.Y = 148.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = 'Start Location Update'
+    OnClick = Button6Click
+  end
+  object Button7: TButton
+    Align = Top
+    Position.Y = 111.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 5
+    Text = 'Get Authorizations Granted'
+    OnClick = Button7Click
+  end
+  object Button2: TButton
+    Align = Top
+    Position.Y = 185.000000000000000000
+    Size.Width = 463.000000000000000000
+    Size.Height = 37.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 3
+    Text = 'Stop Location Update'
+    OnClick = Button2Click
+  end
+end

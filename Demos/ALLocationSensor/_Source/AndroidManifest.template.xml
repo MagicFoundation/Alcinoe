@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BEGIN_INCLUDE(manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="%package%"
+          android:versionCode="%versionCode%"
+          android:versionName="%versionName%"
+          android:installLocation="%installLocation%">
+
+  <uses-sdk android:minSdkVersion="%minSdkVersion%"
+            android:targetSdkVersion="%targetSdkVersion%"/>
+
+  <!-- <%uses-permission%>  -->
+  <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+  <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+  <uses-feature android:glEsVersion="0x00020000"
+                android:required="true"/>
+
+  <queries>
+   
+    <%queries-child-elements%>
+    
+  </queries>
+  
+  <!-- ============================================ -->
+  <!-- AndroidMerger auto-generated section (BEGIN) -->
+  <!-- ============================================ -->
+  
+  <!-- ===== androidx.core ===== -->
+  <!-- <application android:appComponentFactory="androidx.core.app.CoreComponentFactory"/> -->
+  
+  <!-- ========================================== -->
+  <!-- AndroidMerger auto-generated section (END) -->
+  <!-- ========================================== -->
+  
+  <application android:persistent="%persistent%"
+               android:restoreAnyVersion="%restoreAnyVersion%"
+               android:label="%label%"
+               android:debuggable="%debuggable%"
+               android:largeHeap="%largeHeap%"
+               android:icon="@mipmap/ic_launcher"
+               android:theme="@android:style/Theme.NoTitleBar"
+               android:hardwareAccelerated="%hardwareAccelerated%"
+               android:resizeableActivity="false"
+               android:requestLegacyExternalStorage="true">
+
+    <%provider%>
+
+    <%application-meta-data%>
+
+    <%uses-libraries%>
+
+    <%services%>
+  
+    <!-- Our activity is a subclass of the built-in NativeActivity framework class.
+         This will take care of integrating with our NDK code. -->
+    <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
+              android:exported="true"
+              android:label="%activityLabel%"
+              android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+              android:launchMode="singleTask">
+        
+      <!-- Tell NativeActivity the name of our .so -->
+      <meta-data android:name="android.app.lib_name"
+                 android:value="%libNameValue%"/>
+    
+      <intent-filter>  
+        <action android:name="android.intent.action.MAIN"/>
+        <category android:name="android.intent.category.LAUNCHER"/>
+      </intent-filter> 
+
+    </activity>
+      
+    <%activity%>
+
+    <%receivers%>
+    
+    <!-- ============================================ -->
+    <!-- AndroidMerger auto-generated section (BEGIN) -->
+    <!-- ============================================ -->
+    
+    <!-- ===== com.google.android.gms.base ===== -->
+    <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
+              android:theme="@android:style/Theme.Translucent.NoTitleBar"
+              android:exported="false"/>
+    <!-- ===== com.google.android.gms.common ===== -->
+    <meta-data android:name="com.google.android.gms.version"
+               android:value="@integer/google_play_services_version"/>
+    
+    <!-- ========================================== -->
+    <!-- AndroidMerger auto-generated section (END) -->
+    <!-- ========================================== -->
+    
+  </application>
+  
+</manifest>
+<!-- END_INCLUDE(manifest) -->

@@ -639,6 +639,16 @@ begin
           LSrcChildNode.Attributes['android:name']); // const aKeyAttributeValue: AnsiString;
       end
 
+      //<uses-library android:name="string" ... />
+      //https://developer.android.com/guide/topics/manifest/uses-library-element
+      else if ALSameTextA(ASrcNode.NodeName, 'application') and
+              ALSameTextA(LSrcChildNode.NodeName, 'uses-library') then begin
+        _SwapNodeToDest(
+          LSrcChildNode, // const ANode: TALXmlNode;
+          'android:name', // const aKeyAttributeName: AnsiString;
+          LSrcChildNode.Attributes['android:name']); // const aKeyAttributeValue: AnsiString;
+      end
+
       //Unknown node
       else begin
         raise Exception.Createfmt('Unknown node. Please update the source code'#13#10'%s'#13#10'%s', [ASrcNode.nodename, LSrcChildNode.XML]);

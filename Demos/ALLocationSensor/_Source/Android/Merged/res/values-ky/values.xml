@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Иштетүү</string>
+    <string name="common_google_play_services_enable_text" msgid="227660514972886228">Google Play кызматтарын иштетмейиңизче %1$s иштебейт.</string>
+    <string name="common_google_play_services_enable_title" msgid="5122002158466380389">Google Play кызматтарын иштетүү</string>
+    <string name="common_google_play_services_install_button" msgid="7153882981874058840">Орнотуу</string>
+    <string name="common_google_play_services_install_text">Google Play кызматтарысыз %1$s иштебейт. Алар түзмөгүңүздө жок болуп жатат.</string>
+    <string name="common_google_play_services_install_title" msgid="7215213145546190223">Google Play кызматтарын алуу</string>
+    <string name="common_google_play_services_notification_channel_name">Google Play кызматтарынын иштеши</string>
+    <string name="common_google_play_services_notification_ticker">Google Play кызматтарынын катасы</string>
+    <string name="common_google_play_services_unsupported_text">%1$s колдонмосу сиздин түзмөгүңүздө колдоого алынбаган Google Play кызматтары болбосо иштебейт.</string>
+    <string name="common_google_play_services_update_button" msgid="6556509956452265614">Жаңыртуу</string>
+    <string name="common_google_play_services_update_text" msgid="9053896323427875356">Google Play кызматтары жаңыртылмайынча %1$s иштебейт.</string>
+    <string name="common_google_play_services_update_title" msgid="6006316683626838685">Google Play кызматтарын жаңыртуу</string>
+    <string name="common_google_play_services_updating_text">Google Play кызматтарысыз %1$s иштебейт, алар учурда жаңыртылууда.</string>
+    <string name="common_google_play_services_wear_update_text">Google Play кызматтарынын жаңы версиясы талап кылынат. Бир аздан кийин ал өзү эле жаңырат.</string>
+    <string name="common_open_on_phone">Телефондо ачык</string>
+    <string name="common_signin_button_text">Кирүү</string>
+    <string name="common_signin_button_text_long">Google менен кирүү</string>
+    <string name="common_google_play_services_unknown_issue">%1$s колдонмосунун Google Play кызматтары менен иштөөдө көйгөй чыкты. Кайталап көрүңүз.</string>
+</resources>

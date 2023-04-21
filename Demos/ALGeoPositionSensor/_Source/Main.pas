@@ -49,23 +49,23 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
-    FLocationSensor: TALGeoPositionSensor;
+    FGeoPositionSensor: TALGeoPositionSensor;
     {$IF Defined(IOS) or Defined(ANDROID)}
     procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
     {$ENDIF}
-    procedure OnLocationSensorLocationUpdate(
+    procedure OnGeoPositionSensorGeoPositionUpdate(
                 const Sender: TObject;
                 const ALatitude: Double;
                 const ALongitude: Double;
                 const AAltitude: Double;
                 const AAccuracy: Double;
                 Const ADateTime: TdateTime);
-    procedure OnLocationSensorActivateGpsAndGrantLocationAccessResult(Sender: TObject);
-    Procedure OnLocationSensorShowRequestPermissionRationale(
+    procedure OnGeoPositionSensorActivateGpsAndGrantGeoPositionAccessResult(Sender: TObject);
+    Procedure OnGeoPositionSensorShowRequestPermissionRationale(
                 const Sender: TObject;
                 const AToActivateGPS: Boolean;
-                const AToRequestCoarseLocationPermission: Boolean;
-                const AToRequestPreciseLocationPermission: Boolean;
+                const AToRequestCoarseGeoPositionPermission: Boolean;
+                const AToRequestPreciseGeoPositionPermission: Boolean;
                 const AToRequestAlwaysAuthorization: Boolean;
                 const AIsForced: Boolean; // when true it's mean that the user denied the previous permission request with checking "Never ask again option"
                 const ACanRequestPermissionProc: TProc; // the procedure to launch when the user response positivelly to the rationale
@@ -96,10 +96,10 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
   {$ENDIF}
 
-  FLocationSensor := TALGeoPositionSensor.Create(true{AUseGooglePlayServicesIfAvailable});
-  FLocationSensor.OnLocationUpdate := OnLocationSensorLocationUpdate;
-  FLocationSensor.OnAuthorizationStatus := OnLocationSensorActivateGpsAndGrantLocationAccessResult;
-  FLocationSensor.OnShowRequestPermissionRationale := OnLocationSensorShowRequestPermissionRationale;
+  FGeoPositionSensor := TALGeoPositionSensor.Create(true{AUseGooglePlayServicesIfAvailable});
+  FGeoPositionSensor.OnGeoPositionUpdate := OnGeoPositionSensorGeoPositionUpdate;
+  FGeoPositionSensor.OnAuthorizationStatus := OnGeoPositionSensorActivateGpsAndGrantGeoPositionAccessResult;
+  FGeoPositionSensor.OnShowRequestPermissionRationale := OnGeoPositionSensorShowRequestPermissionRationale;
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
@@ -119,7 +119,7 @@ end;
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
 
-  ALFreeAndNil(FLocationSensor);
+  ALFreeAndNil(FGeoPositionSensor);
 
   {$IF Defined(IOS) or Defined(ANDROID)}
   TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
@@ -154,59 +154,59 @@ end;
 {*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
 begin
-  FLocationSensor.ActivateGpsAndGrantLocationAccess(
-    true, // const ACoarseLocation: boolean = True;
-    false, // const APreciseLocation: boolean = True;
+  FGeoPositionSensor.ActivateGpsAndGrantGeoPositionAccess(
+    true, // const ACoarseGeoPosition: boolean = True;
+    false, // const APreciseGeoPosition: boolean = True;
     false); // const AAlwaysAuthorization: boolean = False)
 end;
 
 {*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
 begin
-  FLocationSensor.StopLocationUpdates;
+  FGeoPositionSensor.StopGeoPositionUpdates;
 end;
 
 {*********************************************}
 procedure TForm1.Button4Click(Sender: TObject);
 begin
-  FLocationSensor.ActivateGpsAndGrantLocationAccess(
-    true, // const ACoarseLocation: boolean = True;
-    true, // const APreciseLocation: boolean = True;
+  FGeoPositionSensor.ActivateGpsAndGrantGeoPositionAccess(
+    true, // const ACoarseGeoPosition: boolean = True;
+    true, // const APreciseGeoPosition: boolean = True;
     true); // const AAlwaysAuthorization: boolean = False)
 end;
 
 {*********************************************}
 procedure TForm1.Button5Click(Sender: TObject);
 begin
-  FLocationSensor.ActivateGpsAndGrantLocationAccess(
-    false, // const ACoarseLocation: boolean = True;
-    true, // const APreciseLocation: boolean = True;
+  FGeoPositionSensor.ActivateGpsAndGrantGeoPositionAccess(
+    false, // const ACoarseGeoPosition: boolean = True;
+    true, // const APreciseGeoPosition: boolean = True;
     false); // const AAlwaysAuthorization: boolean = False)
 end;
 
 {*********************************************}
 procedure TForm1.Button6Click(Sender: TObject);
 begin
-  FLocationSensor.StartLocationUpdates(1{aMinDistance});
+  FGeoPositionSensor.StartGeoPositionUpdates(1{aMinDistance});
 end;
 
 {*********************************************}
 procedure TForm1.Button7Click(Sender: TObject);
 begin
   var LRestricted: boolean;
-  var LCoarseLocationGranted: Boolean;
-  var LPreciseLocationGranted: boolean;
+  var LCoarseGeoPositionGranted: Boolean;
+  var LPreciseGeoPositionGranted: boolean;
   var LAuthorizedAlways: Boolean;
-  FLocationSensor.GetPermissionsGranted(
+  FGeoPositionSensor.GetPermissionsGranted(
     LRestricted,
-    LCoarseLocationGranted,
-    LPreciseLocationGranted,
+    LCoarseGeoPositionGranted,
+    LPreciseGeoPositionGranted,
     LAuthorizedAlways);
   Memo1.Lines.add('PermissionsGranted');
-  Memo1.Lines.add('  GpsEnabled: ' + ALBoolToStrW(FLocationSensor.IsGpsEnabled));
+  Memo1.Lines.add('  GpsEnabled: ' + ALBoolToStrW(FGeoPositionSensor.IsGpsEnabled));
   Memo1.Lines.add('  Restricted: ' + ALBoolToStrW(LRestricted));
-  Memo1.Lines.add('  CoarseLocationGranted: ' + ALBoolToStrW(LCoarseLocationGranted));
-  Memo1.Lines.add('  PreciseLocationGranted: ' + ALBoolToStrW(LPreciseLocationGranted));
+  Memo1.Lines.add('  CoarseGeoPositionGranted: ' + ALBoolToStrW(LCoarseGeoPositionGranted));
+  Memo1.Lines.add('  PreciseGeoPositionGranted: ' + ALBoolToStrW(LPreciseGeoPositionGranted));
   Memo1.Lines.add('  AuthorizedAlways: ' + ALBoolToStrW(LAuthorizedAlways));
   Memo1.Lines.add('');
   Memo1.Lines.add('************');
@@ -216,22 +216,22 @@ begin
 end;
 
 {****************************************************************************************}
-procedure TForm1.OnLocationSensorActivateGpsAndGrantLocationAccessResult(Sender: TObject);
+procedure TForm1.OnGeoPositionSensorActivateGpsAndGrantGeoPositionAccessResult(Sender: TObject);
 begin
   var LRestricted: boolean;
-  var LCoarseLocationGranted: Boolean;
-  var LPreciseLocationGranted: boolean;
+  var LCoarseGeoPositionGranted: Boolean;
+  var LPreciseGeoPositionGranted: boolean;
   var LAuthorizedAlways: Boolean;
-  FLocationSensor.GetPermissionsGranted(
+  FGeoPositionSensor.GetPermissionsGranted(
     LRestricted,
-    LCoarseLocationGranted,
-    LPreciseLocationGranted,
+    LCoarseGeoPositionGranted,
+    LPreciseGeoPositionGranted,
     LAuthorizedAlways);
   Memo1.Lines.add('OnAuthorizationStatus');
-  Memo1.Lines.add('  GpsEnabled: ' + ALBoolToStrW(FLocationSensor.IsGpsEnabled));
+  Memo1.Lines.add('  GpsEnabled: ' + ALBoolToStrW(FGeoPositionSensor.IsGpsEnabled));
   Memo1.Lines.add('  Restricted: ' + ALBoolToStrW(LRestricted));
-  Memo1.Lines.add('  CoarseLocationGranted: ' + ALBoolToStrW(LCoarseLocationGranted));
-  Memo1.Lines.add('  PreciseLocationGranted: ' + ALBoolToStrW(LPreciseLocationGranted));
+  Memo1.Lines.add('  CoarseGeoPositionGranted: ' + ALBoolToStrW(LCoarseGeoPositionGranted));
+  Memo1.Lines.add('  PreciseGeoPositionGranted: ' + ALBoolToStrW(LPreciseGeoPositionGranted));
   Memo1.Lines.add('  AuthorizedAlways: ' + ALBoolToStrW(LAuthorizedAlways));
   Memo1.Lines.add('');
   Memo1.Lines.add('************');
@@ -241,7 +241,7 @@ begin
 end;
 
 {**********************************************}
-procedure TForm1.OnLocationSensorLocationUpdate(
+procedure TForm1.OnGeoPositionSensorGeoPositionUpdate(
             const Sender: TObject;
             const ALatitude: Double;
             const ALongitude: Double;
@@ -249,7 +249,7 @@ procedure TForm1.OnLocationSensorLocationUpdate(
             const AAccuracy: Double;
             Const ADateTime: TdateTime);
 begin
-  Memo1.Lines.add('OnLocationUpdate');
+  Memo1.Lines.add('OnGeoPositionUpdate');
   Memo1.Lines.add('  Latitude: ' + ALFloatToStrW(ALatitude, ALDefaultFormatSettingsW));
   Memo1.Lines.add('  Longitude: ' + ALFloatToStrW(ALongitude, ALDefaultFormatSettingsW));
   Memo1.Lines.add('  Altitude: ' + ALFloatToStrW(AAltitude, ALDefaultFormatSettingsW));
@@ -263,11 +263,11 @@ begin
 end;
 
 {**************************************************************}
-procedure TForm1.OnLocationSensorShowRequestPermissionRationale(
+procedure TForm1.OnGeoPositionSensorShowRequestPermissionRationale(
             const Sender: TObject;
             const AToActivateGPS: Boolean;
-            const AToRequestCoarseLocationPermission: Boolean;
-            const AToRequestPreciseLocationPermission: Boolean;
+            const AToRequestCoarseGeoPositionPermission: Boolean;
+            const AToRequestPreciseGeoPositionPermission: Boolean;
             const AToRequestAlwaysAuthorization: Boolean;
             const AIsForced: Boolean; // when true it's mean that the user denied the previous permission request with checking "Never ask again option"
             const ACanRequestPermissionProc: TProc; // the procedure to launch when the user response positivelly to the rationale
@@ -284,7 +284,7 @@ begin
       'you''ve granted us access, you''ll be able to enjoy all the benefits '+
       'of our app''s location-based features. Thank you!'
   end
-  else if AToRequestCoarseLocationPermission then begin
+  else if AToRequestCoarseGeoPositionPermission then begin
     if AIsForced then LMessage :=
       'Hi there! Our app uses your location to provide you with personalized '+
       'content and services. To enable this feature, please go to the '+
@@ -300,7 +300,7 @@ begin
       'privacy and will only use your location information for the intended '+
       'purpose. Would you like to authorize our app to access your location?';
   end
-  else if AToRequestPreciseLocationPermission then begin
+  else if AToRequestPreciseGeoPositionPermission then begin
     if AIsForced then LMessage :=
       'Hello! Our app relies on your precise location to provide you with '+
       'personalized content and services. To enable this feature, please go '+

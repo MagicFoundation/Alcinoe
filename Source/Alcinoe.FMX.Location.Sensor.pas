@@ -1,15 +1,15 @@
 (*******************************************************************************
-The TALLocationSensor component is a Delphi component that grants access to
+The TALGeoPositionSensor component is a Delphi component that grants access to
 location services on iOS and Android devices. It enables the retrieval of the
 device's current location, and can provide location updates as the device's
 location changes. It supports a range of location providers, including GPS,
 cellular network triangulation, and Wi-Fi positioning.
 
-Aside from granting access to location services, TALLocationSensor also
+Aside from granting access to location services, TALGeoPositionSensor also
 automates the process of acquiring the user's permission to use the location
 sensor on both iOS and Android devices. The component can handle situations
 where the user has previously refused access to their location. The
-TALLocationSensor component provides a comprehensive solution for developers
+TALGeoPositionSensor component provides a comprehensive solution for developers
 seeking to integrate location-based functionality into their apps without
 having to worry about low-level implementation details.
 
@@ -20,7 +20,7 @@ Setup (ANDROID)
    * com.google.android.gms:play-services-base:18.2.0
    * com.google.android.gms:play-services-location:21.0.1
    in the project. You can do this with the help of AndroidMerger. You can see
-   an exemple in <Alcinoe>\Demos\ALLocationSensor\_source\Android\MergeLibraries.bat
+   an exemple in <Alcinoe>\Demos\ALGeoPositionSensor\_source\Android\MergeLibraries.bat
 
 2) In the AndroidManifest.template.xml file, you need to add the following
    permissions based on your requirements:
@@ -74,7 +74,7 @@ Setup (IOS)
      </array>
 
 *******************************************************************************)
-unit Alcinoe.FMX.Location.Sensor;
+unit Alcinoe.FMX.GeoPosition.Sensor;
 
 interface
 
@@ -102,8 +102,8 @@ uses
 
 type
 
-  {********************************}
-  TALLocationSensor = class(Tobject)
+  {***********************************}
+  TALGeoPositionSensor = class(Tobject)
 
     {$REGION ' ANDROID'}
     {$IF defined(android)}
@@ -111,9 +111,9 @@ type
       type
         TAndroidLocationListener = class(TJavaLocal, Androidapi.JNI.Location.JLocationListener)
         private
-          FLocationSensor: TALLocationSensor;
+          FGeoPositionSensor: TALGeoPositionSensor;
         public
-          constructor Create(ALocationSensor: TALLocationSensor);
+          constructor Create(AGeoPositionSensor: TALGeoPositionSensor);
           procedure onFlushComplete(requestCode: Integer); cdecl;
           procedure onLocationChanged(location: JLocation); overload; cdecl;
           procedure onLocationChanged(locations: JList); overload; cdecl;
@@ -124,9 +124,9 @@ type
         //--
         TGMSLocationListener = class(TJavaLocal, Alcinoe.AndroidApi.Google.JLocationListener)
         private
-          FLocationSensor: TALLocationSensor;
+          FGeoPositionSensor: TALGeoPositionSensor;
         public
-          constructor Create(ALocationSensor: TALLocationSensor);
+          constructor Create(AGeoPositionSensor: TALGeoPositionSensor);
           procedure onLocationChanged(location: JLocation); cdecl;
         end;
     private
@@ -146,9 +146,9 @@ type
       type
         TLocationManagerDelegate = class(TOCLocal, CLLocationManagerDelegate)
         private
-          FLocationSensor: TALLocationSensor;
+          FGeoPositionSensor: TALGeoPositionSensor;
         public
-          constructor Create(ALocationSensor: TALLocationSensor);
+          constructor Create(AGeoPositionSensor: TALGeoPositionSensor);
           procedure locationManager(manager: CLLocationManager; didFailWithError: NSError); overload; cdecl;
           procedure locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading); overload; cdecl;
           procedure locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation); overload; cdecl;
@@ -190,91 +190,91 @@ type
 
     public
       type
-        TLocationUpdateEvent = procedure(
-                                 const Sender: TObject;
-                                 const ALatitude: Double;
-                                 const ALongitude: Double;
-                                 const AAltitude: Double;
-                                 const AAccuracy: Double;
-                                 Const ADateTime: TdateTime) of object;
+        TGeoPositionUpdateEvent = procedure(
+                                    const Sender: TObject;
+                                    const ALatitude: Double;
+                                    const ALongitude: Double;
+                                    const AAltitude: Double;
+                                    const AAccuracy: Double;
+                                    Const ADateTime: TdateTime) of object;
         TShowRequestPermissionRationaleEvent = Procedure(
                                                  const Sender: TObject;
                                                  const AToActivateGPS: Boolean;
-                                                 const AToRequestCoarseLocationPermission: Boolean;
-                                                 const AToRequestPreciseLocationPermission: Boolean;
+                                                 const AToRequestCoarseGeoPositionPermission: Boolean;
+                                                 const AToRequestPreciseGeoPositionPermission: Boolean;
                                                  const AToRequestAlwaysAuthorization: Boolean;
                                                  const AIsForced: Boolean; // when true it's mean that the user denied the previous permission request with checking "Never ask again option"
                                                  const ACanRequestPermissionProc: TProc; // the procedure to launch when the user response positivelly to the rationale
                                                  const ACanNotRequestPermissionProc: TProc) of object; // the procedure to launch when the user response negativelly to the rationale
     private
-      fOnLocationUpdate: TLocationUpdateEvent;
+      fOnGeoPositionUpdate: TGeoPositionUpdateEvent;
       fOnAuthorizationStatus: TNotifyEvent;
       fOnShowRequestPermissionRationale: TShowRequestPermissionRationaleEvent;
       FRequestPermissionRationaleShowed: Boolean;
       //--
-      FIsActivatingGpsAndGrantingLocationAccess: Boolean;
+      FIsActivatingGpsAndGrantingGeoPositionAccess: Boolean;
       //--
       FWaitingGpsActivationResult: boolean;
-      FWaitingGrantCoarseLocationAccessResult: Boolean;
-      FWaitingGrantPreciseLocationAccessResult: Boolean;
+      FWaitingGrantCoarseGeoPositionAccessResult: Boolean;
+      FWaitingGrantPreciseGeoPositionAccessResult: Boolean;
       FWaitingAlwaysAuthorizationResult: Boolean;
       //--
-      FLocationUpdatesDelayed: Boolean;
-      FLocationUpdatesActive: Boolean;
+      FGeoPositionUpdatesDelayed: Boolean;
+      FGeoPositionUpdatesActive: Boolean;
       //--
-      FRequestCoarseLocation: Boolean;
-      FRequestPreciseLocation: Boolean;
+      FRequestCoarseGeoPosition: Boolean;
+      FRequestPreciseGeoPosition: Boolean;
       FRequestAlwaysAuthorization: Boolean;
       FRequestMinDistance: Integer;
       //--
       FApplicationEventHandlerEnabled: Boolean;
       //--
       procedure ApplicationEventHandler(const Sender: TObject; const M: TMessage);
-      procedure DoActivateGpsAndGrantLocationAccess(Const AForceShowRequestPermissionRationale: Boolean = False);
-      procedure DoActivateGpsAndGrantLocationAccessResult;
-      procedure DoStartLocationUpdates;
+      procedure DoActivateGpsAndGrantGeoPositionAccess(Const AForceShowRequestPermissionRationale: Boolean = False);
+      procedure DoActivateGpsAndGrantGeoPositionAccessResult;
+      procedure DoStartGeoPositionUpdates;
       procedure DoShowRequestPermissionRationale(
                   const AToActivateGPS: Boolean;
-                  const AToRequestCoarseLocationPermission: Boolean;
-                  const AToRequestPreciseLocationPermission: Boolean;
+                  const AToRequestCoarseGeoPositionPermission: Boolean;
+                  const AToRequestPreciseGeoPositionPermission: Boolean;
                   const AToRequestAlwaysAuthorization: Boolean;
                   const AIsForced: Boolean; // when true it's mean that the user denied the previous permission request with checking "Never ask again option"
                   const ARequestPermissionProc: TProc);
       function ShouldShowRequestPermissionRationale(
-                 const ACoarseLocation: Boolean;
-                 const APreciseLocation: Boolean;
+                 const ACoarseGeoPosition: Boolean;
+                 const APreciseGeoPosition: Boolean;
                  const AAlwaysAuthorization: Boolean): Boolean;
       procedure RequestPermissions(
-                  const ACoarseLocation: Boolean;
-                  const APreciseLocation: Boolean;
+                  const ACoarseGeoPosition: Boolean;
+                  const APreciseGeoPosition: Boolean;
                   const AAlwaysAuthorization: Boolean);
-      function GetIsListeningLocationUpdates: boolean;
+      function GetIsListeningGeoPositionUpdates: boolean;
     public
       constructor Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True); virtual;
       destructor Destroy; override;
       function  IsGpsEnabled: Boolean; // If your device GPS is on
       procedure  GetPermissionsGranted(
                    out ARestricted: boolean; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
-                   out ACoarseLocation: Boolean; // If you have granted the app access to your coarse location
-                   out APreciseLocation: boolean; // If you have granted the app access to your precise location
-                   out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time.
-      function  IsLocationAccessGranted: Boolean; overload; // If you have granted the app access to your location
-      function  IsGpsEnabledAndLocationAccessGranted: Boolean; overload; // If your device GPS is on and if your have granted the app access to your location
-      procedure ActivateGpsAndGrantLocationAccess(
-                  const ACoarseLocation: boolean = True;  // when ACoarseLocation = true and APreciseLocation = true
-                  const APreciseLocation: boolean = True; // then user can choose either ACoarseLocation or APreciseLocation
+                   out ACoarseGeoPosition: Boolean; // If you have granted the app access to your coarse geoposition
+                   out APreciseGeoPosition: boolean; // If you have granted the app access to your precise geoposition
+                   out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time
+      function  IsGeoPositionAccessGranted: Boolean; // If you have granted the app access to your geoposition
+      function  IsGpsEnabledAndGeoPositionAccessGranted: Boolean; // If your device GPS is on and if your have granted the app access to your geoposition
+      procedure ActivateGpsAndGrantGeoPositionAccess(
+                  const ACoarseGeoPosition: boolean = True;  // when ACoarseGeoPosition = true and APreciseGeoPosition = true
+                  const APreciseGeoPosition: boolean = True; // then user can choose either ACoarseGeoPosition or APreciseGeoPosition
                   const AAlwaysAuthorization: boolean = False); virtual;
-      procedure StartLocationUpdates(
-                  const aMinDistance: Integer; // minimum distance between location updates in meters
-                  const ACoarseLocation: boolean = true;  // when ACoarseLocation = true and APreciseLocation = true
-                  const APreciseLocation: boolean = true; // then user can choose either ACoarseLocation or APreciseLocation
+      procedure StartGeoPositionUpdates(
+                  const aMinDistance: Integer; // minimum distance between geoposition updates in meters
+                  const ACoarseGeoPosition: boolean = true;  // when ACoarseGeoPosition = true and APreciseGeoPosition = true
+                  const APreciseGeoPosition: boolean = true; // then user can choose either ACoarseGeoPosition or APreciseGeoPosition
                   const AAlwaysAuthorization: boolean = False); virtual;
-      procedure StopLocationUpdates; virtual;
-      property OnLocationUpdate: TLocationUpdateEvent read fOnLocationUpdate write fOnLocationUpdate;
+      procedure StopGeoPositionUpdates; virtual;
+      property OnGeoPositionUpdate: TGeoPositionUpdateEvent read fOnGeoPositionUpdate write fOnGeoPositionUpdate;
       property OnAuthorizationStatus: TNotifyEvent read fOnAuthorizationStatus write fOnAuthorizationStatus;
       property OnShowRequestPermissionRationale: TShowRequestPermissionRationaleEvent read fOnShowRequestPermissionRationale write fOnShowRequestPermissionRationale;
-      property IsListeningLocationUpdates: Boolean read GetIsListeningLocationUpdates; // Set to true in StartLocationUpdates and set to false only in StopLocationUpdates
-      property IsActivatingGpsAndGrantingLocationAccess: Boolean read FIsActivatingGpsAndGrantingLocationAccess; // set to true in ActivateGpsAndGrantLocationAccess and set to false in OnAuthorizationStatus
+      property IsListeningGeoPositionUpdates: Boolean read GetIsListeningGeoPositionUpdates; // Set to true in StartGeoPositionUpdates and set to false only in StopGeoPositionUpdates
+      property IsActivatingGpsAndGrantingGeoPositionAccess: Boolean read FIsActivatingGpsAndGrantingGeoPositionAccess; // set to true in ActivateGpsAndGrantGeoPositionAccess and set to false in OnAuthorizationStatus
     end;
 
 implementation
@@ -304,7 +304,7 @@ uses
   ALcinoe.common;
 
 {********************************************************************************************}
-constructor TALLocationSensor.Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True);
+constructor TALGeoPositionSensor.Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True);
 begin
 
   {$REGION ' ANDROID'}
@@ -339,23 +339,23 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  fOnLocationUpdate := nil;
+  fOnGeoPositionUpdate := nil;
   fOnAuthorizationStatus := nil;
   fOnShowRequestPermissionRationale := nil;
   FRequestPermissionRationaleShowed := False;
   //--
-  FIsActivatingGpsAndGrantingLocationAccess := False;
+  FIsActivatingGpsAndGrantingGeoPositionAccess := False;
   //--
   FWaitingGpsActivationResult := False;
-  FWaitingGrantCoarseLocationAccessResult := False;
-  FWaitingGrantPreciseLocationAccessResult := False;
+  FWaitingGrantCoarseGeoPositionAccessResult := False;
+  FWaitingGrantPreciseGeoPositionAccessResult := False;
   FWaitingAlwaysAuthorizationResult := False;
   //--
-  FLocationUpdatesDelayed := False;
-  FLocationUpdatesActive := False;
+  FGeoPositionUpdatesDelayed := False;
+  FGeoPositionUpdatesActive := False;
   //--
-  FRequestCoarseLocation := False;
-  FRequestPreciseLocation := False;
+  FRequestCoarseGeoPosition := False;
+  FRequestPreciseGeoPosition := False;
   FRequestAlwaysAuthorization := False;
   FRequestMinDistance := 0;
   //--
@@ -365,7 +365,7 @@ begin
 end;
 
 {***********************************}
-destructor TALLocationSensor.Destroy;
+destructor TALGeoPositionSensor.Destroy;
 begin
 
   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
@@ -399,7 +399,7 @@ begin
 end;
 
 {***********************************************}
-function TALLocationSensor.IsGpsEnabled: Boolean;
+function TALGeoPositionSensor.IsGpsEnabled: Boolean;
 begin
 
   {$REGION ' ANDROID'}
@@ -439,17 +439,17 @@ begin
   {$ENDREGION}
 
   {$IFDEF DEBUG}
-  ALLog('TALLocationSensor.IsGpsEnabled', 'Result: ' + ALBoolToStrW(result), TalLogType.verbose);
+  ALLog('TALGeoPositionSensor.IsGpsEnabled', 'Result: ' + ALBoolToStrW(result), TalLogType.verbose);
   {$ENDIF}
 
 end;
 
 {*************************************************}
-procedure  TALLocationSensor.GetPermissionsGranted(
+procedure  TALGeoPositionSensor.GetPermissionsGranted(
              out ARestricted: boolean; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
-             out ACoarseLocation: Boolean; // If you have granted the app access to your coarse location
-             out APreciseLocation: boolean; // If you have granted the app access to your precise location
-             out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time.
+             out ACoarseGeoPosition: Boolean; // If you have granted the app access to your coarse geoposition
+             out APreciseGeoPosition: boolean; // If you have granted the app access to your precise geoposition
+             out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time
 begin
 
   {$REGION ' ANDROID'}
@@ -462,12 +462,12 @@ begin
   ARestricted := False;
   //----
   if (TJBuild_VERSION.JavaClass.SDK_INT >= 23 {marshmallow}) then begin
-    ACoarseLocation := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_COARSE_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED;
-    APreciseLocation := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_FINE_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED;
+    ACoarseGeoPosition := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_COARSE_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED;
+    APreciseGeoPosition := MainActivity.checkSelfPermission(StringToJString('android.permission.ACCESS_FINE_LOCATION')) = TJPackageManager.JavaClass.PERMISSION_GRANTED;
   end
   else begin
-    ACoarseLocation := True;
-    APreciseLocation := True;
+    ACoarseGeoPosition := True;
+    APreciseGeoPosition := True;
   end;
   //----
   if (TJBuild_VERSION.JavaClass.SDK_INT >= 29 {Android 10}) then
@@ -483,8 +483,8 @@ begin
 
   //init output vars
   ARestricted := False;
-  ACoarseLocation := False;
-  APreciseLocation := false;
+  ACoarseGeoPosition := False;
+  APreciseGeoPosition := false;
   AAuthorizedAlways := False;
 
   // The authorization status of a given app is managed by the system and determined by several
@@ -507,20 +507,20 @@ begin
 
     // This app is authorized to start most location services while running in the foreground. This authorization does not allow you to use APIs that could launch your app in response to an event, such as region monitoring and the significant location change services.
     kCLAuthorizationStatusAuthorizedWhenInUse: begin
-      ACoarseLocation := True;
+      ACoarseGeoPosition := True;
       if TOSVersion.Check(14, 0) then
-        APreciseLocation := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
+        APreciseGeoPosition := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
       else
-        APreciseLocation := true;
+        APreciseGeoPosition := true;
     end;
 
     // This app is authorized to start location services at any time. This authorization allows you to use all location services, including those for monitoring regions and significant location changes.
     kCLAuthorizationStatusauthorizedAlways: begin
-      ACoarseLocation := True;
+      ACoarseGeoPosition := True;
       if TOSVersion.Check(14, 0) then
-        APreciseLocation := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
+        APreciseGeoPosition := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
       else
-        APreciseLocation := true;
+        APreciseGeoPosition := true;
       AAuthorizedAlways := True;
     end;
 
@@ -539,21 +539,21 @@ begin
   //if someone know how to grab location from windows could be good
   //to update this function
   ARestricted := True;
-  ACoarseLocation := false;
-  APreciseLocation := false;
+  ACoarseGeoPosition := false;
+  APreciseGeoPosition := false;
   AAuthorizedAlways := False;
 
   {$ENDIF}
   {$ENDREGION}
 
-  if APreciseLocation then ACoarseLocation := true;
+  if APreciseGeoPosition then ACoarseGeoPosition := true;
 
   {$IFDEF DEBUG}
   ALLog(
-    'TALLocationSensor.GetPermissionsGranted',
+    'TALGeoPositionSensor.GetPermissionsGranted',
     'Restricted: ' + ALBoolToStrW(ARestricted) + ' | '+
-    'CoarseLocation: ' + ALBoolToStrW(ACoarseLocation) + ' | '+
-    'PreciseLocation: ' + ALBoolToStrW(APreciseLocation) + ' | '+
+    'CoarseGeoPosition: ' + ALBoolToStrW(ACoarseGeoPosition) + ' | '+
+    'PreciseGeoPosition: ' + ALBoolToStrW(APreciseGeoPosition) + ' | '+
     'AuthorizedAlways: ' + ALBoolToStrW(AAuthorizedAlways),
     TalLogType.verbose);
   {$ENDIF}
@@ -561,30 +561,30 @@ begin
 end;
 
 {**********************************************************}
-function TALLocationSensor.IsLocationAccessGranted: Boolean;
+function TALGeoPositionSensor.IsGeoPositionAccessGranted: Boolean;
 begin
   var LRestricted: boolean;
-  var LCoarseLocation: Boolean;
-  var LPreciseLocation: boolean;
+  var LCoarseGeoPosition: Boolean;
+  var LPreciseGeoPosition: boolean;
   var LAuthorizedAlways: Boolean;
   GetPermissionsGranted(
     LRestricted,
-    LCoarseLocation,
-    LPreciseLocation,
+    LCoarseGeoPosition,
+    LPreciseGeoPosition,
     LAuthorizedAlways);
-  result := LCoarseLocation or LPreciseLocation;
+  result := LCoarseGeoPosition or LPreciseGeoPosition;
 end;
 
 {***********************************************************************}
-function TALLocationSensor.IsGpsEnabledAndLocationAccessGranted: Boolean;
+function TALGeoPositionSensor.IsGpsEnabledAndGeoPositionAccessGranted: Boolean;
 begin
-  result := IsGpsEnabled and IsLocationAccessGranted;
+  result := IsGpsEnabled and IsGeoPositionAccessGranted;
 end;
 
 {**************************************************************}
-function TALLocationSensor.ShouldShowRequestPermissionRationale(
-           const ACoarseLocation: Boolean;
-           const APreciseLocation: Boolean;
+function TALGeoPositionSensor.ShouldShowRequestPermissionRationale(
+           const ACoarseGeoPosition: Boolean;
+           const APreciseGeoPosition: Boolean;
            const AAlwaysAuthorization: Boolean): Boolean;
 begin
 
@@ -592,8 +592,8 @@ begin
   {$IF defined(ANDROID)}
   Result := False;
   if (TJBuild_VERSION.JavaClass.SDK_INT >= 23 {marshmallow}) then begin
-    if aCoarseLocation then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_COARSE_LOCATION')));
-    if aPreciseLocation then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_FINE_LOCATION')));
+    if ACoarseGeoPosition then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_COARSE_LOCATION')));
+    if APreciseGeoPosition then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_FINE_LOCATION')));
   end;
   if (TJBuild_VERSION.JavaClass.SDK_INT >= 29 {Android 10}) then begin
     if aAlwaysAuthorization then Result := Result or (MainActivity.shouldShowRequestPermissionRationale(StringToJString('android.permission.ACCESS_BACKGROUND_LOCATION')));
@@ -609,26 +609,26 @@ begin
   case LAuthorizationStatus of
     kCLAuthorizationStatusNotDetermined: result := false;
     //--
-    kCLAuthorizationStatusDenied: result := ACoarseLocation or APreciseLocation or AAlwaysAuthorization;
+    kCLAuthorizationStatusDenied: result := ACoarseGeoPosition or APreciseGeoPosition or AAlwaysAuthorization;
     //--
-    kCLAuthorizationStatusRestricted: result := ACoarseLocation or APreciseLocation or AAlwaysAuthorization;
+    kCLAuthorizationStatusRestricted: result := ACoarseGeoPosition or APreciseGeoPosition or AAlwaysAuthorization;
     //--
     kCLAuthorizationStatusAuthorizedWhenInUse: begin
-      var LPreciseLocationGranted: Boolean;
+      var LPreciseGeoPositionGranted: Boolean;
       if TOSVersion.Check(14, 0) then
-        LPreciseLocationGranted := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
+        LPreciseGeoPositionGranted := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
       else
-        LPreciseLocationGranted := true;
-      result := AAlwaysAuthorization or (APreciseLocation and (not LPreciseLocationGranted));
+        LPreciseGeoPositionGranted := true;
+      result := AAlwaysAuthorization or (APreciseGeoPosition and (not LPreciseGeoPositionGranted));
     end;
     //--
     kCLAuthorizationStatusauthorizedAlways: begin
-      var LPreciseLocationGranted: Boolean;
+      var LPreciseGeoPositionGranted: Boolean;
       if TOSVersion.Check(14, 0) then
-        LPreciseLocationGranted := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
+        LPreciseGeoPositionGranted := fLocationManager.accuracyAuthorization = CLAccuracyAuthorizationFullAccuracy
       else
-        LPreciseLocationGranted := true;
-      result := (APreciseLocation and (not LPreciseLocationGranted));
+        LPreciseGeoPositionGranted := true;
+      result := (APreciseGeoPosition and (not LPreciseGeoPositionGranted));
     end;
     //--
     Else
@@ -645,10 +645,10 @@ begin
 
   {$IFDEF DEBUG}
   ALLog(
-    'TALLocationSensor.ShouldShowRequestPermissionRationale',
+    'TALGeoPositionSensor.ShouldShowRequestPermissionRationale',
     'Result: ' + ALBoolToStrW(Result) + ' | '+
-    'CoarseLocation: ' + ALBoolToStrW(ACoarseLocation) + ' | '+
-    'PreciseLocation: ' + ALBoolToStrW(APreciseLocation) + ' | '+
+    'CoarseGeoPosition: ' + ALBoolToStrW(ACoarseGeoPosition) + ' | '+
+    'PreciseGeoPosition: ' + ALBoolToStrW(APreciseGeoPosition) + ' | '+
     'AlwaysAuthorization: ' + ALBoolToStrW(AAlwaysAuthorization),
     TalLogType.verbose);
   {$ENDIF}
@@ -656,10 +656,10 @@ begin
 end;
 
 {***********************************************************}
-procedure TALLocationSensor.DoShowRequestPermissionRationale(
+procedure TALGeoPositionSensor.DoShowRequestPermissionRationale(
             const AToActivateGPS: Boolean;
-            const AToRequestCoarseLocationPermission: Boolean;
-            const AToRequestPreciseLocationPermission: Boolean;
+            const AToRequestCoarseGeoPositionPermission: Boolean;
+            const AToRequestPreciseGeoPositionPermission: Boolean;
             const AToRequestAlwaysAuthorization: Boolean;
             const AIsForced: Boolean; // when true it's mean that the user denied the previous permission request with checking "Never ask again option"
             const ARequestPermissionProc: TProc);
@@ -669,62 +669,62 @@ begin
     OnShowRequestPermissionRationale(
       Self, // const Sender: TObject;
       AToActivateGPS, // const AToActivateGPS: Boolean;
-      AToRequestCoarseLocationPermission, // const AToRequestCoarseLocationPermission: Boolean;
-      AToRequestPreciseLocationPermission, // const AToRequestPreciseLocationPermission: Boolean;
+      AToRequestCoarseGeoPositionPermission, // const AToRequestCoarseGeoPositionPermission: Boolean;
+      AToRequestPreciseGeoPositionPermission, // const AToRequestPreciseGeoPositionPermission: Boolean;
       AToRequestAlwaysAuthorization, // const AToRequestAlwaysAuthorization: Boolean;
       AIsForced, // const AIsForced: Boolean;
       // the procedure to launch when the user response positivelly to the rationale
       procedure
       begin
         FWaitingGpsActivationResult := AToActivateGPS;
-        FWaitingGrantCoarseLocationAccessResult := AToRequestCoarseLocationPermission;
-        FWaitingGrantPreciseLocationAccessResult := AToRequestPreciseLocationPermission;
+        FWaitingGrantCoarseGeoPositionAccessResult := AToRequestCoarseGeoPositionPermission;
+        FWaitingGrantPreciseGeoPositionAccessResult := AToRequestPreciseGeoPositionPermission;
         FWaitingAlwaysAuthorizationResult := AToRequestAlwaysAuthorization;
         ARequestPermissionProc;
       end,
       // the procedure to launch when the user response negativelly to the rationale
       procedure
       begin
-        DoActivateGpsAndGrantLocationAccessResult;
+        DoActivateGpsAndGrantGeoPositionAccessResult;
       end);
   end
   else
-    DoActivateGpsAndGrantLocationAccessResult;
+    DoActivateGpsAndGrantGeoPositionAccessResult;
 end;
 
 {*********************************************}
-procedure TALLocationSensor.requestPermissions(
-            const ACoarseLocation: Boolean;
-            const APreciseLocation: Boolean;
+procedure TALGeoPositionSensor.requestPermissions(
+            const ACoarseGeoPosition: Boolean;
+            const APreciseGeoPosition: Boolean;
             const AAlwaysAuthorization: Boolean);
 begin
 
   FApplicationEventHandlerEnabled := False;
   //--
   FWaitingGpsActivationResult := False;
-  FWaitingGrantCoarseLocationAccessResult := False;
-  FWaitingGrantPreciseLocationAccessResult := False;
+  FWaitingGrantCoarseGeoPositionAccessResult := False;
+  FWaitingGrantPreciseGeoPositionAccessResult := False;
   FWaitingAlwaysAuthorizationResult := False;
 
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
   FPermissionsRequestResultHandlerEnabled := True;
   var LPermissionsCount: integer := 0;
-  if ACoarseLocation then inc(LPermissionsCount);
-  if APreciseLocation then inc(LPermissionsCount);
+  if ACoarseGeoPosition then inc(LPermissionsCount);
+  if APreciseGeoPosition then inc(LPermissionsCount);
   if AAlwaysAuthorization then inc(LPermissionsCount);
   if LPermissionsCount = 0 then
     raise Exception.Create('Error 15E524DB-8DA1-440D-8571-3AB304DC8ABC');
   var LPermissions := TJavaObjectArray<JString>.create(LPermissionsCount);
   try
     var LIdx: integer := 0;
-    if ACoarseLocation then begin
-      FWaitingGrantCoarseLocationAccessResult := True;
+    if ACoarseGeoPosition then begin
+      FWaitingGrantCoarseGeoPositionAccessResult := True;
       LPermissions.Items[LIdx] := StringToJString('android.permission.ACCESS_COARSE_LOCATION');
       inc(LIdx);
     end;
-    if APreciseLocation then begin
-      FWaitingGrantPreciseLocationAccessResult := True;
+    if APreciseGeoPosition then begin
+      FWaitingGrantPreciseGeoPositionAccessResult := True;
       LPermissions.Items[LIdx] := StringToJString('android.permission.ACCESS_FINE_LOCATION');
       inc(LIdx);
     end;
@@ -742,14 +742,14 @@ begin
 
   {$REGION ' IOS'}
   {$IF defined(IOS)}
-  flocationManagerDidChangeAuthorizationStatusEnabled := ACoarseLocation or APreciseLocation or AAlwaysAuthorization;
+  flocationManagerDidChangeAuthorizationStatusEnabled := ACoarseGeoPosition or APreciseGeoPosition or AAlwaysAuthorization;
   //--
-  if ACoarseLocation then FWaitingGrantCoarseLocationAccessResult := True;
-  if APreciseLocation then FWaitingGrantPreciseLocationAccessResult := True;
+  if ACoarseGeoPosition then FWaitingGrantCoarseGeoPositionAccessResult := True;
+  if APreciseGeoPosition then FWaitingGrantPreciseGeoPositionAccessResult := True;
   if AAlwaysAuthorization then FWaitingAlwaysAuthorizationResult := True;
   //--
-  if ACoarseLocation then fLocationManager.requestWhenInUseAuthorization
-  else if APreciseLocation then fLocationManager.requestWhenInUseAuthorization
+  if ACoarseGeoPosition then fLocationManager.requestWhenInUseAuthorization
+  else if APreciseGeoPosition then fLocationManager.requestWhenInUseAuthorization
   else if AAlwaysAuthorization then fLocationManager.requestAlwaysAuthorization;
   {$ENDIF}
   {$ENDREGION}
@@ -763,63 +763,63 @@ begin
 end;
 
 {****************************************************************}
-function TALLocationSensor.GetIsListeningLocationUpdates: boolean;
+function TALGeoPositionSensor.GetIsListeningGeoPositionUpdates: boolean;
 begin
-  result := FLocationUpdatesDelayed or FLocationUpdatesActive;
+  result := FGeoPositionUpdatesDelayed or FGeoPositionUpdatesActive;
 end;
 
 {***************************************************************************************************************************}
-procedure TALLocationSensor.DoActivateGpsAndGrantLocationAccess(Const AForceShowRequestPermissionRationale: Boolean = False);
+procedure TALGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccess(Const AForceShowRequestPermissionRationale: Boolean = False);
 begin
 
-  //security check FRequestCoarseLocation and/or FRequestPreciseLocation are mandatories
-  if (not FRequestCoarseLocation) and (not FRequestPreciseLocation) then
-    raise Exception.Create('You must say if you need coarse or precise location permissions');
+  //security check FRequestCoarseGeoPosition and/or FRequestPreciseGeoPosition are mandatories
+  if (not FRequestCoarseGeoPosition) and (not FRequestPreciseGeoPosition) then
+    raise Exception.Create('You must say if you need coarse or precise geoposition permissions');
 
   //if everything is already enabled then nothing to do so exit
   var LGpsEnabled := IsGpsEnabled;
   var LRestricted: boolean;
-  var LCoarseLocationGranted: Boolean;
-  var LPreciseLocationGranted: boolean;
+  var LCoarseGeoPositionGranted: Boolean;
+  var LPreciseGeoPositionGranted: boolean;
   var LAuthorizedAlways: Boolean;
   GetPermissionsGranted(
     LRestricted,
-    LCoarseLocationGranted,
-    LPreciseLocationGranted,
+    LCoarseGeoPositionGranted,
+    LPreciseGeoPositionGranted,
     LAuthorizedAlways);
   if (LGpsEnabled) and // Gps is enabled
-     (LCoarseLocationGranted or LPreciseLocationGranted) and // Coarse or Precise Location Granted
-     (FRequestCoarseLocation or ((FRequestPreciseLocation) and LPreciseLocationGranted)) and // we request CoarseLocation or (PreciseLocation and we have PreciseLocationGranted)
+     (LCoarseGeoPositionGranted or LPreciseGeoPositionGranted) and // Coarse or Precise GeoPosition Granted
+     (FRequestCoarseGeoPosition or ((FRequestPreciseGeoPosition) and LPreciseGeoPositionGranted)) and // we request CoarseGeoPosition or (PreciseGeoPosition and we have PreciseGeoPositionGranted)
      ((not FRequestAlwaysAuthorization) or LAuthorizedAlways) then begin // we do not request AlwaysAuthorization or we have AuthorizedAlwaysGranted
-    DoActivateGpsAndGrantLocationAccessResult;
+    DoActivateGpsAndGrantGeoPositionAccessResult;
     exit;
   end;
 
   //if LRestricted we can not do anything so exit
   if LRestricted then begin
-    DoActivateGpsAndGrantLocationAccessResult;
+    DoActivateGpsAndGrantGeoPositionAccessResult;
     exit;
   end;
 
-  //we must request location permissions and
+  //we must request geoposition permissions and
   //AlwaysAuthorization separatly
-  var LRequestCoarseLocation: Boolean;
-  var LRequestPreciseLocation: Boolean;
+  var LRequestCoarseGeoPosition: Boolean;
+  var LRequestPreciseGeoPosition: Boolean;
   var LRequestAlwaysAuthorization: Boolean;
   if (not LGpsEnabled) then begin
-    LRequestCoarseLocation := False;
-    LRequestPreciseLocation := False;
+    LRequestCoarseGeoPosition := False;
+    LRequestPreciseGeoPosition := False;
     LRequestAlwaysAuthorization := False;
   end
-  else if ((not LCoarseLocationGranted) and (not LPreciseLocationGranted)) or
-          ((not FRequestCoarseLocation) and ((not FRequestPreciseLocation) or (not LPreciseLocationGranted))) then begin
-    LRequestCoarseLocation := FRequestCoarseLocation;
-    LRequestPreciseLocation := FRequestPreciseLocation;
+  else if ((not LCoarseGeoPositionGranted) and (not LPreciseGeoPositionGranted)) or
+          ((not FRequestCoarseGeoPosition) and ((not FRequestPreciseGeoPosition) or (not LPreciseGeoPositionGranted))) then begin
+    LRequestCoarseGeoPosition := FRequestCoarseGeoPosition;
+    LRequestPreciseGeoPosition := FRequestPreciseGeoPosition;
     LRequestAlwaysAuthorization := False;
   end
   else if (FRequestAlwaysAuthorization and (not LAuthorizedAlways)) then begin
-    LRequestCoarseLocation := False;
-    LRequestPreciseLocation := False;
+    LRequestCoarseGeoPosition := False;
+    LRequestPreciseGeoPosition := False;
     LRequestAlwaysAuthorization := True;
   end
   else
@@ -835,16 +835,16 @@ begin
   FApplicationEventHandlerEnabled := False;
   FRequestPermissionRationaleShowed := False;
   FWaitingGpsActivationResult := False;
-  FWaitingGrantCoarseLocationAccessResult := False;
-  FWaitingGrantPreciseLocationAccessResult := False;
+  FWaitingGrantCoarseGeoPositionAccessResult := False;
+  FWaitingGrantPreciseGeoPositionAccessResult := False;
   FWaitingAlwaysAuthorizationResult := False;
 
   //If not IsGpsEnabled
   if (not IsGpsEnabled) then begin
     DoShowRequestPermissionRationale(
       True, // const AToActivateGPS: Boolean;
-      False, // const AToRequestCoarseLocationPermission: Boolean;
-      False, // const AToRequestPreciseLocationPermission: Boolean;
+      False, // const AToRequestCoarseGeoPositionPermission: Boolean;
+      False, // const AToRequestPreciseGeoPositionPermission: Boolean;
       False, // const AToRequestAlwaysAuthorization: Boolean;
       True, // const AIsForced: Boolean;
       procedure
@@ -886,15 +886,15 @@ begin
     //           If the permission is disabled by some device policy or the permission is already requested but the user denied it WITH checking "Never ask again" option in the permission dialog
     var LShouldShowRequestPermissionRationale := AForceShowRequestPermissionRationale or
                                                  ShouldShowRequestPermissionRationale(
-                                                   LRequestCoarseLocation, // const ACoarseLocation: Boolean;
-                                                   LRequestPreciseLocation, // const APreciseLocation: Boolean;
+                                                   LRequestCoarseGeoPosition, // const ACoarseGeoPosition: Boolean;
+                                                   LRequestPreciseGeoPosition, // const APreciseGeoPosition: Boolean;
                                                    LRequestAlwaysAuthorization); // const AAlwaysAuthorization: Boolean
 
     //we do not need to show a Rationale
     if (not LShouldShowRequestPermissionRationale) then begin
       requestPermissions(
-        LRequestCoarseLocation,
-        LRequestPreciseLocation,
+        LRequestCoarseGeoPosition,
+        LRequestPreciseGeoPosition,
         LRequestAlwaysAuthorization);
     end
 
@@ -902,8 +902,8 @@ begin
     else begin
       DoShowRequestPermissionRationale(
         False, // const AToActivateGPS: Boolean;
-        LRequestCoarseLocation, // const AToRequestCoarseLocationPermission: Boolean;
-        LRequestPreciseLocation, // const AToRequestPreciseLocationPermission: Boolean;
+        LRequestCoarseGeoPosition, // const AToRequestCoarseGeoPositionPermission: Boolean;
+        LRequestPreciseGeoPosition, // const AToRequestPreciseGeoPositionPermission: Boolean;
         LRequestAlwaysAuthorization, // const AToRequestAlwaysAuthorization: Boolean;
         {$IF defined(IOS)}LShouldShowRequestPermissionRationale{$ELSE}AForceShowRequestPermissionRationale{$ENDIF}, // const AIsForced: Boolean;
         procedure
@@ -931,8 +931,8 @@ begin
           else begin
 
             requestPermissions(
-              LRequestCoarseLocation, // const ACoarseLocation: Boolean;
-              LRequestPreciseLocation,
+              LRequestCoarseGeoPosition, // const ACoarseGeoPosition: Boolean;
+              LRequestPreciseGeoPosition,
               LRequestAlwaysAuthorization);
 
           end;
@@ -944,7 +944,7 @@ begin
 end;
 
 {********************************************************************}
-procedure TALLocationSensor.DoActivateGpsAndGrantLocationAccessResult;
+procedure TALGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccessResult;
 begin
   {$IF defined(ANDROID)}
   FPermissionsRequestResultHandlerEnabled := False;
@@ -954,41 +954,41 @@ begin
   {$ENDIF}
   FApplicationEventHandlerEnabled := False;
   //--
-  FIsActivatingGpsAndGrantingLocationAccess := False;
+  FIsActivatingGpsAndGrantingGeoPositionAccess := False;
   //--
   FWaitingGpsActivationResult := False;
-  FWaitingGrantCoarseLocationAccessResult := False;
-  FWaitingGrantPreciseLocationAccessResult := False;
+  FWaitingGrantCoarseGeoPositionAccessResult := False;
+  FWaitingGrantPreciseGeoPositionAccessResult := False;
   FWaitingAlwaysAuthorizationResult := False;
   //--
   if assigned(fOnAuthorizationStatus) then
     fOnAuthorizationStatus(self);
   //--
-  if FLocationUpdatesDelayed and IsGpsEnabledAndLocationAccessGranted then
-    DoStartLocationUpdates;
+  if FGeoPositionUpdatesDelayed and IsGpsEnabledAndGeoPositionAccessGranted then
+    DoStartGeoPositionUpdates;
 end;
 
 {************************************************************}
-procedure TALLocationSensor.ActivateGpsAndGrantLocationAccess(
-            const ACoarseLocation: boolean = True;
-            const APreciseLocation: boolean = True;
+procedure TALGeoPositionSensor.ActivateGpsAndGrantGeoPositionAccess(
+            const ACoarseGeoPosition: boolean = True;
+            const APreciseGeoPosition: boolean = True;
             const AAlwaysAuthorization: boolean = False);
 begin
-  if FIsActivatingGpsAndGrantingLocationAccess then
-    raise Exception.Create('ActivateGpsAndGrantLocationAccess is already running');
-  FIsActivatingGpsAndGrantingLocationAccess := True;
-  FRequestCoarseLocation := ACoarseLocation;
-  FRequestPreciseLocation := APreciseLocation;
+  if FIsActivatingGpsAndGrantingGeoPositionAccess then
+    raise Exception.Create('ActivateGpsAndGrantGeoPositionAccess is already running');
+  FIsActivatingGpsAndGrantingGeoPositionAccess := True;
+  FRequestCoarseGeoPosition := ACoarseGeoPosition;
+  FRequestPreciseGeoPosition := APreciseGeoPosition;
   FRequestAlwaysAuthorization := AAlwaysAuthorization;
-  DoActivateGpsAndGrantLocationAccess;
+  DoActivateGpsAndGrantGeoPositionAccess;
 end;
 
 {*************************************************}
-procedure TALLocationSensor.DoStartLocationUpdates;
+procedure TALGeoPositionSensor.DoStartGeoPositionUpdates;
 begin
 
-  FLocationUpdatesDelayed := False;
-  FLocationUpdatesActive := True;
+  FGeoPositionUpdatesDelayed := False;
+  FGeoPositionUpdatesActive := True;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
@@ -1018,8 +1018,8 @@ begin
   end
   else if FFusedLocationProviderClient <> nil then begin
     Var LPriority: integer;
-    if FRequestPreciseLocation then LPriority := TJPriority.JavaClass.PRIORITY_HIGH_ACCURACY
-    else if FRequestCoarseLocation then LPriority := TJPriority.JavaClass.PRIORITY_BALANCED_POWER_ACCURACY
+    if FRequestPreciseGeoPosition then LPriority := TJPriority.JavaClass.PRIORITY_HIGH_ACCURACY
+    else if FRequestCoarseGeoPosition then LPriority := TJPriority.JavaClass.PRIORITY_BALANCED_POWER_ACCURACY
     else raise Exception.Create('Error D2AA5FE1-50E9-4AE3-9474-0DD6C8E4F5B0');
     //--
     var LLocationRequest := TJLocationRequest_Builder.JavaClass.init(0{intervalMillis})
@@ -1058,8 +1058,8 @@ begin
   //kCLLocationAccuracyThreeKilometers
   //kCLLocationAccuracyReduced
   Var LdesiredAccuracy: CLLocationAccuracy;
-  if FRequestPreciseLocation then LdesiredAccuracy := kCLLocationAccuracyBest
-  else if FRequestCoarseLocation then begin
+  if FRequestPreciseGeoPosition then LdesiredAccuracy := kCLLocationAccuracyBest
+  else if FRequestCoarseGeoPosition then begin
     if TOSVersion.Check(14, 0) then LdesiredAccuracy := kCLLocationAccuracyReduced
     else LdesiredAccuracy := kCLLocationAccuracyThreeKilometers;
   end
@@ -1075,31 +1075,31 @@ begin
 end;
 
 {***********************************************}
-procedure TALLocationSensor.StartLocationUpdates(
-            const aMinDistance: Integer; // minimum distance between location updates in meters
-            const ACoarseLocation: boolean = true;  // when ACoarseLocation = true and APreciseLocation = true
-            const APreciseLocation: boolean = true; // then user can choose either ACoarseLocation or APreciseLocation
+procedure TALGeoPositionSensor.StartGeoPositionUpdates(
+            const aMinDistance: Integer; // minimum distance between geoposition updates in meters
+            const ACoarseGeoPosition: boolean = true;  // when ACoarseGeoPosition = true and APreciseGeoPosition = true
+            const APreciseGeoPosition: boolean = true; // then user can choose either ACoarseGeoPosition or APreciseGeoPosition
             const AAlwaysAuthorization: boolean = False);
 begin
-  if FIsActivatingGpsAndGrantingLocationAccess then
-    raise Exception.Create('StartLocationUpdates cannot be called while ActivateGpsAndGrantLocationAccess is already running');
+  if FIsActivatingGpsAndGrantingGeoPositionAccess then
+    raise Exception.Create('StartGeoPositionUpdates cannot be called while ActivateGpsAndGrantGeoPositionAccess is already running');
   //--
-  StopLocationUpdates;
+  StopGeoPositionUpdates;
   //--
   FRequestMinDistance := aMinDistance;
   //--
-  FLocationUpdatesDelayed := True;
-  ActivateGpsAndGrantLocationAccess(
-    ACoarseLocation,
-    APreciseLocation,
+  FGeoPositionUpdatesDelayed := True;
+  ActivateGpsAndGrantGeoPositionAccess(
+    ACoarseGeoPosition,
+    APreciseGeoPosition,
     AAlwaysAuthorization);
 end;
 
 {**********************************************}
-procedure TALLocationSensor.StopLocationUpdates;
+procedure TALGeoPositionSensor.StopGeoPositionUpdates;
 begin
 
-  if FLocationUpdatesActive then begin
+  if FGeoPositionUpdatesActive then begin
 
     {$REGION ' ANDROID'}
     {$IF defined(ANDROID)}
@@ -1116,13 +1116,13 @@ begin
     {$ENDREGION}
 
   end;
-  FLocationUpdatesActive := False;
-  FLocationUpdatesDelayed := False;
+  FGeoPositionUpdatesActive := False;
+  FGeoPositionUpdatesDelayed := False;
 
 end;
 
 {********************************************************************************************}
-procedure TALLocationSensor.ApplicationEventHandler(const Sender: TObject; const M: TMessage);
+procedure TALGeoPositionSensor.ApplicationEventHandler(const Sender: TObject; const M: TMessage);
 begin
   if not FApplicationEventHandlerEnabled then exit;
   if (M is TApplicationEventMessage) then begin
@@ -1132,44 +1132,44 @@ begin
 
     {$IFDEF DEBUG}
     allog(
-      'TALLocationSensor.ApplicationEventHandler',
+      'TALGeoPositionSensor.ApplicationEventHandler',
       'Event: '+TRttiEnumerationType.GetName(LMsg.Value.Event),
       TalLogType.verbose);
     {$ENDIF}
 
     //retrieve the Permissions Granted
     var LRestricted: boolean;
-    var LCoarseLocationGranted: Boolean;
-    var LPreciseLocationGranted: boolean;
+    var LCoarseGeoPositionGranted: Boolean;
+    var LPreciseGeoPositionGranted: boolean;
     var LAuthorizedAlways: Boolean;
     GetPermissionsGranted(
       LRestricted,
-      LCoarseLocationGranted,
-      LPreciseLocationGranted,
+      LCoarseGeoPositionGranted,
+      LPreciseGeoPositionGranted,
       LAuthorizedAlways);
 
     //FWaitingGpsActivationResult
     If FWaitingGpsActivationResult then begin
-      if ISGpsEnabled then DoActivateGpsAndGrantLocationAccess
-      else DoActivateGpsAndGrantLocationAccessResult;
+      if ISGpsEnabled then DoActivateGpsAndGrantGeoPositionAccess
+      else DoActivateGpsAndGrantGeoPositionAccessResult;
     end
 
-    //FWaitingGrantCoarseLocationAccessResult
-    else if FWaitingGrantCoarseLocationAccessResult then begin
-      if LCoarseLocationGranted or LPreciseLocationGranted then DoActivateGpsAndGrantLocationAccess
-      else DoActivateGpsAndGrantLocationAccessResult;
+    //FWaitingGrantCoarseGeoPositionAccessResult
+    else if FWaitingGrantCoarseGeoPositionAccessResult then begin
+      if LCoarseGeoPositionGranted or LPreciseGeoPositionGranted then DoActivateGpsAndGrantGeoPositionAccess
+      else DoActivateGpsAndGrantGeoPositionAccessResult;
     end
 
-    //FWaitingGrantPreciseLocationAccessResult
-    else if FWaitingGrantPreciseLocationAccessResult then begin
-      if LPreciseLocationGranted then DoActivateGpsAndGrantLocationAccess
-      else DoActivateGpsAndGrantLocationAccessResult;
+    //FWaitingGrantPreciseGeoPositionAccessResult
+    else if FWaitingGrantPreciseGeoPositionAccessResult then begin
+      if LPreciseGeoPositionGranted then DoActivateGpsAndGrantGeoPositionAccess
+      else DoActivateGpsAndGrantGeoPositionAccessResult;
     end
 
     //FWaitingAlwaysAuthorizationResult
     else if FWaitingAlwaysAuthorizationResult then begin
-      if LAuthorizedAlways then DoActivateGpsAndGrantLocationAccess
-      else DoActivateGpsAndGrantLocationAccessResult;
+      if LAuthorizedAlways then DoActivateGpsAndGrantGeoPositionAccess
+      else DoActivateGpsAndGrantGeoPositionAccessResult;
     end
 
     //Misc error
@@ -1183,29 +1183,29 @@ end;
 {$IF defined(android)}
 
 {************************************************************************************************}
-constructor TALLocationSensor.TAndroidLocationListener.Create(ALocationSensor: TALLocationSensor);
+constructor TALGeoPositionSensor.TAndroidLocationListener.Create(AGeoPositionSensor: TALGeoPositionSensor);
 begin
   inherited Create;
-  FLocationSensor := ALocationSensor;
+  FGeoPositionSensor := AGeoPositionSensor;
 end;
 
 {*****************************************************************************************}
-procedure TALLocationSensor.TAndroidLocationListener.onFlushComplete(requestCode: Integer);
+procedure TALGeoPositionSensor.TAndroidLocationListener.onFlushComplete(requestCode: Integer);
 begin
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TAndroidLocationListener.onFlushComplete', 'requestCode: '+ALInttostrW(requestCode), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onFlushComplete', 'requestCode: '+ALInttostrW(requestCode), TalLogType.verbose);
   {$ENDIF}
 end;
 
 {******************************************************************************************}
-procedure TALLocationSensor.TAndroidLocationListener.onLocationChanged(location: JLocation);
+procedure TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged(location: JLocation);
 begin
   if location = nil then exit;
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TAndroidLocationListener.onLocationChanged', JstringToString(location.tostring), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged', JstringToString(location.tostring), TalLogType.verbose);
   {$ENDIF}
-  if assigned(FLocationSensor.OnLocationUpdate) then begin
-    FLocationSensor.OnLocationUpdate(
+  if assigned(FGeoPositionSensor.OnGeoPositionUpdate) then begin
+    FGeoPositionSensor.OnGeoPositionUpdate(
       Self, // const Sender: TObject;
       location.getLatitude, // const ALatitude: Double;
       location.getLongitude, // const ALongitude: Double;
@@ -1216,52 +1216,52 @@ begin
 end;
 
 {***************************************************************************************}
-procedure TALLocationSensor.TAndroidLocationListener.onLocationChanged(locations: JList);
+procedure TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged(locations: JList);
 begin
   for var I := 0 to locations.size - 1 do
     onLocationChanged(TJLocation.Wrap(locations.get(I)));
 end;
 
 {*****************************************************************************************}
-procedure TALLocationSensor.TAndroidLocationListener.onProviderDisabled(provider: JString);
+procedure TALGeoPositionSensor.TAndroidLocationListener.onProviderDisabled(provider: JString);
 begin
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TAndroidLocationListener.onProviderDisabled', 'provider: '+JstringToString(provider), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onProviderDisabled', 'provider: '+JstringToString(provider), TalLogType.verbose);
   {$ENDIF}
 end;
 
 {****************************************************************************************}
-procedure TALLocationSensor.TAndroidLocationListener.onProviderEnabled(provider: JString);
+procedure TALGeoPositionSensor.TAndroidLocationListener.onProviderEnabled(provider: JString);
 begin
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TAndroidLocationListener.onProviderEnabled', 'provider: '+JstringToString(provider), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onProviderEnabled', 'provider: '+JstringToString(provider), TalLogType.verbose);
   {$ENDIF}
 end;
 
 {************************************************************************************************************************}
-procedure TALLocationSensor.TAndroidLocationListener.onStatusChanged(provider: JString; status: Integer; extras: JBundle);
+procedure TALGeoPositionSensor.TAndroidLocationListener.onStatusChanged(provider: JString; status: Integer; extras: JBundle);
 begin
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TAndroidLocationListener.onStatusChanged', 'provider: '+JstringToString(provider) + ' | status: ' + ALInttostrW(status), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TAndroidLocationListener.onStatusChanged', 'provider: '+JstringToString(provider) + ' | status: ' + ALInttostrW(status), TalLogType.verbose);
   {$ENDIF}
 end;
 
 {********************************************************************************************}
-constructor TALLocationSensor.TGMSLocationListener.Create(ALocationSensor: TALLocationSensor);
+constructor TALGeoPositionSensor.TGMSLocationListener.Create(AGeoPositionSensor: TALGeoPositionSensor);
 begin
   inherited Create;
-  FLocationSensor := ALocationSensor;
+  FGeoPositionSensor := AGeoPositionSensor;
 end;
 
 {**************************************************************************************}
-procedure TALLocationSensor.TGMSLocationListener.onLocationChanged(location: JLocation);
+procedure TALGeoPositionSensor.TGMSLocationListener.onLocationChanged(location: JLocation);
 begin
   if location = nil then exit;
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TGMSLocationListener.onLocationChanged', JstringToString(location.tostring), TalLogType.verbose);
+  allog('TALGeoPositionSensor.TGMSLocationListener.onLocationChanged', JstringToString(location.tostring), TalLogType.verbose);
   {$ENDIF}
-  if assigned(FLocationSensor.OnLocationUpdate) then begin
-    FLocationSensor.OnLocationUpdate(
+  if assigned(FGeoPositionSensor.OnGeoPositionUpdate) then begin
+    FGeoPositionSensor.OnGeoPositionUpdate(
       Self, // const Sender: TObject;
       location.getLatitude, // const ALatitude: Double;
       location.getLongitude, // const ALongitude: Double;
@@ -1272,7 +1272,7 @@ begin
 end;
 
 {****************************************************************************************************}
-procedure TALLocationSensor.PermissionsRequestResultHandler(const Sender: TObject; const M: TMessage);
+procedure TALGeoPositionSensor.PermissionsRequestResultHandler(const Sender: TObject; const M: TMessage);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _CheckIfNeedForceShowRequestPermissionRationale;
@@ -1286,12 +1286,12 @@ procedure TALLocationSensor.PermissionsRequestResultHandler(const Sender: TObjec
     //ask again" then we will immediatly show him another rationale
     if (not FRequestPermissionRationaleShowed) and
        (not ShouldShowRequestPermissionRationale(
-              FWaitingGrantCoarseLocationAccessResult, // const ACoarseLocation: Boolean;
-              FWaitingGrantPreciseLocationAccessResult, // const APreciseLocation: Boolean;
+              FWaitingGrantCoarseGeoPositionAccessResult, // const ACoarseGeoPosition: Boolean;
+              FWaitingGrantPreciseGeoPositionAccessResult, // const APreciseGeoPosition: Boolean;
               FWaitingAlwaysAuthorizationResult)) then // const AAlwaysAuthorization: Boolean)) then
-      DoActivateGpsAndGrantLocationAccess(true{AForceShowRequestPermissionRationale})
+      DoActivateGpsAndGrantGeoPositionAccess(true{AForceShowRequestPermissionRationale})
     else
-      DoActivateGpsAndGrantLocationAccessResult;
+      DoActivateGpsAndGrantGeoPositionAccessResult;
   end;
 
 begin
@@ -1319,7 +1319,7 @@ begin
     end;
     //--
     allog(
-      'TALLocationSensor.PermissionsRequestResultHandler',
+      'TALGeoPositionSensor.PermissionsRequestResultHandler',
       'RequestCode: '+ALIntToStrW(LMsg.value.RequestCode) + ' | '+
       'Permissions: ' + LPermissionsStr  + ' | '+
       'GrantResults: ' + LGrantResultsStr,
@@ -1328,34 +1328,34 @@ begin
 
     //retrieve the Permissions Granted
     var LRestricted: boolean;
-    var LCoarseLocationGranted: Boolean;
-    var LPreciseLocationGranted: boolean;
+    var LCoarseGeoPositionGranted: Boolean;
+    var LPreciseGeoPositionGranted: boolean;
     var LAuthorizedAlways: Boolean;
     GetPermissionsGranted(
       LRestricted,
-      LCoarseLocationGranted,
-      LPreciseLocationGranted,
+      LCoarseGeoPositionGranted,
+      LPreciseGeoPositionGranted,
       LAuthorizedAlways);
 
     //FWaitingGpsActivationResult
     if FWaitingGpsActivationResult then
       raise Exception.Create('Error AC7DFE47-8B4D-467C-AD78-F9EE73B19038')
 
-    //FWaitingGrantCoarseLocationAccessResult
-    else if FWaitingGrantCoarseLocationAccessResult then begin
-      if LCoarseLocationGranted or LPreciseLocationGranted then DoActivateGpsAndGrantLocationAccess
+    //FWaitingGrantCoarseGeoPositionAccessResult
+    else if FWaitingGrantCoarseGeoPositionAccessResult then begin
+      if LCoarseGeoPositionGranted or LPreciseGeoPositionGranted then DoActivateGpsAndGrantGeoPositionAccess
       else _CheckIfNeedForceShowRequestPermissionRationale;
     end
 
-    //FWaitingGrantPreciseLocationAccessResult
-    else if FWaitingGrantPreciseLocationAccessResult then begin
-      if LPreciseLocationGranted then DoActivateGpsAndGrantLocationAccess
+    //FWaitingGrantPreciseGeoPositionAccessResult
+    else if FWaitingGrantPreciseGeoPositionAccessResult then begin
+      if LPreciseGeoPositionGranted then DoActivateGpsAndGrantGeoPositionAccess
       else _CheckIfNeedForceShowRequestPermissionRationale;
     end
 
     //FWaitingAlwaysAuthorizationResult
     else if FWaitingAlwaysAuthorizationResult then begin
-      if LAuthorizedAlways then DoActivateGpsAndGrantLocationAccess
+      if LAuthorizedAlways then DoActivateGpsAndGrantGeoPositionAccess
       else _CheckIfNeedForceShowRequestPermissionRationale;
     end
 
@@ -1373,14 +1373,14 @@ end;
 {$IF defined(IOS)}
 
 {************************************************************************************************}
-constructor TALLocationSensor.TLocationManagerDelegate.Create(ALocationSensor: TALLocationSensor);
+constructor TALGeoPositionSensor.TLocationManagerDelegate.Create(AGeoPositionSensor: TALGeoPositionSensor);
 begin
   inherited Create;
-  FLocationSensor := ALocationSensor;
+  FGeoPositionSensor := AGeoPositionSensor;
 end;
 
 {**************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didFailWithError: NSError);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didFailWithError: NSError);
 begin
 
   //Tells the delegate that the location manager was unable to retrieve a
@@ -1406,18 +1406,18 @@ begin
   // kCLErrorDenied = 1;
   if (didFailWithError <> nil) then
     allog(
-      'TALLocationSensor.TLocationManagerDelegate.locationManager:didFailWithError',
+      'TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didFailWithError',
       NSStrToStr(didFailWithError.localizedDescription) + ' | ' +
       'ErrorCode: ' + ALIntToStrW(didFailWithError.code),
       TalLogType.error)
   else
-    allog('TALLocationSensor.TLocationManagerDelegate.locationManager:didFailWithError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didFailWithError', TalLogType.verbose);
   {$ENDIF}
 
 end;
 
 {****************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading);
 begin
 
   //Tells the delegate that the location manager received updated
@@ -1432,12 +1432,12 @@ begin
   //headingFilter property of the location manager object.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManager:didUpdateHeading', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didUpdateHeading', TalLogType.VERBOSE);
   {$ENDIF}
 end;
 
 {**********************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation);
 begin
 
   //Tells the delegate that a new location value is available.
@@ -1445,13 +1445,13 @@ begin
   //iOS 2.0–6.0 Deprecated
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManager:didUpdateToLocation:fromLocation', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:didUpdateToLocation:fromLocation', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {*********************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; monitoringDidFailForRegion: CLRegion; withError: NSError);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; monitoringDidFailForRegion: CLRegion; withError: NSError);
 begin
 
   //Tells the delegate that a region monitoring error occurred.
@@ -1467,18 +1467,18 @@ begin
   {$IFDEF DEBUG}
   if (withError <> nil) then
     allog(
-      'TALLocationSensor.TLocationManagerDelegate.locationManager:monitoringDidFailForRegion:withError',
+      'TALGeoPositionSensor.TLocationManagerDelegate.locationManager:monitoringDidFailForRegion:withError',
       NSStrToStr(withError.localizedDescription) + ' | ' +
       'ErrorCode: ' + ALIntToStrW(withError.code),
       TalLogType.error)
   else
-    allog('TALLocationSensor.TLocationManagerDelegate.locationManager:monitoringDidFailForRegion:withError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManager:monitoringDidFailForRegion:withError', TalLogType.verbose);
   {$ENDIF}
 
 end;
 
 {****************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus);
 begin
 
   //Tells the delegate its authorization status when the app creates the
@@ -1486,12 +1486,12 @@ begin
   //
   //iOS 4.2–14.0 Deprecated
 
-  locationManagerDidChangeAuthorization(FlocationSensor.fLocationManager);
+  locationManagerDidChangeAuthorization(FGeoPositionSensor.fLocationManager);
 
 end;
 
 {*********************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization(manager: CLLocationManager);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization(manager: CLLocationManager);
 begin
 
   //Tells the delegate when the app creates the location manager and when the
@@ -1557,43 +1557,43 @@ begin
     kCLAuthorizationStatusauthorizedAlways:    LAuthorizationStatusStr := 'kCLAuthorizationStatusauthorizedAlways';
     else                                       LAuthorizationStatusStr := '???';
   end;
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization', LAuthorizationStatusStr, TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization', LAuthorizationStatusStr, TalLogType.VERBOSE);
   {$ENDIF}
 
   //exit if not flocationManagerDidChangeAuthorizationStatusEnabled
-  if not FlocationSensor.flocationManagerDidChangeAuthorizationStatusEnabled then exit;
+  if not FGeoPositionSensor.flocationManagerDidChangeAuthorizationStatusEnabled then exit;
 
   //retrieve the Permissions Granted
   var LRestricted: boolean;
-  var LCoarseLocationGranted: Boolean;
-  var LPreciseLocationGranted: boolean;
+  var LCoarseGeoPositionGranted: Boolean;
+  var LPreciseGeoPositionGranted: boolean;
   var LAuthorizedAlways: Boolean;
-  FlocationSensor.GetPermissionsGranted(
+  FGeoPositionSensor.GetPermissionsGranted(
     LRestricted,
-    LCoarseLocationGranted,
-    LPreciseLocationGranted,
+    LCoarseGeoPositionGranted,
+    LPreciseGeoPositionGranted,
     LAuthorizedAlways);
 
   //FWaitingGpsActivationResult
-  if FlocationSensor.FWaitingGpsActivationResult then
+  if FGeoPositionSensor.FWaitingGpsActivationResult then
     raise Exception.Create('Error 507E3A3B-8949-42DF-BD53-03078B4C5454')
 
-  //FWaitingGrantCoarseLocationAccessResult
-  else if FlocationSensor.FWaitingGrantCoarseLocationAccessResult then begin
-    if LCoarseLocationGranted or LPreciseLocationGranted then FlocationSensor.DoActivateGpsAndGrantLocationAccess
-    else FlocationSensor.DoActivateGpsAndGrantLocationAccessResult;
+  //FWaitingGrantCoarseGeoPositionAccessResult
+  else if FGeoPositionSensor.FWaitingGrantCoarseGeoPositionAccessResult then begin
+    if LCoarseGeoPositionGranted or LPreciseGeoPositionGranted then FGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccess
+    else FGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccessResult;
   end
 
-  //FWaitingGrantPreciseLocationAccessResult
-  else if FlocationSensor.FWaitingGrantPreciseLocationAccessResult then begin
-    if LPreciseLocationGranted then FlocationSensor.DoActivateGpsAndGrantLocationAccess
-    else FlocationSensor.DoActivateGpsAndGrantLocationAccessResult;
+  //FWaitingGrantPreciseGeoPositionAccessResult
+  else if FGeoPositionSensor.FWaitingGrantPreciseGeoPositionAccessResult then begin
+    if LPreciseGeoPositionGranted then FGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccess
+    else FGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccessResult;
   end
 
   //FWaitingAlwaysAuthorizationResult
-  else if FlocationSensor.FWaitingAlwaysAuthorizationResult then begin
-    if LAuthorizedAlways then FlocationSensor.DoActivateGpsAndGrantLocationAccess
-    else FlocationSensor.DoActivateGpsAndGrantLocationAccessResult;
+  else if FGeoPositionSensor.FWaitingAlwaysAuthorizationResult then begin
+    if LAuthorizedAlways then FGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccess
+    else FGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccessResult;
   end
 
   //Misc error
@@ -1603,7 +1603,7 @@ begin
 end;
 
 {*************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations(manager: CLLocationManager; locations: NSArray);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations(manager: CLLocationManager; locations: NSArray);
 begin
 
   //Tells the delegate that new location data is available.
@@ -1612,7 +1612,7 @@ begin
     var LLocation := TCLLocation.Wrap(locations.objectAtIndex(I));
     {$IFDEF DEBUG}
     ALLog(
-      'TALLocationSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations',
+      'TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations',
       'Date: ' + ALDateTimeToStrW(ALNSDateToUTCDateTime(LLocation.timestamp), ALDefaultFormatSettingsW) + ' | ' +
       'Latitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.latitude, ALDefaultFormatSettingsW) + ' | ' +
       'Longitude: ' + ALFormatFloatW('#.#####', LLocation.coordinate.longitude, ALDefaultFormatSettingsW) + ' | ' +
@@ -1625,8 +1625,8 @@ begin
     //are invalid. i don't think this will ever happen but cost nothing to
     //add a trap here
     if (compareValue(LLocation.horizontalAccuracy, 0, Tepsilon.Vector) >= 0) and
-       (assigned(FLocationSensor.OnLocationUpdate)) then begin
-      FLocationSensor.OnLocationUpdate(
+       (assigned(FGeoPositionSensor.OnGeoPositionUpdate)) then begin
+      FGeoPositionSensor.OnGeoPositionUpdate(
         Self, // const Sender: TObject;
         Llocation.coordinate.latitude, // const ALatitude: Double;
         Llocation.coordinate.longitude, // const ALongitude: Double;
@@ -1639,7 +1639,7 @@ begin
 end;
 
 {**************************************************************************************************************************************}
-function TALLocationSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean;
+function TALGeoPositionSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean;
 begin
 
   //Asks the delegate whether the heading calibration alert should be displayed.
@@ -1679,7 +1679,7 @@ begin
   //the uncalibrated readings.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration', TalLogType.VERBOSE);
   {$ENDIF}
 
   Result := False;
@@ -1687,7 +1687,7 @@ begin
 end;
 
 {*****************************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion(manager: CLLocationManager; state: CLRegionState; region: CLRegion);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion(manager: CLLocationManager; state: CLRegionState; region: CLRegion);
 begin
 
   //Tells the delegate about the state of the specified region.
@@ -1699,39 +1699,39 @@ begin
   //requestStateForRegion: method, which runs asynchronously.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {**************************************************************************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint);
 begin
 
   //Tells the delegate that the location manager detected at least one beacon
   //that satisfies the provided constraint.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {**********************************************************************************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError);
 begin
 
   //Tells the delegate that the location manager couldn’t detect any beacons
   //that satisfy the provided constraint.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {****************************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager; beacons: NSArray; region: CLBeaconRegion);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager; beacons: NSArray; region: CLBeaconRegion);
 begin
 
   //iOS 7.0–13.0 Deprecated
@@ -1744,13 +1744,13 @@ begin
   //of a beacon changes; for example, when a beacon gets closer.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {******************************************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError(manager: CLLocationManager; region: CLBeaconRegion; error: NSError);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError(manager: CLLocationManager; region: CLBeaconRegion; error: NSError);
 begin
 
   //iOS 7.0–13.0 Deprecated
@@ -1765,18 +1765,18 @@ begin
   {$IFDEF DEBUG}
   if (error <> nil) then
     allog(
-      'TALLocationSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError',
+      'TALGeoPositionSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError',
       NSStrToStr(error.localizedDescription) + ' | ' +
       'ErrorCode: ' + ALIntToStrW(error.code),
       TalLogType.error)
   else
-    allog('TALLocationSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError', TalLogType.verbose);
   {$ENDIF}
 
 end;
 
 {*******************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidEnterRegion(manager: CLLocationManager; region: CLRegion);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidEnterRegion(manager: CLLocationManager; region: CLRegion);
 begin
 
   //Tells the delegate that location updates were paused.
@@ -1793,13 +1793,13 @@ begin
   //determine if your delegate should respond.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidEnterRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidEnterRegion', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {******************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidExitRegion(manager: CLLocationManager; region: CLRegion);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidExitRegion(manager: CLLocationManager; region: CLRegion);
 begin
 
   //Tells the delegate that the user left the specified region.
@@ -1817,25 +1817,25 @@ begin
 
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidExitRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidExitRegion', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {********************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; region: CLRegion);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; region: CLRegion);
 begin
 
   //Tells the delegate that a new region is being monitored.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;
 
 {**********************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates(manager: CLLocationManager);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates(manager: CLLocationManager);
 begin
 
   //Tells the delegate that location updates were paused.
@@ -1855,13 +1855,13 @@ begin
   //moving again.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates', TalLogType.VERBOSE)
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates', TalLogType.VERBOSE)
   {$ENDIF}
 
 end;
 
 {***********************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates(manager: CLLocationManager);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates(manager: CLLocationManager);
 begin
 
   //Tells the delegate that the delivery of location updates has resumed.
@@ -1882,13 +1882,13 @@ begin
   //will be called automatiquelly !
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates', TalLogType.VERBOSE)
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates', TalLogType.VERBOSE)
   {$ENDIF}
 
 end;
 
 {************************************************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError);
 begin
 
   //Tells the delegate that updates will no longer be deferred.
@@ -1903,18 +1903,18 @@ begin
   {$IFDEF DEBUG}
   if (error <> nil) then
     allog(
-      'TALLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError',
+      'TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError',
       NSStrToStr(error.localizedDescription) + ' | ' +
       'ErrorCode: ' + ALIntToStrW(error.code),
       TalLogType.error)
   else
-    allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError', TalLogType.verbose);
+    allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError', TalLogType.verbose);
   {$ENDIF}
 
 end;
 
 {***********************************************************************************************************************}
-procedure TALLocationSensor.TLocationManagerDelegate.locationManagerDidVisit(manager: CLLocationManager; visit: CLVisit);
+procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidVisit(manager: CLLocationManager; visit: CLVisit);
 begin
 
   //Tells the delegate that a new visit-related event was received.
@@ -1923,7 +1923,7 @@ begin
   //to report to your app.
 
   {$IFDEF DEBUG}
-  allog('TALLocationSensor.TLocationManagerDelegate.locationManagerDidVisit', TalLogType.VERBOSE);
+  allog('TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidVisit', TalLogType.VERBOSE);
   {$ENDIF}
 
 end;

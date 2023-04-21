@@ -326,23 +326,23 @@ Android and iOS. Learn more at
 [{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
 
   
-Location Sensor for Android/iOS
--------------------------------
+GeoPositioning for Android/iOS
+------------------------------
 
-The TALLocationSensor component is a Delphi component that grants access to
+The TALGeoPositionSensor component is a Delphi component that grants access to
 location services on iOS and Android devices. It enables the retrieval of the
 device's current location, and can provide location updates as the device's
 location changes. It supports a range of location providers, including GPS,
 cellular network triangulation, and Wi-Fi positioning.
 
-Aside from granting access to location services, TALLocationSensor also
+Aside from granting access to location services, TALGeoPositionSensor also
 automates the process of acquiring the user's permission to use the location
 sensor on both iOS and Android devices. The component can handle situations
 where the user has previously refused access to their location. The
-TALLocationSensor component provides a comprehensive solution for developers
+TALGeoPositionSensor component provides a comprehensive solution for developers
 seeking to integrate location-based functionality into their apps without
 having to worry about low-level implementation details. Learn more at 
-[{alcinoe}\Demos\ALLocationSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLocationSensor)
+[{alcinoe}\Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
 
 
 Google OAuth 2.0 Access Token

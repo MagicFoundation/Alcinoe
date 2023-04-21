@@ -215,7 +215,7 @@ begin
   Memo1.SelLength := 0;
 end;
 
-{****************************************************************************************}
+{**********************************************************************************************}
 procedure TForm1.OnGeoPositionSensorActivateGpsAndGrantGeoPositionAccessResult(Sender: TObject);
 begin
   var LRestricted: boolean;
@@ -240,7 +240,7 @@ begin
   Memo1.SelLength := 0;
 end;
 
-{**********************************************}
+{****************************************************}
 procedure TForm1.OnGeoPositionSensorGeoPositionUpdate(
             const Sender: TObject;
             const ALatitude: Double;
@@ -262,7 +262,7 @@ begin
   Memo1.SelLength := 0;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 procedure TForm1.OnGeoPositionSensorShowRequestPermissionRationale(
             const Sender: TObject;
             const AToActivateGPS: Boolean;

@@ -134,7 +134,7 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.InertialMovement,
   Alcinoe.FMX.Layouts,
-  Alcinoe.FMX.Location.Sensor,
+  Alcinoe.FMX.GeoPosition.Sensor,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,

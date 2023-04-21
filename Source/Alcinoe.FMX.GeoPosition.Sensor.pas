@@ -303,7 +303,7 @@ uses
   Alcinoe.stringutils,
   ALcinoe.common;
 
-{********************************************************************************************}
+{***********************************************************************************************}
 constructor TALGeoPositionSensor.Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True);
 begin
 
@@ -364,7 +364,7 @@ begin
 
 end;
 
-{***********************************}
+{**************************************}
 destructor TALGeoPositionSensor.Destroy;
 begin
 
@@ -398,7 +398,7 @@ begin
 
 end;
 
-{***********************************************}
+{**************************************************}
 function TALGeoPositionSensor.IsGpsEnabled: Boolean;
 begin
 
@@ -444,7 +444,7 @@ begin
 
 end;
 
-{*************************************************}
+{****************************************************}
 procedure  TALGeoPositionSensor.GetPermissionsGranted(
              out ARestricted: boolean; // This app is not authorized to use location services. The user cannot change this app’s status, possibly due to active restrictions such as parental controls being in place.
              out ACoarseGeoPosition: Boolean; // If you have granted the app access to your coarse geoposition
@@ -560,7 +560,7 @@ begin
 
 end;
 
-{**********************************************************}
+{****************************************************************}
 function TALGeoPositionSensor.IsGeoPositionAccessGranted: Boolean;
 begin
   var LRestricted: boolean;
@@ -575,13 +575,13 @@ begin
   result := LCoarseGeoPosition or LPreciseGeoPosition;
 end;
 
-{***********************************************************************}
+{*****************************************************************************}
 function TALGeoPositionSensor.IsGpsEnabledAndGeoPositionAccessGranted: Boolean;
 begin
   result := IsGpsEnabled and IsGeoPositionAccessGranted;
 end;
 
-{**************************************************************}
+{*****************************************************************}
 function TALGeoPositionSensor.ShouldShowRequestPermissionRationale(
            const ACoarseGeoPosition: Boolean;
            const APreciseGeoPosition: Boolean;
@@ -655,7 +655,7 @@ begin
 
 end;
 
-{***********************************************************}
+{**************************************************************}
 procedure TALGeoPositionSensor.DoShowRequestPermissionRationale(
             const AToActivateGPS: Boolean;
             const AToRequestCoarseGeoPositionPermission: Boolean;
@@ -692,7 +692,7 @@ begin
     DoActivateGpsAndGrantGeoPositionAccessResult;
 end;
 
-{*********************************************}
+{************************************************}
 procedure TALGeoPositionSensor.requestPermissions(
             const ACoarseGeoPosition: Boolean;
             const APreciseGeoPosition: Boolean;
@@ -762,13 +762,13 @@ begin
 
 end;
 
-{****************************************************************}
+{**********************************************************************}
 function TALGeoPositionSensor.GetIsListeningGeoPositionUpdates: boolean;
 begin
   result := FGeoPositionUpdatesDelayed or FGeoPositionUpdatesActive;
 end;
 
-{***************************************************************************************************************************}
+{*********************************************************************************************************************************}
 procedure TALGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccess(Const AForceShowRequestPermissionRationale: Boolean = False);
 begin
 
@@ -943,7 +943,7 @@ begin
 
 end;
 
-{********************************************************************}
+{**************************************************************************}
 procedure TALGeoPositionSensor.DoActivateGpsAndGrantGeoPositionAccessResult;
 begin
   {$IF defined(ANDROID)}
@@ -968,7 +968,7 @@ begin
     DoStartGeoPositionUpdates;
 end;
 
-{************************************************************}
+{******************************************************************}
 procedure TALGeoPositionSensor.ActivateGpsAndGrantGeoPositionAccess(
             const ACoarseGeoPosition: boolean = True;
             const APreciseGeoPosition: boolean = True;
@@ -983,7 +983,7 @@ begin
   DoActivateGpsAndGrantGeoPositionAccess;
 end;
 
-{*************************************************}
+{*******************************************************}
 procedure TALGeoPositionSensor.DoStartGeoPositionUpdates;
 begin
 
@@ -1074,7 +1074,7 @@ begin
 
 end;
 
-{***********************************************}
+{*****************************************************}
 procedure TALGeoPositionSensor.StartGeoPositionUpdates(
             const aMinDistance: Integer; // minimum distance between geoposition updates in meters
             const ACoarseGeoPosition: boolean = true;  // when ACoarseGeoPosition = true and APreciseGeoPosition = true
@@ -1095,7 +1095,7 @@ begin
     AAlwaysAuthorization);
 end;
 
-{**********************************************}
+{****************************************************}
 procedure TALGeoPositionSensor.StopGeoPositionUpdates;
 begin
 
@@ -1121,7 +1121,7 @@ begin
 
 end;
 
-{********************************************************************************************}
+{***********************************************************************************************}
 procedure TALGeoPositionSensor.ApplicationEventHandler(const Sender: TObject; const M: TMessage);
 begin
   if not FApplicationEventHandlerEnabled then exit;
@@ -1182,14 +1182,14 @@ end;
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
-{************************************************************************************************}
+{*********************************************************************************************************}
 constructor TALGeoPositionSensor.TAndroidLocationListener.Create(AGeoPositionSensor: TALGeoPositionSensor);
 begin
   inherited Create;
   FGeoPositionSensor := AGeoPositionSensor;
 end;
 
-{*****************************************************************************************}
+{********************************************************************************************}
 procedure TALGeoPositionSensor.TAndroidLocationListener.onFlushComplete(requestCode: Integer);
 begin
   {$IFDEF DEBUG}
@@ -1197,7 +1197,7 @@ begin
   {$ENDIF}
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************}
 procedure TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged(location: JLocation);
 begin
   if location = nil then exit;
@@ -1215,14 +1215,14 @@ begin
   end;
 end;
 
-{***************************************************************************************}
+{******************************************************************************************}
 procedure TALGeoPositionSensor.TAndroidLocationListener.onLocationChanged(locations: JList);
 begin
   for var I := 0 to locations.size - 1 do
     onLocationChanged(TJLocation.Wrap(locations.get(I)));
 end;
 
-{*****************************************************************************************}
+{********************************************************************************************}
 procedure TALGeoPositionSensor.TAndroidLocationListener.onProviderDisabled(provider: JString);
 begin
   {$IFDEF DEBUG}
@@ -1230,7 +1230,7 @@ begin
   {$ENDIF}
 end;
 
-{****************************************************************************************}
+{*******************************************************************************************}
 procedure TALGeoPositionSensor.TAndroidLocationListener.onProviderEnabled(provider: JString);
 begin
   {$IFDEF DEBUG}
@@ -1238,7 +1238,7 @@ begin
   {$ENDIF}
 end;
 
-{************************************************************************************************************************}
+{***************************************************************************************************************************}
 procedure TALGeoPositionSensor.TAndroidLocationListener.onStatusChanged(provider: JString; status: Integer; extras: JBundle);
 begin
   {$IFDEF DEBUG}
@@ -1246,14 +1246,14 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************************}
+{*****************************************************************************************************}
 constructor TALGeoPositionSensor.TGMSLocationListener.Create(AGeoPositionSensor: TALGeoPositionSensor);
 begin
   inherited Create;
   FGeoPositionSensor := AGeoPositionSensor;
 end;
 
-{**************************************************************************************}
+{*****************************************************************************************}
 procedure TALGeoPositionSensor.TGMSLocationListener.onLocationChanged(location: JLocation);
 begin
   if location = nil then exit;
@@ -1271,7 +1271,7 @@ begin
   end;
 end;
 
-{****************************************************************************************************}
+{*******************************************************************************************************}
 procedure TALGeoPositionSensor.PermissionsRequestResultHandler(const Sender: TObject; const M: TMessage);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1372,14 +1372,14 @@ end;
 {$REGION ' IOS'}
 {$IF defined(IOS)}
 
-{************************************************************************************************}
+{*********************************************************************************************************}
 constructor TALGeoPositionSensor.TLocationManagerDelegate.Create(AGeoPositionSensor: TALGeoPositionSensor);
 begin
   inherited Create;
   FGeoPositionSensor := AGeoPositionSensor;
 end;
 
-{**************************************************************************************************************************}
+{*****************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didFailWithError: NSError);
 begin
 
@@ -1416,7 +1416,7 @@ begin
 
 end;
 
-{****************************************************************************************************************************}
+{*******************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateHeading: CLHeading);
 begin
 
@@ -1436,7 +1436,7 @@ begin
   {$ENDIF}
 end;
 
-{**********************************************************************************************************************************************************}
+{*************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didUpdateToLocation: CLLocation; fromLocation: CLLocation);
 begin
 
@@ -1450,7 +1450,7 @@ begin
 
 end;
 
-{*********************************************************************************************************************************************************}
+{************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; monitoringDidFailForRegion: CLRegion; withError: NSError);
 begin
 
@@ -1477,7 +1477,7 @@ begin
 
 end;
 
-{****************************************************************************************************************************************************}
+{*******************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManager(manager: CLLocationManager; didChangeAuthorizationStatus: CLAuthorizationStatus);
 begin
 
@@ -1490,7 +1490,7 @@ begin
 
 end;
 
-{*********************************************************************************************************************}
+{************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidChangeAuthorization(manager: CLLocationManager);
 begin
 
@@ -1602,7 +1602,7 @@ begin
 
 end;
 
-{*************************************************************************************************************************************}
+{****************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidUpdateLocations(manager: CLLocationManager; locations: NSArray);
 begin
 
@@ -1638,7 +1638,7 @@ begin
 
 end;
 
-{**************************************************************************************************************************************}
+{*****************************************************************************************************************************************}
 function TALGeoPositionSensor.TLocationManagerDelegate.locationManagerShouldDisplayHeadingCalibration(manager: CLLocationManager): Boolean;
 begin
 
@@ -1686,7 +1686,7 @@ begin
 
 end;
 
-{*****************************************************************************************************************************************************************}
+{********************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidDetermineStateForRegion(manager: CLLocationManager; state: CLRegionState; region: CLRegion);
 begin
 
@@ -1704,7 +1704,7 @@ begin
 
 end;
 
-{**************************************************************************************************************************************************************************************************************}
+{*****************************************************************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsSatisfyingConstraint(manager: CLLocationManager; didRangeBeacons: NSArray; satisfyingConstraint: CLBeaconIdentityConstraint);
 begin
 
@@ -1717,7 +1717,7 @@ begin
 
 end;
 
-{**********************************************************************************************************************************************************************************************************************}
+{*************************************************************************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFailRangingBeaconsForConstraintError(manager: CLLocationManager; didFailRangingBeaconsForConstraint: CLBeaconIdentityConstraint; error: NSError);
 begin
 
@@ -1730,7 +1730,7 @@ begin
 
 end;
 
-{****************************************************************************************************************************************************************}
+{*******************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidRangeBeaconsInRegion(manager: CLLocationManager; beacons: NSArray; region: CLBeaconRegion);
 begin
 
@@ -1749,7 +1749,7 @@ begin
 
 end;
 
-{******************************************************************************************************************************************************************************}
+{*********************************************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerRangingBeaconsDidFailForRegionWithError(manager: CLLocationManager; region: CLBeaconRegion; error: NSError);
 begin
 
@@ -1775,7 +1775,7 @@ begin
 
 end;
 
-{*******************************************************************************************************************************}
+{**********************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidEnterRegion(manager: CLLocationManager; region: CLRegion);
 begin
 
@@ -1798,7 +1798,7 @@ begin
 
 end;
 
-{******************************************************************************************************************************}
+{*********************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidExitRegion(manager: CLLocationManager; region: CLRegion);
 begin
 
@@ -1822,7 +1822,7 @@ begin
 
 end;
 
-{********************************************************************************************************************************************}
+{***********************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidStartMonitoringForRegion(manager: CLLocationManager; region: CLRegion);
 begin
 
@@ -1834,7 +1834,7 @@ begin
 
 end;
 
-{**********************************************************************************************************************}
+{*************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidPauseLocationUpdates(manager: CLLocationManager);
 begin
 
@@ -1860,7 +1860,7 @@ begin
 
 end;
 
-{***********************************************************************************************************************}
+{**************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidResumeLocationUpdates(manager: CLLocationManager);
 begin
 
@@ -1887,7 +1887,7 @@ begin
 
 end;
 
-{************************************************************************************************************************************************}
+{***************************************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidFinishDeferredUpdatesWithError(manager: CLLocationManager; error: NSError);
 begin
 
@@ -1913,7 +1913,7 @@ begin
 
 end;
 
-{***********************************************************************************************************************}
+{**************************************************************************************************************************}
 procedure TALGeoPositionSensor.TLocationManagerDelegate.locationManagerDidVisit(manager: CLLocationManager; visit: CLVisit);
 begin
 

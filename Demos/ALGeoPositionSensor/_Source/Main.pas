@@ -49,7 +49,7 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
-    FLocationSensor: TALLocationSensor;
+    FLocationSensor: TALGeoPositionSensor;
     {$IF Defined(IOS) or Defined(ANDROID)}
     procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
     {$ENDIF}
@@ -96,7 +96,7 @@ begin
   TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
   {$ENDIF}
 
-  FLocationSensor := TALLocationSensor.Create(true{AUseGooglePlayServicesIfAvailable});
+  FLocationSensor := TALGeoPositionSensor.Create(true{AUseGooglePlayServicesIfAvailable});
   FLocationSensor.OnLocationUpdate := OnLocationSensorLocationUpdate;
   FLocationSensor.OnAuthorizationStatus := OnLocationSensorActivateGpsAndGrantLocationAccessResult;
   FLocationSensor.OnShowRequestPermissionRationale := OnLocationSensorShowRequestPermissionRationale;

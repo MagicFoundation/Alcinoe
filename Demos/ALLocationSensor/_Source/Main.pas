@@ -25,7 +25,7 @@ uses
   Grijjy.ErrorReporting,
   {$ENDIF}
   Alcinoe.FMX.Common,
-  Alcinoe.FMX.Location.Sensor,
+  Alcinoe.FMX.GeoPosition.Sensor,
   Alcinoe.FMX.Objects,
   Alcinoe.Common,
   Alcinoe.StringUtils,

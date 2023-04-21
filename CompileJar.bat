@@ -212,7 +212,8 @@ IF EXIST "%AndroidManifestFilename%" goto ERROR
 @echo           package="com.alcinoe.alcinoe-firebase-messaging" ^>>> %AndroidManifestFilename%
 @echo   ^<application^>>> %AndroidManifestFilename%
 @echo     ^<service android:name="com.alcinoe.firebase.messaging.ALFirebaseMessagingService">> %AndroidManifestFilename%
-@echo              android:directBootAware="true"^>>> %AndroidManifestFilename%
+@echo              android:directBootAware="true">> %AndroidManifestFilename%
+@echo              android:exported="true"^>>> %AndroidManifestFilename%
 @echo       ^<intent-filter^>>> %AndroidManifestFilename%
 @echo           ^<action android:name="com.google.firebase.MESSAGING_EVENT"/^>>> %AndroidManifestFilename%
 @echo       ^</intent-filter^>>> %AndroidManifestFilename%

@@ -212,7 +212,7 @@ type
       fOnShowRequestPermissionRationale: TShowRequestPermissionRationaleEvent;
       FRequestPermissionRationaleShowed: Boolean;
       //--
-      FActivatingGpsAndGrantingLocationAccess: Boolean;
+      FIsActivatingGpsAndGrantingLocationAccess: Boolean;
       //--
       FWaitingGpsActivationResult: boolean;
       FWaitingGrantCoarseLocationAccessResult: Boolean;
@@ -250,7 +250,7 @@ type
                   const AAlwaysAuthorization: Boolean);
       function GetIsListeningLocationUpdates: boolean;
     public
-      constructor Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True);
+      constructor Create(Const AUseGooglePlayServicesIfAvailable: Boolean = True); virtual;
       destructor Destroy; override;
       function  IsGpsEnabled: Boolean; // If your device GPS is on
       procedure  GetPermissionsGranted(
@@ -263,17 +263,18 @@ type
       procedure ActivateGpsAndGrantLocationAccess(
                   const ACoarseLocation: boolean = True;  // when ACoarseLocation = true and APreciseLocation = true
                   const APreciseLocation: boolean = True; // then user can choose either ACoarseLocation or APreciseLocation
-                  const AAlwaysAuthorization: boolean = False);
+                  const AAlwaysAuthorization: boolean = False); virtual;
       procedure StartLocationUpdates(
                   const aMinDistance: Integer; // minimum distance between location updates in meters
                   const ACoarseLocation: boolean = true;  // when ACoarseLocation = true and APreciseLocation = true
                   const APreciseLocation: boolean = true; // then user can choose either ACoarseLocation or APreciseLocation
-                  const AAlwaysAuthorization: boolean = False);
-      procedure StopLocationUpdates;
+                  const AAlwaysAuthorization: boolean = False); virtual;
+      procedure StopLocationUpdates; virtual;
       property OnLocationUpdate: TLocationUpdateEvent read fOnLocationUpdate write fOnLocationUpdate;
       property OnAuthorizationStatus: TNotifyEvent read fOnAuthorizationStatus write fOnAuthorizationStatus;
       property OnShowRequestPermissionRationale: TShowRequestPermissionRationaleEvent read fOnShowRequestPermissionRationale write fOnShowRequestPermissionRationale;
-      property IsListeningLocationUpdates: Boolean read GetIsListeningLocationUpdates;
+      property IsListeningLocationUpdates: Boolean read GetIsListeningLocationUpdates; // Set to true in StartLocationUpdates and set to false only in StopLocationUpdates
+      property IsActivatingGpsAndGrantingLocationAccess: Boolean read FIsActivatingGpsAndGrantingLocationAccess; // set to true in ActivateGpsAndGrantLocationAccess and set to false in OnAuthorizationStatus
     end;
 
 implementation
@@ -343,7 +344,7 @@ begin
   fOnShowRequestPermissionRationale := nil;
   FRequestPermissionRationaleShowed := False;
   //--
-  FActivatingGpsAndGrantingLocationAccess := False;
+  FIsActivatingGpsAndGrantingLocationAccess := False;
   //--
   FWaitingGpsActivationResult := False;
   FWaitingGrantCoarseLocationAccessResult := False;
@@ -953,7 +954,7 @@ begin
   {$ENDIF}
   FApplicationEventHandlerEnabled := False;
   //--
-  FActivatingGpsAndGrantingLocationAccess := False;
+  FIsActivatingGpsAndGrantingLocationAccess := False;
   //--
   FWaitingGpsActivationResult := False;
   FWaitingGrantCoarseLocationAccessResult := False;
@@ -973,9 +974,9 @@ procedure TALLocationSensor.ActivateGpsAndGrantLocationAccess(
             const APreciseLocation: boolean = True;
             const AAlwaysAuthorization: boolean = False);
 begin
-  if FActivatingGpsAndGrantingLocationAccess then
+  if FIsActivatingGpsAndGrantingLocationAccess then
     raise Exception.Create('ActivateGpsAndGrantLocationAccess is already running');
-  FActivatingGpsAndGrantingLocationAccess := True;
+  FIsActivatingGpsAndGrantingLocationAccess := True;
   FRequestCoarseLocation := ACoarseLocation;
   FRequestPreciseLocation := APreciseLocation;
   FRequestAlwaysAuthorization := AAlwaysAuthorization;
@@ -1066,6 +1067,7 @@ begin
   FlocationManager.setdesiredAccuracy(LdesiredAccuracy);
   if FRequestAlwaysAuthorization then FlocationManager.setAllowsBackgroundLocationUpdates(True)
   else FlocationManager.setAllowsBackgroundLocationUpdates(false);
+  FlocationManager.setPausesLocationUpdatesAutomatically(false);
   FlocationManager.startUpdatingLocation;
   {$ENDIF}
   {$ENDREGION}
@@ -1079,7 +1081,7 @@ procedure TALLocationSensor.StartLocationUpdates(
             const APreciseLocation: boolean = true; // then user can choose either ACoarseLocation or APreciseLocation
             const AAlwaysAuthorization: boolean = False);
 begin
-  if FActivatingGpsAndGrantingLocationAccess then
+  if FIsActivatingGpsAndGrantingLocationAccess then
     raise Exception.Create('StartLocationUpdates cannot be called while ActivateGpsAndGrantLocationAccess is already running');
   //--
   StopLocationUpdates;

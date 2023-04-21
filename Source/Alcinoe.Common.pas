@@ -612,6 +612,7 @@ const
                   // but finally -0.5 have a big drawback, if you convert it to string and back
                   // to datetime then you will obtain 0.5 ! same if you convert it to unix and
                   // back to datetime :( so i decide that 0 if more suitable than -0.5
+  ALNullLatLng = 999; // 999 because 0 is a valid latitude/longitude
 
 implementation
 

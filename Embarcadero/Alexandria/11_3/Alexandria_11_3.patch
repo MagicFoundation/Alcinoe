@@ -439,6 +439,25 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.iOS.pas b/Embarcadero/
      FMX.Forms.Application.RealCreateForms;
      TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
    finally
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.Platform.Screen.Android.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.Screen.Android.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.Screen.Android.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.Screen.Android.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.Screen.Android.pas	(working copy)
+@@ -258,9 +258,11 @@
+   function ScaleRect(const ARect: TRect; const AScale: Single): TRect;
+   begin
+     Result.Left := Trunc(ARect.Left / AScale);
+-    Result.Right := Trunc(ARect.Right / AScale);
++    //https://quality.embarcadero.com/browse/RSP-41516
++    Result.Right := ceil(ARect.Right / AScale);
+     Result.Top := Trunc(ARect.Top / AScale);
+-    Result.Bottom := Trunc(ARect.Bottom / AScale);
++    //https://quality.embarcadero.com/browse/RSP-41516
++    Result.Bottom := ceil(ARect.Bottom / AScale);
+   end;
+ 
+   function CalculatePhysicalWorkarea(const ANativeDisplay: JDisplay; const APhysicalBounds: TRect): TRect;
 Index: Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas
@@ -471,7 +490,27 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas b/Embar
    public
      /// <summary>Renders form Immediately.</summary>
      procedure Render; override;
-@@ -2776,7 +2776,7 @@
+@@ -1159,7 +1159,8 @@
+   FOwner.FFormBounds.Width := w / PlatformAndroid.WindowService.Scale;
+   FOwner.FFormBounds.Height:= h / PlatformAndroid.WindowService.Scale;
+ 
+-  FormBounds := FOwner.Bounds.Truncate;
++  //https://quality.embarcadero.com/browse/RSP-41516
++  FormBounds := FOwner.Bounds.Ceiling;
+   FOwner.Form.SetBoundsF(FormBounds.Left, FormBounds.Top, FormBounds.Width, FormBounds.Height);
+ end;
+ 
+@@ -1332,7 +1333,8 @@
+   else
+   begin
+     if FWasFormRealignedFirstTime then
+-      FFormBounds := TRectF.Create(0, 0, FormLayout.getWidth / Scale, FormLayout.getHeight / Scale)
++      //https://quality.embarcadero.com/browse/RSP-41516
++      FFormBounds := TRectF.Create(0, 0, Ceil(FormLayout.getWidth / Scale), Ceil(FormLayout.getHeight / Scale))
+     else
+       FFormBounds := TRectF.Create(0, 0, Screen.Width, Screen.Height - TAndroidFormScreenLocationCache.Instance.GetContentViewYOffset);
+     LayoutParams.leftMargin := 0;
+@@ -2776,7 +2778,7 @@
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
    AtomicIncrement(FRefCount);
@@ -480,7 +519,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas b/Embar
    AtomicDecrement(FRefCount);
    inherited;
  end;
-@@ -2786,7 +2786,7 @@
+@@ -2786,7 +2788,7 @@
    if not FIsNeededUpdate then
    begin
      FIsNeededUpdate := True;
@@ -489,7 +528,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Platform.UI.Android.pas b/Embar
    end;
  end;
  
-@@ -2794,7 +2794,7 @@
+@@ -2794,7 +2796,7 @@
  begin
  end;
  

@@ -1,0 +1,153 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 480
+  ClientWidth = 640
+  Fill.Kind = Solid
+  Quality = HighPerformance
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Rectangle1: TRectangle
+    Align = Client
+    Fill.Color = claBlack
+    Size.Width = 640.000000000000000000
+    Size.Height = 480.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Kind = None
+    object Button1: TButton
+      Align = Top
+      Margins.Top = 10.000000000000000000
+      Position.Y = 252.000000000000000000
+      Size.Width = 640.000000000000000000
+      Size.Height = 57.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 0
+      Text = 'Button1'
+      OnClick = Button1Click
+    end
+    object Label2: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 31.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 7
+    end
+    object Label1: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 5.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 6
+    end
+    object Label3: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 57.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 5
+    end
+    object Label4: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 83.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 4
+    end
+    object Label7: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 109.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 3
+    end
+    object Label8: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 135.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 2
+    end
+    object Label9: TLabel
+      Align = Top
+      AutoSize = True
+      StyledSettings = [Family, Size, Style]
+      Margins.Left = 25.000000000000000000
+      Margins.Top = 5.000000000000000000
+      Margins.Bottom = 5.000000000000000000
+      Position.X = 25.000000000000000000
+      Position.Y = 161.000000000000000000
+      Size.Width = 615.000000000000000000
+      Size.Height = 16.000000000000000000
+      Size.PlatformDefault = False
+      TextSettings.FontColor = claWhite
+      Text = 'Label2'
+      TabOrder = 1
+    end
+    object PaintBox1: TPaintBox
+      Align = Top
+      Margins.Top = 10.000000000000000000
+      Position.Y = 192.000000000000000000
+      Size.Width = 640.000000000000000000
+      Size.Height = 50.000000000000000000
+      Size.PlatformDefault = False
+      OnPaint = PaintBox1Paint
+    end
+  end
+end

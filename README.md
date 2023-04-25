@@ -4,9 +4,10 @@ Alcinoe
 Alcinoe is a library of visual and non-visual components for 
 Delphi. These components can be used in commercial, shareware, 
 freeware, and open-source projects at no cost. Alcinoe is 
-compatible with Delphi Alexandria 11.3. If you find this 
-project useful, please consider giving it a 'star' on GitHub. 
-It doesn't cost anything, but it helps to promote the code.
+compatible with Delphi Alexandria 11.3 (Patch #1). If you find 
+this project useful, please consider giving it a 'star' on 
+GitHub. It doesn't cost anything, but it helps to promote 
+the code.
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-24.jpg?raw=true" alt="like" />
 

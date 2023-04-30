@@ -45,12 +45,9 @@ contains
   Alcinoe.FMX.InertialMovement in 'Alcinoe.FMX.InertialMovement.pas',
   Alcinoe.FMX.Edit in 'Alcinoe.FMX.Edit.pas',
   Alcinoe.Common in 'Alcinoe.Common.pas',
-  Alcinoe.FMX.Types3D in 'Alcinoe.FMX.Types3D.pas',
   Alcinoe.StringList in 'Alcinoe.StringList.pas',
   Alcinoe.StringUtils in 'Alcinoe.StringUtils.pas',
   Alcinoe.QuickSortList in 'Alcinoe.QuickSortList.pas',
-  Alcinoe.Mime in 'Alcinoe.Mime.pas',
-  Alcinoe.Cipher in 'Alcinoe.Cipher.pas',
   Alcinoe.AVLBinaryTree in 'Alcinoe.AVLBinaryTree.pas',
   Alcinoe.FMX.VideoPlayer in 'Alcinoe.FMX.VideoPlayer.pas',
   Alcinoe.FMX.Memo in 'Alcinoe.FMX.Memo.pas',
@@ -58,11 +55,6 @@ contains
   Alcinoe.FMX.FilterEffects in 'Alcinoe.FMX.FilterEffects.pas',
   Alcinoe.FMX.Ani in 'Alcinoe.FMX.Ani.pas',
   Alcinoe.FMX.Confetti in 'Alcinoe.FMX.Confetti.pas',
-  Alcinoe.Files in 'Alcinoe.Files.pas',
   Alcinoe.FMX.BreakText in 'Alcinoe.FMX.BreakText.pas';
 
 end.
-
-
-
-

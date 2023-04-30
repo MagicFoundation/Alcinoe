@@ -520,6 +520,7 @@ uses
   FMX.Surfaces,
   Alcinoe.FMX.Types3D,
   {$ENDIF}
+  Alcinoe.StringUtils,
   Alcinoe.FMX.BreakText,
   Alcinoe.Common;
 
@@ -554,11 +555,6 @@ end;
 
 {**********************************************}
 function TALImage.MakeBufBitmap: TALRasterImage;
-
-{$IFDEF ALDPK}
-var LFileName: String;
-{$ENDIF}
-
 begin
 
   if (Scene = nil) or
@@ -586,12 +582,36 @@ begin
   {$endif}
 
     {$IFDEF ALDPK}
-    if fresourceName = '' then LFileName := fFileName
+    var LFileName: String := '';
+    if fresourceName = '' then begin
+      LFileName := fFileName;
+      if not TFile.Exists(LFileName) then LFileName := '';
+    end
     else begin
-      LFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
-      if not TFile.Exists(LFileName) then LFileName := LFileName + '.png';
+      if TFile.Exists(getActiveProject.fileName) then begin
+        var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
+        //<RcItem Include="resources\account_100x100.png">
+        //    <ResourceType>RCDATA</ResourceType>
+        //    <ResourceId>account_100x100</ResourceId>
+        //</RcItem>
+        Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+fResourceName+'</ResourceId>', LDProjSrc);
+        While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
+        if (P1 > 0) then begin
+          var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
+          if P2 > P1 then begin
+            LFileName := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
+            if not TFile.Exists(LFileName) then LFileName := '';
+          end;
+        end;
+      end;
+      if LFileName = '' then begin
+        LFileName := extractFilePath(getActiveProject.fileName) + 'Resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
+        if not TFile.Exists(LFileName) then begin
+          LFileName := LFileName + '.png';
+          if not TFile.Exists(LFileName) then LFileName := '';
+        end;
+      end;
     end;
-    if not TFile.Exists(LFileName) then LFileName := '';
     {$ENDIF}
 
     if (fRotateAccordingToExifOrientation) and

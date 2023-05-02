@@ -259,7 +259,8 @@ type
                    out APreciseGeoPosition: boolean; // If you have granted the app access to your precise geoposition
                    out AAuthorizedAlways: Boolean); // This app is authorized to start location services at any time
       function  IsGeoPositionAccessGranted: Boolean; // If you have granted the app access to your geoposition
-      function  IsGpsEnabledAndGeoPositionAccessGranted: Boolean; // If your device GPS is on and if your have granted the app access to your geoposition
+      function  IsGpsEnabledAndGeoPositionAccessGranted: Boolean; overload; // If your device GPS is on and if your have granted the app access to your geoposition
+      function  IsGpsEnabledAndGeoPositionAccessGranted(out ARestricted: boolean): Boolean; overload; // If your device GPS is on and if your have granted the app access to your geoposition
       procedure ActivateGpsAndGrantGeoPositionAccess(
                   const ACoarseGeoPosition: boolean = True;  // when ACoarseGeoPosition = true and APreciseGeoPosition = true
                   const APreciseGeoPosition: boolean = True; // then user can choose either ACoarseGeoPosition or APreciseGeoPosition
@@ -579,6 +580,20 @@ end;
 function TALGeoPositionSensor.IsGpsEnabledAndGeoPositionAccessGranted: Boolean;
 begin
   result := IsGpsEnabled and IsGeoPositionAccessGranted;
+end;
+
+{********************************************************************************************************}
+function  TALGeoPositionSensor.IsGpsEnabledAndGeoPositionAccessGranted(out ARestricted: boolean): Boolean;
+begin
+  var LCoarseGeoPosition: Boolean;
+  var LPreciseGeoPosition: boolean;
+  var LAuthorizedAlways: Boolean;
+  GetPermissionsGranted(
+    ARestricted,
+    LCoarseGeoPosition,
+    LPreciseGeoPosition,
+    LAuthorizedAlways);
+  result := IsGpsEnabled and (LCoarseGeoPosition or LPreciseGeoPosition);
 end;
 
 {*****************************************************************}

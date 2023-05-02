@@ -50,6 +50,7 @@ Function  AlCopyDirectoryW(
             Const FailIfExists: Boolean = True;
             Const SkipIfExists: Boolean = False): Boolean;
 function  ALGetModuleFileNameA(const AWithoutExtension: boolean = True): ansistring;
+function  ALGetModuleFileNameW(const AWithoutExtension: boolean = True): String;
 function  ALGetModuleNameA: ansistring;
 function  ALGetModuleNameW: String;
 function  ALGetModulePathA: ansiString;
@@ -301,6 +302,19 @@ function ALGetModuleFileNameA(const AWithoutExtension: boolean = True): ansiStri
 Var Ln: Integer;
 begin
   result := ALExtractFileName(ALGetModuleNameA);
+  if AWithoutExtension then begin
+    ln := Length(ALExtractFileExt(Result));
+    if Ln > 0 then delete(Result,length(Result)-ln+1,ln);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(MSWINDOWS)}
+function ALGetModuleFileNameW(const AWithoutExtension: boolean = True): String;
+Var Ln: Integer;
+begin
+  result := ALExtractFileName(ALGetModuleNameW);
   if AWithoutExtension then begin
     ln := Length(ALExtractFileExt(Result));
     if Ln > 0 then delete(Result,length(Result)-ln+1,ln);

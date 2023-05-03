@@ -1,0 +1,83 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'Form1'
+  ClientHeight = 721
+  ClientWidth = 640
+  Quality = HighPerformance
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  DesignerMasterStyle = 0
+  object Arc1: TArc
+    Position.X = 32.000000000000000000
+    Position.Y = 136.000000000000000000
+    Size.Width = 86.000000000000000000
+    Size.Height = 86.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Color = xFFDDDDDD
+    Stroke.Thickness = 3.000000000000000000
+    EndAngle = -90.000000000000000000
+    object FloatAnimation1: TFloatAnimation
+      Enabled = True
+      Duration = 10.000000000000000000
+      Loop = True
+      PropertyName = 'RotationAngle'
+      StartValue = 0.000000000000000000
+      StopValue = 370.000000000000000000
+    end
+  end
+  object Arc2: TArc
+    Position.X = 32.000000000000000000
+    Position.Y = 248.000000000000000000
+    Size.Width = 86.000000000000000000
+    Size.Height = 86.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Color = xFFDDDDDD
+    Stroke.Thickness = 2.000000000000000000
+    EndAngle = -90.000000000000000000
+    object FloatAnimation4: TFloatAnimation
+      Enabled = True
+      Duration = 10.000000000000000000
+      Loop = True
+      PropertyName = 'RotationAngle'
+      StartValue = 0.000000000000000000
+      StopValue = 370.000000000000000000
+    end
+  end
+  object Arc3: TArc
+    Position.X = 32.000000000000000000
+    Position.Y = 374.000000000000000000
+    Size.Width = 86.000000000000000000
+    Size.Height = 86.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Color = xFFDDDDDD
+    EndAngle = -90.000000000000000000
+    object FloatAnimation5: TFloatAnimation
+      Enabled = True
+      Duration = 10.000000000000000000
+      Loop = True
+      PropertyName = 'RotationAngle'
+      StartValue = 0.000000000000000000
+      StopValue = 370.000000000000000000
+    end
+  end
+  object Arc6: TArc
+    Position.X = 32.000000000000000000
+    Position.Y = 16.000000000000000000
+    Size.Width = 86.000000000000000000
+    Size.Height = 86.000000000000000000
+    Size.PlatformDefault = False
+    Stroke.Color = xFFDDDDDD
+    Stroke.Thickness = 4.000000000000000000
+    EndAngle = -90.000000000000000000
+    object FloatAnimation8: TFloatAnimation
+      Enabled = True
+      Duration = 10.000000000000000000
+      Loop = True
+      PropertyName = 'RotationAngle'
+      StartValue = 0.000000000000000000
+      StopValue = 370.000000000000000000
+    end
+  end
+end

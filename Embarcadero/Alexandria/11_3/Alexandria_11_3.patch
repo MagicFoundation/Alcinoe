@@ -551,6 +551,1089 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Presentation.Android.Style.pas 
    public
      procedure Render; override;
    end;
+Index: Embarcadero/Alexandria/11_3/fmx/FMX.StrokeBuilder.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.StrokeBuilder.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.StrokeBuilder.pas
+--- a/Embarcadero/Alexandria/11_3/fmx/FMX.StrokeBuilder.pas	(revision 1)
++++ b/Embarcadero/Alexandria/11_3/fmx/FMX.StrokeBuilder.pas	(working copy)
+@@ -88,8 +88,10 @@
+ 
+ implementation
+ 
++//https://quality.embarcadero.com/browse/RSP-41618
++
+ uses
+-  System.UIConsts, System.Generics.Collections, FMX.Types, System.SysUtils;
++  System.UIConsts, System.Generics.Collections;
+ 
+ function PointFDot(const P1, P2: TPointF): Single;
+ begin
+@@ -96,142 +98,6 @@
+   Result := (P1.X * P2.X) + (P1.Y * P2.Y);
+ end;
+ 
+-type
+-  TVertex = record
+-    P: TPointF;
+-    I: Integer;
+-    class operator Implicit(const APoint: TPointF): TVertex;
+-  end;
+-
+-  TEndCaps = (Start, Stop);
+-  TEndCap = set of TEndCaps;
+-
+-  TStrokeBuilderHelper = class helper for TStrokeBuilder
+-    procedure StartSegment(const P1, P2: TPointF; var A, B: TVertex);
+-    procedure EdgePoints(const P, Direction: TPointF; var A, B: TVertex);
+-    function AddVertex(var V: TVertex): Integer;
+-    procedure Triangle(var A, B, C: TVertex);
+-    procedure Quad(var A, B, C, D: TVertex);
+-    procedure Arc(const O: TPointF; var A, B, C: TVertex; Clockwise: Boolean);
+-  end;
+-
+-class operator TVertex.Implicit(const APoint: TPointF): TVertex;
+-begin
+-  Result.I := -1;
+-  Result.P := APoint;
+-end;
+-
+-procedure Intersect(const A: TVertex; var B: TVertex; const C, D: TVertex);
+-var
+-  D1, D2: TPointF;
+-  Denom, Numer: Single;
+-begin
+-  D1 := B.P - A.P;
+-  D2 := D.P - C.P;
+-  Denom := D1.CrossProduct(D2);
+-  if Abs(Denom) < Epsilon then
+-    Exit;
+-  Numer := D2.CrossProduct(A.P - C.P) / Denom;
+-  B.I := -1;
+-  B.P := A.P + Numer * D1;
+-end;
+-
+-procedure TStrokeBuilderHelper.StartSegment(const P1, P2: TPointF; var A, B: TVertex);
+-var
+-  D1: TPointF;
+-begin
+-  D1 := (P2 - P1).Normalize;
+-  EdgePoints(P1, D1, A, B);
+-end;
+-
+-procedure TStrokeBuilderHelper.EdgePoints(const P, Direction: TPointF; var A, B: TVertex);
+-begin
+-  A.I := -1;
+-  A.P.X := P.X + FHalfThickness * direction.Y;
+-  A.P.Y := P.Y - FHalfThickness * direction.X;
+-  B.I := -1;
+-  B.P.X := P.X - FHalfThickness * direction.Y;
+-  B.P.Y := P.Y + FHalfThickness * direction.X;
+-end;
+-
+-function TStrokeBuilderHelper.AddVertex(var V: TVertex): Integer;
+-begin
+-  if V.I < 0 then
+-  begin
+-    V.I := FCurrentVertex;
+-    InsertVertex(V.P, FStrokeColor);
+-  end;
+-  Result := V.I;
+-end;
+-
+-procedure TStrokeBuilderHelper.Triangle(var A, B, C: TVertex);
+-begin
+-  AddVertex(A);
+-  AddVertex(B);
+-  AddVertex(C);
+-  InsertIndex(A.I);
+-  InsertIndex(B.I);
+-  InsertIndex(C.I);
+-end;
+-
+-procedure TStrokeBuilderHelper.Quad(var A, B, C, D: TVertex);
+-begin
+-  AddVertex(A);
+-  AddVertex(B);
+-  AddVertex(D);
+-  AddVertex(C);
+-  InsertIndex(B.I);
+-  InsertIndex(C.I);
+-  InsertIndex(D.I);
+-  InsertIndex(D.I);
+-  InsertIndex(A.I);
+-  InsertIndex(B.I);
+-end;
+-
+-procedure TStrokeBuilderHelper.Arc(const O: TPointF; var A, B, C: TVertex; Clockwise: Boolean);
+-var
+-  P1, P2: TPointF;
+-  A1, A2: Single;
+-  n: Integer;
+-  P, Z, V: TVertex;
+-  Angle, R: Single;
+-  SN, CS: Single;
+-begin
+-  P1 := B.P - O;
+-  P2 := C.P - O;
+-  A1 := ArcTan2(P1.Y, P1.X);
+-  A2 := ArcTan2(P2.Y, P2.X);
+-  if Clockwise then
+-  begin
+-    if A2 > A1 then
+-      A2 := A2 - 2 * PI;
+-  end
+-  else
+-  begin
+-    if A1 > A2 then
+-      A1 := A1 - 2 * PI;
+-  end;
+-  angle := A2 - A1;
+-
+-  n := Round(Abs(angle) / (10 * PI / 180));
+-  if n < 1 then
+-    n := 1;
+-  P := B;
+-  Z := A;
+-  for var i := 0 to n - 2 do
+-  begin
+-    R := (i + 1) *  angle / n;
+-    SinCos(R, SN, CS);
+-    V.I := -1;
+-    V.P.X := O.X + CS * P1.X - SN * P1.Y;
+-    V.P.Y := O.Y + SN * P1.X + CS * P1.Y;
+-    Triangle(Z, P, V);
+-    P := V;
+-  end;
+-  V := C;
+-  Triangle(Z, P, V);
+-end;
+-
+ {$REGION 'Stroke Builder implementation'}
+ 
+ function TStrokeBuilder.GetMatrixScale: TPointF;
+@@ -1056,458 +922,145 @@
+ end;
+ 
+ procedure TStrokeBuilder.BuildIntermPolygon(const Points: TPolygon; const Opacity: Single; BreakAtEnd: Boolean);
+-const
+-  COS_170_DEGREE = -0.98;
+ var
+-  CurScale: TPointF;
+-  CurIndex: Integer;
+-  FirstPoint: Integer;
++  StepSize, Distance: Single;
++  CurScale, SrcPos, DestPos, PieceDirVec, ThickPerp: TPointF;
++  SrcPosValid, DestPosValid: Boolean;
++  PatternStepCount, CurIndex, TempVertexCount, TempIndexCount: Integer;
++begin
++  if Length(Points) < 2 then
++  begin
++    InitArrays(0, 0);
++    Exit;
++  end;
+ 
+-  procedure PolyLine(Start, Count: Integer);
+-  var
+-    Closed: Boolean;
+-    Loop: Boolean;
+-    SaveThickness: Single;
+-    SaveColor: TAlphaColor;
+-    First, I: Integer;
+-    P1, P2, P3: TPointF;
+-    D1: TPointF;
+-    L1: Single;
+-    A, B, C, D, E, F: TVertex;
++  CurScale := GetMatrixScale;
+ 
+-    Dashes: array of Single;
+-    iDash : Integer;
+-    DashLen: Single;
++  FThickness := FBrush.Thickness * (CurScale.X + CurScale.Y) * 0.5;
++  FHalfThickness := FThickness * 0.5;
++  FStrokeColor := PremultiplyAlpha(MakeColor(FBrush.Color, Opacity));
+ 
+-    EndCap: TEndCap;
++  FUndeterminedMode := True;
++  InitArrayPointers;
+ 
+-    procedure NextDash;
+-    begin
+-      iDash := (iDash + 1) mod Length(Dashes);
+-      DashLen := Dashes[iDash];
+-    end;
++  PatternStepCount := GetPatternStepCount;
++  if PatternStepCount < 1 then
++  begin
++    InitArrays(0, 0);
++    Exit;
++  end;
+ 
+-    procedure EndSegment(var A, B: TVertex; P1, P2: TPointF);
+-    var
+-      C, D, O: TVertex;
+-      D1: TPointF;
+-      L1: Single;
+-    begin
+-      D1 := (P2 - P1).Normalize;
+-      L1 := (P2 - P1).Length;
++  StepSize := FThickness * PatternStepCount;
+ 
+-      while L1 > DashLen do
+-      begin
+-        O.P := P1;
+-        P1 := P1 + D1 * DashLen;
+-        L1 := L1 - DashLen;
+-        EdgePoints(P1, D1, C, D);
+-        if not Odd(iDash) then
+-        begin
+-          if Brush.Cap = TStrokeCap.Round then
+-          begin
+-            if TEndCaps.Start in EndCap then
+-            begin
+-              O.P := O.P + D1 * FHalfThickness;
+-              EdgePoints(O.P, D1, A, B);
+-              O.I := -1;
+-              Arc(O.P, O, B, A, False);
+-            end;
+-            O.P := P1 - D1 * FHalfThickness;
+-            EdgePoints(O.P, D1, E, F);
+-            Quad(A, B, F, E);
+-            O.I := -1;
+-            Arc(O.P, O, E, F, False);
+-          end
+-          else
+-            Quad(A, B, D, C);
+-        end;
+-        A := C;
+-        B := D;
+-        NextDash;
+-        EndCap := [TEndCaps.Start, TEndCaps.Stop];
+-      end;
++  CurIndex := 0;
+ 
+-      if Odd(iDash) or (L1 < FThickness) then
+-        Exit;
++  SrcPosValid := False;
++  DestPosValid := False;
+ 
+-      if Brush.Cap = TStrokeCap.Round then
+-      begin
+-        if TEndCaps.Start in EndCap then
+-        begin
+-          P1 := P1 + D1 * FHalfThickness;
+-          EdgePoints(P1, D1, A, B);
+-          O := P1;
+-          Arc(P1, O, B, A, False);
+-        end;
+-        P2 := P2 - D1 * FHalfThickness;
+-      end;
+-      EdgePoints(P2, D1, C, D);
+-      Quad(A, B, D, C);
+-      if Brush.Cap = TStrokeCap.Round then
+-      begin
+-        O := P2;
+-        Arc(P2, O, C, D, False);
+-      end;
+-    end;
++  while CurIndex < Length(Points) do
++  begin
++    if (CurIndex >= Length(Points) - 1) and BreakAtEnd then
++      Break;
+ 
+-    procedure DrawJoin(var A, B: TVertex; var P1, P2: TPointF; const P3: TPointF; Visible: Boolean = True);
+-    const
+-      COS_170_DEGREE = -0.98;
+-    var
+-      D1, D2: TPointF;
+-      L1: Single;
+-      C, D: TVertex;                 //    A........C E..........G
+-      E, F: TVertex;                 //  P1:        :P2          :P3
+-      G, H: TVertex;                 //    B........D F..........H
+-      O: TVertex;
+-      Style: TStrokeJoin;
+-      CosAngle: Single;
+-      Clockwise: Boolean;
++    if not SrcPosValid then
++    begin
++      SrcPos := Points[CurIndex];
+ 
+-      procedure Capsule;
++      if (SrcPos.X >= $FFFF) or (SrcPos.Y >= $FFFF) then
+       begin
+-        if Brush.Cap = TStrokeCap.Round then
+-        begin
+-          if TEndCaps.Start in EndCap then
+-          begin
+-            P1 := P1 + D1 * FHalfThickness;
+-            EdgePoints(P1, D1, A, B);
+-            O := P1;
+-            Arc(P1, O, B, A, False);
+-          end;
+-          if (L1 > FHalfThickness) or not (TEndCaps.Start in EndCap) then
+-            Quad(A, B, D, C)
+-          else
+-          begin
+-            C := A;
+-            D := B;
+-          end;
+-        end else
+-          Quad(A, B, D, C);
++        DestPosValid := False;
++        Inc(CurIndex);
++        Continue;
+       end;
+ 
++      SrcPos := SrcPos * FMatrix;
++    end
++    else
++      SrcPosValid := False;
++
++    if not DestPosValid then
+     begin
+-      D1 := (P2 - P1).Normalize;
+-      L1 := (P2 - P1).Length;
+-      D2 := (P3 - P2).Normalize;
++      DestPos := Points[(CurIndex + 1) mod Length(Points)];
+ 
+-      Style := Brush.Join;
+-      CosAngle := D1.AngleCosine(D2);
+-      if (Style = TStrokeJoin.Miter) and (CosAngle < COS_170_DEGREE) then
+-        Style := TStrokeJoin.Bevel;
+-
+-      while L1 > DashLen do
++      if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
+       begin
+-        O.P := P1;
+-        P1 := P1 + D1 * DashLen;
+-        L1 := L1 - DashLen;
+-        EdgePoints(P1, D1, C, D);
+-        if Visible and not Odd(iDash) then
++        DestPos := Points[CurIndex];
++        if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
+         begin
+-          if Brush.Cap = TStrokeCap.Round then
+-          begin
+-            if TEndCaps.Start in EndCap then
+-            begin
+-              O.P := O.P + D1 * FHalfThickness;
+-              EdgePoints(O.P, D1, A, B);
+-              O.I := -1;
+-              Arc(O.P, O, B, A, False);
+-            end;
+-            O.P := P1 - D1 * FHalfThickness;
+-            EdgePoints(O.P, D1, E, F);
+-            Quad(A, B, F, E);
+-            O.I := -1;
+-            Arc(O.P, O, E, F, False);
+-          end else
+-            Quad(A, B, D, C);
++          Inc(CurIndex);
++          Continue;
+         end;
+-        A := C;
+-        B := D;
+-        NextDash;
+-        EndCap := [TEndCaps.Start, TEndCaps.Stop];
+-      end;
+-      DashLen := DashLen - L1;
+-      if Odd(iDash) then
+-        Visible := False;
+ 
+-      if Visible then
+-      begin
+-        if (L1 < FHalfThickness) and (TEndCaps.Start in EndCap) then
+-        begin
+-          P1 := P2 - D2 * L1;
+-          EdgePoints(P1, D2, A, B);
+-          D1 := D2;
+-          Style := TStrokeJoin.Miter;
+-        end;
+-        if (DashLen < FHalfThickness) and (TEndCaps.Start in EndCap) then
+-        begin
+-          if Brush.Cap = TStrokeCap.Round then
+-          begin
+-            if TEndCaps.Start in EndCap then
+-            begin
+-              P1 := P1 + D1 * FHalfThickness;
+-              EdgePoints(P1, D1, A, B);
+-              O := P1;
+-              Arc(P1, O, B, A, False);
+-            end;
+-            P1 := P1 + D1 * (DashLen + L1 - FThickness);
+-            EdgePoints(P1, D1, C, D);
+-            Quad(A, B, D, C);
+-            O := P1;
+-            Arc(P1, O, C, D, False);
+-          end
+-          else
+-          begin
+-            P1 := P1 + D1 * (DashLen + L1);
+-            EdgePoints(P1, D1, C, D);
+-            Quad(A, B, D, C);
+-          end;
+-          P2 := P2 + D2 * DashLen;
+-          NextDash;
+-          Visible := False;
+-        end;
+-      end;
+-
+-      EdgePoints(P2, D1, C, D);
+-      EdgePoints(P2, D2, E, F);
+-      EdgePoints(P3, D2, G, H);
+-
+-      if Style = TStrokeJoin.Miter then
+-      begin
+-        Intersect(A, C, E, G);
+-        Intersect(B, D, F, H);
+-        if Visible then
+-          Capsule;
+-        A := C;
+-        B := D;
++        DestPos := DestPos * FMatrix;
+       end
+       else
+-      begin
+-        if CosAngle >= COS_170_DEGREE then
+-        begin
+-          Clockwise := (D1.X * D2.Y - D2.X * D1.Y) < 0;
+-          if Clockwise then
+-          begin
+-            Intersect(A, C, E, G);
+-            if Visible then
+-            begin
+-              Capsule;
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(C, D, F);
+-                TStrokeJoin.Round: Arc(P2, C, D, F, True);
+-              end;
+-            end;
+-            D := F;
+-          end
+-          else
+-          begin
+-            Intersect(B, D, F, H);
+-            if Visible then
+-            begin
+-              Capsule;
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(D, C, E);
+-                TStrokeJoin.Round: Arc(P2, D, C, E, False);
+-              end;
+-            end;
+-            C := E;
+-          end;
+-          A := C;
+-          B := D;
+-        end
+-        else
+-        begin
+-          if Visible then
+-            Quad(A, B, D, C);
+-          A := D;
+-          B := C;
+-        end;
+-      end;
+-
+-      P1 := P2;
+-      P2 := P3;
+-      if Visible then
+-        EndCap := [TEndCaps.Stop]
+-      else
+-        EndCap := [TEndCaps.Start, TEndCaps.Stop];
+-    end;
+-
+-  begin
+-    if Count < 2 then
+-      Exit;
+-
+-    Closed := Points[Start].EqualsTo(Points[Start + Count - 1]);
+-    if Closed then
+-    begin
+-      Dec(Count);
+-      if Count = 2 then
+-        Exit;
++        DestPos := DestPos * FMatrix;
+     end
+     else
+-      Closed := not BreakAtEnd;
++      DestPosValid := False;
+ 
+-    case Brush.Dash of
+-      TStrokeDash.Dash       : Dashes := [3 * FThickness, FThickness];
+-      TStrokeDash.Dot        : Dashes := [FThickness, FThickness];
+-      TStrokeDash.DashDot    : Dashes := [3 * FThickness, FThickness, FThickness, FThickness];
+-      TStrokeDash.DashDotDot : Dashes := [3 * FThickness, FThickness, FThickness, FThickness, FThickness, FThickness];
+-      TStrokeDash.Custom:
+-      begin
+-        SetLength(Dashes, Length(Brush.DashArray));
+-        for I := 0 to Length(Dashes) - 1 do
+-          if Odd(I) then
+-            Dashes[I] := Brush.DashArray[I] * FThickness - FThickness
+-          else
+-            Dashes[I] := Brush.DashArray[I] * FThickness + FThickness
+-      end;
+-    else
+-      Dashes := [Single.MaxValue];
+-    end;
+-    iDash := 0;
+-    DashLen := Dashes[iDash];
++    Distance := DestPos.Distance(SrcPos);
+ 
+-    if  FThickness < 3 then
++    if Distance >= StepSize then
+     begin
+-      SaveThickness := FHalfThickness;
+-      FHalfThickness := 1.75 * FHalfThickness;
+-      F.I := -1;
+-      if Closed then
+-      begin
+-        First := 0;
+-        F.P := Points[Start + Count - 1] * FMatrix;
+-      end
+-      else
+-      begin
+-        First := 1;
+-        F.P := Points[Start] * FMatrix;
+-      end;
+-      for I := First to Count - 1 do
+-      begin
+-        E := F;
+-        F.I := -1;
+-        F.P := Points[Start + I] * FMatrix;
+-        D1 := (F.P - E.P);
+-        L1 := D1.Length;
+-        D1 := D1/L1;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-        while L1 > 0 do
+-        begin
+-          if odd(iDash) then
+-          begin
+-            if L1 < DashLen then
+-            begin
+-              DashLen := DashLen - L1;
+-              Break;
+-            end;
+-            E.I := -1;
+-            E.P := E.P + DashLen * D1;
+-            L1 := L1 - DashLen;
+-            NextDash;
+-          end
+-          else
+-          begin
+-            if L1 > DashLen then
+-            begin
+-              F.I := -1;
+-              F.P := E.P + DashLen * D1;
+-              L1 := L1 - DashLen;
+-              NextDash;
+-            end
+-            else
+-            begin
+-              F.P := Points[Start + I] * FMatrix;
+-              DashLen := DashLen - L1;
+-              L1 := 0;
+-            end;
+-            EdgePoints(E.P, D1, A, B);
+-            EdgePoints(F.P, D1, C, D);
+-            AddVertex(E);
+-            AddVertex(F);
+-            SaveColor := FStrokeColor;
+-            FStrokeColor := MakeColor(FStrokeColor, 0.25);
+-            AddVertex(A);
+-            Quad(A, E, F, C);
+-            AddVertex(B);
+-            Quad(B, E, F, D);
+-            FStrokeColor := SaveColor;
+-            E := F;
+-          end;
+-        end;
+-      end;
+-      FHalfThickness := SaveThickness;
+-      Exit;
+-    end;
++      InsertSegment(SrcPos, PieceDirVec, ThickPerp, DestPos, False);
+ 
+-    Loop := Closed;
+-    if Loop then
+-    begin
+-      L1 := (Points[Start + Count - 1] * FMatrix - Points[Start] * FMatrix).Length;
+-      for I := 0 to Count - 2 do
+-      begin
+-        L1 := L1 + (Points[Start + I + 1] * FMatrix - Points[Start + I] * FMatrix).Length;
+-        while L1 > DashLen do
+-        begin
+-          L1 := L1 - DashLen;
+-          NextDash;
+-        end;
+-        DashLen := DashLen - L1;
+-        L1 := 0;
+-      end;
+-      Loop := (DashLen > FThickness) and not Odd(iDash);
+-      iDash := 0;
+-      DashLen := Dashes[0];
+-    end;
++      SrcPos := SrcPos + (PieceDirVec * StepSize);
+ 
+-    if Loop then
+-    begin
+-      P1 := Points[Start + Count - 1] * FMatrix;
+-      P2 := Points[Start] * FMatrix;
+-      P3 := Points[Start + 1] * FMatrix;
+-      StartSegment(P1, P2, A, B);
+-      EndCap := [TEndCaps.Stop];
+-      DrawJoin(A, B, P1, P2, P3, False);
+-      EndCap := [TEndCaps.Stop];
+-      iDash := 0;
+-      DashLen := Dashes[0] - FHalfThickness;
+-    end
+-    else
+-    begin
+-      P1 := Points[Start + 0] * FMatrix;
+-      P2 := Points[Start + 1] * FMatrix;
+-      D1 := (P2 - P1).Normalize;
+-      P1 := P1 - D1 * FHalfThickness;
+-      StartSegment(P1, P2, A, B);
+-      EndCap := [TEndCaps.Start, TEndCaps.Stop];
++      SrcPosValid := True;
++      DestPosValid := True;
++      Continue;
+     end;
+ 
+-    for I := 0 to Count - 3 do
++    if (CurIndex = Length(Points) - 1) or (Points[CurIndex + 1].X >= $FFFF) or (Points[CurIndex + 1].Y >= $FFFF) or
++      ((CurIndex < Length(Points) - 2) and (Points[CurIndex + 1].X < $FFFF) and (Points[CurIndex + 1].Y < $FFFF) and
++      (Points[CurIndex + 2].X < $FFFF) and (Points[CurIndex + 2].Y < $FFFF) and
++      (Points[CurIndex + 1].Distance(Points[CurIndex + 2]) > StepSize)) then
+     begin
+-      P3 := Points[Start + I + 2] * FMatrix;
+-      DrawJoin(A, B, P1, P2, P3);
+-    end;
++      ComputeBuildEstimates(1 + Distance / StepSize, TempVertexCount, TempIndexCount);
+ 
+-    if Closed then
+-    begin
+-      P3 := Points[Start] * FMatrix;
+-      DrawJoin(A, B, P1, P2, P3);
+-      if Loop then
++      if FSegmentCount > 1 then
+       begin
+-        P3 := Points[Start + 1] * FMatrix;
+-        DrawJoin(A, B, P1, P2, P3);
++        PieceDirVec := (DestPos - SrcPos).Normalize();
++        ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
++
++        InsertSegment(SrcPos, PieceDirVec, ThickPerp, DestPos, True);
++      end;
++
++      if CurIndex < Length(Points) - 1 then
++      begin
++        Inc(CurIndex);
++        Continue;
+       end
+       else
+-        EndSegment(A, B, P1, P3);
+-    end
+-    else
+-    begin
+-      D1 := (P2 - P1).Normalize;
+-      P2 := P2 + D1 * FHalfThickness;
+-      EndSegment(A, B, P1, P2);
++        Break;
+     end;
++
++    SrcPosValid := True;
++    Inc(CurIndex);
+   end;
+ 
++  FinalizeArrays;
++end;
++
++procedure TStrokeBuilder.BuildIntermPath(const Path: TPathData; const Opacity: Single);
++var
++  Points: TPolygon;
+ begin
++  Path.FlattenToPolygon(Points, 1);
++  BuildIntermPolygon(Points, Opacity, (Path.Count > 0) and (Path[Path.Count - 1].Kind <> TPathPointKind.Close));
++end;
++
++procedure TStrokeBuilder.BuildSolidPolygon(const Points: TPolygon; const Opacity: Single; BreakAtEnd: Boolean);
++var
++  StepSize, Distance: Single;
++  CurScale, SrcPos, DestPos, PieceDirVec, ThickPerp: TPointF;
++  SrcPosValid, DestPosValid, PrevVerticesPlaced: Boolean;
++  CurIndex: Integer;
++begin
+   if Length(Points) < 2 then
+   begin
+     InitArrays(0, 0);
+@@ -1523,258 +1076,153 @@
+   FUndeterminedMode := True;
+   InitArrayPointers;
+ 
+-  FirstPoint := 0;
++  StepSize := FThickness;
++  if StepSize < 2 then
++    StepSize := 2;
++
+   CurIndex := 0;
++
++  SrcPosValid := False;
++  DestPosValid := False;
++  PrevVerticesPlaced := False;
++
+   while CurIndex < Length(Points) do
+   begin
+-    if Points[CurIndex] = PolygonPointBreak then
++    if (CurIndex >= Length(Points) - 1) and BreakAtEnd and (Points[0] <> Points[Length(Points) - 1]) then
++      Break;
++
++    if not SrcPosValid then
+     begin
+-      PolyLine(FirstPoint, CurIndex - FirstPoint);
+-      FirstPoint := CurIndex + 1;
+-    end;
+-    Inc(CurIndex);
+-  end;
+-  PolyLine(FirstPoint, CurIndex - FirstPoint);
++      SrcPos := Points[CurIndex];
+ 
+-  FinalizeArrays;
+-end;
++      if (SrcPos.X >= $FFFF) or (SrcPos.Y >= $FFFF) then
++      begin
++        DestPosValid := False;
++        PrevVerticesPlaced := False;
++        Inc(CurIndex);
++        Continue;
++      end;
+ 
+-procedure TStrokeBuilder.BuildIntermPath(const Path: TPathData; const Opacity: Single);
+-var
+-  Points: TPolygon;
+-begin
+-  Path.FlattenToPolygon(Points, 1);
+-  BuildIntermPolygon(Points, Opacity, (Path.Count > 0) and (Path[Path.Count - 1].Kind <> TPathPointKind.Close));
+-end;
+-
+-procedure TStrokeBuilder.BuildSolidPolygon(const Points: TPolygon; const Opacity: Single; BreakAtEnd: Boolean);
+-const
+-  COS_170_DEGREE = -0.98;
+-var
+-  CurScale: TPointF;
+-  CurIndex: Integer;
+-  FirstPoint: Integer;
+-
+-  procedure PolyLine(Start, Count: Integer);
+-  var
+-    Closed: Boolean;
+-    SaveThickness: Single;
+-    SaveColor: TAlphaColor;
+-    First, I: Integer;
+-    P0, P1: TPointF;
+-    L1: Single;
+-    D1, D2: TPointF;
+-    A, B, C, D, E, F, G, H, V: TVertex;
+-    Style: TStrokeJoin;
+-    CosAngle: Single;
+-    Clockwise: Boolean;
+-    NoCap: Boolean;
+-  begin
+-    if Count < 2 then
+-      Exit;
+-
+-    Closed := Points[Start].EqualsTo(Points[Start + Count - 1]);
+-    if Closed then
+-    begin
+-      Dec(Count);
+-      if Count < 2 then
+-        Exit;
++      SrcPos := SrcPos * FMatrix;
+     end
+     else
+-      Closed := not BreakAtEnd;
++      SrcPosValid := False;
+ 
+-    if FThickness < 3 then
++    if not DestPosValid then
+     begin
+-      SaveThickness := FHalfThickness;
+-      FHalfThickness := 1.75 * FHalfThickness;
+-      F.I := -1;
+-      if Closed then
++      DestPos := Points[(CurIndex + 1) mod Length(Points)];
++
++      if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
+       begin
+-        First := 0;
+-        F.P := Points[Start + Count - 1] * FMatrix;
++        DestPos := Points[CurIndex];
++        if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
++        begin
++          PrevVerticesPlaced := False;
++          Inc(CurIndex);
++          Continue;
++        end;
++
++        DestPos := DestPos * FMatrix;
+       end
+       else
+-      begin
+-        First := 1;
+-        F.P := Points[Start] * FMatrix;
+-      end;
+-      for I := First to Count - 1 do
+-      begin
+-        E := F;
+-        F.I := -1;
+-        F.P := Points[Start + I] * FMatrix;
+-        D1 := (F.P - E.P);
+-        L1 := D1.Length;
+-        D1 := D1/L1;
+-        EdgePoints(E.P, D1, A, B);
+-        EdgePoints(F.P, D1, C, D);
++        DestPos := DestPos * FMatrix;
++    end
++    else
++      DestPosValid := False;
+ 
+-        AddVertex(E);
+-        AddVertex(F);
+-        SaveColor := FStrokeColor;
+-        FStrokeColor := MakeColor(FStrokeColor, 0.25);
+-        AddVertex(A);
+-        Quad(A, E, F, C);
+-        AddVertex(B);
+-        Quad(B, E, F, D);
+-        FStrokeColor := SaveColor;
+-      end;
+-      FHalfThickness := SaveThickness;
+-      Exit;
+-    end;
++    Distance := DestPos.Distance(SrcPos);
+ 
+-    if Closed then
++    if Distance >= StepSize then
+     begin
+-      NoCap := True;
+-      P0 := Points[Start + Count - 2] * FMatrix;
+-      P1 := Points[Start + Count - 1] * FMatrix;
+-      Dec(Start, 2);
+-      Inc(Count, 3);
+-    end
+-    else
+-    begin
+-      NoCap := False;
+-      P0 := Points[Start] * FMatrix;
+-      P1 := Points[Start + 1] * FMatrix;
+-    end;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-    D2 := (P1 - P0).Normalize;
++      InsertVertex(SrcPos - ThickPerp, FStrokeColor);
++      InsertVertex(SrcPos + ThickPerp, FStrokeColor);
+ 
+-    if (Brush.Cap = TStrokeCap.Flat) and not Closed then
+-      P0 := P0 - D2 * FHalfThickness;
++      if PrevVerticesPlaced then
++      begin
++        InsertIndex(FCurrentVertex - 3);
++        InsertIndex(FCurrentVertex - 1);
++        InsertIndex(FCurrentVertex - 2);
+ 
+-    EdgePoints(P0, D2, A, B);
+-    EdgePoints(P1, D2, G, H);
++        InsertIndex(FCurrentVertex - 2);
++        InsertIndex(FCurrentVertex - 4);
++        InsertIndex(FCurrentVertex - 3);
++      end;
+ 
+-    if (Brush.Cap = TStrokeCap.Round) and not Closed then
+-    begin
+-      V.I := -1;
+-      V.P := P0;
+-      Arc(P0, V, B, A, False);
++      PrevVerticesPlaced := True;
++
++      SrcPos := SrcPos + (PieceDirVec * StepSize);
++
++      SrcPosValid := True;
++      DestPosValid := True;
++      Continue;
+     end;
+ 
+-    for I := 0 to Count - 3 do
++    if ((CurIndex < Length(Points) - 2) and (Points[CurIndex + 1].X < $FFFF) and (Points[CurIndex + 1].Y < $FFFF) and
++      (Points[CurIndex + 2].X < $FFFF) and (Points[CurIndex + 2].Y < $FFFF) and
++      (Points[CurIndex + 1].Distance(Points[CurIndex + 2]) > StepSize)) then
+     begin
+-      P0 := P1;
+-      if Closed and (I = Count - 3) then
+-        P1 := Points[Start + 2] * FMatrix
+-      else
+-        P1 := Points[Start + I + 2] * FMatrix;
+-      D1 := D2;
+-      D2 := (P1 - P0).Normalize;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-      CosAngle := D1.AngleCosine(D2);
+-      Style := Brush.Join;
+-      if (Style = TStrokeJoin.Miter) and (CosAngle < COS_170_DEGREE) then
+-        Style := TStrokeJoin.Bevel;
++      InsertVertex(DestPos - ThickPerp, FStrokeColor);
++      InsertVertex(DestPos + ThickPerp, FStrokeColor);
+ 
+-      C := G;
+-      D := H;
+-      EdgePoints(P0, D2, E, F);
+-      EdgePoints(P1, D2, G, H);
++      if PrevVerticesPlaced then
++      begin
++        InsertIndex(FCurrentVertex - 3);
++        InsertIndex(FCurrentVertex - 1);
++        InsertIndex(FCurrentVertex - 2);
+ 
+-      if Style = TStrokeJoin.Miter then
++        InsertIndex(FCurrentVertex - 2);
++        InsertIndex(FCurrentVertex - 4);
++        InsertIndex(FCurrentVertex - 3);
++      end;
++
++      if CurIndex < Length(Points) - 1 then
+       begin
+-        Intersect(A, C, E, G);
+-        Intersect(B, D, F, H);
+-        if not NoCap then
+-          Quad(A, B, D, C);
+-        A := C;
+-        B := D;
++        Inc(CurIndex);
++        Continue;
+       end
+       else
+-      begin
+-        if CosAngle >= COS_170_DEGREE then
+-        begin
+-          Clockwise := (D1.X * D2.Y - D2.X * D1.Y) < 0;
+-          if Clockwise then
+-          begin
+-            Intersect(A, C, E, G);
+-            if NoCap = False then
+-            begin
+-              Quad(A, B, D, C);
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(C, D, F);
+-                TStrokeJoin.Round: Arc(P0, C, D, F, True);
+-              end;
+-            end;
+-            A := C;
+-            B := D;
+-            D := F;
+-          end
+-          else
+-          begin
+-            Intersect(B, D, F, H);
+-            if NoCap = False then
+-            begin
+-              Quad(A, B, D, C);
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(D, C, E);
+-                TStrokeJoin.Round: Arc(P0, D, C, E, False);
+-              end;
+-            end;
+-            A := C;
+-            B := D;
+-            C := E;
+-          end;
+-          A := C;
+-          B := D;
+-        end
+-        else if not NoCap then
+-        begin
+-          if Style = TStrokeJoin.Round then
+-            Arc(P0, D, C, E, False);
+-          Quad(A, B, D, C);
+-          A := D;
+-          B := C;
+-        end;
+-      end;
+-      NoCap := False;
++        Break;
+     end;
+ 
+-    if not Closed then
++    if (CurIndex = Length(Points) - 1) or (Points[CurIndex + 1].X >= $FFFF) or (Points[CurIndex + 1].Y >= $FFFF) then
+     begin
+-      if Brush.Cap = TStrokeCap.Flat then
+-        P1 := P1 + D2 * FHalfThickness;
+-      EdgePoints(P1, D2, C, D);
+-      Quad(A, B, D, C);
+-      if Brush.Cap = TStrokeCap.Round then
+-      begin
+-        V.I := -1;
+-        V.P := P1;
+-        Arc(P1, V, C, D, False);
+-      end;
+-    end;
+-  end;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-begin
+-  if Length(Points) < 2 then
+-  begin
+-    InitArrays(0, 0);
+-    Exit;
+-  end;
++      InsertVertex(DestPos - ThickPerp, FStrokeColor);
++      InsertVertex(DestPos + ThickPerp, FStrokeColor);
+ 
+-  CurScale := GetMatrixScale;
++      if PrevVerticesPlaced then
++      begin
++        InsertIndex(FCurrentVertex - 3);
++        InsertIndex(FCurrentVertex - 1);
++        InsertIndex(FCurrentVertex - 2);
+ 
+-  FThickness := FBrush.Thickness * (CurScale.X + CurScale.Y) * 0.5;
+-  FHalfThickness := FThickness * 0.5;
+-  FStrokeColor := PremultiplyAlpha(MakeColor(FBrush.Color, Opacity));
++        InsertIndex(FCurrentVertex - 2);
++        InsertIndex(FCurrentVertex - 4);
++        InsertIndex(FCurrentVertex - 3);
++      end;
+ 
+-  FUndeterminedMode := True;
+-  InitArrayPointers;
++      PrevVerticesPlaced := False;
+ 
+-  FirstPoint := 0;
+-  CurIndex := 0;
+-  while CurIndex < Length(Points) do
+-  begin
+-    if Points[CurIndex] = PolygonPointBreak then
+-    begin
+-      PolyLine(FirstPoint, CurIndex - FirstPoint);
+-      FirstPoint := CurIndex + 1;
++      if CurIndex < Length(Points) - 1 then
++      begin
++        Inc(CurIndex);
++        Continue;
++      end
++      else
++        Break;
+     end;
++
++    SrcPosValid := True;
+     Inc(CurIndex);
+   end;
+-  PolyLine(FirstPoint, CurIndex - FirstPoint);
+ 
+   FinalizeArrays;
+ end;
 Index: Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Alexandria/11_3/fmx/FMX.VirtualKeyboard.Android.pas

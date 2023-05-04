@@ -1268,14 +1268,15 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.StrokeBuilder.pas b/Embarcadero
    if Length(Points) < 2 then
    begin
      InitArrays(0, 0);
-@@ -1523,258 +1076,153 @@
+@@ -1523,258 +1076,154 @@
    FUndeterminedMode := True;
    InitArrayPointers;
  
 -  FirstPoint := 0;
-+  StepSize := FThickness;
-+  if StepSize < 2 then
-+    StepSize := 2;
++  //StepSize := FThickness;
++  //if StepSize < 2 then
++  //  StepSize := 2;
++  Stepsize := 1;
 +
    CurIndex := 0;
 +

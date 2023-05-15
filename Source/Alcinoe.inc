@@ -4,7 +4,8 @@
   //is set for the current compiler version, then progressively replace in all source
   //files ALCompilerVersionSupported by ALCompilerVersionSupported_TMP and when everything done
   //delete ALCompilerVersionSupported_TMP from here and replace in all files ALCompilerVersionSupported_TMP
-  //by ALCompilerVersionSupported
+  //by ALCompilerVersionSupported. This must be done for all the MagicFoundation projects, not only
+  //for the Alcinoe project
   {$DEFINE ALCompilerVersionSupported}
 {$ENDIF}
 

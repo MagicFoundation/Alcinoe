@@ -196,6 +196,16 @@ begin
         end;
       end;
 
+      //remove DCCReference nodes
+      //<DCCReference Include="Unit1.pas">
+      //  <Form>Form1</Form>
+      //</DCCReference>
+      for var I := LItemGroupNode.ChildNodes.Count - 1 downto 0 do begin
+        var LDCCReferenceNode := LItemGroupNode.ChildNodes[i];
+        if ALSameTextA(LDccReferenceNode.NodeName, 'DCCReference') then
+          LItemGroupNode.ChildNodes.Delete(i);
+      end;
+
       //remove from deployment unnecessary items
       //https://quality.embarcadero.com/browse/RSP-28003
       if LDeploymentNode <> nil then begin

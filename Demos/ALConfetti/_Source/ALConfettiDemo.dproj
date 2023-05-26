@@ -323,10 +323,6 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="Main.pas">
-      <Form>TMainForm</Form>
-      <FormType>fmx</FormType>
-    </DCCReference>
     <JavaReference Include="Android\Merged\libs\32bit\r.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>

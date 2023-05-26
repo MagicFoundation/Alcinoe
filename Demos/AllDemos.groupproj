@@ -9,9 +9,6 @@
         <Projects Include="ALFacebookLogin\_source\ALFacebookLogin.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj">
-            <Dependencies/>
-        </Projects>
         <Projects Include="ALFmxControls\_source\ALFmxControls.dproj">
             <Dependencies/>
         </Projects>
@@ -75,6 +72,9 @@
         <Projects Include="ALPOP3Client\_source\ALPOP3ClientDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="ALMessagingService\_Source\ALMessagingServiceDemo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -100,15 +100,6 @@
     </Target>
     <Target Name="ALFacebookLogin:Make">
         <MSBuild Projects="ALFacebookLogin\_source\ALFacebookLogin.dproj" Targets="Make"/>
-    </Target>
-    <Target Name="ALFirebaseMessaging">
-        <MSBuild Projects="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj"/>
-    </Target>
-    <Target Name="ALFirebaseMessaging:Clean">
-        <MSBuild Projects="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="ALFirebaseMessaging:Make">
-        <MSBuild Projects="ALFirebaseMessaging\_source\ALFirebaseMessaging.dproj" Targets="Make"/>
     </Target>
     <Target Name="ALFmxControls">
         <MSBuild Projects="ALFmxControls\_source\ALFmxControls.dproj"/>
@@ -299,14 +290,23 @@
     <Target Name="ALPOP3ClientDemo:Make">
         <MSBuild Projects="ALPOP3Client\_source\ALPOP3ClientDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="ALMessagingServiceDemo">
+        <MSBuild Projects="ALMessagingService\_Source\ALMessagingServiceDemo.dproj"/>
+    </Target>
+    <Target Name="ALMessagingServiceDemo:Clean">
+        <MSBuild Projects="ALMessagingService\_Source\ALMessagingServiceDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="ALMessagingServiceDemo:Make">
+        <MSBuild Projects="ALMessagingService\_Source\ALMessagingServiceDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="ALDatabaseBenchmark;ALFacebookLogin;ALFirebaseMessaging;ALFmxControls;ALJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALWinHTTPWebSocketClientDemo;ALPOP3ClientDemo"/>
+        <CallTarget Targets="ALDatabaseBenchmark;ALFacebookLogin;ALFmxControls;ALJsonDocDemo;ALLibPhoneNumberDemo;ALLiveVideoChatClient;ALLiveVideoChatServer;ALNNTPClientDemo;ALPhpRunnerDemo;ALSMTPClientDemo;ALSortedListBenchmark;ALSqlite3clientDemo;ALStressHTTPServer;ALStringBenchmark;ALWebSpiderDemo;ALWinHTTPClientDemo;ALWinInetHTTPClientDemo;ALXmlDocDemo;ALCipherDemo;ALFmxFilterEffectsDemo;ALRTTIDemo;ALWinHTTPWebSocketClientDemo;ALPOP3ClientDemo;ALMessagingServiceDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="ALDatabaseBenchmark:Clean;ALFacebookLogin:Clean;ALFirebaseMessaging:Clean;ALFmxControls:Clean;ALJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALWinHTTPWebSocketClientDemo:Clean;ALPOP3ClientDemo:Clean"/>
+        <CallTarget Targets="ALDatabaseBenchmark:Clean;ALFacebookLogin:Clean;ALFmxControls:Clean;ALJsonDocDemo:Clean;ALLibPhoneNumberDemo:Clean;ALLiveVideoChatClient:Clean;ALLiveVideoChatServer:Clean;ALNNTPClientDemo:Clean;ALPhpRunnerDemo:Clean;ALSMTPClientDemo:Clean;ALSortedListBenchmark:Clean;ALSqlite3clientDemo:Clean;ALStressHTTPServer:Clean;ALStringBenchmark:Clean;ALWebSpiderDemo:Clean;ALWinHTTPClientDemo:Clean;ALWinInetHTTPClientDemo:Clean;ALXmlDocDemo:Clean;ALCipherDemo:Clean;ALFmxFilterEffectsDemo:Clean;ALRTTIDemo:Clean;ALWinHTTPWebSocketClientDemo:Clean;ALPOP3ClientDemo:Clean;ALMessagingServiceDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="ALDatabaseBenchmark:Make;ALFacebookLogin:Make;ALFirebaseMessaging:Make;ALFmxControls:Make;ALJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALWinHTTPWebSocketClientDemo:Make;ALPOP3ClientDemo:Make"/>
+        <CallTarget Targets="ALDatabaseBenchmark:Make;ALFacebookLogin:Make;ALFmxControls:Make;ALJsonDocDemo:Make;ALLibPhoneNumberDemo:Make;ALLiveVideoChatClient:Make;ALLiveVideoChatServer:Make;ALNNTPClientDemo:Make;ALPhpRunnerDemo:Make;ALSMTPClientDemo:Make;ALSortedListBenchmark:Make;ALSqlite3clientDemo:Make;ALStressHTTPServer:Make;ALStringBenchmark:Make;ALWebSpiderDemo:Make;ALWinHTTPClientDemo:Make;ALWinInetHTTPClientDemo:Make;ALXmlDocDemo:Make;ALCipherDemo:Make;ALFmxFilterEffectsDemo:Make;ALRTTIDemo:Make;ALWinHTTPWebSocketClientDemo:Make;ALPOP3ClientDemo:Make;ALMessagingServiceDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

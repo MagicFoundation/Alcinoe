@@ -1,4 +1,4 @@
-program ALFirebaseMessaging;
+program ALMessagingServiceDemo;
 
 uses
   System.StartUpCopy,

@@ -130,7 +130,9 @@ type
           procedure onLocationChanged(location: JLocation); cdecl;
         end;
     private
-      FRequestPermissionsCode: Integer;
+      const
+        RequestPermissionsCode: Integer = 32769;
+    private
       FLocationManager: JLocationManager;
       FAndroidLocationListener: TAndroidLocationListener;
       FFusedLocationProviderClient: JFusedLocationProviderClient;
@@ -311,7 +313,6 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
-  FRequestPermissionsCode := ALRandom32(Maxint);
   if (AUseGooglePlayServicesIfAvailable) and
      (TJGooglePlayServicesUtil
         .JavaClass
@@ -762,7 +763,7 @@ begin
       LPermissions.Items[LIdx] := StringToJString('android.permission.ACCESS_BACKGROUND_LOCATION');
       //inc(LIdx);
     end;
-    MainActivity.requestPermissions(LPermissions, FRequestPermissionsCode);
+    MainActivity.requestPermissions(LPermissions, RequestPermissionsCode);
   finally
     ALFreeAndNil(LPermissions);
   end;
@@ -1328,7 +1329,7 @@ begin
   if (M is TPermissionsRequestResultMessage) then begin
 
     var LMsg := TPermissionsRequestResultMessage(M);
-    if LMsg.Value.RequestCode <> FRequestPermissionsCode then exit;
+    if LMsg.Value.RequestCode <> RequestPermissionsCode then exit;
 
     {$IFDEF DEBUG}
     var LPermissions: Tarray<String>;
@@ -1349,7 +1350,6 @@ begin
     //--
     allog(
       'TALGeoPositionSensor.PermissionsRequestResultHandler',
-      'RequestCode: '+ALIntToStrW(LMsg.value.RequestCode) + ' | '+
       'Permissions: ' + LPermissionsStr  + ' | '+
       'GrantResults: ' + LGrantResultsStr,
       TalLogType.verbose);

@@ -234,29 +234,6 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="Alcinoe.AVLBinaryTree.pas"/>
-    <DCCReference Include="Alcinoe.Common.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Ani.pas"/>
-    <DCCReference Include="Alcinoe.FMX.BreakText.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Common.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Confetti.pas"/>
-    <DCCReference Include="Alcinoe.FMX.DesignEditors.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Edit.pas"/>
-    <DCCReference Include="Alcinoe.FMX.FilterEffects.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Graphics.pas"/>
-    <DCCReference Include="Alcinoe.FMX.InertialMovement.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Layouts.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Memo.pas"/>
-    <DCCReference Include="Alcinoe.FMX.Objects.pas"/>
-    <DCCReference Include="Alcinoe.FMX.StdCtrls.pas"/>
-    <DCCReference Include="Alcinoe.FMX.TabControl.pas"/>
-    <DCCReference Include="Alcinoe.FMX.VideoPlayer.pas"/>
-    <DCCReference Include="Alcinoe.QuickSortList.pas"/>
-    <DCCReference Include="Alcinoe.StringList.pas"/>
-    <DCCReference Include="Alcinoe.StringUtils.pas"/>
-    <DCCReference Include="DesignIDE.dcp"/>
-    <DCCReference Include="fmx.dcp"/>
-    <DCCReference Include="rtl.dcp"/>
     <BuildConfiguration Include="Base">
       <Key>Base</Key>
     </BuildConfiguration>

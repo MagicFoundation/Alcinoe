@@ -433,9 +433,6 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="Main.pas">
-      <Form>Form1</Form>
-    </DCCReference>
     <JavaReference Include="android\Merged\libs\32bit\androidx.activity-activity-1.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>

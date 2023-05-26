@@ -81,7 +81,8 @@
     
     <!-- ===== com.alcinoe.alcinoe-firebase-messaging ===== -->
     <service android:name="com.alcinoe.firebase.messaging.ALFirebaseMessagingService"
-             android:directBootAware="true">
+             android:directBootAware="true"
+             android:exported="true">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT"/>
       </intent-filter>

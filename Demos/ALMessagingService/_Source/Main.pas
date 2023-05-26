@@ -54,7 +54,7 @@ uses
   system.Messaging,
   Alcinoe.StringUtils,
   Alcinoe.StringList,
-  Alcinoe.FMX.FirebaseMessaging,
+  Alcinoe.FMX.MessagingService,
   Alcinoe.Common,
   Alcinoe.FMX.Objects;
 
@@ -70,7 +70,6 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonGetTokenClick(Sender: TObject);
-    procedure ButtonShowSampleNotificationClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ButtonSendAlertNotificationViaHttpV1Click(Sender: TObject);
     procedure ButtonSendDataNotificationViaHttpV1Click(Sender: TObject);
@@ -78,7 +77,7 @@ type
   private
     { Private declarations }
     FBadge: integer;
-    FFirebaseMessaging: TALFirebaseMessaging;
+    FMessagingService: TALMessagingService;
     procedure onFCMTokenRefresh(const aToken: String);
     procedure onFCMMessageReceived(const aPayload: TALStringListW);
     procedure OnAuthorizationRefused(Sender: TObject);
@@ -147,22 +146,22 @@ begin
   {$ENDIF}
   //----
   FBadge := 0;
-  FFirebaseMessaging := TALFirebaseMessaging.create;
-  FFirebaseMessaging.OnTokenRefresh := onFCMTokenRefresh;
-  FFirebaseMessaging.OnMessageReceived := OnFCMMessageReceived;
-  FFirebaseMessaging.OnAuthorizationRefused := OnAuthorizationRefused;
-  FFirebaseMessaging.OnAuthorizationGranted := OnAuthorizationGranted;
-  FFirebaseMessaging.CreateNotificationChannel(
+  FMessagingService := TALMessagingService.create;
+  FMessagingService.OnTokenRefresh := onFCMTokenRefresh;
+  FMessagingService.OnMessageReceived := OnFCMMessageReceived;
+  FMessagingService.OnAuthorizationRefused := OnAuthorizationRefused;
+  FMessagingService.OnAuthorizationGranted := OnAuthorizationGranted;
+  FMessagingService.CreateNotificationChannel(
     'demo', // const AID: String;
     'demo', // const AName: String;
-    TALFirebaseMessaging.TNotificationChannelImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
-  FFirebaseMessaging.setBadgeCount(0);
+    TALMessagingService.TNotificationChannelImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
+  FMessagingService.setBadgeCount(0);
 end;
 
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  AlFreeAndNil(FFirebaseMessaging);
+  AlFreeAndNil(FMessagingService);
   {$IF Defined(IOS) or Defined(ANDROID)}
   TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
   {$ENDIF}
@@ -171,7 +170,7 @@ end;
 {*****************************************}
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  FFirebaseMessaging.RequestNotificationPermission;
+  FMessagingService.RequestNotificationPermission;
 end;
 
 {************************************}
@@ -222,6 +221,7 @@ end;
 procedure TForm1.OnAuthorizationGranted(Sender: TObject);
 begin
   ALLog('OnAuthorizationGranted');
+  ShowLog('OnAuthorizationGranted');
 end;
 
 {*******************************************}
@@ -396,16 +396,10 @@ begin
   {$ENDIF}
 end;
 
-{******************************************************************}
-procedure TForm1.ButtonShowSampleNotificationClick(Sender: TObject);
-begin
-//toto
-end;
-
 {****************************************************}
 procedure TForm1.ButtonGetTokenClick(Sender: TObject);
 begin
-  FFirebaseMessaging.getToken;
+  FMessagingService.getToken;
 end;
 
 initialization

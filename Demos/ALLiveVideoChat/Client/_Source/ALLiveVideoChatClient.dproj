@@ -436,9 +436,6 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="main.pas">
-      <Form>Form1</Form>
-    </DCCReference>
     <JavaReference Include="android\Merged\libs\32bit\androidx.annotation-annotation-1.3.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>

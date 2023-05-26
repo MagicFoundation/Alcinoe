@@ -8,7 +8,7 @@ Setup (ANDROID)
 On android you just need to include the library com.alcinoe:alcinoe-firebase-messaging:1.0.0
 in the project. You also need to include google-services.json. You can do all
 of this with the help of AndroidMerger. you can see an exemple in
-<Alcinoe>\Demos\ALFirebaseMessaging\_source\android\MergeLibraries.bat
+<Alcinoe>\Demos\ALMessagingService\_source\android\MergeLibraries.bat
 
 
 Setup (IOS)
@@ -50,7 +50,7 @@ Setup (IOS)
 
 5) You must deploy the GoogleService-Info.plist to the root of the app. You
    can use DeployMan for this. you can see an exemple in
-   <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat.
+   <Alcinoe>\Demos\ALMessagingService\_source\ios\DeployMan.bat.
    All info regarding generating the GoogleService-Info.plist can be found at
    https://firebase.google.com/docs/ios/setup
 
@@ -77,7 +77,7 @@ Setup (IOS)
 
    You can use the template of an app extension:
    * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
-     all occurences of com.ALFirebaseMessaging.app by the bundle identifiers
+     all occurences of com.alcinoe.almessagingservice by the bundle identifiers
      of your delphi app
    * copy the content of <alcinoe>\References\iOSNotification\ somewhere in
      the macos. ex: /Users/<username>/Documents/iOSNotification
@@ -86,7 +86,7 @@ Setup (IOS)
    * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
      in a local folder to your project and with DeployMan instruct the dproj
      to deploy those file with your app. see an exemple of the DeployMan
-     command in <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat
+     command in <Alcinoe>\Demos\ALMessagingService\_source\ios\DeployMan.bat
 
    Or You can create the app extension in the following way:
    * Launch Xcode and select "create a new xcode project"
@@ -95,7 +95,7 @@ Setup (IOS)
      * Select your team (you need one just to be able to compile the
        project)
      * Enter the organization identifier of your project. Ex:
-       com.ALFirebaseMessaging.app, doesn't matter if not exact you will
+       com.alcinoe.almessagingservice, doesn't matter if not exact you will
        change it later
      * Select SwiftUI for the Interface
      * Select Swift for the language
@@ -132,7 +132,7 @@ Setup (IOS)
      * Select the signing & capabilities tab
        * Select "ALL" capabillity
        * Bundle Identifier: the bundle identifier of your delphi app
-         (without the team id) Ex: com.ALFirebaseMessaging.app
+         (without the team id) Ex: com.alcinoe.almessagingservice
    * In target select the service extension. Ex NotificationService
      * Select the General tab
        * Deployment info: iOS 11
@@ -141,7 +141,7 @@ Setup (IOS)
        * then select the signing & capabilities tab
          * Bundle Identifier: the bundle identifier of your delphi app
            (without the team id) + .notificationservice. Ex:
-           com.ALFirebaseMessaging.app.notificationservice
+           com.alcinoe.almessagingservice.notificationservice
    * in the left panel of xcode select the app extension.
      Ex NotificationService
    * Select the file NotificationService.m
@@ -159,7 +159,7 @@ Setup (IOS)
    * copy the content of /Users/<username>/Documents/Compiled/iOSNotification.app/PlugIns/
      in a local folder to your project and with DeployMan instruct the dproj
      to deploy those file with your app. see an exemple of the DeployMan
-     command in <Alcinoe>\Demos\ALFirebaseMessaging\_source\ios\DeployMan.bat
+     command in <Alcinoe>\Demos\ALMessagingService\_source\ios\DeployMan.bat
 
 
 Regarding Badge
@@ -257,9 +257,8 @@ uses
   Alcinoe.AndroidApi.AndroidX,
   {$ENDIF}
   {$IF defined(IOS)}
-  System.TypInfo,
-  iOSapi.Foundation,
   Macapi.ObjectiveC,
+  iOSapi.Foundation,
   iOSapi.UserNotifications,
   Alcinoe.iOSApi.FirebaseMessaging,
   {$ENDIF}
@@ -268,10 +267,6 @@ uses
   Alcinoe.StringList;
 
 type
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALFirebaseMessagingTokenRefreshEvent = procedure(const aToken: String) of object;
-  TALFirebaseMessagingMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFirebaseMessaging = class(TObject)
@@ -345,7 +340,6 @@ type
         end;
     private
       fUserNotificationCenterDelegate: TUserNotificationCenterDelegate;
-      procedure UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
 
     //FFIRMessagingDelegate
     private
@@ -369,14 +363,16 @@ type
     {$ENDIF}
     {$ENDREGION}
 
+  public
+    Type
+      TTokenRefreshEvent = procedure(const aToken: String) of object;
+      TMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
   private
     FCurrentToken: String;
     FDeliveredMessageIDs: TDictionary<String,boolean>;
     FGetTokenTaskIsRunning: Boolean;
-    fOnTokenRefresh: TALFirebaseMessagingTokenRefreshEvent;
-    fOnMessageReceived: TALFirebaseMessagingMessageReceivedEvent;
-    fOnAuthorizationRefused: TNotifyEvent;
-    fOnAuthorizationGranted: TNotifyEvent;
+    fOnTokenRefresh: TTokenRefreshEvent;
+    fOnMessageReceived: TMessageReceivedEvent;
   protected
     class var StartupNotificationMessages: Tarray<String>;
     class var CanDeliverStartupNotificationMessages: Boolean;
@@ -389,40 +385,11 @@ type
   public
     const MessageIdKeys: Array[0..2] of String = ('google.message_id','gcm.message_id','fcm_options.gcm.message_id');
   public
-    type
-      //https://developer.android.com/reference/android/app/Notification#VISIBILITY_PRIVATE
-      //VISIBILITY_PRIVATE=Show this notification on all lockscreens, but conceal sensitive or private information on secure lockscreens
-      //VISIBILITY_PUBLIC=Show this notification in its entirety on all lockscreens
-      //VISIBILITY_SECRET=Do not reveal any part of this notification on a secure lockscreen
-      TNotificationChannelLockscreenVisibility = (Public, Private, Secret);
-      //https://developer.android.com/reference/android/app/NotificationManager#IMPORTANCE_DEFAULT
-      //IMPORTANCE_DEFAULT=shows everywhere, makes noise, but does not visually intrude
-      //IMPORTANCE_HIGH=shows everywhere, makes noise and peeks. May use full screen intents
-      //IMPORTANCE_LOW=Shows in the shade, and potentially in the status bar but is not audibly intrusive
-      //IMPORTANCE_MIN=only shows in the shade, below the fold
-      //IMPORTANCE_NONE=does not show in the shade
-      TNotificationChannelImportance = (None, Default, Min, Low, High);
-  public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure RequestNotificationPermission;
-    class procedure CreateNotificationChannel(
-                      const AID: String;
-                      const AName: String;
-                      const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default; // Equivalent to message.android.notification.notification_priority of the http V1 message
-                      const ALockscreenVisibility: TNotificationChannelLockscreenVisibility = TNotificationChannelLockscreenVisibility.Private; // Equivalent to message.android.notification.visibility of the http V1 message
-                      const AEnableVibration: boolean = true;
-                      const AEnableLights: Boolean = true;
-                      const ALightColor: integer = 0;
-                      const ABypassDnd: Boolean = false;
-                      const AShowBadge: Boolean = true;
-                      const ASoundUri: String = 'content://settings/system/notification_sound'); // Equivalent to message.android.notification.sound of the http V1 message
-    class procedure setBadgeCount(const aNewValue: integer);
     procedure GetToken;
-    property OnTokenRefresh: TALFirebaseMessagingTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
-    property OnMessageReceived: TALFirebaseMessagingMessageReceivedEvent read fOnMessageReceived write fOnMessageReceived;
-    property OnAuthorizationRefused: TNotifyEvent read fOnAuthorizationRefused write fOnAuthorizationRefused;
-    property OnAuthorizationGranted: TNotifyEvent read fOnAuthorizationGranted write fOnAuthorizationGranted;
+    property OnTokenRefresh: TTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
+    property OnMessageReceived: TMessageReceivedEvent read fOnMessageReceived write fOnMessageReceived;
   end;
 
 implementation
@@ -433,20 +400,14 @@ uses
   fmx.platform,
   {$IF defined(android)}
   Androidapi.Helpers,
-  Androidapi.JNI.Net,
-  Androidapi.JNI.Provider,
-  Androidapi.JNI.GraphicsContentViewText,
-  Androidapi.JNI.App,
   Androidapi.JNI.Os,
-  Alcinoe.AndroidApi.Firebase,
   FMX.platform.Android,
+  Alcinoe.AndroidApi.Firebase,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.Helpers,
-  iOSapi.Helpers,
-  iOSapi.CocoaTypes,
-  IOSapi.UIKit,
   Macapi.ObjCRuntime,
+  iOSapi.CocoaTypes,
   FMX.Helpers.iOS,
   {$ENDIF}
   Alcinoe.StringUtils,
@@ -466,8 +427,6 @@ begin
   FGetTokenTaskIsRunning := False;
   fOnTokenRefresh := nil;
   fOnMessageReceived := nil;
-  fOnAuthorizationRefused := nil;
-  fOnAuthorizationGranted := nil;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
@@ -550,124 +509,6 @@ begin
   inherited Destroy;
 
 end;
-
-{***********************************************************}
-procedure TALFirebaseMessaging.RequestNotificationPermission;
-begin
-
-  {$REGION ' ANDROID'}
-  {$IF defined(ANDROID)}
-  {$MESSAGE WARN 'Implement RequestNotificationPermission https://firebase.google.com/docs/cloud-messaging/android/client#request-permission13'}
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  var LOptions := UNAuthorizationOptionSound or
-                  UNAuthorizationOptionAlert or
-                  UNAuthorizationOptionBadge;
-  TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(LOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
-  SharedApplication.registerForRemoteNotifications;
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-{*************************************************************}
-class procedure TALFirebaseMessaging.CreateNotificationChannel(
-                  const AID: String;
-                  const AName: String;
-                  const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
-                  const ALockscreenVisibility: TNotificationChannelLockscreenVisibility = TNotificationChannelLockscreenVisibility.Private;
-                  const AEnableVibration: boolean = true;
-                  const AEnableLights: Boolean = true;
-                  const ALightColor: integer = 0;
-                  const ABypassDnd: Boolean = false;
-                  const AShowBadge: Boolean = true;
-                  const ASoundUri: String = 'content://settings/system/notification_sound');
-begin
-
-  {$REGION ' ANDROID'}
-  {$IF defined(ANDROID)}
-  var LImportanceNative: integer;
-  case AImportance of
-    TNotificationChannelImportance.None: LImportanceNative := TJNotificationManager.JavaClass.IMPORTANCE_NONE;
-    TNotificationChannelImportance.Default: LImportanceNative := TJNotificationManager.JavaClass.IMPORTANCE_DEFAULT;
-    TNotificationChannelImportance.Min: LImportanceNative := TJNotificationManager.JavaClass.IMPORTANCE_MIN;
-    TNotificationChannelImportance.Low: LImportanceNative := TJNotificationManager.JavaClass.IMPORTANCE_LOW;
-    TNotificationChannelImportance.High: LImportanceNative := TJNotificationManager.JavaClass.IMPORTANCE_HIGH;
-    else raise Exception.Create('Error D55BED63-B524-4422-B075-71F40CDF5327');
-  end;
-  var LNotificationChannel := TJNotificationChannel.JavaClass.init(
-                                StringToJString(aID),
-                                StrToJCharSequence(aName),
-                                LImportanceNative);
-  //--
-  var LLockscreenVisibilityNative: integer;
-  case ALockscreenVisibility of
-    TNotificationChannelLockscreenVisibility.Public: LLockscreenVisibilityNative := TJNotification.JavaClass.VISIBILITY_PUBLIC;
-    TNotificationChannelLockscreenVisibility.Private: LLockscreenVisibilityNative := TJNotification.JavaClass.VISIBILITY_PRIVATE;
-    TNotificationChannelLockscreenVisibility.Secret: LLockscreenVisibilityNative := TJNotification.JavaClass.VISIBILITY_SECRET;
-    else raise Exception.Create('Error 276AB7CE-3809-46A5-B4B7-65A9B0630A3C');
-  end;
-  LNotificationChannel.setLockscreenVisibility(LLockscreenVisibilityNative);
-  //--
-  LNotificationChannel.enableVibration(aEnableVibration);
-  if aEnableVibration then begin
-    var LPattern := TJavaArray<Int64>.create(2);
-    try
-      LPattern[0] := 0;
-      LPattern[1] := 1200;
-      LNotificationChannel.setVibrationPattern(LPattern);
-    finally
-      AlFreeAndNil(LPattern);
-    end;
-  end;
-  //--
-  LNotificationChannel.enableLights(true);
-  if ALightColor <> 0 then LNotificationChannel.setLightColor(ALightColor);
-  //--
-  LNotificationChannel.setBypassDnd(ABypassDnd);
-  //--
-  LNotificationChannel.setShowBadge(AShowBadge);
-  //--
-  if ASoundUri = 'content://settings/system/notification_sound' then
-    LNotificationChannel.setSound(
-      TJSettings_System.JavaClass.DEFAULT_NOTIFICATION_URI,
-      TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
-  else if ASoundUri <> '' then
-    LNotificationChannel.setSound(
-      StrToJURI(ASoundUri),
-      TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
-  else
-    LNotificationChannel.setSound(nil, nil);
-  //--
-  var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-  var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
-  LNotificationManager.createNotificationChannel(LNotificationChannel);
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-{***************************************************************************}
-class procedure TALFirebaseMessaging.setBadgeCount(const aNewValue: integer);
-begin
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  SharedApplication.setApplicationIconBadgeNumber(aNewValue);
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
 
 {******************************************************************}
 //Returns the FCM registration token for this Firebase project. This
@@ -993,43 +834,6 @@ end;
 {$ENDIF}
 const
   UNNotificationPresentationOptionNone = 0;
-
-{**************************************************************************************************************************************}
-procedure TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
-begin
-
-  // If the local or remote notifications of your app or app extension interact
-  // with the user in any way, you must call this method to request authorization
-  // for those interactions. The first time your app ever calls the method, the
-  // system prompts the user to authorize the requested options. The user may
-  // respond by granting or denying authorization, and the system stores the user’s
-  // response so that subsequent calls to this method do not prompt the user again.
-  // The user may change the allowed interactions at any time. Use the
-  // getNotificationSettingsWithCompletionHandler: method to determine what your
-  // app is allowed to do.
-
-  {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted), TalLogType.verbose);
-  {$ENDIF}
-
- if (not granted) then begin
-   TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
-     procedure
-     begin
-       if assigned(fOnAuthorizationRefused) then
-         fOnAuthorizationRefused(self);
-     end);
-  end
-  else begin
-   TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
-     procedure
-     begin
-       if assigned(fOnAuthorizationGranted) then
-         fOnAuthorizationGranted(self);
-     end);
-  end;
-
-end;
 
 {**********************************************************************************************************************}
 constructor TALFirebaseMessaging.TUserNotificationCenterDelegate.Create(const aFirebaseMessaging: TALFirebaseMessaging);

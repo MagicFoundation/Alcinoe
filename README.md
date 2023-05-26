@@ -324,7 +324,7 @@ Delphi implementation of the latest version of Firebase
 cloud messaging (FCM) with HTTP V1 protocol that will 
 permit you to send alert notifications with images in 
 Android and iOS. Learn more at 
-[{alcinoe}\Demos\ALFirebaseMessaging](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFirebaseMessaging)
+[{alcinoe}\Demos\ALMessagingService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALMessagingService)
 
   
 GeoPositioning for Android/iOS

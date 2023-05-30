@@ -25,7 +25,7 @@ uses
   iOSapi.Foundation,
   {$ENDIF}
   Alcinoe.StringList,
-  Alcinoe.FMX.FirebaseMessaging;
+  Alcinoe.FMX.Firebase.Messaging;
 
 type
 

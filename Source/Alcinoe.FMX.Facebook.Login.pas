@@ -8,7 +8,7 @@ Setup (ANDROID)
 
 https://developers.facebook.com/docs/facebook-login/android/
 
-1) follow the step described in Alcinoe.FMX.FacebookCore
+1) follow the step described in Alcinoe.FMX.Facebook.Core
 
 2) On android you just need to include the library
      * com.facebook.android:facebook-login:15.2.0
@@ -39,9 +39,9 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/facebook-login/ios/
 
-1) follow the step described in Alcinoe.FMX.FacebookCore
+1) follow the step described in Alcinoe.FMX.Facebook.Core
 *******************************************************************************)
-unit Alcinoe.FMX.FacebookLogin;
+unit Alcinoe.FMX.Facebook.Login;
 
 interface
 
@@ -164,7 +164,7 @@ uses
   Macapi.Helpers,
   FMX.Platform,
   {$ENDIF}
-  Alcinoe.FMX.FacebookCore, // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.FMX.Facebook.Core, // [MANDATORY] Because we need it's initialization/finalization section
   Alcinoe.FMX.Common,
   Alcinoe.StringUtils,
   Alcinoe.Common;

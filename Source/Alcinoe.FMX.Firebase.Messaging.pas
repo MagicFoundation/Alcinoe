@@ -232,7 +232,7 @@ ANDROID: data notification          + app NOT RUNNING   : NO ALERT - NO BADGE - 
 ANDROID: alert notification         + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
 ANDROID: data + alert notification  + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
 *******************************************************************************)
-unit Alcinoe.FMX.FirebaseMessaging;
+unit Alcinoe.FMX.Firebase.Messaging;
 
 interface
 
@@ -262,7 +262,7 @@ uses
   iOSapi.UserNotifications,
   Alcinoe.iOSApi.FirebaseMessaging,
   {$ENDIF}
-  Alcinoe.FMX.FirebaseCore, // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.FMX.Firebase.Core, // [MANDATORY] Because we need it's initialization/finalization section
   Alcinoe.JSONDoc,
   Alcinoe.StringList;
 

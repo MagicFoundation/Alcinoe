@@ -1,4 +1,4 @@
-unit Alcinoe.FMX.FirebaseCore;
+unit Alcinoe.FMX.Firebase.Core;
 
 interface
 

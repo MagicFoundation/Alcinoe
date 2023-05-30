@@ -7,7 +7,7 @@ Setup (ANDROID)
 
 https://developers.facebook.com/docs/sharing/android/
 
-1) follow the step described in Alcinoe.FMX.FacebookCore
+1) follow the step described in Alcinoe.FMX.Facebook.Core
 
 2) On android you just need to include the library
      * com.alcinoe:alcinoe-facebook-share:1.0.0
@@ -45,9 +45,9 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/sharing/ios/
 
-1) follow the step described in Alcinoe.FMX.FacebookCore
+1) follow the step described in Alcinoe.FMX.Facebook.Core
 *******************************************************************************)
-unit Alcinoe.FMX.FacebookShare;
+unit Alcinoe.FMX.Facebook.Share;
 
 interface
 
@@ -76,7 +76,7 @@ uses
   Macapi.Helpers,
   Alcinoe.iOSApi.FacebookShareKit,
   {$ENDIF}
-  Alcinoe.FMX.FacebookCore; // [MANDATORY] Because we need it's initialization/finalization section
+  Alcinoe.FMX.Facebook.Core; // [MANDATORY] Because we need it's initialization/finalization section
 
 {*****************************************************************************************}
 class function TALFacebookShareDialog.ShowShareLinkDialog(const aLinkUrl: String): boolean;

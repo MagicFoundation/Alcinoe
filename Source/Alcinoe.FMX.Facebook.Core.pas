@@ -77,7 +77,7 @@ Setup (IOS)
 
 https://developers.facebook.com/docs/ios/getting-started
 
-1) follow the step bescribed described for FIREBASE in Alcinoe.FMX.FirebaseMessaging.pas
+1) follow the step bescribed described for FIREBASE in Alcinoe.FMX.Firebase.Messaging.pas
      1) : LD linker add -ObjC
      3) : Add the libswift frameworks for ios64 and Ios64 simulator
      4) : LD linker add -rpath /usr/lib/swift
@@ -145,7 +145,7 @@ https://developers.facebook.com/docs/ios/getting-started
    ALInitFacebookSDKAtStartup := false
    in the begin .. end section of your dpr
 *******************************************************************************)
-unit Alcinoe.FMX.FacebookCore;
+unit Alcinoe.FMX.Facebook.Core;
 
 interface
 

@@ -3,7 +3,7 @@ program ALFacebookLogin;
 uses
   System.StartUpCopy,
   FMX.Forms,
-  Alcinoe.FMX.FacebookCore,
+  Alcinoe.FMX.Facebook.Core,
   Main in 'Main.pas' {Form1};
 
 {$R *.res}

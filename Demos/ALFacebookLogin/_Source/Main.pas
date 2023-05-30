@@ -24,8 +24,8 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.StringList,
   Alcinoe.FMX.Common,
-  Alcinoe.FMX.FacebookLogin,
-  Alcinoe.FMX.FacebookShare,
+  Alcinoe.FMX.Facebook.Login,
+  Alcinoe.FMX.Facebook.Share,
   Alcinoe.Common,
   FMX.Memo.Types,
   Alcinoe.FMX.Objects;

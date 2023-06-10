@@ -3,7 +3,7 @@
     <ProjectGuid>{095626F5-84D0-448E-A91B-46BA3C696B77}</ProjectGuid>
     <ProjectVersion>19.5</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
-    <MainSource>ALMessagingServiceDemo.dpr</MainSource>
+    <MainSource>ALNotificationServiceDemo.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
     <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
@@ -165,7 +165,7 @@
     <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
     <AUP_WRITE_EXTERNAL_STORAGE>true</AUP_WRITE_EXTERNAL_STORAGE>
     <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-    <SanitizedProjectName>ALMessagingServiceDemo</SanitizedProjectName>
+    <SanitizedProjectName>ALNotificationServiceDemo</SanitizedProjectName>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <AUP_ACCESS_FINE_LOCATION>true</AUP_ACCESS_FINE_LOCATION>
     <AUP_WRITE_CALENDAR>true</AUP_WRITE_CALENDAR>
@@ -187,7 +187,7 @@
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=com.alcinoe.almessagingservicedemo;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.alcinoe.alnotificationservicedemo;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_Build>1</VerInfo_Build>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -202,7 +202,7 @@
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>package=com.alcinoe.almessagingservicedemo;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.alcinoe.alnotificationservicedemo;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_Android>true</Base_Android>
@@ -337,14 +337,14 @@
     <Cfg_1>true</Cfg_1>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=com.alcinoe.almessagingservicedemo;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.alcinoe.alnotificationservicedemo;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
     <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-    <VerInfo_BundleId>com.alcinoe.almessagingservicedemo</VerInfo_BundleId>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=com.alcinoe.almessagingservicedemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_BundleId>com.alcinoe.alnotificationservicedemo</VerInfo_BundleId>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=com.alcinoe.alnotificationservicedemo;CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
     <Cfg_1>true</Cfg_1>
@@ -863,7 +863,7 @@
     <BorlandProject>
       <Delphi.Personality>
         <Source>
-          <Source Name="MainSource">ALMessagingServiceDemo.dpr</Source>
+          <Source Name="MainSource">ALNotificationServiceDemo.dpr</Source>
         </Source>
         <Excluded_Packages>
           <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>

@@ -1,4 +1,4 @@
-program ALMessagingServiceDemo;
+program ALNotificationServiceDemo;
 
 uses
   System.StartUpCopy,

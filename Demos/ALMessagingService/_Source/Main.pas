@@ -54,7 +54,7 @@ uses
   system.Messaging,
   Alcinoe.StringUtils,
   Alcinoe.StringList,
-  Alcinoe.FMX.MessagingService,
+  Alcinoe.FMX.NotificationService,
   Alcinoe.Common,
   Alcinoe.FMX.Objects;
 
@@ -77,9 +77,9 @@ type
   private
     { Private declarations }
     FBadge: integer;
-    FMessagingService: TALMessagingService;
-    procedure onFCMTokenRefresh(const aToken: String);
-    procedure onFCMMessageReceived(const aPayload: TALStringListW);
+    FNotificationService: TALNotificationService;
+    procedure onTokenRefresh(const aToken: String);
+    procedure OnNotificationReceived(const aPayload: TALStringListW);
     procedure OnAuthorizationRefused(Sender: TObject);
     procedure OnAuthorizationGranted(Sender: TObject);
     procedure ShowLog(const aLog: String);
@@ -146,22 +146,22 @@ begin
   {$ENDIF}
   //----
   FBadge := 0;
-  FMessagingService := TALMessagingService.create;
-  FMessagingService.OnTokenRefresh := onFCMTokenRefresh;
-  FMessagingService.OnMessageReceived := OnFCMMessageReceived;
-  FMessagingService.OnAuthorizationRefused := OnAuthorizationRefused;
-  FMessagingService.OnAuthorizationGranted := OnAuthorizationGranted;
-  FMessagingService.CreateNotificationChannel(
+  FNotificationService := TALNotificationService.create;
+  FNotificationService.OnTokenRefresh := onTokenRefresh;
+  FNotificationService.OnNotificationReceived := OnNotificationReceived;
+  FNotificationService.OnAuthorizationRefused := OnAuthorizationRefused;
+  FNotificationService.OnAuthorizationGranted := OnAuthorizationGranted;
+  FNotificationService.CreateNotificationChannel(
     'demo', // const AID: String;
     'demo', // const AName: String;
-    TALMessagingService.TNotificationChannelImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
-  FMessagingService.setBadgeCount(0);
+    TALNotificationService.TNotificationChannelImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
+  FNotificationService.setBadgeCount(0);
 end;
 
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  AlFreeAndNil(FMessagingService);
+  AlFreeAndNil(FNotificationService);
   {$IF Defined(IOS) or Defined(ANDROID)}
   TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
   {$ENDIF}
@@ -170,7 +170,7 @@ end;
 {*****************************************}
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  FMessagingService.RequestNotificationPermission;
+  FNotificationService.RequestNotificationPermission;
 end;
 
 {************************************}
@@ -196,18 +196,18 @@ end;
 {$ENDIF}
 
 {*******************************************************}
-procedure TForm1.onFCMTokenRefresh(const aToken: String);
+procedure TForm1.onTokenRefresh(const aToken: String);
 begin
-  ALLog('onFCMTokenRefresh', 'Token: ' + aToken);
+  ALLog('onTokenRefresh', 'Token: ' + aToken);
   EditToken.text := aToken;
-  ShowLog('onFCMTokenRefresh: ' + aToken);
+  ShowLog('onTokenRefresh: ' + aToken);
 end;
 
 {********************************************************************}
-procedure TForm1.onFCMMessageReceived(const aPayload: TALStringListW);
+procedure TForm1.OnNotificationReceived(const aPayload: TALStringListW);
 begin
-  ALLog('onFCMMessageReceived', aPayload.Text);
-  ShowLog('onFCMMessageReceived'#13#10+aPayload.Text);
+  ALLog('OnNotificationReceived', aPayload.Text);
+  ShowLog('OnNotificationReceived'#13#10+aPayload.Text);
 end;
 
 {*******************************************************}
@@ -399,7 +399,7 @@ end;
 {****************************************************}
 procedure TForm1.ButtonGetTokenClick(Sender: TObject);
 begin
-  FMessagingService.getToken;
+  FNotificationService.getToken;
 end;
 
 initialization

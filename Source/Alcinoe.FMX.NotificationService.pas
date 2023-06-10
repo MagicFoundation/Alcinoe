@@ -12,7 +12,7 @@
 // each time a new service is integrated.
 //
 
-unit Alcinoe.FMX.MessagingService;
+unit Alcinoe.FMX.NotificationService;
 
 interface
 
@@ -29,8 +29,8 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMessagingService = class(TObject)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALNotificationService = class(TObject)
 
     {$REGION ' ANDROID'}
     {$IF defined(android)}
@@ -52,13 +52,13 @@ type
   public
     type
       TTokenRefreshEvent = procedure(const aToken: String) of object;
-      TMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
+      TNotificationReceivedEvent = procedure(const aPayload: TALStringListW) of object;
   private
     FFirebaseMessaging: TALFirebaseMessaging;
     fOnAuthorizationRefused: TNotifyEvent;
     fOnAuthorizationGranted: TNotifyEvent;
     fOnTokenRefresh: TTokenRefreshEvent;
-    fOnMessageReceived: TMessageReceivedEvent;
+    fOnNotificationReceived: TNotificationReceivedEvent;
     procedure onFCMTokenRefresh(const aToken: String);
     procedure onFCMMessageReceived(const aPayload: TALStringListW);
   public
@@ -92,10 +92,11 @@ type
                       const ASoundUri: String = 'content://settings/system/notification_sound'); // Equivalent to message.android.notification.sound of the http V1 message
     class procedure setBadgeCount(const aNewValue: integer);
     procedure GetToken;
+    procedure removeAllDeliveredNotifications;
     property OnAuthorizationRefused: TNotifyEvent read fOnAuthorizationRefused write fOnAuthorizationRefused;
     property OnAuthorizationGranted: TNotifyEvent read fOnAuthorizationGranted write fOnAuthorizationGranted;
     property OnTokenRefresh: TTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
-    property OnMessageReceived: TMessageReceivedEvent read fOnMessageReceived write fOnMessageReceived;
+    property OnNotificationReceived: TNotificationReceivedEvent read fOnNotificationReceived write fOnNotificationReceived;
   end;
 
 implementation
@@ -120,18 +121,18 @@ uses
   Alcinoe.stringUtils,
   Alcinoe.Common;
 
-{*************************************}
-constructor TALMessagingService.Create;
+{****************************************}
+constructor TALNotificationService.Create;
 begin
   inherited Create;
 
   FFirebaseMessaging := TALFirebaseMessaging.create;
   FFirebaseMessaging.OnTokenRefresh := onFCMTokenRefresh;
-  FFirebaseMessaging.onMessageReceived := onFCMMessageReceived;
+  FFirebaseMessaging.OnMessageReceived := onFCMMessageReceived;
   fOnAuthorizationRefused := nil;
   fOnAuthorizationGranted := nil;
   fOnTokenRefresh := nil;
-  fOnMessageReceived := nil;
+  fOnNotificationReceived := nil;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
@@ -141,8 +142,8 @@ begin
 
 end;
 
-{*************************************}
-destructor TALMessagingService.Destroy;
+{****************************************}
+destructor TALNotificationService.Destroy;
 begin
 
   AlFreeAndNil(FFirebaseMessaging);
@@ -157,8 +158,8 @@ begin
 
 end;
 
-{**********************************************************}
-procedure TALMessagingService.RequestNotificationPermission;
+{*************************************************************}
+procedure TALNotificationService.RequestNotificationPermission;
 begin
 
   {$REGION ' ANDROID'}
@@ -193,8 +194,8 @@ begin
 
 end;
 
-{************************************************************}
-class procedure TALMessagingService.CreateNotificationChannel(
+{***************************************************************}
+class procedure TALNotificationService.CreateNotificationChannel(
                   const AID: String;
                   const AName: String;
                   const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
@@ -270,8 +271,8 @@ begin
 
 end;
 
-{**************************************************************************}
-class procedure TALMessagingService.setBadgeCount(const aNewValue: integer);
+{*****************************************************************************}
+class procedure TALNotificationService.setBadgeCount(const aNewValue: integer);
 begin
 
   {$REGION ' IOS'}
@@ -282,31 +283,57 @@ begin
 
 end;
 
-{*************************************}
-procedure TALMessagingService.GetToken;
+{****************************************}
+procedure TALNotificationService.GetToken;
 begin
   FFirebaseMessaging.GetToken;
 end;
 
-{********************************************************************}
-procedure TALMessagingService.onFCMTokenRefresh(const aToken: String);
+{***************************************************************}
+procedure TALNotificationService.removeAllDeliveredNotifications;
+begin
+
+  {$REGION 'ANDROID'}
+  {$IF defined(ANDROID)}
+
+  var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
+  var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
+  LNotificationManager.cancelAll;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'IOS'}
+  {$IF defined(IOS)}
+
+  // under ios 9- no way to remove delivered notifications
+  if not TOSVersion.Check(10) then exit;
+  TUNUserNotificationCenter.OCClass.currentNotificationCenter.removeAllDeliveredNotifications;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{***********************************************************************}
+procedure TALNotificationService.onFCMTokenRefresh(const aToken: String);
 begin
   if assigned(FOnTokenRefresh) then
     FOnTokenRefresh(aToken);
 end;
 
-{*********************************************************************************}
-procedure TALMessagingService.onFCMMessageReceived(const aPayload: TALStringListW);
+{************************************************************************************}
+procedure TALNotificationService.onFCMMessageReceived(const aPayload: TALStringListW);
 begin
-  if assigned(FOnMessageReceived) then
-    FOnMessageReceived(aPayload);
+  if assigned(FOnNotificationReceived) then
+    FOnNotificationReceived(aPayload);
 end;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
-{******************************************************************************************************}
-procedure TALMessagingService.PermissionsRequestResultHandler(const Sender: TObject; const M: TMessage);
+{*********************************************************************************************************}
+procedure TALNotificationService.PermissionsRequestResultHandler(const Sender: TObject; const M: TMessage);
 begin
   if (M is TPermissionsRequestResultMessage) then begin
 
@@ -315,14 +342,14 @@ begin
 
     If MainActivity.checkSelfPermission(StringToJString('android.permission.POST_NOTIFICATIONS')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED then begin
       {$IFDEF DEBUG}
-      allog('TALMessagingService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False), TalLogType.verbose);
+      allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False), TalLogType.verbose);
       {$ENDIF}
       if assigned(fOnAuthorizationRefused) then
         fOnAuthorizationRefused(self);
     end
     else begin
       {$IFDEF DEBUG}
-      allog('TALMessagingService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True), TalLogType.verbose);
+      allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True), TalLogType.verbose);
       {$ENDIF}
       if assigned(fOnAuthorizationGranted) then
         fOnAuthorizationGranted(self);
@@ -337,8 +364,8 @@ end;
 {$REGION ' IOS'}
 {$IF defined(IOS)}
 
-{*************************************************************************************************************************************}
-procedure TALMessagingService.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
+{****************************************************************************************************************************************}
+procedure TALNotificationService.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler(granted: Boolean; error: NSError);
 begin
 
   // If the local or remote notifications of your app or app extension interact
@@ -352,7 +379,7 @@ begin
   // app is allowed to do.
 
   {$IFDEF DEBUG}
-  allog('TALFirebaseMessaging.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted), TalLogType.verbose);
+  allog('TALNotificationService.UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler', 'granted: ' + ALBoolToStrW(granted), TalLogType.verbose);
   {$ENDIF}
 
  if (not granted) then begin

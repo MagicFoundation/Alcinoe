@@ -31,5 +31,5 @@ Example
     -Platforms=iOSDevice64
 ```
     
-You can also check the ALMessagingService Demo and in particular the script:
-[{Alcinoe}\Demos\ALMessagingService\_source\ios\DeployMan.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALMessagingService/_source/ios/DeployMan.bat)
+You can also check the ALNotificationService Demo and in particular the script:
+[{Alcinoe}\Demos\ALNotificationService\_source\ios\DeployMan.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService/_source/ios/DeployMan.bat)

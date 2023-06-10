@@ -136,7 +136,7 @@ uses
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.GeoPosition.Sensor,
   Alcinoe.FMX.Memo,
-  Alcinoe.FMX.MessagingService,
+  Alcinoe.FMX.NotificationService,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.TabControl,

@@ -149,4 +149,4 @@ ic_launcher.png, etc. Then include this dir in the -libraries path like :
 AndroidMerger.exe -Libraries="androidx.appcompat:appcompat:1.5.1;<mydir>" ...
 ```
 
-You can look the [{Alcinoe}\Demos\ALMessagingService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALMessagingService) as example
+You can look the [{Alcinoe}\Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService) as example

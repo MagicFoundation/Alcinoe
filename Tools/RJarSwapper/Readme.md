@@ -25,4 +25,4 @@ Exemple:
 ```
 
 You can find a working example of how to use RJarSwapper
-in [{Alcinoe}\Demos\ALMessagingService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALMessagingService)
+in [{Alcinoe}\Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)

@@ -195,7 +195,7 @@ begin
 end;
 {$ENDIF}
 
-{*******************************************************}
+{****************************************************}
 procedure TForm1.onTokenRefresh(const aToken: String);
 begin
   ALLog('onTokenRefresh', 'Token: ' + aToken);
@@ -203,7 +203,7 @@ begin
   ShowLog('onTokenRefresh: ' + aToken);
 end;
 
-{********************************************************************}
+{**********************************************************************}
 procedure TForm1.OnNotificationReceived(const aPayload: TALStringListW);
 begin
   ALLog('OnNotificationReceived', aPayload.Text);

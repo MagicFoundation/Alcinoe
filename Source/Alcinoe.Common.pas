@@ -87,6 +87,7 @@ type
     fRequests: TObjectList<TALWorkerThreadRequest>;
     function GetPriorityDirection: TPriorityDirection;
     function GetPriorityStartingPoint: int64;
+    function GetPriorityStartingPointExt(const AExtData: Tobject): Int64;
     procedure SetPriorityDirection(const Value: TPriorityDirection);
     procedure SetPriorityStartingPoint(const Value: int64);
   protected
@@ -792,6 +793,12 @@ begin
   result := AtomicCmpExchange(FPriorityStartingPoint{Target},0{NewValue},0{Comparand});
 end;
 
+{***************************************************************************************}
+function TALWorkerThreadPool.GetPriorityStartingPointExt(const AExtData: Tobject): Int64;
+begin
+  result := GetPriorityStartingPoint;
+end;
+
 {*************************************************************************}
 procedure TALWorkerThreadPool.SetPriorityStartingPoint(const Value: int64);
 begin
@@ -969,7 +976,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AExtData: Tobject; // ExtData will be free by the worker thread
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, AExtData, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {****************************************}
@@ -977,7 +984,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {****************************************}
@@ -1053,7 +1060,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AExtData: Tobject; // ExtData will be free by the worker thread
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, AExtData, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {****************************************}
@@ -1061,7 +1068,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 type

@@ -323,6 +323,14 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALGraphicThreadPool = class(TALWorkerThreadPool)
   private
+    class function CreateInstance: TALGraphicThreadPool;
+    class var FInstance: TALGraphicThreadPool;
+    class function GetInstance: TALGraphicThreadPool; static;
+  public
+    type
+      TCreateInstanceFunct = function: TALGraphicThreadPool;
+    class var CreateInstanceFunct: TCreateInstanceFunct;
+    class property Instance: TALGraphicThreadPool read GetInstance;
   public
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
@@ -337,13 +345,6 @@ type
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); override;
   end;
-
-var
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  //you must create and free it yourself in your app
-  //ex: ALGlobalGraphicThreadPool := TALGraphicThreadPool.Create(TThread.ProcessorCount);
-  ALGlobalGraphicThreadPool: TALGraphicThreadPool;
 
 implementation
 
@@ -9249,6 +9250,22 @@ begin
 end;
 {$ENDIF}
 
+{***********************************************************************}
+class function TALGraphicThreadPool.CreateInstance: TALGraphicThreadPool;
+begin
+  result := TALGraphicThreadPool.Create(TThread.ProcessorCount);
+end;
+
+{********************************************************************}
+class function TALGraphicThreadPool.GetInstance: TALGraphicThreadPool;
+begin
+  if FInstance = nil then begin
+    var LInstance := CreateInstanceFunct;
+    if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
+  end;
+  Result := FInstance;
+end;
+
 {*****************************************}
 procedure TALGraphicThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
@@ -9318,9 +9335,10 @@ begin
 end;
 
 initialization
-  ALGlobalGraphicThreadPool := nil;
+  TALGraphicThreadPool.FInstance := nil;
+  TALGraphicThreadPool.CreateInstanceFunct := @TALGraphicThreadPool.CreateInstance;
 
 finalization
-  ALFreeAndNil(ALGlobalGraphicThreadPool);
+  ALFreeAndNil(TALGraphicThreadPool.FInstance);
 
 end.

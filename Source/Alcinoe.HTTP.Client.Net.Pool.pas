@@ -48,6 +48,15 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALNetHttpClientPool = Class(TALWorkerThreadPool)
   private
+    class function CreateInstance: TALNetHttpClientPool;
+    class var FInstance: TALNetHttpClientPool;
+    class function GetInstance: TALNetHttpClientPool; static;
+  public
+    type
+      TCreateInstanceFunct = function: TALNetHttpClientPool;
+    class var CreateInstanceFunct: TCreateInstanceFunct;
+    class property Instance: TALNetHttpClientPool read GetInstance;
+  private
     FCacheData: TALNetHttpClientPoolCacheDataProc;
     FRetrieveCachedData: TALNetHttpClientPoolRetrieveCachedDataProc;
     procedure DoGet(var AExtData: Tobject);
@@ -55,72 +64,65 @@ type
   public
     procedure Get(
                 const AUrl: String;
-                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc; // [MultiThread]
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AExtData: Tobject; // ExtData will be free by the worker thread
                 const AUseCache: Boolean;
                 const APriority: Int64;
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc; // [MultiThread]
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AExtData: Tobject; // ExtData will be free by the worker thread
                 const AUseCache: Boolean;
-                const APriority: TALWorkerThreadGetPriorityFunc;
+                const APriority: TALWorkerThreadGetPriorityFunc; // [MultiThread]
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc; // [MultiThread]
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AExtData: Tobject; // ExtData will be free by the worker thread
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const ACanStartCallBack: TALNetHttpClientPoolCanStartProc; // [MultiThread]
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AExtData: Tobject; // ExtData will be free by the worker thread
                 const AUseCache: Boolean;
                 const APriority: Int64;
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AExtData: Tobject; // ExtData will be free by the worker thread
                 const AUseCache: Boolean;
-                const APriority: TALWorkerThreadGetPriorityFunc;
+                const APriority: TALWorkerThreadGetPriorityFunc; // [MultiThread]
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AExtData: Tobject; // ExtData will be free by the worker thread
                 const AAsync: Boolean = True); overload;
     procedure Get(
                 const AUrl: String;
-                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+                const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc; // [MultiThread]
+                const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc; // [MultiThread]
                 const AAsync: Boolean = True); overload;
     Property CacheData: TALNetHttpClientPoolCacheDataProc read FCacheData write FCacheData;
     Property RetrieveCachedData: TALNetHttpClientPoolRetrieveCachedDataProc read FRetrieveCachedData write FRetrieveCachedData;
   end;
-
-var
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  //you must create and free it yourself in your app
-  //ex: ALGlobalNetHttpClientPool := TALNetHttpClientPool.Create(8);
-  ALGlobalNetHttpClientPool: TALNetHttpClientPool;
 
 implementation
 
@@ -154,6 +156,23 @@ destructor TALNetHttpClientPoolRequest.Destroy;
 begin
   ALFreeAndNil(FExtData);
   inherited Destroy;
+end;
+
+{***********************************************************************}
+class function TALNetHttpClientPool.CreateInstance: TALNetHttpClientPool;
+begin
+  //https://stackoverflow.com/questions/70054035/what-the-ideal-maximum-parallels-http-connections-an-android-app-can-have
+  result := TALNetHttpClientPool.Create(8);
+end;
+
+{********************************************************************}
+class function TALNetHttpClientPool.GetInstance: TALNetHttpClientPool;
+begin
+  if FInstance = nil then begin
+    var LInstance := CreateInstanceFunct;
+    if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
+  end;
+  Result := FInstance;
 end;
 
 {**********************************************************}
@@ -392,9 +411,10 @@ begin
 end;
 
 initialization
-  ALGlobalNetHttpClientPool := nil;
+  TALNetHttpClientPool.FInstance := nil;
+  TALNetHttpClientPool.CreateInstanceFunct := @TALNetHttpClientPool.CreateInstance;
 
 finalization
-  ALFreeAndNil(ALGlobalNetHttpClientPool);
+  ALFreeAndNil(TALNetHttpClientPool.FInstance);
 
 end.

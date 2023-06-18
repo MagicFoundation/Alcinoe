@@ -65,19 +65,14 @@ Setup (IOS)
 7) If you want to show an image in an ios alert, you must add a service
    extension to the project.
 
-   Their is actually 2 difficulties with this way:
-   1/ You need to sign the plugin yourself
-      codesign --remove-signature /YourPathto/NotificationService
-      codesign -s <Identity> /YourPathto/NotificationService
-      https://quality.embarcadero.com/browse/RSP-40216
-   2/ The bundle identifier of the app extension must start with the
-      bundle identifier of the delphi project. That mean we can not create a
-      reusable app extension for different projects.
-      https://stackoverflow.com/questions/74854659/how-to-change-from-command-line-the-bundle-identifier-of-an-app-extension
+   Their is actually 1 difficulties with this way: The bundle identifier of the
+   app extension must start with the bundle identifier of the delphi project.
+   That mean we can not create a reusable app extension for different projects.
+   https://stackoverflow.com/questions/74854659/how-to-change-from-command-line-the-bundle-identifier-of-an-app-extension
 
    You can use the template of an app extension:
    * Replace in <alcinoe>\References\iOSNotification\iOSNotification.xcodeproj\project.pbxproj
-     all occurences of com.alcinoe.alnotificationservice by the bundle identifiers
+     all occurences of com.alcinoe.alnotificationservicedemo by the bundle identifiers
      of your delphi app
    * copy the content of <alcinoe>\References\iOSNotification\ somewhere in
      the macos. ex: /Users/<username>/Documents/iOSNotification
@@ -95,7 +90,7 @@ Setup (IOS)
      * Select your team (you need one just to be able to compile the
        project)
      * Enter the organization identifier of your project. Ex:
-       com.alcinoe.alnotificationservice, doesn't matter if not exact you will
+       com.alcinoe.alnotificationservicedemo, doesn't matter if not exact you will
        change it later
      * Select SwiftUI for the Interface
      * Select Swift for the language
@@ -132,7 +127,7 @@ Setup (IOS)
      * Select the signing & capabilities tab
        * Select "ALL" capabillity
        * Bundle Identifier: the bundle identifier of your delphi app
-         (without the team id) Ex: com.alcinoe.alnotificationservice
+         (without the team id) Ex: com.alcinoe.alnotificationservicedemo
    * In target select the service extension. Ex NotificationService
      * Select the General tab
        * Deployment info: iOS 11
@@ -141,7 +136,7 @@ Setup (IOS)
        * then select the signing & capabilities tab
          * Bundle Identifier: the bundle identifier of your delphi app
            (without the team id) + .notificationservice. Ex:
-           com.alcinoe.alnotificationservice.notificationservice
+           com.alcinoe.alnotificationservicedemo.notificationservice
    * in the left panel of xcode select the app extension.
      Ex NotificationService
    * Select the file NotificationService.m
@@ -834,6 +829,8 @@ end;
 {$ENDIF}
 const
   UNNotificationPresentationOptionNone = 0;
+  UNNotificationPresentationOptionList = (1 shl 3);
+  UNNotificationPresentationOptionBanner = (1 shl 4);
 
 {**********************************************************************************************************************}
 constructor TALFirebaseMessaging.TUserNotificationCenterDelegate.Create(const aFirebaseMessaging: TALFirebaseMessaging);
@@ -858,7 +855,9 @@ end;
 // Asks the delegate to display the in-app notification settings.
 procedure TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter(center: UNUserNotificationCenter; notification: UNNotification);
 begin
-
+  {$IFDEF DEBUG}
+  allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification', TalLogType.verbose);
+  {$ENDIF}
 end;
 
 {*********************************************************************************************************}
@@ -876,12 +875,33 @@ begin
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler', LJsonStr, TalLogType.verbose);
     {$ENDIF}
 
-    var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonStr));
-    TMessageManager.DefaultManager.SendMessage(nil, LMessage);
+    if ALStrToBool(LJsonDoc.GetChildNodeValuetext('alcinoe.presentnotification', '0')) then begin
 
-    @LImp := imp_implementationWithBlock(completionHandler);
-    LImp(UNNotificationPresentationOptionNone);
-    imp_removeBlock(@LImp);
+      @LImp := imp_implementationWithBlock(completionHandler);
+      if TOSVersion.Check(14) then
+        LImp(
+          UNNotificationPresentationOptionBadge or
+          UNNotificationPresentationOptionSound or
+          UNNotificationPresentationOptionList or
+          UNNotificationPresentationOptionBanner)
+      else
+        LImp(
+          UNNotificationPresentationOptionBadge or
+          UNNotificationPresentationOptionSound or
+          UNNotificationPresentationOptionAlert);
+      imp_removeBlock(@LImp);
+
+    end
+    else begin
+
+      var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonStr));
+      TMessageManager.DefaultManager.SendMessage(nil, LMessage);
+
+      @LImp := imp_implementationWithBlock(completionHandler);
+      LImp(UNNotificationPresentationOptionNone);
+      imp_removeBlock(@LImp);
+
+    end;
 
   finally
     ALFreeAndNil(LJsonDoc);

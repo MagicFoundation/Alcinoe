@@ -484,7 +484,9 @@ begin
       LOldToNewNames.add('vALJsonISODateFormatSettings=ALJsonISODateFormatSettingsA');
       LOldToNewNames.add('vALJsonISODateFormatSettingsU=ALJsonISODateFormatSettingsW');
       LOldToNewNames.add('vALDefaultNodeIndentU=ALDefaultJsonNodeIndentW');
-
+      LOldToNewNames.add('ALGlobalNetHttpClientPool=TALNetHttpClientPool.Instance');
+      LOldToNewNames.add('ALGlobalGraphicThreadPool=TALGraphicThreadPool.Instance');
+      
       var LFiles := TALStringListW.Create;
       try
 

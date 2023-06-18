@@ -486,7 +486,7 @@ begin
       LOldToNewNames.add('vALDefaultNodeIndentU=ALDefaultJsonNodeIndentW');
       LOldToNewNames.add('ALGlobalNetHttpClientPool=TALNetHttpClientPool.Instance');
       LOldToNewNames.add('ALGlobalGraphicThreadPool=TALGraphicThreadPool.Instance');
-      
+
       var LFiles := TALStringListW.Create;
       try
 

@@ -307,14 +307,14 @@ begin
   result := Self;
 end;
 
-{**************************************************************************************************}
+{****************************************************************************************************}
 function TALNotification.setImportance(const aImportance: TALNotificationImportance): TALNotification;
 begin
   FImportance := aImportance;
   result := Self;
 end;
 
-{**************************************************************************************************}
+{****************************************************************************************************}
 function TALNotification.setVisibility(const aVisibility: TALNotificationVisibility): TALNotification;
 begin
   FVisibility := aVisibility;
@@ -418,10 +418,10 @@ begin
     if LLargeIconBitmap <> nil then LNotificationBuilder := LNotificationBuilder.setLargeIcon(LLargeIconBitmap);
     if FSmallIconResName <> '' then
       LNotificationBuilder := LNotificationBuilder.setSmallIcon(
-        TAndroidHelper.Context.getResources().getIdentifier(
-          StringToJstring(FSmallIconResName), // name	String: The name of the desired resource.
-          StringToJstring('drawable'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
-          TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
+                                TAndroidHelper.Context.getResources().getIdentifier(
+                                  StringToJstring(FSmallIconResName), // name	String: The name of the desired resource.
+                                  StringToJstring('drawable'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
+                                  TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
     if FNumber >= 0 then LNotificationBuilder.setNumber(FNumber);
     var LDefaults: integer := 0;
     if FSound then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_SOUND;

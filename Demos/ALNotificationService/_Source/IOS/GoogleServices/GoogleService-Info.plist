@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>473525438998-kg1g48bn0co67v9vq5gs84vbjkja1iaq.apps.googleusercontent.com</string>
+	<string>362697684107-s2bk1sotd1d815eg3756nnqleulcs5ki.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.473525438998-kg1g48bn0co67v9vq5gs84vbjkja1iaq</string>
+	<string>com.googleusercontent.apps.362697684107-s2bk1sotd1d815eg3756nnqleulcs5ki</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCzkS27HetJCR_8eduBp3WOkeCMJdTyP4g</string>
+	<string>AIzaSyCqDdt0cbHMYhpovTM68CW-mRUE60cLnrQ</string>
 	<key>GCM_SENDER_ID</key>
-	<string>473525438998</string>
+	<string>362697684107</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.ALFirebaseMessaging.app</string>
+	<string>com.alcinoe.alnotificationservicedemo</string>
 	<key>PROJECT_ID</key>
-	<string>alfirebasemessagingapp</string>
+	<string>alnotificationservicedemo</string>
 	<key>STORAGE_BUCKET</key>
-	<string>alfirebasemessagingapp.appspot.com</string>
+	<string>alnotificationservicedemo.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:473525438998:ios:fc9b83f2050a580ae50337</string>
+	<string>1:362697684107:ios:74af33dc5eb9898a37508e</string>
 </dict>
 </plist>

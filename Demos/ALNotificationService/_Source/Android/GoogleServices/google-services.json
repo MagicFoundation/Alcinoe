@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "362697684107",
+    "project_id": "alnotificationservicedemo",
+    "storage_bucket": "alnotificationservicedemo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:362697684107:android:d39c4bc6df5853ec37508e",
+        "android_client_info": {
+          "package_name": "com.alcinoe.alnotificationservicedemo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "362697684107-s2bk1sotd1d815eg3756nnqleulcs5ki.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alcinoe.alnotificationservicedemo"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

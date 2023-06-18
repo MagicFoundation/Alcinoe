@@ -3178,11 +3178,11 @@
         <attr name="android:drawable"/>
     </declare-styleable>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <string name="default_web_client_id" translatable="false">473525438998-cfesrloac4k87aam569gnivgdkfvckqo.apps.googleusercontent.com</string>
-    <string name="gcm_defaultSenderId" translatable="false">473525438998</string>
-    <string name="google_api_key" translatable="false">AIzaSyD9y8sPkHve0fsgH11UVgBqcRBTRyqrt7E</string>
-    <string name="google_app_id" translatable="false">1:473525438998:android:4de91fba3dae57c7e50337</string>
-    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD9y8sPkHve0fsgH11UVgBqcRBTRyqrt7E</string>
-    <string name="google_storage_bucket" translatable="false">alfirebasemessagingapp.appspot.com</string>
-    <string name="project_id" translatable="false">alfirebasemessagingapp</string>
+    <string name="default_web_client_id" translatable="false">362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">362697684107</string>
+    <string name="google_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>
+    <string name="google_app_id" translatable="false">1:362697684107:android:d39c4bc6df5853ec37508e</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>
+    <string name="google_storage_bucket" translatable="false">alnotificationservicedemo.appspot.com</string>
+    <string name="project_id" translatable="false">alnotificationservicedemo</string>
 </resources>

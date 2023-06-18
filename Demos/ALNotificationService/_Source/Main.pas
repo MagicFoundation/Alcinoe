@@ -67,6 +67,7 @@ type
     ButtonSendAlertNotificationViaHttpV1: TButton;
     ButtonSendDataNotificationViaHttpV1: TButton;
     ButtonSendAlertDataNotificationViaHttpV1: TButton;
+    ButtonShowNotification: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonGetTokenClick(Sender: TObject);
@@ -74,6 +75,7 @@ type
     procedure ButtonSendAlertNotificationViaHttpV1Click(Sender: TObject);
     procedure ButtonSendDataNotificationViaHttpV1Click(Sender: TObject);
     procedure ButtonSendAlertDataNotificationViaHttpV1Click(Sender: TObject);
+    procedure ButtonShowNotificationClick(Sender: TObject);
   private
     { Private declarations }
     FBadge: integer;
@@ -101,40 +103,40 @@ const
 
   //The info are taken from an account (wonderful.life.photos@gmail.com) that I
   //created specifically for this demo. I retrieve it like this:
-  // * go to Firebase console project settings (ALFirebaseMessagingApp)
-  //   https://console.firebase.google.com/project/alfirebasemessagingapp/settings/cloudmessaging/android:com.ALFirebaseMessaging.app
+  // * go to Firebase console project settings (ALNotificationServiceDemo)
+  //   https://console.firebase.google.com/project/alnotificationservicedemo/settings/general/android:com.alcinoe.alnotificationservicedemo
   // * Then click on clound messaging and click on Manage Service Accounts under Firebase Cloud Messaging API (V1)
-  // * Then download the json key associated with the Service accounts for project "ALFirebaseMessagingApp"
+  // * Then download the json key associated with the Service accounts for project "ALNotificationServiceDemo"
   // * find all the info below inside the json key you just downloaded
-  FirebaseMessagingHttpV1ProjectID: AnsiString = 'alfirebasemessagingapp';
-  FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-s54m2@alfirebasemessagingapp.iam.gserviceaccount.com';
+  FirebaseMessagingHttpV1ProjectID: AnsiString = 'alnotificationservicedemo';
+  FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-nwe4e@alnotificationservicedemo.iam.gserviceaccount.com';
   FirebaseMessagingHttpV1ServiceAccountPrivateKey: AnsiString = '-----BEGIN PRIVATE KEY-----'+
-                                                                'MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDfUXJ03IVm/Vhs'+
-                                                                'fdnuJdjvyXH9EvOwots8HQR+kaeHhD8h+1Gu3DNncMfkshKbRqiYjWDjqbiw6jPD'+
-                                                                'UNVKDzhK20HxqiLFbqkV8G7PgxANSDw7+iuu4vRMTeKaco6FDs+OCuODFd48J2sd'+
-                                                                'fd7HaAILbedgmbOHBEoAzeNl6ceeOkdk8+ap4ne/JK6gC4ENZ30oV5T5Ob1VpCBP'+
-                                                                'K/M4+4hsS5r+Uf+ZU3jpjHQxlMbSo/rUGKnz+WuQoBCcfrYhXDIE89kMEjEqQapz'+
-                                                                '+wTmn5EK7CVg5SBjwheriAy4F0HBW4kB91Ef01aV/f0OB2SVXoIoiziNayx/nHZ4'+
-                                                                'QO8xMSWrAgMBAAECgf8NJX4SV17CXU7Aym0C/ruGNKFJ2xooD3eE30Pd1TVduvOs'+
-                                                                '3t3Y4Al+KtknCVVmNQe15FhMR3bdw3WFzc5ivHlnpmkKja1Vkk87pHfaA/R0NTs1'+
-                                                                'dH/FjPvExtkUVyjZu5vhu8l7ke1YyUGXsX0yzexGsoHTfW/kdBWZGbhZRmSL3O5B'+
-                                                                'vayCZASX9Iy26H6f/UvP6fnH/TDDUGz8HWSOH8Ne7Xvaa3kukG5Uod9lrykhX3ak'+
-                                                                'Xx6cXbcohE0+rhoNjR7ks1V736fjuRxOnj0btF709qvsKVthaR4lxrmoGswMCSS8'+
-                                                                'h78ZJOa4Fvle3hPxL1eaE3SPKSZdqAzxwlKerQkCgYEA+xfaQtgjh3/65h3OMiZ6'+
-                                                                '/VP+oupuNHcHq+O2Sf+uMh2peuk/Addf8lpFhR5AOK368BiAOljuIcMqVIJV2kJU'+
-                                                                'vWbAuakxsxSkq/Rz89SjR9YmbKeiEj+ZYUnMCl2lSU8LDuz4J5hEQ0Vb/BEf/3iZ'+
-                                                                'fU6KYqc35sGlqVWkjhyxHi0CgYEA466k3jf/q+dNfyhmdmtUWMcNsLlJWslNVuas'+
-                                                                'nub5CGJYPOHwZZS4xW16sQIs3tL3WN1cD3XJIz+uW5847BwBZHav7o1FEsfpc41W'+
-                                                                'fLlH3i0F5bTY/OFg1rJkmp40qVWBG1msfZn4OIR5Mbs6C4NRO71bUcb76XV77B0G'+
-                                                                'lLZmkjcCgYEA2+QSpzFDRBmm7rkxZyfd01YojCHDKz0GQdjkPb+knIzvbA0xuXoU'+
-                                                                's1esxBwu37Q1Kug5+18ABB83RdTyPHaUYV3H74+lT5AHefNVTDZuW63F7qeLPnHl'+
-                                                                '75ZCEt3Zru6C36pU08/8D/GA0alpnT/PIzaR6D1KrlHtsvKmbjHgRm0CgYBdqk43'+
-                                                                'ARCUVq6h/ivQ0ay8bP8r0b3ktGW1t2YSZPDUSykDuutbzsgIqFZOFZgB/wY0r7Qc'+
-                                                                'xBcAAkWneaRANfE4tD8CQ2nEJSvcFqwa2VpAg4MmkbSmq81b5b3PggAmHX/kkYqN'+
-                                                                'jVb5YT4+gEiLzfUQP4Ee7l5aF7PoWbSIX1VpFwKBgQDwjfI8sX7LwxvKQuNu5qcx'+
-                                                                'mMfLnDfRgssLE3tMfjUX9sntCLpczRtjk+x7ImM8vy2C3S1ukvJhp77ZYn6uiHVq'+
-                                                                'vH1tQxnf7TvB1u39SY8EK0dKOQbBVJi8Zk8AGCP9rt3BLsM+BIr9qv9i9iteguDw'+
-                                                                'onhj6y2OHcmbEvc3pbSMdQ=='+
+                                                                'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMzhD2+LmYJrxD'+
+                                                                'RtUqQkHPwQRDjRC0AyD5JBJjuvtpgZoBEfYAd8CYuS2ah2dY7jGgzjqrQ7ovyv8H'+
+                                                                'gs1gKLXZXC8VHxKn/VtGqpqBWm65M3CvlFN3/aFCw2PV8YC/dq4NuVr3/bowJbha'+
+                                                                'hL+LUhFzXRqKQAhGajO/wZJQkjaO48F9zNbXuuyRf60Sj6aPjqOJjHJeFHEq9Kij'+
+                                                                'Dam4R/IJVMMeoOXhyX26xPrqRBoPxuJwlSZg6lZBzGCXxXxMUTCHvO5Ki15TeJef'+
+                                                                'Fo4EpXkZrw3VfsLF2+ucbSzByRctjqyU3m7/kOp0hxiZ5wRolSyIwX9N9NIbw4lO'+
+                                                                'FJu5/jeRAgMBAAECggEABnckWZkMhFGqi9ASRTSGQ1fUAnMBxrXAZOi34nIartFw'+
+                                                                'ZeZutX4plFc6Bvakx6rWEMmx47jCuB8qEHIXYg0yl7hnpNP2HHLMu8XS/WIJpSgu'+
+                                                                'BTz0k24PO+zeyibG3qGRaROvRMSNOoYQgADcGPTv7Yw44s+t8zJkjI21GgiX+iVM'+
+                                                                'xW7bvii0sC7v+QSmfKpdmHtjc0QcdGz02dQ2m0uaNyGSYQzqn21D+vS7vbCUpr5X'+
+                                                                'QdQ+TEp4lDsa3Wf2b4avDEVnMFrag1bPO9mjo8M+9NkpMQbA/SvFv78He4DZpljJ'+
+                                                                'Rp6I+cJ6xWyxdNR4PPVV89Dsk34XQS/TytMlSZipKQKBgQDo3iuOAKshh/m8uiwm'+
+                                                                'uT2NuvKuvqbuDgwTgKd7Nr9tKTbJcfHfBaiPRdrgYDu30YOHsxFfL80HUIv15CDe'+
+                                                                'DNeufp8UVEqXl6EzOAgcXm3BWFqOjkgFWpcgQeBevYlJYhdzLUF6WeO6gBpYhr2F'+
+                                                                'mnIxHtsn+y7jRSDyoLBmPF8tEwKBgQDhJkGjBP3B+R+wxcjphoZZgobraFFm+DKk'+
+                                                                '5eJKu9f5O3BJfIk57pFnGzfhrjEKKKe3Ub7i0f1SV7jkCROSxRtUXB8zWi6adQkK'+
+                                                                'fPN3CGCkU//yQz0PUcwX7XPzS/PvMMkvQ690LAgxHTBwEKEHHxF0zZcw6dRUNkA+'+
+                                                                'NCA61+NRSwKBgHqZvcSdhXu54zoBqo0YqdecvXhS2AAtVR5Pdd3hDRejwzx7ySPq'+
+                                                                'DryfwoSvJcG5hM5E8Lh0qjVXqthiqws9J7Cu6YICfuMg6bXVoi+NZ6uLoOG89x4a'+
+                                                                'e8Z36HD4yPbhtgblpLuN59+g4j4Jcm6MyeIipK+AB0eQdbBH+ZdZ4aIRAoGAQbeB'+
+                                                                '5wxY6RpHFrjUSN1cL5o6uVGMmQqO9bSn1Xp4sqWXw8tW3pL02+yE5hmK9NUjBw4U'+
+                                                                'Mm5qi3NRYzYHAYsIzBnLfZiwC6NnjSklgzPtyWk/Rr47f1I3yTAk7PnZbJKH1oTi'+
+                                                                'HH2Rsow7jCo+Zi66UKaFn+BQengPTli2o5ZKInsCgYEAzuEA7iz6mxj4Tl14/EHl'+
+                                                                'lXPOUUZ8a1T+hkiV4IHg5sacRoyIF8LtlQdx4LL8tNiCj0p1Y6vVzmFDDrOdGww2'+
+                                                                'TENN4jneIB6Y2Gzh7KLfiD543aLOd5RJc6hNGbBHJ5jd5E8VxnswUd0L6v0LrG9o'+
+                                                                'RVNesy22JS69CCX39m8T2MU='+
                                                                 '-----END PRIVATE KEY-----';
 
 {*******************************************}
@@ -154,7 +156,7 @@ begin
   FNotificationService.CreateNotificationChannel(
     'demo', // const AID: String;
     'demo', // const AName: String;
-    TALNotificationService.TNotificationChannelImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
+    TALNotificationImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
   FNotificationService.setBadgeCount(0);
 end;
 
@@ -394,6 +396,29 @@ begin
   {$ELSE}
   TDialogService.ShowMessage('You can send messages using HTTP V1 protocol only from Microsoft Windows operating system');
   {$ENDIF}
+end;
+
+{************************************************************}
+procedure TForm1.ButtonShowNotificationClick(Sender: TObject);
+begin
+  TALNotification.Create(ALRandomStrW(25){ATag})
+    .SetChannelId('demo')
+    .SetTitle('Notification Title')
+    .SetText('This is a sample notification alert!')
+    .setTicker('Sample ticker')
+    //.SetLargeIconStream(const aLargeIconStream: TMemoryStream)
+    .SetLargeIconUrl('https://i.stack.imgur.com/EwPfY.jpg?s=64&g=1')
+    .setSmallIconResName('notification_icon')
+    .AddPayload('one_sample_key'{aName}, 'one_sample_value'{aValue})
+    .AddPayload('another_sample_key'{aName}, 'another_sample_value'{aValue})
+    //.SetAutoCancel(const aAutoCancel: boolean)
+    //.setNumber(const aNumber: integer)
+    //.setSound(const aSound: boolean)
+    //.setVibrate(const aVibrate: boolean)
+    //.setLights(const aLights: boolean)
+    //.setImportance(const aImportance: TALNotificationImportance)
+    //.setVisibility(const aVisibility: TALNotificationVisibility)
+    .show;
 end;
 
 {****************************************************}

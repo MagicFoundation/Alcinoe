@@ -17,11 +17,11 @@ object Form1: TForm1
     TextSettings.WordWrap = True
     Align = Client
     Size.Width = 360.000000000000000000
-    Size.Height = 307.000000000000000000
+    Size.Height = 267.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 4
+    TabOrder = 5
     Viewport.Width = 356.000000000000000000
-    Viewport.Height = 303.000000000000000000
+    Viewport.Height = 263.000000000000000000
   end
   object ButtonGetToken: TButton
     Align = Top
@@ -29,7 +29,7 @@ object Form1: TForm1
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 3
+    TabOrder = 4
     Text = 'Get Token'
     OnClick = ButtonGetTokenClick
   end
@@ -61,8 +61,8 @@ object Form1: TForm1
   object EditToken: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     Align = Top
-    TabOrder = 5
-    Position.Y = 377.000000000000000000
+    TabOrder = 6
+    Position.Y = 417.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 34.000000000000000000
     Size.PlatformDefault = False
@@ -74,7 +74,7 @@ object Form1: TForm1
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 2
+    TabOrder = 3
     Text = 'Send Alert Notification (Http V1)'
     OnClick = ButtonSendAlertNotificationViaHttpV1Click
   end
@@ -84,7 +84,7 @@ object Form1: TForm1
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 1
+    TabOrder = 2
     Text = 'Send Data Notification (Http V1)'
     OnClick = ButtonSendDataNotificationViaHttpV1Click
   end
@@ -94,8 +94,18 @@ object Form1: TForm1
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 0
+    TabOrder = 1
     Text = 'Send Alert + Data Notification (Http V1)'
     OnClick = ButtonSendAlertDataNotificationViaHttpV1Click
+  end
+  object ButtonShowNotification: TButton
+    Align = Top
+    Position.Y = 377.000000000000000000
+    Size.Width = 360.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 0
+    Text = 'Show Alert Notification'
+    OnClick = ButtonShowNotificationClick
   end
 end

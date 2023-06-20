@@ -149,7 +149,9 @@ type
     FLastGeneratedUniqueID: integer;
     procedure onFCMTokenRefresh(const aToken: String);
     procedure onFCMMessageReceived(const aPayload: TALStringListW);
+    {$HINTS OFF}
     function GenerateUniqueID: integer;
+    {$HINTS ON}
   public
     class var TmpPath: String;
   public
@@ -494,25 +496,26 @@ begin
 
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
-
-  var LNotificationChannel := TJNotificationChannel.JavaClass.init(
-                                StringToJString(ANotificationChannel.FID),
-                                StrToJCharSequence(ANotificationChannel.FName),
-                                ALNotificationImportanceToNative(ANotificationChannel.FImportance));
-  LNotificationChannel.setLockscreenVisibility(ALNotificationVisibilityToNative(ANotificationChannel.FLockscreenVisibility));
-  LNotificationChannel.enableVibration(ANotificationChannel.FEnableVibration);
-  LNotificationChannel.enableLights(ANotificationChannel.FEnableLights);
-  LNotificationChannel.setShowBadge(ANotificationChannel.FShowBadge);
-  if ANotificationChannel.FEnableSound then
-    LNotificationChannel.setSound(
-      TJSettings_System.JavaClass.DEFAULT_NOTIFICATION_URI, // 'content://settings/system/notification_sound'
-      TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
-  else
-    LNotificationChannel.setSound(nil, nil);
-  var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-  var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
-  LNotificationManager.createNotificationChannel(LNotificationChannel);
-
+  // Create the NotificationChannel, but only on API 26+ (Android 8.0 oreo)
+  if TOSVersion.Check(8) then begin
+    var LNotificationChannel := TJNotificationChannel.JavaClass.init(
+                                  StringToJString(ANotificationChannel.FID),
+                                  StrToJCharSequence(ANotificationChannel.FName),
+                                  ALNotificationImportanceToNative(ANotificationChannel.FImportance));
+    LNotificationChannel.setLockscreenVisibility(ALNotificationVisibilityToNative(ANotificationChannel.FLockscreenVisibility));
+    LNotificationChannel.enableVibration(ANotificationChannel.FEnableVibration);
+    LNotificationChannel.enableLights(ANotificationChannel.FEnableLights);
+    LNotificationChannel.setShowBadge(ANotificationChannel.FShowBadge);
+    if ANotificationChannel.FEnableSound then
+      LNotificationChannel.setSound(
+        TJSettings_System.JavaClass.DEFAULT_NOTIFICATION_URI, // 'content://settings/system/notification_sound'
+        TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
+    else
+      LNotificationChannel.setSound(nil, nil);
+    var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
+    var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
+    LNotificationManager.createNotificationChannel(LNotificationChannel);
+  end;
   {$ENDIF}
   {$ENDREGION}
 
@@ -686,25 +689,25 @@ begin
     var LUserInfo := TNSMutableDictionary.Create;
     try
       LUserInfo.setValue(StringToID('alcinoe:'+ALLowerCase(ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}))), StrToNsStr('google.message_id')); // Need to unduplicate received messages in TALFirebaseMessaging
-      for var I := low(FPayload) to high(FPayload) do
-        LUserInfo.setValue(StringToID(FPayload[i].Value), StrToNsStr(FPayload[i].Key));
+      for var I := low(ANotification.FPayload) to high(ANotification.FPayload) do
+        LUserInfo.setValue(StringToID(ANotification.FPayload[i].Value), StrToNsStr(ANotification.FPayload[i].Key));
       LUserInfo.setValue(StringToID('1'), StrToNsStr('alcinoe.presentnotification'));
       LNotificationContent.setUserInfo(LUserInfo);
     finally
       LUserInfo.release;
     end;
-    if FTitle <> '' then LNotificationContent.setTitle(StrToNSStr(FTitle));
-    if Ftext <> '' then LNotificationContent.setbody(StrToNSStr(Ftext));
-    if FNumber >= 0 then LNotificationContent.setBadge(TNSNumber.Wrap(TNSNumber.OCClass.numberWithInt(FNumber)));
-    if Fsound then LNotificationContent.setSound(TUNNotificationSound.OCClass.defaultSound);
-    if FLargeIconStream <> nil then begin
-      var LFileExt := AlDetectImageExtension(FLargeIconStream);
-      Var LTmpPath := TALNotification.TmpPath;
+    if ANotification.FTitle <> '' then LNotificationContent.setTitle(StrToNSStr(ANotification.FTitle));
+    if ANotification.Ftext <> '' then LNotificationContent.setbody(StrToNSStr(ANotification.Ftext));
+    if ANotification.FNumber >= 0 then LNotificationContent.setBadge(TNSNumber.Wrap(TNSNumber.OCClass.numberWithInt(ANotification.FNumber)));
+    if ANotification.Fsound then LNotificationContent.setSound(TUNNotificationSound.OCClass.defaultSound);
+    if ANotification.FLargeIconStream <> nil then begin
+      var LFileExt := AlDetectImageExtension(ANotification.FLargeIconStream);
+      Var LTmpPath := TALNotificationService.TmpPath;
       if LTmpPath = '' then LTmpPath := Tpath.GetTempPath;
       var LFileName := Tpath.Combine(
                          LTmpPath,
                          'alcinoe_notification_'+ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}).tolower + ALIfThenW(LFileExt <> '', '.') + LFileExt);
-      FLargeIconStream.SaveToFile(LFileName);
+      ANotification.FLargeIconStream.SaveToFile(LFileName);
       var LErrorPtr: PNSError := nil;
       var LNotificationAttachment := TUNNotificationAttachment.OCClass.attachmentWithIdentifier(
                                        nil, // identifier: NSString;
@@ -725,7 +728,7 @@ begin
     end;
     //-----
     var LNotificationRequest := TUNNotificationRequest.OCClass.requestWithIdentifier(
-                                  StrToNsStr(FTag), // identifier: NSString; ;
+                                  StrToNsStr(ANotification.FTag), // identifier: NSString; ;
                                   LNotificationContent, // content: UNNotificationContent
                                   nil); // trigger: UNNotificationTrigger
     try

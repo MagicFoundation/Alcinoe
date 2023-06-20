@@ -79,7 +79,6 @@ type
   private
     { Private declarations }
     FBadge: integer;
-    FNotificationService: TALNotificationService;
     procedure onTokenRefresh(const aToken: String);
     procedure OnNotificationReceived(const aPayload: TALStringListW);
     procedure OnAuthorizationRefused(Sender: TObject);
@@ -148,22 +147,19 @@ begin
   {$ENDIF}
   //----
   FBadge := 0;
-  FNotificationService := TALNotificationService.create;
-  FNotificationService.OnTokenRefresh := onTokenRefresh;
-  FNotificationService.OnNotificationReceived := OnNotificationReceived;
-  FNotificationService.OnAuthorizationRefused := OnAuthorizationRefused;
-  FNotificationService.OnAuthorizationGranted := OnAuthorizationGranted;
-  FNotificationService.CreateNotificationChannel(
-    'demo', // const AID: String;
-    'demo', // const AName: String;
-    TALNotificationImportance.High); //const AImportance: TNotificationChannelImportance = TNotificationChannelImportance.Default;
-  FNotificationService.setBadgeCount(0);
+  TALNotificationService.Instance.OnTokenRefresh := onTokenRefresh;
+  TALNotificationService.Instance.OnNotificationReceived := OnNotificationReceived;
+  TALNotificationService.Instance.OnAuthorizationRefused := OnAuthorizationRefused;
+  TALNotificationService.Instance.OnAuthorizationGranted := OnAuthorizationGranted;
+  TALNotificationService.Instance.CreateNotificationChannel(
+    TALNotificationChannel.create('demo'{AID})
+      .SetImportance(TALNotificationImportance.High));
+  TALNotificationService.Instance.setBadgeCount(0);
 end;
 
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  AlFreeAndNil(FNotificationService);
   {$IF Defined(IOS) or Defined(ANDROID)}
   TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
   {$ENDIF}
@@ -172,7 +168,7 @@ end;
 {*****************************************}
 procedure TForm1.FormShow(Sender: TObject);
 begin
-  FNotificationService.RequestNotificationPermission;
+  TALNotificationService.Instance.RequestNotificationPermission;
 end;
 
 {************************************}
@@ -401,30 +397,22 @@ end;
 {************************************************************}
 procedure TForm1.ButtonShowNotificationClick(Sender: TObject);
 begin
-  TALNotification.Create(ALRandomStrW(25){ATag})
-    .SetChannelId('demo')
-    .SetTitle('Notification Title')
-    .SetText('This is a sample notification alert!')
-    .setTicker('Sample ticker')
-    //.SetLargeIconStream(const aLargeIconStream: TMemoryStream)
-    .SetLargeIconUrl('https://i.stack.imgur.com/EwPfY.jpg?s=64&g=1')
-    .setSmallIconResName('notification_icon')
-    .AddPayload('one_sample_key'{aName}, 'one_sample_value'{aValue})
-    .AddPayload('another_sample_key'{aName}, 'another_sample_value'{aValue})
-    //.SetAutoCancel(const aAutoCancel: boolean)
-    //.setNumber(const aNumber: integer)
-    //.setSound(const aSound: boolean)
-    //.setVibrate(const aVibrate: boolean)
-    //.setLights(const aLights: boolean)
-    //.setImportance(const aImportance: TALNotificationImportance)
-    //.setVisibility(const aVisibility: TALNotificationVisibility)
-    .show;
+  TALNotificationService.Instance.ShowNotification(
+    TALNotification.Create(ALRandomStrW(25){ATag})
+      .SetChannelId('demo')
+      .SetTitle('Notification Title')
+      .SetText('This is a sample notification alert!')
+      .setTicker('Sample ticker')
+      .SetLargeIconUrl('https://i.stack.imgur.com/EwPfY.jpg?s=64&g=1')
+      .setSmallIconResName('notification_icon')
+      .AddPayload('one_sample_key'{aName}, 'one_sample_value'{aValue})
+      .AddPayload('another_sample_key'{aName}, 'another_sample_value'{aValue}));
 end;
 
 {****************************************************}
 procedure TForm1.ButtonGetTokenClick(Sender: TObject);
 begin
-  FNotificationService.getToken;
+  TALNotificationService.Instance.getToken;
 end;
 
 initialization

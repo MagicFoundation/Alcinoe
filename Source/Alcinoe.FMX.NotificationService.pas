@@ -48,13 +48,6 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~}
   TALNotification = record
   private
-    {$HINTS OFF}
-    class var FLastGeneratedUniqueID: integer;
-    class function GenerateUniqueID: integer; static;
-    {$HINTS ON}
-  public
-    class var TmpPath: String;
-  private
     FTag: String;
     FChannelId: String;
     FTitle: String;
@@ -87,7 +80,31 @@ type
     function setLights(const aLights: boolean): TALNotification;
     function setImportance(const aImportance: TALNotificationImportance): TALNotification;
     function setVisibility(const aVisibility: TALNotificationVisibility): TALNotification;
-    procedure Show;
+  End;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALNotificationChannel = record
+  private
+    FID: String;
+    FName: String;
+    FImportance: TALNotificationImportance;
+    FLockscreenVisibility: TALNotificationVisibility;
+    FEnableVibration: Boolean;
+    FEnableLights: Boolean;
+    FEnableSound: Boolean;
+    FShowBadge: Boolean;
+  public
+    constructor Create(const AID: String); // The id of the channel. Must be unique per package
+    function SetName(const AName: String): TALNotificationChannel; // The user visible name of the channel.
+    function SetImportance(const AImportance: TALNotificationImportance): TALNotificationChannel; // Sets the level of interruption of this notification channel.
+    function SetLockscreenVisibility(const ALockscreenVisibility: TALNotificationVisibility): TALNotificationChannel; // Sets whether notifications posted to this channel appear on the lockscreen or not, and if so, whether they appear in a redacted form.
+    function SetEnableVibration(const AEnableVibration: Boolean): TALNotificationChannel; // Sets whether notification posted to this channel should vibrate.
+    //function SetVibrationPattern(const AVibrationPattern: TArray<Int64>): TALNotificationChannel;
+    function SetEnableLights(const AEnableLights: Boolean): TALNotificationChannel; // Sets whether notifications posted to this channel should display notification lights
+    //function SetLightColor(const ALightColor: TAlphaColor): TALNotificationChannel;
+    function SetEnableSound(const AEnableSound: Boolean): TALNotificationChannel;
+    //function SetSoundUri(const ASoundUri: String): TALNotificationChannel;
+    function SetShowBadge(const AShowBadge: Boolean): TALNotificationChannel; // Sets whether notifications posted to this channel can appear as application icon badges in a Launcher.
   End;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -110,6 +127,15 @@ type
     {$ENDIF}
     {$ENDREGION}
 
+  private
+    class function CreateInstance: TALNotificationService;
+    class var FInstance: TALNotificationService;
+    class function GetInstance: TALNotificationService; static;
+  public
+    type
+      TCreateInstanceFunct = function: TALNotificationService;
+    class var CreateInstanceFunct: TCreateInstanceFunct;
+    class property Instance: TALNotificationService read GetInstance;
   public
     type
       TTokenRefreshEvent = procedure(const aToken: String) of object;
@@ -120,24 +146,19 @@ type
     fOnAuthorizationGranted: TNotifyEvent;
     fOnTokenRefresh: TTokenRefreshEvent;
     fOnNotificationReceived: TNotificationReceivedEvent;
+    FLastGeneratedUniqueID: integer;
     procedure onFCMTokenRefresh(const aToken: String);
     procedure onFCMMessageReceived(const aPayload: TALStringListW);
+    function GenerateUniqueID: integer;
+  public
+    class var TmpPath: String;
   public
     constructor Create; virtual;
     destructor Destroy; override;
     procedure RequestNotificationPermission;
-    class procedure CreateNotificationChannel(
-                      const AID: String;
-                      const AName: String;
-                      const AImportance: TALNotificationImportance = TALNotificationImportance.Default; // Equivalent to message.android.notification.notification_priority of the http V1 message
-                      const ALockscreenVisibility: TALNotificationVisibility = TALNotificationVisibility.Private; // Equivalent to message.android.notification.visibility of the http V1 message
-                      const AEnableVibration: boolean = true;
-                      const AEnableLights: Boolean = true;
-                      const ALightColor: integer = 0;
-                      const ABypassDnd: Boolean = false;
-                      const AShowBadge: Boolean = true;
-                      const ASoundUri: String = 'content://settings/system/notification_sound'); // Equivalent to message.android.notification.sound of the http V1 message
-    class procedure setBadgeCount(const aNewValue: integer);
+    procedure CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel); virtual;
+    procedure SetBadgeCount(const aNewValue: integer); virtual;
+    procedure ShowNotification(const ANotification: TALNotification); virtual;
     procedure GetToken;
     procedure removeAllDeliveredNotifications;
     property OnAuthorizationRefused: TNotifyEvent read fOnAuthorizationRefused write fOnAuthorizationRefused;
@@ -204,13 +225,6 @@ begin
   FLights := True;
   FImportance := TALNotificationImportance.Default;
   FVisibility := TALNotificationVisibility.Private;
-end;
-
-{*******************************************************}
-class function TALNotification.GenerateUniqueID: integer;
-begin
-  inc(FLastGeneratedUniqueID);
-  result := FLastGeneratedUniqueID;
 end;
 
 {*******************************************************************************}
@@ -321,16 +335,211 @@ begin
   result := Self;
 end;
 
-{*****************************}
-procedure TALNotification.Show;
+{***********************************************************}
+constructor TALNotificationChannel.Create(const AID: String);
+begin
+  FID := AID;
+  FName := AID;
+  FImportance := TALNotificationImportance.Default;
+  FLockscreenVisibility := TALNotificationVisibility.Private;
+  FEnableVibration := true;
+  FEnableLights := true;
+  FEnableSound := true;
+  FShowBadge := true;
+end;
+
+{***********************************************************************************}
+function TALNotificationChannel.SetName(const AName: String): TALNotificationChannel;
+begin
+  FName := AName;
+  result := Self;
+end;
+
+{******************************************************************************************************************}
+function TALNotificationChannel.SetImportance(const AImportance: TALNotificationImportance): TALNotificationChannel;
+begin
+  FImportance := AImportance;
+  result := Self;
+end;
+
+{**************************************************************************************************************************************}
+function TALNotificationChannel.SetLockscreenVisibility(const ALockscreenVisibility: TALNotificationVisibility): TALNotificationChannel;
+begin
+  FLockscreenVisibility := ALockscreenVisibility;
+  result := Self;
+end;
+
+{**********************************************************************************************************}
+function TALNotificationChannel.SetEnableVibration(const AEnableVibration: Boolean): TALNotificationChannel;
+begin
+  FEnableVibration := AEnableVibration;
+  result := Self;
+end;
+
+{****************************************************************************************************}
+function TALNotificationChannel.SetEnableLights(const AEnableLights: Boolean): TALNotificationChannel;
+begin
+  FEnableLights := AEnableLights;
+  result := Self;
+end;
+
+{**************************************************************************************************}
+function TALNotificationChannel.SetEnableSound(const AEnableSound: Boolean): TALNotificationChannel;
+begin
+  FEnableSound := AEnableSound;
+  result := Self;
+end;
+
+{**********************************************************************************************}
+function TALNotificationChannel.SetShowBadge(const AShowBadge: Boolean): TALNotificationChannel;
+begin
+  FShowBadge := AShowBadge;
+  result := Self;
+end;
+
+{****************************************}
+constructor TALNotificationService.Create;
 begin
 
-  if (FLargeIconUrl <> '') and (FLargeIconStream = nil) then begin
+  inherited Create;
 
-    var LSelf := Self;
+  FFirebaseMessaging := TALFirebaseMessaging.create;
+  FFirebaseMessaging.OnTokenRefresh := onFCMTokenRefresh;
+  FFirebaseMessaging.OnMessageReceived := onFCMMessageReceived;
+  fOnAuthorizationRefused := nil;
+  fOnAuthorizationGranted := nil;
+  fOnTokenRefresh := nil;
+  fOnNotificationReceived := nil;
+  FLastGeneratedUniqueID := integer(ALDateTimeToUnixms(ALUTCNow) mod Maxint);
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+  TMessageManager.DefaultManager.SubscribeToMessage(TPermissionsRequestResultMessage, PermissionsRequestResultHandler);
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{****************************************}
+destructor TALNotificationService.Destroy;
+begin
+
+  AlFreeAndNil(FFirebaseMessaging);
+
+  {$REGION ' ANDROID'}
+  {$IF defined(android)}
+  TMessageManager.DefaultManager.Unsubscribe(TPermissionsRequestResultMessage, PermissionsRequestResultHandler);
+  {$ENDIF}
+  {$ENDREGION}
+
+  inherited Destroy;
+
+end;
+
+{***************************************************************************}
+class function TALNotificationService.CreateInstance: TALNotificationService;
+begin
+  result := TALNotificationService.Create;
+end;
+
+{************************************************************************}
+class function TALNotificationService.GetInstance: TALNotificationService;
+begin
+  if FInstance = nil then begin
+    var LInstance := CreateInstanceFunct;
+    if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
+  end;
+  Result := FInstance;
+end;
+
+{*************************************************************}
+procedure TALNotificationService.RequestNotificationPermission;
+begin
+
+  {$REGION ' ANDROID'}
+  {$IF defined(ANDROID)}
+  // This is only necessary for API level >= 33 (TIRAMISU)
+  if (TOSVersion.Check(13, 0)) and
+     (MainActivity.checkSelfPermission(StringToJString('android.permission.POST_NOTIFICATIONS')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED) then begin
+    var LPermissions := TJavaObjectArray<JString>.create(1);
+    try
+      LPermissions.Items[0] := StringToJString('android.permission.POST_NOTIFICATIONS');
+      MainActivity.requestPermissions(LPermissions, RequestPermissionsCode);
+    finally
+      ALFreeAndNil(LPermissions);
+    end;
+  end
+  else begin
+    if assigned(fOnAuthorizationGranted) then
+      fOnAuthorizationGranted(self);
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(IOS)}
+  var LOptions := UNAuthorizationOptionSound or
+                  UNAuthorizationOptionAlert or
+                  UNAuthorizationOptionBadge;
+  TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(LOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
+  SharedApplication.registerForRemoteNotifications;
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{*************************************************************************************************************}
+procedure TALNotificationService.CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel);
+begin
+
+  {$REGION ' ANDROID'}
+  {$IF defined(ANDROID)}
+
+  var LNotificationChannel := TJNotificationChannel.JavaClass.init(
+                                StringToJString(ANotificationChannel.FID),
+                                StrToJCharSequence(ANotificationChannel.FName),
+                                ALNotificationImportanceToNative(ANotificationChannel.FImportance));
+  LNotificationChannel.setLockscreenVisibility(ALNotificationVisibilityToNative(ANotificationChannel.FLockscreenVisibility));
+  LNotificationChannel.enableVibration(ANotificationChannel.FEnableVibration);
+  LNotificationChannel.enableLights(ANotificationChannel.FEnableLights);
+  LNotificationChannel.setShowBadge(ANotificationChannel.FShowBadge);
+  if ANotificationChannel.FEnableSound then
+    LNotificationChannel.setSound(
+      TJSettings_System.JavaClass.DEFAULT_NOTIFICATION_URI, // 'content://settings/system/notification_sound'
+      TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
+  else
+    LNotificationChannel.setSound(nil, nil);
+  var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
+  var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
+  LNotificationManager.createNotificationChannel(LNotificationChannel);
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{***********************************************************************}
+procedure TALNotificationService.SetBadgeCount(const aNewValue: integer);
+begin
+
+  {$REGION ' IOS'}
+  {$IF defined(IOS)}
+  SharedApplication.setApplicationIconBadgeNumber(aNewValue);
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{**************************************************************************************}
+procedure TALNotificationService.ShowNotification(const ANotification: TALNotification);
+begin
+
+  if (ANotification.FLargeIconUrl <> '') and (ANotification.FLargeIconStream = nil) then begin
+
+    var LNotification := ANotification;
     TALNetHttpClientPool.Instance.Get(
       // const AUrl: String;
-      FLargeIconUrl,
+      LNotification.FLargeIconUrl,
       //
       // const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
       procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AExtData: TObject)
@@ -339,8 +548,8 @@ begin
         TThread.Synchronize(nil,
           procedure
           begin
-            LSelf.FLargeIconStream := LContentStream;
-            LSelf.Show;
+            LNotification.FLargeIconStream := LContentStream;
+            TALNotificationService.Instance.ShowNotification(LNotification);
           end);
       end,
       //
@@ -350,11 +559,11 @@ begin
         TThread.Synchronize(nil,
           procedure
           begin
-            LSelf.FLargeIconStream := TMemoryStream.create;
+            LNotification.FLargeIconStream := TMemoryStream.create;
             try
-              LSelf.Show;
+              TALNotificationService.Instance.ShowNotification(LNotification);
             finally
-              ALFreeAndNil(LSelf.FLargeIconStream);
+              ALFreeAndNil(LNotification.FLargeIconStream);
             end;
           end);
       end);
@@ -369,11 +578,11 @@ begin
   try
 
     //download the LLargeIconBitmap
-    if (FLargeIconStream <> nil) and (FLargeIconStream.Size > 0)  then begin
+    if (ANotification.FLargeIconStream <> nil) and (ANotification.FLargeIconStream.Size > 0)  then begin
       try
 
         LLargeIconBitmap := ALFitIntoAndCropImageV2(
-                              FLargeIconStream,
+                              ANotification.FLargeIconStream,
                               function(const aOriginalSize: TPointF): TpointF
                               begin
                                 if aOriginalSize.x > aOriginalSize.y then result := TpointF.create(aOriginalSize.Y, aOriginalSize.Y)
@@ -394,8 +603,8 @@ begin
     var LIntent := TAndroidHelper.Context.getPackageManager.getLaunchIntentForPackage(TAndroidHelper.Context.getPackageName);
     LIntent.setAction(TJNotificationInfo.JavaClass.ACTION_NOTIFICATION); // need by the FMX framework to detect it's a notification and sent the TMessageReceivedNotification message
     LIntent.putExtra(StringToJstring('google.message_id'), StringToJstring('alcinoe:'+ALLowerCase(ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen})))); // Need to unduplicate received messages in TALFirebaseMessaging
-    for var I := low(FPayload) to high(FPayload) do
-      LIntent.putExtra(StringToJstring(FPayload[i].Key), StringToJstring(FPayload[i].Value));
+    for var I := low(ANotification.FPayload) to high(ANotification.FPayload) do
+      LIntent.putExtra(StringToJstring(ANotification.FPayload[i].Key), StringToJstring(ANotification.FPayload[i].Value));
     LIntent.setFlags(TJIntent.JavaClass.FLAG_ACTIVITY_SINGLE_TOP or TJIntent.javaclass.FLAG_ACTIVITY_CLEAR_TOP);
     var LPendingIntent := TJPendingIntent.javaclass.getActivity(
                             TAndroidHelper.Context, // context	Context: The Context in which this PendingIntent should start the activity.
@@ -411,28 +620,28 @@ begin
                                                                        // be supplied when the actual send happens. */
 
     //-----
-    var LNotificationBuilder := TJApp_NotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context, StringToJstring(FChannelId));
-    if FTitle <> '' then LNotificationBuilder := LNotificationBuilder.setContentTitle(StrToJCharSequence(Ftitle));
-    if Ftext <> '' then LNotificationBuilder := LNotificationBuilder.setContentText(StrToJCharSequence(Ftext));
-    if FTicker <> '' then LNotificationBuilder := LNotificationBuilder.SetTicker(StrToJCharSequence(FTicker));
+    var LNotificationBuilder := TJApp_NotificationCompat_Builder.JavaClass.init(TAndroidHelper.Context, StringToJstring(ANotification.FChannelId));
+    if ANotification.FTitle <> '' then LNotificationBuilder := LNotificationBuilder.setContentTitle(StrToJCharSequence(ANotification.Ftitle));
+    if ANotification.Ftext <> '' then LNotificationBuilder := LNotificationBuilder.setContentText(StrToJCharSequence(ANotification.Ftext));
+    if ANotification.FTicker <> '' then LNotificationBuilder := LNotificationBuilder.SetTicker(StrToJCharSequence(ANotification.FTicker));
     if LLargeIconBitmap <> nil then LNotificationBuilder := LNotificationBuilder.setLargeIcon(LLargeIconBitmap);
-    if FSmallIconResName <> '' then
+    if ANotification.FSmallIconResName <> '' then
       LNotificationBuilder := LNotificationBuilder.setSmallIcon(
                                 TAndroidHelper.Context.getResources().getIdentifier(
-                                  StringToJstring(FSmallIconResName), // name	String: The name of the desired resource.
+                                  StringToJstring(ANotification.FSmallIconResName), // name	String: The name of the desired resource.
                                   StringToJstring('drawable'), // String: Optional default resource type to find, if "type/" is not included in the name. Can be null to require an explicit type.
                                   TAndroidHelper.Context.getPackageName())); // String: Optional default package to find, if "package:" is not included in the name. Can be null to require an explicit package.
-    if FNumber >= 0 then LNotificationBuilder.setNumber(FNumber);
+    if ANotification.FNumber >= 0 then LNotificationBuilder.setNumber(ANotification.FNumber);
     var LDefaults: integer := 0;
-    if FSound then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_SOUND;
-    if FVibrate then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_Vibrate;
-    if FLights then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_Lights;
+    if ANotification.FSound then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_SOUND;
+    if ANotification.FVibrate then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_Vibrate;
+    if ANotification.FLights then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_Lights;
     LNotificationBuilder := LNotificationBuilder.setDefaults(LDefaults);
-    if (not FSound) and (not FVibrate) then LNotificationBuilder.setSilent(true);
-    LNotificationBuilder := LNotificationBuilder.setVisibility(ALNotificationVisibilityToNative(FVisibility));
-    if FImportance <> TALNotificationImportance.None then begin
+    if (not ANotification.FSound) and (not ANotification.FVibrate) then LNotificationBuilder.setSilent(true);
+    LNotificationBuilder := LNotificationBuilder.setVisibility(ALNotificationVisibilityToNative(ANotification.FVisibility));
+    if ANotification.FImportance <> TALNotificationImportance.None then begin
       var LPriority: integer;
-      case FImportance of
+      case ANotification.FImportance of
         TALNotificationImportance.Default: LPriority := TJNotification.JavaClass.PRIORITY_DEFAULT;
         TALNotificationImportance.Min: LPriority := TJNotification.JavaClass.PRIORITY_MIN;
         TALNotificationImportance.Low: LPriority := TJNotification.JavaClass.PRIORITY_LOW;
@@ -447,9 +656,9 @@ begin
     //-----
     var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
     var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
-    if FTag <> '' then
+    if ANotification.FTag <> '' then
       LNotificationManager.notify(
-        StringToJstring(FTag), // tag	String: A string identifier for this notification. May be null.
+        StringToJstring(ANotification.FTag), // tag	String: A string identifier for this notification. May be null.
         0, // id	int: An identifier for this notification. The pair (tag, id) must be unique within your application.
         LNotificationBuilder.build()) // notification	Notification: A Notification object describing what to show the user. Must not be null.
     else
@@ -536,153 +745,6 @@ begin
 end;
 
 {****************************************}
-constructor TALNotificationService.Create;
-begin
-  inherited Create;
-
-  FFirebaseMessaging := TALFirebaseMessaging.create;
-  FFirebaseMessaging.OnTokenRefresh := onFCMTokenRefresh;
-  FFirebaseMessaging.OnMessageReceived := onFCMMessageReceived;
-  fOnAuthorizationRefused := nil;
-  fOnAuthorizationGranted := nil;
-  fOnTokenRefresh := nil;
-  fOnNotificationReceived := nil;
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  TMessageManager.DefaultManager.SubscribeToMessage(TPermissionsRequestResultMessage, PermissionsRequestResultHandler);
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-{****************************************}
-destructor TALNotificationService.Destroy;
-begin
-
-  AlFreeAndNil(FFirebaseMessaging);
-
-  {$REGION ' ANDROID'}
-  {$IF defined(android)}
-  TMessageManager.DefaultManager.Unsubscribe(TPermissionsRequestResultMessage, PermissionsRequestResultHandler);
-  {$ENDIF}
-  {$ENDREGION}
-
-  inherited Destroy;
-
-end;
-
-{*************************************************************}
-procedure TALNotificationService.RequestNotificationPermission;
-begin
-
-  {$REGION ' ANDROID'}
-  {$IF defined(ANDROID)}
-  // This is only necessary for API level >= 33 (TIRAMISU)
-  if (TOSVersion.Check(13, 0)) and
-     (MainActivity.checkSelfPermission(StringToJString('android.permission.POST_NOTIFICATIONS')) <> TJPackageManager.JavaClass.PERMISSION_GRANTED) then begin
-    var LPermissions := TJavaObjectArray<JString>.create(1);
-    try
-      LPermissions.Items[0] := StringToJString('android.permission.POST_NOTIFICATIONS');
-      MainActivity.requestPermissions(LPermissions, RequestPermissionsCode);
-    finally
-      ALFreeAndNil(LPermissions);
-    end;
-  end
-  else begin
-    if assigned(fOnAuthorizationGranted) then
-      fOnAuthorizationGranted(self);
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  var LOptions := UNAuthorizationOptionSound or
-                  UNAuthorizationOptionAlert or
-                  UNAuthorizationOptionBadge;
-  TUNUserNotificationCenter.OCClass.currentNotificationCenter.requestAuthorizationWithOptions(LOptions{options}, UserNotificationCenterRequestAuthorizationWithOptionsCompletionHandler{completionHandler});
-  SharedApplication.registerForRemoteNotifications;
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-{***************************************************************}
-class procedure TALNotificationService.CreateNotificationChannel(
-                  const AID: String;
-                  const AName: String;
-                  const AImportance: TALNotificationImportance = TALNotificationImportance.Default;
-                  const ALockscreenVisibility: TALNotificationVisibility = TALNotificationVisibility.Private;
-                  const AEnableVibration: boolean = true;
-                  const AEnableLights: Boolean = true;
-                  const ALightColor: integer = 0;
-                  const ABypassDnd: Boolean = false;
-                  const AShowBadge: Boolean = true;
-                  const ASoundUri: String = 'content://settings/system/notification_sound');
-begin
-
-  {$REGION ' ANDROID'}
-  {$IF defined(ANDROID)}
-
-  var LNotificationChannel := TJNotificationChannel.JavaClass.init(
-                                StringToJString(aID),
-                                StrToJCharSequence(aName),
-                                ALNotificationImportanceToNative(AImportance));
-  //--
-  LNotificationChannel.setLockscreenVisibility(ALNotificationVisibilityToNative(ALockscreenVisibility));
-  //--
-  LNotificationChannel.enableVibration(aEnableVibration);
-  if aEnableVibration then begin
-    var LPattern := TJavaArray<Int64>.create(2);
-    try
-      LPattern[0] := 0;
-      LPattern[1] := 1200;
-      LNotificationChannel.setVibrationPattern(LPattern);
-    finally
-      AlFreeAndNil(LPattern);
-    end;
-  end;
-  //--
-  LNotificationChannel.enableLights(true);
-  if ALightColor <> 0 then LNotificationChannel.setLightColor(ALightColor);
-  //--
-  LNotificationChannel.setBypassDnd(ABypassDnd);
-  //--
-  LNotificationChannel.setShowBadge(AShowBadge);
-  //--
-  if ASoundUri = 'content://settings/system/notification_sound' then
-    LNotificationChannel.setSound(
-      TJSettings_System.JavaClass.DEFAULT_NOTIFICATION_URI,
-      TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
-  else if ASoundUri <> '' then
-    LNotificationChannel.setSound(
-      StrToJURI(ASoundUri),
-      TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
-  else
-    LNotificationChannel.setSound(nil, nil);
-  //--
-  var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
-  var LNotificationManager := TJNotificationManager.Wrap((LNotificationServiceNative as ILocalObject).GetObjectID);
-  LNotificationManager.createNotificationChannel(LNotificationChannel);
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-{*****************************************************************************}
-class procedure TALNotificationService.setBadgeCount(const aNewValue: integer);
-begin
-
-  {$REGION ' IOS'}
-  {$IF defined(IOS)}
-  SharedApplication.setApplicationIconBadgeNumber(aNewValue);
-  {$ENDIF}
-  {$ENDREGION}
-
-end;
-
-{****************************************}
 procedure TALNotificationService.GetToken;
 begin
   FFirebaseMessaging.GetToken;
@@ -712,6 +774,13 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
+end;
+
+{********************************************************}
+function TALNotificationService.GenerateUniqueID: integer;
+begin
+  inc(FLastGeneratedUniqueID);
+  result := FLastGeneratedUniqueID;
 end;
 
 {***********************************************************************}
@@ -829,7 +898,11 @@ end;
 {$ENDREGION}
 
 initialization
-  TALNotification.FLastGeneratedUniqueID := integer(ALDateTimeToUnixms(ALUTCNow) mod Maxint);
-  TALNotification.TmpPath := '';
+  TALNotificationService.TmpPath := '';
+  TALNotificationService.FInstance := nil;
+  TALNotificationService.CreateInstanceFunct := @TALNotificationService.CreateInstance;
+
+finalization
+  ALFreeAndNil(TALNotificationService.FInstance);
 
 end.

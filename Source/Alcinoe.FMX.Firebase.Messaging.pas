@@ -183,8 +183,8 @@ want to display.
 Note
 ----
 
-To know when a notification was "pushed" by an user you can look in the data
-payload for the presence of notification.presented=1 It's added by the
+To know when a notification was "tapped" by an user you can look in the data
+payload for the presence of alcinoe.notification_clicked=1 It's added by the
 ALFirebaseMessaging Framework to each notification presented to end user so
 it's mean user tapped on it. This is the behavior of the notification in iOS/android:
 
@@ -195,13 +195,13 @@ IOS: data + alert notification  + app in FOREGROUND     : NO ALERT - NO BADGE - 
 IOS: data notification          + app in BACKGROUND (1) : NO ALERT - NO BADGE - we receive the data message                                                                             - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                        > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
 IOS: data notification          + app in BACKGROUND (2) : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                         - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                        > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
 IOS: data notification          + app in BACKGROUND (3) : NO ALERT - NO BADGE - we NEVER receive the data message
-IOS: alert notification         + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert message (with notification.presented=1)        - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-IOS: data + alert notification  + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert + data message (with notification.presented=1) - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: alert notification         + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert message (with alcinoe.notification_clicked=1)        - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data + alert notification  + app in BACKGROUND     : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the alert + data message (with alcinoe.notification_clicked=1) - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
 ---
-IOS: data notification          + app NOT RUNNING (1)   : NO ALERT - NO BADGE - we receive the data message                                                                                                   - via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-IOS: data notification          + app NOT RUNNING (2)   : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                                               - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                                                                                           > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-IOS: alert notification         + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                       - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
-IOS: data + alert notification  + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1)  - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data notification          + app NOT RUNNING (1)   : NO ALERT - NO BADGE - we receive the data message                                                                                                         - via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data notification          + app NOT RUNNING (2)   : NO ALERT - NO BADGE - WHEN the app will BECAME FOREGROUND: we receive only the LAST SENT data message                                                     - via TApplicationDelegate.applicationDidReceiveRemoteNotificationWithFetchCompletionHandler                                                                                           > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: alert notification         + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with alcinoe.notification_clicked=1)                       - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
+IOS: data + alert notification  + app NOT RUNNING       : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with alcinoe.notification_clicked=1)  - via TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler                                                                    > TALFirebaseMessaging.applicationDidReceiveRemoteNotification  | and also via TApplicationDelegate.applicationDidFinishLaunchingWithOptions > TALFirebaseMessaging.StartupNotificationMessageHandler > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.applicationDidReceiveRemoteNotification
 
   (1) We are lucky (for exemple We didn't launch any other app from the time the app goes in background and in the info.plist we have <key>UIBackgroundModes</key><array><string>remote-notification</string></array> and we follow https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/pushing_background_updates_to_your_app?language=objc)
   (2) We was unlucky in (1) (For exemple we launch another app from the time the app goes in background)
@@ -219,13 +219,13 @@ ANDROID: data notification          + app in FOREGROUND : NO ALERT - NO BADGE - 
 ANDROID: alert notification         + app in FOREGROUND : NO ALERT - NO BADGE - we receive the notification message                - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
 ANDROID: data + alert notification  + app in FOREGROUND : NO ALERT - NO BADGE - we receive the motification message + data message - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
 -------
-ANDROID: data notification          + app in BACKGROUND : NO ALERT - NO BADGE - we receive the data message                                                                                                  - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
-ANDROID: alert notification         + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
-ANDROID: data + alert notification  + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+ANDROID: data notification          + app in BACKGROUND : NO ALERT - NO BADGE - we receive the data message                                                                                                        - via ALFirebaseMessagingService.onMessageReceived > TALFirebaseMessaging.TNewMessageObserver.onChanged
+ANDROID: alert notification         + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with alcinoe.notification_clicked=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+ANDROID: data + alert notification  + app in BACKGROUND : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with alcinoe.notification_clicked=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TMessageReceivedNotification) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
 -------
 ANDROID: data notification          + app NOT RUNNING   : NO ALERT - NO BADGE - we NEVER receive the data message (actually we receive it in the ALFirebaseMessagingService only)
-ANDROID: alert notification         + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with notification.presented=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
-ANDROID: data + alert notification  + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with notification.presented=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+ANDROID: alert notification         + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the notification message (with alcinoe.notification_clicked=1)                      - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
+ANDROID: data + alert notification  + app NOT RUNNING   : ALERT    - BADGE    - WHEN the user will CLICK THE ALERT: we receive the data message and the notification message (with alcinoe.notification_clicked=1) - via TALFirebaseMessaging.StartupNotificationMessageHandler (TApplicationEventMessage.FinishedLaunching) > TALFirebaseMessaging.DeliverStartupNotificationMessages > TALFirebaseMessaging.ReceiveStartupNotificationMessage
 *******************************************************************************)
 unit Alcinoe.FMX.Firebase.Messaging;
 
@@ -706,7 +706,7 @@ begin
 
         {$REGION ' ANDROID'}
         {$IF defined(ANDROID)}
-        LJsonDoc.SetChildNodeValueText('notification.presented', '1');
+        LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
         var LPushStartupNotificationMessage := TPushStartupNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
         TMessageManager.DefaultManager.SendMessage(nil, LPushStartupNotificationMessage);
         {$ENDIF}
@@ -718,7 +718,7 @@ begin
         //so we must detect if it's an alert or a pure data message. I use content-available that I
         //think will be only present in data message
         if LJsonDoc.GetChildNodeValueFloat(['aps', 'content-available'], 0) = 0 then
-          LJsonDoc.SetChildNodeValueText('notification.presented', '1');
+          LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
         var LPushRemoteNotificationMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
         TMessageManager.DefaultManager.SendMessage(nil, LPushRemoteNotificationMessage);
         {$ENDIF}
@@ -875,7 +875,7 @@ begin
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:notification:completionHandler', LJsonStr, TalLogType.verbose);
     {$ENDIF}
 
-    if ALStrToBool(LJsonDoc.GetChildNodeValuetext('alcinoe.presentnotification', '0')) then begin
+    if ALStrToBool(LJsonDoc.GetChildNodeValuetext('alcinoe.present_notification', '0')) then begin
 
       @LImp := imp_implementationWithBlock(completionHandler);
       if TOSVersion.Check(14) then
@@ -922,7 +922,7 @@ begin
     allog('TALFirebaseMessaging.TUserNotificationCenterDelegate.userNotificationCenter:center:response:completionHandler', 'Message: ' + LJsonDoc.JSON, TalLogType.verbose);
     {$ENDIF}
 
-    LJsonDoc.SetChildNodeValueText('notification.presented', '1');
+    LJsonDoc.SetChildNodeValueText('alcinoe.notification_clicked', '1');
     var LMessage := TPushRemoteNotificationMessage.Create(TPushNotificationData.Create(LJsonDoc.JSON));
     TMessageManager.DefaultManager.SendMessage(nil, LMessage);
 

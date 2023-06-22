@@ -691,7 +691,7 @@ begin
       LUserInfo.setValue(StringToID('alcinoe:'+ALLowerCase(ALNewGUIDStringW(true{WithoutBracket}, true{WithoutHyphen}))), StrToNsStr('google.message_id')); // Need to unduplicate received messages in TALFirebaseMessaging
       for var I := low(ANotification.FPayload) to high(ANotification.FPayload) do
         LUserInfo.setValue(StringToID(ANotification.FPayload[i].Value), StrToNsStr(ANotification.FPayload[i].Key));
-      LUserInfo.setValue(StringToID('1'), StrToNsStr('alcinoe.presentnotification'));
+      LUserInfo.setValue(StringToID('1'), StrToNsStr('alcinoe.present_notification'));
       LNotificationContent.setUserInfo(LUserInfo);
     finally
       LUserInfo.release;

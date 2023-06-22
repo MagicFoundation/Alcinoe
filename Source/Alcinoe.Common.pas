@@ -2423,6 +2423,7 @@ begin
     finally
       Tmonitor.Exit(_ALLogQueue);
     end;
+    if _type = TalLogType.ASSERT then ALPrintLogQueue
   end
   else begin
     {$IF defined(ANDROID)}

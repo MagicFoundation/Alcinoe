@@ -608,6 +608,8 @@ type
     procedure Clear;
     function AddChild(const NodeName: AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA; overload;
     function AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA; overload;
+    function DeleteChild(const NodeName: AnsiString): boolean; overload;
+    function DeleteChild(const Path: array of AnsiString): boolean; overload;
     function CreateNode(const NodeName: AnsiString; NodeType: TALJSONNodeType): TALJSONNodeA;
     function ExtractNode: TALJSONNodeA;
     function IsEmptyDoc: Boolean;
@@ -1172,6 +1174,8 @@ type
     procedure Clear;
     function AddChild(const NodeName: String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeW; overload;
     function AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeW; overload;
+    function DeleteChild(const NodeName: String): boolean; overload;
+    function DeleteChild(const Path: array of String): boolean; overload;
     function CreateNode(const NodeName: String; NodeType: TALJSONNodeType): TALJSONNodeW;
     function ExtractNode: TALJSONNodeW;
     function IsEmptyDoc: Boolean;
@@ -4369,6 +4373,18 @@ end;
 function TALJSONDocumentA.AddChild(const Path: array of AnsiString; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeA;
 begin
   Result := Node.AddChild(Path, NodeType, Index);
+end;
+
+{*************************************************************************}
+function TALJSONDocumentA.DeleteChild(const NodeName: AnsiString): boolean;
+begin
+  Result := Node.DeleteChild(NodeName);
+end;
+
+{******************************************************************************}
+function TALJSONDocumentA.DeleteChild(const Path: array of AnsiString): boolean;
+begin
+  Result := Node.DeleteChild(Path);
 end;
 
 {********************************************************************************************************}
@@ -11365,6 +11381,18 @@ end;
 function TALJSONDocumentW.AddChild(const Path: array of String; const NodeType: TALJSONNodeType = ntText; const Index: Integer = -1): TALJSONNodeW;
 begin
   Result := Node.AddChild(Path, NodeType, Index);
+end;
+
+{*********************************************************************}
+function TALJSONDocumentW.DeleteChild(const NodeName: String): boolean;
+begin
+  Result := Node.DeleteChild(NodeName);
+end;
+
+{**************************************************************************}
+function TALJSONDocumentW.DeleteChild(const Path: array of String): boolean;
+begin
+  Result := Node.DeleteChild(Path);
 end;
 
 {****************************************************************************************************}

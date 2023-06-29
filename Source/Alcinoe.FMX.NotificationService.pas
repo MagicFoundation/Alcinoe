@@ -147,6 +147,7 @@ type
     fOnTokenRefresh: TTokenRefreshEvent;
     fOnNotificationReceived: TNotificationReceivedEvent;
     FLastGeneratedUniqueID: integer;
+    FIsRequestingNotificationPermission: Boolean;
     procedure onFCMTokenRefresh(const aToken: String);
     procedure onFCMMessageReceived(const aPayload: TALStringListW);
     {$HINTS OFF}
@@ -157,7 +158,7 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
-    procedure RequestNotificationPermission;
+    procedure RequestNotificationPermission; virtual;
     procedure CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel); virtual;
     procedure SetBadgeCount(const aNewValue: integer); virtual;
     procedure ShowNotification(const ANotification: TALNotification); virtual;
@@ -167,6 +168,7 @@ type
     property OnAuthorizationGranted: TNotifyEvent read fOnAuthorizationGranted write fOnAuthorizationGranted;
     property OnTokenRefresh: TTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
     property OnNotificationReceived: TNotificationReceivedEvent read fOnNotificationReceived write fOnNotificationReceived;
+    property IsRequestingNotificationPermission: Boolean read FIsRequestingNotificationPermission; // set to true in RequestNotificationPermission and set to false in OnAuthorizationRefused/OnAuthorizationGranted
   end;
 
 {$REGION ' ANDROID'}
@@ -413,6 +415,7 @@ begin
   fOnTokenRefresh := nil;
   fOnNotificationReceived := nil;
   FLastGeneratedUniqueID := integer(ALDateTimeToUnixms(ALUTCNow) mod Maxint);
+  FIsRequestingNotificationPermission := False;
 
   {$REGION ' ANDROID'}
   {$IF defined(android)}
@@ -458,6 +461,10 @@ end;
 procedure TALNotificationService.RequestNotificationPermission;
 begin
 
+  if FIsRequestingNotificationPermission then
+    raise Exception.Create('RequestNotificationPermission is already running');
+  FIsRequestingNotificationPermission := True;
+
   {$REGION ' ANDROID'}
   {$IF defined(ANDROID)}
   // This is only necessary for API level >= 33 (TIRAMISU)
@@ -472,6 +479,7 @@ begin
     end;
   end
   else begin
+    FIsRequestingNotificationPermission := False;
     if assigned(fOnAuthorizationGranted) then
       fOnAuthorizationGranted(self);
   end;
@@ -840,6 +848,7 @@ begin
       {$IFDEF DEBUG}
       allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(False), TalLogType.verbose);
       {$ENDIF}
+      FIsRequestingNotificationPermission := False;
       if assigned(fOnAuthorizationRefused) then
         fOnAuthorizationRefused(self);
     end
@@ -847,6 +856,7 @@ begin
       {$IFDEF DEBUG}
       allog('TALNotificationService.PermissionsRequestResultHandler', 'granted: ' + ALBoolToStrW(True), TalLogType.verbose);
       {$ENDIF}
+      FIsRequestingNotificationPermission := False;
       if assigned(fOnAuthorizationGranted) then
         fOnAuthorizationGranted(self);
     end;
@@ -882,6 +892,7 @@ begin
    TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
      procedure
      begin
+       FIsRequestingNotificationPermission := False;
        if assigned(fOnAuthorizationRefused) then
          fOnAuthorizationRefused(self);
      end);
@@ -890,6 +901,7 @@ begin
    TThread.Synchronize(nil, // << Strangely it's seam this function is not called from the mainThread
      procedure
      begin
+       FIsRequestingNotificationPermission := False;
        if assigned(fOnAuthorizationGranted) then
          fOnAuthorizationGranted(self);
      end);

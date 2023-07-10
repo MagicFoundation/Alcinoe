@@ -308,6 +308,19 @@ type
     private
       FGetTokenTaskCompleteListener: TGetTokenTaskCompleteListener;
 
+    //FDeleteTokenTaskCompleteListener
+    private
+      Type
+        TDeleteTokenTaskCompleteListener = class(TJavaLocal, JOnCompleteListener)
+        private
+          FFirebaseMessaging: TALFirebaseMessaging;
+        public
+          constructor Create(const AFirebaseMessaging: TALFirebaseMessaging);
+          procedure onComplete(task: JTask); cdecl;
+        end;
+    private
+      FDeleteTokenTaskCompleteListener: TDeleteTokenTaskCompleteListener;
+
     //Startup Notification
     private
       procedure ReceiveStartupNotificationMessage(const Sender: TObject; const M: TMessage);
@@ -349,7 +362,7 @@ type
     private
       fFIRMessagingDelegate: TFIRMessagingDelegate;
       procedure FIRMessagingTokenWithCompletionHandler(token: NSString; error: NSError);
-
+      procedure FIRMessagingDeleteTokenWithCompletionHandler(error: NSError);
     //Message handler
     private
       procedure applicationDidReceiveRemoteNotification(const Sender: TObject; const M: TMessage);
@@ -360,12 +373,16 @@ type
 
   public
     Type
+      TGetTokenEvent = procedure(const AToken: String; const AErrorMessage: String) of object;
+      TDeleteTokenEvent = procedure(const AIsSuccessful: Boolean; const AErrorMessage: String) of object;
       TTokenRefreshEvent = procedure(const aToken: String) of object;
       TMessageReceivedEvent = procedure(const aPayload: TALStringListW) of object;
   private
-    FCurrentToken: String;
     FDeliveredMessageIDs: TDictionary<String,boolean>;
     FGetTokenTaskIsRunning: Boolean;
+    FDeleteTokenTaskIsRunning: Boolean;
+    fOnGetToken: TGetTokenEvent;
+    fOnDeleteToken: TDeleteTokenEvent;
     fOnTokenRefresh: TTokenRefreshEvent;
     fOnMessageReceived: TMessageReceivedEvent;
   protected
@@ -383,6 +400,9 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     procedure GetToken;
+    procedure DeleteToken;
+    property OnGetToken: TGetTokenEvent read fOnGetToken write fOnGetToken;
+    property OnDeleteToken: TDeleteTokenEvent read fOnDeleteToken write fOnDeleteToken;
     property OnTokenRefresh: TTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
     property OnMessageReceived: TMessageReceivedEvent read fOnMessageReceived write fOnMessageReceived;
   end;
@@ -417,9 +437,11 @@ begin
   {$ENDIF}
 
   inherited Create;
-  FCurrentToken := '';
   FDeliveredMessageIDs := TDictionary<String,boolean>.create;
   FGetTokenTaskIsRunning := False;
+  FDeleteTokenTaskIsRunning := False;
+  fOnGetToken := nil;
+  fOnDeleteToken := nil;
   fOnTokenRefresh := nil;
   fOnMessageReceived := nil;
 
@@ -428,6 +450,7 @@ begin
   FNewMessageObserver := TNewMessageObserver.Create(self);
   FNewTokenObserver := TNewTokenObserver.Create(self);
   FGetTokenTaskCompleteListener := nil;
+  FDeleteTokenTaskCompleteListener := nil;
   TMessageManager.DefaultManager.SubscribeToMessage(TPushStartupNotificationMessage, ReceiveStartupNotificationMessage);
   //as fOnMessageReceived and fOnTokenRefresh = nil right now then calling observeForever
   //will do nothing even if FNewMessageObserver/FNewTokenObserver contain new data
@@ -472,7 +495,9 @@ begin
   {$ENDIF}
 
   if FGetTokenTaskIsRunning then
-    raise Exception.Create('You cannot Destroy a TALFirebaseInstallations Instance when a GetToken task is running');
+    raise Exception.Create('You cannot Destroy a TALFirebaseMessaging Instance when a GetToken task is running');
+  if FDeleteTokenTaskIsRunning then
+    raise Exception.Create('You cannot Destroy a TALFirebaseMessaging Instance when a DeleteToken task is running');
 
   TALFirebaseMessaging.CanDeliverStartupNotificationMessages := False;
 
@@ -483,6 +508,7 @@ begin
   ALFreeAndNil(FNewMessageObserver);
   ALFreeAndNil(FNewTokenObserver);
   ALFreeAndNil(FGetTokenTaskCompleteListener);
+  ALFreeAndNil(FDeleteTokenTaskCompleteListener);
   TMessageManager.DefaultManager.Unsubscribe(TPushStartupNotificationMessage, ReceiveStartupNotificationMessage);
   {$ENDIF}
   {$ENDREGION}
@@ -515,6 +541,8 @@ procedure TALFirebaseMessaging.GetToken;
 begin
 
   if FGetTokenTaskIsRunning then Exit;
+  FGetTokenTaskIsRunning := true;
+  if FDeleteTokenTaskIsRunning then exit;
 
   {$REGION ' android'}
   {$IF defined(android)}
@@ -532,14 +560,39 @@ begin
 
 end;
 
+{*************************************************************}
+//Deletes the FCM registration token for this Firebase project.
+//Note that this does not delete the Firebase Installations ID
+//that may have been created when generating the token. See
+//FirebaseInstallations.delete() for deleting that.
+procedure TALFirebaseMessaging.DeleteToken;
+begin
+
+  if FDeleteTokenTaskIsRunning then Exit;
+  FDeleteTokenTaskIsRunning := true;
+  if FGetTokenTaskIsRunning then exit;
+
+  {$REGION ' android'}
+  {$IF defined(android)}
+  ALFreeAndNil(FDeleteTokenTaskCompleteListener);
+  FDeleteTokenTaskCompleteListener := TDeleteTokenTaskCompleteListener.Create(self);
+  TJFirebaseMessaging.javaclass.getInstance().DeleteToken.addOnCompleteListener(FDeleteTokenTaskCompleteListener);
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' IOS'}
+  {$IF defined(IOS)}
+  TFIRMessaging.Wrap(TFIRMessaging.OCClass.messaging).deleteTokenWithCompletion(FIRMessagingDeleteTokenWithCompletionHandler);
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
 {******************************************************************}
 procedure TALFirebaseMessaging.doTokenRefresh(const aToken: String);
 begin
-  if assigned(fOnTokenRefresh) then begin
-    if (aToken <> '') and (aToken = FCurrentToken) then exit;
-    FCurrentToken := aToken;
+  if assigned(fOnTokenRefresh) then
     fOnTokenRefresh(aToken);
-  end;
 end;
 
 {*******************************************************************************}
@@ -778,29 +831,67 @@ end;
 {***********************************************************************************}
 procedure TALFirebaseMessaging.TGetTokenTaskCompleteListener.onComplete(task: JTask);
 begin
+  var LIsSuccessful := task.isSuccessful;
   var LToken: String;
-  if task.isSuccessful then LToken := JStringToString(TJString.Wrap(task.getResult))
-  else LToken := '';
-  {$IF defined(debug)}
-  var LLogType: TalLogType;
-  var LErrorStr: String;
-  if (not task.isSuccessful) then begin
-    LLogType := TalLogType.ERROR;
-    LErrorStr := JStringToString(task.getException.getMessage);
+  var LErrorMessage: String;
+  if LIsSuccessful then begin
+    LToken := JStringToString(TJString.Wrap(task.getResult));
+    LErrorMessage := '';
   end
   else begin
-    LLogType := TalLogType.Verbose;
-    LErrorStr := '';
+    LToken := '';
+    LErrorMessage := JStringToString(task.getException.getMessage);
   end;
+  {$IF defined(debug)}
+  var LLogType: TalLogType;
+  if LIsSuccessful then LLogType := TalLogType.Verbose
+  else LLogType := TalLogType.ERROR;
   allog(
     'TALFirebaseMessaging.TGetTokenTaskCompleteListener.onComplete',
-    'token: ' + LToken + ' | ' +
-    'error: ' + LErrorStr,
+    'Token: ' + LToken + ' | ' +
+    'Error: ' + LErrorMessage,
     LLogType);
   {$ENDIF}
   FFirebaseMessaging.FGetTokenTaskIsRunning := False;
-  FFirebaseMessaging.FCurrentToken := '';
-  FFirebaseMessaging.doTokenRefresh(LToken);
+  var LDoDeleteToken := FFirebaseMessaging.FDeleteTokenTaskIsRunning;
+  FFirebaseMessaging.FDeleteTokenTaskIsRunning := False;
+  if assigned(FFirebaseMessaging.fOnGetToken) then
+    FFirebaseMessaging.fOnGetToken(LToken, LErrorMessage);
+  if LIsSuccessful then FFirebaseMessaging.doTokenRefresh(LToken);
+  if LDoDeleteToken then FFirebaseMessaging.DeleteToken;
+end;
+
+{***********************************************************************************************************************}
+constructor TALFirebaseMessaging.TDeleteTokenTaskCompleteListener.Create(const AFirebaseMessaging: TALFirebaseMessaging);
+begin
+  inherited Create;
+  FFirebaseMessaging := AFirebaseMessaging;
+end;
+
+{**************************************************************************************}
+procedure TALFirebaseMessaging.TDeleteTokenTaskCompleteListener.onComplete(task: JTask);
+begin
+  var LIsSuccessful := task.isSuccessful;
+  var LErrorMessage: String;
+  if LIsSuccessful then LErrorMessage := ''
+  else LErrorMessage := JStringToString(task.getException.getMessage);
+  {$IF defined(debug)}
+  var LLogType: TalLogType;
+  if LIsSuccessful then LLogType := TalLogType.Verbose
+  else LLogType := TalLogType.ERROR;
+  allog(
+    'TALFirebaseMessaging.TDeleteTokenTaskCompleteListener.onComplete',
+    'IsSuccessful: ' + ALBoolToStrW(LIsSuccessful) + ' | ' +
+    'Error: ' + LErrorMessage,
+    LLogType);
+  {$ENDIF}
+  FFirebaseMessaging.FDeleteTokenTaskIsRunning := False;
+  var LDoGetToken := FFirebaseMessaging.FGetTokenTaskIsRunning;
+  FFirebaseMessaging.FGetTokenTaskIsRunning := False;
+  if assigned(FFirebaseMessaging.fOnDeleteToken) then
+    FFirebaseMessaging.fOnDeleteToken(LIsSuccessful, LErrorMessage);
+  if LIsSuccessful then FFirebaseMessaging.doTokenRefresh('');
+  if LDoGetToken then FFirebaseMessaging.GetToken;
 end;
 
 {*********************************************************************************************************}
@@ -938,26 +1029,54 @@ end;
 {*****************************************************************************************************}
 procedure TALFirebaseMessaging.FIRMessagingTokenWithCompletionHandler(token: NSString; error: NSError);
 begin
+  var LIsSuccessful := error = nil;
+  var LToken := NSStrToStr(Token);
+  var LErrorMessage: String;
+  if LIsSuccessful then LErrorMessage := ''
+  else LErrorMessage := NSStrToStr(error.localizedDescription);
   {$IF defined(debug)}
   var LLogType: TalLogType;
-  var LErrorStr: String;
-  if (error <> nil) then begin
-    LLogType := TalLogType.ERROR;
-    LErrorStr := NSStrToStr(error.localizedDescription);
-  end
-  else begin
-    LLogType := TalLogType.Verbose;
-    LErrorStr := '';
-  end;
+  if LIsSuccessful then LLogType := TalLogType.Verbose
+  else LLogType := TalLogType.ERROR;
   allog(
     'TALFirebaseMessaging.FIRMessagingTokenWithCompletionHandler',
-    'token: ' + NSStrToStr(token) + ' | ' +
-    'error: ' + LErrorStr,
+    'Token: ' + LToken + ' | ' +
+    'Error: ' + LErrorMessage,
     LLogType);
   {$ENDIF}
   FGetTokenTaskIsRunning := False;
-  FCurrentToken := '';
-  doTokenRefresh(NSStrToStr(token));
+  var LDoDeleteToken := FDeleteTokenTaskIsRunning;
+  FDeleteTokenTaskIsRunning := False;
+  if assigned(fOnGetToken) then
+    fOnGetToken(LToken, LErrorMessage);
+  if LIsSuccessful then doTokenRefresh(LToken);
+  if LDoDeleteToken then DeleteToken;
+end;
+
+{******************************************************************************************}
+procedure TALFirebaseMessaging.FIRMessagingDeleteTokenWithCompletionHandler(error: NSError);
+begin
+  var LIsSuccessful := error = nil;
+  var LErrorMessage: String;
+  if LIsSuccessful then LErrorMessage := ''
+  else LErrorMessage := NSStrToStr(error.localizedDescription);
+  {$IF defined(debug)}
+  var LLogType: TalLogType;
+  if LIsSuccessful then LLogType := TalLogType.Verbose
+  else LLogType := TalLogType.ERROR;
+  allog(
+    'TALFirebaseMessaging.FIRMessagingDeleteTokenWithCompletionHandler',
+    'IsSuccessful: ' + ALBoolToStrW(LIsSuccessful) + ' | ' +
+    'Error: ' + LErrorMessage,
+    LLogType);
+  {$ENDIF}
+  FDeleteTokenTaskIsRunning := False;
+  var LDoGetToken := FGetTokenTaskIsRunning;
+  FGetTokenTaskIsRunning := False;
+  if assigned(fOnDeleteToken) then
+    fOnDeleteToken(LIsSuccessful, LErrorMessage);
+  if LIsSuccessful then doTokenRefresh('');
+  if LDoGetToken then GetToken;
 end;
 
 {************************************************************************************************************}

@@ -68,6 +68,7 @@ type
     ButtonSendDataNotificationViaHttpV1: TButton;
     ButtonSendAlertDataNotificationViaHttpV1: TButton;
     ButtonShowNotification: TButton;
+    ButtonDeleteToken: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure ButtonGetTokenClick(Sender: TObject);
@@ -76,9 +77,12 @@ type
     procedure ButtonSendDataNotificationViaHttpV1Click(Sender: TObject);
     procedure ButtonSendAlertDataNotificationViaHttpV1Click(Sender: TObject);
     procedure ButtonShowNotificationClick(Sender: TObject);
+    procedure ButtonDeleteTokenClick(Sender: TObject);
   private
     { Private declarations }
     FBadge: integer;
+    procedure onGetToken(const AToken: String; const AErrorMessage: String);
+    procedure onDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
     procedure onTokenRefresh(const aToken: String);
     procedure OnNotificationReceived(const aPayload: TALStringListW);
     procedure OnAuthorizationRefused(Sender: TObject);
@@ -147,6 +151,8 @@ begin
   {$ENDIF}
   //----
   FBadge := 0;
+  TALNotificationService.Instance.OnGetToken := onGetToken;
+  TALNotificationService.Instance.OnDeleteToken := onDeleteToken;
   TALNotificationService.Instance.OnTokenRefresh := onTokenRefresh;
   TALNotificationService.Instance.OnNotificationReceived := OnNotificationReceived;
   TALNotificationService.Instance.OnAuthorizationRefused := OnAuthorizationRefused;
@@ -192,6 +198,22 @@ begin
   {$ENDIF}
 end;
 {$ENDIF}
+
+{*****************************************************************************}
+procedure TForm1.onGetToken(const AToken: String; const AErrorMessage: String);
+begin
+  ALLog('onGetToken', 'Token: ' + aToken + ' | ErrorMessage: ' + AErrorMessage);
+  if AToken = '' then ShowLog('onGetToken: ' + aErrorMessage)
+  else ShowLog('onGetToken: Success');
+end;
+
+{****************************************************************************************}
+procedure TForm1.onDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
+begin
+  ALLog('onDeleteToken', 'IsSuccessful: ' + ALBoolToStrW(AIsSuccessful) + ' | ErrorMessage: ' + AErrorMessage);
+  if not AIsSuccessful then ShowLog('onGetToken: ' + aErrorMessage)
+  else ShowLog('onDeleteToken: Success');
+end;
 
 {****************************************************}
 procedure TForm1.onTokenRefresh(const aToken: String);
@@ -413,6 +435,12 @@ end;
 procedure TForm1.ButtonGetTokenClick(Sender: TObject);
 begin
   TALNotificationService.Instance.getToken;
+end;
+
+{*******************************************************}
+procedure TForm1.ButtonDeleteTokenClick(Sender: TObject);
+begin
+  TALNotificationService.Instance.DeleteToken;
 end;
 
 initialization

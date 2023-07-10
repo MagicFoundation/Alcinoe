@@ -17,11 +17,11 @@ object Form1: TForm1
     TextSettings.WordWrap = True
     Align = Client
     Size.Width = 360.000000000000000000
-    Size.Height = 267.000000000000000000
+    Size.Height = 227.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 5
+    TabOrder = 6
     Viewport.Width = 356.000000000000000000
-    Viewport.Height = 263.000000000000000000
+    Viewport.Height = 223.000000000000000000
   end
   object ButtonGetToken: TButton
     Align = Top
@@ -29,7 +29,7 @@ object Form1: TForm1
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 4
+    TabOrder = 5
     Text = 'Get Token'
     OnClick = ButtonGetTokenClick
   end
@@ -61,8 +61,8 @@ object Form1: TForm1
   object EditToken: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     Align = Top
-    TabOrder = 6
-    Position.Y = 417.000000000000000000
+    TabOrder = 7
+    Position.Y = 457.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 34.000000000000000000
     Size.PlatformDefault = False
@@ -70,7 +70,7 @@ object Form1: TForm1
   end
   object ButtonSendAlertNotificationViaHttpV1: TButton
     Align = Top
-    Position.Y = 297.000000000000000000
+    Position.Y = 337.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
@@ -80,7 +80,7 @@ object Form1: TForm1
   end
   object ButtonSendDataNotificationViaHttpV1: TButton
     Align = Top
-    Position.Y = 257.000000000000000000
+    Position.Y = 297.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
@@ -90,7 +90,7 @@ object Form1: TForm1
   end
   object ButtonSendAlertDataNotificationViaHttpV1: TButton
     Align = Top
-    Position.Y = 337.000000000000000000
+    Position.Y = 377.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
@@ -100,12 +100,22 @@ object Form1: TForm1
   end
   object ButtonShowNotification: TButton
     Align = Top
-    Position.Y = 377.000000000000000000
+    Position.Y = 417.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     Text = 'Show Alert Notification'
     OnClick = ButtonShowNotificationClick
+  end
+  object ButtonDeleteToken: TButton
+    Align = Top
+    Position.Y = 257.000000000000000000
+    Size.Width = 360.000000000000000000
+    Size.Height = 40.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 4
+    Text = 'Delete Token'
+    OnClick = ButtonDeleteTokenClick
   end
 end

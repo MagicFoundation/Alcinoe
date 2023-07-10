@@ -61,6 +61,7 @@ type
     FSound: boolean;
     FVibrate: boolean;
     FLights: boolean;
+    FAutoCancel: boolean;
     FImportance: TALNotificationImportance;
     FVisibility: TALNotificationVisibility;
   public
@@ -78,8 +79,26 @@ type
     function setSound(const aSound: boolean): TALNotification;
     function setVibrate(const aVibrate: boolean): TALNotification;
     function setLights(const aLights: boolean): TALNotification;
+    function setAutoCancel(const aAutoCancel: boolean): TALNotification;
     function setImportance(const aImportance: TALNotificationImportance): TALNotification;
     function setVisibility(const aVisibility: TALNotificationVisibility): TALNotification;
+    //--
+    property Tag: String read FTag;
+    property ChannelId: String read FChannelId;
+    property Title: String read FTitle;
+    property Text: String read FText;
+    property Ticker: String read FTicker;
+    property LargeIconStream: TMemoryStream read FLargeIconStream;
+    property LargeIconUrl: String read FLargeIconUrl;
+    property SmallIconResName: String read FSmallIconResName;
+    property Payload: TArray<TPair<String, String>> read FPayload;
+    property Number: integer read FNumber;
+    property Sound: boolean read FSound;
+    property Vibrate: boolean read FVibrate;
+    property Lights: boolean read FLights;
+    property AutoCancel: boolean read FAutoCancel;
+    property Importance: TALNotificationImportance read FImportance;
+    property Visibility: TALNotificationVisibility read FVisibility;
   End;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -138,34 +157,46 @@ type
     class property Instance: TALNotificationService read GetInstance;
   public
     type
+      TGetTokenEvent = procedure(const AToken: String; const AErrorMessage: String) of object;
+      TDeleteTokenEvent = procedure(const AIsSuccessful: Boolean; const AErrorMessage: String) of object;
       TTokenRefreshEvent = procedure(const aToken: String) of object;
       TNotificationReceivedEvent = procedure(const aPayload: TALStringListW) of object;
+      TPushProvider = (FCM, APNs, PushKit);
   private
+    FPushProvider: TPushProvider;
     FFirebaseMessaging: TALFirebaseMessaging;
     fOnAuthorizationRefused: TNotifyEvent;
     fOnAuthorizationGranted: TNotifyEvent;
+    fOnGetToken: TGetTokenEvent;
+    fOnDeleteToken: TDeleteTokenEvent;
     fOnTokenRefresh: TTokenRefreshEvent;
     fOnNotificationReceived: TNotificationReceivedEvent;
     FLastGeneratedUniqueID: integer;
     FIsRequestingNotificationPermission: Boolean;
-    procedure onFCMTokenRefresh(const aToken: String);
-    procedure onFCMMessageReceived(const aPayload: TALStringListW);
+    procedure HandleGetToken(const AToken: String; const AErrorMessage: String);
+    procedure HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
+    procedure HandleTokenRefresh(const aToken: String);
+    procedure HandleMessageReceived(const aPayload: TALStringListW);
     {$HINTS OFF}
     function GenerateUniqueID: integer;
     {$HINTS ON}
   public
     class var TmpPath: String;
   public
-    constructor Create; virtual;
+    constructor Create(const aPushProvider: TPushProvider = TPushProvider.FCM); virtual;
     destructor Destroy; override;
     procedure RequestNotificationPermission; virtual;
     procedure CreateNotificationChannel(const ANotificationChannel: TALNotificationChannel); virtual;
     procedure SetBadgeCount(const aNewValue: integer); virtual;
     procedure ShowNotification(const ANotification: TALNotification); virtual;
     procedure GetToken;
+    procedure DeleteToken;
     procedure removeAllDeliveredNotifications;
+    property PushProvider: TPushProvider read FPushProvider write FPushProvider;
     property OnAuthorizationRefused: TNotifyEvent read fOnAuthorizationRefused write fOnAuthorizationRefused;
     property OnAuthorizationGranted: TNotifyEvent read fOnAuthorizationGranted write fOnAuthorizationGranted;
+    property OnGetToken: TGetTokenEvent read fOnGetToken write fOnGetToken;
+    property OnDeleteToken: TDeleteTokenEvent read fOnDeleteToken write fOnDeleteToken;
     property OnTokenRefresh: TTokenRefreshEvent read fOnTokenRefresh write fOnTokenRefresh;
     property OnNotificationReceived: TNotificationReceivedEvent read fOnNotificationReceived write fOnNotificationReceived;
     property IsRequestingNotificationPermission: Boolean read FIsRequestingNotificationPermission; // set to true in RequestNotificationPermission and set to false in OnAuthorizationRefused/OnAuthorizationGranted
@@ -227,6 +258,7 @@ begin
   FSound := True;
   FVibrate := True;
   FLights := True;
+  FAutoCancel := True;
   FImportance := TALNotificationImportance.Default;
   FVisibility := TALNotificationVisibility.Private;
 end;
@@ -325,6 +357,13 @@ begin
   result := Self;
 end;
 
+{**********************************************************************************}
+function TALNotification.setAutoCancel(const aAutoCancel: boolean): TALNotification;
+begin
+  FAutoCancel := aAutoCancel;
+  result := Self;
+end;
+
 {****************************************************************************************************}
 function TALNotification.setImportance(const aImportance: TALNotificationImportance): TALNotification;
 begin
@@ -401,17 +440,26 @@ begin
   result := Self;
 end;
 
-{****************************************}
-constructor TALNotificationService.Create;
+{************************************************************************************************}
+constructor TALNotificationService.Create(const aPushProvider: TPushProvider = TPushProvider.FCM);
 begin
 
   inherited Create;
 
+  // Currently, only TPushProvider.FCM is supported.
+  if aPushProvider <> TPushProvider.FCM then
+    raise Exception.Create('Unsupported push provider');
+
+  FPushProvider := aPushProvider;
   FFirebaseMessaging := TALFirebaseMessaging.create;
-  FFirebaseMessaging.OnTokenRefresh := onFCMTokenRefresh;
-  FFirebaseMessaging.OnMessageReceived := onFCMMessageReceived;
+  FFirebaseMessaging.OnGetToken := HandleGetToken;
+  FFirebaseMessaging.OnDeleteToken := HandleDeleteToken;
+  FFirebaseMessaging.OnTokenRefresh := HandleTokenRefresh;
+  FFirebaseMessaging.OnMessageReceived := HandleMessageReceived;
   fOnAuthorizationRefused := nil;
   fOnAuthorizationGranted := nil;
+  fOnGetToken := nil;
+  fOnDeleteToken := nil;
   fOnTokenRefresh := nil;
   fOnNotificationReceived := nil;
   FLastGeneratedUniqueID := integer(ALDateTimeToUnixms(ALUTCNow) mod Maxint);
@@ -649,6 +697,7 @@ begin
     if ANotification.FLights then LDefaults := LDefaults or TJNotification.javaclass.DEFAULT_Lights;
     LNotificationBuilder := LNotificationBuilder.setDefaults(LDefaults);
     if (not ANotification.FSound) and (not ANotification.FVibrate) then LNotificationBuilder.setSilent(true);
+    LNotificationBuilder := LNotificationBuilder.setAutoCancel(ANotification.FAutoCancel);
     LNotificationBuilder := LNotificationBuilder.setVisibility(ALNotificationVisibilityToNative(ANotification.FVisibility));
     if ANotification.FImportance <> TALNotificationImportance.None then begin
       var LPriority: integer;
@@ -761,6 +810,12 @@ begin
   FFirebaseMessaging.GetToken;
 end;
 
+{*******************************************}
+procedure TALNotificationService.DeleteToken;
+begin
+  FFirebaseMessaging.DeleteToken;
+end;
+
 {***************************************************************}
 procedure TALNotificationService.removeAllDeliveredNotifications;
 begin
@@ -794,15 +849,29 @@ begin
   result := FLastGeneratedUniqueID;
 end;
 
-{***********************************************************************}
-procedure TALNotificationService.onFCMTokenRefresh(const aToken: String);
+{*************************************************************************************************}
+procedure TALNotificationService.HandleGetToken(const AToken: String; const AErrorMessage: String);
+begin
+  if assigned(FOnGetToken) then
+    FOnGetToken(AToken, AErrorMessage);
+end;
+
+{************************************************************************************************************}
+procedure TALNotificationService.HandleDeleteToken(const AIsSuccessful: Boolean; const AErrorMessage: String);
+begin
+  if assigned(FOnDeleteToken) then
+    FOnDeleteToken(AIsSuccessful, AErrorMessage);
+end;
+
+{************************************************************************}
+procedure TALNotificationService.HandleTokenRefresh(const aToken: String);
 begin
   if assigned(FOnTokenRefresh) then
     FOnTokenRefresh(aToken);
 end;
 
-{************************************************************************************}
-procedure TALNotificationService.onFCMMessageReceived(const aPayload: TALStringListW);
+{*************************************************************************************}
+procedure TALNotificationService.HandleMessageReceived(const aPayload: TALStringListW);
 begin
   if assigned(FOnNotificationReceived) then
     FOnNotificationReceived(aPayload);

@@ -35,8 +35,7 @@ echo 3) alcinoe-edittext
 echo 4) alcinoe-facebook-share
 echo 5) alcinoe-firebase-messaging
 echo 6) alcinoe-installreferrer
-echo 7) alcinoe-launchscreen
-echo 8) alcinoe-webrtc
+echo 7) alcinoe-webrtc
 
 set /P LibraryToBuild=Enter number to select a library (Empty for all): %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
@@ -102,8 +101,7 @@ if "%LibraryToBuild%"=="3" goto alcinoe_edittext
 if "%LibraryToBuild%"=="4" goto alcinoe_facebook_share
 if "%LibraryToBuild%"=="5" goto alcinoe_firebase_messaging
 if "%LibraryToBuild%"=="6" goto alcinoe_installreferrer
-if "%LibraryToBuild%"=="7" goto alcinoe_launchscreen
-if "%LibraryToBuild%"=="8" goto alcinoe_webrtc
+if "%LibraryToBuild%"=="7" goto alcinoe_webrtc
 goto FINISHED
 
 :ALL_LIBRARIES
@@ -120,28 +118,6 @@ SET ClassPath="%SDKApiLevelPath%\android.jar"
 SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\util\*.java
 SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\com\alcinoe\content\*.java
 Call :BUILD_JAR "com.alcinoe" "alcinoe-common" "1.0.1"
-if NOT "%LibraryToBuild%"=="" GOTO FINISHED
-
-
-REM ------------------------------
-REM Build alcinoe-launchscreen.jar
-REM ------------------------------
-
-:alcinoe_launchscreen
-echo [36mBuild alcinoe-launchscreen[0m
-type nul > %TMPDependenciesFile%
-SET ClassPath="%SDKApiLevelPath%\android.jar";"%FMXJAR%"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.appcompat" "appcompat" "1.5.1"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.activity" "activity" "1.5.1"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.3.0"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.core" "core" "1.8.0"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.drawerlayout" "drawerlayout" "1.0.0"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment" "fragment" "1.3.6"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-common" "2.5.1"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-viewmodel" "2.5.1"
-Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.savedstate" "savedstate" "1.2.0"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\launchscreen\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-launchscreen" "1.0.0" 
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 

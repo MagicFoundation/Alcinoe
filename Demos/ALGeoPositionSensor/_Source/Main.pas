@@ -21,9 +21,7 @@ uses
   FMX.Controls.Presentation,
   FMX.StdCtrls,
   FMX.Memo.Types,
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Grijjy.ErrorReporting,
-  {$ENDIF}
+  Alcinoe.FMX.ErrorReporting,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.GeoPosition.Sensor,
   Alcinoe.FMX.Objects,
@@ -50,9 +48,6 @@ type
     procedure Button2Click(Sender: TObject);
   private
     FGeoPositionSensor: TALGeoPositionSensor;
-    {$IF Defined(IOS) or Defined(ANDROID)}
-    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
     procedure OnGeoPositionSensorGeoPositionUpdate(
                 const Sender: TObject;
                 const ALatitude: Double;
@@ -91,10 +86,7 @@ uses
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Application.OnException := TgoExceptionReporter.ExceptionHandler;
-  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
+  TALErrorReporting.Instance;
 
   FGeoPositionSensor := TALGeoPositionSensor.Create(true{AUseGooglePlayServicesIfAvailable});
   FGeoPositionSensor.OnGeoPositionUpdate := OnGeoPositionSensorGeoPositionUpdate;
@@ -118,38 +110,8 @@ end;
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-
   ALFreeAndNil(FGeoPositionSensor);
-
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
-
 end;
-
-{************************************}
-{$IF Defined(IOS) or Defined(ANDROID)}
-procedure TForm1.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-begin
-  var LReport := TgoExceptionReportMessage(M).Report;
-  allog('ERROR', LReport.Report, TalLogType.error);
-  memo1.lines.clear;
-  memo1.lines.Add(LReport.Report);
-  {$IF Defined(IOS)}
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Halt(1); // << This is the only way i found to crash the app :(
-        end);
-    end).Start;
-  {$ELSE}
-  Application.Terminate;
-  {$ENDIF}
-end;
-{$ENDIF}
 
 {*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);

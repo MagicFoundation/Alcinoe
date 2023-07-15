@@ -35,12 +35,6 @@ type
     fMustcheckanswer: boolean;
     fUserID: int64;
     fWebRTC: TalWebRTC;
-    {$IF Defined(IOS) or Defined(ANDROID)}
-    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
-    {$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-    procedure ApplicationExceptionHandler(Sender: TObject; E: Exception);
-    {$ENDIF}
     procedure OnLocalFrameAvailable(Sender: TObject);
     procedure OnRemoteFrameAvailable(Sender: TObject);
     procedure onLocalDescription(Sender: TObject; const aType: TALWebRTCSDPType; const aDescription: String);
@@ -61,7 +55,7 @@ uses
   system.math,
   system.math.vectors,
   fmx.platform,
-  Grijjy.ErrorReporting,
+  Alcinoe.FMX.ErrorReporting,
   {$IF defined(ANDROID)}
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.JavaTypes,
@@ -374,18 +368,9 @@ end;
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-
   ALLog('TForm1.FormCreate', TalLogType.verbose);
-
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Application.OnException := TgoExceptionReporter.ExceptionHandler;
-  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ELSE}
-  Application.OnException := ApplicationExceptionHandler;
-  {$ENDIF}
-
+  TALErrorReporting.Instance;
   fWebRTC := nil;
-
 end;
 
 {*******************************************}
@@ -596,40 +581,6 @@ begin
     fWebRTC.LocalBitmap);
   {$ENDIF}
 end;
-
-{************************************}
-{$IF Defined(IOS) or Defined(ANDROID)}
-procedure TForm1.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-var aReport: IgoExceptionReport;
-begin
-
-  aReport := TgoExceptionReportMessage(M).Report;
-  allog('ERROR', aReport.Report, TalLogType.error);
-
-  {$IF Defined(IOS)}
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Halt(1); // << This is the only way i found to crash the app :(
-        end);
-    end).Start;
-  {$ELSE}
-  Application.Terminate;
-  {$ENDIF}
-
-end;
-{$ENDIF}
-
-{*****************************************}
-{$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-procedure TForm1.ApplicationExceptionHandler(Sender: TObject; E: Exception);
-begin
-  Application.Terminate;
-end;
-{$ENDIF}
 
 initialization
   {$IFDEF DEBUG}

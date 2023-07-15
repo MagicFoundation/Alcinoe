@@ -6,7 +6,7 @@
     <MainSource>ALNotificationServiceDemo.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
   </PropertyGroup>

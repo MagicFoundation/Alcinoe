@@ -17,9 +17,7 @@ uses
   FMX.Memo,
   FMX.Controls.Presentation,
   FMX.StdCtrls,
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Grijjy.ErrorReporting,
-  {$ENDIF}
+  Alcinoe.FMX.ErrorReporting,
   system.Messaging,
   Alcinoe.StringUtils,
   Alcinoe.StringList,
@@ -52,10 +50,6 @@ type
     procedure onFaceBookLoginError(const aMsg: String);
     procedure onFaceBookLoginSuccess(const aUserID: String; const aToken: String; const AGrantedPermissions: TArray<String>; const ADeniedPermissions: TArray<String>);
     procedure onFaceBookGraphRequestCompleted(const aResponse: string; Const aErrorCode: integer; Const aErrorMsg: String);
-  private
-    {$IF Defined(IOS) or Defined(ANDROID)}
-    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
   public
   end;
 
@@ -70,10 +64,7 @@ implementation
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Application.OnException := TgoExceptionReporter.ExceptionHandler;
-  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
+  TALErrorReporting.Instance;
 
   fFaceBookLogin := TalFacebookLogin.Create;
   fFaceBookLogin.onCancel := onFaceBookLoginCancel;
@@ -88,42 +79,9 @@ end;
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
-
   alFreeAndNil(fFaceBookLogin);
   alFreeAndNil(fFacebookGraphRequest);
-
 end;
-
-{************************************}
-{$IF Defined(IOS) or Defined(ANDROID)}
-procedure TForm1.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-var aReport: IgoExceptionReport;
-begin
-  aReport := TgoExceptionReportMessage(M).Report;
-  allog('ERROR', aReport.Report, TalLogType.error);
-  memo1.lines.clear;
-  memo1.lines.Add(aReport.Report);
-
-  {$IF Defined(IOS)}
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Halt(1); // << This is the only way i found to crash the app :(
-        end);
-    end).Start;
-  {$ELSE}
-  Application.Terminate;
-  {$ENDIF}
-
-end;
-{$ENDIF}
 
 {*************************************}
 procedure TForm1.onFaceBookLoginCancel;

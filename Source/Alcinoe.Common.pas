@@ -2423,11 +2423,11 @@ procedure _ALLog(
 begin
   if CanPreserve and (ALMaxLogHistory > 0) then begin
     var LLogItem := _TALLogItem.Create(
-                                 Tag, // const ATag: String;
-                                 Msg, // const AMsg: String;
-                                 &Type, // Const aType: TalLogType
-                                 ThreadID, // Const AThreadID: TThreadID;
-                                 Now); // const ATimeStamp: TDateTime
+                      Tag, // const ATag: String;
+                      Msg, // const AMsg: String;
+                      &Type, // Const aType: TalLogType
+                      ThreadID, // Const AThreadID: TThreadID;
+                      Now); // const ATimeStamp: TDateTime
     Tmonitor.enter(_ALLogHistory);
     Try
       _ALLogHistoryIndex := (_ALLogHistoryIndex + 1) mod ALMaxLogHistory;

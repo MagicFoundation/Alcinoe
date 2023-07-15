@@ -53,12 +53,6 @@ type
     procedure ALLayout1Resize(Sender: TObject);
   private
     fColorAdjustEffect: TALColorAdjustEffect;
-    {$IF Defined(IOS) or Defined(ANDROID)}
-    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
-    {$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-    procedure ApplicationExceptionHandler(Sender: TObject; E: Exception);
-    {$ENDIF}
   public
     { Public declarations }
   end;
@@ -70,7 +64,7 @@ implementation
 
 {$R *.fmx}
 
-uses Grijjy.ErrorReporting,
+uses Alcinoe.FMX.ErrorReporting,
      Alcinoe.Common;
 
 {****************************************************}
@@ -165,49 +159,12 @@ end;
 {*******************************************}
 procedure TForm2.FormCreate(Sender: TObject);
 begin
+  TALErrorReporting.Instance;
   fColorAdjustEffect := TALColorAdjustEffect.Create(Image1);
   fColorAdjustEffect.Parent := Image1;
   fColorAdjustEffect.Enabled := true;
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Application.OnException := TgoExceptionReporter.ExceptionHandler;
-  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ELSE}
-  Application.OnException := ApplicationExceptionHandler;
-  {$ENDIF}
   ALLayout1.Height := ALLayout1.Width / (720 / 404)
 end;
-
-{$IF Defined(IOS) or Defined(ANDROID)}
-procedure TForm2.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-var aReport: IgoExceptionReport;
-begin
-
-  aReport := TgoExceptionReportMessage(M).Report;
-  allog('ERROR', aReport.Report, TalLogType.error);
-
-  {$IF Defined(IOS)}
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Halt(1); // << This is the only way i found to crash the app :(
-        end);
-    end).Start;
-  {$ELSE}
-  Application.Terminate;
-  {$ENDIF}
-
-end;
-{$ENDIF}
-
-{$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-procedure TForm2.ApplicationExceptionHandler(Sender: TObject; E: Exception);
-begin
-  Application.Terminate;
-end;
-{$ENDIF}
 
 initialization
   {$IFDEF DEBUG}

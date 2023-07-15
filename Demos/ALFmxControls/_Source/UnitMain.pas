@@ -31,9 +31,7 @@ uses
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.FMX.DatePickerDialog,
   FMX.Effects,
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Grijjy.ErrorReporting,
-  {$ENDIF}
+  Alcinoe.FMX.ErrorReporting,
   FMX.Filter.Effects,
   system.Messaging,
   Alcinoe.FMX.Ani,
@@ -288,12 +286,6 @@ type
     fALCircle1: TALCircleStopWatch;
     fCircle1: TCircleStopWatch;
     FVKKeyboardOpen: boolean;
-    {$IF Defined(IOS) or Defined(ANDROID)}
-    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
-    {$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-    procedure ApplicationExceptionHandler(Sender: TObject; E: Exception);
-    {$ENDIF}
   public
   end;
 
@@ -1308,12 +1300,7 @@ end;
 procedure TForm1.FormCreate(Sender: TObject);
 begin
 
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Application.OnException := TgoExceptionReporter.ExceptionHandler;
-  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ELSE}
-  Application.OnException := ApplicationExceptionHandler;
-  {$ENDIF}
+  TALErrorReporting.Instance;
 
   fDatePickerDialog := nil;
 
@@ -1492,44 +1479,8 @@ end;
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
-
   ALLog('FormDestroy');
 end;
-
-{$IF Defined(IOS) or Defined(ANDROID)}
-procedure TForm1.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-var aReport: IgoExceptionReport;
-begin
-  aReport := TgoExceptionReportMessage(M).Report;
-  allog('ERROR', aReport.Report, TalLogType.error);
-
-  {$IF Defined(IOS)}
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Halt(1); // << This is the only way i found to crash the app :(
-        end);
-    end).Start;
-  {$ELSE}
-  Application.Terminate;
-  {$ENDIF}
-
-end;
-{$ENDIF}
-
-{$IF Defined(MSWINDOWS) or Defined(_MACOS)}
-procedure TForm1.ApplicationExceptionHandler(Sender: TObject; E: Exception);
-begin
-  Application.Terminate;
-end;
-{$ENDIF}
 
 {*******************************************}
 procedure TForm1.FormResize(Sender: TObject);

@@ -26,9 +26,6 @@ uses
   {$IF Defined(MSWindows)}
   Alcinoe.Cipher,
   {$ENDIF}
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Grijjy.ErrorReporting,
-  {$ENDIF}
   {$IF defined(ANDROID)}
   Androidapi.JNI.Provider,
   Androidapi.JNI.GraphicsContentViewText,
@@ -56,6 +53,7 @@ uses
   Alcinoe.StringList,
   Alcinoe.FMX.NotificationService,
   Alcinoe.Common,
+  Alcinoe.FMX.ErrorReporting,
   Alcinoe.FMX.Objects;
 
 type
@@ -70,7 +68,6 @@ type
     ButtonShowNotification: TButton;
     ButtonDeleteToken: TButton;
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure ButtonGetTokenClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ButtonSendAlertNotificationViaHttpV1Click(Sender: TObject);
@@ -88,9 +85,6 @@ type
     procedure OnAuthorizationRefused(Sender: TObject);
     procedure OnAuthorizationGranted(Sender: TObject);
     procedure ShowLog(const aLog: String);
-    {$IF Defined(IOS) or Defined(ANDROID)}
-    procedure ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-    {$ENDIF}
   public
     { Public declarations }
   end;
@@ -145,11 +139,7 @@ const
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  Application.OnException := TgoExceptionReporter.ExceptionHandler;
-  TMessageManager.DefaultManager.SubscribeToMessage(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
-  //----
+  TALErrorReporting.Instance;
   FBadge := 0;
   TALNotificationService.Instance.OnGetToken := onGetToken;
   TALNotificationService.Instance.OnDeleteToken := onDeleteToken;
@@ -163,41 +153,11 @@ begin
   TALNotificationService.Instance.setBadgeCount(0);
 end;
 
-{********************************************}
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  {$IF Defined(IOS) or Defined(ANDROID)}
-  TMessageManager.DefaultManager.Unsubscribe(TgoExceptionReportMessage, ApplicationExceptionHandler);
-  {$ENDIF}
-end;
-
 {*****************************************}
 procedure TForm1.FormShow(Sender: TObject);
 begin
   TALNotificationService.Instance.RequestNotificationPermission;
 end;
-
-{************************************}
-{$IF Defined(IOS) or Defined(ANDROID)}
-procedure TForm1.ApplicationExceptionHandler(const Sender: TObject; const M: TMessage);
-begin
-  var LReport := TgoExceptionReportMessage(M).Report;
-  allog('ERROR', LReport.Report, TalLogType.error);
-  {$IF Defined(IOS)}
-  TThread.CreateAnonymousThread(
-    procedure
-    begin
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Halt(1); // << This is the only way i found to crash the app :(
-        end);
-    end).Start;
-  {$ELSE}
-  Application.Terminate;
-  {$ENDIF}
-end;
-{$ENDIF}
 
 {*****************************************************************************}
 procedure TForm1.onGetToken(const AToken: String; const AErrorMessage: String);

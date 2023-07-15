@@ -324,8 +324,9 @@ type
   TALGraphicThreadPool = class(TALWorkerThreadPool)
   private
     class function CreateInstance: TALGraphicThreadPool;
-    class var FInstance: TALGraphicThreadPool;
     class function GetInstance: TALGraphicThreadPool; static;
+  protected
+    class var FInstance: TALGraphicThreadPool;
   public
     type
       TCreateInstanceFunct = function: TALGraphicThreadPool;

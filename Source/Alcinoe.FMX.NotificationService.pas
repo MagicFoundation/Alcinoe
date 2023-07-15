@@ -148,8 +148,9 @@ type
 
   private
     class function CreateInstance: TALNotificationService;
-    class var FInstance: TALNotificationService;
     class function GetInstance: TALNotificationService; static;
+  protected
+    class var FInstance: TALNotificationService;
   public
     type
       TCreateInstanceFunct = function: TALNotificationService;

@@ -489,21 +489,39 @@ type
     constructor CreateFmt(const Msg: string; const Args: array of const); overload;
   end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-var ALCallStackCustomLogsMaxCount: integer = 50;
-procedure ALAddCallStackCustomLog(Const aLog: String);
-function ALGetCallStackCustomLogs(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
+{~~}
+Type
+  TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
+  TALCustomLogMsgProc = procedure(Const Tag: String; Const msg: String; const &Type: TalLogType) of object;
+  TALCustomLogExceptionProc = procedure(Const Tag: String; Const E: Exception; const &Type: TalLogType) of object;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-Type TalLogType = (VERBOSE, DEBUG, INFO, WARN, ERROR, ASSERT);
-procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO); overload;
-procedure ALLog(Const Tag: String; const _type: TalLogType = TalLogType.INFO); overload;
-Var ALEnqueueLog: Boolean; // We can use this flag to enqueue the log when the device just started and when we didn't yet
-procedure ALPrintLogQueue; // pluged the device to the monitoring tool, so that we can print the log a little later
+var
+  ALCustomLogMsgProc: TALCustomLogMsgProc = nil;
+  ALCustomLogExceptionProc: TALCustomLogExceptionProc = nil;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-type TALCustomDelayedFreeObjectProc = procedure(var aObject: Tobject) of object;
-var ALCustomDelayedFreeObjectProc: TALCustomDelayedFreeObjectProc;
+procedure _ALLog(
+            Const Tag: String;
+            Const msg: String;
+            Const &Type: TalLogType;
+            Const ThreadID: TThreadID;
+            Const CanPreserve: boolean);
+procedure ALLog(Const Tag: String; Const msg: String; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: String; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: String; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
+
+var ALMaxLogHistory: integer = 0;
+function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
+
+Var ALEnqueueLog: Boolean = False; // We can use this flag to enqueue the log when the device just started and when we didn't yet
+procedure ALPrintLogQueue;         // pluged the device to the monitoring tool, so that we can print the log a little later
+
+{~~}
+type
+  TALCustomDelayedFreeObjectProc = procedure(var aObject: Tobject) of object;
+
+var
+  ALCustomDelayedFreeObjectProc: TALCustomDelayedFreeObjectProc = nil;
+
 {$IF CompilerVersion >= 34} // sydney
 Procedure ALFreeAndNil(const [ref] Obj: TObject; const ADelayed: boolean = false); inline;
 {$ELSE}
@@ -1069,44 +1087,6 @@ procedure TALWorkerThreadPool.ExecuteProc(
             Const AAsync: Boolean = True);
 begin
   ExecuteProc(AProc, nil{AExtData}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
-end;
-
-type
-
-  {*****************************}
-  _TALCallStackCustomLog = record
-    ThreadID: TThreadID;
-    TimeStamp: TDateTime;
-    log: String;
-  end;
-
-var
-  _ALCallStackCustomLogs: TList<_TALCallStackCustomLog>;
-  _ALCallStackCustomLogsCurrentIndex: integer = -1;
-
-type
-
-  {***********************}
-  _TALLogQueueItem = record
-  private
-    Tag: String;
-    msg: String;
-    _type: TalLogType;
-    ThreadID: TThreadID;
-  public
-    class function Create(const ATag: String; const AMsg: String; Const aType: TalLogType; Const aThreadID: TThreadID): _TALLogQueueItem; static; inline;
-  end;
-
-var
-  _ALLogQueue: TList<_TALLogQueueItem>;
-
-{****************************************************************************************************************************************************}
-class function _TALLogQueueItem.Create(const ATag: String; const AMsg: String; Const aType: TalLogType; Const aThreadID: TThreadID): _TALLogQueueItem;
-begin
-  Result.Tag := aTag;
-  Result.Msg := aMsg;
-  Result._Type := aType;
-  Result.ThreadID := aThreadID;
 end;
 
 {***********************************************}
@@ -2352,78 +2332,128 @@ begin
   inherited CreateFmt(Msg, Args);
 end;
 
-{****************************************************}
-procedure ALAddCallStackCustomLog(Const aLog: String);
-var LCallStackCustomLog: _TALCallStackCustomLog;
+type
+
+  {******************}
+  _TALLogItem = record
+  private
+    Tag: String;
+    msg: String;
+    &Type: TalLogType;
+    ThreadID: TThreadID;
+    TimeStamp: TDateTime;
+  public
+    class function Create(
+                     const ATag: String;
+                     const AMsg: String;
+                     Const AType: TalLogType;
+                     Const AThreadID: TThreadID;
+                     const ATimeStamp: TDateTime): _TALLogItem; static; inline;
+  end;
+
+var
+  _ALLogQueue: TList<_TALLogItem>;
+  _ALLogHistory: TList<_TALLogItem>;
+  _ALLogHistoryIndex: integer = -1;
+
+{********************************}
+class function _TALLogItem.Create(
+                 const ATag: String;
+                 const AMsg: String;
+                 Const AType: TalLogType;
+                 Const AThreadID: TThreadID;
+                 const ATimeStamp: TDateTime): _TALLogItem;
 begin
-  LCallStackCustomLog.ThreadID := TThread.Current.ThreadID;
-  LCallStackCustomLog.TimeStamp := Now;
-  LCallStackCustomLog.log := aLog;
-  Tmonitor.enter(_ALCallStackCustomLogs);
-  Try
-    _ALCallStackCustomLogsCurrentIndex := (_ALCallStackCustomLogsCurrentIndex + 1) mod ALCallStackCustomLogsMaxCount;
-    if _ALCallStackCustomLogsCurrentIndex <= _ALCallStackCustomLogs.Count - 1 then
-      _ALCallStackCustomLogs[_ALCallStackCustomLogsCurrentIndex] := LCallStackCustomLog
-    else
-      _ALCallStackCustomLogsCurrentIndex := _ALCallStackCustomLogs.Add(LCallStackCustomLog);
-  Finally
-    Tmonitor.exit(_ALCallStackCustomLogs);
-  End;
+  Result.Tag := aTag;
+  Result.Msg := aMsg;
+  Result.&Type := aType;
+  Result.ThreadID := aThreadID;
+  Result.TimeStamp := ATimeStamp;
 end;
 
-{*************************************************************************************************************************}
-function ALGetCallStackCustomLogs(Const aPrependTimeStamp: boolean = True; Const aPrependThreadID: boolean = True): String;
-Var i: integer;
+{*****************************************************************************}
+function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _LogItemToStr(const ALogItem: _TALLogItem; const aIgnoreLogItemMsg: Boolean): String;
+  begin
+    Result := ALFormatDateTimeW(
+                'yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''',
+                TTimeZone.Local.ToUniversalTime(ALogItem.TimeStamp),
+                ALDefaultFormatSettingsW);
+    case ALogItem.&Type of
+      TalLogType.VERBOSE: Result := Result + ' [V]';
+      TalLogType.DEBUG:   Result := Result + ' [D][V]';
+      TalLogType.INFO:    Result := Result + ' [I][D][V]';
+      TalLogType.WARN:    Result := Result + ' [W][I][D][V]';
+      TalLogType.ERROR:   Result := Result + ' [E][W][I][D][V]';
+      TalLogType.ASSERT:  Result := Result + ' [A][E][W][I][D][V]';
+      else raise Exception.Create('Error 651AAEA2-4FF7-4621-A4DB-4BA299E238CE');
+    end;
+    if ALogItem.ThreadID <> MainThreadID then Result := Result + '['+ALIntToStrW(ALogItem.ThreadID)+']';
+    if ALogItem.Tag <> '' then Result := Result + ' ' + ALogItem.Tag;
+    if (not aIgnoreLogItemMsg) and (ALogItem.msg <> '') then begin
+      var lMsg := ALStringReplaceW(ALogItem.msg, #13#10, #10, [rfreplaceALL]);
+      lMsg := ALStringReplaceW(lMsg, #13, #10, [rfreplaceALL]);
+      Result := ALTrim(ALStringReplaceW(#10+lMsg, #10, #13#10+Result+' | ', [RfReplaceALL]));
+    end;
+  end;
+
 begin
   Result := '';
-  Tmonitor.enter(_ALCallStackCustomLogs);
+  Tmonitor.enter(_ALLogHistory);
   Try
-    if aPrependTimeStamp and aPrependThreadID then begin
-      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
-      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ' [' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
-    end
-    else if aPrependTimeStamp then begin
-      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogs[i].log + #13#10;
-      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
-        Result := Result + ALFormatDateTimeW('yyyy''-''mm''-''dd''T''hh'':''nn'':''ss''.''zzz''Z''', TTimeZone.Local.ToUniversalTime(_ALCallStackCustomLogs[i].TimeStamp), ALDefaultFormatSettingsW) + ': ' + _ALCallStackCustomLogs[i].log + #13#10;
-    end
-    else if aPrependThreadID then begin
-      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
-        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
-      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
-        Result := Result + '[' + ALIntToStrW(_ALCallStackCustomLogs[i].ThreadID) + ']: ' + _ALCallStackCustomLogs[i].log + #13#10;
-    end
-    else begin
-      for i := _ALCallStackCustomLogsCurrentIndex downto 0 do
-        Result := Result + _ALCallStackCustomLogs[i].log + #13#10;
-      for i := _ALCallStackCustomLogs.Count - 1 downto _ALCallStackCustomLogsCurrentIndex + 1 do
-        Result := Result + _ALCallStackCustomLogs[i].log + #13#10;
-    end;
+    for var i := _ALLogHistoryIndex downto 0 do
+      Result := Result + _LogItemToStr(_ALLogHistory[i], AIgnoreLastLogItemMsg and (_ALLogHistoryIndex=i)) + #13#10;
+    for var i := _ALLogHistory.Count - 1 downto _ALLogHistoryIndex + 1 do
+      Result := Result + _LogItemToStr(_ALLogHistory[i], false) + #13#10;
   Finally
-    Tmonitor.exit(_ALCallStackCustomLogs);
+    Tmonitor.exit(_ALLogHistory);
   End;
   Result := ALTrim(Result);
 end;
 
-{*********************************************************************************************************}
-procedure _ALLog(Const Tag: String; Const msg: String; const _type: TalLogType; const ThreadID: TThreadID);
+{***************}
+procedure _ALLog(
+            Const Tag: String;
+            Const msg: String;
+            Const &Type: TalLogType;
+            Const ThreadID: TThreadID;
+            Const CanPreserve: boolean);
 begin
-  if ALEnqueueLog then begin
+  if CanPreserve and (ALMaxLogHistory > 0) then begin
+    var LLogItem := _TALLogItem.Create(
+                                 Tag, // const ATag: String;
+                                 Msg, // const AMsg: String;
+                                 &Type, // Const aType: TalLogType
+                                 ThreadID, // Const AThreadID: TThreadID;
+                                 Now); // const ATimeStamp: TDateTime
+    Tmonitor.enter(_ALLogHistory);
+    Try
+      _ALLogHistoryIndex := (_ALLogHistoryIndex + 1) mod ALMaxLogHistory;
+      if _ALLogHistoryIndex <= _ALLogHistory.Count - 1 then
+        _ALLogHistory[_ALLogHistoryIndex] := LLogItem
+      else
+        _ALLogHistoryIndex := _ALLogHistory.Add(LLogItem);
+    Finally
+      Tmonitor.exit(_ALLogHistory);
+    End;
+  end;
+  //--
+  if CanPreserve and ALEnqueueLog then begin
     Tmonitor.Enter(_ALLogQueue);
     try
       _ALLogQueue.Add(
-        _TALLogQueueItem.Create(
+        _TALLogItem.Create(
           Tag, // const ATag: String;
           Msg, // const AMsg: String;
-          _Type, // Const aType: TalLogType
-          ThreadID));
+          &Type, // Const aType: TalLogType
+          ThreadID, // Const AThreadID: TThreadID;
+          Now)); // const ATimeStamp: TDateTime
     finally
       Tmonitor.Exit(_ALLogQueue);
     end;
-    if _type = TalLogType.ASSERT then ALPrintLogQueue
+    if &Type = TalLogType.ASSERT then ALPrintLogQueue
   end
   else begin
     {$IF defined(ANDROID)}
@@ -2431,7 +2461,7 @@ begin
     if Msg <> '' then LMsg := msg
     else LMsg := '<empty>';
     if ThreadID <> MainThreadID then LMsg := '['+ALIntToStrW(ThreadID)+'] ' + LMsg;
-    case _type of
+    case &Type of
       TalLogType.VERBOSE: TJLog.JavaClass.v(StringToJString(Tag), StringToJString(LMsg));
       TalLogType.DEBUG: TJLog.JavaClass.d(StringToJString(Tag), StringToJString(LMsg));
       TalLogType.INFO: TJLog.JavaClass.i(StringToJString(Tag), StringToJString(LMsg));
@@ -2441,7 +2471,7 @@ begin
     end;
     {$ELSEIF defined(IOS)}
     var LMsg: String;
-    if msg <> '' then LMsg := Tag + ' => ' + msg
+    if msg <> '' then LMsg := Tag + ' | ' + msg
     else LMsg := Tag;
     var LThreadID: String;
     if ThreadID <> MainThreadID then LThreadID := '['+ALIntToStrW(ThreadID)+']'
@@ -2452,7 +2482,7 @@ begin
     while P <= length(LMsg) do begin
       var LMsgPart := ALCopyStr(LMsg, P, 950); // to stay safe
       inc(P, 950);
-      case _type of
+      case &Type of
         TalLogType.VERBOSE: NSLog(StringToID('[V]'+LThreadID+' ' + LMsgPart));
         TalLogType.DEBUG:   NSLog(StringToID('[D][V]'+LThreadID+' ' + LMsgPart));
         TalLogType.INFO:    NSLog(StringToID('[I][D][V]'+LThreadID+' ' + LMsgPart));
@@ -2462,11 +2492,11 @@ begin
       end;
     end;
     {$ELSEIF defined(MSWINDOWS)}
-    if _type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
+    if &Type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
       var LMsg: String;
-      if msg <> '' then LMsg := Tag + ' => ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
+      if msg <> '' then LMsg := Tag + ' | ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
       else LMsg := Tag;
-      case _type of
+      case &Type of
         TalLogType.VERBOSE: OutputDebugString(pointer('[V] ' + LMsg + ' |'));
         TalLogType.DEBUG:   OutputDebugString(pointer('[D][V] ' + LMsg + ' |'));
         TalLogType.INFO:    OutputDebugString(pointer('[I][D][V] ' + LMsg + ' |'));
@@ -2479,34 +2509,44 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
-procedure ALLog(Const Tag: String; Const msg: String; const _type: TalLogType = TalLogType.INFO);
+{**************************************************************************************************}
+procedure ALLog(Const Tag: String; Const msg: String; const &Type: TalLogType = TalLogType.VERBOSE);
 begin
-  _ALLog(Tag, msg, _type, TThread.Current.ThreadID);
+  if assigned(ALCustomLogMsgProc) then
+    ALCustomLogMsgProc(Tag, msg, &Type)
+  else
+    _ALLog(Tag, msg, &Type, TThread.Current.ThreadID, True{CanPreserve});
 end;
 
-{****************************************************************************}
-procedure ALLog(Const Tag: String; const _type: TalLogType = TalLogType.INFO);
+{*******************************************************************************}
+procedure ALLog(Const Tag: String; const &Type: TalLogType = TalLogType.VERBOSE);
 begin
-  _ALLog(Tag, '', _type, TThread.Current.ThreadID);
+  if assigned(ALCustomLogMsgProc) then
+    ALCustomLogMsgProc(Tag, '', &Type)
+  else
+    _ALLog(Tag, '', &Type, TThread.Current.ThreadID, True{CanPreserve});
+end;
+
+{*************************************************************************************************}
+procedure ALLog(Const Tag: String; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR);
+begin
+  if assigned(ALCustomLogExceptionProc) then
+    ALCustomLogExceptionProc(Tag, E, &Type)
+  else
+    _ALLog(Tag, E.message, &Type, TThread.Current.ThreadID, True{CanPreserve});
 end;
 
 {************************}
 procedure ALPrintLogQueue;
-var LOldEnqueueLogValue: Boolean;
-    i: integer;
 begin
-  LOldEnqueueLogValue := ALEnqueueLog;
-  ALEnqueueLog := False;
   Tmonitor.Enter(_ALLogQueue);
   try
-    for I := 0 to _ALLogQueue.Count - 1 do
+    for var I := 0 to _ALLogQueue.Count - 1 do
       with _ALLogQueue[i] do
-        _ALLog(Tag, Msg, _type, ThreadID);
+        _ALLog(Tag, Msg, &Type, ThreadID, False{CanPreserve});
     _ALLogQueue.Clear;
   finally
     Tmonitor.Exit(_ALLogQueue);
-    ALEnqueueLog := LOldEnqueueLogValue;
   end;
 end;
 
@@ -3093,15 +3133,13 @@ end;
 
 
 initialization
-  ALCustomDelayedFreeObjectProc := nil;
-  ALEnqueueLog := False;
-  _ALLogQueue := TList<_TALLogQueueItem>.Create;
-  _ALCallStackCustomLogs := TList<_TALCallStackCustomLog>.Create;
+  _ALLogQueue := TList<_TALLogItem>.Create;
+  _ALLogHistory := TList<_TALLogItem>.Create;
   ALMove := system.Move;
 
 
 Finalization
-  ALFreeAndNil(_ALCallStackCustomLogs);
+  ALFreeAndNil(_ALLogHistory);
   ALFreeAndNil(_ALLogQueue);
 
 end.

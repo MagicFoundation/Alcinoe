@@ -49,8 +49,9 @@ type
   TALNetHttpClientPool = Class(TALWorkerThreadPool)
   private
     class function CreateInstance: TALNetHttpClientPool;
-    class var FInstance: TALNetHttpClientPool;
     class function GetInstance: TALNetHttpClientPool; static;
+  protected
+    class var FInstance: TALNetHttpClientPool;
   public
     type
       TCreateInstanceFunct = function: TALNetHttpClientPool;

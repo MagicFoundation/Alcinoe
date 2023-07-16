@@ -434,7 +434,7 @@ begin
                LUrlPath, // Var LUrlPath: AnsiString;
                LExtraInfo, // Var LExtraInfo: AnsiString;
                LPortNumber) then
-        raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
+        raise EALHTTPClientException.CreateFmt(ALHTTPCLientMsgInvalidURL, [Value]);
       if ALSameTextA(LSchemeName, 'wss') then FURLScheme := INTERNET_SCHEME_HTTPS
       else if ALSameTextA(LSchemeName, 'ws') then FURLScheme := INTERNET_SCHEME_HTTP
       else raise Exception.Createfmt('Unknown scheme (%s)',[LSchemeName]);
@@ -505,7 +505,7 @@ begin
 
   {init URL}
   SetURL(aUrl);
-  if URL = '' then raise EALHTTPClientException.Create(CALHTTPCLient_MsgEmptyURL);
+  if URL = '' then raise EALHTTPClientException.Create(ALHTTPCLientMsgEmptyURL);
   if (FConnected) then Exit;
 
   try

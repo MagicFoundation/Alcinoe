@@ -170,6 +170,8 @@ type
     property  OnStatusChange: TAlWinInetFtpClientStatusChangeEvent read FOnStatusChange write SetOnStatusChange;
   end;
 
+Function ALCreateWininetFtpClient: TALWininetFtpClient;
+
 implementation
 
 uses
@@ -177,6 +179,22 @@ uses
   System.Ansistrings,
   Alcinoe.Common,
   Alcinoe.StringUtils;
+
+{*****************************************************}
+Function ALCreateWininetFtpClient: TALWininetFtpClient;
+Begin
+  Result := TALWininetFtpClient.Create;
+  With Result do begin
+    AccessType := wFtpAt_Direct;
+    InternetOptions := [wFtpIo_Passive,
+                        wftpIo_No_cache_write,
+                        wftpIo_Reload];
+    TransferType := wFtpTt_BINARY;
+    ReceiveTimeout := ALCreateFTPClientReceiveTimeout;
+    sendTimeout    := ALCreateFTPClientSendTimeout;
+    ConnectTimeout := ALCreateFTPClientConnectTimeout;
+  end;
+end;
 
 {********************************************************************}
 {this procedure produce some strange bug under windows Server 2008 R2}
@@ -411,14 +429,14 @@ end;
 {*************************************************************************}
 procedure TALWinInetFTPClient.CreateDirectory(const Directory: AnsiString);
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(not FtpCreateDirectoryA(FInetConnect, PAnsiChar(Directory)));
 end;
 
 {*******************************************************************}
 procedure TALWinInetFTPClient.DeleteFile(const FileName: AnsiString);
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(not FtpDeleteFileA(FInetConnect, PAnsiChar(FileName)));
 end;
 
@@ -462,7 +480,7 @@ function TALWinInetFTPClient.FindFirst(
 
 const faSpecial = faDirectory;
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   F.ExcludeAttr := not Attr and faSpecial;
   F.FindHandle := FtpFindFirstFileA(
                     FInetConnect,
@@ -481,7 +499,7 @@ end;
 {***************************************************************************}
 function TALWinInetFTPClient.FindNext(var F: TALFtpclientSearchRec): Integer;
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   // This component uses AnsiString everywhere so previous function (InternetFindNextFile)
   // was working incorrectly. We need to use version ***A() instead.
   if InternetFindNextFileA(F.FindHandle, @F.FindData) then Result := FindMatchingFile(F)
@@ -501,7 +519,7 @@ end;
 function TALWinInetFTPClient.GetCurrentDirectory: AnsiString;
 var Len: Dword;
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   Len := 0;
   Result := '';
   If not FtpGetCurrentDirectoryA(
@@ -545,7 +563,7 @@ var Size,
     nFileSizeHigh: LongWord;
 
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   HFile := FtpOpenFileA(
              FInetConnect,
              PAnsiChar(RemoteFile),
@@ -610,7 +628,7 @@ procedure TALWinInetFTPClient.GetFile(
   end;
 
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(
     not FtpGetFileA(
           FInetConnect,
@@ -641,7 +659,7 @@ function TALWinInetFTPClient.GetFileSize(const filename: AnsiString): Longword;
 Var hFile: HINTERNET;
     nFileSizeHigh: LongWord;
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   HFile := FtpOpenFileA(
              FInetConnect,
              PAnsiChar(filename),
@@ -680,7 +698,7 @@ var RetVal: DWord;
     hFile: HINTERNET;
 
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   HFile := FtpOpenFileA(
              FInetConnect,
              PAnsiChar(RemoteFile),
@@ -703,7 +721,7 @@ begin
       if Len = 0 then break;
       { Read data in buffer and write out}
       Len := DataStream.Read(Buffer.Memory^, Len);
-      if Len = 0 then raise EALFtpClientException.CreateRes(@cALFTPCLient_MsgInvalidFtpRequest);
+      if Len = 0 then raise EALFtpClientException.CreateRes(@ALFtpCLientMsgInvalidFtpRequest);
 
       CheckError(
         not InternetWriteFile(
@@ -743,7 +761,7 @@ procedure TALWinInetFTPClient.PutFile(
   end;
 
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(
     not FtpPutFileA(
           FInetConnect,
@@ -756,7 +774,7 @@ end;
 {*************************************************************************}
 procedure TALWinInetFTPClient.RemoveDirectory(const Directory: AnsiString);
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(not FtpRemoveDirectoryA(FInetConnect, PAnsiChar(Directory)));
 end;
 
@@ -765,7 +783,7 @@ procedure TALWinInetFTPClient.RenameFile(
             const ExistingFile: AnsiString;
             const NewFile: AnsiString);
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(
     not FtpRenameFileA(
           FInetConnect,
@@ -776,7 +794,7 @@ end;
 {*****************************************************************************}
 procedure TALWinInetFTPClient.SetCurrentDirectory(const Directory: AnsiString);
 begin
-  If Not fconnected then raise EALFTPClientException.CreateRes(@cALFTPCLient_MsgNotConnected);
+  If Not fconnected then raise EALFTPClientException.CreateRes(@ALFtpCLientMsgNotConnected);
   CheckError(not FtpSetCurrentDirectoryA(FInetConnect,PAnsiChar(Directory)));
 end;
 

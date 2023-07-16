@@ -133,8 +133,13 @@ type
   end;
 
 ResourceString
-  CALFtpCLient_MsgNotConnected         = 'Not connected';
-  CALFtpCLient_MsgInvalidFtpRequest    = 'Invalid Ftp Request';
+  ALFtpCLientMsgNotConnected         = 'Not connected';
+  ALFtpCLientMsgInvalidFtpRequest    = 'Invalid Ftp Request';
+
+var
+  ALCreateFTPClientReceiveTimeout: integer = 20000;
+  ALCreateFTPClientSendTimeout: integer = 20000;
+  ALCreateFTPClientConnectTimeout: integer = 20000;
 
 implementation
 

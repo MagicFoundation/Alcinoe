@@ -6,17 +6,10 @@ uses
   System.Net.HttpClient,
   System.net.URLClient;
 
-Function ALCreateKeepAliveNetHTTPClient(Const aAllowcookies: Boolean = False): THttpClient;
+Function ALCreateNetHTTPClient(Const aAllowcookies: Boolean = False): THttpClient;
 function ALAcquireKeepAliveNetHttpClient(const aURI: TUri): THTTPClient;
 procedure ALReleaseKeepAliveNetHttpClient(const aURI: TUri; var aHTTPClient: THTTPClient);
 procedure ALReleaseAllKeepAliveNetHttpClients;
-
-{*}
-var
-  ALMaxKeepAliveNetHttpClientPerHost: integer = 16;
-  ALKeepAliveNetHTTPClientReceiveTimeout: integer = 20000;
-  ALKeepAliveNetHTTPClientSendTimeout: integer = 20000;
-  ALKeepAliveNetHTTPClientConnectTimeout: integer = 20000;
 
 implementation
 
@@ -26,14 +19,15 @@ uses
   System.Types,
   System.Generics.Collections,
   Alcinoe.Common,
+  Alcinoe.HTTP.Client,
   Alcinoe.StringUtils;
 
 {*}
 var
   _ALNetHttpClientKeepAlives: TObjectDictionary<String, TobjectList<THTTPClient>>;
 
-{*****************************************************************************************}
-Function ALCreateKeepAliveNetHTTPClient(Const aAllowcookies: Boolean = False): THttpClient;
+{********************************************************************************}
+Function ALCreateNetHTTPClient(Const aAllowcookies: Boolean = False): THttpClient;
 Begin
   Result := THttpClient.Create;
   Result.AllowCookies := aAllowcookies;
@@ -48,9 +42,9 @@ Begin
   Result.AcceptEncoding := 'gzip';
   {$ENDIF}
   Result.UserAgent := 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)';
-  Result.ConnectionTimeout := ALKeepAliveNetHTTPClientConnectTimeout;
-  Result.ResponseTimeout := ALKeepAliveNetHTTPClientReceiveTimeout;
-  Result.SendTimeout := ALKeepAliveNetHTTPClientSendTimeout;
+  Result.ConnectionTimeout := ALCreateHttpClientConnectTimeout;
+  Result.ResponseTimeout := ALCreateHttpClientReceiveTimeout;
+  Result.SendTimeout := ALCreateHttpClientSendTimeout;
 end;
 
 {**********************************************************************}
@@ -61,9 +55,9 @@ begin
   try
     if _ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then begin
       if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
-      else result := ALCreateKeepAliveNetHTTPClient;
+      else result := ALCreateNetHTTPClient;
     end
-    else result := ALCreateKeepAliveNetHTTPClient;
+    else result := ALCreateNetHTTPClient;
   finally
     TMonitor.exit(_ALNetHttpClientKeepAlives);
   end;
@@ -76,7 +70,7 @@ begin
   TMonitor.Enter(_ALNetHttpClientKeepAlives);
   try
     if _ALNetHttpClientKeepAlives.TryGetValue(AlLowerCase(aURI.Scheme) + '://' + AlLowerCase(aURI.Host) + ':' + ALIntToStrW(aURI.port), LList) then begin
-      while LList.Count >= ALMaxKeepAliveNetHttpClientPerHost do
+      while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
         LList.Delete(0);
       LList.Add(aHTTPClient);
       aHTTPClient := nil;

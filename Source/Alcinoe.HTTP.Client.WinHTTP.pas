@@ -26,6 +26,7 @@ uses
   Winapi.Windows,
   Winapi.WinHTTP,
   System.Classes,
+  system.net.urlClient,
   Alcinoe.HTTP.Client;
 
 type
@@ -200,13 +201,97 @@ type
     property  OnStatus: TALWinHttpClientStatusEvent read FOnStatus write SetOnStatus;
   end;
 
+Function ALCreateWinHttpClient(Const aAllowcookies: Boolean = False): TALWinHttpClient;
+function ALAcquireKeepAliveWinHttpClient(const aURI: TUri): TALWinHttpClient;
+procedure ALReleaseKeepAliveWinHttpClient(const aURI: TUri; var aHTTPClient: TALWinHttpClient);
+procedure ALReleaseAllKeepAliveWinHttpClients;
+
 implementation
 
 uses
   System.SysUtils,
   System.Ansistrings,
+  System.Types,
+  System.Generics.Collections,
   Alcinoe.Common,
   Alcinoe.StringUtils;
+
+{*}
+var
+  _ALWinHttpClientKeepAlives: TObjectDictionary<AnsiString, TobjectList<TALWinHttpClient>>;
+
+{*************************************************************************************}
+Function ALCreateWinHttpClient(Const aAllowcookies: Boolean = False): TALWinHttpClient;
+Begin
+  Result := TALWinHttpClient.Create;
+  With Result do begin
+    AccessType := wHttpAt_NO_PROXY;
+    InternetOptions := [Alcinoe.HTTP.Client.WinHTTP.wHttpIo_REFRESH,
+                        Alcinoe.HTTP.Client.WinHTTP.wHttpIo_Keep_connection];
+    If not aAllowCookies then InternetOptions := InternetOptions + [Alcinoe.HTTP.Client.WinHTTP.wHttpIo_No_cookies];
+    RequestHeader.Accept := 'text/html, */*';
+    RequestHeader.AcceptEncoding := 'gzip';
+    RequestHeader.UserAgent := 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)';
+    ReceiveTimeout := ALCreateHttpClientReceiveTimeout;
+    sendTimeout    := ALCreateHttpClientSendTimeout;
+    ConnectTimeout := ALCreateHttpClientConnectTimeout;
+  end;
+end;
+
+{***************************************************************************}
+function ALAcquireKeepAliveWinHttpClient(const aURI: TUri): TALWinHttpClient;
+var LList: TobjectList<TALWinHttpClient>;
+begin
+  TMonitor.Enter(_ALWinHttpClientKeepAlives);
+  try
+    if _ALWinHttpClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
+      if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
+      else result := ALCreateWinHttpClient;
+    end
+    else result := ALCreateWinHttpClient;
+  finally
+    TMonitor.exit(_ALWinHttpClientKeepAlives);
+  end;
+end;
+
+{*********************************************************************************************}
+procedure ALReleaseKeepAliveWinHttpClient(const aURI: TUri; var aHTTPClient: TALWinHttpClient);
+var LList: TobjectList<TALWinHttpClient>;
+begin
+  TMonitor.Enter(_ALWinHttpClientKeepAlives);
+  try
+    if _ALWinHttpClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
+      while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
+        LList.Delete(0);
+      LList.Add(aHTTPClient);
+      aHTTPClient := nil;
+    end
+    else begin
+      LList := TobjectList<TALWinHttpClient>.create(true{aOwnObject});
+      try
+        LList.Add(aHTTPClient);
+        aHTTPClient := nil;
+        if not _ALWinHttpClientKeepAlives.TryAdd(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then ALFreeAndNil(LList);
+      except
+        ALFreeAndNil(LList);
+        raise;
+      end;
+    end;
+  finally
+    TMonitor.exit(_ALWinHttpClientKeepAlives);
+  end;
+end;
+
+{********************************************}
+procedure ALReleaseAllKeepAliveWinHttpClients;
+begin
+  TMonitor.Enter(_ALWinHttpClientKeepAlives);
+  try
+    _ALWinHttpClientKeepAlives.Clear;
+  finally
+    TMonitor.exit(_ALWinHttpClientKeepAlives);
+  end;
+end;
 
 {**************************************}
 procedure ALWinHTTPCLientStatusCallback(
@@ -310,7 +395,7 @@ begin
                LUrlPath, // Var LUrlPath: AnsiString;
                LExtraInfo, // Var LExtraInfo: AnsiString;
                LPortNumber) then
-        raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
+        raise EALHTTPClientException.CreateFmt(ALHTTPCLientMsgInvalidURL, [Value]);
       //-----
       if ALSameTextA(LSchemeName, 'https') then LScheme := INTERNET_SCHEME_HTTPS
       else if ALSameTextA(LSchemeName, 'http') then LScheme := INTERNET_SCHEME_HTTP
@@ -581,7 +666,7 @@ begin
             if LLen > UploadBufferSize then LLen := UploadBufferSize;
             if LLen = 0 then break;
             LLen := aRequestDataStream.Read(LBuffer.Memory^, LLen);
-            if LLen = 0 then raise EALHTTPClientException.Create(CALHTTPCLient_MsgInvalidHTTPRequest);
+            if LLen = 0 then raise EALHTTPClientException.Create(ALHTTPCLientMsgInvalidHTTPRequest);
             CheckError(
               not WinHttpWriteData(
                     Result, // _In_  HINTERNET hRequest,
@@ -774,7 +859,7 @@ var LContext: HINTERNET;
     I: integer;
 begin
   SetURL(aURL);
-  if URL = '' then raise EALHTTPClientException.Create(CALHTTPCLient_MsgEmptyURL);
+  if URL = '' then raise EALHTTPClientException.Create(ALHTTPCLientMsgEmptyURL);
 
   LRestoreRequestHeader := False;
   if length(ARequestHeaderValues) > 0 then begin
@@ -829,5 +914,11 @@ procedure TALWinHttpClient.OnProxyParamsChange(sender: Tobject; Const PropertyIn
 begin
   if (PropertyIndex = -1) or (PropertyIndex in [0, 1, 2]) then Disconnect; //clear, ProxyBypass, ProxyServer, ProxyPort
 end;
+
+initialization
+  _ALWinHttpClientKeepAlives := TObjectDictionary<AnsiString, TobjectList<TALWinHttpClient>>.create([doOwnsValues]);
+
+finalization
+  ALFreeAndNil(_ALWinHttpClientKeepAlives);
 
 end.

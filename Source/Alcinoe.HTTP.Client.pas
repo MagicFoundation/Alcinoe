@@ -530,9 +530,15 @@ procedure ALDecompressHttpResponseContent(const aContentEncoding: AnsiString; va
 procedure ALDecompressHttpResponseContent(const aContentEncoding: String; var aContentStream: TMemoryStream); overload;
 
 Const
-  cALHTTPCLient_MsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
-  cALHTTPCLient_MsgInvalidHTTPRequest = 'Invalid HTTP Request: Length is 0';
-  cALHTTPCLient_MsgEmptyURL           = 'Empty URL';
+  ALHTTPCLientMsgInvalidURL         = 'Invalid url ''%s'' - only supports ''http'' and ''https'' schemes';
+  ALHTTPCLientMsgInvalidHTTPRequest = 'Invalid HTTP Request: Length is 0';
+  ALHTTPCLientMsgEmptyURL           = 'Empty URL';
+
+var
+  ALMaxKeepAliveHttpClientPerHost: integer = 16;
+  ALCreateHttpClientReceiveTimeout: integer = 20000;
+  ALCreateHttpClientSendTimeout: integer = 20000;
+  ALCreateHttpClientConnectTimeout: integer = 20000;
 
 implementation
 

@@ -18,6 +18,7 @@ interface
 uses
   Winapi.Windows,
   System.Classes,
+  system.net.urlClient,
   WinApi.WinInet,
   Alcinoe.HTTP.Client;
 
@@ -195,13 +196,100 @@ type
     property  IgnoreSecurityErrors: Boolean read FIgnoreSecurityErrors write FIgnoreSecurityErrors;
   end;
 
+Function ALCreateWininetHTTPClient(Const aAllowcookies: Boolean = False): TALWininetHTTPClient;
+function ALAcquireKeepAliveWininetHTTPClient(const aURI: TUri): TALWininetHTTPClient;
+procedure ALReleaseKeepAliveWininetHTTPClient(const aURI: TUri; var aHTTPClient: TALWininetHTTPClient);
+procedure ALReleaseAllKeepAliveWininetHTTPClients;
+
 implementation
 
 uses
   System.SysUtils,
   System.Ansistrings,
+  System.Types,
+  System.Generics.Collections,
   Alcinoe.Common,
   Alcinoe.StringUtils;
+
+{*}
+var
+  _ALWininetHTTPClientKeepAlives: TObjectDictionary<AnsiString, TobjectList<TALWininetHTTPClient>>;
+
+{*********************************************************************************************}
+Function ALCreateWininetHTTPClient(Const aAllowcookies: Boolean = False): TALWininetHTTPClient;
+Begin
+  Result := TALWininetHttpClient.Create;
+  With Result do begin
+    AccessType := wHttpAt_Direct;
+    InternetOptions := [Alcinoe.HTTP.Client.WinINet.wHttpIo_No_cache_write,
+                        Alcinoe.HTTP.Client.WinINet.wHttpIo_Pragma_nocache,
+                        Alcinoe.HTTP.Client.WinINet.wHttpIo_No_ui,
+                        Alcinoe.HTTP.Client.WinINet.wHttpIo_Reload,
+                        Alcinoe.HTTP.Client.WinINet.wHttpIo_Keep_connection];
+    If not aAllowCookies then InternetOptions := InternetOptions + [Alcinoe.HTTP.Client.WinINet.wHttpIo_No_cookies];
+    RequestHeader.Accept := 'text/html, */*';
+    RequestHeader.AcceptEncoding := 'gzip';
+    RequestHeader.UserAgent := 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)';
+    ReceiveTimeout := ALCreateHttpClientReceiveTimeout;
+    sendTimeout    := ALCreateHttpClientSendTimeout;
+    ConnectTimeout := ALCreateHttpClientConnectTimeout;
+  end;
+end;
+
+{***********************************************************************************}
+function ALAcquireKeepAliveWininetHTTPClient(const aURI: TUri): TALWininetHTTPClient;
+var LList: TobjectList<TALWininetHTTPClient>;
+begin
+  TMonitor.Enter(_ALWininetHTTPClientKeepAlives);
+  try
+    if _ALWininetHTTPClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
+      if LList.Count > 0 then result := LList.ExtractItem(LList.Last, TDirection.FromEnd)
+      else result := ALCreateWininetHTTPClient;
+    end
+    else result := ALCreateWininetHTTPClient;
+  finally
+    TMonitor.exit(_ALWininetHTTPClientKeepAlives);
+  end;
+end;
+
+{*****************************************************************************************************}
+procedure ALReleaseKeepAliveWininetHTTPClient(const aURI: TUri; var aHTTPClient: TALWininetHTTPClient);
+var LList: TobjectList<TALWininetHTTPClient>;
+begin
+  TMonitor.Enter(_ALWininetHTTPClientKeepAlives);
+  try
+    if _ALWininetHTTPClientKeepAlives.TryGetValue(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then begin
+      while LList.Count >= ALMaxKeepAliveHttpClientPerHost do
+        LList.Delete(0);
+      LList.Add(aHTTPClient);
+      aHTTPClient := nil;
+    end
+    else begin
+      LList := TobjectList<TALWininetHTTPClient>.create(true{aOwnObject});
+      try
+        LList.Add(aHTTPClient);
+        aHTTPClient := nil;
+        if not _ALWininetHTTPClientKeepAlives.TryAdd(AlLowerCase(ansiString(aURI.Scheme)) + '://' + AlLowerCase(ansiString(aURI.Host)) + ':' + ALIntToStrA(aURI.port), LList) then ALFreeAndNil(LList);
+      except
+        ALFreeAndNil(LList);
+        raise;
+      end;
+    end;
+  finally
+    TMonitor.exit(_ALWininetHTTPClientKeepAlives);
+  end;
+end;
+
+{************************************************}
+procedure ALReleaseAllKeepAliveWininetHTTPClients;
+begin
+  TMonitor.Enter(_ALWininetHTTPClientKeepAlives);
+  try
+    _ALWininetHTTPClientKeepAlives.Clear;
+  finally
+    TMonitor.exit(_ALWininetHTTPClientKeepAlives);
+  end;
+end;
 
 {******************************************}
 procedure ALWininetHTTPCLientStatusCallback(
@@ -306,7 +394,7 @@ begin
                LUrlPath, // Var LUrlPath: AnsiString;
                LExtraInfo, // Var LExtraInfo: AnsiString;
                LPortNumber) then
-        raise EALHTTPClientException.CreateFmt(CALHTTPCLient_MsgInvalidURL, [Value]);
+        raise EALHTTPClientException.CreateFmt(ALHTTPCLientMsgInvalidURL, [Value]);
       //-----
       if ALSameTextA(LSchemeName, 'https') then LScheme := INTERNET_SCHEME_HTTPS
       else if ALSameTextA(LSchemeName, 'http') then LScheme := INTERNET_SCHEME_HTTP
@@ -613,7 +701,7 @@ begin
             if LLen = 0 then break;
             { Read data in buffer and write out}
             LLen := aRequestDataStream.Read(LBuffer.Memory^, LLen);
-            if LLen = 0 then raise EALHTTPClientException.Create(CALHTTPCLient_MsgInvalidHTTPRequest);
+            if LLen = 0 then raise EALHTTPClientException.Create(ALHTTPCLientMsgInvalidHTTPRequest);
 
             CheckError(
               not InternetWriteFile(
@@ -794,7 +882,7 @@ var LContext: HINTERNET;
     I: integer;
 begin
   SetURL(aURL);
-  if URL = '' then raise EALHTTPClientException.Create(CALHTTPCLient_MsgEmptyURL);
+  if URL = '' then raise EALHTTPClientException.Create(ALHTTPCLientMsgEmptyURL);
 
   LRestoreRequestHeader := False;
   if length(ARequestHeaderValues) > 0 then begin
@@ -861,5 +949,11 @@ begin
     FInternetOptions := Value;
   end;
 end;
+
+initialization
+  _ALWininetHTTPClientKeepAlives := TObjectDictionary<AnsiString, TobjectList<TALWininetHTTPClient>>.create([doOwnsValues]);
+
+finalization
+  ALFreeAndNil(_ALWininetHTTPClientKeepAlives);
 
 end.

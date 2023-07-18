@@ -19,6 +19,42 @@ Example of app made with Alcinoe
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtube_kiskis2.jpg?raw=true" alt="KisKis" />
 </a>
 
+
+Embarcadero Quality Reports
+---------------------------
+
+Please vote for the resolution of these quality reports. The 
+lack of resolution on these issues from Embarcadero has compelled 
+us to patch the original Delphi source files:
+
+* [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
+* [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
+* [for android compilation, need to use aapt2 instead of aapt](https://quality.embarcadero.com/browse/RSP-27606)
+* [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
+* [BeginUpdate/Endupdate block with add or remove of child objects : misconception](https://quality.embarcadero.com/browse/RSP-21013)
+* [The width and height of a TContext3D object must be defined as single-precision floating-point numbers, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
+* [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)
+* [Regression in Alexandria: FMX.StrokeBuilder.pas Revamp Leads to TARC Drawing Issues](https://quality.embarcadero.com/browse/RSP-41618)
+* [GL_TEXTURE_EXTERNAL_OES not supported](https://quality.embarcadero.com/browse/RSP-16830)
+* [Make CanvasHelper of TCanvasGpu public](https://quality.embarcadero.com/browse/RSP-18797)
+* [Make that TTexture can define a material (GLSL shader) to use](https://quality.embarcadero.com/browse/RSP-23501)
+* [On iOS we need to pass options: PNSDictionary with the message TApplicationEvent.FinishedLaunching](https://quality.embarcadero.com/browse/RSP-40351)
+* [AVPlayerItem miss the function addOutput](https://quality.embarcadero.com/browse/RSP-16853)
+* [CLVisit is missing from the implementation of CLLocationManager](https://quality.embarcadero.com/browse/RSP-18621)
+* [Miss kCIInputImageKey in iOSapi.CoreImage.pas](https://quality.embarcadero.com/browse/RSP-19878)
+* [Miss some definition in IOSapi.Security](https://quality.embarcadero.com/browse/RSP-20279)
+* [Effect ProcessTexture is not working and function TFilter.InputTexture: TTexture do unecessary work](https://quality.embarcadero.com/browse/RSP-20825)
+* [TVirtualKeyboardAndroid.GetVirtualKeyboardState not accurate](https://quality.embarcadero.com/browse/RSP-24737)
+* [Add NSPersonNameComponents in iOSapi.Foundation.pas](https://quality.embarcadero.com/browse/RSP-28096)
+* [FilterServerSupportFunctionProc WinApi badly converted in Delphi](https://quality.embarcadero.com/browse/RSP-33754)
+* [Comparison of 2 interfaces result in bad behavior in TCommonCustomForm.SetHovered and similar](https://quality.embarcadero.com/browse/RSP-36612)
+* [In android, TFormRender must use JChoreographer_FrameCallback not JRunnable](https://quality.embarcadero.com/browse/RSP-38660)
+* [Need JNotificationClass.AUDIO_ATTRIBUTES_DEFAULT and JNotificationChannel.setSound](https://quality.embarcadero.com/browse/RSP-39511)
+* [Declaration of JLocationListener miss somes methods](https://quality.embarcadero.com/browse/RSP-41343)
+* [Miss CLLocationManager.accuracyAuthorization in iOSapi.CoreLocation.pas](https://quality.embarcadero.com/browse/RSP-41352)
+* [Miss constant kCLLocationAccuracyReduced in iOSapi.CoreLocation.pas](https://quality.embarcadero.com/browse/RSP-41388)
+* [iOS/OSX: Declaration for CLRegion.initCircularRegionWithCenter is incorrect](https://quality.embarcadero.com/browse/RSP-15717)
+
     
 Install Alcinoe
 ---------------
@@ -385,14 +421,14 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 Json Parser
 -----------
 
-TALJSONDocumentA is a Delphi parser/writer for JSON/BSON 
+TALJSONDocument is a Delphi parser/writer for JSON/BSON 
 data formats. It supports both DOM and SAX parsers. (Note 
 that a better name for SAX could be SAJ for Simple API for 
 JSON instead of Simple API for XML, but as the concept of 
-SAX is well-known, I will keep this name.) TALJSONDocumentA 
+SAX is well-known, I will keep this name.) TALJSONDocument 
 also supports BSON format and uses a syntax similar to 
-TALXMLDocument/TXMLDocument. Additionally, TALJSONDocumentA 
-can export Json/Bson data to TALStringListA.
+TALXMLDocument/TXMLDocument. Additionally, TALJSONDocument 
+can export Json/Bson data to TALStringList.
 
 Example :
 
@@ -513,16 +549,16 @@ poll the server for a reply. Learn more at
 Fast TStringList
 ----------------
 
-TALStringListA works the same as Delphi's TStringList, 
+TALStringList works the same as Delphi's TStringList, 
 except that it allows you to search for a name=value 
 using a quicksort algorithm when the list is sorted. 
-Additionally, TALStringListA uses a locale-independent 
+Additionally, TALStringList uses a locale-independent 
 algorithm (based on the 8-bit ordinal value of each 
 character) instead of the AnsiCompareText and 
 AnsiCompareStr used by Delphi's TStringList. As a 
-result, sorting in TALStringListA is up to 10 times 
+result, sorting in TALStringList is up to 10 times 
 faster than in Delphi's TStringList. Furthermore, 
-TALStringListA is not a Unicode TStringList, but a 100% 
+TALStringList is not a Unicode TStringList, but a 100% 
 Ansi StringList. You can start exploring this feature 
 with the demo located at 
 [{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)

@@ -645,7 +645,7 @@ begin
   var LJsonDoc := TALJSONDocumentW.create;
   try
     LJsonDoc.LoadFromJSONString(aPayload);
-    doMessageReceived(LJsonDoc.Node);
+    doMessageReceived(LJsonDoc);
   finally
     ALFreeAndNil(LJsonDoc);
   end;

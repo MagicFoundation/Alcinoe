@@ -1593,7 +1593,7 @@ end;
 
 {***********************}
 Function FindLibraryNode(
-           const ALibraries: TALJSONDocumentA;
+           const ALibraries: TALJSONNodeA;
            const AGroupID: AnsiString;
            const AArtifactID: AnsiString;
            const AVersion: AnsiString): TALJSONNodeA;
@@ -1612,7 +1612,7 @@ end;
 
 {*************************}
 Function RemoveLibraryNode(
-           const ALibraries: TALJSONDocumentA;
+           const ALibraries: TALJSONNodeA;
            const AGroupID: AnsiString;
            const AArtifactID: AnsiString;
            const AVersion: AnsiString): TALJSONNodeA;
@@ -2361,7 +2361,7 @@ begin
               else begin
                 if ALPosA(' ', LDependencyVersion) > 0 then raise Exception.Create('Error CD3F7D9C-874C-4089-B674-9CCCE4AFA50E'#13#10+string(LGradleResultSrc));
                 if FindLibraryNode(
-                     LLibraries, // const ALibraries: TALJSONDocumentA;
+                     LLibraries, // const ALibraries: TALJSONNodeA;
                      LDependencyGroupID, // const AGroupID: AnsiString;
                      LDependencyArtifactID, // const AArtifactID: AnsiString;
                      LDependencyVersion) <> nil then continue; // const AVersion: AnsiString): TALJSONNodeA; then
@@ -2503,7 +2503,7 @@ begin
 
                   {$REGION 'init LAlreadyIncludedDependencyLibrary'}
                   var LAlreadyIncludedDependencyLibrary := FindLibraryNode(
-                                                             LLibraries, // const ALibraries: TALJSONDocumentA;
+                                                             LLibraries, // const ALibraries: TALJSONNodeA;
                                                              LDependencyGroupID, // const AGroupID: AnsiString;
                                                              LDependencyArtifactID, // const AArtifactID: AnsiString;
                                                              ''); // const AVersion: AnsiString): TALJSONNodeA;
@@ -2675,7 +2675,7 @@ begin
                           if (LTodeleteGroupID = '') or (LTodeleteArtifactid = '') or (LTodeleteVersion = '') then
                             raise Exception.Create('Error 47607420-D49C-4D38-9185-A2B597EF7551');
                           RemoveLibraryNode(
-                            LLibraries, // const ALibraries: TALJSONDocumentA;
+                            LLibraries, // const ALibraries: TALJSONNodeA;
                             LTodeleteGroupID, // const AGroupID: AnsiString;
                             LTodeleteArtifactid, // const AArtifactID: AnsiString;
                             LTodeleteVersion); // const AVersion: AnsiString): TALJSONNodeA;

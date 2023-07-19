@@ -717,7 +717,7 @@ Var LStmt: SQLite3_Stmt;
     LRecIndex: integer;
     LRecAdded: integer;
     LContinue: Boolean;
-    LJsonDocument: TALJSONDocumentA;
+    LJsonDocument: TALJSONNodeA;
     LUpdateRowTagByFieldValue: Boolean;
     LStopWatch: TStopWatch;
     LCacheKey: ansiString;
@@ -736,7 +736,7 @@ begin
   if assigned(JsonDATA) then LJsonDocument := Nil
   else begin
     LJsonDocument := TALJSONDocumentA.create;
-    JsonDATA := LJsonDocument.Node;
+    JsonDATA := LJsonDocument;
   end;
 
   try
@@ -765,7 +765,7 @@ begin
         else LViewRec := Jsondata;
 
         //assign the tmp data to the JsonData
-        LViewRec.LoadFromBsonString(LCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromBsonString(LCacheStr, []);
 
         //exit
         exit;
@@ -851,7 +851,7 @@ begin
             end;
 
             //free the node if aJsonDocument
-            if assigned(LJsonDocument) then LJsonDocument.Node.ChildNodes.Clear;
+            if assigned(LJsonDocument) then LJsonDocument.ChildNodes.Clear;
 
             //handle the First
             inc(LRecAdded);
@@ -1832,7 +1832,7 @@ Var LStmt: SQLite3_Stmt;
     LTmpConnectionHandle: SQLite3;
     LOwnConnection: Boolean;
     LContinue: Boolean;
-    LJsonDocument: TALJSONDocumentA;
+    LJsonDocument: TALJSONNodeA;
     LUpdateRowTagByFieldValue: Boolean;
     LStopWatch: TStopWatch;
     LCacheKey: ansiString;
@@ -1848,7 +1848,7 @@ begin
   if assigned(JsonDATA) then LJsonDocument := Nil
   else begin
     LJsonDocument := TALJSONDocumentA.create;
-    JsonDATA := LJsonDocument.Node;
+    JsonDATA := LJsonDocument;
   end;
 
   try
@@ -1877,7 +1877,7 @@ begin
         else LViewRec := Jsondata;
 
         //assign the tmp data to the JsonData
-        LViewRec.LoadFromBsonString(LCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromBsonString(LCacheStr, []);
 
         //exit
         exit;
@@ -1969,7 +1969,7 @@ begin
               end;
 
               //free the node if aJsonDocument
-              if assigned(LJsonDocument) then LJsonDocument.Node.ChildNodes.Clear;
+              if assigned(LJsonDocument) then LJsonDocument.ChildNodes.Clear;
 
               //handle the First
               inc(LRecAdded);

@@ -28,6 +28,8 @@ object Form1: TForm1
       item
         Width = 200
       end>
+    ExplicitTop = 743
+    ExplicitWidth = 999
   end
   object Panel3: TPanel
     Left = 0
@@ -37,25 +39,27 @@ object Form1: TForm1
     Align = alClient
     Caption = 'Panel2'
     TabOrder = 2
+    ExplicitWidth = 999
+    ExplicitHeight = 414
     object Splitter4: TSplitter
-      Left = 709
+      Left = 705
       Top = 1
-      Height = 414
+      Height = 413
       Align = alRight
       ExplicitLeft = 624
       ExplicitTop = -3
       ExplicitHeight = 469
     end
     object Panel5: TPanel
-      Left = 712
+      Left = 708
       Top = 1
       Width = 294
-      Height = 414
+      Height = 413
       Align = alRight
       Caption = 'Panel2'
       TabOrder = 0
-      ExplicitLeft = 708
-      ExplicitHeight = 413
+      ExplicitLeft = 704
+      ExplicitHeight = 412
       object ALMemoResult: TcxMemo
         Left = 1
         Top = 1
@@ -71,6 +75,7 @@ object Form1: TForm1
         Style.Font.Style = []
         Style.IsFontAssigned = True
         TabOrder = 0
+        ExplicitHeight = 410
         Height = 411
         Width = 292
       end
@@ -83,11 +88,13 @@ object Form1: TForm1
       Align = alClient
       Caption = 'Panel2'
       TabOrder = 1
+      ExplicitWidth = 700
+      ExplicitHeight = 412
       object GridThread: TcxGrid
         Left = 1
         Top = 1
-        Width = 706
-        Height = 412
+        Width = 702
+        Height = 411
         Align = alClient
         Font.Charset = ANSI_CHARSET
         Font.Color = clWindowText
@@ -96,8 +103,8 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 702
-        ExplicitHeight = 411
+        ExplicitWidth = 698
+        ExplicitHeight = 410
         object TableViewThread: TcxGridTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -187,6 +194,7 @@ object Form1: TForm1
     TabOrder = 0
     Properties.ActivePage = Firebird
     Properties.CustomButtons.Buttons = <>
+    ExplicitWidth = 999
     ClientRectBottom = 324
     ClientRectLeft = 5
     ClientRectRight = 998
@@ -194,10 +202,7 @@ object Form1: TForm1
     object Firebird: TcxTabSheet
       Caption = 'Firebird'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 993
-      ExplicitHeight = 0
+      ExplicitWidth = 989
       object Label2: TcxLabel
         Left = 71
         Top = 93

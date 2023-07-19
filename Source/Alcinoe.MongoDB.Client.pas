@@ -23,9 +23,9 @@ try
     '{fieldA:1, fieldB:1}', // the return fields selector
     aJSONDoc.node);
   aMongoDBClient.disconnect;
-  for i := 0 to aJSONDoc.node.childnodes.count - 1 do
-    with aJSONDoc.node.childnodes[i] do
-      writeln(aJSONDoc.node.childnodes[i].nodename + '=' + aJSONDoc.node.childnodes[i].text)
+  for i := 0 to aJSONDoc.ChildNodes.count - 1 do
+    with aJSONDoc.ChildNodes[i] do
+      writeln(aJSONDoc.ChildNodes[i].nodename + '=' + aJSONDoc.ChildNodes[i].text)
 finally
   aMongoDBClient.free;
   aJSONDoc.free;
@@ -1173,7 +1173,7 @@ Var LResponseFlags: integer;
     LStartingFrom: integer;
     LNumberReturned: integer;
     LContinue: boolean;
-    LJSONDoc: TALJSONDocumentA;
+    LJSONDoc: TALJSONNodeA;
     LCodeNode: TALJSONNodeA;
     LCodeInt: int32;
     LNode: TALJSONNodeA;
@@ -1195,7 +1195,7 @@ begin
       LCursorID,
       LStartingFrom,
       LNumberReturned,
-      LJSONDoc.Node,
+      LJSONDoc,
       nil,
       nil,
       '',
@@ -1203,21 +1203,21 @@ begin
       LContinue);
     try
 
-      CheckRunCommandResponse(LJSONDoc.Node);
+      CheckRunCommandResponse(LJSONDoc);
 
-      LCodeNode := LJSONDoc.Node.ChildNodes.FindNode('code');
+      LCodeNode := LJSONDoc.ChildNodes.FindNode('code');
       if assigned(LCodeNode) and (not LCodeNode.Null) then LCodeInt := LCodeNode.int32
       else LCodeInt := 0;
 
       //err is null unless an error occurs. When there was an error with the preceding
       //operation, err contains a string identifying the error.
-      LNode := LJSONDoc.Node.ChildNodes.FindNode('err');
+      LNode := LJSONDoc.ChildNodes.FindNode('err');
       if assigned(LNode) and (not LNode.Null) then
         raise EAlMongoDBClientException.Create(LNode.Text, LCodeInt);
 
       //errmsg contains the description of the error. errmsg only appears
       //if there was an error with the preceding operation.
-      LNode := LJSONDoc.Node.ChildNodes.FindNode('errmsg');
+      LNode := LJSONDoc.ChildNodes.FindNode('errmsg');
       if assigned(LNode) and (not LNode.Null) then
         raise EAlMongoDBClientException.Create(LNode.Text, LCodeInt);
 
@@ -1236,18 +1236,18 @@ begin
       //results in the creation of a new document, n returns the number of documents inserted.
       //
       //n is 0 if reporting on an update or remove that occurs through a findAndModify operation.
-      LNode := LJSONDoc.Node.ChildNodes.FindNode('n');
+      LNode := LJSONDoc.ChildNodes.FindNode('n');
       if assigned(LNode) then NumberOfDocumentsUpdatedOrRemoved := LNode.int32
       else NumberOfDocumentsUpdatedOrRemoved := 0;
 
       //updatedExisting is true when an update affects at least one document and
       //does not result in an upsert.
-      LNode := LJSONDoc.Node.ChildNodes.FindNode('updatedExisting');
+      LNode := LJSONDoc.ChildNodes.FindNode('updatedExisting');
       if assigned(LNode) then UpdatedExisting := LNode.bool
       else UpdatedExisting := False;
 
       //If the update results in an insert, upserted is the value of _id field of the document.
-      LNode := LJSONDoc.Node.ChildNodes.FindNode('upserted');
+      LNode := LJSONDoc.ChildNodes.FindNode('upserted');
       if assigned(LNode) then Upserted := LNode.text
       else Upserted := '';
 
@@ -1358,7 +1358,7 @@ var LCurrPos: integer;
     LTmpInt: integer;
     LOPCode: integer;
     LBsonDocuments: ansiString;
-    LJsonDocument: TALJSONDocumentA;
+    LJsonDocument: TALJSONNodeA;
     i: integer;
 begin
 
@@ -1387,7 +1387,7 @@ begin
       LJsonDocument.LoadFromJSONString('{"documents":' + documents + '}'); // { .... }                      => {"documents":{ .... } }
                                                                            // [{ ... }, { ... }, { ... }]   => {"documents":[{ ... }, { ... }, { ... }] }
       LBsonDocuments := '';
-      with LJsonDocument.Node.ChildNodes['documents'] do begin
+      with LJsonDocument.ChildNodes['documents'] do begin
         if nodeType = ntObject then LBsonDocuments := BSON  // {"documents":{ .... } }
         else begin  // {"documents":[{ ... }, { ... }, { ... }] }
           for I := 0 to ChildNodes.Count - 1 do
@@ -1461,7 +1461,7 @@ var LCurrPos: integer;
     LZERO: integer;
     LBsonSelector: ansiString;
     LBsonUpdate: AnsiString;
-    LJSONDocument: TALJSONDocumentA;
+    LJSONDocument: TALJSONNodeA;
 begin
 
   //
@@ -1579,7 +1579,7 @@ var LCurrPos: integer;
     LOPCode: integer;
     LZERO: integer;
     LBsonSelector: ansiString;
-    LJSONDocument: TALJSONDocumentA;
+    LJSONDocument: TALJSONNodeA;
 begin
 
   //
@@ -1676,7 +1676,7 @@ var LCurrPos: integer;
     LOPCode: integer;
     LBsonQuery: ansiString;
     LBSONReturnFieldsSelector: ansiString;
-    LJsonDocument: TALJSONDocumentA;
+    LJsonDocument: TALJSONNodeA;
 begin
 
   //
@@ -1974,7 +1974,7 @@ begin
       if (LTmpRowTag <> '') or
          (documents.NodeType = ntarray) then LJsonNode1 := documents.AddChild(LTmpRowTag, ntobject)
       else LJsonNode1 := documents;
-      LJsonNode1.LoadFromBSONString(LDocumentStr, False{ClearChildNodes});
+      LJsonNode1.LoadFromBSONString(LDocumentStr, []);
       if LUpdateRowTagByFieldValue then begin
         LJsonNode2 := LJsonNode1.ChildNodes.FindNode(LTmpRowTag);
         if assigned(LJsonNode2) then LJsonNode1.NodeName := LJsonNode2.Text;
@@ -2435,7 +2435,7 @@ Procedure TAlMongoDBClient.SelectData(
             ExtData: Pointer);
 
 Var LViewRec: TALJSONNodeA;
-    LJSONDocument: TALJSONDocumentA;
+    LJSONDocument: TALJSONNodeA;
     LResponseFlags: integer;
     LCursorID: int64;
     LStartingFrom: integer;
@@ -2459,7 +2459,7 @@ begin
   if assigned(JSONDATA) then LJSONDocument := Nil
   else begin
     LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument.Node;
+    JSONDATA := LJSONDocument;
   end;
 
   Try
@@ -2493,7 +2493,7 @@ begin
         else LViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromJsonString(LCacheStr, []);
 
         //exit
         exit;
@@ -2921,7 +2921,7 @@ Var LViewRec: TALJSONNodeA;
     LRowRec: TALJSONNodeA;
     LCursorRec: TALJSONNodeA;
     LFirstBatchRec: TALJSONNodeA;
-    LJSONDocument: TALJSONDocumentA;
+    LJSONDocument: TALJSONNodeA;
     LResponseFlags: integer;
     LCursorID: int64;
     LStartingFrom: integer;
@@ -2949,7 +2949,7 @@ begin
   if assigned(JSONDATA) then LJSONDocument := Nil
   else begin
     LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument.Node;
+    JSONDATA := LJSONDocument;
   end;
 
   try
@@ -2982,7 +2982,7 @@ begin
         else LViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromJsonString(LCacheStr, []);
 
         //exit
         exit;
@@ -3546,7 +3546,7 @@ Var LStopWatch: TStopWatch;
     LContinue: boolean;
     LTmpRowTag: ansiString;
     LUpdateRowTagByFieldValue: Boolean;
-    LJSONDoc: TALJSONDocumentA;
+    LJSONDoc: TALJSONNodeA;
     LNode1: TALJSONNodeA;
     LNode2: TALJSONNodeA;
     LLastErrorObjectNode: TALJSONNodeA;
@@ -3594,7 +3594,7 @@ begin
       LCursorID,
       LStartingFrom,
       LNumberReturned,
-      LJSONDoc.Node,
+      LJSONDoc,
       nil,
       nil,
       '',
@@ -3633,10 +3633,10 @@ begin
       else LViewRec := JSONdata;
 
       //check error
-      CheckRunCommandResponse(LJSONDoc.Node);
+      CheckRunCommandResponse(LJSONDoc);
 
       //get the value node
-      LNode1 := LJSONDoc.Node.ChildNodes.FindNode('value');
+      LNode1 := LJSONDoc.ChildNodes.FindNode('value');
       if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
 
         //init aUpdateRowTagByFieldValue and aTmpRowTag
@@ -3673,7 +3673,7 @@ begin
       end;
 
       //init alastErrorObjectNode;
-      LLastErrorObjectNode := LJSONDoc.Node.ChildNodes['lastErrorObject'];
+      LLastErrorObjectNode := LJSONDoc.ChildNodes['lastErrorObject'];
 
       //NumberOfDocumentsUpdatedOrRemoved
       LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('n');
@@ -4053,7 +4053,7 @@ Procedure TAlMongoDBConnectionPoolClient.SelectData(
             const ConnectionSocket: TSocket = INVALID_SOCKET);
 
 Var LViewRec: TALJSONNodeA;
-    LJSONDocument: TALJSONDocumentA;
+    LJSONDocument: TALJSONNodeA;
     LResponseFlags: integer;
     LCursorID: int64;
     LStartingFrom: integer;
@@ -4076,7 +4076,7 @@ begin
   if assigned(JSONDATA) then LJSONDocument := Nil
   else begin
     LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument.Node;
+    JSONDATA := LJSONDocument;
   end;
 
   try
@@ -4110,7 +4110,7 @@ begin
         else LViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromJsonString(LCacheStr, []);
 
         //exit
         exit;
@@ -4564,7 +4564,7 @@ Var LViewRec: TALJSONNodeA;
     LRowRec: TALJSONNodeA;
     LCursorRec: TALJSONNodeA;
     LFirstBatchRec: TALJSONNodeA;
-    LJSONDocument: TALJSONDocumentA;
+    LJSONDocument: TALJSONNodeA;
     LResponseFlags: integer;
     LCursorID: int64;
     LStartingFrom: integer;
@@ -4591,7 +4591,7 @@ begin
   if assigned(JSONDATA) then LJSONDocument := Nil
   else begin
     LJSONDocument := TALJSONDocumentA.create;
-    JSONDATA := LJSONDocument.Node;
+    JSONDATA := LJSONDocument;
   end;
 
   try
@@ -4624,7 +4624,7 @@ begin
         else LViewRec := JSONDATA;
 
         //assign the tmp data to the XMLData
-        LViewRec.LoadFromJsonString(LCacheStr, false{ClearChildNodes});
+        LViewRec.LoadFromJsonString(LCacheStr, []);
 
         //exit
         exit;
@@ -5317,7 +5317,7 @@ Var LTMPConnectionSocket: TSocket;
     LContinue: boolean;
     LTmpRowTag: ansiString;
     LUpdateRowTagByFieldValue: Boolean;
-    LJSONDoc: TALJSONDocumentA;
+    LJSONDoc: TALJSONNodeA;
     LNode1: TALJSONNodeA;
     LNode2: TALJSONNodeA;
     LLastErrorObjectNode: TALJSONNodeA;
@@ -5374,7 +5374,7 @@ begin
         LCursorID,
         LStartingFrom,
         LNumberReturned,
-        LJSONDoc.Node,
+        LJSONDoc,
         nil,
         nil,
         '',
@@ -5413,10 +5413,10 @@ begin
         else LViewRec := JSONdata;
 
         //check error
-        CheckRunCommandResponse(LJSONDoc.Node);
+        CheckRunCommandResponse(LJSONDoc);
 
         //get the value node
-        LNode1 := LJSONDoc.Node.ChildNodes.FindNode('value');
+        LNode1 := LJSONDoc.ChildNodes.FindNode('value');
         if assigned(LNode1) and (LNode1.NodeType = ntObject) then begin
 
           //init aUpdateRowTagByFieldValue and aTmpRowTag
@@ -5453,7 +5453,7 @@ begin
         end;
 
         //init alastErrorObjectNode;
-        LLastErrorObjectNode := LJSONDoc.Node.ChildNodes['lastErrorObject'];
+        LLastErrorObjectNode := LJSONDoc.ChildNodes['lastErrorObject'];
 
         //NumberOfDocumentsUpdatedOrRemoved
         LNode1 := LLastErrorObjectNode.ChildNodes.FindNode('n');

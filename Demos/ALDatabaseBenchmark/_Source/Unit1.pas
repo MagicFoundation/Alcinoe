@@ -3035,7 +3035,7 @@ Var aStopWatch: TStopWatch;
     aSelector: AnsiString;
     aSkip: integer;
     aFirst: integer;
-    aJSONDATA: TALJSONDocumentA;
+    aJSONDATA: TALJSONNodeA;
 begin
 
   aJSONDATA := TALJSONDocumentA.create;
@@ -3087,7 +3087,7 @@ begin
                            nil));
 
         //update the data
-        aJSONDATA.Clear;
+        aJSONDATA.ChildNodes.Clear;
         aStopWatch := TStopWatch.StartNew;
         if fCMD = 'SELECT' then Tform1(fOwner).MongoDBConnectionPoolClient.SelectData(
                                   aFullCollectionName,
@@ -3097,7 +3097,7 @@ begin
                                   '', // rowtag
                                   aSkip,
                                   aFirst,
-                                  aJSONDATA.Node)
+                                  aJSONDATA)
         else if fCMD = 'UPDATE' then Tform1(fOwner).MongoDBConnectionPoolClient.UpdateData(
                                        aFullCollectionName,
                                        aQuery,
@@ -3688,7 +3688,7 @@ end;
 {***********************************************************}
 procedure TForm1.ALButtonMongoDBSelectClick(Sender: TObject);
 Var aMongoDBClient: TAlMongoDBClient;
-    aJSONDATA: TALJSONDocumentA;
+    aJSONDATA: TALJSONNodeA;
     aStopWatch: TstopWatch;
     aFlags: TALMongoDBClientSelectDataFlags;
 begin
@@ -3702,11 +3702,6 @@ begin
 
       aJSONDATA := TALJSONDocumentA.create;
       Try
-
-        With aJSONDATA Do Begin
-          Options := [TALJSONDocOption(doNodeAutoIndent)];
-          ParseOptions := [];
-        end;
 
         aflags := [];
         if CheckGroupMongoDBSelectFlags.States[0] = cbsChecked then aflags := aflags + [sfSlaveOk];
@@ -3753,7 +3748,7 @@ begin
               SQLFastTagReplaceFunct,
               True,
               nil)),
-          aJSONDATA.Node);
+          aJSONDATA);
         aStopWatch.Stop;
 
         TableViewThread.DataController.RecordCount := 1;

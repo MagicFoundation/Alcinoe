@@ -290,7 +290,7 @@ begin
       LDeployProjXmlDoc.ParseOptions := [];
 
       //remove the Prolog node <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-      LDeployProjXmlDoc.Node.ChildNodes.Delete(0);
+      LDeployProjXmlDoc.ChildNodes.Delete(0);
 
       //<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
       LDeployProjXmlDoc.DocumentElement.Attributes['xmlns'] := LDProjXmlDoc.DocumentElement.Attributes['xmlns'];

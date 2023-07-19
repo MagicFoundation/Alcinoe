@@ -31,6 +31,7 @@ us to patch the original Delphi source files:
 * [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
 * [for android compilation, need to use aapt2 instead of aapt](https://quality.embarcadero.com/browse/RSP-27606)
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
+* [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [BeginUpdate/Endupdate block with add or remove of child objects : misconception](https://quality.embarcadero.com/browse/RSP-21013)
 * [The width and height of a TContext3D object must be defined as single-precision floating-point numbers, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
 * [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)

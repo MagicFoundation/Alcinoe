@@ -2492,7 +2492,7 @@ begin
       end;
     end;
     {$ELSEIF defined(MSWINDOWS)}
-    if &Type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
+    //if &Type <> TalLogType.VERBOSE  then begin // because log on windows slow down the app so skip verbosity
       var LMsg: String;
       if msg <> '' then LMsg := Tag + ' | ' + stringReplace(msg, '%', '%%', [rfReplaceALL]) // https://quality.embarcadero.com/browse/RSP-15942
       else LMsg := Tag;
@@ -2504,7 +2504,7 @@ begin
         TalLogType.ERROR:   OutputDebugString(pointer('[E][W][I][D][V] ' + LMsg + ' |'));
         TalLogType.ASSERT:  OutputDebugString(pointer('[A][E][W][I][D][V] ' + LMsg + ' |'));
       end;
-    end;
+    //end;
     {$IFEND}
   end;
 end;

@@ -407,6 +407,10 @@ begin
       LOldToNewNames.add('ALDecompressHttpResponseContentU=ALDecompressHttpResponseContent');
       LOldToNewNames.add('AlIsValidEmailU=AlIsValidEmail');
       LOldToNewNames.add('AlDetectImageExtensionU=AlDetectImageExtension');
+      LOldToNewNames.add('ALGetEnumName=ALGetEnumNameA');
+      LOldToNewNames.add('ALSetToString=ALSetToStringA');
+      LOldToNewNames.add('ALTryStringToSet=ALTryStringToSetA');
+      LOldToNewNames.add('ALStringToSet=ALStringToSetA');
 
       //type names
       LOldToNewNames.add('pALFormatSettings=pALFormatSettingsA');

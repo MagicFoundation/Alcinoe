@@ -420,6 +420,88 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 </p>
 
 
+Streamlining Object Initialization with TALInit
+-----------------------------------------------
+
+In the constant evolution of software development, we often find ourselves
+seeking ways to reduce boilerplate code and enhance the maintainability of our
+projects. One such instance where boilerplate can become cumbersome is in the
+initialization of class fields. The traditional method involves explicitly
+setting each field's value in the constructor, which can be tedious, especially
+for classes with numerous fields. Enter TALInit—a feature that allows
+automatic initialization of object fields based on their attributes.
+
+#### The Traditional Way ####
+
+In the typical approach, developers manually initialize object fields in the
+constructor. Take the following class as an example:
+
+```
+    TAutoInitObject = class(TObject)
+    public
+      CharValue: Char;
+      ChildObject: TChildObject;
+    public
+      constructor Create; virtual;
+      destructor Destroy; override;
+    End;
+```
+
+Here, each field is initialized in the Create constructor:
+
+```
+  constructor TAutoInitObject.create(const aOwner: Tform1; const AAutoInit: Boolean);
+  begin
+    CharValue := 'A';
+    ChildObject := TChildObject.create;
+    ChildObject.Name := 'AnObject';
+    ChildObject.Value := 12.2;
+  end;
+
+  destructor TAutoInitObject.Destroy;
+  begin
+    ALFreeandNil(ChildObject);
+    inherited;
+  end;
+```
+
+While this method offers precise control, it can become tedious for large
+classes with numerous fields.
+
+#### The TALInit Way ####
+
+Imagine having a mechanism that not only automates this but is also as fast as
+the traditional way - yes, you read that right. TALInit achieves this
+remarkable feat.
+
+```
+  TAutoInitObject = class(TObject)
+  public
+    [TALInit('A')]
+    CharValue: Char;
+    [TALInit('Name:AnObject;Value:12.2')]
+    ChildObject: TChildObject;
+    Owner: TForm1;
+  End;
+```
+
+By using custom attributes, every field within the object can be automatically
+initialized based on its corresponding attribute. This eliminates the need for
+manually setting each field within the constructor. The above snippet showcases
+just how concise and readable object field initialization can become with
+TALInit.
+
+#### Performance - A Game Changer: ####
+
+One of the strongest advantages of using TALInit is its performance. When
+introducing automation, a natural concern is the overhead that might come with
+it. However, TALInit is designed to be as efficient as the traditional way
+of initializing fields. This means developers can enjoy the convenience
+without having to worry about any hidden costs in execution time.
+
+Learn more at [{alcinoe}/Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
+
+
 Json Parser
 -----------
 

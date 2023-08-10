@@ -481,7 +481,6 @@ remarkable feat.
     CharValue: Char;
     [TALInit('Name:AnObject;Value:12.2')]
     ChildObject: TChildObject;
-    Owner: TForm1;
   End;
 ```
 

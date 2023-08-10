@@ -158,6 +158,7 @@ uses
   {$IFDEF MSWINDOWS}
   ALTestStrings in 'ALTestStrings.pas',
   ALTestCipher in 'ALTestCipher.pas',
+  ALTestRtti in 'ALTestRtti.pas',
   {$ENDIF}
   System.SysUtils;
 

@@ -15,6 +15,8 @@ uses
                 PROPERTIES([vcProtected, vcPublic, vcPublished])}
 
 type
+
+  {~~~~~~~~~~~~~~~~~~~}
   TForm1 = class(TForm)
     ButtonCreateObjectWithAutoInit: TButton;
     ButtonCreateObjectClassicalWay: TButton;
@@ -39,8 +41,10 @@ type
   public
   end;
 
+  {~~~~~~~~~~~~~~~~~~~}
   TChildObject = class;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TAutoInitObject = class(TObject)
   private
     FDateTimeValue2: TDateTime;
@@ -205,6 +209,7 @@ type
     destructor Destroy; override;
   End;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   [TALInit('BooleanValue3:false;Int32Value:52')]
   TAutoInitObject2 = class(TAutoInitObject)
   private
@@ -215,6 +220,7 @@ type
     constructor Create(const aOwner: Tform1; const AAutoInit: Boolean); override;
   End;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~}
   [TALInit('Int32Value:75')]
   TAutoInitObject3 = class(TAutoInitObject2)
   private
@@ -225,6 +231,7 @@ type
     constructor Create(const aOwner: Tform1; const AAutoInit: Boolean); override;
   End;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TChildObject = class(TObject)
   private
     fOwner: TAutoInitObject;
@@ -232,7 +239,8 @@ type
     constructor Create(const aOwner: TAutoInitObject); virtual;
   End;
 
-var Form1: TForm1;
+var
+  Form1: TForm1;
 
 implementation
 
@@ -477,6 +485,10 @@ begin
   else begin
     ALFreeandNil(StringList);
     ALFreeandNil(ChildObject);
+    ALFreeandNil(StringList2);
+    ALFreeandNil(ChildObject2);
+    ALFreeandNil(StringList3);
+    ALFreeandNil(ChildObject3);
   end;
   inherited;
 end;

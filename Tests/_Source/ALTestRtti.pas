@@ -288,7 +288,7 @@ begin
       fStopWatchDelphi.Stop;
   end;
   //--
-  CheckExecutionTime(1.40{ARatio});
+  CheckExecutionTime(1.20{ARatio});
 end;
 
 {*********************************************}
@@ -435,6 +435,10 @@ begin
   else begin
     ALFreeandNil(StringList);
     ALFreeandNil(ChildObject);
+    ALFreeandNil(StringList2);
+    ALFreeandNil(ChildObject2);
+    ALFreeandNil(StringList3);
+    ALFreeandNil(ChildObject3);
   end;
   inherited;
 end;

@@ -435,10 +435,7 @@ begin
 
   // Stop the animation
   fRunning := False;
-  Enabled := False; // this to stop the timer
-                    // because timer it's problem when we are in bound
-                    // Enabled := False will work only because interval = 0
-                    // ##{^#{^ anicalculations is very hard to understand :(
+  Stop;
 
   // SetActiveTabWithTransition + aVelocity
   fTabControl.SetActiveTabWithTransition(fTabControl.tabs[LTargetTabIndex], TALTabTransition.Slide, LVelocity, false{ALaunchAniStartEvent});
@@ -499,8 +496,6 @@ begin
   FAniCalculations.AutoShowing := False;  // Enables the smooth hiding and showing of scroll bars.
   FAniCalculations.averaging := false;  // Specifies whether to average an inertial moving velocity taking into account all existing points on a trajectory.
   FAniCalculations.BoundsAnimation := true; // the TTargetType.Min and TTargetType.Max must be set. this make a bound the the animation reach the min or max of the scrooling area
-  FAniCalculations.Interval := 0; // DefaultIntervalOfAni 10 ms for ~100 frames per second - Defines the interval between successive updates of the pictures of the inertial moving.
-                                  // we don't need any inertial moving with FAniCalculations - we use FAniCalculations just to calculate the velocity
   FAniCalculations.TouchTracking := [ttHorizontal]; // Defines the possible directions of the inertial scrolling initiated by the touch input.
   FAniCalculations.DecelerationRate := ALDecelerationRateNormal; // DecelerationRateNormal (1.95) - Determines the deceleration rate of inertial scrolling.
   FAniCalculations.Elasticity := ALDefaultElasticity; // By default, the scroll view "bounces" back when scrolling exceeds the bounds of the content.

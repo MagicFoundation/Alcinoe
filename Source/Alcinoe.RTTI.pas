@@ -595,6 +595,13 @@ Type
     property Params: TALRttiString read FParams;
   end;
 
+  //This function is used solely to ensure RTTI generation
+  //for specific classes. This becomes necessary when the given
+  //classes aren't explicitly referenced anywhere in the code.
+  //Including them as a parameter here acts as a workaround
+  //to ensure that RTTI information is generated for them.
+  procedure ALEnsureRTTIgeneration(AClass: TClass);
+
 {*********************************************************************************}
 function ALGetEnumNameA(TypeInfo: PTypeInfo; Value: Integer): ansistring; overload;
 function ALGetEnumNameA(PropInfo: PPropInfo; Value: Integer): ansistring; inline; overload;
@@ -620,7 +627,7 @@ function ALStringToSet(TypeInfo: PTypeInfo; const Value: ansistring): Integer; o
 function ALStringToSet(PropInfo: PPropInfo; const Value: ansistring): Integer; inline; overload;
 function ALStringToSet(TypeInfo: PTypeInfo; const Value: string): Integer; overload;
 function ALStringToSet(PropInfo: PPropInfo; const Value: string): Integer; inline; overload;
-function ALGetRttiType(const aQualifiedName: TALRttiString): TALRttiType;
+function ALGetRttiType(const aQualifiedName: TALRttiString; const aRaiseExceptionIfNotFound: Boolean = True): TALRttiType;
 procedure ALRttiInitializeInstance(const AInstance: TObject);
 procedure ALRttiFinalizeInstance(const AInstance: TObject);
 procedure ALRttiInitialization(
@@ -628,11 +635,6 @@ procedure ALRttiInitialization(
             const AQualifiedNameToExclude: array of TALRttiString); overload; // [] to Exclude nothing
 procedure ALRttiInitialization; overload;
 procedure ALRttiFinalization;
-
-{*}
-var
-  ALRTTIContext: TRttiContext;
-  ALRttiTypeCache: TObjectDictionary<TALRttiString,TALRttiType>;
 
 implementation
 
@@ -645,6 +647,11 @@ uses
   Alcinoe.Common,
   Alcinoe.StringList,
   Alcinoe.StringUtils;
+
+{*}
+var
+  ALRTTIContext: TRttiContext;
+  ALRttiTypeCache: TObjectDictionary<TALRttiString,TALRttiType>;
 
 {***}
 const
@@ -1202,7 +1209,7 @@ begin
   //    raise ENonPublicType.CreateResFmt(@SNonPublicType, [Name]);
   //end;
   if assigned(aRttiField.FieldType) and
-     (ALPosA(':',aRttiField.FieldType.Handle.Name) <> 1) then fFieldType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiField.FieldType.QualifiedName))
+     (ALPosA(':',aRttiField.FieldType.Handle.Name) <> 1) then fFieldType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiField.FieldType.QualifiedName), false{aRaiseExceptionIfNotFound})
   else fFieldType := nil;
   fOffset := aRttiField.Offset;
 end;
@@ -1224,7 +1231,7 @@ constructor TALRttiProperty.Create(const aRttiProperty: TRttiProperty);
 begin
   inherited create(aRttiProperty);
   fRttiProperty := aRttiProperty;
-  if assigned(aRttiProperty.PropertyType) then fPropertyType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiProperty.PropertyType.QualifiedName))
+  if assigned(aRttiProperty.PropertyType) then fPropertyType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiProperty.PropertyType.QualifiedName), false{aRaiseExceptionIfNotFound})
   else fPropertyType := nil;
   fIsReadable := aRttiProperty.IsReadable;
   fIsWritable := aRttiProperty.IsWritable;
@@ -1257,7 +1264,7 @@ constructor TALRttiParameter.Create(const aRttiParameter: TRttiParameter);
 begin
   inherited create(aRttiParameter);
   FFlags := aRttiParameter.Flags;
-  if assigned(aRttiParameter.ParamType) then fParamType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiParameter.ParamType.QualifiedName))
+  if assigned(aRttiParameter.ParamType) then fParamType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiParameter.ParamType.QualifiedName), false{aRaiseExceptionIfNotFound})
   else fParamType := nil;
 end;
 
@@ -1278,7 +1285,7 @@ begin
   for I := Low(LRttiParameters) to High(LRttiParameters) do
     fRttiParameters[I] := TALRttiParameter.Create(LRttiParameters[I]);
   if aRttiMethod.HasExtendedInfo and
-     assigned(aRttiMethod.ReturnType) then fReturnType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiMethod.ReturnType.QualifiedName))
+     assigned(aRttiMethod.ReturnType) then fReturnType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRttiMethod.ReturnType.QualifiedName), false{aRaiseExceptionIfNotFound})
   else fReturnType := nil;
   fCodeAddress := aRttiMethod.CodeAddress;
   fIsConstructor := aRttiMethod.IsConstructor;
@@ -1346,7 +1353,7 @@ constructor TALRttiIndexedProperty.Create(const aRTTIIndexedProperty: TRttiIndex
 begin
   inherited create(aRTTIIndexedProperty);
   fRTTIIndexedProperty := aRTTIIndexedProperty;
-  if assigned(aRTTIIndexedProperty.PropertyType) then fPropertyType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRTTIIndexedProperty.PropertyType.QualifiedName))
+  if assigned(aRTTIIndexedProperty.PropertyType) then fPropertyType := ALGetRttiType({$IF defined(ALRTTIAnsiString)}AnsiString{$ENDIF}(aRTTIIndexedProperty.PropertyType.QualifiedName), false{aRaiseExceptionIfNotFound})
   else fPropertyType := nil;
   if assigned(aRTTIIndexedProperty.ReadMethod) then fReadMethod := TALRttiMethod.Create(aRTTIIndexedProperty.ReadMethod)
   else fReadMethod := nil;
@@ -1918,13 +1925,16 @@ begin
   Result := nil;
 end;
 
-{***********************************************************************}
-function ALGetRttiType(const aQualifiedName: TALRttiString): TALRttiType;
+{************************************************************************************************************************}
+function ALGetRttiType(const aQualifiedName: TALRttiString; const aRaiseExceptionIfNotFound: Boolean = True): TALRttiType;
 begin
   if not ALRttiTypeCache.TryGetValue(aQualifiedName, result) then begin
     Result := nil;
-    raise EALException.CreateFmt('Cannot obtain RTTI information for the class %s', [aQualifiedName]);
-    //ALLog(ALFormatW('Cannot obtain RTTI information for the class %s', [aQualifiedName], ALDefaultFormatSettingsW), TALLogType.ERROR);
+    {$IF defined(debug)}
+    ALLog(ALFormatW('Cannot obtain RTTI information for the type %s', [aQualifiedName], ALDefaultFormatSettingsW), TALLogType.Warn);
+    {$ENDIF}
+    if aRaiseExceptionIfNotFound then
+      raise EALException.CreateFmt('Cannot obtain RTTI information for the class %s', [aQualifiedName]);
   end;
 end;
 
@@ -1934,13 +1944,18 @@ begin
   FParams := AParams;
 end;
 
+{***********************************************}
+procedure ALEnsureRTTIgeneration(AClass: TClass);
+begin
+end;
+
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~}
   TALRTTIInitValue = record
   public
     type
-      TValueKind = (vkChar, vkansiChar, vkString, vkansiString, vkInt64, vkInt32, vkInt16, vkInt8, vkSingle, vkDouble, vkDateTime, vkObject, vkRecord, vkMethod);
+      TValueKind = (vkChar, vkansiChar, vkString, vkansiString, vkInt64, vkInt32, vkInt16, vkInt8, vkSingle, vkDouble, vkDateTime, vkObject, vkRecord, vkMethod, vkClassRef);
   public
     RttiMember: TALRttiMember;
     Order: integer;
@@ -1958,6 +1973,7 @@ type
     DateTimeValue: TDateTime;
     ParamLessCreateMethod: Boolean;
     MethodValue: TALRttiMethod;
+    ClassValue: TClass;
     InitValues: Tarray<TALRTTIInitValue>;
   End;
 
@@ -2065,6 +2081,7 @@ procedure ALRttiInitializeInstance(const AInstance: TObject);
     _TDoubleSetterMethod = procedure(Value: Double) of object;
     _TDateTimeSetterMethod = procedure(Value: TDateTime) of object;
     _TMethodSetterMethod = procedure(Value: _TMethodPointer) of object;
+    _TClassSetterMethod = procedure(Value: TClass) of object;
     _TObjectSetterMethod = procedure(Value: Tobject) of object;
     _TObjectGetterMethod = function: TObject of object;
   begin
@@ -2086,6 +2103,7 @@ procedure ALRttiInitializeInstance(const AInstance: TObject);
           TALRTTIInitValue.TValueKind.vkSingle: PSingle(Pointer(NativeInt(AInstance) + LRttiField.Offset))^ := ARttiInitValues[i].SingleValue;
           TALRTTIInitValue.TValueKind.vkDouble: PDouble(Pointer(NativeInt(AInstance) + LRttiField.Offset))^ := ARttiInitValues[i].DoubleValue;
           TALRTTIInitValue.TValueKind.vkDateTime: PDateTime(Pointer(NativeInt(AInstance) + LRttiField.Offset))^ := ARttiInitValues[i].DateTimeValue;
+          TALRTTIInitValue.TValueKind.vkClassRef: PPointer(Pointer(NativeInt(AInstance) + LRttiField.Offset))^ := Pointer(ARttiInitValues[i].ClassValue);
           TALRTTIInitValue.TValueKind.vkObject: begin
             var LObject := TObject(Pointer(NativeInt(AInstance) + LRttiField.Offset)^);
             if LObject = nil then begin
@@ -2267,6 +2285,17 @@ procedure ALRttiInitializeInstance(const AInstance: TObject);
               LSetterMethod(ARttiInitValues[i].DateTimeValue);
             end;
           end;
+          TALRTTIInitValue.TValueKind.vkClassRef: begin
+            var ASlotField: Boolean;
+            var LCode := _ALRttiGetSetterCode(AInstance, LRttiInstanceProperty, ASlotField);
+            if ASlotField then PPointer(LCode)^ := Pointer(ARttiInitValues[i].ClassValue)
+            else begin
+              var LSetterMethod: _TClassSetterMethod;
+              Tmethod(LSetterMethod).Code := LCode;
+              Tmethod(LSetterMethod).Data := AInstance;
+              LSetterMethod(ARttiInitValues[i].ClassValue);
+            end;
+          end;
           TALRTTIInitValue.TValueKind.vkObject: begin
             var LObject: Tobject;
             var ASlotField: Boolean;
@@ -2353,6 +2382,7 @@ procedure ALRttiInitializeInstance(const AInstance: TObject);
   end;
 
 begin
+  if ALRttiTypeInitValuesIndex = nil then exit;
   var LIndex: Integer;
   if ALRttiTypeInitValuesIndex.TryGetValue(AInstance.ClassInfo, LIndex) then
     _DoRttiInitializeInstance(AInstance, ALRttiTypeInitValuesArray[LIndex]);
@@ -2465,12 +2495,12 @@ procedure ALRttiInitialization(
           //--
           var P := {$IF defined(ALRTTIAnsiString)}ALPosA{$ELSE}ALPosW{$ENDIF}('.', LMemberName);
           if P > 0 then begin
-            var LPrefix := AlcopyStr(LMemberName, 1, P); // position.
             Lvalue := AlcopyStr(LMemberName, P+1,Maxint) + ':' + LValue; // y:50
+            LMemberName := AlcopyStr(LMemberName, 1, P); // position.
             var J := I;
             while J <= LLst.Count - 1 do begin
               var LTmpMemberName := ALTrim(LLst.Names[J]); // position.x
-              if {$IF defined(ALRTTIAnsiString)}AlposIgnoreCaseA{$ELSE}AlposIgnoreCaseW{$ENDIF}(Lprefix, LTmpMemberName) = 1 then begin
+              if {$IF defined(ALRTTIAnsiString)}AlposIgnoreCaseA{$ELSE}AlposIgnoreCaseW{$ENDIF}(LMemberName, LTmpMemberName) = 1 then begin
                 var LTmpValue := ALTrim(LLst.ValueFromIndex[J]); // 75
                 Lvalue := Lvalue + ';' + AlcopyStr(LTmpMemberName, P+1,Maxint) + ':' + LTmpValue; // y:50;x:75
                 LLst.Delete(j);
@@ -2781,7 +2811,16 @@ procedure ALRttiInitialization(
       {$endregion}
 
       {$region 'tkClassRef'}
-      tkClassRef: raise Exception.Createfmt('The type "%s" is not yet supported', [AType.QualifiedName]);
+      tkClassRef: begin
+        if (ARttiMember is TALRttiProperty) and
+           (not TALRttiProperty(ARttiMember).IsWritable) then
+          raise Exception.CreateFmt('The property "%s" of "%s" is not writable', [ARttiMember.Name, AOwnerRttiType.ClassName]);
+        var LRttiType := ALGetRttiType(AParams);
+        if not (LRttiType is TALRttiInstanceType) then
+          raise Exception.CreateFmt('The RTTI type for "%s" is not recognized as an instance type', [{$IF defined(ALRTTIAnsiString)}String{$ENDIF}(AParams)]);
+        Result.ValueKind := TALRTTIInitValue.TValueKind.VkClassRef;
+        Result.ClassValue := TALRttiInstanceType(LRttiType).MetaclassType;
+      end;
       {$endregion}
 
       {$region 'tkPointer'}
@@ -3057,7 +3096,7 @@ end;
 {*****************************}
 procedure ALRttiInitialization;
 begin
-  ALRttiInitialization(['*'], []);
+  ALRttiInitialization(['*']{aQualifiedNameToInclude}, []{AQualifiedNameToExclude});
 end;
 
 {***************************}
@@ -3067,5 +3106,9 @@ Begin
   ALFreeAndNil(ALRttiTypeCache);
   ALRTTIContext.free;
 End;
+
+initialization
+  ALRttiTypeInitValuesIndex := nil;
+  ALRttiTypeCache := nil;
 
 end.

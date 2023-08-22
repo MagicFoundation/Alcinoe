@@ -42,19 +42,16 @@ type
 
 const
   ALDefaultStorageTime = 0.15;
-  ALDefaultIntervalOfAni = 10; // << on ios this is not use because we synch via cadisplaylink. however on android
-                               // << this will be not exact time between each timerproc,
-                               // << because the onpaint is bound to the fps (60), so every onpaint
-                               // << must wait the vsync signal (every 16.6 ms), so the intervalOfAni
-                               // << will be generally not less than 16.6 ms
-                               // << but also it's can produce strange bug: https://quality.embarcadero.com/browse/RSP-18982
+  // We don't use ALDefaultIntervalOfAni for Android/iOS since we
+  // utilize DisplayLink and JChoreographer
+  ALDefaultIntervalOfAni = 10;
   ALDecelerationRateNormal = 1.95;
   ALDecelerationRateFast = 9.5;
   ALDefaultElasticity = 100;
   ALDefaultMinVelocity = 10;
   ALDefaultMaxVelocity = 5000;
   ALDefaultDeadZone = 8;
-  ALDefaultVelocityFactor = 1;
+  ALDefaultVelocityFactor = 1; // added from FMX.InertialMovement
 
 type
 
@@ -72,6 +69,7 @@ type
     end;
   {$IFDEF IOS}
 
+  // added from FMX.InertialMovement
   private type
     IDisplayLinkListener = interface(NSObject)
     ['{810AD3F0-265C-4A73-9B96-74103268884A}']
@@ -94,6 +92,7 @@ type
 
   {$ELSEIF defined(ANDROID)}
 
+  // added from FMX.InertialMovement
   private type
     TChoreographerFrameCallback = class(TJavaLocal, JChoreographer_FrameCallback)
     private
@@ -113,12 +112,13 @@ type
 
   {$ENDIF}
   private
+    // added from FMX.InertialMovement
     class var FPlatformTimer: IFMXTimerService;
     class procedure InitPlatformTimer; inline;
   private
-    FTag: NativeInt;
-    FTimerActive: Boolean;
-    FVelocityFactor: Double;
+    FTag: NativeInt; // added from FMX.InertialMovement
+    FTimerActive: Boolean; // added from FMX.InertialMovement
+    FVelocityFactor: Double; // added from FMX.InertialMovement
     FEnabled: Boolean;
     FInTimerProc: Boolean;
     FTouchTracking: TTouchTracking;
@@ -127,7 +127,7 @@ type
     FUpVelocity: TALPointD;
     FUpPosition: TALPointD;
     FUpDownTime: TDateTime;
-    FlastTickCalc: Double;
+    FlastTickCalc: Double; // added from FMX.InertialMovement
     FLastTimeCalc: TDateTime;
     [Weak] FOwner: TPersistent;
     FPointTime: TList<TPointTime>;
@@ -139,13 +139,12 @@ type
     FCancelTargetX: Boolean;
     FCancelTargetY: Boolean;
     FOnStart: TNotifyEvent;
-    FOnChanged: TNotifyEvent;
+    FOnChanged: TNotifyEvent; // Replace from FOnTimer
     FOnStop: TNotifyEvent;
     FDown: Boolean;
     FAnimation: Boolean;
     FViewportPosition: TALPointD;
     FLowChanged: Boolean;
-    FLastTimeChanged: TDateTime;
     FDownPoint: TALPointD;
     FDownPosition: TALPointD;
     FUpdateTimerCount: Integer;
@@ -156,8 +155,8 @@ type
     FInDoStop: Boolean;
     FMoved: Boolean;
     FStarted: Boolean;
-    FBoundsAnimationAtMinTarget: Boolean;
-    FBoundsAnimationAtMaxTarget: Boolean;
+    FBoundsAnimationAtMinTarget: Boolean; // Replace FBoundsAnimation
+    FBoundsAnimationAtMaxTarget: Boolean; // Replace FBoundsAnimation
     FAutoShowing: Boolean;
     FOpacity: Single;
     FShown: Boolean;
@@ -168,12 +167,12 @@ type
     FDeadZone: Integer;
     FUpdateCount: Integer;
     FElasticityFactor: TPoint;
-    FOnCalcVelocity: TNotifyEvent;
-    {$IFDEF DEBUG}
-    //fTimerProcStopWatch: TstopWatch;
-    {$ENDIF}
+    FOnCalcVelocity: TNotifyEvent; // added from FMX.InertialMovement
     procedure StartTimer;
     procedure StopTimer;
+    {$IF (not defined(IOS)) and (not defined(ANDROID))}
+    procedure TimerProc;
+    {$ENDIF}
     procedure Clear(T: TDateTime = 0);
     procedure UpdateTimer;
     procedure SetInterval(const Value: Word);
@@ -187,14 +186,14 @@ type
     function DecelerationRateStored: Boolean;
     function ElasticityStored: Boolean;
     function StorageTimeStored: Boolean;
-    function VelocityFactorStored: boolean;
+    function VelocityFactorStored: boolean; // added from FMX.InertialMovement
     procedure CalcVelocity(const Time: TDateTime = 0);
     procedure InternalStart;
     procedure InternalTerminated;
-    function GetBoundsAnimation: Boolean;
+    function GetBoundsAnimation: Boolean; // added from FMX.InertialMovement
     procedure SetBoundsAnimation(const Value: Boolean);
-    procedure SetBoundsAnimationAtMinTarget(const Value: Boolean);
-    procedure SetBoundsAnimationAtMaxTarget(const Value: Boolean);
+    procedure SetBoundsAnimationAtMinTarget(const Value: Boolean); // added from FMX.InertialMovement
+    procedure SetBoundsAnimationAtMaxTarget(const Value: Boolean); // added from FMX.InertialMovement
     procedure UpdateViewportPositionByBounds;
     procedure SetAutoShowing(const Value: Boolean);
     procedure SetShown(const Value: Boolean);
@@ -210,7 +209,6 @@ type
     function GetOpacity: Single;
     function GetLowVelocity: Boolean;
     function AddPointTime(const X, Y: Double; const Time: TDateTime = 0): TPointTime;
-    procedure InternalChanged;
     procedure UpdateTarget;
     function DoStopScrolling(CurrentTime: TDateTime = 0): Boolean;
   protected
@@ -241,9 +239,6 @@ type
     destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure Assign(Source: TPersistent); override;
-    {$IF not defined(IOS)}
-    procedure TimerProc;
-    {$ENDIF}
     procedure MouseDown(X, Y: Double); virtual;
     procedure MouseMove(X, Y: Double); virtual;
     procedure MouseLeave; virtual;
@@ -253,8 +248,10 @@ type
     property AutoShowing: Boolean read FAutoShowing write SetAutoShowing default False;
     property Averaging: Boolean read FAveraging write FAveraging default False;
     property BoundsAnimation: Boolean read GetBoundsAnimation write SetBoundsAnimation default True;
-    property BoundsAnimationAtMinTarget: Boolean read FBoundsAnimationAtMinTarget write SetBoundsAnimationAtMinTarget default True;
-    property BoundsAnimationAtMaxTarget: Boolean read FBoundsAnimationAtMaxTarget write SetBoundsAnimationAtMaxTarget default True;
+    property BoundsAnimationAtMinTarget: Boolean read FBoundsAnimationAtMinTarget write SetBoundsAnimationAtMinTarget default True; // added from FMX.InertialMovement
+    property BoundsAnimationAtMaxTarget: Boolean read FBoundsAnimationAtMaxTarget write SetBoundsAnimationAtMaxTarget default True; // added from FMX.InertialMovement
+    // We don't use Interval for Android/iOS since we utilize DisplayLink and JChoreographer
+    property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property TouchTracking: TTouchTracking read FTouchTracking write SetTouchTracking default [ttVertical, ttHorizontal];
     property TargetCount: Integer read GetTargetCount;
     procedure SetTargets(const ATargets: array of TTarget);
@@ -262,41 +259,40 @@ type
     property MinTarget: TTarget read FMinTarget;
     property MaxTarget: TTarget read FMaxTarget;
     procedure UpdatePosImmediately(const Force: Boolean = False);
-    property CurrentVelocity: TALPointD read FCurrentVelocity write FCurrentVelocity;
+    property CurrentVelocity: TALPointD read FCurrentVelocity write FCurrentVelocity; // Make the property write-enabled.
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
     property ViewportPositionF: TPointF read GetViewportPositionF write SetViewportPositionF;
-    property DownPosition: TALPointD read fDownPosition write fDownPosition;
+    property DownPosition: TALPointD read fDownPosition write fDownPosition; // added from FMX.InertialMovement
     property LastTimeCalc: TDateTime read FLastTimeCalc;
     property Down: Boolean read FDown write SetDown;
     property Opacity: Single read GetOpacity;
     property InTimerProc: Boolean read FInTimerProc;
-    Procedure WakeUpTimer;
-    // In the onpaint of the control we can manually call Calculate to have most
-    // accurate position, this because between the time we receive the ontimer
-    // event AND the time we will actually repaint the form they could be a delay.
-    // so in this way callling calculate from the onpaint and we are sure we have
-    // the most accurate position to draw. However I m not sure that this is not
-    // simply useless because visually I didn't see any diference
-    Procedure Calculate;
+    Procedure WakeUpTimer; // added from FMX.InertialMovement
+    // During the OnPaint event of a control, we can manually invoke the Calculate method
+    // to ensure the most accurate position. This is because there might be a delay between
+    // receiving the OnTimer event and the actual repainting of the form.
+    // By invoking Calculate from the OnPaint, we ensure the most accurate position is used for drawing.
+    // However, its actual usefulness is debatable as there seems to be no visible difference.
+    Procedure Calculate; // added from FMX.InertialMovement
     property Moved: Boolean read FMoved;
     property LowVelocity: Boolean read GetLowVelocity;
     procedure BeginUpdate;
     procedure EndUpdate;
-    function IsUpdating: Boolean;
+    function IsUpdating: Boolean; // added from FMX.InertialMovement
     property UpdateCount: Integer read FUpdateCount;
     property OnStart: TNotifyEvent read FOnStart write FOnStart;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property OnStop: TNotifyEvent read FOnStop write FOnStop;
     property DeadZone: Integer read FDeadZone write FDeadZone default ALDefaultDeadZone;
-    property TimerActive: boolean read FTimerActive;
-    property Tag: NativeInt read FTag write FTag default 0;
+    property TimerActive: boolean read FTimerActive; // added from FMX.InertialMovement
+    property Tag: NativeInt read FTag write FTag default 0; // added from FMX.InertialMovement
+    procedure Stop; // added from FMX.InertialMovement
   published
-    property Interval: Word read FInterval write SetInterval default ALDefaultIntervalOfAni;
     property DecelerationRate: Double read FDecelerationRate write FDecelerationRate stored DecelerationRateStored nodefault;
     property Elasticity: Double read FElasticity write FElasticity stored ElasticityStored nodefault;
     property StorageTime: Double read FStorageTime write FStorageTime stored StorageTimeStored nodefault;
-    property VelocityFactor: Double read FVelocityFactor write FVelocityFactor stored VelocityFactorStored nodefault; // << this is a factor to apply to the calculated velocity of the scroll (to boost a the velocity)
-    property OnCalcVelocity: TNotifyEvent read FOnCalcVelocity write FOnCalcVelocity; // << we this you can dynamically calc the velocity
+    property VelocityFactor: Double read FVelocityFactor write FVelocityFactor stored VelocityFactorStored nodefault; // added from FMX.InertialMovement
+    property OnCalcVelocity: TNotifyEvent read FOnCalcVelocity write FOnCalcVelocity; // added from FMX.InertialMovement
   end;
 
 implementation
@@ -325,14 +321,15 @@ const
   ALEpsilonPoint = TEpsilon.Position;
   ALDefaultOpacityTime = 0.3;
   ALMaxOpacity = 1.5;
-  ALEpsilonTime = 0; // 0.01; => https://quality.embarcadero.com/browse/RSP-18982
+  // https://quality.embarcadero.com/browse/RSP-18982
+  // ALEpsilonTime = 0.01;
   ALStopTime = 0.007;
 
 var
   ALEpsilonRange: Integer;
 
-{************************************************************************************}
-function ALAniSign(const CurrentValue, TargetValue, EpsilonPoint: Double): TValueSign;
+{********************************************************************************************}
+function ALAniSign(const CurrentValue, TargetValue, EpsilonPoint: Double): TValueSign; inline;
 begin
   Result := -CompareValue(CurrentValue, TargetValue, EpsilonPoint);
 end;
@@ -675,7 +672,7 @@ procedure TALAniCalculations.SetEnabled(const Value: Boolean);
 begin
   if FEnabled <> Value then
   begin
-    if Value and (FInterval > 0) then
+    if Value then
     begin
       if Not IsUpdating then
       begin
@@ -698,9 +695,11 @@ procedure TALAniCalculations.SetInterval(const Value: Word);
 begin
   if FInterval <> Value then
   begin
+    if Value <= 0 then
+      raise Exception.Create('Interval must be greater than 0');
     StopTimer;
     FInterval := Value;
-    if FEnabled and (FInterval > 0) and (not IsUpdating) then
+    if FEnabled and (not IsUpdating) then
       StartTimer;
   end;
 end;
@@ -729,11 +728,11 @@ begin
     LTarget.Point := TALPointD.Create(0, 0);
     SetMouseTarget(LTarget);
     if Down then
-      InternalChanged
+      DoChanged
     else
     begin
       UpdateTimer;
-      InternalChanged;
+      DoChanged;
     end;
   end;
 end;
@@ -994,6 +993,12 @@ begin
   result := FUpdateCount > 0;
 end;
 
+{********************************}
+procedure TALAniCalculations.Stop;
+begin
+  CurrentVelocity := TalPointD.Zero;
+end;
+
 {**********************************************************}
 function TALAniCalculations.DecelerationRateStored: Boolean;
 begin
@@ -1037,8 +1042,8 @@ begin
   end;
 end;
 
-{********************}
-{$IF not defined(IOS)}
+{*************************************************}
+{$IF (not defined(IOS)) and (not defined(ANDROID))}
 procedure TALAniCalculations.TimerProc;
 begin
   calculate;
@@ -1075,14 +1080,6 @@ begin
   if (FTimerActive) and (not FInTimerProc) then
   begin
 
-    {$IFDEF DEBUG}
-    //fTimerProcStopWatch.stop;
-    //ALLog('TALAniCalculations.TimerProc', 'interval: '  + ALFormatFloatW('0', fTimerProcStopWatch.Elapsed.totalMilliseconds, ALDefaultFormatSettingsW), TalLogType.verbose);
-    //fTimerProcStopWatch := TstopWatch.StartNew;
-    {$ENDIF}
-
-    FInTimerProc := True;
-
     // you put you finger, you move => result in jerks!
     // why ? because their is 16ms between each paint, BUT if you call very often the paint,
     // then maybe you can miss some move event resulting in drop frame (not really dropped
@@ -1094,20 +1091,7 @@ begin
     // T=16 paint OK
     // T=32 paint (aie we didn't receive yet the move move, that maybe is in the nanosecond later) result in drop frame
     //
-    //
-    // this is handled in the unit FMX.Platform.UI.Android by adding this in TFormRender.Render
-    //
-    // ALAniCalcTimerProcs: Tlist<TALAniCalculations>;
-    // for var i := ALAniCalcTimerProcs.Count - 1 downto 0 do begin
-    //   var LAniCalcTimerProc := ALAniCalcTimerProcs[i];
-    //   if LAniCalcTimerProc.Down then begin
-    //     if LAniCalcTimerProc.mouseEventConsumed > 0 then exit;
-    //     LAniCalcTimerProc.mouseEventConsumed := 1;
-    //     Break;
-    //   end;
-    // end;
-    //
-    // finally it's handled in FMX.Platform.UI.Android by using JChoreographer_FrameCallback for TFormRender instead of JRunnable
+    // It's handled in FMX.Platform.UI.Android by using JChoreographer_FrameCallback for TFormRender instead of JRunnable
     // https://quality.embarcadero.com/browse/RSP-38660
 
     InitPlatformTimer;
@@ -1116,14 +1100,15 @@ begin
     IsInit := FLastTimeCalc > 0;
     D := T - FLastTimeCalc;
     FLastTimeCalc := T;
+    FInTimerProc := True;
     try
       if (D > 0) then
       try
         D := D * SecsPerDay;
         if AutoShowing then
         begin
-          DOpacity := Min(D, 2 * Interval / 1000);
-          DOpacity := DOpacity / ALDefaultOpacityTime;
+          //DOpacity := Min(D, 2 * Interval / 1000);
+          DOpacity := D / ALDefaultOpacityTime;
           if (FOpacity < ALMaxOpacity) and (Shown) then
             FOpacity := ALMaxOpacity
           else if (FOpacity > 0) and (not Shown) then
@@ -1131,12 +1116,12 @@ begin
         end
         else
           FOpacity := ALMaxOpacity;
-        if IsInit and ((D > ALEpsilonTime) or (not Down) or FLowChanged) then
+        if IsInit and ((not Down) or FLowChanged) then
         begin
           DoStopScrolling(FLastTimeCalc);
           if Animation and (not (Down and Moved)) then
             InternalCalc(D);
-          InternalChanged;
+          DoChanged;
           FLowChanged := False;
           UpdateTimer;
         end;
@@ -1533,28 +1518,6 @@ begin
   end;
 end;
 
-{*******************************************}
-procedure TALAniCalculations.InternalChanged;
-var
-  T: TDateTime;
-begin
-  InitPlatformTimer;
-  T := FPlatformTimer.getTick/SecsPerDay;
-  if (FLastTimeChanged = 0) or (Abs(T - FLastTimeChanged) * SecsPerDay >= ALEpsilonTime) then
-  begin
-    try
-      DoChanged;
-    finally
-      FLastTimeChanged := T;
-    end;
-  end
-  else if not InTimerProc then
-  begin
-    FUpdateTimerCount := -1;
-    UpdateTimer;
-  end;
-end;
-
 {****************************************************************}
 procedure TALAniCalculations.SetAutoShowing(const Value: Boolean);
 begin
@@ -1567,7 +1530,7 @@ begin
         FOpacity := 0
       else
         FOpacity := ALMaxOpacity;
-      InternalChanged;
+      DoChanged;
     end;
     UpdateTimer;
   end;
@@ -1606,7 +1569,6 @@ begin
     D := D * (SecsPerDay);
     if D > 0 then
     begin
-      D := Max(D, ALEpsilonTime);
       if ttHorizontal in InternalTouchTracking then
       begin
         FCurrentVelocity.X := Positions[PositionCount - 1].X - Positions[I].X;

@@ -69,7 +69,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 28
-      Text = 'Bench TALText Paint'
+      Text = 'Bench TALText'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button15Click
     end
@@ -83,7 +83,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 16
-      Text = 'Bench TRectangle (stroke + corners) Paint'
+      Text = 'Bench TRectangle (stroke + corners)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button4Click
     end
@@ -105,7 +105,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 23
-      Text = 'Bench TALRectangle (stroke + corners) Paint'
+      Text = 'Bench TALRectangle (stroke + corners)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button255Click
     end
@@ -118,7 +118,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 26
-      Text = 'Bench TText Paint'
+      Text = 'Bench TText'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button3Click
     end
@@ -140,7 +140,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 20
-      Text = 'Bench TALRectangle (stroke) Paint'
+      Text = 'Bench TALRectangle (stroke)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button6Click
     end
@@ -154,7 +154,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 13
-      Text = 'Bench TRectangle (stroke) Paint'
+      Text = 'Bench TRectangle (stroke)'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button7Click
     end
@@ -176,7 +176,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 18
-      Text = 'Bench TALRectangle Paint'
+      Text = 'Bench TALRectangle'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button8Click
     end
@@ -190,7 +190,7 @@ object Form1: TForm1
       Size.Height = 41.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 10
-      Text = 'Bench TRectangle Paint'
+      Text = 'Bench TRectangle'
       TextSettings.Font.Size = 13.000000000000000000
       OnClick = Button9Click
     end
@@ -838,7 +838,7 @@ object Form1: TForm1
       Size.Width = 487.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 118
+      TabOrder = 120
       object ALAniIndicator1: TALAniIndicator
         Align = Center
         Enabled = True
@@ -883,7 +883,6 @@ object Form1: TForm1
       TabOrder = 5
       Text = 'TalRectangle with fast drawing shadow'
       TextSettings.Font.Size = 13.000000000000000000
-      OnClick = Button22Click
     end
     object Text6: TText
       Align = Top

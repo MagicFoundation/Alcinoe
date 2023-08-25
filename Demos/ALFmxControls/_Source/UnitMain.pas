@@ -336,7 +336,6 @@ begin
     ALSwitch1.Thumb.Stroke.Color := $ffd5d5d5;
     ALSwitch1.Thumb.Fill.Color := $ffffffff;
   end;
-
 end;
 
 {******************************************************}
@@ -368,19 +367,19 @@ procedure TForm1.ALTabControl1Resize(Sender: TObject);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _updateLabels(const aTab: TalTabItem);
-  var aText1, aText2: TalText;
-      aControl1: Tcontrol;
+  var LText1, LText2: TalText;
+      LControl1: Tcontrol;
   begin
-    aText1 := nil;
-    aText2 := nil;
-    for aControl1 in aTab.Controls do begin
-      if (aControl1 is TalText) and (aControl1.Tag = 1) then aText1 := TalText(aControl1)
-      else if (aControl1 is TalText) and (aControl1.Tag = 2) then aText2 := TalText(aControl1);
+    LText1 := nil;
+    LText2 := nil;
+    for LControl1 in aTab.Controls do begin
+      if (LControl1 is TalText) and (LControl1.Tag = 1) then LText1 := TalText(LControl1)
+      else if (LControl1 is TalText) and (LControl1.Tag = 2) then LText2 := TalText(LControl1);
     end;
-    if aText1 <> nil then
-      aText1.Position.X := ((aTab.Width - aText1.Width) / 2) + (aTab.Position.X / 5);
-    if aText2 <> nil then
-      aText2.Position.X := ((aTab.Width - aText2.Width) / 2) + (aTab.Position.X);
+    if LText1 <> nil then
+      LText1.Position.X := ((aTab.Width - LText1.Width) / 2) + (aTab.Position.X / 5);
+    if LText2 <> nil then
+      LText2.Position.X := ((aTab.Width - LText2.Width) / 2) + (aTab.Position.X);
   end;
 
 begin
@@ -490,7 +489,6 @@ begin
     if ALVideoPlayerSurface1.VideoPlayer.state in [vpsStarted] then ALVideoPlayerSurface1.VideoPlayer.Pause
     else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := False;
   end;
-
 
   if (ALLayout1.Position.y + ALLayout1.Height >= NewViewportPosition.Y) and
      (ALLayout1.Position.y < NewViewportPosition.Y + height) then begin
@@ -693,488 +691,290 @@ end;
 
 {*********************************************}
 procedure TForm1.Button2Click(Sender: TObject);
-Var aDemoForm: TDemoForm;
-    aRectangle: TALRectangle;
-    aChildRectangle: TalRectangle;
-    //aChildRectangle2: TalRectangle;
-    aVertScrollBox: TalVertScrollBox;
-    aText: TALText;
+Var LDemoForm: TDemoForm;
+    LRectangle: TALRectangle;
+    LChildRectangle: TalRectangle;
+    LVertScrollBox: TalVertScrollBox;
+    LText: TALText;
     i: integer;
 begin
-  aDemoForm := TDemoForm.Create(nil);
-  aVertScrollBox := TalVertScrollBox.Create(aDemoForm);
-  aVertScrollBox.Parent := aDemoForm;
-  aVertScrollBox.BeginUpdate;
-  aVertScrollBox.Align := TalignLayout.Client;
-  aVertScrollBox.AniCalculations.VelocityFactor := 2;
-  aVertScrollBox.AniCalculations.BoundsAnimation := False;
-  aDemoForm.fALAniCalculations := aVertScrollBox.AniCalculations;
-  aDemoForm.fvertScrollBox := aVertScrollBox;
+  LDemoForm := TDemoForm.Create(nil);
+  LVertScrollBox := TalVertScrollBox.Create(LDemoForm);
+  LVertScrollBox.Parent := LDemoForm;
+  LVertScrollBox.BeginUpdate;
+  LVertScrollBox.Align := TalignLayout.Client;
+  LVertScrollBox.AniCalculations.VelocityFactor := 2;
+  LVertScrollBox.AniCalculations.BoundsAnimation := False;
+  LDemoForm.fALAniCalculations := LVertScrollBox.AniCalculations;
+  LDemoForm.fvertScrollBox := LVertScrollBox;
   for I := 1 to 50 do begin
-    aRectangle := TALRectangle.Create(aVertScrollBox);
-    aRectangle.Parent := aVertScrollBox;
-    aRectangle.doubleBuffered := True;
-    aRectangle.Align := TalignLayout.Top;
-    aRectangle.Margins.Left := 15;
-    aRectangle.Margins.Top := 10;
-    aRectangle.Margins.Right := 15;
-    aRectangle.Margins.Bottom := 10;
-    aRectangle.Position.Y := 0;
-    aRectangle.Size.Height := 50;
-    aRectangle.XRadius := 12;
-    aRectangle.YRadius := 12;
+    LRectangle := TALRectangle.Create(LVertScrollBox);
+    LRectangle.Parent := LVertScrollBox;
+    LRectangle.doubleBuffered := True;
+    LRectangle.Align := TalignLayout.Top;
+    LRectangle.Margins.Left := 15;
+    LRectangle.Margins.Top := 10;
+    LRectangle.Margins.Right := 15;
+    LRectangle.Margins.Bottom := 10;
+    LRectangle.Position.Y := 0;
+    LRectangle.Size.Height := 50;
+    LRectangle.XRadius := 12;
+    LRectangle.YRadius := 12;
     //-----
-    aText := TALText.Create(self);
-    aText.Parent := aRectangle;
-    aText.doubleBuffered := True;
-    aText.Align := TalignLayout.left;
-    aText.Text := 'Alcinoe';
-    aText.Margins.Left := 15;
-    aText.WordWrap := False;
-    aText.autosize := True;
+    LText := TALText.Create(self);
+    LText.Parent := LRectangle;
+    LText.doubleBuffered := True;
+    LText.Align := TalignLayout.left;
+    LText.Text := 'Alcinoe';
+    LText.Margins.Left := 15;
+    LText.WordWrap := False;
+    LText.autosize := True;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.red;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Darkblue;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.red;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.green;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Coral;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.green;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.blue;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Indigo;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.blue;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.yellow;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Deeppink;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.yellow;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.Orange;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Lavender;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.Orange;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.Aliceblue;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Oldlace;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.Aliceblue;
     //-----
-    aChildRectangle := TALRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
-      //-----
-      (*
-      aChildRectangle2 := TALRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Silver;
-      *)
+    LChildRectangle := TALRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
   end;
-  aVertScrollBox.endUpdate;
-  aDemoForm.Show;
-  ALFmxMakeBufBitmaps(aVertScrollBox);
+  LVertScrollBox.endUpdate;
+  LDemoForm.Show;
+  ALFmxMakeBufBitmaps(LVertScrollBox);
 end;
 
 {*********************************************}
 procedure TForm1.Button1Click(Sender: TObject);
-Var aDemoForm: TDemoForm;
-    aRectangle: TRectangle;
-    aChildRectangle: TRectangle;
-    //aChildRectangle2: TRectangle;
-    aVertScrollBox: TVertScrollBox;
-    aText: TText;
+Var LDemoForm: TDemoForm;
+    LRectangle: TRectangle;
+    LChildRectangle: TRectangle;
+    LVertScrollBox: TVertScrollBox;
+    LText: TText;
     i: integer;
 begin
-  aDemoForm := TDemoForm.Create(nil);
-  aVertScrollBox := TVertScrollBox.Create(aDemoForm);
-  aVertScrollBox.Parent := aDemoForm;
-  aVertScrollBox.BeginUpdate;
-  aVertScrollBox.Align := TalignLayout.Client;
-  //aVertScrollBox.AniCalculations.VelocityFactor := 2;
-  aVertScrollBox.AniCalculations.BoundsAnimation := False;
-  aDemoForm.fAniCalculations := aVertScrollBox.AniCalculations;
-  aDemoForm.fvertScrollBox := aVertScrollBox;
+  LDemoForm := TDemoForm.Create(nil);
+  LVertScrollBox := TVertScrollBox.Create(LDemoForm);
+  LVertScrollBox.Parent := LDemoForm;
+  LVertScrollBox.BeginUpdate;
+  LVertScrollBox.Align := TalignLayout.Client;
+  //LVertScrollBox.AniCalculations.VelocityFactor := 2;
+  LVertScrollBox.AniCalculations.BoundsAnimation := False;
+  LDemoForm.fAniCalculations := LVertScrollBox.AniCalculations;
+  LDemoForm.fvertScrollBox := LVertScrollBox;
   for I := 1 to 50 do begin
-    aRectangle := TRectangle.Create(aVertScrollBox);
-    aRectangle.Parent := aVertScrollBox;
-    //aRectangle.doubleBuffered := True;
-    aRectangle.Align := TalignLayout.Top;
-    aRectangle.Margins.Left := 15;
-    aRectangle.Margins.Top := 10;
-    aRectangle.Margins.Right := 15;
-    aRectangle.Margins.Bottom := 10;
-    aRectangle.Position.Y := 0;
-    aRectangle.Size.Height := 50;
-    aRectangle.XRadius := 12;
-    aRectangle.YRadius := 12;
+    LRectangle := TRectangle.Create(LVertScrollBox);
+    LRectangle.Parent := LVertScrollBox;
+    //LRectangle.doubleBuffered := True;
+    LRectangle.Align := TalignLayout.Top;
+    LRectangle.Margins.Left := 15;
+    LRectangle.Margins.Top := 10;
+    LRectangle.Margins.Right := 15;
+    LRectangle.Margins.Bottom := 10;
+    LRectangle.Position.Y := 0;
+    LRectangle.Size.Height := 50;
+    LRectangle.XRadius := 12;
+    LRectangle.YRadius := 12;
     //-----
-    aText := TText.Create(self);
-    aText.Parent := aRectangle;
-    //aText.doubleBuffered := True;
-    aText.Align := TalignLayout.left;
-    aText.Text := 'Alcinoe';
-    aText.Margins.Left := 15;
-    aText.WordWrap := False;
-    aText.autosize := True;
+    LText := TText.Create(self);
+    LText.Parent := LRectangle;
+    //LText.doubleBuffered := True;
+    LText.Align := TalignLayout.left;
+    LText.Text := 'Alcinoe';
+    LText.Margins.Left := 15;
+    LText.WordWrap := False;
+    LText.autosize := True;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.red;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Darkblue;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.red;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.green;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Coral;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.green;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.blue;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Indigo;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.blue;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.yellow;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Deeppink;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.yellow;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.Orange;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Lavender;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.Orange;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.Aliceblue;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Oldlace;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.Aliceblue;
     //-----
-    aChildRectangle := TRectangle.Create(aRectangle);
-    aChildRectangle.Parent := aRectangle;
-    //aChildRectangle.doubleBuffered := True;
-    aChildRectangle.Align := TalignLayout.right;
-    aChildRectangle.Margins.Left := 0;
-    aChildRectangle.Margins.Top := 10;
-    aChildRectangle.Margins.Right := random(15);
-    aChildRectangle.Margins.Bottom := 10;
-    aChildRectangle.Position.Y := 0;
-    aChildRectangle.Size.width := 25;
-    aChildRectangle.XRadius := 5;
-    aChildRectangle.YRadius := 5;
-    aChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
-      //-----
-      (*
-      aChildRectangle2 := TRectangle.Create(aRectangle);
-      aChildRectangle2.Parent := aChildRectangle;
-      //aChildRectangle2.doubleBuffered := True;
-      aChildRectangle2.Align := TalignLayout.client;
-      aChildRectangle2.Margins.Left := 5;
-      aChildRectangle2.Margins.Top := 5;
-      aChildRectangle2.Margins.Right := 5;
-      aChildRectangle2.Margins.Bottom := 5;
-      aChildRectangle2.XRadius := 5;
-      aChildRectangle2.YRadius := 5;
-      aChildRectangle2.Fill.Color := TAlphaColorRec.Silver;
-      *)
+    LChildRectangle := TRectangle.Create(LRectangle);
+    LChildRectangle.Parent := LRectangle;
+    //LChildRectangle.doubleBuffered := True;
+    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Margins.Left := 0;
+    LChildRectangle.Margins.Top := 10;
+    LChildRectangle.Margins.Right := random(15);
+    LChildRectangle.Margins.Bottom := 10;
+    LChildRectangle.Position.Y := 0;
+    LChildRectangle.Size.width := 25;
+    LChildRectangle.XRadius := 5;
+    LChildRectangle.YRadius := 5;
+    LChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
   end;
-  aVertScrollBox.endUpdate;
-  aDemoForm.Show;
-  //ALFmxMakeBufBitmaps(aVertScrollBox);
+  LVertScrollBox.endUpdate;
+  LDemoForm.Show;
+  //ALFmxMakeBufBitmaps(LVertScrollBox);
 end;
 
 {*********************************************}
@@ -1306,6 +1106,11 @@ begin
 
   FVKKeyboardOpen := False;
   beginupdate;
+
+  //-----
+  //for the demo I activate the animation even on Windows
+  AlVertScrollBox1.AniCalculations.Animation := true;
+  AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
 
   //-----
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
@@ -1493,7 +1298,6 @@ begin
   if FVKKeyboardOpen then
     AlVertScrollBox1.AniCalculations.ViewportPosition := AlVertScrollBox1.AniCalculations.MaxTarget.Point;
   {$ENDIF}
-
 end;
 
 {*****************************************}
@@ -1519,244 +1323,227 @@ begin
   AlVertScrollBox1.AniCalculations.TouchTracking := [];
 end;
 
-{ TALTextStopWatch }
-
+{************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 function TALTextStopWatch.MakeBufBitmap: TTexture;
 {$ELSE}
 function TALTextStopWatch.MakeBufBitmap: Tbitmap;
 {$ENDIF}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   if (BufBitmap = nil) then begin
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
     result := inherited MakeBufBitmap;
-    aStopWatch.stop;
-    bufCreatePaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+    LStopWatch.stop;
+    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
   else result := inherited MakeBufBitmap;
 end;
 
 {*******************************}
 procedure TALTextStopWatch.Paint;
-var aStopWatch: TstopWatch;
-    aRemovebufCreatePaintMs: boolean;
+var LStopWatch: TstopWatch;
+    LRemovebufCreatePaintMs: boolean;
 begin
   clearbufBitmap;
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aRemovebufCreatePaintMs := (BufBitmap = nil);
-  aStopWatch := TstopWatch.StartNew;
+  LRemovebufCreatePaintMs := (BufBitmap = nil);
+  LStopWatch := TstopWatch.StartNew;
   MakeBufBitmap;
   inherited paint;
-  aStopWatch.stop;
-  bufPaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  if aRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  LStopWatch.stop;
+  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
 end;
-
-{ TTextStopWatch }
 
 {*****************************}
 procedure TTextStopWatch.Paint;
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+  LStopWatch.stop;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
-
-{ TRectangleStopWatch }
 
 {**********************************}
 procedure TRectangleStopWatch.Paint;
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+  LStopWatch.stop;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
-{ TALRectangleStopWatch }
-
+{************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 function TALRectangleStopWatch.MakeBufBitmap: TTexture;
 {$ELSE}
 function TALRectangleStopWatch.MakeBufBitmap: Tbitmap;
 {$ENDIF}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   if (BufBitmap = nil) then begin
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
     result := inherited MakeBufBitmap;
-    aStopWatch.stop;
-    bufCreatePaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+    LStopWatch.stop;
+    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
   else result := inherited MakeBufBitmap;
 end;
 
 {************************************}
 procedure TALRectangleStopWatch.Paint;
-var aStopWatch: TstopWatch;
-    aRemovebufCreatePaintMs: boolean;
+var LStopWatch: TstopWatch;
+    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aRemovebufCreatePaintMs := (BufBitmap = nil);
-  aStopWatch := TstopWatch.StartNew;
+  LRemovebufCreatePaintMs := (BufBitmap = nil);
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  bufPaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  if aRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  LStopWatch.stop;
+  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
 end;
-
-{ TCheckBoxStopWatch }
 
 {*****************************************}
 procedure TCheckBoxStopWatch.PaintChildren;
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   inherited PaintChildren;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+  LStopWatch.stop;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
-{ TALCheckBoxStopWatch }
-
+{************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
  function TALCheckBoxStopWatch.MakeBufBitmap: TTexture;
 {$ELSE}
  function TALCheckBoxStopWatch.MakeBufBitmap: Tbitmap;
 {$ENDIF}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   if (BufBitmap = nil) then begin
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
     result := inherited MakeBufBitmap;
-    aStopWatch.stop;
-    bufCreatePaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+    LStopWatch.stop;
+    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
   else result := inherited MakeBufBitmap;
 end;
 
 {***********************************}
 procedure TALCheckBoxStopWatch.Paint;
-var aStopWatch: TstopWatch;
-    aRemovebufCreatePaintMs: boolean;
+var LStopWatch: TstopWatch;
+    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aRemovebufCreatePaintMs := (BufBitmap = nil);
-  aStopWatch := TstopWatch.StartNew;
+  LRemovebufCreatePaintMs := (BufBitmap = nil);
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  bufPaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  if aRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  LStopWatch.stop;
+  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
 end;
-
-{ TLineStopWatch }
 
 {*****************************}
 procedure TLineStopWatch.Paint;
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+  LStopWatch.stop;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
-{ TALLineStopWatch }
-
+{************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
  function TALLineStopWatch.MakeBufBitmap: TTexture;
 {$ELSE}
  function TALLineStopWatch.MakeBufBitmap: Tbitmap;
 {$ENDIF}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   if (BufBitmap = nil) then begin
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
     result := inherited MakeBufBitmap;
-    aStopWatch.stop;
-    bufCreatePaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+    LStopWatch.stop;
+    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
   else result := inherited MakeBufBitmap;
 end;
 
 {*******************************}
 procedure TALLineStopWatch.Paint;
-var aStopWatch: TstopWatch;
-    aRemovebufCreatePaintMs: boolean;
+var LStopWatch: TstopWatch;
+    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aRemovebufCreatePaintMs := (BufBitmap = nil);
-  aStopWatch := TstopWatch.StartNew;
+  LRemovebufCreatePaintMs := (BufBitmap = nil);
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  bufPaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  if aRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  LStopWatch.stop;
+  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
 end;
-
-{ TALRangeTrackBarStopWatch }
 
 {************************************************}
 procedure TALRangeTrackBarStopWatch.PaintChildren;
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   inherited PaintChildren;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+  LStopWatch.stop;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
-{ TALCircleStopWatch }
-
+{************************************}
 {$IF DEFINED(IOS) or DEFINED(ANDROID)}
 function TALCircleStopWatch.MakeBufBitmap: TTexture;
 {$ELSE}
 function TALCircleStopWatch.MakeBufBitmap: Tbitmap;
 {$ENDIF}
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   if (BufBitmap = nil) then begin
-    aStopWatch := TstopWatch.StartNew;
+    LStopWatch := TstopWatch.StartNew;
     result := inherited MakeBufBitmap;
-    aStopWatch.stop;
-    bufCreatePaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+    LStopWatch.stop;
+    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
   else result := inherited MakeBufBitmap;
 end;
 
 {*********************************}
 procedure TALCircleStopWatch.Paint;
-var aStopWatch: TstopWatch;
-    aRemovebufCreatePaintMs: boolean;
+var LStopWatch: TstopWatch;
+    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aRemovebufCreatePaintMs := (BufBitmap = nil);
-  aStopWatch := TstopWatch.StartNew;
+  LRemovebufCreatePaintMs := (BufBitmap = nil);
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  bufPaintMs := aStopWatch.Elapsed.TotalMilliseconds;
-  if aRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  LStopWatch.stop;
+  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
 end;
-
-{ TCircleStopWatch }
 
 {*******************************}
 procedure TCircleStopWatch.Paint;
-var aStopWatch: TstopWatch;
+var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  aStopWatch := TstopWatch.StartNew;
+  LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  aStopWatch.stop;
-  PaintMs := aStopWatch.Elapsed.TotalMilliseconds;
+  LStopWatch.stop;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
 initialization

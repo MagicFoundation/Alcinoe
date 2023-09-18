@@ -335,13 +335,7 @@ Improved FireMonkey controls
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
 
-<p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-15.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-14.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
-  &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-16.jpg?raw=true" alt="video player for FireMonkey" width="250" style="width:250px;"/>
-</p>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/tabcontrol.gif?raw=true" alt="tabcontrol" width="250" style="width:250px;"/>
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
   

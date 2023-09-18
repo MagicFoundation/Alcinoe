@@ -422,6 +422,8 @@ standard for scrolling dynamics. Leveraging the reliability and efficiency of
 Android's scrolling mechanisms, the TALScrollEngine offers Delphi developers a
 top-notch scrolling experience, rooted in established and trusted technologies.
 
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="scrollingengine" />
+
 Learn more at 
 [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
   

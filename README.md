@@ -33,6 +33,7 @@ us to patch the original Delphi source files:
 * [Root Class Not Found' Error in Delphi IDE When Opening a Class Inherited via an Include Directive](https://quality.embarcadero.com/browse/RSP-42021)
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
+* [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
 * [BeginUpdate/Endupdate block with add or remove of child objects : misconception](https://quality.embarcadero.com/browse/RSP-21013)
 * [The width and height of a TContext3D object must be defined as single-precision floating-point numbers, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
 * [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)
@@ -355,6 +356,76 @@ high-performance confetti falling animation. Learn more at
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 
 
+Interpolated Animation
+----------------------
+
+The TALAnimation component is a refined iteration of Delphi's foundational
+TAnimation object, meticulously tailored for mobile platforms. By forgoing the
+traditional Timer mechanism and instead adopting platform-specific technologies,
+this component offers a vastly improved animation experience for mobile users.
+On Android, animations are seamlessly integrated with the Choreographer,
+ensuring they sync perfectly with the device's refresh rate. Meanwhile, on iOS,
+the precision of DisplayLink is harnessed, leading to optimized and fluid
+animation rendering. Beyond these foundational changes, one of the most notable
+enhancements is the capability to support custom interpolation algorithms. This
+offers developers the flexibility to design unique and intricate animation
+patterns, moving beyond the traditional ease-in or ease-out sequences.
+
+<p align="left">
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/interpolated1.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/interpolated2.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
+</p>
+
+Learn more at 
+[{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+  
+
+SpringForce Animation
+---------------------
+
+Inspired by Android's SpringForce, the TALSpringForceAnimation Component brings
+the intrigue of physics-based animations to the Delphi platform. This component
+captures the real-world dynamism of objects influenced by spring mechanics. The
+resulting animations are ones that stretch, bounce, and settle, mirroring
+real-world behaviors and offering a tangible sense of realism to users.
+Developers have the added advantage of being able to adjust various physical
+properties of the spring, such as its stiffness and damping ratio. This ensures
+that a broad spectrum of animation behaviors can be realized, catering to the
+specific nuances of different applications.
+  
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="springforce" width="320" style="width:320px;" />
+
+Learn more at 
+[{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+  
+
+Scrolling Engine
+----------------
+
+TALOverScroller and TALVelocityTracker are essential components of the
+TALScrollEngine, playing crucial roles in refining user interface interactions.
+While TALOverScroller is designed to animate and manage actions like scrolling
+and flinging, offering a decelerating animation as users scroll past a view's
+edge to indicate the boundary, TALVelocityTracker measures the velocity of
+touch events, helping to determine the speed and direction of user gestures.
+Together within the TALScrollEngine, they elevate the overall user experience
+by offering smooth animations and intuitive touch feedback.
+
+Building a scrolling engine is a complex endeavor, requiring expertise in
+various domains, including physics. Rather than starting from scratch and
+potentially reinventing the wheel, we looked towards proven solutions. To this
+end, we utilized the robust and well-tested code from Android's VelocityTracker
+and OverScroller. By translating their Java and C++ codes into Delphi, we've
+ensured that the resultant TALScrollEngine not only meets but exceeds the
+standard for scrolling dynamics. Leveraging the reliability and efficiency of
+Android's scrolling mechanisms, the TALScrollEngine offers Delphi developers a
+top-notch scrolling experience, rooted in established and trusted technologies.
+
+Learn more at 
+[{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+  
+
 Firebase cloud messaging
 ------------------------
 
@@ -364,7 +435,7 @@ permit you to send alert notifications with images in
 Android and iOS. Learn more at 
 [{alcinoe}\Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)
 
-  
+
 GeoPositioning for Android/iOS
 ------------------------------
 

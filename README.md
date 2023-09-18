@@ -335,7 +335,7 @@ Improved FireMonkey controls
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/tabcontrol.gif?raw=true" alt="tabcontrol" width="250" style="width:250px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/tabcontrol.gif?raw=true" alt="tabcontrol" width="360" style="width:360px;"/>
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
   

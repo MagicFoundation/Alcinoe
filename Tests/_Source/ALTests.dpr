@@ -132,7 +132,7 @@ uses
   Alcinoe.FMX.Firebase.Core,
   Alcinoe.FMX.Firebase.Messaging,
   Alcinoe.FMX.Graphics,
-  Alcinoe.FMX.InertialMovement,
+  Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Layouts,
   Alcinoe.FMX.GeoPosition.Sensor,
   Alcinoe.FMX.Memo,

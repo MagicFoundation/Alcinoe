@@ -97,7 +97,8 @@ begin
       LOldToNewNames.add('Alcinoe.FMX.FirebaseCore=Alcinoe.FMX.Firebase.Core');
       LOldToNewNames.add('Alcinoe.FMX.FirebaseMessaging=Alcinoe.FMX.Firebase.Messaging');
       LOldToNewNames.add('ALFmxGraphics=Alcinoe.FMX.Graphics');
-      LOldToNewNames.add('ALFmxInertialMovement=Alcinoe.FMX.InertialMovement');
+      LOldToNewNames.add('ALFmxInertialMovement=Alcinoe.FMX.ScrollEngine');
+      LOldToNewNames.add('Alcinoe.FMX.InertialMovement=Alcinoe.FMX.ScrollEngine');
       LOldToNewNames.add('ALFmxAndroidNativeView=Alcinoe.FMX.NativeView.Android');
       LOldToNewNames.add('ALFmxIosNativeView=Alcinoe.FMX.NativeView.iOS');
       LOldToNewNames.add('ALFmxIosScrollBox=Alcinoe.FMX.ScrollBox.iOS');
@@ -481,6 +482,7 @@ begin
       LOldToNewNames.add('TALJSONArrayNodeU=TALJSONArrayNodeW');
       LOldToNewNames.add('TALJSONTextNodeU=TALJSONTextNodeW');
       LOldToNewNames.add('TALJSONDocumentU=TALJSONDocumentW');
+      LOldToNewNames.add('TALAniCalculations=TALScrollEngine');
 
       //var names
       LOldToNewNames.add('ALDefaultFormatSettings=ALDefaultFormatSettingsA');

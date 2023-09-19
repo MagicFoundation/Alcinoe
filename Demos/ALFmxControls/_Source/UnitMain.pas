@@ -136,8 +136,8 @@ type
   End;
 
   TForm1 = class(TForm)
-    Button1: TButton;
-    Button2: TButton;
+    ButtonLaunchScrollBoxDemoDelphi: TButton;
+    ButtonLaunchScrollBoxDemoAlcinoe: TButton;
     Button15: TButton;
     ALVertScrollBox1: TALVertScrollBox;
     Button4: TButton;
@@ -224,7 +224,7 @@ type
     Layout5: TLayout;
     Button23: TButton;
     Button24: TButton;
-    procedure Button2Click(Sender: TObject);
+    procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
     procedure Button255Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button15Click(Sender: TObject);
@@ -234,7 +234,7 @@ type
     procedure Button7Click(Sender: TObject);
     procedure Button8Click(Sender: TObject);
     procedure Button9Click(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    procedure ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
     procedure Button13Click(Sender: TObject);
     procedure Button16Click(Sender: TObject);
     procedure Button17Click(Sender: TObject);
@@ -245,7 +245,7 @@ type
     procedure ALTabControl1AniTransitionInit(
                 const sender: TObject;
                 const ATransition: TALTabTransition;
-                const aVelocity: Double;
+                const aVelocity: Single;
                 const aAnimation: TALFloatPropertyAnimation);
     procedure ALTabControl1Resize(Sender: TObject);
     procedure ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
@@ -269,6 +269,8 @@ type
     procedure Button11Click(Sender: TObject);
     procedure ALSwitch1Change(Sender: TObject);
     procedure Button23Click(Sender: TObject);
+    procedure ALTabControl1AniStart(Sender: TObject);
+    procedure ALTabControl1AniStop(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fALcheckbox2: TALcheckboxStopWatch;
@@ -298,12 +300,194 @@ uses
   system.Diagnostics,
   system.threading,
   system.Math,
-  UnitDemo,
+  UnitScrollBoxDemo,
   system.DateUtils,
-  Alcinoe.FMX.InertialMovement,
+  Alcinoe.FMX.ScrollEngine,
   Alcinoe.Common;
 
 {$R *.fmx}
+
+{*******************************************}
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+
+  //ALVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
+
+  TALErrorReporting.Instance;
+
+  fDatePickerDialog := nil;
+
+  FVKKeyboardOpen := False;
+  beginupdate;
+
+  //-----
+  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+  //-----
+  fALRectangle1 := TALRectangleStopWatch.Create(self);
+  fALRectangle1.Parent := ALVertScrollBox1;
+  fALRectangle1.doubleBuffered := True;
+  fALRectangle1.Align := TalignLayout.Top;
+  fALRectangle1.Margins.Left := 15;
+  fALRectangle1.Margins.Top := 15;
+  fALRectangle1.Margins.Right := 15;
+  fALRectangle1.Margins.Bottom := 15;
+  fALRectangle1.Position.Y := Button5.Position.Y - Button5.Margins.Top;
+  fALRectangle1.Size.Height := 50;
+  fALRectangle1.XRadius := 12;
+  fALRectangle1.YRadius := 12;
+  //-----
+  fRectangle1 := TRectangleStopWatch.Create(self);
+  fRectangle1.Parent := ALVertScrollBox1;
+  fRectangle1.Align := TalignLayout.Top;
+  fRectangle1.Margins.Left := 15;
+  fRectangle1.Margins.Top := 15;
+  fRectangle1.Margins.Right := 15;
+  fRectangle1.Margins.Bottom := 15;
+  fRectangle1.Position.Y := Button5.Position.Y - Button5.Margins.Top;
+  fRectangle1.Size.Height := 50;
+  fRectangle1.XRadius := 12;
+  fRectangle1.YRadius := 12;
+
+  //-----
+  fALRectangle2 := TALRectangleStopWatch.Create(self);
+  fALRectangle2.Parent := ALVertScrollBox1;
+  fALRectangle2.doubleBuffered := True;
+  fALRectangle2.Align := TalignLayout.Top;
+  fALRectangle2.Margins.Left := 15;
+  fALRectangle2.Margins.Top := 15;
+  fALRectangle2.Margins.Right := 15;
+  fALRectangle2.Margins.Bottom := 15;
+  fALRectangle2.Position.Y := button6.Position.Y- Button6.Margins.Top;
+  fALRectangle2.Size.Height := 50;
+  fALRectangle2.XRadius := 0;
+  fALRectangle2.YRadius := 0;
+  //-----
+  fRectangle2 := TRectangleStopWatch.Create(self);
+  fRectangle2.Parent := ALVertScrollBox1;
+  fRectangle2.Align := TalignLayout.Top;
+  fRectangle2.Margins.Left := 15;
+  fRectangle2.Margins.Top := 15;
+  fRectangle2.Margins.Right := 15;
+  fRectangle2.Margins.Bottom := 15;
+  fRectangle2.Position.Y := button6.Position.Y- Button6.Margins.Top;
+  fRectangle2.Size.Height := 50;
+  fRectangle2.XRadius := 0;
+  fRectangle2.YRadius := 0;
+
+  //-----
+  fALRectangle3 := TALRectangleStopWatch.Create(self);
+  fALRectangle3.Parent := ALVertScrollBox1;
+  fALRectangle3.doubleBuffered := True;
+  fALRectangle3.Align := TalignLayout.Top;
+  fALRectangle3.Margins.Left := 15;
+  fALRectangle3.Margins.Top := 15;
+  fALRectangle3.Margins.Right := 15;
+  fALRectangle3.Margins.Bottom := 15;
+  fALRectangle3.Position.Y := button8.Position.Y- Button8.Margins.Top;
+  fALRectangle3.Size.Height := 50;
+  fALRectangle3.Stroke.Kind := TbrushKind.None;
+  fALRectangle3.XRadius := 0;
+  fALRectangle3.YRadius := 0;
+  //-----
+  fRectangle3 := TRectangleStopWatch.Create(self);
+  fRectangle3.Parent := ALVertScrollBox1;
+  fRectangle3.Align := TalignLayout.Top;
+  fRectangle3.Margins.Left := 15;
+  fRectangle3.Margins.Top := 15;
+  fRectangle3.Margins.Right := 15;
+  fRectangle3.Margins.Bottom := 15;
+  fRectangle3.Position.Y := button8.Position.Y- Button8.Margins.Top;
+  fRectangle3.Size.Height := 50;
+  fRectangle3.Stroke.Kind := TbrushKind.None;
+  fRectangle3.XRadius := 0;
+  fRectangle3.YRadius := 0;
+
+  //-----
+  fALCircle1 := TALCircleStopWatch.Create(self);
+  fALCircle1.Parent := ALVertScrollBox1;
+  fALCircle1.doubleBuffered := True;
+  fALCircle1.Align := TalignLayout.Top;
+  fALCircle1.Margins.Left := 15;
+  fALCircle1.Margins.Top := 15;
+  fALCircle1.Margins.Right := 15;
+  fALCircle1.Margins.Bottom := 15;
+  fALCircle1.Position.Y := button22.Position.Y- Button22.Margins.Top;
+  fALCircle1.Size.Height := 50;
+  //-----
+  fCircle1 := TCircleStopWatch.Create(self);
+  fCircle1.Parent := ALVertScrollBox1;
+  fCircle1.Align := TalignLayout.Top;
+  fCircle1.Margins.Left := 15;
+  fCircle1.Margins.Top := 15;
+  fCircle1.Margins.Right := 15;
+  fCircle1.Margins.Bottom := 15;
+  fCircle1.Position.Y := button22.Position.Y- Button22.Margins.Top;
+  fCircle1.Size.Height := 50;
+
+  //-----
+  fALText := TALTextStopWatch.Create(self);
+  fALText.Parent := ALVertScrollBox1;
+  fALText.TextSettings.WordWrap := True;
+  fALText.TextSettings.HorzAlign := TTextAlign.Center;
+  fALText.doubleBuffered := True;
+  fALText.Align := TalignLayout.Top;
+  fALText.Margins.Top := 8;
+  fALText.Position.Y := button15.Position.Y - button15.Margins.Top;
+  fALText.Size.Height := 80;
+  fALText.Text := 'TALText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
+                  ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
+  //-----
+  fText := TTextStopWatch.Create(self);
+  fText.Parent := ALVertScrollBox1;
+  fText.TextSettings.WordWrap := True;
+  fText.TextSettings.HorzAlign := TTextAlign.Center;
+  fText.Align := TalignLayout.Top;
+  fText.Margins.Top := 8;
+  fText.Position.Y := button15.Position.Y - button15.Margins.Top;
+  fText.Size.Height := 80;
+  fText.Text := 'TText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
+                ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
+
+  //-----
+  fALcheckbox2 := TALcheckboxStopWatch.Create(layout3);
+  fALcheckbox2.Parent := layout3;
+  fALcheckbox2.Height := 22;
+  fALcheckbox2.width := 22;
+  fALcheckbox2.Position.Point := TpointF.Create(0,0);
+  //-----
+  fcheckbox2 := TcheckboxStopWatch.Create(layout4);
+  fcheckbox2.Parent := layout4;
+  fcheckbox2.Text := '';
+  fcheckbox2.Height := 22;
+  fcheckbox2.width := 22;
+  fcheckbox2.Position.Point := TpointF.Create(0,0);
+
+  //-----
+  fALline := TALLineStopWatch.Create(self);
+  fALline.Parent := ALVertScrollBox1;
+  fALline.doubleBuffered := true;
+  fALline.Align := TalignLayout.Top;
+  fALline.Margins.Top := 8;
+  fALline.Margins.right := 24;
+  fALline.Margins.left := 24;
+  fALline.Height := 1;
+  fALline.Position.Y := button16.Position.Y - button16.Margins.Top;
+  fALline.LineType := TLineType.Top;
+  //-----
+  fline := TLineStopWatch.Create(self);
+  fline.Parent := ALVertScrollBox1;
+  fline.Align := TalignLayout.Top;
+  fline.Margins.Top := 8;
+  fline.Margins.right := 24;
+  fline.Margins.left := 24;
+  fline.Height := 1;
+  fline.Position.Y := button16.Position.Y - button16.Margins.Top;
+  fline.LineType := TLineType.Top;
+  //-----
+  ALFmxMakeBufBitmaps(ALVertScrollBox1);
+  endupdate;
+  ALTabControl1Resize(nil);
+end;
 
 {********************************************}
 procedure TForm1.ALEditEnter(Sender: TObject);
@@ -344,11 +528,23 @@ begin
   SetFocused(nil);
 end;
 
+{******************************************************}
+procedure TForm1.ALTabControl1AniStart(Sender: TObject);
+begin
+  ALLog('TForm1.ALTabControl1AniStart', TALLogType.VERBOSE);
+end;
+
+{*****************************************************}
+procedure TForm1.ALTabControl1AniStop(Sender: TObject);
+begin
+  ALLog('TForm1.ALTabControl1AniStop', TALLogType.VERBOSE);
+end;
+
 {**********************************************}
 procedure TForm1.ALTabControl1AniTransitionInit(
             const sender: TObject;
             const ATransition: TALTabTransition;
-            const aVelocity: Double;
+            const aVelocity: Single;
             const aAnimation: TALFloatPropertyAnimation);
 begin
   // aVelocity = pixels per seconds given by the anicalculations
@@ -359,7 +555,7 @@ begin
   if aAnimation.Duration > 0.8 then aAnimation.Duration := 0.8
   else if aAnimation.Duration < 0.1 then aAnimation.Duration := 0.1;
   aAnimation.AnimationType := TAnimationType.out;
-  aAnimation.Interpolation := TInterpolationType.circular;
+  aAnimation.Interpolation := TALInterpolationType.circular;
 end;
 
 {****************************************************}
@@ -367,12 +563,10 @@ procedure TForm1.ALTabControl1Resize(Sender: TObject);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _updateLabels(const aTab: TalTabItem);
-  var LText1, LText2: TalText;
-      LControl1: Tcontrol;
   begin
-    LText1 := nil;
-    LText2 := nil;
-    for LControl1 in aTab.Controls do begin
+    var LText1: TalText := nil;
+    var LText2: TalText := nil;
+    for var LControl1 in aTab.Controls do begin
       if (LControl1 is TalText) and (LControl1.Tag = 1) then LText1 := TalText(LControl1)
       else if (LControl1 is TalText) and (LControl1.Tag = 2) then LText2 := TalText(LControl1);
     end;
@@ -688,27 +882,20 @@ begin
   Text3.Text := 'Paint: ' + FormatFloat('0.#####',fcheckbox2.PaintMs) + ' ms';
 end;
 
-
-{*********************************************}
-procedure TForm1.Button2Click(Sender: TObject);
-Var LDemoForm: TDemoForm;
-    LRectangle: TALRectangle;
-    LChildRectangle: TalRectangle;
-    LVertScrollBox: TalVertScrollBox;
-    LText: TALText;
-    i: integer;
+{**********************************************************************}
+procedure TForm1.ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
 begin
-  LDemoForm := TDemoForm.Create(nil);
-  LVertScrollBox := TalVertScrollBox.Create(LDemoForm);
-  LVertScrollBox.Parent := LDemoForm;
+  var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
+  var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxDemoForm);
+  LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
   LVertScrollBox.Align := TalignLayout.Client;
-  LVertScrollBox.AniCalculations.VelocityFactor := 2;
-  LVertScrollBox.AniCalculations.BoundsAnimation := False;
-  LDemoForm.fALAniCalculations := LVertScrollBox.AniCalculations;
-  LDemoForm.fvertScrollBox := LVertScrollBox;
-  for I := 1 to 50 do begin
-    LRectangle := TALRectangle.Create(LVertScrollBox);
+  LVertScrollBox.ScrollEngine.MinEdgeSpringbackEnabled := False;
+  LVertScrollBox.ScrollEngine.MaxEdgeSpringbackEnabled := False;
+  LScrollBoxDemoForm.fScrollEngine := LVertScrollBox.ScrollEngine;
+  LScrollBoxDemoForm.fvertScrollBox := LVertScrollBox;
+  for var I := 1 to 150 do begin
+    var LRectangle := TALRectangle.Create(LVertScrollBox);
     LRectangle.Parent := LVertScrollBox;
     LRectangle.doubleBuffered := True;
     LRectangle.Align := TalignLayout.Top;
@@ -721,7 +908,7 @@ begin
     LRectangle.XRadius := 12;
     LRectangle.YRadius := 12;
     //-----
-    LText := TALText.Create(self);
+    var LText := TALText.Create(self);
     LText.Parent := LRectangle;
     LText.doubleBuffered := True;
     LText.Align := TalignLayout.left;
@@ -730,7 +917,7 @@ begin
     LText.WordWrap := False;
     LText.autosize := True;
     //-----
-    LChildRectangle := TALRectangle.Create(LRectangle);
+    var LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
     LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
@@ -829,30 +1016,24 @@ begin
     LChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
   end;
   LVertScrollBox.endUpdate;
-  LDemoForm.Show;
+  LScrollBoxDemoForm.Show;
   ALFmxMakeBufBitmaps(LVertScrollBox);
 end;
 
-{*********************************************}
-procedure TForm1.Button1Click(Sender: TObject);
-Var LDemoForm: TDemoForm;
-    LRectangle: TRectangle;
-    LChildRectangle: TRectangle;
-    LVertScrollBox: TVertScrollBox;
-    LText: TText;
-    i: integer;
+{*********************************************************************}
+procedure TForm1.ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
 begin
-  LDemoForm := TDemoForm.Create(nil);
-  LVertScrollBox := TVertScrollBox.Create(LDemoForm);
-  LVertScrollBox.Parent := LDemoForm;
+  var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
+  var LVertScrollBox := TVertScrollBox.Create(LScrollBoxDemoForm);
+  LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
   LVertScrollBox.Align := TalignLayout.Client;
   //LVertScrollBox.AniCalculations.VelocityFactor := 2;
   LVertScrollBox.AniCalculations.BoundsAnimation := False;
-  LDemoForm.fAniCalculations := LVertScrollBox.AniCalculations;
-  LDemoForm.fvertScrollBox := LVertScrollBox;
-  for I := 1 to 50 do begin
-    LRectangle := TRectangle.Create(LVertScrollBox);
+  LScrollBoxDemoForm.fAniCalculations := LVertScrollBox.AniCalculations;
+  LScrollBoxDemoForm.fvertScrollBox := LVertScrollBox;
+  for var I := 1 to 150 do begin
+    var LRectangle := TRectangle.Create(LVertScrollBox);
     LRectangle.Parent := LVertScrollBox;
     //LRectangle.doubleBuffered := True;
     LRectangle.Align := TalignLayout.Top;
@@ -865,7 +1046,7 @@ begin
     LRectangle.XRadius := 12;
     LRectangle.YRadius := 12;
     //-----
-    LText := TText.Create(self);
+    var LText := TText.Create(self);
     LText.Parent := LRectangle;
     //LText.doubleBuffered := True;
     LText.Align := TalignLayout.left;
@@ -874,7 +1055,7 @@ begin
     LText.WordWrap := False;
     LText.autosize := True;
     //-----
-    LChildRectangle := TRectangle.Create(LRectangle);
+    var LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
     //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
@@ -973,7 +1154,7 @@ begin
     LChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
   end;
   LVertScrollBox.endUpdate;
-  LDemoForm.Show;
+  LScrollBoxDemoForm.Show;
   //ALFmxMakeBufBitmaps(LVertScrollBox);
 end;
 
@@ -1096,191 +1277,6 @@ begin
     end).Start;
 end;
 
-{*******************************************}
-procedure TForm1.FormCreate(Sender: TObject);
-begin
-
-  TALErrorReporting.Instance;
-
-  fDatePickerDialog := nil;
-
-  FVKKeyboardOpen := False;
-  beginupdate;
-
-  //-----
-  //for the demo I activate the animation even on Windows
-  AlVertScrollBox1.AniCalculations.Animation := true;
-  AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
-
-  //-----
-  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
-  //-----
-  fALRectangle1 := TALRectangleStopWatch.Create(self);
-  fALRectangle1.Parent := ALVertScrollBox1;
-  fALRectangle1.doubleBuffered := True;
-  fALRectangle1.Align := TalignLayout.Top;
-  fALRectangle1.Margins.Left := 15;
-  fALRectangle1.Margins.Top := 15;
-  fALRectangle1.Margins.Right := 15;
-  fALRectangle1.Margins.Bottom := 15;
-  fALRectangle1.Position.Y := Button5.Position.Y - Button5.Margins.Top;
-  fALRectangle1.Size.Height := 50;
-  fALRectangle1.XRadius := 12;
-  fALRectangle1.YRadius := 12;
-  //-----
-  fRectangle1 := TRectangleStopWatch.Create(self);
-  fRectangle1.Parent := ALVertScrollBox1;
-  fRectangle1.Align := TalignLayout.Top;
-  fRectangle1.Margins.Left := 15;
-  fRectangle1.Margins.Top := 15;
-  fRectangle1.Margins.Right := 15;
-  fRectangle1.Margins.Bottom := 15;
-  fRectangle1.Position.Y := Button5.Position.Y - Button5.Margins.Top;
-  fRectangle1.Size.Height := 50;
-  fRectangle1.XRadius := 12;
-  fRectangle1.YRadius := 12;
-
-  //-----
-  fALRectangle2 := TALRectangleStopWatch.Create(self);
-  fALRectangle2.Parent := ALVertScrollBox1;
-  fALRectangle2.doubleBuffered := True;
-  fALRectangle2.Align := TalignLayout.Top;
-  fALRectangle2.Margins.Left := 15;
-  fALRectangle2.Margins.Top := 15;
-  fALRectangle2.Margins.Right := 15;
-  fALRectangle2.Margins.Bottom := 15;
-  fALRectangle2.Position.Y := button6.Position.Y- Button6.Margins.Top;
-  fALRectangle2.Size.Height := 50;
-  fALRectangle2.XRadius := 0;
-  fALRectangle2.YRadius := 0;
-  //-----
-  fRectangle2 := TRectangleStopWatch.Create(self);
-  fRectangle2.Parent := ALVertScrollBox1;
-  fRectangle2.Align := TalignLayout.Top;
-  fRectangle2.Margins.Left := 15;
-  fRectangle2.Margins.Top := 15;
-  fRectangle2.Margins.Right := 15;
-  fRectangle2.Margins.Bottom := 15;
-  fRectangle2.Position.Y := button6.Position.Y- Button6.Margins.Top;
-  fRectangle2.Size.Height := 50;
-  fRectangle2.XRadius := 0;
-  fRectangle2.YRadius := 0;
-
-  //-----
-  fALRectangle3 := TALRectangleStopWatch.Create(self);
-  fALRectangle3.Parent := ALVertScrollBox1;
-  fALRectangle3.doubleBuffered := True;
-  fALRectangle3.Align := TalignLayout.Top;
-  fALRectangle3.Margins.Left := 15;
-  fALRectangle3.Margins.Top := 15;
-  fALRectangle3.Margins.Right := 15;
-  fALRectangle3.Margins.Bottom := 15;
-  fALRectangle3.Position.Y := button8.Position.Y- Button8.Margins.Top;
-  fALRectangle3.Size.Height := 50;
-  fALRectangle3.Stroke.Kind := TbrushKind.None;
-  fALRectangle3.XRadius := 0;
-  fALRectangle3.YRadius := 0;
-  //-----
-  fRectangle3 := TRectangleStopWatch.Create(self);
-  fRectangle3.Parent := ALVertScrollBox1;
-  fRectangle3.Align := TalignLayout.Top;
-  fRectangle3.Margins.Left := 15;
-  fRectangle3.Margins.Top := 15;
-  fRectangle3.Margins.Right := 15;
-  fRectangle3.Margins.Bottom := 15;
-  fRectangle3.Position.Y := button8.Position.Y- Button8.Margins.Top;
-  fRectangle3.Size.Height := 50;
-  fRectangle3.Stroke.Kind := TbrushKind.None;
-  fRectangle3.XRadius := 0;
-  fRectangle3.YRadius := 0;
-
-  //-----
-  fALCircle1 := TALCircleStopWatch.Create(self);
-  fALCircle1.Parent := ALVertScrollBox1;
-  fALCircle1.doubleBuffered := True;
-  fALCircle1.Align := TalignLayout.Top;
-  fALCircle1.Margins.Left := 15;
-  fALCircle1.Margins.Top := 15;
-  fALCircle1.Margins.Right := 15;
-  fALCircle1.Margins.Bottom := 15;
-  fALCircle1.Position.Y := button22.Position.Y- Button22.Margins.Top;
-  fALCircle1.Size.Height := 50;
-  //-----
-  fCircle1 := TCircleStopWatch.Create(self);
-  fCircle1.Parent := ALVertScrollBox1;
-  fCircle1.Align := TalignLayout.Top;
-  fCircle1.Margins.Left := 15;
-  fCircle1.Margins.Top := 15;
-  fCircle1.Margins.Right := 15;
-  fCircle1.Margins.Bottom := 15;
-  fCircle1.Position.Y := button22.Position.Y- Button22.Margins.Top;
-  fCircle1.Size.Height := 50;
-
-  //-----
-  fALText := TALTextStopWatch.Create(self);
-  fALText.Parent := ALVertScrollBox1;
-  fALText.TextSettings.WordWrap := True;
-  fALText.TextSettings.HorzAlign := TTextAlign.Center;
-  fALText.doubleBuffered := True;
-  fALText.Align := TalignLayout.Top;
-  fALText.Margins.Top := 8;
-  fALText.Position.Y := button15.Position.Y - button15.Margins.Top;
-  fALText.Size.Height := 80;
-  fALText.Text := 'TALText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
-                  ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
-  //-----
-  fText := TTextStopWatch.Create(self);
-  fText.Parent := ALVertScrollBox1;
-  fText.TextSettings.WordWrap := True;
-  fText.TextSettings.HorzAlign := TTextAlign.Center;
-  fText.Align := TalignLayout.Top;
-  fText.Margins.Top := 8;
-  fText.Position.Y := button15.Position.Y - button15.Margins.Top;
-  fText.Size.Height := 80;
-  fText.Text := 'TText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
-                ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
-
-  //-----
-  fALcheckbox2 := TALcheckboxStopWatch.Create(layout3);
-  fALcheckbox2.Parent := layout3;
-  fALcheckbox2.Height := 22;
-  fALcheckbox2.width := 22;
-  fALcheckbox2.Position.Point := TpointF.Create(0,0);
-  //-----
-  fcheckbox2 := TcheckboxStopWatch.Create(layout4);
-  fcheckbox2.Parent := layout4;
-  fcheckbox2.Text := '';
-  fcheckbox2.Height := 22;
-  fcheckbox2.width := 22;
-  fcheckbox2.Position.Point := TpointF.Create(0,0);
-
-  //-----
-  fALline := TALLineStopWatch.Create(self);
-  fALline.Parent := ALVertScrollBox1;
-  fALline.doubleBuffered := true;
-  fALline.Align := TalignLayout.Top;
-  fALline.Margins.Top := 8;
-  fALline.Margins.right := 24;
-  fALline.Margins.left := 24;
-  fALline.Height := 1;
-  fALline.Position.Y := button16.Position.Y - button16.Margins.Top;
-  fALline.LineType := TLineType.Top;
-  //-----
-  fline := TLineStopWatch.Create(self);
-  fline.Parent := ALVertScrollBox1;
-  fline.Align := TalignLayout.Top;
-  fline.Margins.Top := 8;
-  fline.Margins.right := 24;
-  fline.Margins.left := 24;
-  fline.Height := 1;
-  fline.Position.Y := button16.Position.Y - button16.Margins.Top;
-  fline.LineType := TLineType.Top;
-  //-----
-  ALFmxMakeBufBitmaps(ALVertScrollBox1);
-  endupdate;
-  ALTabControl1Resize(nil);
-end;
-
 {********************************************}
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
@@ -1296,7 +1292,7 @@ begin
   {$IF Defined(ANDROID)}
   //handle the action bar under lollipop
   if FVKKeyboardOpen then
-    AlVertScrollBox1.AniCalculations.ViewportPosition := AlVertScrollBox1.AniCalculations.MaxTarget.Point;
+    AlVertScrollBox1.ScrollEngine.ViewportPosition := AlVertScrollBox1.ScrollEngine.MaxScrollLimit;
   {$ENDIF}
 end;
 
@@ -1308,7 +1304,7 @@ begin
   ALLog('FormVirtualKeyboardHidden');
   FVKKeyboardOpen := False;
   AlVertScrollBox1.margins.Bottom := 0;
-  AlVertScrollBox1.AniCalculations.TouchTracking := [ttVertical];
+  AlVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
 end;
 
 {****************************************}
@@ -1320,7 +1316,7 @@ begin
   FVKKeyboardOpen := True;
   AlVertScrollBox1.margins.Bottom := Bounds.height;
   AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
-  AlVertScrollBox1.AniCalculations.TouchTracking := [];
+  AlVertScrollBox1.ScrollEngine.TouchTracking := [];
 end;
 
 {************************************}

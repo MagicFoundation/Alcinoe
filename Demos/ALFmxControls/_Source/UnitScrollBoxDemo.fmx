@@ -1,4 +1,4 @@
-object DemoForm: TDemoForm
+object ScrollBoxDemoForm: TScrollBoxDemoForm
   Left = 0
   Top = 0
   ClientHeight = 480
@@ -20,7 +20,7 @@ object DemoForm: TDemoForm
     Size.Width = 638.000000000000000000
     Size.Height = 16.000000000000000000
     Size.PlatformDefault = False
-    Text = 'FPS Analyzing start when velocity > 500'
+    Text = 'Analyzing...'
     TextSettings.HorzAlign = Center
   end
 end

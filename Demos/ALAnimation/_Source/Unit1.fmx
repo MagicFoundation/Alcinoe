@@ -1,0 +1,366 @@
+object Form1: TForm1
+  Left = 0
+  Top = 0
+  Caption = 'ALAnimationDemo'
+  ClientHeight = 819
+  ClientWidth = 360
+  Fill.Kind = Solid
+  FormFactor.Width = 320
+  FormFactor.Height = 480
+  FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  DesignerMasterStyle = 0
+  object MainTabControl: TTabControl
+    Align = Client
+    Size.Width = 360.000000000000000000
+    Size.Height = 819.000000000000000000
+    Size.PlatformDefault = False
+    TabIndex = 0
+    TabOrder = 1
+    TabPosition = PlatformDefault
+    OnResized = LayoutResized
+    Sizes = (
+      360s
+      793s
+      360s
+      793s)
+    object TabItemInterpolation: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = True
+      Size.Width = 89.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'Interpolation'
+      OnResized = LayoutResized
+      ExplicitSize.cx = 69.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object LayoutInterpolation: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 15.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object TextInterpolation: TALText
+          AutoSize = True
+          Position.X = 15.000000000000000000
+          Size.Width = 69.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'Interpolation'
+          OnResized = LayoutResized
+        end
+        object ComboBoxInterpolation: TComboBox
+          Items.Strings = (
+            'Linear'
+            'Sinusoidal'
+            'Quadratic'
+            'Cubic'
+            'Quartic'
+            'Quintic'
+            'Exponential'
+            'Circular'
+            'Elastic'
+            'Back'
+            'Bounce'
+            'Custom')
+          ItemIndex = 0
+          Position.X = 112.000000000000000000
+          Size.Width = 129.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          OnResized = LayoutResized
+        end
+      end
+      object LayoutAnimationType: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 52.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object TextAnimationType: TALText
+          AutoSize = True
+          Position.X = 15.000000000000000000
+          Size.Width = 80.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'AnimationType'
+          OnResized = LayoutResized
+        end
+        object ComboBoxAnimationType: TComboBox
+          Items.Strings = (
+            'In'
+            'Out'
+            'InOut')
+          ItemIndex = 0
+          Position.X = 112.000000000000000000
+          TabOrder = 4
+          OnResized = LayoutResized
+        end
+      end
+      object LayoutStart: TALLayout
+        Align = Top
+        Margins.Top = 20.000000000000000000
+        Position.Y = 94.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 3
+        object ButtonStart: TButton
+          Position.X = 15.000000000000000000
+          TabOrder = 0
+          Text = 'Start'
+          OnClick = ButtonStartClick
+          OnResized = LayoutResized
+        end
+        object CheckBoxClearGraph: TCheckBox
+          IsChecked = True
+          Position.X = 133.000000000000000000
+          TabOrder = 1
+          Text = 'Clear graph'
+          OnChange = CheckBoxClearGraphChange
+          OnResized = LayoutResized
+        end
+      end
+      object LayoutGraph: TALLayout
+        Align = Client
+        Margins.Top = 20.000000000000000000
+        Margins.Bottom = 25.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 632.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 5
+        OnResized = LayoutResized
+        object LayoutBullet: TALLayout
+          Align = Left
+          Margins.Left = 15.000000000000000000
+          Margins.Right = 25.000000000000000000
+          Position.X = 15.000000000000000000
+          RotationAngle = 180.000000000000000000
+          Size.Width = 20.000000000000000000
+          Size.Height = 632.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+          object CircleBullet: TALCircle
+            Fill.Color = claCrimson
+            Position.Y = -10.000000000000000000
+            Size.Width = 20.000000000000000000
+            Size.Height = 20.000000000000000000
+            Size.PlatformDefault = False
+            Stroke.Kind = None
+            object ALFloatPropertyAnimation: TALFloatPropertyAnimation
+              Duration = 1.000000000000000000
+              OnFirstFrame = ALFloatPropertyAnimationFirstFrame
+              OnProcess = ALFloatPropertyAnimationProcess
+              OnCustomInterpolation = ALFloatPropertyAnimationCustomInterpolation
+              PropertyName = 'Position.Y'
+              StartValue = 0.000000000000000000
+              StopValue = 0.000000000000000000
+              Left = 88
+              Top = 192
+            end
+          end
+        end
+        object PaintBoxChart: TPaintBox
+          Align = Client
+          Margins.Right = 15.000000000000000000
+          Size.Width = 285.000000000000000000
+          Size.Height = 632.000000000000000000
+          Size.PlatformDefault = False
+          OnPaint = PaintBoxChartPaint
+        end
+        object ALText0_0: TALText
+          AutoSize = True
+          Position.X = 42.000000000000000000
+          Position.Y = 296.000000000000000000
+          Size.Width = 13.000000000000000000
+          Size.Height = 14.000000000000000000
+          Size.PlatformDefault = False
+          Text = '0.0'
+          TextSettings.Font.Size = 10.000000000000000000
+          OnResized = LayoutResized
+        end
+        object ALText1_4: TALText
+          AutoSize = True
+          Position.X = 43.000000000000000000
+          Size.Width = 13.000000000000000000
+          Size.Height = 14.000000000000000000
+          Size.PlatformDefault = False
+          Text = '1.4'
+          TextSettings.Font.Size = 10.000000000000000000
+          OnResized = LayoutResized
+        end
+        object ALTextmin1_0: TALText
+          AutoSize = True
+          Position.X = 44.000000000000000000
+          Position.Y = 456.000000000000000000
+          Size.Width = 17.000000000000000000
+          Size.Height = 14.000000000000000000
+          Size.PlatformDefault = False
+          Text = '-1.0'
+          TextSettings.Font.Size = 10.000000000000000000
+          OnResized = LayoutResized
+        end
+        object ALTextmin1_4: TALText
+          AutoSize = True
+          Position.X = 39.000000000000000000
+          Position.Y = 640.000000000000000000
+          Size.Width = 17.000000000000000000
+          Size.Height = 14.000000000000000000
+          Size.PlatformDefault = False
+          Text = '-1.4'
+          TextSettings.Font.Size = 10.000000000000000000
+          OnResized = LayoutResized
+        end
+        object ALText1_0: TALText
+          AutoSize = True
+          Position.X = 43.000000000000000000
+          Position.Y = 88.000000000000000000
+          Size.Width = 13.000000000000000000
+          Size.Height = 14.000000000000000000
+          Size.PlatformDefault = False
+          Text = '1.0'
+          TextSettings.Font.Size = 10.000000000000000000
+          OnResized = LayoutResized
+        end
+      end
+    end
+    object TabItemSpringForce: TTabItem
+      CustomIcon = <
+        item
+        end>
+      IsSelected = False
+      Size.Width = 84.000000000000000000
+      Size.Height = 26.000000000000000000
+      Size.PlatformDefault = False
+      StyleLookup = ''
+      TabOrder = 0
+      Text = 'SpringForce'
+      ExplicitSize.cx = 69.000000000000000000
+      ExplicitSize.cy = 26.000000000000000000
+      object LayoutDampingRatio: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 15.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        object TextDampingRatio: TALText
+          AutoSize = True
+          Position.X = 15.000000000000000000
+          Size.Width = 76.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'DampingRatio'
+          OnResized = LayoutResized
+        end
+        object ComboBoxDampingRatio: TComboBox
+          Items.Strings = (
+            'HIGH_BOUNCY'
+            'MEDIUM_BOUNCY'
+            'LOW_BOUNCY'
+            'NO_BOUNCY')
+          ItemIndex = 1
+          Position.X = 112.000000000000000000
+          Size.Width = 177.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
+          OnResized = LayoutResized
+        end
+      end
+      object LayoutStiffness: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 52.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+        object TextStiffness: TALText
+          AutoSize = True
+          Position.X = 15.000000000000000000
+          Size.Width = 44.000000000000000000
+          Size.Height = 16.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'Stiffness'
+          OnResized = LayoutResized
+        end
+        object ComboBoxStiffness: TComboBox
+          Items.Strings = (
+            'HIGH'
+            'MEDIUM'
+            'LOW'
+            'VERY_LOW')
+          ItemIndex = 1
+          Position.X = 112.000000000000000000
+          Size.Width = 177.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 4
+          OnResized = LayoutResized
+        end
+      end
+      object LayoutSpringForce: TALLayout
+        Align = Client
+        HitTest = True
+        Size.Width = 360.000000000000000000
+        Size.Height = 719.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        OnMouseDown = LayoutSpringForceMouseDown
+        OnMouseMove = LayoutSpringForceMouseMove
+        OnMouseUp = LayoutSpringForceMouseUp
+        OnMouseLeave = LayoutSpringForceMouseLeave
+        object CircleSpringForce: TALCircle
+          Fill.Color = claBrown
+          HitTest = False
+          Position.X = 155.000000000000000000
+          Position.Y = 335.000000000000000000
+          Size.Width = 50.000000000000000000
+          Size.Height = 50.000000000000000000
+          Size.PlatformDefault = False
+          Stroke.Kind = None
+          OnResize = LayoutResized
+          object ALSpringForcePropertyAnimationY: TALSpringForcePropertyAnimation
+            PropertyName = 'Position.Y'
+            StartValue = 0.000000000000000000
+            StopValue = 0.000000000000000000
+            InitialVelocity = 0.000000000000000000
+            Left = 88
+            Top = 248
+          end
+          object ALSpringForcePropertyAnimationX: TALSpringForcePropertyAnimation
+            PropertyName = 'Position.X'
+            StartValue = 0.000000000000000000
+            StopValue = 0.000000000000000000
+            InitialVelocity = 0.000000000000000000
+            Left = 88
+            Top = 304
+          end
+          object TextDragMe: TALText
+            Align = Center
+            AutoSize = True
+            Size.Width = 39.000000000000000000
+            Size.Height = 14.000000000000000000
+            Size.PlatformDefault = False
+            Text = 'Drag me'
+            TextSettings.Font.Size = 10.000000000000000000
+            TextSettings.FontColor = claWhite
+            OnResized = LayoutResized
+          end
+        end
+      end
+    end
+  end
+end

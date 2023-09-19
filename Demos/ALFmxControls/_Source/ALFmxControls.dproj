@@ -641,54 +641,6 @@
         </Excluded_Packages>
       </Delphi.Personality>
       <Deployment Version="4">
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="Android64\Debug\splash_image_def.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="Android\Debug\splash_image_def.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Release" LocalName="Android64\Release\splash_image_def.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Release" LocalName="Android\Release\splash_image_def.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android64\Debug\styles.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android\Debug\styles.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Release" LocalName="Android64\Release\styles.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Release" LocalName="Android\Release\styles.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
         <DeployFile Class="AndroidSplashStylesV21" Configuration="Debug" LocalName="Android64\Debug\styles-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
@@ -717,7 +669,7 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="Android64\Debug\colors.xml">
+        <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="..\Android64\Debug\colors.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -1161,7 +1113,7 @@
             <RemoteName>splash_image.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Strings" Configuration="Debug" LocalName="Android64\Debug\strings.xml">
+        <DeployFile Class="Android_Strings" Configuration="Debug" LocalName="..\Android64\Debug\strings.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>

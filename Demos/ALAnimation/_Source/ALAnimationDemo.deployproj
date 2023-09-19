@@ -1,0 +1,1328 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALAnimationDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\classes\</RemoteDir>
+      <RemoteName>ALAnimationDemo.classes</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\libALAnimationDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libALAnimationDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALAnimationDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\classes\</RemoteDir>
+      <RemoteName>ALAnimationDemo.classes</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\libALAnimationDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\library\lib\armeabi-v7a\</RemoteDir>
+      <RemoteName>libALAnimationDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\ALAnimationDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\classes\</RemoteDir>
+      <RemoteName>ALAnimationDemo.classes</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\libALAnimationDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libALAnimationDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALAnimationDemo.classes">
+      <DeployClass>AndroidClasses</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\classes\</RemoteDir>
+      <RemoteName>ALAnimationDemo.classes</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
+      <DeployClass>ProjectAndroidManifest</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\</RemoteDir>
+      <RemoteName>AndroidManifest.xml</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\libALAnimationDemo.so">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\library\lib\arm64-v8a\</RemoteDir>
+      <RemoteName>libALAnimationDemo.so</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-hdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-mdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo\res\mipmap-xxhdpi\</RemoteDir>
+      <RemoteName>ic_launcher.png</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALAnimationDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALAnimationDemo.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSX64\Debug\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALAnimationDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSX64\Release\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALAnimationDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALAnimationDemo.dSYM">
+      <DeployClass>ProjectOSXDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\OSXARM64\Debug\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
+      <DeployClass>ProjectOSXResource</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\Resources\</RemoteDir>
+      <RemoteName>ALAnimationDemo.icns</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\MacOS\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectOSXEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\OSXARM64\Release\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectOSXInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\Contents\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALAnimationDemo.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSDevice64\Debug\ALAnimationDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALAnimationDemo.launchscreen</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSDevice64\Release\ALAnimationDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALAnimationDemo.launchscreen</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALAnimationDemo.dSYM">
+      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\iOSSimARM64\Debug\ALAnimationDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALAnimationDemo.launchscreen</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
+      <DeployClass>iPad_AppIcon152</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_152x152.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_167x167.png">
+      <DeployClass>iPad_AppIcon167</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_167x167.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPad_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPadDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_LaunchImage_2x.png">
+      <DeployClass>iPad_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPad_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png">
+      <DeployClass>iPad_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPad_SpotLight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_1024x1024.png">
+      <DeployClass>iOS_AppStore1024</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_1024x1024.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_120x120.png">
+      <DeployClass>iPhone_AppIcon120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png">
+      <DeployClass>iPhone_AppIcon180</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_ApplicationIcon_180x180.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImageDark_3x.png">
+      <DeployClass>iPhone_LaunchDark3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_2x.png">
+      <DeployClass>iPhone_Launch2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_LaunchImage_3x.png">
+      <DeployClass>iPhone_Launch3x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_40x40.png">
+      <DeployClass>iPhone_Notification40</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_40x40.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_NotificationIcon_60x60.png">
+      <DeployClass>iPhone_Notification60</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_NotificationIcon_60x60.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_58x58.png">
+      <DeployClass>iPhone_Setting58</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_58x58.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SettingIcon_87x87.png">
+      <DeployClass>iPhone_Setting87</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SettingIcon_87x87.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png">
+      <DeployClass>iPhone_Spotlight120</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_120x120.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png">
+      <DeployClass>iPhone_Spotlight80</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset\</RemoteDir>
+      <RemoteName>FM_SpotlightSearchIcon_80x80.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALAnimationDemo">
+      <DeployClass>ProjectOutput</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>ALAnimationDemo</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALAnimationDemo.entitlements">
+      <DeployClass>ProjectiOSEntitlements</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\</RemoteDir>
+      <RemoteName>ALAnimationDemo.entitlements</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALAnimationDemo.info.plist">
+      <DeployClass>ProjectiOSInfoPList</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\</RemoteDir>
+      <RemoteName>Info.plist</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\iOSSimARM64\Release\ALAnimationDemo.launchscreen">
+      <DeployClass>ProjectiOSLaunchScreen</DeployClass>
+      <LocalCommand/>
+      <Operation>64</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALAnimationDemo.app\..\$(PROJECTNAME).launchscreen\</RemoteDir>
+      <RemoteName>ALAnimationDemo.launchscreen</RemoteName>
+    </DeployFile>
+  </ItemGroup>
+  <ProjectExtensions>
+    <ProjectFileVersion>12</ProjectFileVersion>
+  </ProjectExtensions>
+</Project>

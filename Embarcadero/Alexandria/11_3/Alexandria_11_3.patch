@@ -149,7 +149,15 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
      procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
      procedure KeyUp(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
      procedure DialogKey(var Key: Word; Shift: TShiftState); virtual;
-@@ -2220,6 +2225,7 @@
+@@ -602,6 +607,7 @@
+     { optimization }
+     function GetFirstVisibleObjectIndex: Embarcadero/Alexandria/11_3/Integer; virtual;
+     function GetLastVisibleObjectIndex: Embarcadero/Alexandria/11_3/Integer; virtual;
++    function IsVisibleObject(const AObject: TControl): Boolean; virtual; // https://quality.embarcadero.com/browse/RSP-42357
+     function GetDefaultSize: TSizeF; virtual;
+     { bi-di }
+     function FillTextFlags: TFillTextFlags; virtual;
+@@ -2220,6 +2226,7 @@
    TabStop: IControl;
    ChildControl: TControl;
    NeedRepaint: Boolean;
@@ -157,7 +165,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  begin
    DisableDisappear := True;
    try
-@@ -2226,7 +2232,10 @@
+@@ -2226,7 +2233,10 @@
      if AObject is TControl then
      begin
        ChildControl := TControl(AObject);
@@ -169,7 +177,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
      end
      else
        ChildControl := nil;
-@@ -2266,7 +2275,8 @@
+@@ -2266,7 +2276,8 @@
          ChildControl.TempCanvas := TempCanvas;
        if FInPaintTo then
          ChildControl.FInPaintTo := True;
@@ -179,7 +187,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
        if not FSimpleTransform then
          ChildControl.FSimpleTransform := False;
        ChildControl.RecalcEnabled;
-@@ -2296,8 +2306,20 @@
+@@ -2296,8 +2307,20 @@
    var
      I: Integer;
    begin
@@ -202,7 +210,74 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
    end;
  
  var
-@@ -3676,7 +3698,7 @@
+@@ -2372,7 +2395,7 @@
+   FRecalcUpdateRect := True;
+   if FControls <> nil then
+     for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+-      if I < FControls.Count then
++      if (I < FControls.Count) and IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
+         FControls[I].RecalcUpdateRect;
+ end;
+ 
+@@ -2444,7 +2467,7 @@
+       begin
+         for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
+         begin
+-          if not FControls[I].Visible then
++          if not IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
+             Continue;
+           R := FControls[I].UpdateRect;
+           Result := UnionRect(Result, R);
+@@ -2481,7 +2504,7 @@
+     for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+     begin
+       Control := FControls[I];
+-      if Control.Visible then
++      if IsVisibleObject(Control) then // https://quality.embarcadero.com/browse/RSP-42357
+         Result := UnionRect(Result, Control.GetChildrenRect);
+     end
+ end;
+@@ -2933,7 +2956,7 @@
+     for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
+     begin
+       Control := Controls[I];
+-      if not Control.GetVisible then
++      if not IsVisibleObject(Control) then // https://quality.embarcadero.com/browse/RSP-42357
+         Continue;
+ 
+       NewObj := Control.ObjectAtPoint(AScreenPoint);
+@@ -3399,7 +3422,7 @@
+ begin
+   if (FScene <> nil) and (ControlsCount > 0) then
+     for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+-      if FControls[I].Visible then
++      if IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
+       begin
+         Control := FControls[I];
+         if Control.FScene = nil then
+@@ -3442,7 +3465,7 @@
+ begin
+   if (FScene <> nil) and (ControlsCount > 0) then
+     for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+-      if FControls[I].Visible then
++      if IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
+       begin
+         Control := FControls[I];
+         if Control.FScene = nil then
+@@ -3664,6 +3687,12 @@
+     Result := 0;
+ end;
+ 
++// https://quality.embarcadero.com/browse/RSP-42357
++function TControl.IsVisibleObject(const AObject: TControl): Boolean;
++begin
++  result := AObject.Visible;
++end;
++
+ function TControl.GetLeft: Single;
+ begin
+   Result := Position.X;
+@@ -3676,7 +3705,7 @@
    Result := Touch.InteractiveGestures;
    if Result = [] then
      if (Parent <> nil) and Supports(Parent, IGestureControl, LGObj) then
@@ -211,7 +286,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  end;
  
  function TControl.GetLocked: Boolean;
-@@ -4122,6 +4144,7 @@
+@@ -4122,6 +4151,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseEnter) then
      FOnMouseEnter(Self);
@@ -219,7 +294,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  end;
  
  procedure TControl.DoMouseLeave;
-@@ -4131,6 +4154,7 @@
+@@ -4131,6 +4161,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseLeave) then
      FOnMouseLeave(Self);
@@ -227,7 +302,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  end;
  
  function TControl.GetCanFocus: Boolean;
-@@ -4422,7 +4446,7 @@
+@@ -4422,7 +4453,7 @@
      end;
  
    if not Handled and (FParent <> nil) and (EventInfo.GestureID <> sgiNoGesture) and Supports(Parent, IGestureControl, LGObj) then
@@ -236,7 +311,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  end;
  
  function TControl.ConvertLocalPointFrom(const AControl: TControl; const AControlLocalPoint: TPointF): TPointF;
-@@ -4547,6 +4571,7 @@
+@@ -4547,6 +4578,7 @@
  
    if Assigned(FOnMouseDown) then
      FOnMouseDown(Self, Button, Shift, X, Y);
@@ -244,7 +319,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
    if FAutoCapture then
      Capture;
    if Button = TMouseButton.mbLeft then
-@@ -4569,6 +4594,7 @@
+@@ -4569,6 +4601,7 @@
  begin
    if Assigned(FOnMouseMove) then
      FOnMouseMove(Self, Shift, X, Y);
@@ -252,7 +327,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  end;
  
  procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-@@ -4577,6 +4603,7 @@
+@@ -4577,6 +4610,7 @@
  
    if Assigned(FOnMouseUp) then
      FOnMouseUp(Self, Button, Shift, X, Y);
@@ -260,7 +335,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
    if FPressed then
    begin
      FPressed := False;
-@@ -4591,6 +4618,41 @@
+@@ -4591,6 +4625,41 @@
      FOnMouseWheel(Self, Shift, WheelDelta, Handled)
  end;
  
@@ -302,7 +377,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
  var
    Operation: TDragOperation;
-@@ -6013,7 +6075,7 @@
+@@ -6013,7 +6082,7 @@
    KillResourceLink;
    if csLoading in ComponentState then
      Exit;
@@ -311,7 +386,7 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
  end;
  
  procedure TStyledControl.AdjustSize;
-@@ -7171,7 +7233,7 @@
+@@ -7171,7 +7240,7 @@
  var
    LFontColor: TAlphaColor;
  begin

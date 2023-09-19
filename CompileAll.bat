@@ -267,6 +267,7 @@ goto BUILD_DEMOS
 
 :DO_BUILD_DEMOS
 
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALAnimation" "_Source" "ALAnimationDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALCipher" "_Source" "ALCipherDemo.dproj"
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALConfetti" "_Source" "ALConfettiDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALDatabaseBenchmark" "_Source" "ALDatabaseBenchmark.dproj"

@@ -13,11 +13,12 @@ uses
   System.Types,
   System.UITypes,
   System.Messaging,
+  System.Generics.Collections,
   FMX.layouts,
   FMX.Types,
   FMX.Controls,
   Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.InertialMovement;
+  Alcinoe.FMX.ScrollEngine;
 
 type
 
@@ -31,43 +32,46 @@ type
   {*************************}
   TALCustomScrollBox = class;
 
-  {***********************************************************}
-  //as i understand Tcontent is specially usefull to get warned
-  //when a child control do
-  //  * DoMatrixChanged (ie for exemple change it's position) => ParentContent.Changed;
-  //  * SetAlign (ie for exemple Bottom or top) => ParentContent.Changed;
-  //  * SetVisible => ParentContent.Changed;
-  //  * InternalSizeChanged => FParentControl.Realign
-  //  All of this are especially important to launch the realign of the scrollbox
+  {*********************************************************************}
+  // TContent plays a pivotal role in being notified when a child control
+  // undergoes specific changes:
+  //   * DoMatrixChanged (e.g., when changing its position) => ParentContent.Changed;
+  //   * SetAlign (e.g., settings like Bottom or Top) => ParentContent.Changed;
+  //   * SetVisible => ParentContent.Changed;
+  //   * InternalSizeChanged => FParentControl.Realign;
+  // These notifications are crucial to trigger the realignment of the
+  // scrollbox.
   TALScrollBoxContent = class(TContent)
   private
-    [weak] FScrollBox: TALCustomScrollBox;
+    FScrollBox: TALCustomScrollBox;
   protected
     procedure ContentChanged; override;
+    {$IFNDEF ALDPK}
+    function IsVisibleObject(const AObject: TControl): Boolean; override;
+    {$ENDIF}
   public
     constructor Create(AOwner: TComponent); override;
     property ScrollBox: TALCustomScrollBox read FScrollBox;
   end;
 
-  {******************************************************}
-  TALScrollBoxAniCalculations = class (TALAniCalculations)
+  {************************************************}
+  TALScrollBoxScrollEngine = class (TALScrollEngine)
   private
-    [Weak] FScrollBox: TALCustomScrollBox;
+    FScrollBox: TALCustomScrollBox;
     fLastViewportPosition: TpointF;
-    fScreenScale: single;
   protected
     procedure DoChanged; override;
     procedure DoStart; override;
     procedure DoStop; override;
   public
-    constructor Create(AOwner: TPersistent); override;
+    constructor Create(const AScrollBox: TALCustomScrollBox); reintroduce;
     property ScrollBox: TALCustomScrollBox read FScrollBox;
   end;
 
   {***********************************}
   TALScrollBoxBar = class(TALScrollBar)
   private
-    [weak] FScrollBox: TALCustomScrollBox;
+    FScrollBox: TALCustomScrollBox;
   protected
     procedure DoChanged; override;
     procedure Resize; override;
@@ -94,11 +98,10 @@ type
   {**********************************}
   TALCustomScrollBox = class(TControl)
   private
-    FScreenScale: single;
-    FAniCalculations: TALScrollBoxAniCalculations;
-    [Weak] FContent: TALScrollBoxContent;
-    [Weak] FHScrollBar: TALScrollBoxBar;
-    [Weak] FVScrollBar: TALScrollBoxBar;
+    FScrollEngine: TALScrollBoxScrollEngine;
+    FContent: TALScrollBoxContent;
+    FHScrollBar: TALScrollBoxBar;
+    FVScrollBar: TALScrollBoxBar;
     FDisableMouseWheel: Boolean;
     fdisableScrollChange: Boolean;
     FHasTouchScreen: Boolean;
@@ -110,18 +113,15 @@ type
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
     fMouseDownPos: TpointF;
-    FDeadZoneBeforeAcquireScrolling: Integer;
-    fScrollingAcquiredByMe: boolean;
-    fScrollingAcquiredByOther: boolean;
-    fScrollingAcquiredByOtherMessageID: integer;
+    fScrollCapturedByMe: boolean;
+    fScrollCapturedByOther: boolean;
     fMaxContentWidth: Single;
     fMaxContentHeight: single;
     fAnchoredContentOffset: TPointF;
-    procedure setScrollingAcquiredByMe(const Value: boolean);
-    procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+    procedure setScrollCapturedByMe(const Value: boolean);
+    procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetShowScrollBars(const Value: Boolean);
     procedure SetAutoHide(const Value: Boolean);
-    procedure setAniCalculations(const Value: TALScrollBoxAniCalculations);
     function isMaxContentHeightStored: Boolean;
     function isMaxContentWidthStored: Boolean;
     procedure internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
@@ -134,7 +134,7 @@ type
     procedure DoRealign; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
     function CreateContent: TALScrollBoxContent; virtual;
-    function CreateAniCalculations: TALScrollBoxAniCalculations; virtual;
+    function CreateScrollEngine: TALScrollBoxScrollEngine; virtual;
     function CalcContentBounds: TRectF; virtual;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
@@ -154,7 +154,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property AniCalculations: TALScrollBoxAniCalculations read FAniCalculations write setAniCalculations;
+    property ScrollEngine: TALScrollBoxScrollEngine read FScrollEngine;
     procedure Sort(Compare: TFmxObjectSortCompare); override;
     procedure ScrollBy(const Dx, Dy: Single);
     function GetTabList: ITabList; override;
@@ -164,7 +164,6 @@ type
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
     property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 32;
     property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
@@ -179,7 +178,6 @@ type
   published
     property HScrollBar;
     property VScrollBar;
-    property AniCalculations;
     property Align;
     property Anchors;
     property AutoHide;
@@ -246,11 +244,10 @@ type
     function CalcContentBounds: TRectF; override;
     procedure Paint; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
-    function CreateAniCalculations: TALScrollBoxAniCalculations; override;
+    function CreateScrollEngine: TALScrollBoxScrollEngine; override;
   published
     property MaxContentWidth;
     property VScrollBar;
-    property AniCalculations;
     property Align;
     property Anchors;
     property AutoHide;
@@ -317,11 +314,10 @@ type
     function CalcContentBounds: TRectF; override;
     procedure Paint; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
-    function CreateAniCalculations: TALScrollBoxAniCalculations; override;
+    function CreateScrollEngine: TALScrollBoxScrollEngine; override;
   published
     property MaxContentHeight;
     property HScrollBar;
-    property AniCalculations;
     property Align;
     property Anchors;
     property AutoHide;
@@ -397,6 +393,7 @@ uses
   FMX.Effects,
   FMX.utils,
   FMX.Ani,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
@@ -410,9 +407,8 @@ uses
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was not corrected and adjust the IFDEF'}
 {$ENDIF}
 procedure TALLayout.DoRealign;
-var LOriginalSize: TpointF;
 begin
-  LOriginalSize := Size.Size;
+  var LOriginalSize: TPointF := Size.Size;
   inherited DoRealign;
   if not LOriginalSize.EqualsTo(Size.Size) then DoRealign;
 end;
@@ -426,49 +422,54 @@ begin
   SetAcceptsControls(False);
 end;
 
+{*************}
+{$IFNDEF ALDPK}
+function TALScrollBoxContent.IsVisibleObject(const AObject: TControl): Boolean;
+begin
+  if AObject.Visible then begin
+    Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
+              (AObject.Position.Y + AObject.Height > -Position.Y) and
+              (AObject.Position.X < Position.X + FscrollBox.Width) and
+              (AObject.Position.X + AObject.Width > Position.X);
+  end
+  else
+    result := False;
+end;
+{$ENDIF}
+
 {*******************************************}
 procedure TALScrollBoxContent.ContentChanged;
 begin
   inherited;
-  if (not IsUpdating) then FScrollBox.Realign; // << if we are in csloading this will actually like a no-ops
+  // if we are in csloading this will actually like a no-ops
+  if (not IsUpdating) then FScrollBox.Realign;
 end;
 
-{******************************************************************}
-constructor TALScrollBoxAniCalculations.Create(AOwner: TPersistent);
+{********************************************************************************}
+constructor TALScrollBoxScrollEngine.Create(const AScrollBox: TALCustomScrollBox);
 begin
-  ValidateInheritance(AOwner, TALCustomScrollBox, False{CanBeNil});
-  inherited Create(AOwner);
-  FScrollBox := TALCustomScrollBox(AOwner);
+  inherited Create;
+  FScrollBox := AScrollBox;
   fLastViewportPosition := TpointF.Create(0,0);
-  FScreenScale := FScrollBox.FScreenScale;
 end;
 
-{**********************************************}
-procedure TALScrollBoxAniCalculations.DoChanged;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _getPixelAlignedViewportPosition: TPointF;
-  var X, Y: Single;
-  begin
-    X := Round(ViewportPosition.X * FScreenScale) / FScreenScale;
-    Y := Round(ViewportPosition.Y * FScreenScale) / FScreenScale;
-    Result := TPointF.Create(
-                X - FScrollBox.fAnchoredContentOffset.X,  // FScrollBox.fAnchoredContentOffset.X is already pixel aligned and if present then x = 0 so return -FScrollBox.fAnchoredContentOffset.X
-                Y - FScrollBox.fAnchoredContentOffset.Y); // FScrollBox.fAnchoredContentOffset.Y is already pixel aligned and if present then y = 0 so return -FScrollBox.fAnchoredContentOffset.Y
-  end;
-
-var LNewViewportPosition: TPointF;
-
+{*******************************************}
+procedure TALScrollBoxScrollEngine.DoChanged;
 begin
   if (not (csDestroying in FScrollBox.ComponentState)) then begin
 
     //update FScrollBox.Content.Position
-    if FScrollBox.Content <> nil then
-      FScrollBox.Content.Position.Point := -_getPixelAlignedViewportPosition;
-
-    //update the Shown
-    if (not Down) and LowVelocity then Shown := False
-    else Shown := true;
+    if FScrollBox.Content <> nil then begin
+      var LSaveDisableAlign := FScrollBox.FDisableAlign;
+      FScrollBox.FDisableAlign := True;
+      try
+        FScrollBox.Content.Position.Point := -TPointF.Create(
+                                                ViewportPosition.X - FScrollBox.fAnchoredContentOffset.X,
+                                                ViewportPosition.Y - FScrollBox.fAnchoredContentOffset.Y);
+      finally
+        FScrollBox.FDisableAlign := LSaveDisableAlign;
+      end;
+    end;
 
     //update the opacity of the scrollBar
     if FScrollBox.VScrollBar <> nil then FScrollBox.VScrollBar.Opacity := Opacity;
@@ -486,7 +487,7 @@ begin
     end;
 
     //fire the OnViewportPositionChange
-    LNewViewportPosition := TpointF.Create(ViewportPosition.X, ViewportPosition.Y);
+    var LNewViewportPosition := TpointF.Create(ViewportPosition.X, ViewportPosition.Y);
     if (assigned(FScrollBox.FOnViewportPositionChange)) and
        (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
       FScrollBox.FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
@@ -496,8 +497,8 @@ begin
   inherited DoChanged;
 end;
 
-{********************************************}
-procedure TALScrollBoxAniCalculations.DoStart;
+{*****************************************}
+procedure TALScrollBoxScrollEngine.DoStart;
 begin
   inherited DoStart;
 
@@ -510,8 +511,8 @@ begin
     fscrollBox.fOnAniStart(fscrollBox);
 end;
 
-{*******************************************}
-procedure TALScrollBoxAniCalculations.DoStop;
+{****************************************}
+procedure TALScrollBoxScrollEngine.DoStop;
 begin
   inherited DoStop;
 
@@ -539,8 +540,8 @@ begin
   if FScrollBox.fdisableScrollChange then exit;
   FScrollBox.fdisableScrollChange := True;
   try
-    if Orientation=TOrientation.vertical then FScrollBox.fAniCalculations.ViewportPosition := TAlPointD.Create(FScrollBox.fAniCalculations.ViewportPosition.x, Value)
-    else FScrollBox.fAniCalculations.ViewportPosition := TAlPointD.Create(Value, FScrollBox.fAniCalculations.ViewportPosition.Y);
+    if Orientation=TOrientation.vertical then FScrollBox.fScrollEngine.ViewportPosition := TAlPointD.Create(FScrollBox.fScrollEngine.ViewportPosition.x, Value)
+    else FScrollBox.fScrollEngine.ViewportPosition := TAlPointD.Create(Value, FScrollBox.fScrollEngine.ViewportPosition.Y);
   finally
     FScrollBox.fdisableScrollChange := False;
   end;
@@ -556,15 +557,12 @@ end;
 
 {********************************************************}
 constructor TALCustomScrollBox.Create(AOwner: TComponent);
-var LDeviceService: IFMXDeviceService;
-    LScreenSrv: IFMXScreenService;
 begin
   inherited Create(AOwner);
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
-  else FScreenScale := 1;
   ClipChildren := True;
   SetAcceptsControls(True);
   AutoCapture := True;
+  var LDeviceService: IFMXDeviceService;
   if SupportsPlatformService(IFMXDeviceService, LDeviceService) then FHasTouchScreen := TDeviceFeature.HasTouchScreen in LDeviceService.GetFeatures
   else FHasTouchScreen := False;
   Touch.DefaultInteractiveGestures := Touch.DefaultInteractiveGestures + [TInteractiveGesture.Pan];
@@ -578,7 +576,7 @@ begin
   fOnScrollBarInit := nil;
   fOnAniStart := nil;
   fOnAniStop := nil;
-  fAniCalculations := CreateAniCalculations;
+  fScrollEngine := CreateScrollEngine;
   fMaxContentWidth := 0;
   fMaxContentHeight := 0;
   fAnchoredContentOffset := TpointF.Create(0,0);
@@ -591,19 +589,18 @@ begin
   if FHScrollBar <> nil then FHScrollBar.BringToFront;
   if FVScrollBar <> nil then FVScrollBar.BringToFront;
   //-----
-  fMouseDownPos := TpointF.Create(0,0);
-  FDeadZoneBeforeAcquireScrolling := 32;
-  fScrollingAcquiredByMe := False;
-  fScrollingAcquiredByOther := False;
-  fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
+  fMouseDownPos := TpointF.zero;
+  fScrollCapturedByMe := False;
+  fScrollCapturedByOther := False;
+  TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
 {************************************}
 destructor TALCustomScrollBox.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
-  ALFreeAndNil(FAniCalculations);
-  inherited;
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  ALFreeAndNil(FScrollEngine);
+  inherited Destroy;
 end;
 
 {************************************************************}
@@ -620,11 +617,10 @@ end;
 
 {****************************************************}
 function TALCustomScrollBox.CalcContentBounds: TRectF;
-var I: Integer;
 begin
   Result := LocalRect;
-  if (FContent <> nil) then
-    for I := 0 to FContent.ControlsCount - 1 do
+  if (FContent <> nil) then begin
+    for var I := 0 to FContent.ControlsCount - 1 do
       if FContent.Controls[I].Visible then begin
         {$IFDEF MSWINDOWS}
         if (csDesigning in ComponentState) and Supports(FContent.Controls[I], IDesignerControl) then
@@ -632,6 +628,7 @@ begin
         {$ENDIF}
         Result.Union(FContent.Controls[I].BoundsRect);
       end;
+  end;
   if result.Top < 0 then result.Top := 0;
   if result.left < 0 then result.left := 0;
   fAnchoredContentOffset := TpointF.Create(0, 0);
@@ -693,44 +690,36 @@ procedure TALCustomScrollBox.DoRealign;
     end;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateAnimationTargets(const aContentRect: TRectF);
-  var LNewTargets: array of TALAniCalculations.TTarget;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateScrollEngineLimits(const aContentRect: TRectF);
   begin
-    SetLength(LNewTargets, 2);
-    LNewTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
-    LNewTargets[0].Point := TALPointD.Create(0,0);
-    LNewTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
+    ScrollEngine.MinScrollLimit := TALPointD.Create(0,0);
     if (fHScrollBar <> nil) and
-       (fVScrollBar <> nil) then LNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, aContentRect.Height - height)
-    else if (fVScrollBar <> nil) then LNewTargets[1].Point := TALPointD.Create(0, aContentRect.Height - height)
-    else if (fHScrollBar <> nil) then LNewTargets[1].Point := TALPointD.Create(aContentRect.Width - width, 0)
-    else LNewTargets[1].Point := TALPointD.Create(0, 0);
-    AniCalculations.SetTargets(LNewTargets);
+       (fVScrollBar <> nil) then ScrollEngine.MaxScrollLimit := TALPointD.Create(aContentRect.Width - width, aContentRect.Height - height)
+    else if (fVScrollBar <> nil) then ScrollEngine.MaxScrollLimit := TALPointD.Create(0, aContentRect.Height - height)
+    else if (fHScrollBar <> nil) then ScrollEngine.MaxScrollLimit := TALPointD.Create(aContentRect.Width - width, 0)
+    else ScrollEngine.MaxScrollLimit := TALPointD.Create(0, 0);
   end;
-
-var LContentRect: TrectF;
-    LDoRealignAgain: boolean;
 
 begin
 
+  var LDoRealignAgain := False;
   if fDisableAlign then exit;
   fDisableAlign := True;
   try
 
-    LDoRealignAgain := False;
     if (FContent <> nil) then begin
-      LContentRect := CalcContentBounds;
+      var LContentRect := CalcContentBounds;
       Content.SetBounds(
         LContentRect.Left + fAnchoredContentOffset.x,
         LContentRect.Top + fAnchoredContentOffset.y,
         LContentRect.Width,
         LContentRect.Height);
-      if LContentRect.EqualsTo(CalcContentBounds, Tepsilon.Position) then  begin
+      if LContentRect.EqualsTo(CalcContentBounds, Tepsilon.Position) then begin
         _UpdateVScrollBar(LContentRect);
         _UpdateHScrollBar(LContentRect);
-        _UpdateAnimationTargets(LContentRect);
-        fAniCalculations.DoChanged;
+        _UpdateScrollEngineLimits(LContentRect);
+        fScrollEngine.DoChanged;
       end
       else LDoRealignAgain := True;
     end;
@@ -776,89 +765,103 @@ begin
   Result.HitTest := False;
 end;
 
-{*****************************************************************************}
-function TALCustomScrollBox.CreateAniCalculations: TALScrollBoxAniCalculations;
+{***********************************************************************}
+function TALCustomScrollBox.CreateScrollEngine: TALScrollBoxScrollEngine;
 begin
-  Result := TALScrollBoxAniCalculations.Create(self);
-  Result.BeginUpdate;
-  try
-    Result.Animation := HasTouchScreen;
-    if HasTouchScreen then Result.TouchTracking := [ttVertical, ttHorizontal]
-    else Result.TouchTracking := [];
-    Result.BoundsAnimation := HasTouchScreen;
-    Result.AutoShowing := HasTouchScreen;
-  finally
-    Result.EndUpdate;
+  Result := TALScrollBoxScrollEngine.Create(self);
+  if HasTouchScreen then Result.TouchTracking := [ttVertical, ttHorizontal]
+  else Result.TouchTracking := [];
+  Result.MinEdgeSpringbackEnabled := HasTouchScreen;
+  Result.MaxEdgeSpringbackEnabled := HasTouchScreen;
+  Result.AutoShowing := HasTouchScreen;
+end;
+
+{***********************************************************************}
+procedure TALCustomScrollBox.setScrollCapturedByMe(const Value: boolean);
+begin
+  if Value <> fScrollCapturedByMe  then begin
+    {$IFDEF DEBUG}
+    //ALLog('TALCustomScrollBox.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
+    {$ENDIF}
+    fScrollCapturedByMe := Value;
+    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value));
   end;
 end;
 
-{****************************************************************************************}
-procedure TALCustomScrollBox.setAniCalculations(const Value: TALScrollBoxAniCalculations);
+{**************************************************************************************************}
+procedure TALCustomScrollBox.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  FAniCalculations.Assign(Value);
-end;
-
-{**************************************************************************}
-procedure TALCustomScrollBox.setScrollingAcquiredByMe(const Value: boolean);
-begin
-  if Value <> fScrollingAcquiredByMe  then begin
-    fScrollingAcquiredByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create(Value), True);
-  end;
-end;
-
-{*****************************************************************************************************}
-procedure TALCustomScrollBox.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
-begin
-  //the scrolling was acquired or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be acquired BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollingAcquiredByOther to handle this
+  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
+  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
+  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
-  if TALScrollingAcquiredMessage(M).Acquired then begin
-    if fAniCalculations.down then begin
-      fAniCalculations.Down := false;
-      fAniCalculations.CurrentVelocity := TalPointD.Create(0,0);
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALCustomScrollBox.ScrollCapturedByOtherHandler',
+  //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
+  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down),
+  //  TalLogType.verbose);
+  {$ENDIF}
+  if TALScrollCapturedMessage(M).Captured then begin
+    if fScrollEngine.down then begin
+      fScrollEngine.Down := false;
       FMouseEvents := False;
     end;
-    fScrollingAcquiredByOther := True;
+    fScrollCapturedByOther := True;
   end
-  else fScrollingAcquiredByOther := False;
+  else fScrollCapturedByOther := False;
 end;
 
 {*****************************************************************************************************}
 procedure TALCustomScrollBox.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALCustomScrollBox.MouseDown',
+  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
+  {$ENDIF}
   FMouseEvents := true;
-  inherited;
-  if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollingAcquiredByMe(False);
+  if (not fScrollCapturedByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
+    setScrollCapturedByMe(False);
     fMouseDownPos := TpointF.Create(X,Y);
-    FAniCalculations.averaging := ssTouch in Shift;
-    AniCalculations.MouseDown(X, Y);
+    ScrollEngine.MouseDown(X, Y);
   end;
 end;
 
 {*******************************************************************************}
 procedure TALCustomScrollBox.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALCustomScrollBox.internalMouseMove',
+  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
+  {$ENDIF}
   if FMouseEvents then begin
-    if (not fScrollingAcquiredByMe) and
-       (((ttHorizontal in fAniCalculations.TouchTracking) and
-         (abs(fMouseDownPos.x - x) > fDeadZoneBeforeAcquireScrolling)) or
-        ((ttVertical in fAniCalculations.TouchTracking) and
-         (abs(fMouseDownPos.y - y) > fDeadZoneBeforeAcquireScrolling))) then setScrollingAcquiredByMe(True);
-    AniCalculations.MouseMove(X, Y);
+    if (not fScrollCapturedByMe) and
+       (((ttHorizontal in fScrollEngine.TouchTracking) and
+         (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
+         (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop)) or
+        ((ttVertical in fScrollEngine.TouchTracking) and
+         (abs(fMouseDownPos.y - y) > abs(fMouseDownPos.x - x)) and
+         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then setScrollCapturedByMe(True);
+    ScrollEngine.MouseMove(X, Y);
   end;
 end;
 
 {***************************************************************************************************}
 procedure TALCustomScrollBox.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALCustomScrollBox.internalMouseUp',
+  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
+  {$ENDIF}
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollingAcquiredByMe(False);
-    AniCalculations.MouseUp(X, Y);
+    setScrollCapturedByMe(False);
+    ScrollEngine.MouseUp(X, Y);
     FMouseEvents := False;
   end;
 end;
@@ -866,10 +869,12 @@ end;
 {**********************************************}
 procedure TALCustomScrollBox.internalMouseLeave;
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog('TALCustomScrollBox.internalMouseLeave', TalLogType.verbose);
+  {$ENDIF}
   if FMouseEvents then begin
-    setScrollingAcquiredByMe(False);
-    AniCalculations.MouseLeave;
+    setScrollCapturedByMe(False);
+    ScrollEngine.MouseLeave;
     FMouseEvents := False;
   end;
 end;
@@ -909,10 +914,9 @@ Type
 {*************}
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
 begin
   if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
 end;
@@ -921,9 +925,8 @@ end;
 {*************}
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
 begin
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
@@ -932,10 +935,9 @@ end;
 {*************}
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
 begin
   if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
 end;
@@ -952,25 +954,24 @@ end;
 
 {*****************************************************************************************************}
 procedure TALCustomScrollBox.MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean);
-var Offset: Single;
 begin
   inherited;
   if (not (Handled or FDisableMouseWheel)) then begin
     if ssHorizontal in Shift then begin
       if FContent.Width > Width then begin
-        Offset := (Width / 5) * -1 * (WheelDelta / 120);
-        AniCalculations.MouseWheel(Offset, 0);
+        var Offset: Single := (Width / 5) * -1 * (WheelDelta / 120);
+        ScrollEngine.MouseWheel(Offset, 0);
         Handled := True;
       end;
     end
     else if FContent.Height > Height then begin
-      Offset := (Height / 5) * -1 * (WheelDelta / 120);
-      AniCalculations.MouseWheel(0, Offset);
+      var Offset: Single := (Height / 5) * -1 * (WheelDelta / 120);
+      ScrollEngine.MouseWheel(0, Offset);
       Handled := True;
     end
     else if FContent.Width > Width then begin
-      Offset := (Width / 5) * -1 * (WheelDelta / 120);
-      AniCalculations.MouseWheel(Offset, 0);
+      var Offset: Single := (Width / 5) * -1 * (WheelDelta / 120);
+      ScrollEngine.MouseWheel(Offset, 0);
       Handled := True;
     end;
   end;
@@ -1042,7 +1043,7 @@ begin
   Result := inherited CalcContentBounds;
   if not sameValue(fMaxContentWidth, 0, Tepsilon.Position) then begin
     result.Width := Min(fMaxContentWidth, Width);
-    fAnchoredContentOffset.X := Round(((Width - result.Width) / 2) * FScreenScale) / FScreenScale;
+    fAnchoredContentOffset.X := (Width - result.Width) / 2;
   end
   else Result.Width := Width;
 end;
@@ -1054,10 +1055,10 @@ begin
   result := inherited CreateScrollBar(aOrientation);
 end;
 
-{***************************************************************************}
-function TALVertScrollBox.CreateAniCalculations: TALScrollBoxAniCalculations;
+{*********************************************************************}
+function TALVertScrollBox.CreateScrollEngine: TALScrollBoxScrollEngine;
 begin
-  result := inherited CreateAniCalculations;
+  result := inherited CreateScrollEngine;
   result.TouchTracking := result.TouchTracking - [ttHorizontal];
 end;
 
@@ -1076,7 +1077,7 @@ begin
   Result.Height := Height;
   if not sameValue(fMaxContentHeight, 0, Tepsilon.Position) then begin
     result.Height := min(Height, fMaxContentHeight);
-    fAnchoredContentOffset.Y := Round(((Height - result.Height) / 2) * FScreenScale) / FScreenScale;
+    fAnchoredContentOffset.Y := (Height - result.Height) / 2;
   end
   else Result.Height := Height;
 end;
@@ -1088,10 +1089,10 @@ begin
   result := inherited CreateScrollBar(aOrientation);
 end;
 
-{***************************************************************************}
-function TALHorzScrollBox.CreateAniCalculations: TALScrollBoxAniCalculations;
+{*********************************************************************}
+function TALHorzScrollBox.CreateScrollEngine: TALScrollBoxScrollEngine;
 begin
-  result := inherited CreateAniCalculations;
+  result := inherited CreateScrollEngine;
   result.TouchTracking := result.TouchTracking - [ttVertical];
 end;
 

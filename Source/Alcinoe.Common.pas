@@ -543,6 +543,18 @@ function  ALIfThen(AValue: Boolean; const ATrue: Extended; const AFalse: Extende
 function  ALIfThenA(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString; overload; inline;
 function  ALIfThenW(AValue: Boolean; const ATrue: String; AFalse: String = ''): String; overload; inline;
 
+const
+  ALMsPerSec = 1000;
+  ALNanosPerMs = 1000000;
+  ALNanosPerSec = 1000000000;
+
+{********************************}
+function ALElapsedTimeNano: int64;
+function ALElapsedTimeMillisAsDouble: Double;
+function ALElapsedTimeMillisAsInt64: int64;
+function ALElapsedTimeSecondsAsDouble: Double;
+function ALElapsedTimeSecondsAsInt64: int64;
+
 {$IFDEF MSWINDOWS}
 {$IFNDEF ALCompilerVersionSupported}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
@@ -638,15 +650,23 @@ implementation
 uses
   system.math,
   system.Rtti,
+  {$IF defined(MSWindows)}
+  Winapi.MMSystem,
+  {$ENDIF}
   {$IF defined(ANDROID)}
   Posix.Sched,
   Androidapi.JNI.JavaTypes,
   Androidapi.Helpers,
   Alcinoe.AndroidApi.Common,
+  Posix.Time,
   {$ENDIF}
   {$IF defined(IOS)}
   Posix.Sched,
   Macapi.Helpers,
+  Macapi.Mach,
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
+  Macapi.Mach,
   {$ENDIF}
   system.DateUtils,
   Alcinoe.StringUtils;
@@ -2641,6 +2661,62 @@ begin
     Result := AFalse;
 end;
 
+{$IF defined(MSWindows)}
+var
+  ALPerformanceFrequency: TLargeInteger;
+{$ENDIF}
+
+{********************************}
+function ALElapsedTimeNano: int64;
+begin
+  {$IFDEF ANDROID}
+  var res: timespec;
+  clock_gettime(CLOCK_MONOTONIC, @res);
+  Result := Int64(ALNanosPerSec) * res.tv_sec + res.tv_nsec;
+  {$ELSEIF defined(IOS)}
+  Result := AbsoluteToNanoseconds(mach_absolute_time)
+  {$ELSEIF defined(ALMacOS)}
+  Result := AbsoluteToNanoseconds(mach_absolute_time)
+  {$ELSEIF defined(MSWindows)}
+  if ALPerformanceFrequency = -1 then begin
+    if not QueryPerformanceFrequency(ALPerformanceFrequency) then
+      ALPerformanceFrequency := 0;
+  end;
+  if ALPerformanceFrequency = 0 then Result := timeGetTime * ALNanosPerMs
+  else begin
+    var PerformanceCounter: Int64;
+    QueryPerformanceCounter(PerformanceCounter);
+    Result := trunc(PerformanceCounter / (ALPerformanceFrequency{counts per second} / ALNanosPerSec{nanos per second}));
+  end;
+  {$ELSE}
+    Raise Exception.Create('The platform has not been implemented yet');
+  {$ENDIF}
+end;
+
+{*******************************************}
+function ALElapsedTimeMillisAsDouble: Double;
+begin
+  Result := ALElapsedTimeNano / ALNanosPerMs;
+end;
+
+{*****************************************}
+function ALElapsedTimeMillisAsInt64: int64;
+begin
+  Result := trunc(ALElapsedTimeNano / ALNanosPerMs);
+end;
+
+{********************************************}
+function ALElapsedTimeSecondsAsDouble: Double;
+begin
+  Result := ALElapsedTimeNano / ALNanosPerSec;
+end;
+
+{******************************************}
+function ALElapsedTimeSecondsAsInt64: int64;
+begin
+  Result := trunc(ALElapsedTimeNano / ALNanosPerSec);
+end;
+
 {****************}
 {$IFDEF MSWINDOWS}
 Function ALGetDynamicTimeZoneInformations: Tarray<TDynamicTimeZoneInformation>;
@@ -3133,6 +3209,9 @@ end;
 
 
 initialization
+  {$IF defined(MSWindows)}
+  ALPerformanceFrequency := -1;
+  {$ENDIF}
   _ALLogQueue := TList<_TALLogItem>.Create;
   _ALLogHistory := TList<_TALLogItem>.Create;
   ALMove := system.Move;

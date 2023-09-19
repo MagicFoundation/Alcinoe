@@ -17,7 +17,7 @@ uses
   FMX.Controls,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Layouts,
-  Alcinoe.FMX.InertialMovement;
+  Alcinoe.FMX.ScrollEngine;
 
 type
 
@@ -34,13 +34,13 @@ type
   TALTabAniTransitionInit = procedure(
                               const sender: TObject;
                               const ATransition: TALTabTransition;
-                              const aVelocity: Double;
+                              const aVelocity: Single;
                               const aAnimation: TALFloatPropertyAnimation) of object;
 
   {**************************}
   TALTabItem = class(TControl)
   private
-    [Weak] FTabControl: TALTabControl;
+    FTabControl: TALTabControl;
     FIsSelected: Boolean;
     fViewPortOffset: single;
     procedure SetIsSelected(const Value: Boolean);
@@ -107,7 +107,7 @@ type
     FTabIndex: Integer;
     FRealigningTabs: Boolean;
     FOnChange: TNotifyEvent;
-    FAniCalculations: TALAniCalculations;
+    FScrollEngine: TALScrollEngine;
     fLastViewportPosition: TpointF;
     FOnViewportPositionChange: TALTabPositionChangeEvent;
     FAniTransition: TALFloatPropertyAnimation;
@@ -116,13 +116,11 @@ type
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
     fOnAniProcess: TnotifyEvent;
-    fMouseDownPos: single;
-    FDeadZoneBeforeAcquireScrolling: Integer;
-    fScrollingAcquiredByMe: boolean;
-    fScrollingAcquiredByOther: boolean;
-    fScrollingAcquiredByOtherMessageID: integer;
-    procedure setScrollingAcquiredByMe(const Value: boolean);
-    procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+    fMouseDownPos: TPointF;
+    fScrollCapturedByMe: boolean;
+    fScrollCapturedByOther: boolean;
+    procedure setScrollCapturedByMe(const Value: boolean);
+    procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetTabIndex(const Value: Integer);
     function GetActiveTab: TALTabItem;
     procedure SetActiveTab(const Value: TALTabItem);
@@ -171,8 +169,7 @@ type
     function SetActiveTabWithTransition(
                const ATab: TALTabItem;
                const ATransition: TALTabTransition;
-               const AVelocity: double=0;
-               const ALaunchAniStartEvent: boolean = True): boolean; overload;
+               const AVelocity: Single = 0): boolean; overload;
     function SetActiveTabWithTransition(const ATabIndex: integer; ATransition: TALTabTransition): boolean; overload;
     function FindVisibleTab(var Index: Integer; const FindKind: TFindKind): Boolean; overload;
     function FindVisibleTab(const FindKind: TFindKind): Integer; overload;
@@ -186,9 +183,8 @@ type
     function HasActiveTab: Boolean;
     property TabCount: Integer read fTabCount;
     property Tabs[AIndex: Integer]: TALTabItem read GetTabItem;
-    property AniCalculations: TALAniCalculations read FAniCalculations;
+    property ScrollEngine: TALScrollEngine read FScrollEngine;
     property AniTransition: TALFloatPropertyAnimation read FAniTransition;
-    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 16;
   published
     property Align;
     property Anchors;
@@ -249,6 +245,7 @@ uses
   System.Math.Vectors,
   FMX.Utils,
   FMX.Consts,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
@@ -309,9 +306,8 @@ procedure TALTabItem.ParentChanged;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindTabControl: TALTabControl;
-  var P: TFmxObject;
   begin
-    P := Parent;
+    var P := Parent;
     while P <> nil do begin
       if P is TALTabControl then begin
         Result := P as TALTabControl;
@@ -340,34 +336,31 @@ end;
 
 {**}
 type
-  TALTabControlAniCalculations = class(TALAniCalculations)
+  TALTabControlScrollEngine = class(TALScrollEngine)
   private
-    [Weak] FTabControl: TALTabControl;
-    fRunning: Boolean;
+    FTabControl: TALTabControl;
     Procedure LaunchAniTransition;
   protected
     procedure DoStart; override;
     procedure DoStop; override;
     procedure DoChanged; override;
   public
-    constructor Create(AOwner: TPersistent); override;
-    procedure MouseDown(X, Y: Double); override;
-    procedure MouseUp(X, Y: Double); override;
+    constructor Create(const ATabControl: TALTabControl); reintroduce;
+    procedure MouseDown(X, Y: Single); override;
+    procedure MouseUp(X, Y: Single); override;
     procedure MouseLeave; override;
     property TabControl: TALTabControl read FTabControl;
   end;
 
-{*******************************************************************}
-constructor TALTabControlAniCalculations.Create(AOwner: TPersistent);
+{*****************************************************************************}
+constructor TALTabControlScrollEngine.Create(const ATabControl: TALTabControl);
 begin
-  ValidateInheritance(AOwner, TALTabControl, False);
-  inherited;
-  FTabControl := TALTabControl(AOwner);
-  fRunning := False;
+  inherited Create;
+  FTabControl := ATabControl;
 end;
 
-{***********************************************}
-procedure TALTabControlAniCalculations.DoChanged;
+{********************************************}
+procedure TALTabControlScrollEngine.DoChanged;
 begin
   inherited DoChanged;
   if (csDestroying in FTabControl.ComponentState) or
@@ -377,53 +370,43 @@ begin
   FTabControl.AniTransitionSlideProcess(nil); // will realign all the tab around activeTab (and update also activetab if neccessary) and fire OnViewportPositionChange
 end;
 
-{*********************************************}
-procedure TALTabControlAniCalculations.DoStart;
+{******************************************}
+procedure TALTabControlScrollEngine.DoStart;
 begin
   inherited DoStart;
-
-  if (not fRunning) and
-     (assigned(FTabControl.fOnAniStart)) and
+  if (assigned(FTabControl.fOnAniStart)) and
      (not FTabControl.AniTransition.Running) and
      (not (csDestroying in FTabControl.ComponentState)) then FTabControl.fOnAniStart(FTabControl);
-
-  if down then fRunning := true;
 end;
 
-{********************************************}
-procedure TALTabControlAniCalculations.DoStop;
+{*****************************************}
+procedure TALTabControlScrollEngine.DoStop;
 begin
   inherited DoStop;
-
-  if (fRunning) and
+  if (assigned(FTabControl.fOnAniStop)) and
      (not FTabControl.AniTransition.Running) and
-     (assigned(FTabControl.fOnAniStop)) and
      (not (csDestroying in FTabControl.ComponentState)) then FTabControl.fOnAniStop(FTabControl);
-
-  if (not down) then fRunning := False;
 end;
 
-{*************************************************************}
-procedure TALTabControlAniCalculations.MouseDown(X, Y: Double);
+{**********************************************************}
+procedure TALTabControlScrollEngine.MouseDown(X, Y: Single);
 begin
   inherited MouseDown(X, Y);
   if down then FTabControl.FAniTransition.StopAtCurrent;
 end;
 
-{*********************************************************}
-Procedure TALTabControlAniCalculations.LaunchAniTransition;
-var LVelocity: double;
-    LTargetTabIndex: integer;
+{******************************************************}
+Procedure TALTabControlScrollEngine.LaunchAniTransition;
 begin
 
   // exit or if their is no activetab
   if (not FTabControl.HasActiveTab) then exit;
 
   // init aVelocity
-  LVelocity := currentVelocity.X;
+  var LVelocity := currentVelocity.X;
 
   // init aTargetTabIndex
-  LTargetTabIndex := fTabControl.tabindex;
+  var LTargetTabIndex := fTabControl.tabindex;
   if compareValue(LVelocity, 0, Tepsilon.Position) > 0 then begin
     if compareValue(FTabControl.activeTab.Position.x, 0, Tepsilon.Position) <= 0 then
       fTabControl.FindVisibleTab(LTargetTabIndex, TALTabControl.TFindKind.next); // if not found the bounds animation will play
@@ -433,33 +416,32 @@ begin
       fTabControl.FindVisibleTab(LTargetTabIndex, TALTabControl.TFindKind.back); // if not found the bounds animation will play
   end;
 
-  // Stop the animation
-  fRunning := False;
-  Stop;
+  // Stop the animation. Stop will not terminate imediatly the Timer and thus
+  // will not call imediatly the dostop
+  Stop(False{ACanDoSpringBack});
 
   // SetActiveTabWithTransition + aVelocity
-  fTabControl.SetActiveTabWithTransition(fTabControl.tabs[LTargetTabIndex], TALTabTransition.Slide, LVelocity, false{ALaunchAniStartEvent});
+  fTabControl.SetActiveTabWithTransition(
+    fTabControl.tabs[LTargetTabIndex],
+    TALTabTransition.Slide,
+    LVelocity);
 
 end;
 
-{***********************************************************}
-procedure TALTabControlAniCalculations.MouseUp(X, Y: Double);
-var LDown: Boolean;
+{********************************************************}
+procedure TALTabControlScrollEngine.MouseUp(X, Y: Single);
 begin
-  LDown := Down;
-  fRunning := False;
+  var LWasDown := Down;
   inherited MouseUp(X, Y);
-  if LDown and Moved then LaunchAniTransition;
+  if LWasDown then LaunchAniTransition;
 end;
 
-{************************************************}
-procedure TALTabControlAniCalculations.MouseLeave;
-var LDown: Boolean;
+{*********************************************}
+procedure TALTabControlScrollEngine.MouseLeave;
 begin
-  LDown := Down;
-  fRunning := False;
+  var LWasDown := Down;
   inherited MouseLeave;
-  if LDown and Moved then LaunchAniTransition;
+  if LWasDown then LaunchAniTransition;
 end;
 
 {***************************************************}
@@ -485,25 +467,16 @@ begin
   FRealigningTabs := False;
   AutoCapture := True;
   SetAcceptsControls(True);
-  FDeadZoneBeforeAcquireScrolling := 16;
-  fMouseDownPos := 0;
-  fScrollingAcquiredByMe := False;
-  fScrollingAcquiredByOther := False;
-  fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
+  fMouseDownPos := TpointF.Zero;
+  fScrollCapturedByMe := False;
+  fScrollCapturedByOther := False;
+  TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //-----
-  FAniCalculations := TALTabControlAniCalculations.Create(Self);
-  FAniCalculations.Animation := true; // Specifies whether to customize inertial scrolling by taking into account the DecelerationRate property when calculating parameters of inertial scrolling.
-  FAniCalculations.AutoShowing := False;  // Enables the smooth hiding and showing of scroll bars.
-  FAniCalculations.averaging := false;  // Specifies whether to average an inertial moving velocity taking into account all existing points on a trajectory.
-  FAniCalculations.BoundsAnimation := true; // the TTargetType.Min and TTargetType.Max must be set. this make a bound the the animation reach the min or max of the scrooling area
-  FAniCalculations.TouchTracking := [ttHorizontal]; // Defines the possible directions of the inertial scrolling initiated by the touch input.
-  FAniCalculations.DecelerationRate := ALDecelerationRateNormal; // DecelerationRateNormal (1.95) - Determines the deceleration rate of inertial scrolling.
-  FAniCalculations.Elasticity := ALDefaultElasticity; // By default, the scroll view "bounces" back when scrolling exceeds the bounds of the content.
-                                                      // Elasticity defines the velocity of this "BOUNCING" (not the velocity of the scroll, just the elasticity of the bouncing)
-  FAniCalculations.StorageTime := ALDefaultStorageTime; // DefaultStorageTime (0.15) - The duration of time in which the scrolling engine stores obtained trajectory points.
-                                                        // so if you make a big number here, then it's something like if you press the screen without moving for few second, and suddenly
-                                                        // move fastly then the velocity will be taken with the time when you move slowly (so a slow velocity)
-                                                        // on the other side if to slow then only one point (or even 0) will be keep and their will be no amims at all
+  FScrollEngine := TALTabControlScrollEngine.Create(Self);
+  FScrollEngine.AutoShowing := False;
+  FScrollEngine.MinEdgeSpringbackEnabled := true;
+  FScrollEngine.MaxEdgeSpringbackEnabled := true;
+  FScrollEngine.TouchTracking := [ttHorizontal];
   FOnViewportPositionChange := nil;
   fLastViewportPosition := TpointF.Create(0,0);
   //-----
@@ -516,8 +489,8 @@ end;
 {*******************************}
 destructor TALTabControl.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
-  ALFreeAndNil(FAniCalculations);
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
+  ALFreeAndNil(FScrollEngine);
   ALFreeAndNil(FAniTransition);
   inherited;
 end;
@@ -526,8 +499,6 @@ end;
 // this method is called on Child.ChangeOrder (like changing the index property)
 // DoInsertObject and Sort but NOT on DoAddObject !
 procedure TALTabControl.ChangeChildren;
-var LNeedRealignTabs: Boolean;
-    i, k: integer;
 begin
 
   //this will update also the controls list (that is different from the childreen list)
@@ -539,11 +510,11 @@ begin
   //keep the TalTabItem at the beginning of the controls list and the
   //other child objects at the end of the controls list
   if not FchildreenChanging then begin
-    LNeedRealignTabs := False;
+    var LNeedRealignTabs := False;
     FchildreenChanging := True;
     try
-      K := controlsCount - 1;
-      for I := controlsCount - 1 downto 0 do begin
+      var K := controlsCount - 1;
+      for var I := controlsCount - 1 downto 0 do begin
         if not (controls[i] is TalTabItem) then begin
           if (i <> k) then begin
             LNeedRealignTabs := True;
@@ -562,12 +533,11 @@ end;
 
 {*************************************************************}
 procedure TALTabControl.DoAddObject(const AObject: TFmxObject);
-var LIdx: integer;
 begin
   //keep the TalTabItem as the beginning of the controls list and the
   //other child objects at the end of the controls list
   if AObject is TALTabItem then begin
-    LIdx := TabCount;
+    var LIdx := TabCount;
     inherited DoAddObject(AObject);
     AObject.Index := LIdx;
     inc(FTabCount);
@@ -619,14 +589,14 @@ end;
 {**************************************************}
 function TALTabControl.getAnimationEnabled: boolean;
 begin
-  result := ttHorizontal in FAniCalculations.TouchTracking;
+  result := ttHorizontal in FScrollEngine.TouchTracking;
 end;
 
 {****************************************************************}
 procedure TALTabControl.setAnimationEnabled(const Value: boolean);
 begin
-  if value then FAniCalculations.TouchTracking := [ttHorizontal]
-  else FAniCalculations.TouchTracking := [];
+  if value then FScrollEngine.TouchTracking := [ttHorizontal]
+  else FScrollEngine.TouchTracking := [];
 end;
 
 {**********************************************}
@@ -718,67 +688,93 @@ begin
     FOnChange(Self);
 end;
 
-{*********************************************************************}
-procedure TALTabControl.setScrollingAcquiredByMe(const Value: boolean);
+{******************************************************************}
+procedure TALTabControl.setScrollCapturedByMe(const Value: boolean);
 begin
-  if Value <> fScrollingAcquiredByMe  then begin
-    fScrollingAcquiredByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create(Value), True);
+  if Value <> fScrollCapturedByMe  then begin
+    {$IFDEF DEBUG}
+    //ALLog('TALTabControl.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
+    {$ENDIF}
+    fScrollCapturedByMe := Value;
+    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value));
   end;
 end;
 
-{************************************************************************************************}
-procedure TALTabControl.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+{*********************************************************************************************}
+procedure TALTabControl.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was acquired or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be acquired BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollingAcquiredByOther to handle this
+  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
+  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
+  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
-  if TALScrollingAcquiredMessage(M).Acquired then begin
-    if fAniCalculations.down then begin
-      fAniCalculations.MouseLeave; // instead of down := false to reposition the tabitem
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALTabControl.ScrollCapturedByOtherHandler',
+  //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
+  //  'ScrollEngine.down: ' + ALBoolToStrW(fScrollEngine.down),
+  //  TalLogType.verbose);
+  {$ENDIF}
+  if TALScrollCapturedMessage(M).Captured then begin
+    if fScrollEngine.down then begin
+      fScrollEngine.Down := false; // instead of down := false to reposition the tabitem
       FMouseEvents := False;
-      if not FAniTransition.Running then RealignTabs; // << if i try with fAniCalculations.launchanimation i have a flickr because the anim stop and restart at a different speed
+      // If i try with fScrollEngine.launchanimation i have a flickr because the anim stop and restart at a different speed
+      if not FAniTransition.Running then RealignTabs;
     end;
-    fScrollingAcquiredByOther := True;
+    fScrollCapturedByOther := True;
   end
-  else fScrollingAcquiredByOther := False;
+  else fScrollCapturedByOther := False;
 end;
 
 {************************************************************************************************}
 procedure TALTabControl.internalMouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALTabControl.MouseDown',
+  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
+  {$ENDIF}
   FMouseEvents := true;
-  inherited;
   if not AnimationEnabled then exit;
-  if (not fScrollingAcquiredByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollingAcquiredByMe(False);
-    fMouseDownPos := x;
-    FAniCalculations.averaging := ssTouch in Shift;
-    AniCalculations.MouseDown(X, Y);
+  if (not fScrollCapturedByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
+    setScrollCapturedByMe(False);
+    fMouseDownPos := TPointF.Create(X,Y);
+    ScrollEngine.MouseDown(X, Y);
   end;
 end;
 
 {**************************************************************************}
 procedure TALTabControl.internalMouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALTabControl.internalMouseMove',
+  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
+  {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents then begin
-    if (not fScrollingAcquiredByMe) and
-       (abs(fMouseDownPos - x) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
-    AniCalculations.MouseMove(X, Y);
+    if (not fScrollCapturedByMe) and
+       (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
+       (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then setScrollCapturedByMe(True);
+    ScrollEngine.MouseMove(X, Y);
   end;
 end;
 
 {**********************************************************************************************}
 procedure TALTabControl.internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALTabControl.internalMouseUp',
+  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  TalLogType.verbose);
+  {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollingAcquiredByMe(False);
-    AniCalculations.MouseUp(X, Y);
+    setScrollCapturedByMe(False);
+    ScrollEngine.MouseUp(X, Y);
     FMouseEvents := False;
   end;
 end;
@@ -786,11 +782,13 @@ end;
 {*****************************************}
 procedure TALTabControl.internalMouseLeave;
 begin
-  inherited;
+  {$IFDEF DEBUG}
+  //ALLog('TALTabControl.internalMouseLeave', TalLogType.verbose);
+  {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents then begin
-    setScrollingAcquiredByMe(False);
-    AniCalculations.MouseLeave;
+    setScrollCapturedByMe(False);
+    ScrollEngine.MouseLeave;
     FMouseEvents := False;
   end;
 end;
@@ -830,10 +828,9 @@ Type
 {*************}
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
 begin
   if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
 end;
@@ -842,9 +839,8 @@ end;
 {*************}
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
 begin
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseMove(Shift, P.X, P.Y);
   inherited;
 end;
@@ -853,10 +849,9 @@ end;
 {*************}
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-var P: Tpointf;
 begin
   if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
-  P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
+  var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
 end;
@@ -875,7 +870,6 @@ end;
 procedure TALTabControl.RealignTabs;
 var LBoundsRect: TrectF;
     LTmpRect: TrectF;
-    LTargets: array of TALAniCalculations.TTarget;
     i, k: integer;
 begin
 
@@ -932,15 +926,11 @@ begin
     end;
     dec(k);
 
-    //update the FAniCalculations target
-    SetLength(LTargets, 2);
-    LTargets[0].TargetType := TALAniCalculations.TTargetType.Min;
-    LTargets[0].Point := TALPointD.Create(0, 0);
-    LTargets[1].TargetType := TALAniCalculations.TTargetType.Max;
-    LTargets[1].Point := TALPointD.Create(max(0,k) * width, 0);
-    FAniCalculations.SetTargets(LTargets);
-    if HasActiveTab then FAniCalculations.ViewportPosition := TAlPointD.Create(ActiveTab.ViewPortOffset, 0)
-    else FAniCalculations.ViewportPosition := TAlPointD.Create(0,0);
+    //update the FScrollEngine target
+    FScrollEngine.MinScrollLimit := TALPointD.Create(0, 0);
+    FScrollEngine.MaxScrollLimit := TALPointD.Create(max(0,k) * width, 0);
+    if HasActiveTab then FScrollEngine.ViewportPosition := TAlPointD.Create(ActiveTab.ViewPortOffset, 0)
+    else FScrollEngine.ViewportPosition := TAlPointD.Create(0,0);
 
   finally
     FRealigningTabs := False;
@@ -950,21 +940,19 @@ end;
 
 {*****************************************************************}
 procedure TALTabControl.AniTransitionSlideProcess(Sender: TObject);
-var LTargetTabItem: TALTabItem;
-    LNewViewportPosition: TPointF;
-    i, k: integer;
 begin
 
   //security check
   if not HasActiveTab then exit;
 
   //init aTargetTabItem
+  var LTargetTabItem: TALTabItem;
   if (Sender <> nil) then LTargetTabItem := TALTabItem((Sender as TALFloatPropertyAnimation).TagObject)
   else LTargetTabItem := activeTab;
 
   //offset all the items before aTargetTabItem
-  k := LTargetTabItem.Index;
-  for I := LTargetTabItem.Index - 1 downto 0 do begin
+  var k := LTargetTabItem.Index;
+  for var I := LTargetTabItem.Index - 1 downto 0 do begin
     if tabs[i].Visible then begin
       tabs[i].Position.X := tabs[k].Position.X - tabs[i].Width;
       k := i;
@@ -973,7 +961,7 @@ begin
 
   //offset all the items after aTargetTabItem
   k := LTargetTabItem.Index;
-  for I := LTargetTabItem.Index + 1 to tabcount - 1 do begin
+  for var I := LTargetTabItem.Index + 1 to tabcount - 1 do begin
     if tabs[i].Visible then begin
       tabs[i].Position.X := tabs[k].Position.X + tabs[k].Width;
       k := i;
@@ -985,11 +973,11 @@ begin
     FRealigningTabs := True; //to deactivate RealignTabs during SetTabIndex
     try
       if activeTab.Position.x > 0 then begin
-        i := tabindex;
+        var i := tabindex;
         if FindVisibleTab(i, TFindKind.back) then TabIndex := i;
       end
       else if activeTab.Position.x < 0 then begin
-        i := tabindex;
+        var i := tabindex;
         if FindVisibleTab(i, TFindKind.next) then TabIndex := i;
       end;
     finally
@@ -997,21 +985,20 @@ begin
     end;
   end;
 
-  //update FAniCalculations.ViewportPosition if the AniTransitionSlideProcess
+  //update FScrollEngine.ViewportPosition if the AniTransitionSlideProcess
   //was called from the fAniTransition
   if (Sender <> nil) then
-    FAniCalculations.ViewportPosition := TAlPointD.Create(activeTab.ViewPortOffset - activeTab.Position.Point.X, 0);
+    FScrollEngine.SetViewportPosition(TAlPointD.Create(activeTab.ViewPortOffset - activeTab.Position.Point.X, 0), False{WithinLimits});
 
   //fire the OnViewportPositionChange
-  LNewViewportPosition := TpointF.Create(FAniCalculations.ViewportPosition.X, FAniCalculations.ViewportPosition.Y);
+  var LNewViewportPosition := TpointF.Create(FScrollEngine.ViewportPosition.X, FScrollEngine.ViewportPosition.Y);
   if (assigned(FOnViewportPositionChange)) and
      (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then
     FOnViewportPositionChange(self, fLastViewportPosition, LNewViewportPosition);
   fLastViewportPosition := LNewViewportPosition;
 
   //fire the fOnAniProcess
-  if (assigned(fOnAniProcess)) and
-     (not fAniCalculations.down) then
+  if assigned(fOnAniProcess) then
     fOnAniProcess(Self);
 
 end;
@@ -1020,7 +1007,7 @@ end;
 procedure TALTabControl.AniTransitionSlideFinish(Sender: TObject);
 begin
   if (assigned(fOnAniStop)) and
-     (not fAniCalculations.down) then
+     (not fScrollEngine.TimerActive) then
     fOnAniStop(Self);
 end;
 
@@ -1033,13 +1020,13 @@ end;
 
 {******************************************************************}
 procedure TALTabControl.AniTransitionFadeOutFinish(Sender: TObject);
-var LOldActiveTab: TalTabItem;
 begin
-  LOldActiveTab := ActiveTab;
+  var LOldActiveTab := ActiveTab;
   ActiveTab := TALTabItem(TALFloatPropertyAnimation(Sender).TagObject);
   LOldActiveTab.Opacity := 1;
   ALFreeAndNil(FAniTransitionOverlay);
-  if (assigned(fOnAniStop)) then
+  if (assigned(fOnAniStop)) and
+     (not fScrollEngine.TimerActive) then
     fOnAniStop(Self);
 end;
 
@@ -1047,8 +1034,7 @@ end;
 function TALTabControl.SetActiveTabWithTransition(
            const ATab: TALTabItem;
            const ATransition: TALTabTransition;
-           const AVelocity: double=0;
-           const ALaunchAniStartEvent: boolean = True): boolean;
+           const AVelocity: Single = 0): boolean;
 begin
 
   ALFreeAndNil(FAniTransitionOverlay);
@@ -1070,7 +1056,7 @@ begin
 
     FAniTransition.Duration := 0.3;
     FAniTransition.AnimationType := TAnimationType.In;
-    FAniTransition.Interpolation := TInterpolationType.Linear;
+    FAniTransition.Interpolation := TALInterpolationType.Linear;
     if assigned(fOnAniTransitionInit) then
       fOnAniTransitionInit(
         self,
@@ -1078,8 +1064,9 @@ begin
         AVelocity,
         FAniTransition);
 
-    if (ALaunchAniStartEvent) and
-       (assigned(fOnAniStart)) then fOnAniStart(self);
+    if (assigned(fOnAniStart)) and
+       (not fScrollEngine.TimerActive) then
+      fOnAniStart(Self);
     FAniTransition.start;
 
   end
@@ -1105,7 +1092,7 @@ begin
 
     FAniTransition.Duration := 0.3;
     FAniTransition.AnimationType := TAnimationType.out;
-    FAniTransition.Interpolation := TInterpolationType.Linear;
+    FAniTransition.Interpolation := TALInterpolationType.Linear;
     if assigned(fOnAniTransitionInit) then
       fOnAniTransitionInit(
         self,
@@ -1113,8 +1100,9 @@ begin
         AVelocity,
         FAniTransition);
 
-    if (ALaunchAniStartEvent) and
-       (assigned(fOnAniStart)) then fOnAniStart(self);
+    if (assigned(fOnAniStart)) and
+       (not fScrollEngine.TimerActive) then
+      fOnAniStart(Self);
     FAniTransition.start;
 
   end
@@ -1133,10 +1121,8 @@ function TALTabControl.FindVisibleTab(var Index: Integer; const FindKind: TFindK
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindNextVisibleTab(const AFromIndex: Integer): Integer;
-  var
-    I: Integer;
   begin
-    I := AFromIndex;
+    var I := AFromIndex;
     repeat
       Inc(I);
     until (I >= TabCount) or Tabs[I].Visible;
@@ -1145,10 +1131,8 @@ function TALTabControl.FindVisibleTab(var Index: Integer; const FindKind: TFindK
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function FindPrevVisibleTab(const AFromIndex: Integer): Integer;
-  var
-    I: Integer;
   begin
-    I := AFromIndex;
+    var I := AFromIndex;
     repeat
       Dec(I);
     until (I < 0) or Tabs[I].Visible;
@@ -1199,9 +1183,8 @@ end;
 
 {************************************************************************}
 function TALTabControl.FindVisibleTab(const FindKind: TFindKind): Integer;
-var I: Integer;
 begin
-  I := TabIndex;
+  var I := TabIndex;
   if FindVisibleTab(I, FindKind) then Result := I
   else Result := -1;
 end;
@@ -1232,16 +1215,15 @@ end;
 
 {***********************************************************}
 function TALTabControl.Delete(const Index: Integer): Boolean;
-var LTabIndex: Integer;
-    Obj: TFmxObject;
 begin
   Result := False;
   if (Index >= 0) and (Index < TabCount) then begin
+    var LTabIndex: Integer;
     if TabIndex > Index then LTabIndex := TabIndex - 1
     else if TabIndex = Index then LTabIndex := Index
     else LTabIndex := -1;
-    Obj := (Self as IItemsContainer).GetItem(Index);
-    ALFreeAndNil(Obj);
+    var LObj := (Self as IItemsContainer).GetItem(Index);
+    ALFreeAndNil(LObj);
     if (LTabIndex >= 0) and FindVisibleTab(LTabIndex, TFindKind.Current) then
       TabIndex := LTabIndex;
   end;
@@ -1249,8 +1231,8 @@ end;
 
 {**********************************************************************}
 function TALTabControl.Add(const TabClass: TALTabItemClass): TALTabItem;
-var LTabClass: TALTabItemClass;
 begin
+  var LTabClass: TALTabItemClass;
   if TabClass = nil then LTabClass := TALTabItem
   else LTabClass := TabClass;
   Result := LTabClass.Create(Self);
@@ -1264,10 +1246,10 @@ end;
 
 {*****************************************************************************************************}
 function TALTabControl.Insert(const Index: Integer; const TabClass: TALTabItemClass = nil): TALTabItem;
-var LTabIndex: Integer;
 begin
   Result := nil;
   if (Index >= 0) and (Index <= TabCount) then begin
+    var LTabIndex: Integer;
     if TabIndex >= Index then LTabIndex := TabIndex + 1
     else LTabIndex := -1;
     Result := Add(TabClass);

@@ -219,7 +219,7 @@
         <DCCReference Include="Alcinoe.FMX.Common.pas"/>
         <DCCReference Include="Alcinoe.FMX.TabControl.pas"/>
         <DCCReference Include="Alcinoe.FMX.DesignEditors.pas"/>
-        <DCCReference Include="Alcinoe.FMX.InertialMovement.pas"/>
+        <DCCReference Include="Alcinoe.FMX.ScrollEngine.pas"/>
         <DCCReference Include="Alcinoe.FMX.Edit.pas"/>
         <DCCReference Include="Alcinoe.Common.pas"/>
         <DCCReference Include="Alcinoe.FMX.Types3D.pas"/>

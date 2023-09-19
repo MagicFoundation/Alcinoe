@@ -31,7 +31,7 @@ uses
   FMX.ImgList,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Graphics,
-  Alcinoe.FMX.InertialMovement,
+  Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Objects;
 
 type
@@ -138,18 +138,15 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTrackThumb = class(TALRectangle)
   private
-    [Weak] fValueRange: TValueRange;
-    [Weak] FTrack: TALCustomTrack;
-    [Weak] FGlyph: TALTrackThumbGlyph;
-    FDownOffset: TPointF;
-    fTrackDownOffset: single;
+    fValueRange: TValueRange;
+    FTrack: TALCustomTrack;
+    FGlyph: TALTrackThumbGlyph;
+    fMouseDownPos: TPointF;
     FPressed: Boolean;
-    FDeadZoneBeforeAcquireScrolling: Integer;
-    fScrollingAcquiredByMe: boolean;
-    fScrollingAcquiredByOther: boolean;
-    fScrollingAcquiredByOtherMessageID: integer;
-    procedure setScrollingAcquiredByMe(const Value: boolean);
-    procedure ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+    fScrollCapturedByMe: boolean;
+    fScrollCapturedByOther: boolean;
+    procedure setScrollCapturedByMe(const Value: boolean);
+    procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     function PointToValue(X, Y: Single): Single;
   public
     constructor Create(const ATrack: TALCustomTrack; const aValueRange: TValueRange; const aWithGlyphObj: boolean); reintroduce;
@@ -160,7 +157,6 @@ type
     procedure DoMouseLeave; override;
     function GetDefaultTouchTargetExpansion: TRectF; override;
     property IsPressed: Boolean read FPressed;
-    property DeadZoneBeforeAcquireScrolling: Integer read FDeadZoneBeforeAcquireScrolling write FDeadZoneBeforeAcquireScrolling default 5;
   published
     property TouchTargetExpansion;
     property Locked default True;
@@ -212,9 +208,9 @@ type
     FTracking: Boolean;
     FThumbSize: Single;
     FMinThumbSize: Single;
-    [Weak] FThumb: TALTrackThumb;
-    [Weak] FBackGround: TALTrackBackground;
-    [Weak] FHighlight: TALTrackHighlight;
+    FThumb: TALTrackThumb;
+    FBackGround: TALTrackBackground;
+    FHighlight: TALTrackHighlight;
     procedure SetViewportSize(const Value: Single); virtual;
     function GetViewportSize: Single; virtual;
     function GetFrequency: Single; virtual;
@@ -430,7 +426,7 @@ type
   private
     FMaxValueRange: TValueRange;
   protected
-    [Weak] FMaxThumb: TALTrackThumb;
+    FMaxThumb: TALTrackThumb;
     procedure SetViewportSize(const Value: Single); override;
     procedure SetFrequency(const Value: Single); override;
     procedure SetMax(const Value: Single); override;
@@ -674,8 +670,8 @@ type
     DefaultSwitchAnimationDuration = 0.2;
     TrackingSensitivity = 3;
   private
-    [Weak] FThumb: TALSwitchThumb;
-    [Weak] FBackGround: TALSwitchBackground;
+    FThumb: TALSwitchThumb;
+    FBackGround: TALSwitchBackground;
     FThumbRect: TrectF;
     FPressed, FTracking: Boolean;
     FPressedThumbPos, FSavedPos: TPointF;
@@ -1067,18 +1063,16 @@ begin
     fGlyph.Name := 'Glyph';
   end
   else fGlyph := nil;
-  FDeadZoneBeforeAcquireScrolling := 5;
-  FDownOffset := TpointF.Create(0, 0);
-  fTrackDownOffset := 0;
-  fScrollingAcquiredByMe := False;
-  fScrollingAcquiredByOther := False;
-  fScrollingAcquiredByOtherMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TALScrollingAcquiredMessage, ScrollingAcquiredByOtherHandler);
+  fMouseDownPos := TpointF.Zero;
+  fScrollCapturedByMe := False;
+  fScrollCapturedByOther := False;
+  TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
 {*******************************}
 destructor TALTrackThumb.Destroy;
 begin
-  TMessageManager.DefaultManager.Unsubscribe(TALScrollingAcquiredMessage, fScrollingAcquiredByOtherMessageID);
+  TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   inherited;
 end;
 
@@ -1090,12 +1084,12 @@ begin
   if (Parent is TControl) then begin
     if FTrack.Orientation = TOrientation.Horizontal then begin
       P := FTrack.ScreenToLocal(LocalToScreen(TPointF.Create(X, 0)));
-      P.X := P.X - FDownOffset.X + Width / 2;
+      P.X := P.X - fMouseDownPos.X + Width / 2;
       Result := _PosToValue(FTrack.Min, FTrack.Max, FTrack.ViewportSize, Self.Width, FTrack.Width, P.X, FTrack.FIgnoreViewportSize);
     end
     else begin
       P := FTrack.ScreenToLocal(LocalToScreen(TPointF.Create(0, Y)));
-      P.Y := P.Y - FDownOffset.Y + Height / 2;
+      P.Y := P.Y - fMouseDownPos.Y + Height / 2;
       Result := _PosToValue(FTrack.Min, FTrack.Max, FTrack.ViewportSize, Self.Height, FTrack.Height, P.Y, FTrack.FIgnoreViewportSize);
     end;
   end;
@@ -1116,43 +1110,52 @@ begin
     Result := inherited ;
 end;
 
-{*********************************************************************}
-procedure TALTrackThumb.setScrollingAcquiredByMe(const Value: boolean);
+{******************************************************************}
+procedure TALTrackThumb.setScrollCapturedByMe(const Value: boolean);
 begin
-  if Value <> fScrollingAcquiredByMe  then begin
-    fScrollingAcquiredByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollingAcquiredMessage.Create(Value), True);
+  if Value <> fScrollCapturedByMe  then begin
+    {$IFDEF DEBUG}
+    //ALLog('TALTrackThumb.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
+    {$ENDIF}
+    fScrollCapturedByMe := Value;
+    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value), True);
   end;
 end;
 
-{************************************************************************************************}
-procedure TALTrackThumb.ScrollingAcquiredByOtherHandler(const Sender: TObject; const M: TMessage);
+{*********************************************************************************************}
+procedure TALTrackThumb.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was acquired or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be acquired BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollingAcquiredByOther to handle this
+  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
+  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
+  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
-  if TALScrollingAcquiredMessage(M).Acquired then begin
+  {$IFDEF DEBUG}
+  //ALLog(
+  //  'TALTrackThumb.ScrollCapturedByOtherHandler',
+  //  'Captured: ' + ALBoolToStrW(TALScrollCapturedMessage(M).Captured)+ ' | ' +
+  //  'Pressed: ' + ALBoolToStrW(FPressed),
+  //  TalLogType.verbose);
+  {$ENDIF}
+  if TALScrollCapturedMessage(M).Captured then begin
     if FPressed then begin
       FPressed := False;
       if (not FValueRange.Tracking) then FValueRange.Tracking := True;
     end;
-    fScrollingAcquiredByOther := True;
+    fScrollCapturedByOther := True;
   end
-  else fScrollingAcquiredByOther := False;
+  else fScrollCapturedByOther := False;
 end;
 
 {****************************************************************************************}
 procedure TALTrackThumb.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  if (not fScrollingAcquiredByOther) and (Button = TMouseButton.mbLeft) and Enabled then begin
+  if (not fScrollCapturedByOther) and (Button = TMouseButton.mbLeft) and Enabled then begin
     BringToFront;
     repaint;
     FPressed := True;
-    setScrollingAcquiredByMe(False);
-    FDownOffset := PointF(X, Y);
-    fTrackDownOffset := FTrack.ScreenToLocal(LocalToScreen(TPointF.Create(X, 0))).x;
+    setScrollCapturedByMe(False);
+    fMouseDownPos := PointF(X, Y);
     FTrack.SetFocus;
     fValueRange.Tracking := FTrack.Tracking;
     StartTriggerAnimation(Self, 'IsPressed');
@@ -1166,8 +1169,9 @@ begin
   inherited;
   if FPressed and Enabled then begin
 
-    if (not fScrollingAcquiredByMe) and
-       (abs(FTrack.ScreenToLocal(LocalToScreen(TPointF.Create(x, 0))).x - fTrackDownOffset) > fDeadZoneBeforeAcquireScrolling) then setScrollingAcquiredByMe(True);
+    if (not fScrollCapturedByMe) and
+       (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
+       (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then setScrollCapturedByMe(True);
 
     try
       FValueRange.Value := PointToValue(X, Y);
@@ -1187,7 +1191,7 @@ begin
   inherited;
   if FPressed then begin
 
-    setScrollingAcquiredByMe(False);
+    setScrollCapturedByMe(False);
 
     FPressed := False;
     try
@@ -1209,7 +1213,7 @@ begin
   inherited;
   if FPressed then begin
 
-    setScrollingAcquiredByMe(False);
+    setScrollCapturedByMe(False);
 
     FPressed := False;
     try
@@ -1245,7 +1249,7 @@ type
   {**************************************}
   TALValueRangeTrack = class (TValueRange)
   private
-    [Weak] FTrack: TALCustomTrack;
+    FTrack: TALCustomTrack;
     FValueChanged: Boolean;
   public
     constructor Create(AOwner: TComponent); override;
@@ -2405,7 +2409,7 @@ begin
   //-----
   FAnimation := TALFloatAnimation.Create;
   FAnimation.AnimationType := TAnimationType.In;
-  FAnimation.Interpolation := TInterpolationType.Linear;
+  FAnimation.Interpolation := TALInterpolationType.Linear;
   FAnimation.OnProcess := doAnimationProcess;
   FAnimation.OnFinish := DoAnimationEnd;
   FAnimation.Enabled := False;

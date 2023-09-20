@@ -146,7 +146,7 @@
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <SanitizedProjectName>ALAnimationDemo</SanitizedProjectName>
-    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Alexandria\11_3\fmx;..\..\..\Embarcadero\Alexandria\11_3\rtl\ios;..\..\..\Embarcadero\Alexandria\11_3\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Alexandria\fmx;..\..\..\Embarcadero\Alexandria\rtl\ios;..\..\..\Embarcadero\Alexandria\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <DCC_UsePackage>DBXSqliteDriver;DBXInterBaseDriver;tethering;bindcompfmx;FmxTeeUI;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;bindengine;DataSnapClient;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;ibmonitor;FMXTee;DbxCommonDriver;ibxpress;xmlrtl;DataSnapNativeClient;ibxbindings;rtl;FireDACDSDriver;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>

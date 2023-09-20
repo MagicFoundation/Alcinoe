@@ -160,7 +160,7 @@
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
-    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Alexandria\11_3\fmx;..\..\..\Embarcadero\Alexandria\11_3\rtl\ios;..\..\..\Embarcadero\Alexandria\11_3\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Alexandria\fmx;..\..\..\Embarcadero\Alexandria\rtl\ios;..\..\..\Embarcadero\Alexandria\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <DCC_CodePage>65001</DCC_CodePage>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>

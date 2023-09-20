@@ -62,42 +62,39 @@ us to patch the original Delphi source files:
 Install Alcinoe
 ---------------
 
+To set up Alcinoe, first execute [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat). This 
+batch file handles a series of tasks: it retrieves and 
+patches the original Delphi source code, downloads the 
+necessary iOS/Android libraries, constructs the Alcinoe 
+JAR files, builds the BPL (Borland Package Library), 
+compiles tools from the [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/) directory, and 
+finally compiles all demos in the [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/) 
+directory. Please be aware that some demos utilize 
+components from [devexpress](https://www.devexpress.com/).
+
+If your goal is to use only the non-visual components 
+from Alcinoe, no further installation steps are necessary. 
+Just ensure to include [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) in your project's 
+search path.
+
+For those wanting to use Alcinoe's visual components 
+during design time, a few more steps are required. You 
+will need to install the BPL: Open Delphi, navigate to 
+Component > Install Packages... and select the BPL from 
+[{alcinoe}\Libraries\bpl\Alcinoe\Win32\<YourDelphiVersion>\Alcinoe<YourDelphiVersion>.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
+Also, remember to include both [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) and all 
+subdirectories from [{alcinoe}\Embarcadero\<YourDelphiVersion>](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
+in your search path.
+
+
+Update Alcinoe
+--------------
+
 We need some time to rename unit/class/function names. To 
 help you automatically perform this renaming task in your 
 project to the latest version of Alcinoe, we provide you 
 with the tool called CodeRenaming. You can find this tool 
 at the following link: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming).
-
-If you plan to use the FMX (FireMonkey) framework with 
-Alcinoe, you will need to patch the original Delphi 
-source code. To do this, you need to go to [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/) 
-and run [update.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/update.bat) 
-to retrieve and patch the original Delphi source code. 
-The batch file assumes that the original source code is 
-located in c:\Program Files (x86)\Embarcadero\Studio\22.0\source\ 
-and that you have GIT in your path. Later, you will need to 
-include all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/)
-in your project search path.
-
-You will also need to run [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat) 
-to download the iOS/Android libraries, build the 
-Alcinoe Jars, build the BPL, build all tools located 
-in [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/), 
-and finally build all demos located in [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/). 
-Note that some demos use [devexpress](https://www.devexpress.com/).
-
-If you don't plan to use any Alcinoe visual components at 
-design time, you don't need to install anything. Just add 
-[{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
-to the search path of your project.
-
-However, if you want to use visual components at design time, 
-you need to install the BPL. Launch Delphi and go to 
-Component > Install Packages... > and choose the BPL located 
-in [{alcinoe}\Libraries\bpl\Alcinoe\Win32\Alexandria\AlcinoeAlexandria.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32/Alexandria). 
-You also need to add [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
-and all subdirectories located in [{alcinoe}\Embarcadero\Alexandria\11_3](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Alexandria/11_3/) 
-to your search path.
 
 
 Propose a change using GitHub

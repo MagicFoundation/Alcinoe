@@ -5,7 +5,7 @@ set ALBaseDir=%~dp0
 set Libraries=%ALBaseDir%\App\
 set Libraries=%Libraries%;com.alcinoe:alcinoe-edittext:1.0.0
 set Libraries=%Libraries%;com.alcinoe:alcinoe-datepicker:1.0.0
-set Libraries=%Libraries%;com.alcinoe:alcinoe-common:1.0.0
+set Libraries=%Libraries%;com.alcinoe:alcinoe-common:1.0.1
 set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-core:2.18.2
 set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-hls:2.18.2
 

@@ -81,9 +81,9 @@ For those wanting to use Alcinoe's visual components
 during design time, a few more steps are required. You 
 will need to install the BPL: Open Delphi, navigate to 
 Component > Install Packages... and select the BPL from 
-[{alcinoe}\Libraries\bpl\Alcinoe\Win32\<YourDelphiVersion>\Alcinoe<YourDelphiVersion>.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
+[{alcinoe}\Libraries\bpl\Alcinoe\Win32\{YourDelphiVersion}\Alcinoe{YourDelphiVersion}.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
 Also, remember to include both [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) and all 
-subdirectories from [{alcinoe}\Embarcadero\<YourDelphiVersion>](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
+subdirectories from [{alcinoe}\Embarcadero\{YourDelphiVersion}](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
 in your search path.
 
 

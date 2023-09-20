@@ -229,7 +229,6 @@ type
   protected
     procedure ProcessTick(const ATime, ADeltaTime: Double); override;
     function GetNormalizedTime: Single; virtual;
-    property NormalizedTime: Single read GetNormalizedTime;
     function DoCustomInterpolation: Single; virtual;
   public
     constructor Create; override;
@@ -241,6 +240,10 @@ type
     property Interpolation: TALInterpolationType read FInterpolation write FInterpolation;
     property OnCustomInterpolation: TALCustomInterpolationEvent read FOnCustomInterpolation write FOnCustomInterpolation;
     property Overshoot: Single read fOvershoot write fOvershoot;
+    // Given the current time, NormalizedTime returns a number in the range from
+    // 0 through 1, indicating how far the controlled property value has changed
+    // from the StartValue to the StopValue
+    property NormalizedTime: Single read GetNormalizedTime;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}

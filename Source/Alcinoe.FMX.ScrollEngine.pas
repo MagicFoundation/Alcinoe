@@ -404,6 +404,7 @@ type
   // This class encapsulates scrolling with the
   // ability to overshoot the bounds of a scrolling operation.
   // Taken from Android OverScroller
+  // https://www.sobyte.net/post/2022-02/android-over-scroller/
   {$IFNDEF ALCompilerVersionSupported}
     {$MESSAGE WARN 'Check if android OverScroller was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\OverScroller.java with <SDKs>\android\sources\android-33\android\widget\OverScroller.java

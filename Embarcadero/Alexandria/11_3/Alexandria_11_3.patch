@@ -151,8 +151,8 @@ diff --git a/Embarcadero/Alexandria/11_3/fmx/FMX.Controls.pas b/Embarcadero/Alex
      procedure DialogKey(var Key: Word; Shift: TShiftState); virtual;
 @@ -602,6 +607,7 @@
      { optimization }
-     function GetFirstVisibleObjectIndex: Embarcadero/Alexandria/11_3/Integer; virtual;
-     function GetLastVisibleObjectIndex: Embarcadero/Alexandria/11_3/Integer; virtual;
+     function GetFirstVisibleObjectIndex: Integer; virtual;
+     function GetLastVisibleObjectIndex: Integer; virtual;
 +    function IsVisibleObject(const AObject: TControl): Boolean; virtual; // https://quality.embarcadero.com/browse/RSP-42357
      function GetDefaultSize: TSizeF; virtual;
      { bi-di }

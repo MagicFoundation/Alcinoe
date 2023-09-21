@@ -535,7 +535,7 @@ type
     FOpacityTransitionStartTime: int64;
     FTag: NativeInt;
     procedure StartTimer;
-    procedure StopTimer;
+    procedure StopTimer(const AAbruptly: Boolean = False);
     {$IF (not defined(IOS)) and (not defined(ANDROID))}
     procedure TimerProc;
     {$ENDIF}
@@ -593,7 +593,7 @@ type
     property DragResistanceFactor: Single read FDragResistanceFactor write FDragResistanceFactor;
     // Halts the ongoing animation, freezing the scroller at its current position
     // without completing the remaining motion.
-    procedure Stop(const ACanDoSpringBack: Boolean = True);
+    procedure Stop(const AAbruptly: Boolean = False);
     property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write SetMinEdgeSpringbackEnabled;
     property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write SetMaxEdgeSpringbackEnabled;
     property TouchTracking: TTouchTracking read FTouchTracking write SetTouchTracking;
@@ -2762,14 +2762,15 @@ begin
 
 end;
 
-{**********************************}
-procedure TALScrollEngine.StopTimer;
+{********************************************************************}
+procedure TALScrollEngine.StopTimer(const AAbruptly: Boolean = False);
 begin
 
   if not FTimerActive then exit;
   FTimerActive := False;
 
-  DoStop;
+  if not AAbruptly then
+    DoStop;
 
   {$IFDEF IOS}
   if fDisplayLink <> nil then
@@ -2823,11 +2824,20 @@ end;
 {***************************************************************************}
 // Halts the ongoing animation, freezing the scroller at its current position
 // without completing the remaining motion.
-procedure TALScrollEngine.Stop(const ACanDoSpringBack: Boolean = True);
+procedure TALScrollEngine.Stop(const AAbruptly: Boolean = False);
 begin
-  if FOverScroller.isFinished then exit;
+  if AAbruptly then
+    FDown := False;
+  //--
+  if FOverScroller.isFinished then begin
+    if AAbruptly then
+      StopTimer(true{AAbruptly});
+    exit;
+  end;
+  //--
   FOverScroller.forceFinished(true{finished});
-  if ACanDoSpringBack then begin
+  //--
+  if not AAbruptly then begin
 
     var LStartX: integer;
     var LStartY: integer;
@@ -2871,7 +2881,9 @@ begin
       LMinY, // minY: integer;
       LMaxY);
 
-  end;
+  end
+  else
+    StopTimer(true{AAbruptly});
 end;
 
 {*************************************************************}
@@ -3083,8 +3095,8 @@ begin
   FDown := False;
 
   if (not SameValue(X, FLastMotionPos.X, Tepsilon.Position)) or
-     (not SameValue(Y, FLastMotionPos.Y, Tepsilon.Position))  then
-    FVelocityTracker.addMovement(ALElapsedTimeNano, TPointF.Create(X*ScreenScale,Y*ScreenScale));
+     (not SameValue(Y, FLastMotionPos.Y, Tepsilon.Position)) then
+    MouseMove(X, Y);
 
   var LStartX: integer;
   var LStartY: integer;

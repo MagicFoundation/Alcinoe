@@ -416,15 +416,19 @@ begin
       fTabControl.FindVisibleTab(LTargetTabIndex, TALTabControl.TFindKind.back); // if not found the bounds animation will play
   end;
 
-  // Stop the animation. Stop will not terminate imediatly the Timer and thus
-  // will not call imediatly the dostop
-  Stop(False{ACanDoSpringBack});
-
-  // SetActiveTabWithTransition + aVelocity
-  fTabControl.SetActiveTabWithTransition(
-    fTabControl.tabs[LTargetTabIndex],
-    TALTabTransition.Slide,
-    LVelocity);
+  // SetActiveTabWithTransition
+  // Important: FTabControl.HasActiveTab = true and TALTabTransition.Slide
+  // so we are certain than SetActiveTabWithTransition will start an animation
+  // or will return false
+  if fTabControl.SetActiveTabWithTransition(
+       fTabControl.tabs[LTargetTabIndex],
+       TALTabTransition.Slide,
+       LVelocity) then
+    // Stop with AAbruptly = true will terminate imediatly
+    // the Timer and will not call dostop
+    Stop(True{AAbruptly})
+  else
+    Stop(False{AAbruptly});
 
 end;
 
@@ -1106,7 +1110,8 @@ begin
     FAniTransition.start;
 
   end
-  else ActiveTab := ATab;
+  else
+    ActiveTab := ATab;
 
 end;
 

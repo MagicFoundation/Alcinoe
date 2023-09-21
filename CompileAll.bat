@@ -79,7 +79,7 @@ goto COPY_AND_PATCH_DELPHI_SOURCE
 
 :DO_COPY_AND_PATCH_DELPHI_SOURCE
 
-call %ALBaseDir%\Embarcadero\%ALDelphiName%\Update.bat
+call "%ALBaseDir%\Embarcadero\%ALDelphiName%\Update.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -109,11 +109,11 @@ goto DOWNLOAD_LIBRARIES
 
 :DO_DOWNLOAD_LIBRARIES
 
-call %ALBaseDir%\Libraries\ios\DownloadLibraries.bat
+call "%ALBaseDir%\Libraries\ios\DownloadLibraries.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
-call %ALBaseDir%\Libraries\jar\DownloadLibraries.bat
+call "%ALBaseDir%\Libraries\jar\DownloadLibraries.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -185,7 +185,7 @@ goto RUN_TESTS
 
 :DO_RUN_TESTS
 
-call %ALBaseDir%\Tests\RunTests.bat
+call "%ALBaseDir%\Tests\RunTests.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

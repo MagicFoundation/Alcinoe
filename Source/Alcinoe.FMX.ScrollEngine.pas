@@ -540,15 +540,11 @@ type
     procedure TimerProc;
     {$ENDIF}
     procedure SetTimerInterval(const Value: Integer);
-    procedure SetTouchTracking(const Value: TTouchTracking);
     procedure SetDown(const Value: Boolean);
     procedure SetMinScrollLimit(const Value: TalPointD);
     procedure SetMaxScrollLimit(const Value: TalPointD);
-    procedure SetMinEdgeSpringbackEnabled(const Value: Boolean);
-    procedure SetMaxEdgeSpringbackEnabled(const Value: Boolean);
     procedure SetAutoShowing(const Value: Boolean);
     function GetCurrentVelocity: TPointF;
-    function RecomputeCurrentFling: boolean;
   public
     procedure SetViewportPosition(const Value: TALPointD; const WithinLimits: Boolean); overload;
     procedure SetViewportPosition(const Value: TALPointD); overload;
@@ -594,9 +590,9 @@ type
     // Halts the ongoing animation, freezing the scroller at its current position
     // without completing the remaining motion.
     procedure Stop(const AAbruptly: Boolean = False);
-    property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write SetMinEdgeSpringbackEnabled;
-    property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write SetMaxEdgeSpringbackEnabled;
-    property TouchTracking: TTouchTracking read FTouchTracking write SetTouchTracking;
+    property MinEdgeSpringbackEnabled: Boolean read FMinEdgeSpringbackEnabled write FMinEdgeSpringbackEnabled;
+    property MaxEdgeSpringbackEnabled: Boolean read FMaxEdgeSpringbackEnabled write FMaxEdgeSpringbackEnabled;
+    property TouchTracking: TTouchTracking read FTouchTracking write FTouchTracking;
     // Controls the opacity behavior typically used by elements like scrollbars.
     // When enabled, the opacity increases, making the element visible during
     // scrolling activity and fades out, hiding the element when the scrolling stops
@@ -1696,8 +1692,8 @@ begin
   {$IFDEF DEBUG}
   ALLog(
     'TALSplineOverScroller.Create',
-    'PixelsPerInch:' + ALFloatToStrW(PixelsPerInch, ALDefaultFormatSettingsW) + ' | ' +
-    'PhysicalCoeff:' + ALFloatToStrW(FPhysicalCoeff, ALDefaultFormatSettingsW),
+    'PixelsPerInch:' + ALFormatFloatW('0.##', PixelsPerInch, ALDefaultFormatSettingsW) + ' | ' +
+    'PhysicalCoeff:' + ALFormatFloatW('0.##', FPhysicalCoeff, ALDefaultFormatSettingsW),
     TalLogType.verbose);
   {$ENDIF}
 end;
@@ -2569,99 +2565,12 @@ begin
   end;
 end;
 
-{******************************************************}
-function TALScrollEngine.RecomputeCurrentFling: boolean;
-begin
-  if FOverScroller.isFinished then exit(False);
-  Result := True;
-
-  var LStartX: integer;
-  var LStartY: integer;
-  var LVelocityX: integer;
-  var LVelocityY: integer;
-  var LMinX: integer;
-  var LMaxX: integer;
-  var LMinY: integer;
-  var LMaxY: integer;
-  var LOverX: integer;
-  var LOverY: integer;
-
-  if FTouchTracking = [ttVertical, ttHorizontal] then begin
-    LStartX := trunc(FViewPortPosition.X*ScreenScale);
-    LStartY := trunc(FViewPortPosition.Y*ScreenScale);
-    LVelocityX := trunc(GetCurrentVelocity.X*ScreenScale);
-    LVelocityY := trunc(GetCurrentVelocity.Y*ScreenScale);
-    LMinX := trunc(FMinScrollLimit.x*ScreenScale);
-    LMaxX := trunc(FMaxScrollLimit.x*ScreenScale);
-    LMinY := trunc(FMinScrollLimit.y*ScreenScale);
-    LMaxY := trunc(FMaxScrollLimit.y*ScreenScale);
-    LOverX := trunc(FOverflingDistance*ScreenScale);
-    LOverY := trunc(FOverflingDistance*ScreenScale);
-  end
-  else if FTouchTracking = [ttVertical] then begin
-    LStartX := 0;
-    LStartY := trunc(FViewPortPosition.Y*ScreenScale);
-    LVelocityX := 0;
-    LVelocityY := trunc(GetCurrentVelocity.Y*ScreenScale);
-    LMinX := 0;
-    LMaxX := 0;
-    LMinY := trunc(FMinScrollLimit.y*ScreenScale);
-    LMaxY := trunc(FMaxScrollLimit.y*ScreenScale);
-    LOverX := 0;
-    LOverY := trunc(FOverflingDistance*ScreenScale);
-  end
-  else if FTouchTracking = [ttHorizontal] then begin
-    LStartX := trunc(FViewPortPosition.X*ScreenScale);
-    LStartY := 0;
-    LVelocityX := trunc(GetCurrentVelocity.X*ScreenScale);
-    LVelocityY := 0;
-    LMinX := trunc(FMinScrollLimit.x*ScreenScale);
-    LMaxX := trunc(FMaxScrollLimit.x*ScreenScale);
-    LMinY := 0;
-    LMaxY := 0;
-    LOverX := trunc(FOverflingDistance*ScreenScale);
-    LOverY := 0;
-  end
-  else
-    exit;
-
-  if (not FMinEdgeSpringbackEnabled) then begin
-    if LVelocityX < 0 then LOverX := 0;
-    if LVelocityY < 0 then LOverY := 0;
-  end;
-  if (not FMaxEdgeSpringbackEnabled) then begin
-    if LVelocityX > 0 then LOverX := 0;
-    if LVelocityY > 0 then LOverY := 0;
-  end;
-
-  if (not FOverScroller.springBack(
-            LStartX, // startX: integer;
-            LStartY, // startY: integer;
-            LMinX, // minX: integer;
-            LMaxX, // maxX: integer;
-            LMinY, // minY: integer;
-            LMaxY)) then // maxY: integer): Boolean;
-    FOverScroller.fling(
-      LstartX, // startX: integer;
-      LstartY, // startY: integer;
-      LVelocityX, // velocityX: integer;
-      LVelocityY, // velocityY: integer;
-      LMinX, // minX: integer;
-      LMaxX, // maxX: integer;
-      LMinY, // minY: integer;
-      LMaxY, // maxY: integer
-      LOverX, // const overX: integer = 0;
-      LOverY); // const overY: integer = 0
-
-  Starttimer;
-end;
-
 {******************************************************************}
 procedure TALScrollEngine.SetMinScrollLimit(const Value: TalPointD);
 begin
   if FMinScrollLimit <> Value then begin
     FMinScrollLimit := Value;
-    if not RecomputeCurrentFling then
+    if FOverScroller.isFinished then
       SetViewPortPosition(FViewPortPosition);
   end;
 end;
@@ -2671,28 +2580,8 @@ procedure TALScrollEngine.SetMaxScrollLimit(const Value: TalPointD);
 begin
   if FMaxScrollLimit <> Value then begin
     FMaxScrollLimit := Value;
-    if not RecomputeCurrentFling then
+    if FOverScroller.isFinished then
       SetViewPortPosition(FViewPortPosition);
-  end;
-end;
-
-{**************************************************************************}
-procedure TALScrollEngine.SetMinEdgeSpringbackEnabled(const Value: Boolean);
-begin
-  if FMinEdgeSpringbackEnabled <> Value then
-  begin
-    FMinEdgeSpringbackEnabled := Value;
-    RecomputeCurrentFling;
-  end;
-end;
-
-{**************************************************************************}
-procedure TALScrollEngine.SetMaxEdgeSpringbackEnabled(const Value: Boolean);
-begin
-  if FMaxEdgeSpringbackEnabled <> Value then
-  begin
-    FMaxEdgeSpringbackEnabled := Value;
-    RecomputeCurrentFling;
   end;
 end;
 
@@ -2720,15 +2609,6 @@ end;
 function TALScrollEngine.GetCurrentVelocity: TPointF;
 begin
   result := Foverscroller.getCurrVelocity / ScreenScale;
-end;
-
-{**********************************************************************}
-procedure TALScrollEngine.SetTouchTracking(const Value: TTouchTracking);
-begin
-  if FTouchTracking <> Value then begin
-    FTouchTracking := Value;
-    RecomputeCurrentFling;
-  end;
 end;
 
 {***********************************}
@@ -2804,7 +2684,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.DoChanged',
-  //  'ViewPortPosition:' + ALFloatToStrW(ViewPortPosition.x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(ViewPortPosition.y, ALDefaultFormatSettingsW),
+  //  'ViewPortPosition:' + ALFormatFloatW('0.##', ViewPortPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', ViewPortPosition.y, ALDefaultFormatSettingsW),
   //TalLogType.verbose);
   {$ENDIF}
   if Assigned(FOnChanged) then
@@ -2925,7 +2805,72 @@ end;
 {******************************************}
 function TALScrollEngine.Calculate: boolean;
 begin
+
   Result := FOverScroller.computeScrollOffset;
+
+  if Result and (not FOverScroller.isOverScrolled) then begin
+
+    if ttVertical in FTouchTracking then begin
+      var LCurrVelocityY := FOverScroller.getCurrVelocity.Y;
+      if (LCurrVelocityY > 0) and
+         (FOverScroller.getCurrY > FMaxScrollLimit.Y*ScreenScale) then begin
+        FOverScroller.notifyVerticalEdgeReached(
+          FOverScroller.getCurrY, // startY: integer;
+          trunc(FMaxScrollLimit.Y*ScreenScale), // finalY: integer;
+          trunc(FOverflingDistance*ScreenScale));  // overY: integer;
+        {$IFDEF DEBUG}
+        ALLog(
+          'TALScrollEngine.Calculate',
+          'notifyVerticalEdgeReached',
+        TalLogType.verbose);
+        {$ENDIF}
+      end;
+      if (LCurrVelocityY < 0) and
+         (FOverScroller.getCurrY < FMinScrollLimit.Y*ScreenScale) then begin
+        FOverScroller.notifyVerticalEdgeReached(
+          FOverScroller.getCurrY, // startY: integer;
+          trunc(FMinScrollLimit.Y*ScreenScale), // finalY: integer;
+          trunc(FOverflingDistance*ScreenScale));  // overY: integer;
+        {$IFDEF DEBUG}
+        ALLog(
+          'TALScrollEngine.Calculate',
+          'notifyVerticalEdgeReached',
+        TalLogType.verbose);
+        {$ENDIF}
+      end;
+    end;
+
+    if ttHorizontal in FTouchTracking then begin
+      var LCurrVelocityX := FOverScroller.getCurrVelocity.X;
+      if (LCurrVelocityX > 0) and
+         (FOverScroller.getCurrX > FMaxScrollLimit.X*ScreenScale) then begin
+        FOverScroller.notifyHorizontalEdgeReached(
+          FOverScroller.getCurrX, // startX: integer;
+          trunc(FMaxScrollLimit.X*ScreenScale), // finalX: integer;
+          trunc(FOverflingDistance*ScreenScale));  // overX: integer;
+        {$IFDEF DEBUG}
+        ALLog(
+          'TALScrollEngine.Calculate',
+          'notifyHorizontalEdgeReached',
+        TalLogType.verbose);
+        {$ENDIF}
+      end;
+      if (LCurrVelocityX < 0) and
+         (FOverScroller.getCurrX < FMinScrollLimit.X*ScreenScale) then begin
+        FOverScroller.notifyHorizontalEdgeReached(
+          FOverScroller.getCurrX, // startX: integer;
+          trunc(FMinScrollLimit.X*ScreenScale), // finalX: integer;
+          trunc(FOverflingDistance*ScreenScale));  // overX: integer;
+        {$IFDEF DEBUG}
+        ALLog(
+          'TALScrollEngine.Calculate',
+          'notifyHorizontalEdgeReached',
+        TalLogType.verbose);
+        {$ENDIF}
+      end;
+    end;
+
+  end;
 
   Var LOpacityChanged := False;
   if AutoShowing then begin
@@ -2968,6 +2913,7 @@ begin
   end
   else if Fdown then
     result := True;
+
 end;
 
 {*************************************************}
@@ -2990,7 +2936,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //    'TALScrollEngine.MouseDown',
-  //    'Position:' + ALFloatToStrW(FDownPosition.x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(FDownPosition.y, ALDefaultFormatSettingsW),
+  //    'Position:' + ALFormatFloatW('0.##', FDownPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FDownPosition.y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   FOverScroller.forceFinished(true{finished});
@@ -3053,7 +2999,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.MouseMove',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
 
@@ -3106,8 +3052,6 @@ begin
   var LMaxX: integer;
   var LMinY: integer;
   var LMaxY: integer;
-  var LOverX: integer;
-  var LOverY: integer;
 
   FvelocityTracker.getVelocity(LVelocityX, LVelocityY);
 
@@ -3120,8 +3064,6 @@ begin
     LMaxX := trunc(FMaxScrollLimit.x*ScreenScale);
     LMinY := trunc(FMinScrollLimit.y*ScreenScale);
     LMaxY := trunc(FMaxScrollLimit.y*ScreenScale);
-    LOverX := trunc(FOverflingDistance*ScreenScale);
-    LOverY := trunc(FOverflingDistance*ScreenScale);
   end
   else if FTouchTracking = [ttVertical] then begin
     LStartX := 0;
@@ -3132,8 +3074,6 @@ begin
     LMaxX := 0;
     LMinY := trunc(FMinScrollLimit.y*ScreenScale);
     LMaxY := trunc(FMaxScrollLimit.y*ScreenScale);
-    LOverX := 0;
-    LOverY := trunc(FOverflingDistance*ScreenScale);
   end
   else if FTouchTracking = [ttHorizontal] then begin
     LStartX := trunc(FViewPortPosition.X*ScreenScale);
@@ -3144,20 +3084,9 @@ begin
     LMaxX := trunc(FMaxScrollLimit.x*ScreenScale);
     LMinY := 0;
     LMaxY := 0;
-    LOverX := trunc(FOverflingDistance*ScreenScale);
-    LOverY := 0;
   end
   else
     exit;
-
-  if (not FMinEdgeSpringbackEnabled) then begin
-    if LVelocityX < 0 then LOverX := 0;
-    if LVelocityY < 0 then LOverY := 0;
-  end;
-  if (not FMaxEdgeSpringbackEnabled) then begin
-    if LVelocityX > 0 then LOverX := 0;
-    if LVelocityY > 0 then LOverY := 0;
-  end;
 
   FUpPosition := TPointF.Create(X, Y);
   FUpVelocity := TPointF.Create(LVelocityX/ScreenScale, LVelocityY/ScreenScale);
@@ -3165,8 +3094,8 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.MouseUp',
-  //  'Position:' + ALFloatToStrW(FUpPosition.x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(FUpPosition.y, ALDefaultFormatSettingsW) + ' | ' +
-  //  'Velocity:' + ALFloatToStrW(FUpVelocity.x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(FUpVelocity.y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', FUpPosition.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FUpPosition.y, ALDefaultFormatSettingsW) + ' | ' +
+  //  'Velocity:' + ALFormatFloatW('0.##', FUpVelocity.x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', FUpVelocity.y, ALDefaultFormatSettingsW),
   //TalLogType.verbose);
   {$ENDIF}
 
@@ -3182,12 +3111,10 @@ begin
       LstartY, // startY: integer;
       trunc(LVelocityX), // velocityX: integer;
       trunc(LVelocityY), // velocityY: integer;
-      LMinX, // minX: integer;
-      LMaxX, // maxX: integer;
-      LMinY, // minY: integer;
-      LMaxY, // maxY: integer
-      LOverX, // const overX: integer = 0;
-      LOverY); // const overY: integer = 0
+      -MaxInt, // minX: integer;
+      MaxInt, // maxX: integer;
+      -MaxInt, // minY: integer;
+      MaxInt); // maxY: integer
 
   Starttimer;
 end;
@@ -3207,7 +3134,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALScrollEngine.MouseWheel',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
 

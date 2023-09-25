@@ -818,7 +818,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALCustomScrollBox.MouseDown',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   FMouseEvents := true;
@@ -835,7 +835,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALCustomScrollBox.internalMouseMove',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   if FMouseEvents then begin
@@ -856,7 +856,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALCustomScrollBox.internalMouseUp',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin

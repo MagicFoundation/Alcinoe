@@ -736,7 +736,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALTabControl.MouseDown',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   FMouseEvents := true;
@@ -754,7 +754,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALTabControl.internalMouseMove',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   if not AnimationEnabled then exit;
@@ -772,7 +772,7 @@ begin
   {$IFDEF DEBUG}
   //ALLog(
   //  'TALTabControl.internalMouseUp',
-  //  'Position:' + ALFloatToStrW(x, ALDefaultFormatSettingsW) + ',' + ALFloatToStrW(y, ALDefaultFormatSettingsW),
+  //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
   if not AnimationEnabled then exit;

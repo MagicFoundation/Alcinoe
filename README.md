@@ -90,11 +90,11 @@ in your search path.
 Update Alcinoe
 --------------
 
-We need some time to rename unit/class/function names. To 
-help you automatically perform this renaming task in your 
-project to the latest version of Alcinoe, we provide you 
-with the tool called CodeRenaming. You can find this tool 
-at the following link: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming).
+We occasionally need to rename units, classes, and 
+functions. To assist you in automatically updating 
+these names in your project to align with the latest 
+version of Alcinoe, we offer a tool called CodeRenaming. 
+You can find this tool at the following link: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming).
 
 
 Propose a change using GitHub

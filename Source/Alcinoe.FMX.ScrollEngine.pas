@@ -391,6 +391,7 @@ type
     procedure updateScroll(q: Single);
     procedure startScroll(start: integer; distance: integer; duration: integer);
     procedure finish;
+    procedure setStartPosition(position: integer);
     procedure setFinalPosition(position: integer);
     procedure extendDuration(extend: integer);
     function springback(start: integer; min: integer; max: integer): Boolean;
@@ -440,6 +441,10 @@ type
     function getFinalY: integer;
     function getDuration: integer;
     procedure extendDuration(extend: integer);
+    procedure setCurrX(newX: integer);
+    procedure setCurrY(newY: integer);
+    procedure setStartX(newX: integer);
+    procedure setStartY(newY: integer);
     procedure setFinalX(newX: integer);
     procedure setFinalY(newY: integer);
     function computeScrollOffset: Boolean;
@@ -541,13 +546,15 @@ type
     {$ENDIF}
     procedure SetTimerInterval(const Value: Integer);
     procedure SetDown(const Value: Boolean);
-    procedure SetMinScrollLimit(const Value: TalPointD);
-    procedure SetMaxScrollLimit(const Value: TalPointD);
     procedure SetAutoShowing(const Value: Boolean);
     function GetCurrentVelocity: TPointF;
+    procedure SetMinScrollLimit(const Value: TalPointD);
+    procedure SetMaxScrollLimit(const Value: TalPointD);
+    procedure SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean; const SynchOverScroller: Boolean); overload;
   public
-    procedure SetViewportPosition(const Value: TALPointD; const WithinLimits: Boolean); overload;
+    procedure SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean); overload;
     procedure SetViewportPosition(const Value: TALPointD); overload;
+    procedure SetScrollLimits(const MinValue: TalPointD; const MaxValue: TalPointD; const EnforceLimits: Boolean = True);
   protected
     procedure DoStart; virtual;
     procedure DoChanged; virtual;
@@ -561,7 +568,7 @@ type
       DefaultOverflingDistance = 65;
       // We don't use ALDefaultIntervalOfAni for Android/iOS since we
       // utilize DisplayLink and JChoreographer
-      DefaultTimerInterval = 10;
+      DefaultTimerInterval = 10; // 100 fps
       // The default multiplier that dampens a drag movement at boundaries.
       DefaultDragResistanceFactor = 0.4;
       // A constant value of 0.3, representing the default duration (in seconds)
@@ -574,6 +581,7 @@ type
     // TimerInterval for Android/iOS since we utilize DisplayLink and JChoreographer
     property TimerInterval: Integer read FTimerInterval write SetTimerInterval;
     property TimerActive: boolean read FTimerActive;
+    procedure setFriction(friction: Single);
     procedure MouseDown(X, Y: Single); virtual;
     procedure MouseMove(X, Y: Single); virtual;
     procedure MouseUp(X, Y: Single); virtual;
@@ -1766,6 +1774,14 @@ begin
 end;
 
 {******************************************************************}
+procedure TALSplineOverScroller.setStartPosition(position: integer);
+begin
+  FStart := position;
+  FSplineDistance := FFinal - FStart;
+  FFinished := false;
+end;
+
+{******************************************************************}
 procedure TALSplineOverScroller.setFinalPosition(position: integer);
 begin
   FFinal := position;
@@ -2135,13 +2151,15 @@ begin
   result := FScrollerY.FCurrentPosition;
 end;
 
-{****************************************************}
-// Returns the absolute value of the current velocity.
-// @return The original velocity less the deceleration, norm of the X and Y velocity vector.
+{*******************************************}
+// Returns the value of the current velocity.
+// @return The original velocity less the deceleration.
 function TALOverScroller.getCurrVelocity: TPointF;
 begin
   //result := {(Single)} system.Math.hypot(FScrollerX.FCurrVelocity, FScrollerY.FCurrVelocity);
   result := TPointF.Create(FScrollerX.FCurrVelocity, FScrollerY.FCurrVelocity);
+  if FScrollerX.FState = FScrollerX.CUBIC then Result.X := -Result.X;
+  if FScrollerY.FState = FScrollerY.CUBIC then Result.Y := -Result.Y;
 end;
 
 {******************************************}
@@ -2194,6 +2212,30 @@ procedure TALOverScroller.extendDuration(extend: integer);
 begin
   FScrollerX.extendDuration(extend);
   FScrollerY.extendDuration(extend);
+end;
+
+{************************************************}
+procedure TALOverScroller.setCurrX(newX: integer);
+begin
+  FScrollerX.FCurrentPosition := newX;
+end;
+
+{************************************************}
+procedure TALOverScroller.setCurrY(newY: integer);
+begin
+  FScrollerY.FCurrentPosition := newY;
+end;
+
+{*************************************************}
+procedure TALOverScroller.setStartX(newX: integer);
+begin
+  FScrollerX.setStartPosition(newX);
+end;
+
+{*************************************************}
+procedure TALOverScroller.setStartY(newY: integer);
+begin
+  FScrollerY.setStartPosition(newY);
 end;
 
 {***********************************************}
@@ -2565,24 +2607,40 @@ begin
   end;
 end;
 
+{******************************************}
+// The amount of friction applied to flings.
+// @param friction A scalar dimension-less value representing the coefficient of friction.
+procedure TALScrollEngine.setFriction(friction: Single);
+begin
+  FoverScroller.setFriction(friction);
+end;
+
+{***********************************************************************************************************************************}
+procedure TALScrollEngine.SetScrollLimits(const MinValue: TalPointD; const MaxValue: TalPointD; const EnforceLimits: Boolean = True);
+begin
+  Var LUpdated: Boolean := False;
+  if FMinScrollLimit <> MinValue then begin
+    FMinScrollLimit := MinValue;
+    LUpdated := True;
+  end;
+  if FMaxScrollLimit <> MaxValue then begin
+    FMaxScrollLimit := MaxValue;
+    LUpdated := True;
+  end;
+  if LUpdated and EnforceLimits then
+    SetViewPortPosition(FViewPortPosition);
+end;
+
 {******************************************************************}
 procedure TALScrollEngine.SetMinScrollLimit(const Value: TalPointD);
 begin
-  if FMinScrollLimit <> Value then begin
-    FMinScrollLimit := Value;
-    if FOverScroller.isFinished then
-      SetViewPortPosition(FViewPortPosition);
-  end;
+  SetScrollLimits(Value, FMaxScrollLimit);
 end;
 
 {******************************************************************}
 procedure TALScrollEngine.SetMaxScrollLimit(const Value: TalPointD);
 begin
-  if FMaxScrollLimit <> Value then begin
-    FMaxScrollLimit := Value;
-    if FOverScroller.isFinished then
-      SetViewPortPosition(FViewPortPosition);
-  end;
+  SetScrollLimits(FMinScrollLimit, Value);
 end;
 
 {******************************************************}
@@ -2715,55 +2773,14 @@ begin
     exit;
   end;
   //--
-  FOverScroller.forceFinished(true{finished});
-  //--
   if not AAbruptly then begin
-
-    var LStartX: integer;
-    var LStartY: integer;
-    var LMinX: integer;
-    var LMaxX: integer;
-    var LMinY: integer;
-    var LMaxY: integer;
-
-    if FTouchTracking = [ttVertical, ttHorizontal] then begin
-      LStartX := trunc(FViewPortPosition.X*ScreenScale);
-      LStartY := trunc(FViewPortPosition.Y*ScreenScale);
-      LMinX := trunc(FMinScrollLimit.x*ScreenScale);
-      LMaxX := trunc(FMaxScrollLimit.x*ScreenScale);
-      LMinY := trunc(FMinScrollLimit.y*ScreenScale);
-      LMaxY := trunc(FMaxScrollLimit.y*ScreenScale);
-    end
-    else if FTouchTracking = [ttVertical] then begin
-      LStartX := 0;
-      LStartY := trunc(FViewPortPosition.Y*ScreenScale);
-      LMinX := 0;
-      LMaxX := 0;
-      LMinY := trunc(FMinScrollLimit.y*ScreenScale);
-      LMaxY := trunc(FMaxScrollLimit.y*ScreenScale);
-    end
-    else if FTouchTracking = [ttHorizontal] then begin
-      LStartX := trunc(FViewPortPosition.X*ScreenScale);
-      LStartY := 0;
-      LMinX := trunc(FMinScrollLimit.x*ScreenScale);
-      LMaxX := trunc(FMaxScrollLimit.x*ScreenScale);
-      LMinY := 0;
-      LMaxY := 0;
-    end
-    else
-      exit;
-
-    FOverScroller.springBack(
-      LStartX, // startX: integer;
-      LStartY, // startY: integer;
-      LMinX, // minX: integer;
-      LMaxX, // maxX: integer;
-      LMinY, // minY: integer;
-      LMaxY);
-
+    if not FOverScroller.isOverScrolled then
+      FOverScroller.forceFinished(true{finished});
   end
-  else
+  else begin
+    FOverScroller.forceFinished(true{finished});
     StopTimer(true{AAbruptly});
+  end;
 end;
 
 {*************************************************************}
@@ -2776,37 +2793,95 @@ begin
   end;
 end;
 
-{*************************************************************************************************}
-procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD; const WithinLimits: Boolean);
+{***********************************************************************************************************************************}
+procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean; const SynchOverScroller: Boolean);
 begin
-  if WithinLimits then begin
-    var LViewportPosition: TALPointD;
-    LViewportPosition.X := max(min(Value.X, FMaxScrollLimit.X), FMinScrollLimit.X);
-    LViewportPosition.Y := max(min(Value.Y, FMaxScrollLimit.Y), FMinScrollLimit.Y);
-    if FViewportPosition <> LViewportPosition then begin
-      FViewportPosition := LViewportPosition;
-      DoChanged
+
+  // If FOverScroller is still active and is in an over-scrolled state,
+  // we check if the final position lies within the ViewportPosition boundaries.
+  // If it doesn't, we terminate the FOverScroller to allow the subsequent block
+  // to initiate a new spring back action.
+  if EnforceLimits and (not FOverScroller.isFinished) and FOverScroller.isOverScrolled then begin
+    var LMinX: integer := trunc(FMinScrollLimit.x*ScreenScale);
+    var LMaxX: integer := trunc(FMaxScrollLimit.x*ScreenScale);
+    var LMinY: integer := trunc(FMinScrollLimit.y*ScreenScale);
+    var LMaxY: integer := trunc(FMaxScrollLimit.y*ScreenScale);
+    var LFinalX: integer := FOverScroller.getFinalX;
+    var LFinalY: integer := FOverScroller.getFinalY;
+    if SynchOverScroller then begin
+      var LDelta := (Value - FViewportPosition) * ScreenScale;
+      LFinalX := Trunc(LFinalX + LDelta.X);
+      LFinalY := Trunc(LFinalY + LDelta.Y);
+    end;
+    if (LFinalX < LMinX) or
+       (LFinalX > LMaxX) or
+       (LFinalY < LMinY) or
+       (LFinalY > LMaxY) then FOverScroller.forceFinished(true);
+  end;
+
+  // If the FOverScroller has completed, we verify the ViewportPosition boundaries.
+  // Should the new ViewportPosition exceed these boundaries, we initiate the springBack function.
+  if FOverScroller.isFinished then begin
+    if EnforceLimits then begin
+      var LStartX: integer := trunc(Value.X*ScreenScale);
+      var LStartY: integer := trunc(Value.Y*ScreenScale);
+      var LMinX: integer := trunc(FMinScrollLimit.x*ScreenScale);
+      var LMaxX: integer := trunc(FMaxScrollLimit.x*ScreenScale);
+      var LMinY: integer := trunc(FMinScrollLimit.y*ScreenScale);
+      var LMaxY: integer := trunc(FMaxScrollLimit.y*ScreenScale);
+      if FOverScroller.springBack(
+        LStartX, // startX: integer;
+        LStartY, // startY: integer;
+        LMinX, // minX: integer;
+        LMaxX, // maxX: integer;
+        LMinY, // minY: integer;
+        LMaxY) then startTimer;
+    end;
+    if FViewportPosition <> Value then begin
+      FViewportPosition := Value;
+      DoChanged;
     end;
   end
+
+  // If FOverScroller hasn't finished, we skip checking the ViewportPosition
+  // limits. The upcoming calculation will call notifyVerticalEdgeReached or
+  // notifyHorizontalEdgeReached to adjust the viewport to its boundary limits.
   else begin
     if FViewportPosition <> Value then begin
+      if SynchOverScroller then begin
+        var LDelta := (Value - FViewportPosition) * ScreenScale;
+        FOverScroller.setCurrX(Trunc(FOverScroller.getCurrX + LDelta.X));
+        FOverScroller.setCurrY(Trunc(FOverScroller.getCurrY + LDelta.Y));
+        FOverScroller.setStartX(Trunc(FOverScroller.getStartX + LDelta.X));
+        FOverScroller.setStartY(Trunc(FOverScroller.getStartY + LDelta.Y));
+        FOverScroller.setFinalX(Trunc(FOverScroller.getFinalX + LDelta.X));
+        FOverScroller.setFinalY(Trunc(FOverScroller.getFinalY + LDelta.Y));
+      end;
       FViewportPosition := Value;
       DoChanged
     end;
   end;
+
+end;
+
+{*************************************************************************************************}
+procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean);
+begin
+  SetViewportPosition(Value, EnforceLimits, true{SynchOverScroller});
 end;
 
 {********************************************************************}
 procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD);
 begin
-  SetViewportPosition(Value, true{WithinLimits});
+  SetViewportPosition(Value, true{EnforceLimits}, true{SynchOverScroller});
 end;
 
 {******************************************}
 function TALScrollEngine.Calculate: boolean;
 begin
 
-  Result := FOverScroller.computeScrollOffset;
+  if not FDown then Result := FOverScroller.computeScrollOffset
+  else Result := False;
 
   if Result and (not FOverScroller.isOverScrolled) then begin
 
@@ -2824,9 +2899,9 @@ begin
           'notifyVerticalEdgeReached',
         TalLogType.verbose);
         {$ENDIF}
-      end;
-      if (LCurrVelocityY < 0) and
-         (FOverScroller.getCurrY < FMinScrollLimit.Y*ScreenScale) then begin
+      end
+      else if (LCurrVelocityY < 0) and
+              (FOverScroller.getCurrY < FMinScrollLimit.Y*ScreenScale) then begin
         FOverScroller.notifyVerticalEdgeReached(
           FOverScroller.getCurrY, // startY: integer;
           trunc(FMinScrollLimit.Y*ScreenScale), // finalY: integer;
@@ -2854,9 +2929,9 @@ begin
           'notifyHorizontalEdgeReached',
         TalLogType.verbose);
         {$ENDIF}
-      end;
-      if (LCurrVelocityX < 0) and
-         (FOverScroller.getCurrX < FMinScrollLimit.X*ScreenScale) then begin
+      end
+      else if (LCurrVelocityX < 0) and
+              (FOverScroller.getCurrX < FMinScrollLimit.X*ScreenScale) then begin
         FOverScroller.notifyHorizontalEdgeReached(
           FOverScroller.getCurrX, // startX: integer;
           trunc(FMinScrollLimit.X*ScreenScale), // finalX: integer;
@@ -2905,7 +2980,8 @@ begin
       TALPointD.Create(
         FOverScroller.getCurrX/ScreenScale,
         FOverScroller.getCurrY/ScreenScale),
-      False{WithinLimits});
+      False{EnforceLimits},
+      False{SynchOverScroller});
   end
   else if LOpacityChanged then begin
     Result := True;
@@ -3022,11 +3098,12 @@ begin
   if (FViewportPosition.y < FMinScrollLimit.y) or
      (FViewportPosition.y > FMaxScrollLimit.y) then yDiff := yDiff * FDragResistanceFactor;
 
-  SetViewPortPosition(
+  SetViewportPosition(
     TALPointD.Create(
       FViewportPosition.x + xDiff,
       FViewportPosition.Y + YDiff),
-    False{WithinLimits});
+    False{EnforceLimits},
+    False{SynchOverScroller});
 
   FLastMotionPos := TpointF.Create(X,Y);
   FVelocityTracker.addMovement(ALElapsedTimeNano, FLastMotionPos*ScreenScale);
@@ -3111,10 +3188,10 @@ begin
       LstartY, // startY: integer;
       trunc(LVelocityX), // velocityX: integer;
       trunc(LVelocityY), // velocityY: integer;
-      -MaxInt, // minX: integer;
-      MaxInt, // maxX: integer;
-      -MaxInt, // minY: integer;
-      MaxInt); // maxY: integer
+      ALIfThen(FMinEdgeSpringbackEnabled, -MaxInt, LMinX), // minX: integer;
+      ALIfThen(FMaxEdgeSpringbackEnabled, MaxInt, LMaxX), // maxX: integer;
+      ALIfThen(FMinEdgeSpringbackEnabled, -MaxInt, LMinY), // minY: integer;
+      ALIfThen(FMaxEdgeSpringbackEnabled, MaxInt, LMaxY)); // maxY: integer
 
   Starttimer;
 end;

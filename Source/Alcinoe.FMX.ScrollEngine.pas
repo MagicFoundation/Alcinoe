@@ -2793,7 +2793,7 @@ begin
   end;
 end;
 
-{***********************************************************************************************************************************}
+{************************************************************************************************************************************}
 procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean; const SynchOverScroller: Boolean);
 begin
 
@@ -2830,12 +2830,12 @@ begin
       var LMinY: integer := trunc(FMinScrollLimit.y*ScreenScale);
       var LMaxY: integer := trunc(FMaxScrollLimit.y*ScreenScale);
       if FOverScroller.springBack(
-        LStartX, // startX: integer;
-        LStartY, // startY: integer;
-        LMinX, // minX: integer;
-        LMaxX, // maxX: integer;
-        LMinY, // minY: integer;
-        LMaxY) then startTimer;
+           LStartX, // startX: integer;
+           LStartY, // startY: integer;
+           LMinX, // minX: integer;
+           LMaxX, // maxX: integer;
+           LMinY, // minY: integer;
+           LMaxY) then startTimer;
     end;
     if FViewportPosition <> Value then begin
       FViewportPosition := Value;
@@ -2864,7 +2864,7 @@ begin
 
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 procedure TALScrollEngine.SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean);
 begin
   SetViewportPosition(Value, EnforceLimits, true{SynchOverScroller});
@@ -2897,7 +2897,7 @@ begin
         ALLog(
           'TALScrollEngine.Calculate',
           'notifyVerticalEdgeReached',
-        TalLogType.verbose);
+          TalLogType.verbose);
         {$ENDIF}
       end
       else if (LCurrVelocityY < 0) and
@@ -2910,7 +2910,7 @@ begin
         ALLog(
           'TALScrollEngine.Calculate',
           'notifyVerticalEdgeReached',
-        TalLogType.verbose);
+          TalLogType.verbose);
         {$ENDIF}
       end;
     end;
@@ -2927,7 +2927,7 @@ begin
         ALLog(
           'TALScrollEngine.Calculate',
           'notifyHorizontalEdgeReached',
-        TalLogType.verbose);
+          TalLogType.verbose);
         {$ENDIF}
       end
       else if (LCurrVelocityX < 0) and
@@ -2940,7 +2940,7 @@ begin
         ALLog(
           'TALScrollEngine.Calculate',
           'notifyHorizontalEdgeReached',
-        TalLogType.verbose);
+          TalLogType.verbose);
         {$ENDIF}
       end;
     end;

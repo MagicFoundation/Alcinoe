@@ -9,7 +9,7 @@ REM ----------------
 REM Init Environment
 REM ----------------
 
-call "..\..\InitEnvironment.bat"
+call "%~dp0\..\..\InitEnvironment.bat"
 IF ERRORLEVEL 1 goto ERROR
 
 

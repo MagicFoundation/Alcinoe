@@ -5,6 +5,7 @@ REM Init ALBaseDir
 REM ------------
 
 set ALBaseDir=%~dp0
+IF "%ALBaseDir:~-1%"=="\" SET ALBaseDir=%ALBaseDir:~0,-1%
 if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 

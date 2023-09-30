@@ -8,7 +8,7 @@ REM ----------------
 if "%ALBaseDir%"=="" (  
   
   Set Standalone=1
-  call "InitEnvironment.bat"
+  call "%~dp0InitEnvironment.bat"
   IF ERRORLEVEL 1 goto ERROR
   
 )

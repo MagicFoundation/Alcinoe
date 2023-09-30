@@ -5,7 +5,7 @@ if "%ALBaseDir%"=="" (
   cls  
   Set Standalone=1
   set ALDelphiVersion=22.0
-  call "..\..\InitEnvironment.bat"
+  call "%~dp0\..\..\InitEnvironment.bat"
   IF ERRORLEVEL 1 goto ERROR  
 )
 
@@ -53,10 +53,7 @@ xcopy /Q "%EmbSourceDir%\rtl\net" "%ALBaseDir%\Embarcadero\Alexandria\rtl\net"
 IF ERRORLEVEL 1 goto ERROR
 
 echo Patch the locally copied source code
-set PREV_DIR=%CD%
-CHDIR "%ALBaseDir%"
-git apply --ignore-space-change --ignore-whitespace .\Embarcadero\Alexandria\Alexandria.patch -v
-CHDIR "%PREV_DIR%"
+git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace .\Embarcadero\Alexandria\Alexandria.patch -v
 
 echo Remove warnings from the copied files
 

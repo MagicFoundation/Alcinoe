@@ -42,7 +42,7 @@ REM ----------------
 
 :INIT_ENVIRONMENT
 
-call .\InitEnvironment.bat
+call %~dp0InitEnvironment.bat
 IF ERRORLEVEL 1 goto ERROR
 echo.
 

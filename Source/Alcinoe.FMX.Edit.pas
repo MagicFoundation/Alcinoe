@@ -2047,7 +2047,7 @@ begin
   if (AutoConvertFontFamily) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
-      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family, TextSettings.Font.Style);
+      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
   //-----
   inherited;
   //-----

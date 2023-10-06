@@ -289,8 +289,8 @@ type
     fBufTrimming: TTextTrimming;
     fBufSize: TsizeF;
     fBufText: string;
-    fBufTextBreaked: Boolean;
-    fBufAllTextDrawed: Boolean;
+    fBufTextBroken: Boolean;
+    fBufAllTextDrawn: Boolean;
   protected
     procedure DoRenderLayout; override;
     procedure DoDrawLayout(const ACanvas: TCanvas); override;
@@ -402,7 +402,7 @@ type
     procedure clearBufBitmap; virtual;
     procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
     procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
-    function TextBreaked: Boolean;
+    function TextBroken: Boolean;
     property Font: TFont read GetFont write SetFont;
     property Color: TAlphaColor read GetColor write SetColor;
     property HorzTextAlign: TTextAlign read GetHorzTextAlign write SetHorzTextAlign;
@@ -1788,7 +1788,7 @@ begin
                                       TAlignLayout.MostTop,                        //                                   =>
                                       TAlignLayout.MostBottom,                     //                                   =>
                                       TAlignLayout.VertCenter])) and               //   and if the Width is not aligned =>
-         (not fBufTextBreaked) and                                                 //   and if text wasn't breaked                                            => else if fbufBitmapRect.width > MaxSize.x
+         (not fBufTextBroken) and                                                  //   and If the text wasn't broken                                         => else if fbufBitmapRect.width > MaxSize.x
          (CompareValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position) <= 0))  //   and if fbufBitmapRect.width <= MaxSize.x we can't do anything better  => then we must recalculate the width
        ) and
        (
@@ -1803,7 +1803,7 @@ begin
                                       TAlignLayout.MostLeft,                       //                                    =>
                                       TAlignLayout.MostRight,                      //                                    =>
                                       TAlignLayout.HorzCenter])) and               //   and if the Height is not aligned =>
-         (fBufAllTextDrawed) and                                                   //   and IF all text was drawed                                                 => else if fbufBitmapRect.height > MaxSize.y
+         (fBufAllTextDrawn) and                                                    //   and IF all text was Drawn                                                  => else if fbufBitmapRect.height > MaxSize.y
          (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0)) //   and if fbufBitmapRect.height <= MaxSize.y then we can't do anything better => then we must recalculate the height
        )
       )
@@ -1886,7 +1886,7 @@ begin
     LOptions.LineSpacing := FBufLineSpacing * FScreenScale;
     LOptions.Trimming := fBufTrimming;
     //LOptions.FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
-    //LOptions.FailIfTextBreaked: boolean; // default = false
+    //LOptions.FailIfTextBroken: boolean; // default = false
     //-----
     LOptions.HTextAlign := fBufHorizontalAlign;
     LOptions.VTextAlign := fBufVerticalAlign;
@@ -1910,8 +1910,8 @@ begin
     fBufBitmap := ALDrawMultiLineText(
                     fBufText, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
                     fBufBitmapRect, // var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                    fBufTextBreaked,
-                    fBufAllTextDrawed,
+                    fBufTextBroken,
+                    fBufAllTextDrawn,
                     LOptions);
 
     //align fbufBitmapRect
@@ -2159,7 +2159,7 @@ begin
   if (AutoConvertFontFamily) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
-      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family, TextSettings.Font.Style);
+      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
   //-----
   inherited;
   //-----
@@ -2771,12 +2771,12 @@ begin
   inherited; // will call dorealign that will call AdjustSize
 end;
 
-{************************************}
-function TALText.TextBreaked: Boolean;
+{***********************************}
+function TALText.TextBroken: Boolean;
 begin
   if not doubleBuffered then exit(false);
   result := (TALdoubleBufferedTextLayout(fLayout).fbufBitmap <> nil) and
-            (TALdoubleBufferedTextLayout(fLayout).fBufTextBreaked);
+            (TALdoubleBufferedTextLayout(fLayout).fBufTextBroken);
 end;
 
 {*************************************************}

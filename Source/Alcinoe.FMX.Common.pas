@@ -59,14 +59,14 @@ type
 
 type
 
-  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
+  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName): TFontName;
 
 var
 
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
 
-{*************************************************************************************************}
-function  ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
+{*****************************************************************}
+function  ALConvertFontFamily(const AFamily: TFontName): TFontName;
 function  ALTranslate(const AText: string): string;
 Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 function  ALAlignAbsolutePointToPixelRound(const Point: TPointF; const Scale: single): TpointF;
@@ -395,12 +395,12 @@ begin
   end;
 end;
 
-{************************************************************************************************}
-function ALConvertFontFamily(const AFamily: TFontName; const aFontStyles: TfontStyles): TFontName;
+{****************************************************************}
+function ALConvertFontFamily(const AFamily: TFontName): TFontName;
 begin
   if AFamily = '' then Exit('');
   if Assigned(ALCustomConvertFontFamilyProc) then begin
-    Result := ALCustomConvertFontFamilyProc(AFamily, aFontStyles);
+    Result := ALCustomConvertFontFamilyProc(AFamily);
     if Result = '' then Result := AFamily;
     Exit;
   end;

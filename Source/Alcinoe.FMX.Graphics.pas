@@ -61,9 +61,8 @@ function ALTransformBitmaptoTexture(var aBitmap: Tbitmap): TTexture;
 {$ENDIF}
 
 type
-
-    TALResizeImageGetDestSizeFunct = reference to function(const aOriginalSize: TPointF): TpointF;
-    TALResizeAndBlurImageGetDestSizeFunct = reference to function(const aOriginalSize: TPointF; var aRadius: single): TpointF;
+  TALResizeImageGetDestSizeFunct = reference to function(const aOriginalSize: TPointF): TpointF;
+  TALResizeAndBlurImageGetDestSizeFunct = reference to function(const aOriginalSize: TPointF; var aRadius: single): TpointF;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 //https://i.stack.imgur.com/CcESX.png - transparent pixel in the mask are removed from the resulting image
@@ -220,7 +219,6 @@ function  ALLoadNormalizeOrientationFileImageV3(const aFileName: String): TALRas
 
 {$IF defined(IOS)}
 type
-
   PAlphaColorCGFloat = ^TAlphaColorCGFloat;
   TAlphaColorCGFloat = record
   public
@@ -245,13 +243,35 @@ procedure ALPaintRectangle(
             const aCanvas: Tcanvas;
             {$ENDIF}
             const dstRect: TrectF;
+            const FillColor: TAlphaColor;
+            const StrokeColor: TalphaColor;
+            const StrokeThickness: Single;
+            const ShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+            const shadowBlur: Single;
+            const shadowOffsetX: Single;
+            const shadowOffsetY: Single;
+            const Sides: TSides;
+            const Corners: TCorners;
+            const XRadius: Single;
+            const YRadius: Single); overload;
+procedure ALPaintRectangle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
             const Fill: TBrush;
             const Stroke: TStrokeBrush;
-            const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
-            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
-            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
-            const XRadius: Single = 0;
-            const YRadius: Single = 0);
+            const Shadow: TALShadow; // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the rectangle)
+            const Sides: TSides;
+            const Corners: TCorners;
+            const XRadius: Single;
+            const YRadius: Single); overload;
 
 {**********************}
 procedure ALPaintCircle(
@@ -265,9 +285,27 @@ procedure ALPaintCircle(
             const aCanvas: Tcanvas;
             {$ENDIF}
             const dstRect: TrectF;
+            const FillColor: TAlphaColor;
+            const StrokeColor: TalphaColor;
+            const StrokeThickness: Single;
+            const ShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+            const shadowBlur: Single;
+            const shadowOffsetX: Single;
+            const shadowOffsetY: Single); overload;
+procedure ALPaintCircle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
             const Fill: TBrush;
             const Stroke: TStrokeBrush;
-            const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+            const Shadow: TALShadow); overload; // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the circle)
 
 {*******************************}
 Procedure ALCreateDrawingSurface(
@@ -370,6 +408,9 @@ uses
   Macapi.Helpers,
   Alcinoe.iOSApi.ImageIO,
   Alcinoe.FMX.Types3D,
+  {$ENDIF}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
+  FMX.Effects,
   {$ENDIF}
   {$IFDEF ALUseTexture}
   FMX.Canvas.GPU,
@@ -682,8 +723,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextClipToMask(
                     LContext,
                     ALLowerLeftCGRect(
@@ -836,8 +877,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextClipToMask(
                       LContext,
                       ALLowerLeftCGRect(
@@ -1081,8 +1122,8 @@ begin
           if LContext <> nil then begin
             try
               CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-              CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-              CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+              CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+              CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
               CGContextClipToMask(
                 LContext,
                 ALLowerLeftCGRect(
@@ -1224,8 +1265,8 @@ begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                 CGContextClipToMask(
                   LContext,
                   ALLowerLeftCGRect(
@@ -1522,8 +1563,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
 
                   LGridHeight := H;
@@ -1733,8 +1774,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
 
                     LGridHeight := H;
@@ -1982,8 +2023,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
                   CGContextAddEllipseInRect(
                     LContext,
@@ -2138,8 +2179,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
                     CGContextAddEllipseInRect(
                       LContext,
@@ -2428,8 +2469,8 @@ begin
           if LContext <> nil then begin
             try
               CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-              CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-              CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+              CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+              CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
               CGContextBeginPath(LContext);  // Creates a new empty path in a graphics context.
               CGContextAddEllipseInRect(
                 LContext,
@@ -2567,8 +2608,8 @@ begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                 CGContextDrawImage(
                   LContext, // c: The graphics context in which to draw the image.
                   ALLowerLeftCGRect(
@@ -2808,8 +2849,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -2952,8 +2993,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -3097,8 +3138,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -3240,8 +3281,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -3518,8 +3559,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -3714,8 +3755,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -3867,8 +3908,8 @@ begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                 CGContextDrawImage(
                   LContext, // c: The graphics context in which to draw the image.
                   ALLowerLeftCGRect(
@@ -3992,8 +4033,8 @@ begin
 
               try
                 CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                 CGContextDrawImage(
                   LContext, // c: The graphics context in which to draw the image.
                   ALLowerLeftCGRect(
@@ -4407,8 +4448,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -4564,8 +4605,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -4714,8 +4755,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -4863,8 +4904,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -5262,8 +5303,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -5406,8 +5447,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -5544,8 +5585,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -5686,8 +5727,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -5992,8 +6033,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -6132,8 +6173,8 @@ begin
               if LContext <> nil then begin
                 try
                   CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                  CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                  CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                  CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                  CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                   CGContextDrawImage(
                     LContext, // c: The graphics context in which to draw the image.
                     ALLowerLeftCGRect(
@@ -6268,8 +6309,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -6408,8 +6449,8 @@ begin
 
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextDrawImage(
                       LContext, // c: The graphics context in which to draw the image.
                       ALLowerLeftCGRect(
@@ -6771,8 +6812,8 @@ begin
                 if LContext <> nil then begin
                   try
                     CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-                    CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-                    CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+                    CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+                    CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
                     CGContextConcatCTM(LContext, LMatrix);
                     if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
                                                 TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
@@ -7247,8 +7288,8 @@ begin
       if LContext <> nil then begin
         try
           CGContextSetInterpolationQuality(LContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-          CGContextSetShouldAntialias(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-          CGContextSetAllowsAntialiasing(LContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+          CGContextSetShouldAntialias(LContext, True); // Sets anti-aliasing on or off for a graphics context.
+          CGContextSetAllowsAntialiasing(LContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
           CGContextConcatCTM(LContext, LMatrix);
           if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
                                       TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
@@ -7562,13 +7603,17 @@ procedure ALPaintRectangle(
             const aCanvas: Tcanvas;
             {$ENDIF}
             const dstRect: TrectF;
-            const Fill: TBrush;
-            const Stroke: TStrokeBrush;
-            const Shadow: TALShadow = nil; // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
-            const Sides: TSides = [TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]; // default = AllSides
-            const Corners: TCorners = [TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]; // default = AllCorners
-            const XRadius: Single = 0;
-            const YRadius: Single = 0);
+            const FillColor: TAlphaColor;
+            const StrokeColor: TalphaColor;
+            const StrokeThickness: Single;
+            const ShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+            const shadowBlur: Single;
+            const shadowOffsetX: Single;
+            const shadowOffsetY: Single;
+            const Sides: TSides;
+            const Corners: TCorners;
+            const XRadius: Single;
+            const YRadius: Single);
 
   {$REGION ' _drawRect (ANDROID)'}
   {$IF defined(ANDROID)}
@@ -7577,7 +7622,695 @@ procedure ALPaintRectangle(
               const aPaint: JPaint;
               const aRect: TrectF;
               Const aDrawOnlyBorder: Boolean);
+  var LJRect: JRectF;
+      LPath: JPath;
+      LXRadius: single;
+      LYradius: Single;
+      LWidthMinusCorners: single;
+      LHeightMinusCorners: Single;
+      LCorners: TCorners;
+      LHalfStrokeWidth: Single;
+  begin
 
+    // use drawRoundRect
+    if ((compareValue(xRadius, 0, TEpsilon.position) > 0) and
+        (compareValue(YRadius, 0, TEpsilon.position) > 0)) and
+       (corners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+       (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+      //-----
+      if (not aDrawOnlyBorder) and
+         (ShadowColor <> TalphaColorRec.Null) then aPaint.setShadowLayer(ShadowBlur{radius}, ShadowOffsetX{dx}, ShadowOffsetY{dy}, integer(ShadowColor){shadowColor});
+
+      LJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
+      aCanvas.drawRoundRect(
+        LJRect{rect},
+        xRadius {rx},
+        yRadius {ry},
+        apaint);
+      LJRect := nil;
+
+      if (not aDrawOnlyBorder) and
+         (ShadowColor <> TalphaColorRec.Null) then aPaint.clearShadowLayer;
+      //-----
+    end
+
+    // use drawRect
+    else if ((compareValue(xRadius, 0, TEpsilon.position) = 0) or
+             (compareValue(YRadius, 0, TEpsilon.position) = 0) or
+             (corners=[])) and
+            (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+      //-----
+      if (not aDrawOnlyBorder) and
+         (ShadowColor <> TalphaColorRec.Null) then aPaint.setShadowLayer(ShadowBlur{radius}, ShadowOffsetX{dx}, ShadowOffsetY{dy}, integer(ShadowColor){shadowColor});
+
+      aCanvas.drawRect(
+        aRect.left{left},
+        aRect.top{top},
+        aRect.right{right},
+        aRect.bottom{bottom},
+        apaint);
+
+      if (not aDrawOnlyBorder) and
+         (ShadowColor <> TalphaColorRec.Null) then aPaint.clearShadowLayer;
+      //-----
+    end
+
+    // use drawPath
+    else begin
+
+      LPath := TJPath.Create;
+      //----
+      LXRadius := xRadius;
+      LYradius := yRadius;
+      if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
+      if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
+      //----
+      if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
+         (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := corners
+      else LCorners := [];
+      //----
+      LWidthMinusCorners := (aRect.width - (2 * LXRadius));
+      LHeightMinusCorners := (aRect.height - (2 * LYradius));
+      //----
+      if (StrokeColor <> TalphaColorRec.Null) then LHalfStrokeWidth := (StrokeThickness) / 2
+      else LHalfStrokeWidth := 0;
+
+
+      //----- TopRight
+      if (TCorner.TopRight in LCorners) then begin
+        LPath.moveTo(aRect.right, aRect.top + LYradius);
+        LPath.rQuadTo(0, -LYradius, -LXRadius, -LYradius);
+        if not aDrawOnlyBorder then LPath.rlineTo(0, -LHalfStrokeWidth);
+      end
+      else begin
+        if not aDrawOnlyBorder then LPath.moveTo(aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
+        else LPath.moveTo(aRect.right, aRect.top + LYradius);
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+           LPath.rLineTo(0, -LYradius -LHalfStrokeWidth);
+           if aDrawOnlyBorder then LPath.rMoveTo(0, LHalfStrokeWidth);
+        end
+        else LPath.rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          if not aDrawOnlyBorder then LPath.rLineTo(-LXRadius -LHalfStrokeWidth,0)
+          else begin
+            LPath.rMoveTo(+LHalfStrokeWidth,0);
+            LPath.rLineTo(-LXRadius -LHalfStrokeWidth,0);
+          end;
+        end
+        else LPath.rMoveTo(-LXRadius,0); // aDrawOnlyBorder AND not TSide.top
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.Top in sides) then LPath.rLineTo(-LWidthMinusCorners, 0)
+      else LPath.rMoveTo(-LWidthMinusCorners, 0);
+
+      //----- TopLeft
+      if (TCorner.TopLeft in LCorners) then begin
+        if not aDrawOnlyBorder then LPath.rlineTo(0, +LHalfStrokeWidth);
+        LPath.rQuadTo(-LXRadius, 0, -LXRadius, LYradius);
+        if not aDrawOnlyBorder then LPath.rlineTo(-LHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          LPath.rLineTo(-LXRadius -LHalfStrokeWidth, 0);
+          if aDrawOnlyBorder then LPath.rMoveTo(LHalfStrokeWidth, 0);
+        end
+        else LPath.rMoveTo(-LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          if not aDrawOnlyBorder then LPath.rLineTo(0,LYradius +LHalfStrokeWidth)
+          else begin
+            LPath.rMoveTo(0,-LHalfStrokeWidth);
+            LPath.rLineTo(0,+LYradius +LHalfStrokeWidth);
+          end;
+        end
+        else LPath.rMoveTo(0,LYradius); // aDrawOnlyBorder AND not TSide.left
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.left in sides) then LPath.rLineTo(0, LHeightMinusCorners)
+      else LPath.rMoveTo(0, LHeightMinusCorners);
+
+      //----- BottomLeft
+      if (TCorner.BottomLeft in LCorners) then begin
+        if not aDrawOnlyBorder then LPath.rlineTo(LHalfStrokeWidth, 0);
+        LPath.rQuadTo(0, LYradius, LXRadius, LYradius);
+        if not aDrawOnlyBorder then LPath.rlineTo(0, LHalfStrokeWidth);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          LPath.rLineTo(0, LYradius +LHalfStrokeWidth);
+          if aDrawOnlyBorder then LPath.rMoveTo(0, -LHalfStrokeWidth);
+        end
+        else LPath.rMoveTo(0, LYradius); // aDrawOnlyBorder AND not TSide.left
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          if not aDrawOnlyBorder then LPath.rLineTo(LXRadius +LHalfStrokeWidth,0)
+          else begin
+            LPath.rMoveTo(-LHalfStrokeWidth,0);
+            LPath.rLineTo(+LXRadius +LHalfStrokeWidth,0);
+          end;
+        end
+        else LPath.rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.bottom in sides) then LPath.rLineTo(LWidthMinusCorners, 0)
+      else LPath.rMoveTo(LWidthMinusCorners, 0);
+
+      //----- BottomRight
+      if (TCorner.BottomRight in LCorners) then begin
+        if not aDrawOnlyBorder then LPath.rlineTo(0, -LHalfStrokeWidth);
+        LPath.rQuadTo(LXRadius, 0, LXRadius, -LYradius);
+        if not aDrawOnlyBorder then LPath.rlineTo(LHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          LPath.rLineTo(LXRadius +LHalfStrokeWidth,0);
+          if aDrawOnlyBorder then LPath.rMoveTo(-LHalfStrokeWidth, 0);
+        end
+        else LPath.rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+          if not aDrawOnlyBorder then LPath.rLineTo(0, -LYradius -LHalfStrokeWidth)
+          else begin
+            LPath.rMoveTo(0,+LHalfStrokeWidth);
+            LPath.rLineTo(0,-LYradius -LHalfStrokeWidth);
+          end;
+        end
+        else LPath.rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.right in sides) then LPath.rLineTo(0, -LHeightMinusCorners)
+      else LPath.rMoveTo(0, -LHeightMinusCorners);
+
+      //-----
+      if (not aDrawOnlyBorder) and
+         (ShadowColor <> TalphaColorRec.Null) then aPaint.setShadowLayer(ShadowBlur{radius}, ShadowOffsetX{dx}, ShadowOffsetY{dy}, integer(ShadowColor){shadowColor});
+
+      aCanvas.drawPath(LPath,aPaint);
+      LPath := nil;
+
+      if (not aDrawOnlyBorder) and
+         (ShadowColor <> TalphaColorRec.Null) then aPaint.clearShadowLayer;
+      //-----
+
+    end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' _DrawPath (IOS)'}
+  {$IF defined(IOS)}
+  procedure _DrawPath(
+              const aRect: TrectF;
+              Const aDrawOnlyBorder: Boolean);
+
+  var LXRadius: single;
+      LYradius: Single;
+      LWidthMinusCorners: single;
+      LHeightMinusCorners: Single;
+      LCorners: TCorners;
+      LHalfStrokeWidth: Single;
+      LCurPoint: TpointF;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _moveTo(x: Single; y: Single);
+    begin
+      CGContextMoveToPoint(aContext, X, aGridHeight - Y);
+      LCurPoint.X := x;
+      LCurPoint.Y := Y;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rQuadTo(dx1: Single; dy1: Single; dx2: Single; dy2: Single);
+    begin
+      CGContextAddQuadCurveToPoint(
+        aContext,
+        LCurPoint.X + dx1{cpx},
+        aGridHeight - (LCurPoint.Y + dy1){cpy},
+        LCurPoint.X + dx2{x},
+        aGridHeight - (LCurPoint.Y + dy2){y});
+      LCurPoint.X := LCurPoint.X + dx2;
+      LCurPoint.Y := LCurPoint.Y + dy2;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rLineTo(dx: Single; dy: Single);
+    begin
+      CGContextAddLineToPoint(aContext, LCurPoint.X + dx{x}, aGridHeight - (LCurPoint.Y + dy{y}));
+      LCurPoint.X := LCurPoint.X + dx;
+      LCurPoint.Y := LCurPoint.Y + dy;
+    end;
+
+    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+    procedure _rMoveTo(dx: Single; dy: Single);
+    begin
+      CGContextMoveToPoint(aContext, LCurPoint.X + dx{x}, aGridHeight - (LCurPoint.Y + dy{y}));
+      LCurPoint.X := LCurPoint.X + dx;
+      LCurPoint.Y := LCurPoint.Y + dy;
+    end;
+
+  begin
+
+    // Creates a new empty path in a graphics context.
+    CGContextBeginPath(aContext);
+
+    // use drawRect
+    if ((compareValue(xRadius, 0, TEpsilon.position) = 0) or
+        (compareValue(YRadius, 0, TEpsilon.position) = 0) or
+        (corners=[])) and
+       (sides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+     //-----
+     CGContextAddRect(
+       aContext,
+       ALLowerLeftCGRect(
+         aRect.TopLeft,
+         aRect.Width,
+         aRect.Height,
+         aGridHeight));
+     //-----
+    end
+
+    // use drawPath
+    else begin
+
+      LXRadius := xRadius;
+      LYradius := yRadius;
+      if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
+      if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
+      //----
+      if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
+         (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := corners
+      else LCorners := [];
+      //----
+      LWidthMinusCorners := (aRect.width - (2 * LXRadius));
+      LHeightMinusCorners := (aRect.height - (2 * LYradius));
+      //----
+      if (StrokeColor <> TalphaColorRec.Null) then LHalfStrokeWidth := (StrokeThickness) / 2
+      else LHalfStrokeWidth := 0;
+
+
+      //----- TopRight
+      if (TCorner.TopRight in LCorners) then begin
+        _moveTo(aRect.right, aRect.top + LYradius);
+        _rQuadTo(0, -LYradius, -LXRadius, -LYradius);
+        if not aDrawOnlyBorder then _rlineTo(0, -LHalfStrokeWidth);
+      end
+      else begin
+        if not aDrawOnlyBorder then _moveTo(aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
+        else _moveTo(aRect.right, aRect.top + LYradius);
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+           _rLineTo(0, -LYradius -LHalfStrokeWidth);
+           if aDrawOnlyBorder then _rMoveTo(0, LHalfStrokeWidth);
+        end
+        else _rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(-LXRadius -LHalfStrokeWidth,0)
+          else begin
+            _rMoveTo(+LHalfStrokeWidth,0);
+            _rLineTo(-LXRadius -LHalfStrokeWidth,0);
+          end;
+        end
+        else _rMoveTo(-LXRadius,0); // aDrawOnlyBorder AND not TSide.top
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.Top in sides) then _rLineTo(-LWidthMinusCorners, 0)
+      else _rMoveTo(-LWidthMinusCorners, 0);
+
+      //----- TopLeft
+      if (TCorner.TopLeft in LCorners) then begin
+        if not aDrawOnlyBorder then _rlineTo(0, +LHalfStrokeWidth);
+        _rQuadTo(-LXRadius, 0, -LXRadius, LYradius);
+        if not aDrawOnlyBorder then _rlineTo(-LHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.top in sides) then begin
+          _rLineTo(-LXRadius -LHalfStrokeWidth, 0);
+          if aDrawOnlyBorder then _rMoveTo(LHalfStrokeWidth, 0);
+        end
+        else _rMoveTo(-LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(0,LYradius +LHalfStrokeWidth)
+          else begin
+            _rMoveTo(0,-LHalfStrokeWidth);
+            _rLineTo(0,+LYradius +LHalfStrokeWidth);
+          end;
+        end
+        else _rMoveTo(0,LYradius); // aDrawOnlyBorder AND not TSide.left
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.left in sides) then _rLineTo(0, LHeightMinusCorners)
+      else _rMoveTo(0, LHeightMinusCorners);
+
+      //----- BottomLeft
+      if (TCorner.BottomLeft in LCorners) then begin
+        if not aDrawOnlyBorder then _rlineTo(LHalfStrokeWidth, 0);
+        _rQuadTo(0, LYradius, LXRadius, LYradius);
+        if not aDrawOnlyBorder then _rlineTo(0, LHalfStrokeWidth);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.left in sides) then begin
+          _rLineTo(0, LYradius +LHalfStrokeWidth);
+          if aDrawOnlyBorder then _rMoveTo(0, -LHalfStrokeWidth);
+        end
+        else _rMoveTo(0, LYradius); // aDrawOnlyBorder AND not TSide.left
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(LXRadius +LHalfStrokeWidth,0)
+          else begin
+            _rMoveTo(-LHalfStrokeWidth,0);
+            _rLineTo(+LXRadius +LHalfStrokeWidth,0);
+          end;
+        end
+        else _rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.bottom in sides) then _rLineTo(LWidthMinusCorners, 0)
+      else _rMoveTo(LWidthMinusCorners, 0);
+
+      //----- BottomRight
+      if (TCorner.BottomRight in LCorners) then begin
+        if not aDrawOnlyBorder then _rlineTo(0, -LHalfStrokeWidth);
+        _rQuadTo(LXRadius, 0, LXRadius, -LYradius);
+        if not aDrawOnlyBorder then _rlineTo(LHalfStrokeWidth, 0);
+      end
+      else begin
+        if (not aDrawOnlyBorder) or
+           (TSide.bottom in sides) then begin
+          _rLineTo(LXRadius +LHalfStrokeWidth,0);
+          if aDrawOnlyBorder then _rMoveTo(-LHalfStrokeWidth, 0);
+        end
+        else _rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
+        //----
+        if (not aDrawOnlyBorder) or
+           (TSide.right in sides) then begin
+          if not aDrawOnlyBorder then _rLineTo(0, -LYradius -LHalfStrokeWidth)
+          else begin
+            _rMoveTo(0,+LHalfStrokeWidth);
+            _rLineTo(0,-LYradius -LHalfStrokeWidth);
+          end;
+        end
+        else _rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
+      end;
+      //-----
+      if (not aDrawOnlyBorder) or
+         (TSide.right in sides) then _rLineTo(0, -LHeightMinusCorners)
+      else _rMoveTo(0, -LHeightMinusCorners);
+
+    end;
+
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION ' _GetShapeRect (MSWINDOWS / ALMacOS)'}
+  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
+  function _GetShapeRect: TRectF;
+  begin
+    Result := DstRect;
+    if StrokeColor <> TalphaColorRec.Null then
+      InflateRect(Result, -(StrokeThickness / 2), -(StrokeThickness / 2));
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+{$IF defined(ANDROID)}
+var LRect: TrectF;
+    LPaint: JPaint;
+{$ELSEIF defined(IOS)}
+var LRect: TrectF;
+    LAlphaColor: TAlphaColorCGFloat;
+    LColor: CGColorRef;
+{$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+var LShapeRect: TRectF;
+    LOff: Single;
+    LFillKindRestoreValue: TBrushKind;
+    LFillColorRestoreValue: TAlphacolor;
+    LStrokeKindRestoreValue: TBrushKind;
+    LStrokeColorRestoreValue: TAlphacolor;
+    LStrokeThicknessRestoreValue: Single;
+    LFillShape, LDrawShape: Boolean;
+    LShadowEffect: TshadowEffect;
+{$ENDIF}
+
+begin
+
+  {$IFDEF ANDROID}
+
+  //create the canvas and the paint
+  LPaint := TJPaint.JavaClass.init;
+  LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+  LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+  LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+
+  //init LRect
+  if StrokeColor <> TalphaColorRec.Null then begin
+    LRect := TrectF.Create(
+               dstRect.Left + (StrokeThickness / 2),
+               dstRect.Top + (StrokeThickness / 2),
+               dstRect.right - (StrokeThickness / 2),
+               dstRect.bottom - (StrokeThickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else LRect := dstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the rectangle
+  if FillColor <> TalphaColorRec.Null then begin
+
+    //init LPaint
+    LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LRect + StrokeThickness :( this result&ing in border if the fill is for exemple black and border white
+
+    //fill with solid color
+    LPaint.setColor(integer(FillColor));
+    _drawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder});
+
+  end;
+
+  //stroke the rectangle
+  if StrokeColor <> TalphaColorRec.Null then begin
+
+    //init LPaint
+    LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
+    LPaint.setStrokeWidth(StrokeThickness);
+
+    //stroke with solid color
+    LPaint.setColor(integer(StrokeColor));
+    _drawRect(aCanvas, LPaint, LRect, true{aDrawOnlyBorder});
+
+  end;
+
+  //free the paint and the canvas
+  LPaint := nil;
+
+  {$ELSEIF DEFINED(IOS)}
+
+  //set the paint default properties
+  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+  //-----
+  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
+  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
+
+  //init LRect
+  if StrokeColor <> TalphaColorRec.Null then begin
+    LRect := TrectF.Create(
+               DstRect.Left + (StrokeThickness / 2),
+               DstRect.Top + (StrokeThickness / 2),
+               DstRect.right - (StrokeThickness / 2),
+               DstRect.bottom - (StrokeThickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else LRect := DstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the rectangle
+  if FillColor <> TalphaColorRec.Null then begin
+
+    //fill with solid color
+    LAlphaColor := TAlphaColorCGFloat.Create(FillColor);
+    CGContextSetRGBFillColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+    _DrawPath(LRect, false{aDrawOnlyBorder});
+    //-----
+    if (ShadowColor <> TalphaColorRec.Null) then begin
+      LAlphaColor := TAlphaColorCGFloat.Create(ShadowColor);
+      LColor := CGColorCreate(aColorSpace, @LAlphaColor);
+      try
+        CGContextSetShadowWithColor(
+          aContext,
+          CGSizeMake(ShadowOffsetX, ShadowOffsetY), // offset
+          ShadowBlur, // blur
+          LColor); // color
+      finally
+        CGColorRelease(LColor);
+      end;
+    end;
+    //-----
+    CGContextFillPath(aContext);
+    //-----
+    if (ShadowColor <> TalphaColorRec.Null) then begin
+      CGContextSetShadowWithColor(
+        aContext,
+        CGSizeMake(0, 0), // offset
+        0, // blur
+        nil); // color
+    end;
+
+  end;
+
+  //stroke the rectangle
+  if StrokeColor <> TalphaColorRec.Null then begin
+
+    //stroke with solid color
+    LAlphaColor := TAlphaColorCGFloat.Create(StrokeColor);
+    CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+    CGContextSetLineWidth(aContext, StrokeThickness);
+    _DrawPath(LRect, True{aDrawOnlyBorder});
+    CGContextStrokePath(aContext);
+
+  end;
+
+  {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+
+  LFillKindRestoreValue := ACanvas.Fill.Kind;
+  LFillColorRestoreValue := ACanvas.Fill.color;
+  LStrokeKindRestoreValue := ACanvas.Stroke.kind;
+  LStrokeColorRestoreValue := ACanvas.Stroke.Color;
+  LStrokeThicknessRestoreValue := ACanvas.Stroke.Thickness;
+  if FillColor <> TAlphaColorRec.Null then begin
+    ACanvas.Fill.Kind := TBrushKind.Solid;
+    ACanvas.Fill.Color := FillColor;
+  end
+  else ACanvas.Fill.Kind := TBrushKind.None;
+  If StrokeColor <> TalphaColorRec.Null then begin
+    ACanvas.Stroke.Kind := TBrushKind.Solid;
+    ACanvas.Stroke.Color := StrokeColor;
+    ACanvas.Stroke.Thickness := StrokeThickness;
+  end
+  else ACanvas.Stroke.Kind := TBrushKind.None;
+  try
+
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, ACanvas.Fill, ACanvas.Stroke, False, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
+
+    if Sides <> AllSides then
+    begin
+      LOff := LShapeRect.Left;
+      if not(TSide.Top in Sides) then
+        LShapeRect.Top := LShapeRect.Top - LOff;
+      if not(TSide.Left in Sides) then
+        LShapeRect.Left := LShapeRect.Left - LOff;
+      if not(TSide.Bottom in Sides) then
+        LShapeRect.Bottom := LShapeRect.Bottom + LOff;
+      if not(TSide.Right in Sides) then
+        LShapeRect.Right := LShapeRect.Right + LOff;
+      if LFillShape then
+        aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
+      if LDrawShape then
+        aCanvas.DrawRectSides(_GetShapeRect, XRadius, YRadius, Corners,  1{AbsoluteOpacity}, Sides, ACanvas.Stroke, TCornerType.Round{CornerType});
+    end
+    else
+    begin
+      if LFillShape then
+        aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
+      if LDrawShape then
+        aCanvas.DrawRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, ACanvas.Stroke, TCornerType.Round{CornerType});
+    end;
+
+    if (ShadowColor <> TalphaColorRec.Null) then begin
+
+      LShadowEffect := TshadowEffect.Create(nil);
+      try
+        LShadowEffect.ShadowColor := ShadowColor;
+        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
+                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                    // we use the opacity of the color instead
+        LShadowEffect.softness := ShadowBlur / 24; // Specifies the amount of blur applied to the shadow.
+                                                   // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                   // i calculate approximatly that 0.5 = around 12 for blur
+        Acanvas.Flush;
+        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
+      finally
+        ALFreeAndNil(LShadowEffect);
+      end;
+
+      if Sides <> AllSides then
+      begin
+        if LFillShape then
+          aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
+        if LDrawShape then
+          aCanvas.DrawRectSides(_GetShapeRect, XRadius, YRadius, Corners,  1{AbsoluteOpacity}, Sides, ACanvas.Stroke, TCornerType.Round{CornerType});
+      end
+      else
+      begin
+        if LFillShape then
+          aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
+        if LDrawShape then
+          aCanvas.DrawRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, ACanvas.Stroke, TCornerType.Round{CornerType});
+      end;
+
+    end;
+
+  finally
+    ACanvas.Fill.Kind := LFillKindRestoreValue;
+    ACanvas.Fill.color := LFillColorRestoreValue;
+    ACanvas.Stroke.kind := LStrokeKindRestoreValue;
+    ACanvas.Stroke.Color := LStrokeColorRestoreValue;
+    ACanvas.Stroke.Thickness := LStrokeThicknessRestoreValue;
+  end;
+
+  {$ENDIF}
+
+end;
+
+{*************************}
+procedure ALPaintRectangle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
+            const Fill: TBrush;
+            const Stroke: TStrokeBrush;
+            const Shadow: TALShadow; // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the rectangle)
+            const Sides: TSides;
+            const Corners: TCorners;
+            const XRadius: Single;
+            const YRadius: Single);
+
+  {$REGION ' _drawRect (ANDROID)'}
+  {$IF defined(ANDROID)}
+  procedure _drawRect(
+              const aCanvas: Jcanvas;
+              const aPaint: JPaint;
+              const aRect: TrectF;
+              Const aDrawOnlyBorder: Boolean);
   var LJRect: JRectF;
       LPath: JPath;
       LXRadius: single;
@@ -8021,7 +8754,7 @@ procedure ALPaintRectangle(
   {$ENDREGION}
 
 {$IF defined(IOS)}
-const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
+const DefaultInputRange: array[0..1] of CGFloat = (0, 1);
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -8052,9 +8785,10 @@ var LRect: TrectF;
     LImage: UIImage;
 {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
 var LShapeRect: TRectF;
-    Off: Single;
-    StrokeThicknessRestoreValue: Single;
-    FillShape, DrawShape: Boolean;
+    LOff: Single;
+    LStrokeThicknessRestoreValue: Single;
+    LFillShape, LDrawShape: Boolean;
+    LShadowEffect: TshadowEffect;
 {$ENDIF}
 
 begin
@@ -8200,8 +8934,8 @@ begin
   //set the paint default properties
   CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
   //-----
-  CGContextSetShouldAntialias(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
+  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
 
   //init LRect
   if Stroke.Kind <> TBrushKind.None then begin
@@ -8228,7 +8962,7 @@ begin
         LFunc := CGFunctionCreate(
                    fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
                    1, // domainDimension - The number of inputs.
-                   @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                   @DefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
                    4, // rangeDimension - The number of outputs.
                    nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
                    @LCallback); // callbacks - A pointer to a callback function table.
@@ -8241,8 +8975,8 @@ begin
                           CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.Height / 2))), // end - The center of the ending circle, in the shading's target coordinate space.
                           0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
                           LFunc, // function
-                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+                          True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                          True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
           end
           else begin
             LShading := CGShadingCreateAxial(
@@ -8254,8 +8988,8 @@ begin
                             LRect.Left + (Fill.Gradient.StopPosition.X * LRect.Width),
                             aGridHeight - LRect.top - (Fill.Gradient.StopPosition.Y * LRect.Height)), // end - The ending point of the axis, in the shading's target coordinate space.
                           LFunc, // function
-                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
-                          {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
+                          True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
+                          True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
           end;
           try
             _DrawPath(LRect, false{aDrawOnlyBorder});
@@ -8267,7 +9001,7 @@ begin
             //-----
             if (Shadow <> nil) and
                (Shadow.enabled) then begin
-              LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+              LAlphaColor := TAlphaColorCGFloat.Create(Shadow.Color);
               LColor := CGColorCreate(aColorSpace, @LAlphaColor);
               try
                 CGContextSetShadowWithColor(
@@ -8356,7 +9090,7 @@ begin
                     //-----
                     if (Shadow <> nil) and
                        (Shadow.enabled) then begin
-                      LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+                      LAlphaColor := TAlphaColorCGFloat.Create(Shadow.Color);
                       LColor := CGColorCreate(aColorSpace, @LAlphaColor);
                       try
                         CGContextSetShadowWithColor(
@@ -8413,7 +9147,7 @@ begin
       //-----
       if (Shadow <> nil) and
          (Shadow.enabled) then begin
-        LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+        LAlphaColor := TAlphaColorCGFloat.Create(Shadow.Color);
         LColor := CGColorCreate(aColorSpace, @LAlphaColor);
         try
           CGContextSetShadowWithColor(
@@ -8456,36 +9190,307 @@ begin
 
   {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
 
-  StrokeThicknessRestoreValue := Stroke.Thickness;
+  LStrokeThicknessRestoreValue := Stroke.Thickness;
   try
-    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, Fill, Stroke, False, FillShape, DrawShape, StrokeThicknessRestoreValue);
+
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, Fill, Stroke, False, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
 
     if Sides <> AllSides then
     begin
-      Off := LShapeRect.Left;
+      LOff := LShapeRect.Left;
       if not(TSide.Top in Sides) then
-        LShapeRect.Top := LShapeRect.Top - Off;
+        LShapeRect.Top := LShapeRect.Top - LOff;
       if not(TSide.Left in Sides) then
-        LShapeRect.Left := LShapeRect.Left - Off;
+        LShapeRect.Left := LShapeRect.Left - LOff;
       if not(TSide.Bottom in Sides) then
-        LShapeRect.Bottom := LShapeRect.Bottom + Off;
+        LShapeRect.Bottom := LShapeRect.Bottom + LOff;
       if not(TSide.Right in Sides) then
-        LShapeRect.Right := LShapeRect.Right + Off;
-      if FillShape then
+        LShapeRect.Right := LShapeRect.Right + LOff;
+      if LFillShape then
         aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Fill, TCornerType.Round{CornerType});
-      if DrawShape then
+      if LDrawShape then
         aCanvas.DrawRectSides(_GetShapeRect, XRadius, YRadius, Corners,  1{AbsoluteOpacity}, Sides, Stroke, TCornerType.Round{CornerType});
     end
     else
     begin
-      if FillShape then
+      if LFillShape then
         aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Fill, TCornerType.Round{CornerType});
-      if DrawShape then
+      if LDrawShape then
         aCanvas.DrawRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Stroke, TCornerType.Round{CornerType});
     end;
+
+    if (Shadow <> nil) and
+       (Shadow.Enabled) then begin
+
+      LShadowEffect := TshadowEffect.Create(nil);
+      try
+        LShadowEffect.ShadowColor := Shadow.Color;
+        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
+                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                    // we use the opacity of the color instead
+        LShadowEffect.softness := Shadow.blur / 24; // Specifies the amount of blur applied to the shadow.
+                                                    // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                    // i calculate approximatly that 0.5 = around 12 for blur
+        Acanvas.Flush;
+        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
+      finally
+        ALFreeAndNil(LShadowEffect);
+      end;
+
+      if Sides <> AllSides then
+      begin
+        if LFillShape then
+          aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Fill, TCornerType.Round{CornerType});
+        if LDrawShape then
+          aCanvas.DrawRectSides(_GetShapeRect, XRadius, YRadius, Corners,  1{AbsoluteOpacity}, Sides, Stroke, TCornerType.Round{CornerType});
+      end
+      else
+      begin
+        if LFillShape then
+          aCanvas.FillRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Fill, TCornerType.Round{CornerType});
+        if LDrawShape then
+          aCanvas.DrawRect(LShapeRect, XRadius, YRadius, Corners, 1{AbsoluteOpacity}, Stroke, TCornerType.Round{CornerType});
+      end;
+
+    end;
+
   finally
-    if StrokeThicknessRestoreValue <> Stroke.Thickness then
-      Stroke.Thickness := StrokeThicknessRestoreValue;
+    Stroke.Thickness := LStrokeThicknessRestoreValue;
+  end;
+
+  {$ENDIF}
+
+end;
+
+{**********************}
+procedure ALPaintCircle(
+            {$IF defined(ANDROID)}
+            const aCanvas: Jcanvas;
+            {$ELSEIF defined(IOS)}
+            const aContext: CGContextRef;
+            const aColorSpace: CGColorSpaceRef;
+            const aGridHeight: Single;
+            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+            const aCanvas: Tcanvas;
+            {$ENDIF}
+            const dstRect: TrectF;
+            const FillColor: TAlphaColor;
+            const StrokeColor: TalphaColor;
+            const StrokeThickness: Single;
+            const ShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+            const shadowBlur: Single;
+            const shadowOffsetX: Single;
+            const shadowOffsetY: Single);
+
+{$IF defined(IOS)}
+const DefaultInputRange: array[0..1] of CGFloat = (0, 1);
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+var LPaint: JPaint;
+    LRect: TRectf;
+{$ELSEIF defined(IOS)}
+var LAlphaColor: TAlphaColorCGFloat;
+    LColor: CGColorRef;
+    LRect: TRectf;
+{$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+var LShapeRect: TRectF;
+    LFillKindRestoreValue: TBrushKind;
+    LFillColorRestoreValue: TAlphacolor;
+    LStrokeKindRestoreValue: TBrushKind;
+    LStrokeColorRestoreValue: TAlphacolor;
+    LStrokeThicknessRestoreValue: Single;
+    LFillShape, LDrawShape: Boolean;
+    LShadowEffect: TshadowEffect;
+{$ENDIF}
+
+begin
+
+  {$IFDEF ANDROID}
+
+  //create the canvas and the paint
+  LPaint := TJPaint.JavaClass.init;
+  LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+  LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+  LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+
+  //init LRect
+  if StrokeColor <> TalphaColorRec.Null then begin
+    LRect := TrectF.Create(
+               dstRect.Left + (StrokeThickness / 2),
+               dstRect.Top + (StrokeThickness / 2),
+               dstRect.right - (StrokeThickness / 2),
+               dstRect.bottom - (StrokeThickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else LRect := dstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the circle
+  if FillColor <> TalphaColorRec.Null then begin
+
+    //init LPaint
+    LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LRect + StrokeThickness :( this result&ing in border if the fill is for exemple black and border white
+
+    //fill with solid color
+    LPaint.setColor(integer(FillColor));
+    if (ShadowColor <> TalphaColorRec.Null) then LPaint.setShadowLayer(ShadowBlur{radius}, ShadowOffsetX{dx}, ShadowOffsetY{dy}, integer(ShadowColor){shadowColor});
+    aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
+    if (ShadowColor <> TalphaColorRec.Null) then LPaint.clearShadowLayer;
+
+  end;
+
+  //stroke the circle
+  if StrokeColor <> TalphaColorRec.Null then begin
+
+    //init LPaint
+    LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
+    LPaint.setStrokeWidth(StrokeThickness);
+
+    //stroke with solid color
+    LPaint.setColor(integer(StrokeColor));
+    aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
+
+  end;
+
+  //free the paint and the canvas
+  LPaint := nil;
+
+  {$ELSEIF DEFINED(IOS)}
+
+  //set the paint default properties
+  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+  //-----
+  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
+  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
+
+  //init LRect
+  if StrokeColor <> TalphaColorRec.Null then begin
+    LRect := TrectF.Create(
+               DstRect.Left + (StrokeThickness / 2),
+               DstRect.Top + (StrokeThickness / 2),
+               DstRect.right - (StrokeThickness / 2),
+               DstRect.bottom - (StrokeThickness / 2)); // http://stackoverflow.com/questions/17038017/ios-draw-filled-circles
+  end
+  else LRect := DstRect; // << stupid bug https://quality.embarcadero.com/browse/RSP-16607
+
+  //fill the circle
+  if FillColor <> TalphaColorRec.Null then begin
+
+    //fill with solid color
+    LAlphaColor := TAlphaColorCGFloat.Create(FillColor);
+    CGContextSetRGBFillColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+    //-----
+    if (ShadowColor <> TalphaColorRec.Null) then begin
+      LAlphaColor := TAlphaColorCGFloat.Create(ShadowColor);
+      LColor := CGColorCreate(aColorSpace, @LAlphaColor);
+      try
+        CGContextSetShadowWithColor(
+          aContext,
+          CGSizeMake(ShadowOffsetX, ShadowOffsetY), // offset
+          Shadowblur, // blur
+          LColor); // color
+      finally
+        CGColorRelease(LColor);
+      end;
+    end;
+    //-----
+    CGContextFillEllipseInRect(
+      aContext,
+      ALLowerLeftCGRect(
+        LRect.TopLeft,
+        LRect.Width,
+        LRect.Height,
+        aGridHeight));
+    //-----
+    if (ShadowColor <> TalphaColorRec.Null) then begin
+      CGContextSetShadowWithColor(
+        aContext,
+        CGSizeMake(0, 0), // offset
+        0, // blur
+        nil); // color
+    end;
+
+  end;
+
+  //stroke the circle
+  if StrokeColor <> TalphaColorRec.Null then begin
+
+    //stroke with solid color
+    LAlphaColor := TAlphaColorCGFloat.Create(StrokeColor);
+    CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+    CGContextSetLineWidth(aContext, StrokeThickness);
+    CGContextStrokeEllipseInRect(
+      aContext,
+      ALLowerLeftCGRect(
+        LRect.TopLeft,
+        LRect.Width,
+        LRect.Height,
+        aGridHeight));
+
+  end;
+
+  {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+
+  LFillKindRestoreValue := ACanvas.Fill.Kind;
+  LFillColorRestoreValue := ACanvas.Fill.color;
+  LStrokeKindRestoreValue := ACanvas.Stroke.kind;
+  LStrokeColorRestoreValue := ACanvas.Stroke.Color;
+  LStrokeThicknessRestoreValue := ACanvas.Stroke.Thickness;
+  if FillColor <> TAlphaColorRec.Null then begin
+    ACanvas.Fill.Kind := TBrushKind.Solid;
+    ACanvas.Fill.Color := FillColor;
+  end
+  else ACanvas.Fill.Kind := TBrushKind.None;
+  If StrokeColor <> TalphaColorRec.Null then begin
+    ACanvas.Stroke.Kind := TBrushKind.Solid;
+    ACanvas.Stroke.Color := StrokeColor;
+    ACanvas.Stroke.Thickness := StrokeThickness;
+  end
+  else ACanvas.Stroke.Kind := TBrushKind.None;
+  try
+
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, ACanvas.Fill, ACanvas.Stroke, True, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
+
+    if LFillShape then
+      aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Fill);
+    if LDrawShape then
+      aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Stroke);
+
+    if (ShadowColor <> TalphaColorRec.Null) then begin
+
+      LShadowEffect := TshadowEffect.Create(nil);
+      try
+        LShadowEffect.ShadowColor := ShadowColor;
+        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
+                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                    // we use the opacity of the color instead
+        LShadowEffect.softness := ShadowBlur / 24; // Specifies the amount of blur applied to the shadow.
+                                                    // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                    // i calculate approximatly that 0.5 = around 12 for blur
+        Acanvas.Flush;
+        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
+      finally
+        ALFreeAndNil(LShadowEffect);
+      end;
+
+      if LFillShape then
+        aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Fill);
+      if LDrawShape then
+        aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Stroke);
+
+    end;
+
+  finally
+    ACanvas.Fill.Kind := LFillKindRestoreValue;
+    ACanvas.Fill.color := LFillColorRestoreValue;
+    ACanvas.Stroke.kind := LStrokeKindRestoreValue;
+    ACanvas.Stroke.Color := LStrokeColorRestoreValue;
+    ACanvas.Stroke.Thickness := LStrokeThicknessRestoreValue;
   end;
 
   {$ENDIF}
@@ -8506,10 +9511,10 @@ procedure ALPaintCircle(
             const dstRect: TrectF;
             const Fill: TBrush;
             const Stroke: TStrokeBrush;
-            const Shadow: TALShadow = nil); // if shadow then the Canvas must contain enalf space to draw the shadow (around Shadow.blur on each side of the rectangle)
+            const Shadow: TALShadow); // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the circle)
 
 {$IF defined(IOS)}
-const aDefaultInputRange: array[0..1] of CGFloat = (0, 1);
+const DefaultInputRange: array[0..1] of CGFloat = (0, 1);
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -8539,8 +9544,9 @@ var LAlphaColor: TAlphaColorCGFloat;
     LImage: UIImage;
 {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
 var LShapeRect: TRectF;
-    StrokeThicknessRestoreValue: Single;
-    FillShape, DrawShape: Boolean;
+    LStrokeThicknessRestoreValue: Single;
+    LFillShape, LDrawShape: Boolean;
+    LShadowEffect: TshadowEffect;
 {$ENDIF}
 
 begin
@@ -8670,8 +9676,8 @@ begin
   //set the paint default properties
   CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
   //-----
-  CGContextSetShouldAntialias(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
+  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
 
   //init LRect
   if Stroke.Kind <> TBrushKind.None then begin
@@ -8697,7 +9703,7 @@ begin
         LFunc := CGFunctionCreate(
                    fill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
                    1, // domainDimension - The number of inputs.
-                   @aDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                   @DefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
                    4, // rangeDimension - The number of outputs.
                    nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
                    @LCallback); // callbacks - A pointer to a callback function table.
@@ -8709,8 +9715,8 @@ begin
                         CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.Height / 2)), // end - The center of the ending circle, in the shading's target coordinate space.
                         0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
                         LFunc, // function
-                        {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                        {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+                        True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                        True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
           try
             CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
             CGContextAddEllipseInRect(
@@ -8729,7 +9735,7 @@ begin
             //-----
             if (Shadow <> nil) and
                (Shadow.enabled) then begin
-              LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+              LAlphaColor := TAlphaColorCGFloat.Create(Shadow.Color);
               LColor := CGColorCreate(aColorSpace, @LAlphaColor);
               try
                 CGContextSetShadowWithColor(
@@ -8826,7 +9832,7 @@ begin
                     //-----
                     if (Shadow <> nil) and
                        (Shadow.enabled) then begin
-                      LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+                      LAlphaColor := TAlphaColorCGFloat.Create(Shadow.Color);
                       LColor := CGColorCreate(aColorSpace, @LAlphaColor);
                       try
                         CGContextSetShadowWithColor(
@@ -8882,7 +9888,7 @@ begin
       //-----
       if (Shadow <> nil) and
          (Shadow.enabled) then begin
-        LAlphaColor := TAlphaColorCGFloat.Create(Shadow.ShadowColor);
+        LAlphaColor := TAlphaColorCGFloat.Create(Shadow.Color);
         LColor := CGColorCreate(aColorSpace, @LAlphaColor);
         try
           CGContextSetShadowWithColor(
@@ -8937,16 +9943,46 @@ begin
 
   {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
 
-  StrokeThicknessRestoreValue := Stroke.Thickness;
+  LStrokeThicknessRestoreValue := Stroke.Thickness;
   try
-    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, Fill, Stroke, True, FillShape, DrawShape, StrokeThicknessRestoreValue);
-    if FillShape then
+
+    LShapeRect := ALGetDrawingShapeRectAndSetThickness(DstRect, Fill, Stroke, True, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
+
+    if LFillShape then
       aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, Fill);
-    if DrawShape then
+    if LDrawShape then
       aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, Stroke);
+
+    if (Shadow <> nil) and
+       (Shadow.Enabled) then begin
+
+      LShadowEffect := TshadowEffect.Create(nil);
+      try
+        LShadowEffect.ShadowColor := Shadow.Color;
+        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
+                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
+                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
+        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
+                                    // we use the opacity of the color instead
+        LShadowEffect.softness := Shadow.blur / 24; // Specifies the amount of blur applied to the shadow.
+                                                    // Softness is a System.Single value that takes values in the range from 0 through 9.
+                                                    // i calculate approximatly that 0.5 = around 12 for blur
+        Acanvas.Flush;
+        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
+      finally
+        ALFreeAndNil(LShadowEffect);
+      end;
+
+      if LFillShape then
+        aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, Fill);
+      if LDrawShape then
+        aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, Stroke);
+
+    end;
+
   finally
-    if StrokeThicknessRestoreValue <> Stroke.Thickness then
-      Stroke.Thickness := StrokeThicknessRestoreValue;
+    Stroke.Thickness := LStrokeThicknessRestoreValue;
   end;
 
   {$ENDIF}
@@ -9028,11 +10064,11 @@ begin
         //set the paint default properties
         CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
         //-----
-        CGContextSetShouldAntialias(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // default: ON
+        CGContextSetShouldAntialias(aContext, True); // default: ON
                                                                                                         // Sets anti-aliasing on or off for a graphics context.
-        CGContextSetAllowsAntialiasing(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+        CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
         //-----
-        //CGContextSetShouldSmoothFonts(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
+        //CGContextSetShouldSmoothFonts(aContext, True); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
                                                                                                             // Note that some contexts (such as PostScript contexts) do not support font smoothing.
                                                                                                             // -----
                                                                                                             // Enables or disables font smoothing in a graphics context.
@@ -9046,9 +10082,9 @@ begin
                                                                                                             // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
                                                                                                             // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
                                                                                                             // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
-        //CGContextSetAllowsFontSmoothing(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow font smoothing for a graphics context.
+        //CGContextSetAllowsFontSmoothing(aContext, True); // Sets whether or not to allow font smoothing for a graphics context.
         //-----
-        CGContextSetShouldSubpixelPositionFonts(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // default: ON
+        CGContextSetShouldSubpixelPositionFonts(aContext, True); // default: ON
                                                                                                                     // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
                                                                                                                     // the position of glyphs are always forced to integral pixel boundaries.
                                                                                                                     // -----
@@ -9059,9 +10095,9 @@ begin
                                                                                                                     // take pixel boundaries in account. This can improve the visual definition of
                                                                                                                     // the glyphs (making them slightly less "blurry") at the expense of honoring
                                                                                                                     // the font metrics.
-        CGContextSetAllowsFontSubpixelPositioning(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow subpixel positioning for a graphics context
+        CGContextSetAllowsFontSubpixelPositioning(aContext, True); // Sets whether or not to allow subpixel positioning for a graphics context
         //-----
-        CGContextSetShouldSubpixelQuantizeFonts(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // default: ON
+        CGContextSetShouldSubpixelQuantizeFonts(aContext, True); // default: ON
                                                                                                                     // Enables or disables subpixel quantization in a graphics context.
                                                                                                                     // -----
                                                                                                                     // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
@@ -9069,7 +10105,7 @@ begin
                                                                                                                     // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
                                                                                                                     // This improvement, requires additional processing so changing this value can affect text
                                                                                                                     // drawing performance.
-        CGContextSetAllowsFontSubpixelQuantization(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF});  // Sets whether or not to allow subpixel quantization for a graphics context
+        CGContextSetAllowsFontSubpixelQuantization(aContext, True);  // Sets whether or not to allow subpixel quantization for a graphics context
 
       except
         CGContextRelease(aContext);
@@ -9182,11 +10218,11 @@ begin
       //set the paint default properties
       CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
       //-----
-      CGContextSetShouldAntialias(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // default: ON
+      CGContextSetShouldAntialias(aContext, True); // default: ON
                                                                                                       // Sets anti-aliasing on or off for a graphics context.
-      CGContextSetAllowsAntialiasing(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow anti-aliasing for a graphics context.
+      CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
       //-----
-      //CGContextSetShouldSmoothFonts(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
+      //CGContextSetShouldSmoothFonts(aContext, True); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
                                                                                                           // Note that some contexts (such as PostScript contexts) do not support font smoothing.
                                                                                                           // -----
                                                                                                           // Enables or disables font smoothing in a graphics context.
@@ -9200,9 +10236,9 @@ begin
                                                                                                           // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
                                                                                                           // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
                                                                                                           // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
-      //CGContextSetAllowsFontSmoothing(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow font smoothing for a graphics context.
+      //CGContextSetAllowsFontSmoothing(aContext, True); // Sets whether or not to allow font smoothing for a graphics context.
       //-----
-      CGContextSetShouldSubpixelPositionFonts(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // default: ON
+      CGContextSetShouldSubpixelPositionFonts(aContext, True); // default: ON
                                                                                                                   // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
                                                                                                                   // the position of glyphs are always forced to integral pixel boundaries.
                                                                                                                   // -----
@@ -9213,9 +10249,9 @@ begin
                                                                                                                   // take pixel boundaries in account. This can improve the visual definition of
                                                                                                                   // the glyphs (making them slightly less "blurry") at the expense of honoring
                                                                                                                   // the font metrics.
-      CGContextSetAllowsFontSubpixelPositioning(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // Sets whether or not to allow subpixel positioning for a graphics context
+      CGContextSetAllowsFontSubpixelPositioning(aContext, True); // Sets whether or not to allow subpixel positioning for a graphics context
       //-----
-      CGContextSetShouldSubpixelQuantizeFonts(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF}); // default: ON
+      CGContextSetShouldSubpixelQuantizeFonts(aContext, True); // default: ON
                                                                                                                   // Enables or disables subpixel quantization in a graphics context.
                                                                                                                   // -----
                                                                                                                   // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
@@ -9223,7 +10259,7 @@ begin
                                                                                                                   // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
                                                                                                                   // This improvement, requires additional processing so changing this value can affect text
                                                                                                                   // drawing performance.
-      CGContextSetAllowsFontSubpixelQuantization(aContext, {$IF CompilerVersion >= 34}{sydney}true{$ELSE}1{$ENDIF});  // Sets whether or not to allow subpixel quantization for a graphics context
+      CGContextSetAllowsFontSubpixelQuantization(aContext, True);  // Sets whether or not to allow subpixel quantization for a graphics context
 
     except
       CGContextRelease(aContext);

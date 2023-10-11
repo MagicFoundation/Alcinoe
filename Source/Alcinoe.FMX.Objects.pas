@@ -187,9 +187,6 @@ type
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     fShadow: TALShadow;
-    {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-    fShadowEffect: TshadowEffect;
-    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
     procedure SetShadow(const Value: TALShadow);
   protected
@@ -218,9 +215,6 @@ type
     fBufBitmapRect: TRectF;
     fBufSize: TsizeF;
     fShadow: TALShadow;
-    {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-    fShadowEffect: TshadowEffect;
-    {$ENDIF}
     procedure SetdoubleBuffered(const Value: Boolean);
     procedure SetShadow(const Value: TALShadow);
   protected
@@ -884,9 +878,6 @@ begin
   fBufBitmap := nil;
   fShadow := TalShadow.Create;
   fShadow.OnChanged := ShadowChanged;
-  {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-  fShadowEffect := nil;
-  {$ENDIF}
 end;
 
 {******************************}
@@ -894,9 +885,6 @@ destructor TALRectangle.Destroy;
 begin
   clearBufBitmap;
   alFreeAndNil(fShadow);
-  {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-  AlFreeAndNil(fShadowEffect);
-  {$ENDIF}
   inherited;
 end;
 
@@ -924,27 +912,6 @@ end;
 procedure TALRectangle.ShadowChanged(Sender: TObject);
 begin
   clearBufBitmap;
-  {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-  if shadow.enabled then begin
-    if not assigned(fShadowEffect) then begin
-      fShadowEffect := TshadowEffect.Create(self);
-      fShadowEffect.Parent := self;
-      fShadowEffect.SetSubComponent(true);
-      fShadowEffect.stored := False;
-    end;
-    fShadowEffect.ShadowColor := shadow.ShadowColor;
-    fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
-                                 // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-    fShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                   // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-    fShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                // we use the opacity of the color instead
-    fShadowEffect.softness := fShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
-                                                 // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                 // i calculate approximatly that 0.5 = around 12 for blur
-  end
-  else AlFreeAndNil(fShadowEffect);
-  {$ENDIF}
   if FUpdating = 0 then Repaint;
 end;
 
@@ -1085,6 +1052,40 @@ begin
         LColorSpace); // Var aColorSpace: CGColorSpaceRef;
     end;
 
+    {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+
+    //create the drawing surface
+    ALCreateDrawingSurface(
+      fBufBitmap, // Var aBitmap: Tbitmap;
+      true, // const aClearBitmap: boolean;
+      round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+      round(fBufBitmapRect.height * FScreenScale));// const h: integer)
+    try
+
+      //begin the scene
+      if fBufBitmap.Canvas.BeginScene then
+      try
+
+        ALPaintRectangle(
+          fBufBitmap.Canvas, // const aBitmap: Jbitmap;
+          LRect, // const Rect: TrectF;
+          Fill, // const Fill: TBrush;
+          Stroke, // const Stroke: TStrokeBrush;
+          Shadow, // const Shadow: TALShadow
+          Sides, // const Sides: TSides;
+          Corners, // const Corners: TCorners;
+          XRadius * fScreenScale, // const XRadius: Single = 0;
+          YRadius * fScreenScale); // const YRadius: Single = 0);
+
+      finally
+        fBufBitmap.Canvas.EndScene;
+      end;
+
+    Except
+      ALFreeDrawingSurface(fBufBitmap);
+      raise;
+    end;
+
     {$ENDIF}
 
   finally
@@ -1167,9 +1168,6 @@ begin
   fBufBitmap := nil;
   fShadow := TalShadow.Create;
   fShadow.OnChanged := ShadowChanged;
-  {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-  fShadowEffect := nil;
-  {$ENDIF}
 end;
 
 {***************************}
@@ -1177,9 +1175,6 @@ destructor TALCircle.Destroy;
 begin
   clearBufBitmap;
   alFreeAndNil(fShadow);
-  {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-  AlFreeandNil(fShadowEffect);
-  {$ENDIF}
   inherited;
 end;
 
@@ -1207,27 +1202,6 @@ end;
 procedure TALCircle.ShadowChanged(Sender: TObject);
 begin
   clearBufBitmap;
-  {$IF DEFINED(MSWindows) or DEFINED(ALMacOS)}
-  if shadow.enabled then begin
-    if not assigned(fShadowEffect) then begin
-      fShadowEffect := TshadowEffect.Create(self);
-      fShadowEffect.Parent := self;
-      fShadowEffect.SetSubComponent(true);
-      fShadowEffect.stored := False;
-    end;
-    fShadowEffect.ShadowColor := shadow.ShadowColor;
-    fShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
-                                 // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-    fShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                   // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-    fShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                // we use the opacity of the color instead
-    fShadowEffect.softness := fShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
-                                                 // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                 // i calculate approximatly that 0.5 = around 12 for blur
-  end
-  else AlFreeAndNil(fShadowEffect);
-  {$ENDIF}
   if FUpdating = 0 then Repaint;
 end;
 
@@ -1345,6 +1319,36 @@ begin
         LBitmapSurface, // var aBitmapSurface: TbitmapSurface;
         LContext, // Var aContext: CGContextRef;
         LColorSpace); // Var aColorSpace: CGColorSpaceRef;
+    end;
+
+    {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
+
+    //create the drawing surface
+    ALCreateDrawingSurface(
+      fBufBitmap, // Var aBitmap: Tbitmap;
+      true, // const aClearBitmap: boolean;
+      round(fBufBitmapRect.Width * FScreenScale), // const w: integer;
+      round(fBufBitmapRect.height * FScreenScale));// const h: integer)
+    try
+
+      //begin the scene
+      if fBufBitmap.Canvas.BeginScene then
+      try
+
+        ALPaintCircle(
+          fBufBitmap.Canvas, // const aBitmap: Jbitmap;
+          LRect, // const Rect: TrectF;
+          Fill, // const Fill: TBrush;
+          Stroke, // const Stroke: TStrokeBrush;
+          Shadow); // const Shadow: TALShadow
+
+      finally
+        fBufBitmap.Canvas.EndScene;
+      end;
+
+    Except
+      ALFreeDrawingSurface(fBufBitmap);
+      raise;
     end;
 
     {$ENDIF}

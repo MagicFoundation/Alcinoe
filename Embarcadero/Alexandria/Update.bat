@@ -24,6 +24,7 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
 mkdir "%FileName%\ios"
+mkdir "%FileName%\osx"
 mkdir "%FileName%\android"
 mkdir "%FileName%\win"
 mkdir "%FileName%\net"
@@ -35,6 +36,12 @@ IF ERRORLEVEL 1 goto ERROR
 IF EXIST "%EmbSourceDir%\rtl\ios" (
   echo Copy "%EmbSourceDir%\rtl\ios"
   xcopy /Q "%EmbSourceDir%\rtl\ios" "%ALBaseDir%\Embarcadero\Alexandria\rtl\ios"
+  IF ERRORLEVEL 1 goto ERROR
+)
+
+IF EXIST "%EmbSourceDir%\rtl\osx" (
+  echo Copy "%EmbSourceDir%\rtl\osx"
+  xcopy /Q "%EmbSourceDir%\rtl\osx" "%ALBaseDir%\Embarcadero\Alexandria\rtl\osx"
   IF ERRORLEVEL 1 goto ERROR
 )
 

@@ -35,7 +35,7 @@ us to patch the original Delphi source files:
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
 * [BeginUpdate/Endupdate block with add or remove of child objects : misconception](https://quality.embarcadero.com/browse/RSP-21013)
-* [The width and height of a TContext3D object must be defined as single-precision floating-point numbers, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
+* [The width and height of a TContext3D object must be defined as single-precision, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
 * [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)
 * [Regression in Alexandria: FMX.StrokeBuilder.pas Revamp Leads to TARC Drawing Issues](https://quality.embarcadero.com/browse/RSP-41618)
 * [GL_TEXTURE_EXTERNAL_OES not supported](https://quality.embarcadero.com/browse/RSP-16830)
@@ -57,6 +57,7 @@ us to patch the original Delphi source files:
 * [Miss CLLocationManager.accuracyAuthorization in iOSapi.CoreLocation.pas](https://quality.embarcadero.com/browse/RSP-41352)
 * [Miss constant kCLLocationAccuracyReduced in iOSapi.CoreLocation.pas](https://quality.embarcadero.com/browse/RSP-41388)
 * [iOS/OSX: Declaration for CLRegion.initCircularRegionWithCenter is incorrect](https://quality.embarcadero.com/browse/RSP-15717)
+* [Missing function declaration for maximumFramesPerSecond in iOSapi.UIKit.UIScreen](https://quality.embarcadero.com/browse/RSP-42455)
 
     
 Install Alcinoe

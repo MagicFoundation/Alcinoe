@@ -2164,6 +2164,19 @@ diff --git a/Embarcadero/Alexandria/rtl/ios/iOSapi.Security.pas b/Embarcadero/Al
  {$IF defined(IOS) and NOT defined(CPUARM)}
  
  initialization
+Index: Embarcadero/Alexandria/rtl/ios/iOSapi.UIKit.pas
+===================================================================
+diff --git a/Embarcadero/Alexandria/rtl/ios/iOSapi.UIKit.pas b/Embarcadero/Alexandria/rtl/ios/iOSapi.UIKit.pas
+--- a/Embarcadero/Alexandria/rtl/ios/iOSapi.UIKit.pas	(revision 1)
++++ b/Embarcadero/Alexandria/rtl/ios/iOSapi.UIKit.pas	(working copy)
+@@ -2634,6 +2634,7 @@
+     function nativeBounds: CGRect; cdecl;
+     function nativeScale: CGFloat; cdecl;
+     function snapshotViewAfterScreenUpdates(afterUpdates: Boolean): UIView; cdecl;
++    function maximumFramesPerSecond: NSInteger; cdecl;
+   end;
+   TUIScreen = class(TOCGenericImport<UIScreenClass, UIScreen>)  end;
+ 
 Index: Embarcadero/Alexandria/rtl/win/Winapi.Isapi2.pas
 ===================================================================
 diff --git a/Embarcadero/Alexandria/rtl/win/Winapi.Isapi2.pas b/Embarcadero/Alexandria/rtl/win/Winapi.Isapi2.pas

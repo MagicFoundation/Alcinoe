@@ -34,13 +34,13 @@ type
     fblur: Single;
     fOffsetX: Single;
     fOffsetY: Single;
-    fShadowColor: TAlphaColor;
+    fColor: TAlphaColor;
     FOnChanged: TNotifyEvent;
     procedure SetEnabled(const Value: boolean);
     procedure setblur(const Value: Single);
     procedure setOffsetX(const Value: Single);
     procedure setOffsetY(const Value: Single);
-    procedure setShadowColor(const Value: TAlphaColor);
+    procedure setColor(const Value: TAlphaColor);
     function IsblurStored: Boolean;
     function IsOffsetXStored: Boolean;
     function IsOffsetYStored: Boolean;
@@ -54,7 +54,7 @@ type
     property blur: Single read fblur write setblur stored IsblurStored;
     property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored;
     property OffsetY: Single read fOffsetY write setOffsetY stored IsOffsetYStored;
-    property ShadowColor: TAlphaColor read fShadowColor write setShadowColor default $96000000;
+    property Color: TAlphaColor read fColor write setColor default $96000000;
   end;
 
 type
@@ -310,7 +310,7 @@ begin
   fblur := 12;
   fOffsetX := 0;
   fOffsetY := 0;
-  fShadowColor := $96000000;
+  fColor := $96000000;
   FOnChanged := nil;
 end;
 
@@ -325,7 +325,7 @@ begin
     fblur := TALShadow(Source).fblur;
     fOffsetX := TALShadow(Source).fOffsetX;
     fOffsetY := TALShadow(Source).fOffsetY;
-    fShadowColor := TALShadow(Source).fShadowColor;
+    fColor := TALShadow(Source).fColor;
     FOnChanged := LSaveChange;
     if Assigned(FOnChanged) then FOnChanged(Self);
   end
@@ -386,11 +386,11 @@ begin
   end;
 end;
 
-{***********************************************************}
-procedure TALShadow.setShadowColor(const Value: TAlphaColor);
+{*****************************************************}
+procedure TALShadow.setColor(const Value: TAlphaColor);
 begin
-  if FShadowColor <> Value then begin
-    FShadowColor := Value;
+  if FColor <> Value then begin
+    FColor := Value;
     if Assigned(FOnChanged) then FOnChanged(Self);
   end;
 end;

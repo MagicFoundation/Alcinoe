@@ -8329,7 +8329,7 @@ procedure ALPaintRectangle(
       //-----
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.Color){shadowColor});
 
       LJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
       aCanvas.drawRoundRect(
@@ -8353,7 +8353,7 @@ procedure ALPaintRectangle(
       //-----
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.Color){shadowColor});
 
       aCanvas.drawRect(
         aRect.left{left},
@@ -8511,7 +8511,7 @@ procedure ALPaintRectangle(
       //-----
       if (not aDrawOnlyBorder) and
          (Shadow <> nil) and
-         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
+         (Shadow.enabled) then aPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.Color){shadowColor});
 
       aCanvas.drawPath(LPath,aPaint);
       LPath := nil;
@@ -9587,7 +9587,7 @@ begin
         LShader := TJRadialGradient.JavaClass.init(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius},  LColors, LStops, TJShader_TileMode.JavaClass.CLAMP{tile});
         LPaint.setShader(LShader);
         if (Shadow <> nil) and
-           (Shadow.enabled) then LPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
+           (Shadow.enabled) then LPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.Color){shadowColor});
         aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
         if (Shadow <> nil) and
            (Shadow.enabled) then LPaint.clearShadowLayer;
@@ -9625,7 +9625,7 @@ begin
           LJSrcRect := TJRect.JavaClass.init(0, 0, fill.Bitmap.Bitmap.Width, fill.Bitmap.Bitmap.height);
           LPaint.setXfermode(LPorterDuffXfermode);
           if (Shadow <> nil) and
-             (Shadow.enabled) then LPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
+             (Shadow.enabled) then LPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.Color){shadowColor});
           aCanvas.drawBitmap(LTmpBitmap, LJSrcRect, LJDestRectf, LPaint);
           if (Shadow <> nil) and
              (Shadow.enabled) then LPaint.clearShadowLayer;
@@ -9645,7 +9645,7 @@ begin
     else if Fill.Kind = TBrushKind.Solid then begin
       LPaint.setColor(integer(Fill.Color));
       if (Shadow <> nil) and
-         (Shadow.enabled) then LPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.ShadowColor){shadowColor});
+         (Shadow.enabled) then LPaint.setShadowLayer(Shadow.blur{radius}, Shadow.OffsetX{dx}, Shadow.OffsetY{dy}, integer(Shadow.Color){shadowColor});
       aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
       if (Shadow <> nil) and
          (Shadow.enabled) then LPaint.clearShadowLayer;

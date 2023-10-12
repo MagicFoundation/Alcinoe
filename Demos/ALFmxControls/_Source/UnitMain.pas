@@ -429,7 +429,6 @@ begin
   fALText.Parent := ALVertScrollBox1;
   fALText.TextSettings.WordWrap := True;
   fALText.TextSettings.HorzAlign := TTextAlign.Center;
-  fALText.doubleBuffered := True;
   fALText.Align := TalignLayout.Top;
   fALText.Margins.Top := 8;
   fALText.Position.Y := button15.Position.Y - button15.Margins.Top;
@@ -910,7 +909,6 @@ begin
     //-----
     var LText := TALText.Create(self);
     LText.Parent := LRectangle;
-    LText.doubleBuffered := True;
     LText.Align := TalignLayout.left;
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;

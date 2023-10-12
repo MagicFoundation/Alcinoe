@@ -257,70 +257,20 @@ type
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
   end;
 
-  {~~~~~~~~~~~~~~}
-  TALText = class;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDoubleBufferedTextLayout = class(TTextLayout)
-  private
-    FScreenScale: single;
-    [weak] fTextControl: TALText;
-    fBufBitmap: TALRasterImage;
-    fBufBitmapRect: TRectF;
-    //-----
-    fBufHorizontalAlign: TTextAlign;
-    fBufVerticalAlign: TTextAlign;
-    fBuffontColor: TAlphaColor;
-    fBuffontFamily: TFontName;
-    fBuffontStyle: TFontStyles;
-    fBuffontSize: Single;
-    fBufLineSpacing: Single;
-    fBufXRadius: Single;
-    fBufYRadius: Single;
-    fBufTextIsHTML: Boolean;
-    fBufWordWrap: Boolean;
-    fBufAutosize: Boolean;
-    fBufTrimming: TTextTrimming;
-    fBufSize: TsizeF;
-    fBufText: string;
-    fBufTextBroken: Boolean;
-    fBufAllTextDrawn: Boolean;
-  protected
-    procedure DoRenderLayout; override;
-    procedure DoDrawLayout(const ACanvas: TCanvas); override;
-    function GetTextHeight: Single; override;
-    function GetTextWidth: Single; override;
-    function GetTextRect: TRectF; override;
-    function DoPositionAtPoint(const APoint: TPointF): Integer; override;
-    function DoRegionForRange(const ARange: TTextRange): TRegion; override;
-  public
-    constructor Create(const ACanvas: TCanvas; const aTextControl: TALText); reintroduce;
-    destructor Destroy; override;
-    function MakeBufBitmap: TALRasterImage; virtual;
-    procedure clearBufBitmap; virtual;
-    procedure ConvertToPath(const APath: TPathData); override;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  // Note: we can use this class in for exemple Tlabel
-  // by overriding the Tlabel default Style but i
-  // do not recomend to use Tlabel, because it's simply
-  // a painless class that is in the top of the TText !
-  // this class use also it's own TTextLayoutNG to calculate
-  // the size, making everythink duplicate for .. nothing in fact !
-  // but i made some test and it's work with tlabel (but check carefully
-  // that you define well the properties of the TALText in the
-  // style to not have MakeBufBitmap called several times (applystyle
-  // don't call beginupdate/endupdate (crazy!!), so everytime a property of the
-  // TALText is updated, MakeBufBitmap is call again)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALText = class(TControl)
   private
-    fRestoreLayoutUpdateAfterLoaded: boolean;
+    FScreenScale: single;
+    fBufBitmap: TALRasterImage;
+    fBufBitmapRect: TRectF;
+    fBufSize: TsizeF;
+    fBufTextBroken: Boolean;
+    fBufAllTextDrawn: Boolean;
     FAutoTranslate: Boolean;
     FAutoConvertFontFamily: boolean;
+    FText: String;
     FTextSettings: TTextSettings;
-    FLayout: TTextLayout;
     FAutoSize: Boolean;
     fMaxWidth: Single;
     fMaxHeight: Single;
@@ -332,14 +282,10 @@ type
     FStroke: TStrokeBrush;
     fLineSpacing: single;
     fTextIsHtml: boolean;
-    fMustCallResized: Boolean;
     procedure SetFill(const Value: TBrush);
     procedure SetStroke(const Value: TStrokeBrush);
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
-    function GetBufBitmap: TALRasterImage;
-    function GetdoubleBuffered: Boolean;
-    procedure SetdoubleBuffered(const Value: Boolean);
     procedure SetText(const Value: string);
     procedure SetFont(const Value: TFont);
     procedure SetHorzTextAlign(const Value: TTextAlign);
@@ -349,7 +295,6 @@ type
     procedure SetColor(const Value: TAlphaColor);
     procedure SetTrimming(const Value: TTextTrimming);
     procedure OnFontChanged(Sender: TObject);
-    function GetTextSettings: TTextSettings;
     procedure SetTextSettings(const Value: TTextSettings);
     function GetColor: TAlphaColor;
     function GetFont: TFont;
@@ -357,13 +302,12 @@ type
     function GetTrimming: TTextTrimming;
     function GetVertTextAlign: TTextAlign;
     function GetWordWrap: Boolean;
-    function GetText: string;
     procedure SetMaxWidth(const Value: Single);
     procedure SetMaxHeight(const Value: Single);
     function IsMaxWidthStored: Boolean;
     function IsMaxHeightStored: Boolean;
   protected
-    property BufBitmap: TALRasterImage read GetBufBitmap;
+    property BufBitmap: TALRasterImage read FBufBitmap;
     procedure PaddingChanged; override;
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
@@ -373,29 +317,21 @@ type
     procedure SetTextIsHtml(const Value: Boolean); virtual;
     procedure SetCorners(const Value: TCorners); virtual;
     procedure SetSides(const Value: TSides); virtual;
-    procedure SetParent(const Value: TFmxObject); override;
     procedure FontChanged; virtual;
-    function SupportsPaintStage(const Stage: TPaintStage): Boolean; override;
     function GetTextSettingsClass: TTextSettingsClass; virtual;
     procedure Paint; override;
     function GetData: TValue; override;
     procedure SetData(const Value: TValue); override;
-    procedure DoRealign; override;
-    procedure AdjustSize;
-    procedure Resize; override;
-    {$IF CompilerVersion >= 32} // tokyo
-    procedure DoResized; override;
-    {$ENDIF}
     procedure Loaded; override;
-    property Layout: TTextLayout read FLayout;
+    procedure DoResized; override;
+    procedure DoEndUpdate; override;
+    procedure AdjustSize;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetNewScene(AScene: IScene); override;
     function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
-    procedure BeginUpdate; override; // this is neccessary because the MakeBufBitmap is not only call during the paint,
-    procedure EndUpdate; override;   // but also when any property changed because need to retrieve the dimension
     function TextBroken: Boolean;
     property Font: TFont read GetFont write SetFont;
     property Color: TAlphaColor read GetColor write SetColor;
@@ -425,8 +361,8 @@ type
     property RotationCenter;
     property Scale;
     property Size;
-    property Text: string read GetText write SetText;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property Text: string read FText write SetText;
+    property TextSettings: TTextSettings read fTextSettings write SetTextSettings;
     property Visible default True;
     property Width;
     property MaxWidth: single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored;       // these properties are usefull when used
@@ -452,7 +388,6 @@ type
     {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
     {$ENDIF}
-    property doubleBuffered: Boolean read GetdoubleBuffered write setdoubleBuffered default true;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
     property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
     property Fill: TBrush read FFill write SetFill;
@@ -468,23 +403,6 @@ type
 
 procedure ALLockTexts(const aParentControl: Tcontrol);
 procedure ALUnLockTexts(const aParentControl: Tcontrol);
-
-{$IFDEF debug}
-var
-  AlDebugImageMakeBufBitmapCount: integer;
-  AlDebugRectangleMakeBufBitmapCount: integer;
-  AlDebugCircleMakeBufBitmapCount: integer;
-  AlDebugLineMakeBufBitmapCount: integer;
-  AlDebugTextMakeBufBitmapCount: integer;
-  AlDebugTextInheritedDoRenderLayoutCount: integer;
-  AlDebugTextInheritedDoDrawLayoutCount: integer;
-
-  AlDebugImageMakeBufBitmapStopWatch: TstopWatch;
-  AlDebugRectangleMakeBufBitmapStopWatch: TstopWatch;
-  AlDebugCircleMakeBufBitmapStopWatch: TstopWatch;
-  AlDebugLineMakeBufBitmapStopWatch: TstopWatch;
-  AlDebugTextMakeBufBitmapStopWatch: TstopWatch;
-{$endif}
 
 procedure Register;
 
@@ -566,169 +484,161 @@ begin
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
 
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog('TALImage.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  {$endif}
   clearBufBitmap;
   fBufSize := Size.Size;
 
-  {$IFDEF debug}
-  inc(AlDebugImageMakeBufBitmapCount);
-  AlDebugImageMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
-
-    {$IFDEF ALDPK}
-    var LFileName: String := '';
-    if fresourceName = '' then begin
-      LFileName := fFileName;
-      if not TFile.Exists(LFileName) then LFileName := '';
-    end
-    else begin
-      if TFile.Exists(getActiveProject.fileName) then begin
-        var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
-        //<RcItem Include="resources\account_100x100.png">
-        //    <ResourceType>RCDATA</ResourceType>
-        //    <ResourceId>account_100x100</ResourceId>
-        //</RcItem>
-        Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+fResourceName+'</ResourceId>', LDProjSrc);
-        While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
-        if (P1 > 0) then begin
-          var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
-          if P2 > P1 then begin
-            LFileName := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
-            if not TFile.Exists(LFileName) then LFileName := '';
-          end;
-        end;
-      end;
-      if LFileName = '' then begin
-        LFileName := extractFilePath(getActiveProject.fileName) + 'Resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
-        if not TFile.Exists(LFileName) then begin
-          LFileName := LFileName + '.png';
+  {$IFDEF ALDPK}
+  var LFileName: String := '';
+  if fresourceName = '' then begin
+    LFileName := fFileName;
+    if not TFile.Exists(LFileName) then LFileName := '';
+  end
+  else begin
+    if TFile.Exists(getActiveProject.fileName) then begin
+      var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
+      //<RcItem Include="resources\account_100x100.png">
+      //    <ResourceType>RCDATA</ResourceType>
+      //    <ResourceId>account_100x100</ResourceId>
+      //</RcItem>
+      Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+fResourceName+'</ResourceId>', LDProjSrc);
+      While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
+      if (P1 > 0) then begin
+        var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
+        if P2 > P1 then begin
+          LFileName := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
           if not TFile.Exists(LFileName) then LFileName := '';
         end;
       end;
     end;
-    {$ENDIF}
-
-    if (fRotateAccordingToExifOrientation) and
-       (fResourceName = '') and
-       (fFileName <> '') then fExifOrientationInfo := AlGetExifOrientationInfo(ffilename)
-    else fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
-
-    if fExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
-                                TalExifOrientationInfo.ROTATE_90,
-                                TalExifOrientationInfo.TRANSVERSE,
-                                TalExifOrientationInfo.ROTATE_270] then fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), FScreenScale) // to have the pixel aligned width and height
-    else fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
-                                                                                  // TalExifOrientationInfo.FLIP_HORIZONTAL:;
-                                                                                  // TalExifOrientationInfo.FLIP_VERTICAL:;
-                                                                                  // TalExifOrientationInfo.NORMAL:;
-                                                                                  // TalExifOrientationInfo.ROTATE_180:;
-                                                                                  // TalExifOrientationInfo.UNDEFINED:;
-
-    case FWrapMode of
-
-      //Display the image with its original dimensions:
-      //* The image is placed in the upper-left corner of the rectangle of the control.
-      //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
-      //  which fits in the rectangle of the control, is shown. The image is not resized.
-      TALImageWrapMode.Original:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Best fit the image in the rectangle of the control:
-      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
-      //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
-      //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
-      //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
-      //  should be displayed. The image is displayed centered in the rectangle of the control.
-      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-      //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-      TALImageWrapMode.Fit:
-        begin
-          {$IFDEF ALDPK}
-          if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := nil;
-          {$ELSE}
-          if fResourceName <> '' then fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := ALLoadFitIntoFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
-          {$ENDIF}
-          result := fBufBitmap;
-        end;
-
-      //Stretch the image to fill the entire rectangle of the control.
-      TALImageWrapMode.Stretch:
-        begin
-          {$IFDEF ALDPK}
-          if LFileName <> '' then fBufBitmap := ALLoadStretchFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := nil;
-          {$ELSE}
-          if fResourceName <> '' then fBufBitmap := ALLoadStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := ALLoadStretchFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
-          {$ENDIF}
-          result := fBufBitmap;
-        end;
-
-      //Tile (multiply) the image to cover the entire rectangle of the control:
-      //* If the image is larger than the rectangle of the control, then only the
-      //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
-      //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
-      //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
-      //  the upper-left corner of the rectangle of the control.
-      TALImageWrapMode.Tile:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Center the image to the rectangle of the control:
-      //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
-      TALImageWrapMode.Center:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Fit the image in the rectangle of the control:
-      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
-      //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
-      //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-      //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
-      TALImageWrapMode.Place:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Best fit the image in the rectangle of the control:
-      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
-      //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
-      //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
-      //  AND the height of the resized image is equal to the height of the rectangle of the control.
-      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-      //  the rectangle of the control. Whole the image should be displayed.
-      TALImageWrapMode.FitAndCrop:
-        begin
-          {$IFDEF ALDPK}
-          if LFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := nil;
-          {$ELSE}
-          if fResourceName <> '' then fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := ALLoadFitIntoAndCropFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
-          {$ENDIF}
-          result := fBufBitmap;
-        end;
-
-      //to hide a stupid warning else
-      else Result := nil;
-
+    if LFileName = '' then begin
+      LFileName := extractFilePath(getActiveProject.fileName) + 'Resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
+      if not TFile.Exists(LFileName) then begin
+        LFileName := LFileName + '.png';
+        if not TFile.Exists(LFileName) then LFileName := '';
+      end;
     end;
-
-    if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
-                                              CenterAt(LocalRect);
-
-  {$IFDEF debug}
-  finally
-    AlDebugImageMakeBufBitmapStopWatch.Stop;
   end;
-  if result <> nil then ALLog('TALImage.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
-  {$endif}
+  {$ENDIF}
+
+  if (fRotateAccordingToExifOrientation) and
+     (fResourceName = '') and
+     (fFileName <> '') then fExifOrientationInfo := AlGetExifOrientationInfo(ffilename)
+  else fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+
+  if fExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
+                              TalExifOrientationInfo.ROTATE_90,
+                              TalExifOrientationInfo.TRANSVERSE,
+                              TalExifOrientationInfo.ROTATE_270] then fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), FScreenScale) // to have the pixel aligned width and height
+  else fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+                                                                                // TalExifOrientationInfo.FLIP_HORIZONTAL:;
+                                                                                // TalExifOrientationInfo.FLIP_VERTICAL:;
+                                                                                // TalExifOrientationInfo.NORMAL:;
+                                                                                // TalExifOrientationInfo.ROTATE_180:;
+                                                                                // TalExifOrientationInfo.UNDEFINED:;
+
+  case FWrapMode of
+
+    //Display the image with its original dimensions:
+    //* The image is placed in the upper-left corner of the rectangle of the control.
+    //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
+    //  which fits in the rectangle of the control, is shown. The image is not resized.
+    TALImageWrapMode.Original:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Best fit the image in the rectangle of the control:
+    //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+    //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
+    //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
+    //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
+    //  should be displayed. The image is displayed centered in the rectangle of the control.
+    // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+    //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+    TALImageWrapMode.Fit:
+      begin
+        {$IFDEF ALDPK}
+        if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := nil;
+        {$ELSE}
+        if fResourceName <> '' then fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := ALLoadFitIntoFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+        {$ENDIF}
+        result := fBufBitmap;
+      end;
+
+    //Stretch the image to fill the entire rectangle of the control.
+    TALImageWrapMode.Stretch:
+      begin
+        {$IFDEF ALDPK}
+        if LFileName <> '' then fBufBitmap := ALLoadStretchFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := nil;
+        {$ELSE}
+        if fResourceName <> '' then fBufBitmap := ALLoadStretchResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := ALLoadStretchFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+        {$ENDIF}
+        result := fBufBitmap;
+      end;
+
+    //Tile (multiply) the image to cover the entire rectangle of the control:
+    //* If the image is larger than the rectangle of the control, then only the
+    //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
+    //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
+    //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
+    //  the upper-left corner of the rectangle of the control.
+    TALImageWrapMode.Tile:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Center the image to the rectangle of the control:
+    //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
+    TALImageWrapMode.Center:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Fit the image in the rectangle of the control:
+    //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
+    //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
+    //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+    //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
+    TALImageWrapMode.Place:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Best fit the image in the rectangle of the control:
+    //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+    //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
+    //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
+    //  AND the height of the resized image is equal to the height of the rectangle of the control.
+    // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+    //  the rectangle of the control. Whole the image should be displayed.
+    TALImageWrapMode.FitAndCrop:
+      begin
+        {$IFDEF ALDPK}
+        if LFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := nil;
+        {$ELSE}
+        if fResourceName <> '' then fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(fResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := ALLoadFitIntoAndCropFileImageV3(fFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+        {$ENDIF}
+        result := fBufBitmap;
+      end;
+
+    //to hide a stupid warning else
+    else Result := nil;
+
+  end;
+
+  if result <> nil then
+    fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                        CenterAt(LocalRect);
 
 end;
 
@@ -912,7 +822,7 @@ end;
 procedure TALRectangle.ShadowChanged(Sender: TObject);
 begin
   clearBufBitmap;
-  if FUpdating = 0 then Repaint;
+  Repaint;
 end;
 
 {**************************************************}
@@ -960,14 +870,12 @@ begin
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
 
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog('TALRectangle.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  {$endif}
   clearBufBitmap;
   fBufSize := Size.Size;
-
-  {$IFDEF debug}
-  inc(AlDebugRectangleMakeBufBitmapCount);
-  AlDebugRectangleMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
 
   //init fBufBitmapRect / LRect
   fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
@@ -1101,13 +1009,6 @@ begin
   //set the result
   result := fBufBitmap;
 
-  {$IFDEF debug}
-  finally
-    AlDebugRectangleMakeBufBitmapStopWatch.Stop;
-  end;
-  if result <> nil then ALLog('TALRectangle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
-  {$endif}
-
 end;
 
 {***************************}
@@ -1202,7 +1103,7 @@ end;
 procedure TALCircle.ShadowChanged(Sender: TObject);
 begin
   clearBufBitmap;
-  if FUpdating = 0 then Repaint;
+  Repaint;
 end;
 
 {***********************************************}
@@ -1237,14 +1138,12 @@ begin
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
 
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog('TALCircle.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  {$endif}
   clearBufBitmap;
   fBufSize := Size.Size;
-
-  {$IFDEF debug}
-  inc(AlDebugCircleMakeBufBitmapCount);
-  AlDebugCircleMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
 
   //init fBufBitmapRect / LRect
   fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), FScreenScale); // to have the pixel aligned width and height
@@ -1365,13 +1264,6 @@ begin
 
   //set the result
   result := fBufBitmap;
-
-  {$IFDEF debug}
-  finally
-    AlDebugCircleMakeBufBitmapStopWatch.Stop;
-  end;
-  if result <> nil then ALLog('TALCircle.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
-  {$endif}
 
 end;
 
@@ -1495,14 +1387,12 @@ begin
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
 
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog('TALLine.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  {$endif}
   clearBufBitmap;
   fBufSize := Size.Size;
-
-  {$IFDEF debug}
-  inc(AlDebugLineMakeBufBitmapCount);
-  AlDebugLineMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
 
   {$IFDEF ANDROID}
 
@@ -1675,13 +1565,6 @@ begin
 
   result := fBufBitmap;
 
-  {$IFDEF debug}
-  finally
-    AlDebugLineMakeBufBitmapStopWatch.Stop;
-  end;
-  if result <> nil then ALLog('TALLine.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
-  {$endif}
-
 end;
 
 {**********************}
@@ -1725,344 +1608,6 @@ begin
   end;
 end;
 
-{**************************************************************************************************}
-constructor TALDoubleBufferedTextLayout.Create(const ACanvas: TCanvas; const aTextControl: TALText);
-var LScreenSrv: IFMXScreenService;
-begin
-  inherited Create(ACanvas);
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
-  else FScreenScale := 1;
-  fBufBitmap := nil;
-  fTextControl := aTextControl;
-end;
-
-{*********************************************}
-destructor TALDoubleBufferedTextLayout.Destroy;
-begin
-  clearBufBitmap;
-  inherited;
-end;
-
-{*****************************************************************}
-function TALDoubleBufferedTextLayout.MakeBufBitmap: TALRasterImage;
-var LOptions: TALDrawMultiLineTextOptions;
-begin
-
-  if (fTextControl.Scene = nil) or // << fTextControl.Scene = nil mean mostly the fTextControl (or his parent) is not yet assigned to any form
-     (fTextControl.text.IsEmpty) then begin
-    clearBufBitmap;
-    exit(nil);
-  end;
-
-  // we need to use the value of the fTextControl and not of the current TTextLayout
-  // because TText update some value on each call to adjustsize with different value that will
-  // be used in paint
-  if (fBufBitmap <> nil) and
-     (fBufHorizontalAlign = fTextControl.TextSettings.HorzAlign) and  // TText.adjustsize always use TTextAlign.Leading
-     (fBufVerticalAlign = fTextControl.TextSettings.VertAlign) and // TText.adjustsize always use TTextAlign.Leading
-     (fBufFontColor = fTextControl.TextSettings.FontColor) and
-     (sametext(fBuffontFamily, fTextControl.TextSettings.Font.Family)) and
-     (fBuffontStyle = fTextControl.TextSettings.Font.Style) and
-     (SameValue(fBuffontSize, fTextControl.TextSettings.Font.Size, TEpsilon.FontSize)) and
-     (SameValue(fBufLineSpacing, fTextControl.LineSpacing, TEpsilon.FontSize)) and
-     (SameValue(fBufXRadius, fTextControl.XRadius, TEpsilon.Vector)) and
-     (SameValue(fBufYRadius, fTextControl.YRadius, TEpsilon.Vector)) and
-     (fBufTextIsHTML = fTextControl.TextIsHTML) and
-     (fBufWordWrap = fTextControl.TextSettings.WordWrap) and
-     (fBufAutosize = fTextControl.AutoSize) and
-     (fBufTrimming = fTextControl.TextSettings.Trimming) and
-     (
-      (
-       (not fTextControl.AutoSize) and                              // if NOT autosize then the dimensions returned
-       (SameValue(fBufSize.cx, MaxSize.X, TEpsilon.position)) and   // by this function will depend of MaxSize.X / MaxSize.Y
-       (SameValue(fBufSize.cy, MaxSize.Y, TEpsilon.position))       // so if fBufSize = MaxSize do nothing
-      )
-      OR
-      (
-       (fTextControl.AutoSize) and                                                 // * IF autosize
-       (
-        (SameValue(fBufSize.cx, MaxSize.x, TEpsilon.position)) or                  // * if we already did the job with maxsize.x then do nothing
-        (SameValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position)) or         // * if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
-        ((fTextControl.Fill.Kind = TbrushKind.None) and                            // * if we don't draw any background =>
-         (fTextControl.stroke.Kind = TbrushKind.None) and                          //                                   =>
-         (not (fTextControl.Align in [TAlignLayout.Client,                         //                                   =>
-                                      TAlignLayout.Contents,                       //                                   => Else we must have
-                                      TAlignLayout.Top,                            //                                   => fbufBitmapRect.width = MaxSize.x
-                                      TAlignLayout.Bottom,                         //                                   =>
-                                      TAlignLayout.MostTop,                        //                                   =>
-                                      TAlignLayout.MostBottom,                     //                                   =>
-                                      TAlignLayout.VertCenter])) and               //   and if the Width is not aligned =>
-         (not fBufTextBroken) and                                                  //   and If the text wasn't broken                                         => else if fbufBitmapRect.width > MaxSize.x
-         (CompareValue(fbufBitmapRect.width, MaxSize.x, TEpsilon.position) <= 0))  //   and if fbufBitmapRect.width <= MaxSize.x we can't do anything better  => then we must recalculate the width
-       ) and
-       (
-        (SameValue(fBufSize.cy, MaxSize.y, TEpsilon.position)) or                  // * if we already did the job with maxsize.y then do nothing
-        (SameValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position)) or        // * if fbufBitmapRect.height = MaxSize.y we can not do anything better ;)
-        ((fTextControl.Fill.Kind = TbrushKind.None) and                            // * if we don't draw any background  =>
-         (fTextControl.stroke.Kind = TbrushKind.None) and                          //                                    =>
-         (not (fTextControl.Align in [TAlignLayout.Client,                         //                                    =>
-                                      TAlignLayout.Contents,                       //                                    => Else we must have
-                                      TAlignLayout.Left,                           //                                    => fbufBitmapRect.height = MaxSize.y
-                                      TAlignLayout.Right,                          //                                    =>
-                                      TAlignLayout.MostLeft,                       //                                    =>
-                                      TAlignLayout.MostRight,                      //                                    =>
-                                      TAlignLayout.HorzCenter])) and               //   and if the Height is not aligned =>
-         (fBufAllTextDrawn) and                                                    //   and IF all text was Drawn                                                  => else if fbufBitmapRect.height > MaxSize.y
-         (CompareValue(fbufBitmapRect.height, MaxSize.y, TEpsilon.position) <= 0)) //   and if fbufBitmapRect.height <= MaxSize.y then we can't do anything better => then we must recalculate the height
-       )
-      )
-     ) and
-     (fBufText = fTextControl.Text) then exit(fBufBitmap);
-
-  clearBufBitmap;
-  fBufHorizontalAlign := fTextControl.TextSettings.HorzAlign;
-  fBufVerticalAlign := fTextControl.TextSettings.VertAlign;
-  fBufFontColor := fTextControl.TextSettings.FontColor;
-  fBuffontFamily := fTextControl.TextSettings.Font.Family;
-  fBuffontStyle := fTextControl.TextSettings.Font.Style;
-  fBuffontSize := fTextControl.TextSettings.Font.Size;
-  fBufLineSpacing := fTextControl.LineSpacing;
-  fBufXRadius := fTextControl.XRadius;
-  fBufYRadius := fTextControl.YRadius;
-  fBufTextIsHtml := fTextControl.TextIsHTML;
-  fBufWordWrap := fTextControl.TextSettings.WordWrap;
-  fBufAutosize := fTextControl.AutoSize;
-  fBufTrimming := fTextControl.TextSettings.Trimming;
-  fBufSize := MaxSize;
-  fBufText := fTextControl.Text;
-
-  {$IFDEF debug}
-  inc(AlDebugTextMakeBufBitmapCount);
-  AlDebugTextMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
-
-  //init fBufBitmapRect
-  fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX * FScreenScale, fBufSize.cY * FScreenScale);
-
-  //create aOptions
-  LOptions := TALDrawMultiLineTextOptions.Create;
-  Try
-
-    //init aOptions
-    LOptions.FontName := fBuffontFamily;
-    LOptions.FontSize := fBuffontSize * FScreenScale;
-    LOptions.FontStyle := fBuffontStyle;
-    LOptions.FontColor := fBufFontColor;
-    //-----
-    //LOptions.EllipsisText: String; // default = '…';
-    //LOptions.EllipsisFontStyle: TFontStyles; // default = [];
-    //LOptions.EllipsisFontColor: TalphaColor; // default = TAlphaColorRec.Null;
-    //-----
-    if ((fTextControl.Fill.Kind <> TbrushKind.None) or            // if we don't draw any background then
-        (fTextControl.stroke.Kind <> TbrushKind.None)) then begin // always set autosize = true
-
-      if (not fBufAutosize) then LOptions.AutoSize := false // if we ask autosize = false then autosize to false
-      //-----
-      else if (fTextControl.Align in [TAlignLayout.Top,
-                                      TAlignLayout.Bottom,
-                                      TAlignLayout.MostTop,
-                                      TAlignLayout.MostBottom,
-                                      TAlignLayout.VertCenter]) then begin
-          LOptions.AutoSize := false;   // if we ask autosize = true and Width is aligned
-          LOptions.AutoSizeY := True;   // then autosize only the Y
-      end
-      //-----
-      else if (fTextControl.Align in [TAlignLayout.Left,
-                                      TAlignLayout.Right,
-                                      TAlignLayout.MostLeft,
-                                      TAlignLayout.MostRight,
-                                      TAlignLayout.HorzCenter]) then begin
-        LOptions.AutoSize := false; // if we ask autosize = true and Height is aligned
-        LOptions.AutoSizeX := True; // then autosize only the X
-      end
-      //-----
-      else if (fTextControl.Align in [TAlignLayout.Client,
-                                      TAlignLayout.Contents]) then LOptions.AutoSize := false  // if we ask autosize = true and Width & Height are aligned then don't autosize anything
-      //-----
-      else LOptions.AutoSize := True; // // if we ask autosize = true and Width & Height are not aligned then autosize to true
-
-    end
-    else LOptions.AutoSize := True;
-    //-----
-    LOptions.WordWrap := fBufWordWrap;
-    //LOptions.MaxLines: integer; // default = 0;
-    LOptions.LineSpacing := FBufLineSpacing * FScreenScale;
-    LOptions.Trimming := fBufTrimming;
-    //LOptions.FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
-    //LOptions.FailIfTextBroken: boolean; // default = false
-    //-----
-    LOptions.HTextAlign := fBufHorizontalAlign;
-    LOptions.VTextAlign := fBufVerticalAlign;
-    //-----
-    LOptions.Fill.assign(fTextControl.Fill);
-    LOptions.Stroke.assign(fTextControl.Stroke);
-    LOptions.Stroke.Thickness := LOptions.Stroke.Thickness * FScreenScale;
-    LOptions.Sides := fTextControl.Sides;
-    LOptions.XRadius := fBufXRadius * FScreenScale;
-    LOptions.YRadius := fBufYRadius * FScreenScale;
-    LOptions.Corners := fTextControl.Corners;
-    LOptions.Padding := fTextControl.padding.Rect;
-    LOptions.Padding.Top := LOptions.Padding.Top * FScreenScale;
-    LOptions.Padding.right := LOptions.Padding.right * FScreenScale;
-    LOptions.Padding.left := LOptions.Padding.left * FScreenScale;
-    LOptions.Padding.bottom := LOptions.Padding.bottom * FScreenScale;
-    //-----
-    LOptions.TextIsHtml := FBufTextIsHtml;
-
-    //build fBufBitmap
-    fBufBitmap := ALDrawMultiLineText(
-                    fBufText, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
-                    fBufBitmapRect, // var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-                    fBufTextBroken,
-                    fBufAllTextDrawn,
-                    LOptions);
-
-    //align fbufBitmapRect
-    if LOptions.AutoSize and (not fBufAutosize) then begin
-      case LOptions.HTextAlign of
-        TTextAlign.Center: begin
-                             fbufBitmapRect.Offset(((fBufSize.cx * FScreenScale) - fbufBitmapRect.width) / 2, 0);
-                           end;
-        TTextAlign.Trailing: begin
-                               fbufBitmapRect.Offset((fBufSize.cx * FScreenScale) - fbufBitmapRect.width, 0);
-                             end;
-      end;
-      case LOptions.VTextAlign of
-        TTextAlign.Center: begin
-                             fbufBitmapRect.Offset(0, ((fBufSize.cy * FScreenScale) - fbufBitmapRect.Height) / 2);
-                           end;
-        TTextAlign.Trailing: begin
-                               fbufBitmapRect.Offset(0, (fBufSize.cy * FScreenScale) - fbufBitmapRect.Height);
-                             end;
-      end;
-    end;
-    if fBufAutosize then fBufBitmapRect.Offset(-fBufBitmapRect.left, -fBufBitmapRect.top);
-
-    //convert fbufBitmapRect do virtual pixel
-    fbufBitmapRect.Top := fbufBitmapRect.Top / FScreenScale;
-    fbufBitmapRect.right := fbufBitmapRect.right / FScreenScale;
-    fbufBitmapRect.left := fbufBitmapRect.left / FScreenScale;
-    fbufBitmapRect.bottom := fbufBitmapRect.bottom / FScreenScale;
-
-  finally
-    ALFreeAndNil(LOptions);
-  end;
-
-  //update the result
-  result := fBufBitmap;
-
-  {$IFDEF debug}
-  finally
-    AlDebugTextMakeBufBitmapStopWatch.Stop;
-  end;
-  if result <> nil then
-    ALLog(
-      'TALDoubleBufferedTextLayout.MakeBufBitmap',
-      'Name: ' + fTextControl.Name + ' | ' +
-      'text:' + fBufText + ' | ' +
-      'MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY),
-      TalLogType.verbose);
-  {$endif}
-
-end;
-
-{***************************************************}
-procedure TALDoubleBufferedTextLayout.clearBufBitmap;
-begin
-  ALFreeAndNil(fBufBitmap);
-end;
-
-{***************************************************}
-procedure TALDoubleBufferedTextLayout.DoRenderLayout;
-begin
-  MakeBufBitmap; // recreate the fBufBitmap
-end;
-
-{*************************************************************************}
-procedure TALDoubleBufferedTextLayout.DoDrawLayout(const ACanvas: TCanvas);
-var LDestRect: TrectF;
-    LDesignatedArea: TrectF;
-    LLocation: TPointF;
-begin
-
-  MakeBufBitmap;
-  if fBufBitmap = nil then exit;
-
-  LDestRect := fBufBitmapRect;
-  if fBufAutosize then begin
-    LDesignatedArea := FTextControl.localrect;
-    case FTextControl.HorzTextAlign of
-      TTextAlign.Center: LLocation.X := (LDesignatedArea.Left + LDesignatedArea.Right - LDestRect.Width) / 2;
-      TTextAlign.Leading: LLocation.X := LDesignatedArea.Left;
-      TTextAlign.Trailing: LLocation.X := LDesignatedArea.Right - LDestRect.Width;
-    end;
-    case FTextControl.VertTextAlign of
-      TTextAlign.Center: LLocation.Y := (LDesignatedArea.Top + LDesignatedArea.Bottom - LDestRect.Height) / 2;
-      TTextAlign.Leading: LLocation.Y := LDesignatedArea.Top;
-      TTextAlign.Trailing: LLocation.Y := LDesignatedArea.Bottom - LDestRect.Height;
-    end;
-    LDestRect.SetLocation(LLocation);
-  end;
-
-  {$IF DEFINED(ALUseTexture)}
-
-  TCustomCanvasGpu(ACanvas).DrawTexture(
-    ACanvas.AlignToPixel(LDestRect), // ATexRect (destRec)
-    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
-    ALPrepareColor(TCustomCanvasGpu.ModulateColor, Opacity), // https://quality.embarcadero.com/browse/RSP-15432
-    fBufBitmap);
-
-  {$ELSE}
-
-  aCanvas.DrawBitmap(
-    fBufBitmap,
-    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
-    aCanvas.AlignToPixel(LDestRect), {DestRect}
-    Opacity, {opacity}
-    true{highSpeed});
-
-  {$ENDIF}
-
-end;
-
-{*******************************************************}
-function TALDoubleBufferedTextLayout.GetTextRect: TRectF;
-begin
-  if fBufBitmap = nil then result := TrectF.Create(0,0,0,0)
-  else result := fBufBitmapRect;
-end;
-
-{*********************************************************}
-function TALDoubleBufferedTextLayout.GetTextHeight: Single;
-begin
-  result := 0;
-end;
-
-{********************************************************}
-function TALDoubleBufferedTextLayout.GetTextWidth: Single;
-begin
-  result := 0;
-end;
-
-{*************************************************************************************}
-function TALDoubleBufferedTextLayout.DoPositionAtPoint(const APoint: TPointF): Integer;
-begin
-  result := 0;
-end;
-
-{***************************************************************************************}
-function TALDoubleBufferedTextLayout.DoRegionForRange(const ARange: TTextRange): TRegion;
-begin
-  setlength(result, 0);
-end;
-
-{**************************************************************************}
-procedure TALDoubleBufferedTextLayout.ConvertToPath(const APath: TPathData);
-begin
-  //do nothing - virtual
-end;
-
 {**}
 type
   TALTextTextSettings = class(TTextSettings)
@@ -2089,9 +1634,12 @@ end;
 
 {*********************************************}
 constructor TALText.Create(AOwner: TComponent);
-var LClass: TTextSettingsClass;
 begin
-  inherited;
+  inherited Create(AOwner);
+  var LScreenSrv: IFMXScreenService;
+  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
+  else FScreenScale := 1;
+  fBufBitmap := nil;
   //-----
   FFill := TBrush.Create(TBrushKind.none, $FFE0E0E0);
   FFill.OnChanged := FillChanged;
@@ -2103,7 +1651,6 @@ begin
   FSides := AllSides;
   fLineSpacing := 0;
   fTextIsHtml := False;
-  fMustCallResized := False;
   //-----
   HitTest := False;
   //-----
@@ -2112,40 +1659,19 @@ begin
   FAutoSize := False;
   fMaxWidth := 65535;
   fMaxHeight := 65535;
+  FText := '';
   //-----
-  LClass := GetTextSettingsClass;
+  var LClass := GetTextSettingsClass;
   if LClass = nil then LClass := TALTextTextSettings;
-  //-----
-  FLayout := TALdoubleBufferedTextLayout.Create(nil, self);
-  //-----
-  //i use this way to know that the compoment
-  //will load it's properties from the dfm
-  if (aOwner <> nil) and
-     (csloading in aOwner.ComponentState) then begin
-    fRestoreLayoutUpdateAfterLoaded := True;
-    Layout.BeginUpdate;
-  end
-  else fRestoreLayoutUpdateAfterLoaded := False;
-  //-----
   FTextSettings := LClass.Create(Self);
   FTextSettings.OnChanged := OnFontChanged;
-  FTextSettings.BeginUpdate;
-  try
-    FTextSettings.IsAdjustChanged := True;
-  finally
-    FTextSettings.EndUpdate; // << this will not call adjustsize because at this time
-                             // << fautosize = false. This will only update the textsettings
-                             // << of the flayout, and if we are in csloading, this will not even
-                             // << call any DoRenderLayout (else yes it's will call DoRenderLayout
-                             // << but with empty text)
-  end;
 end;
 
 {*************************}
 destructor TALText.Destroy;
 begin
+  clearBufBitmap;
   ALFreeAndNil(FTextSettings);
-  ALFreeAndNil(FLayout);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FFill);
   inherited;
@@ -2154,77 +1680,104 @@ end;
 {***********************}
 procedure TALText.Loaded;
 begin
-  //-----
   if (AutoTranslate) and
      (Text <> '') and
      (not (csDesigning in ComponentState)) then
-      Text := ALTranslate(Text);
-  //-----
+    Text := ALTranslate(Text);
+
   if (AutoConvertFontFamily) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
-      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
-  //-----
-  inherited;
-  //-----
-  if fRestoreLayoutUpdateAfterLoaded then begin
-    if (FAutoSize) and
-       (Text <> '') then begin
+    TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
 
-      //Originally, if WordWrap then the algo take in account the current width of the TALText
-      //to calculate the autosized width (mean the size can be lower than maxwidth if the current width
-      //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
-      //dimension) of an already calculated TALText, then it's the old width (that correspond to the
-      //previous text/font) that will be taken in account. finally the good way is to alway use the
-      //the property maxwidth if we desir a max width and don't rely on the current width
-      //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
-      //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
+  inherited Loaded;
 
-      if (Align in [TAlignLayout.Top,
-                    TAlignLayout.Bottom,
-                    TAlignLayout.MostTop,
-                    TAlignLayout.MostBottom,
-                    TAlignLayout.VertCenter]) then Layout.MaxSize := TPointF.Create(Width, maxHeight)
-      else if (Align in [TAlignLayout.Left,
-                         TAlignLayout.Right,
-                         TAlignLayout.MostLeft,
-                         TAlignLayout.MostRight,
-                         TAlignLayout.HorzCenter]) then Layout.MaxSize := TPointF.Create(maxWidth, Height)
-      else if (Align in [TAlignLayout.Client,
-                         TAlignLayout.Contents]) then Layout.MaxSize := TPointF.Create(Width, Height)
-      else Layout.MaxSize := TPointF.Create(maxWidth, maxHeight);
+  AdjustSize;
+end;
 
-    end
-    else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
-                                                           // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
-                                                           // << and then after when we will paint the control, we will again call DoRenderLayout
-                                                           // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
-                                                           // << need to redo the bufbitmap
-    Layout.endUpdate;
-    AdjustSize;
+{********************************************}
+procedure TALText.SetNewScene(AScene: IScene);
+begin
+  inherited SetNewScene(AScene);
+  AdjustSize;
+end;
+
+{**************************}
+procedure TALText.DoResized;
+begin
+  inherited DoResized;
+  AdjustSize;
+end;
+
+{****************************}
+procedure TALText.DoEndUpdate;
+begin
+  AdjustSize;
+  inherited DoEndUpdate;
+end;
+
+{***************************}
+procedure TALText.AdjustSize;
+begin
+  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
+     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
+     (not isupdating) and // DoEndUpdate will call again AdjustSize
+     (FAutoSize) and // if FAutoSize is false nothing to adjust
+     (Text <> '') and // if Text is empty do not do autosize
+     (scene <> nil) then begin // SetNewScene will call again AdjustSize
+
+    MakeBufBitmap;
+
+    //this to take care of the align constraint of the ftextLayout
+    var R := FBufBitmapRect;
+    if Align in [TAlignLayout.Client,
+                 TAlignLayout.Contents,
+                 TAlignLayout.Top,
+                 TAlignLayout.Bottom,
+                 TAlignLayout.MostTop,
+                 TAlignLayout.MostBottom,
+                 TAlignLayout.Horizontal,
+                 TAlignLayout.VertCenter] then begin
+      r.Left := 0;
+      r.Width := Width;
+    end;
+    if Align in [TAlignLayout.Client,
+                 TAlignLayout.Contents,
+                 TAlignLayout.Left,
+                 TAlignLayout.Right,
+                 TAlignLayout.MostLeft,
+                 TAlignLayout.MostRight,
+                 TAlignLayout.Vertical,
+                 TAlignLayout.HorzCenter] then begin
+      r.Top := 0;
+      r.height := height;
+    end;
+
+    SetBounds(Position.X, Position.Y, R.Width + R.Left * 2, R.Height + R.Top * 2);
+
   end;
-  fRestoreLayoutUpdateAfterLoaded := False;
 end;
 
 {*******************************}
 procedure TALText.PaddingChanged;
 begin
   clearBufBitmap;
-  if FUpdating = 0 then Repaint;
+  AdjustSize;
+  Repaint;
 end;
 
 {*********************************************}
 procedure TALText.FillChanged(Sender: TObject);
 begin
   clearBufBitmap;
-  if FUpdating = 0 then Repaint;
+  Repaint;
 end;
 
 {***********************************************}
 procedure TALText.StrokeChanged(Sender: TObject);
 begin
   clearBufBitmap;
-  if FUpdating = 0 then Repaint;
+  Repaint;
 end;
 
 {*********************************************}
@@ -2255,6 +1808,7 @@ end;
 procedure TALText.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then begin
+    clearBufBitmap;
     FCorners := Value;
     Repaint;
   end;
@@ -2268,6 +1822,7 @@ begin
   if csDesigning in ComponentState then NewValue := Min(Value, Min(Width / 2, Height / 2))
   else NewValue := Value;
   if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+    clearBufBitmap;
     FXRadius := NewValue;
     Repaint;
   end;
@@ -2281,6 +1836,7 @@ begin
   if csDesigning in ComponentState then NewValue := Min(Value, Min(Width / 2, Height / 2))
   else NewValue := Value;
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+    clearBufBitmap;
     FYRadius := NewValue;
     Repaint;
   end;
@@ -2289,6 +1845,7 @@ end;
 procedure TALText.SetLineSpacing(const Value: Single);
 begin
   if not sameValue(Value,FlineSpacing,Tepsilon.FontSize) then begin
+    clearBufBitmap;
     FlineSpacing := Value;
     AdjustSize;
     repaint;
@@ -2299,6 +1856,7 @@ end;
 procedure TALText.SetTextIsHtml(const Value: Boolean);
 begin
   if Value <> FTextIsHTML then begin
+    clearBufBitmap;
     FTextIsHTML := Value;
     AdjustSize;
     repaint;
@@ -2309,6 +1867,7 @@ end;
 procedure TALText.SetSides(const Value: TSides);
 begin
   if FSides <> Value then begin
+    clearBufBitmap;
     FSides := Value;
     Repaint;
   end;
@@ -2335,40 +1894,9 @@ end;
 {****************************}
 procedure TALText.FontChanged;
 begin
-  FLayout.BeginUpdate;
-  try
-    FLayout.WordWrap := WordWrap;
-    FLayout.HorizontalAlign := HorzTextAlign;
-    FLayout.VerticalAlign := VertTextAlign;
-    FLayout.Color := Color;
-    FLayout.Font := Font;
-    FLayout.Opacity := AbsoluteOpacity;
-    FLayout.RightToLeft := TFillTextFlag.RightToLeft in FillTextFlags;
-    FLayout.Trimming := Trimming;
-  finally
-    FLayout.EndUpdate;
-  end;
-  //-----
+  ClearBufBitmap;
   if FTextSettings.IsAdjustChanged then AdjustSize;
   Repaint;
-end;
-
-{**************************}
-procedure TALText.DoRealign;
-begin
-  //in original delphi source code it's was
-  //inherited;
-  //AdjustSize;
-  //but i think it's must be the oposite !
-  //https://quality.embarcadero.com/browse/RSP-15761
-  AdjustSize;
-  inherited;
-end;
-
-{**********************************************}
-function TALText.GetTextSettings: TTextSettings;
-begin
-  Result := FTextSettings;
 end;
 
 {********************************************************}
@@ -2383,28 +1911,56 @@ begin
   FTextSettings.Assign(Value);
 end;
 
-{*********************************************************************}
-function TALText.SupportsPaintStage(const Stage: TPaintStage): Boolean;
-begin
-  Result := Stage in [TPaintStage.All, TPaintStage.Text];
-end;
-
 {**********************}
 procedure TALText.Paint;
 begin
-  FLayout.BeginUpdate;
-  try
-    FLayout.LayoutCanvas := Self.Canvas;
-    FLayout.TopLeft := LocalRect.TopLeft;
-    FLayout.Opacity := AbsoluteOpacity;
-    FLayout.RightToLeft := TFillTextFlag.RightToLeft in FillTextFlags;
-    FLayout.MaxSize := PointF(LocalRect.Width, LocalRect.Height);
-  finally
-    FLayout.EndUpdate;
+
+  MakeBufBitmap;
+
+  if fBufBitmap = nil then begin
+    inherited paint;
+    exit;
   end;
-  FLayout.RenderLayout(Canvas);
+
+  var LDestRect := fBufBitmapRect;
+  if Autosize then begin
+    var LLocation: TPointF;
+    var LDesignatedArea := localrect;
+    case HorzTextAlign of
+      TTextAlign.Center: LLocation.X := (LDesignatedArea.Left + LDesignatedArea.Right - LDestRect.Width) / 2;
+      TTextAlign.Leading: LLocation.X := LDesignatedArea.Left;
+      TTextAlign.Trailing: LLocation.X := LDesignatedArea.Right - LDestRect.Width;
+    end;
+    case VertTextAlign of
+      TTextAlign.Center: LLocation.Y := (LDesignatedArea.Top + LDesignatedArea.Bottom - LDestRect.Height) / 2;
+      TTextAlign.Leading: LLocation.Y := LDesignatedArea.Top;
+      TTextAlign.Trailing: LLocation.Y := LDesignatedArea.Bottom - LDestRect.Height;
+    end;
+    LDestRect.SetLocation(LLocation);
+  end;
+
+  {$IF DEFINED(ALUseTexture)}
+
+  TCustomCanvasGpu(Canvas).DrawTexture(
+    Canvas.AlignToPixel(LDestRect), // ATexRect (destRec)
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), // ARect (srcRec)
+    ALPrepareColor(TCustomCanvasGpu.ModulateColor, AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    fBufBitmap);
+
+  {$ELSE}
+
+  Canvas.DrawBitmap(
+    fBufBitmap,
+    TRectF.Create(0, 0, fBufBitmap.Width, fBufBitmap.Height), {SrcRect}
+    Canvas.AlignToPixel(LDestRect), {DestRect}
+    AbsoluteOpacity, {opacity}
+    true{highSpeed});
+
+  {$ENDIF}
+
   if (csDesigning in ComponentState) and not Locked then
     DrawDesignBorder;
+
 end;
 
 {*************************************}
@@ -2484,309 +2040,250 @@ procedure TALText.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
   begin
+    clearBufBitmap;
     FAutoSize := Value;
     AdjustSize;
+    repaint;
   end;
-end;
-
-{***********************}
-procedure TALText.Resize;
-begin
-  inherited;
-  AdjustSize;
-end;
-
-{*************************}
-{$IF CompilerVersion >= 32} // tokyo
-procedure TALText.DoResized;
-begin
-  if not FDisableAlign then inherited DoResized
-  else fMustCallResized := True;
-end;
-{$endif}
-
-{***************************}
-procedure TALText.AdjustSize;
-var R: TRectF;
-    AlignRoot: IAlignRoot;
-    LHorzAlign: TTextAlign;
-    LVertAlign: TTextAlign;
-    LOpacity: Single;
-begin
-  if (not FDisableAlign) and
-     (not (csLoading in ComponentState)) and
-     (not (csDestroying in ComponentState)) and
-     (not isupdating) and
-     (FAutoSize) and
-     (Text <> '') and
-     (scene <> nil) then begin
-
-    fMustCallResized := False;
-    FDisableAlign := True;  // i don't understand why in the original delphi source code they do like this - but i feel lazzy to fully study why so i leave it
-                            // this mean that we can't add aligned control inside the TalText because when we will update the size of the taltext via adjustsize
-                            // then we will not realign all the childs
-                            // NOTE: as this fucking FDisableAlign piss me off because no way to resize the control inside the OnResize event (for exemple by changing the
-                            //       font size, I introduce fMustCallResized to call DoResized AFTER we release the FDisableAlign (because stupid to call resized when
-                            //       FDisableAlign := True
-    try
-
-      LHorzAlign := FLayout.HorizontalAlign;
-      LVertAlign := FLayout.VerticalAlign;
-      LOpacity := FLayout.Opacity;
-      try
-
-        //Originally, if WordWrap then the algo take in account the current width of the TALText
-        //to calculate the autosized width (mean the size can be lower than maxwidth if the current width
-        //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
-        //dimension) of an already calculated TALText, then it's the old width (that correspond to the
-        //previous text/font) that will be taken in account. finally the good way is to alway use the
-        //the property maxwidth if we desir a max width and don't rely on the current width
-        //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
-        //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
-
-        if (Align in [TAlignLayout.Top,
-                      TAlignLayout.Bottom,
-                      TAlignLayout.MostTop,
-                      TAlignLayout.MostBottom,
-                      TAlignLayout.VertCenter]) then R := TRectF.Create(0, 0, Width, maxHeight)
-        else if (Align in [TAlignLayout.Left,
-                           TAlignLayout.Right,
-                           TAlignLayout.MostLeft,
-                           TAlignLayout.MostRight,
-                           TAlignLayout.HorzCenter]) then R := TRectF.Create(0, 0, maxWidth, Height)
-        else if (Align in [TAlignLayout.Client,
-                           TAlignLayout.Contents]) then R := TRectF.Create(0, 0, Width, Height)
-        else R := TRectF.Create(0, 0, maxWidth, maxHeight);
-
-        FLayout.BeginUpdate;
-        try
-          FLayout.TopLeft := R.TopLeft;
-          FLayout.MaxSize := PointF(R.Width, R.Height);
-          FLayout.Opacity := AbsoluteOpacity;
-          FLayout.RightToLeft := TFillTextFlag.RightToLeft in FillTextFlags;
-          FLayout.HorizontalAlign := TTextAlign.Leading;
-          FLayout.VerticalAlign := TTextAlign.Leading;
-        finally
-          FLayout.EndUpdate;
-        end;
-
-        R := FLayout.TextRect;
-
-      finally
-        FLayout.BeginUpdate;
-        try
-          FLayout.Opacity := LOpacity;
-          FLayout.HorizontalAlign := LHorzAlign;
-          FLayout.VerticalAlign := LVertAlign;
-        finally
-          FLayout.EndUpdate;
-        end;
-      end;
-
-      //this to take care of the align constraint of the ftextLayout
-      if Align in [TAlignLayout.Client,
-                   TAlignLayout.Contents,
-                   TAlignLayout.Top,
-                   TAlignLayout.Bottom,
-                   TAlignLayout.MostTop,
-                   TAlignLayout.MostBottom,
-                   TAlignLayout.VertCenter] then begin
-        r.Left := 0;
-        r.Width := Width;
-      end;
-      if Align in [TAlignLayout.Client,
-                   TAlignLayout.Contents,
-                   TAlignLayout.Left,
-                   TAlignLayout.Right,
-                   TAlignLayout.MostLeft,
-                   TAlignLayout.MostRight,
-                   TAlignLayout.HorzCenter] then begin
-        r.Top := 0;
-        r.height := height;
-      end;
-
-      //SetBounds(Position.X, Position.Y, R.Width + R.Left * 2 + FTextSettings.Font.Size / 3, R.Height + R.Top * 2);
-      SetBounds(Position.X, Position.Y, R.Width + R.Left * 2, R.Height + R.Top * 2);
-      if Supports(Parent, IAlignRoot, AlignRoot) then AlignRoot.Realign;
-
-    finally
-      FDisableAlign := False;
-    end;
-
-    {$IF CompilerVersion >= 32} // tokyo
-    if fMustCallResized then DoResized;
-    {$ENDIF}
-
-  end;
-end;
-
-{*******************************}
-function TALText.GetText: string;
-begin
-  Result := FLayout.Text;
 end;
 
 {*********************************************}
 procedure TALText.SetText(const Value: string);
 begin
-  if Text <> Value then begin
-    FLayout.LayoutCanvas := Canvas;
-    FLayout.Text := Value;
+  if FText <> Value then begin
+    clearBufBitmap;
+    FText := Value;
     AdjustSize;
     Repaint;
   end;
 end;
 
-{***************************************************}
-procedure TALText.SetParent(const Value: TFmxObject);
-begin
-  if FParent <> Value then begin
-    inherited;
-    // stupidly when we do setparent the
-    // FisUpdating will be set to the value of the parent BUT without any
-    // notifications nor any call to beginupdate :(
-    // but when the parent will call endupdate then our EndUpdate will be also called
-    if (Value <> nil) and
-       (Value <> self) and
-       (Value is TControl) then begin
-      if TALControlAccessPrivate(Value).FUpdating > TALTextLayoutAccessPrivate(Layout).fupdating then begin
-        while TALControlAccessPrivate(Value).FUpdating > TALTextLayoutAccessPrivate(Layout).fupdating do
-          Layout.BeginUpdate;
-      end
-      else if TALControlAccessPrivate(Value).FUpdating < TALTextLayoutAccessPrivate(Layout).fupdating then begin
-        while (TALControlAccessPrivate(Value).FUpdating < TALTextLayoutAccessPrivate(Layout).fupdating) and
-              (TALControlAccessPrivate(Value).FUpdating > 0) do
-          Layout.EndUpdate;
-      end;
-    end;
-  end;
-end;
-
-{********************************************}
-procedure TALText.SetNewScene(AScene: IScene);
-var LParentControl: Tcontrol;
-begin
-  inherited SetNewScene(AScene);
-
-  LParentControl := parentControl;
-  while LParentControl <> nil do begin
-    if LParentControl.IsUpdating then exit
-    else LParentControl := LParentControl.parentControl;
-  end;
-
-  AdjustSize; // << because before scene was maybe nil so adjustsize returned 0
-end;
-
 {*******************************}
 procedure TALText.clearBufBitmap;
 begin
-  if not doubleBuffered then exit;
-  TALDoubleBufferedTextLayout(Layout).clearBufBitmap;
+  ALFreeAndNil(fBufBitmap);
 end;
 
 {*********************************************}
 function TALText.MakeBufBitmap: TALRasterImage;
 begin
-  if not doubleBuffered then exit(nil);
-  FLayout.BeginUpdate;
-  try
-    FLayout.LayoutCanvas := Self.Canvas;  // useless
-    FLayout.TopLeft := LocalRect.TopLeft; // useless
-    FLayout.Opacity := AbsoluteOpacity;  // useless
-    FLayout.MaxSize := PointF(LocalRect.Width, LocalRect.Height);
-  finally
-    FLayout.EndUpdate;
+
+  if (Scene = nil) or // Scene = nil mean mostly the fTextControl (or his parent) is not yet assigned to any form
+     (text.IsEmpty) then begin
+    clearBufBitmap;
+    exit(nil);
   end;
-  result := TALDoubleBufferedTextLayout(Layout).MakeBufBitmap;
-end;
 
-{******************************************}
-function TALText.GetdoubleBuffered: Boolean;
-begin
-  result := Layout is TALDoubleBufferedTextLayout;
-end;
-
-{********************************************************}
-procedure TALText.SetdoubleBuffered(const Value: Boolean);
-var LText: String;
-begin
-  if value <> doubleBuffered  then begin
-    LText := fLayout.Text;
-    ALFreeAndNil(fLayout);
-    if value then fLayout := TALdoubleBufferedTextLayout.Create(nil, self)
-    else fLayout := TTextLayoutManager.DefaultTextLayout.Create;
-    if fRestoreLayoutUpdateAfterLoaded then Layout.BeginUpdate;
-    FontChanged;
-    FLayout.Text := LText;
-    AdjustSize;
-  end;
-end;
-
-{********************************************}
-function TALText.GetBufBitmap: TALRasterImage;
-begin
-  if not doubleBuffered then exit(nil);
-  result := TALDoubleBufferedTextLayout(Layout).fBufBitmap;
-end;
-
-{****************************}
-procedure TALText.BeginUpdate;
-begin
-  inherited;
-  Layout.BeginUpdate;
-end;
-
-{**************************}
-procedure TALText.EndUpdate;
-begin
-  if (FAutoSize) and
-     (Text <> '') then begin
-
-    //Originally, if WordWrap then the algo take in account the current width of the TALText
-    //to calculate the autosized width (mean the size can be lower than maxwidth if the current width
-    //is already lower than maxwidth). problem with that is if we for exemple change the text (or font
-    //dimension) of an already calculated TALText, then it's the old width (that correspond to the
-    //previous text/font) that will be taken in account. finally the good way is to alway use the
-    //the property maxwidth if we desir a max width and don't rely on the current width
-    //if WordWrap then Layout.MaxSize := TPointF.Create(Min(Width, maxWidth), maxHeight)
-    //else Layout.MaxSize := TPointF.Create(maxWidth, MaxHeight);
-
+  var LMaxSize: TSizeF;
+  if (FAutoSize) then begin
     if (Align in [TAlignLayout.Top,
                   TAlignLayout.Bottom,
                   TAlignLayout.MostTop,
                   TAlignLayout.MostBottom,
-                  TAlignLayout.VertCenter]) then Layout.MaxSize := TPointF.Create(Width, maxHeight)
+                  TAlignLayout.Horizontal,
+                  TAlignLayout.VertCenter]) then LMaxSize := TSizeF.Create(Width, maxHeight)
     else if (Align in [TAlignLayout.Left,
                        TAlignLayout.Right,
                        TAlignLayout.MostLeft,
                        TAlignLayout.MostRight,
-                       TAlignLayout.HorzCenter]) then Layout.MaxSize := TPointF.Create(maxWidth, Height)
+                       TAlignLayout.Vertical,
+                       TAlignLayout.HorzCenter]) then LMaxSize := TSizeF.Create(maxWidth, Height)
     else if (Align in [TAlignLayout.Client,
-                       TAlignLayout.Contents]) then Layout.MaxSize := TPointF.Create(Width, Height)
-    else Layout.MaxSize := TPointF.Create(maxWidth, maxHeight);
+                       TAlignLayout.Contents]) then LMaxSize := TSizeF.Create(Width, Height)
+    else LMaxSize := TSizeF.Create(maxWidth, maxHeight);
 
   end
-  else Layout.MaxSize := TPointF.Create(width, height);  // << this is important because else when the component is loaded then
-                                                         // << we will call DoRenderLayout that will use the original maxsise (ie: 65535, 65535)
-                                                         // << and then after when we will paint the control, we will again call DoRenderLayout
-                                                         // << but this time with maxsize = aTextControl.size and off course if wordwrap we will
-                                                         // << need to redo the bufbitmap
-  Layout.EndUpdate;
-  inherited; // will call dorealign that will call AdjustSize
+  else LMaxSize := TSizeF.Create(width, height);
+
+  if (fBufBitmap <> nil) and
+     (
+      (
+       (not AutoSize) and                                            // if NOT autosize then the dimensions returned
+       (SameValue(fBufSize.cx, LMaxSize.CX, TEpsilon.position)) and  // by this function will depend of MaxSize.X / MaxSize.Y
+       (SameValue(fBufSize.cy, LMaxSize.CY, TEpsilon.position))      // so if fBufSize = MaxSize do nothing
+      )
+      OR
+      (
+       (AutoSize) and                                                                // * IF autosize
+       (
+        (SameValue(fBufSize.cx, LMaxSize.cx, TEpsilon.position)) or                  // * if we already did the job with maxsize.x then do nothing
+        (SameValue(fbufBitmapRect.width, LMaxSize.cx, TEpsilon.position)) or         // * if fbufBitmapRect.width = MaxSize.x we can not do anything better ;)
+        ((Fill.Kind = TbrushKind.None) and                                           // * if we don't draw any background =>
+         (stroke.Kind = TbrushKind.None) and                                         //                                   =>
+         (not (Align in [TAlignLayout.Client,                                        //                                   =>
+                         TAlignLayout.Contents,                                      //                                   => Else we must have
+                         TAlignLayout.Top,                                           //                                   => fbufBitmapRect.width = MaxSize.x
+                         TAlignLayout.Bottom,                                        //                                   =>
+                         TAlignLayout.MostTop,                                       //                                   =>
+                         TAlignLayout.MostBottom,                                    //                                   =>
+                         TAlignLayout.Horizontal,                                    //                                   =>
+                         TAlignLayout.VertCenter])) and                              //   and if the Width is not aligned =>
+         (not fBufTextBroken) and                                                    //   and If the text wasn't broken                                         => else if fbufBitmapRect.width > MaxSize.x
+         (CompareValue(fbufBitmapRect.width, LMaxSize.cx, TEpsilon.position) <= 0))  //   and if fbufBitmapRect.width <= MaxSize.x we can't do anything better  => then we must recalculate the width
+       ) and
+       (
+        (SameValue(fBufSize.cy, LMaxSize.cy, TEpsilon.position)) or                  // * if we already did the job with maxsize.y then do nothing
+        (SameValue(fbufBitmapRect.height, LMaxSize.cy, TEpsilon.position)) or        // * if fbufBitmapRect.height = MaxSize.y we can not do anything better ;)
+        ((Fill.Kind = TbrushKind.None) and                                           // * if we don't draw any background  =>
+         (stroke.Kind = TbrushKind.None) and                                         //                                    =>
+         (not (Align in [TAlignLayout.Client,                                        //                                    =>
+                         TAlignLayout.Contents,                                      //                                    => Else we must have
+                         TAlignLayout.Left,                                          //                                    => fbufBitmapRect.height = MaxSize.y
+                         TAlignLayout.Right,                                         //                                    =>
+                         TAlignLayout.MostLeft,                                      //                                    =>
+                         TAlignLayout.MostRight,                                     //                                    =>
+                         TAlignLayout.Vertical,                                      //                                    =>
+                         TAlignLayout.HorzCenter])) and                              //   and if the Height is not aligned =>
+         (fBufAllTextDrawn) and                                                      //   and IF all text was Drawn                                                  => else if fbufBitmapRect.height > MaxSize.y
+         (CompareValue(fbufBitmapRect.height, LMaxSize.cy, TEpsilon.position) <= 0)) //   and if fbufBitmapRect.height <= MaxSize.y then we can't do anything better => then we must recalculate the height
+       )
+      )
+     ) then
+    exit(fBufBitmap);
+
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog(
+      'TALText.MakeBufBitmap',
+      'BufBitmap is being recreated | ' +
+      'Name: ' + Name + ' | ' +
+      'text:' + Text + ' | ' +
+      'MaxSize: '+floattostr(fBufSize.cX)+'x'+floattostr(fBufSize.cY),
+      TalLogType.warn);
+  {$endif}
+  clearBufBitmap;
+  fBufSize := LMaxSize;
+
+  //init fBufBitmapRect
+  fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX * FScreenScale, fBufSize.cY * FScreenScale);
+
+  //create aOptions
+  var LOptions := TALDrawMultiLineTextOptions.Create;
+  Try
+
+    //init aOptions
+    LOptions.FontName := TextSettings.font.Family;
+    LOptions.FontSize := TextSettings.font.Size * FScreenScale;
+    LOptions.FontStyle := TextSettings.font.Style;
+    LOptions.FontColor := TextSettings.FontColor;
+    //-----
+    //LOptions.EllipsisText: String; // default = '…';
+    //LOptions.EllipsisFontStyle: TFontStyles; // default = [];
+    //LOptions.EllipsisFontColor: TalphaColor; // default = TAlphaColorRec.Null;
+    //-----
+    if ((Fill.Kind <> TbrushKind.None) or            // if we don't draw any background then
+        (stroke.Kind <> TbrushKind.None)) then begin // always set autosize = true
+
+      if (not Autosize) then LOptions.AutoSize := false // if we ask autosize = false then autosize to false
+      //-----
+      else if (Align in [TAlignLayout.Top,
+                         TAlignLayout.Bottom,
+                         TAlignLayout.MostTop,
+                         TAlignLayout.MostBottom,
+                         TAlignLayout.Horizontal,
+                         TAlignLayout.VertCenter]) then begin
+          LOptions.AutoSize := false;   // if we ask autosize = true and Width is aligned
+          LOptions.AutoSizeY := True;   // then autosize only the Y
+      end
+      //-----
+      else if (Align in [TAlignLayout.Left,
+                         TAlignLayout.Right,
+                         TAlignLayout.MostLeft,
+                         TAlignLayout.MostRight,
+                         TAlignLayout.Vertical,
+                         TAlignLayout.HorzCenter]) then begin
+        LOptions.AutoSize := false; // if we ask autosize = true and Height is aligned
+        LOptions.AutoSizeX := True; // then autosize only the X
+      end
+      //-----
+      else if (Align in [TAlignLayout.Client,
+                         TAlignLayout.Contents]) then LOptions.AutoSize := false  // if we ask autosize = true and Width & Height are aligned then don't autosize anything
+      //-----
+      else LOptions.AutoSize := True; // // if we ask autosize = true and Width & Height are not aligned then autosize to true
+
+    end
+    else LOptions.AutoSize := True;
+    //-----
+    LOptions.WordWrap := TextSettings.WordWrap;
+    //LOptions.MaxLines: integer; // default = 0;
+    LOptions.LineSpacing := LineSpacing * FScreenScale;
+    LOptions.Trimming := TextSettings.Trimming;
+    //LOptions.FirstLineIndent: TpointF; // default = Tpointf.create(0,0);
+    //LOptions.FailIfTextBroken: boolean; // default = false
+    //-----
+    LOptions.HTextAlign := TextSettings.HorzAlign;
+    LOptions.VTextAlign := TextSettings.VertAlign;
+    //-----
+    LOptions.Fill.assign(Fill);
+    LOptions.Stroke.assign(Stroke);
+    LOptions.Stroke.Thickness := LOptions.Stroke.Thickness * FScreenScale;
+    LOptions.Sides := Sides;
+    LOptions.XRadius := XRadius * FScreenScale;
+    LOptions.YRadius := YRadius * FScreenScale;
+    LOptions.Corners := Corners;
+    LOptions.Padding := padding.Rect;
+    LOptions.Padding.Top := LOptions.Padding.Top * FScreenScale;
+    LOptions.Padding.right := LOptions.Padding.right * FScreenScale;
+    LOptions.Padding.left := LOptions.Padding.left * FScreenScale;
+    LOptions.Padding.bottom := LOptions.Padding.bottom * FScreenScale;
+    //-----
+    LOptions.TextIsHtml := TextIsHtml;
+
+    //build fBufBitmap
+    fBufBitmap := ALDrawMultiLineText(
+                    Text, // const aText: String; // support only basic html tag like <b>...</b>, <i>...</i>, <font color="#ffffff">...</font> and <span id="xxx">...</span>
+                    fBufBitmapRect, // var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
+                    fBufTextBroken,
+                    fBufAllTextDrawn,
+                    LOptions);
+
+    //align fbufBitmapRect
+    if LOptions.AutoSize and (not Autosize) then begin
+      case LOptions.HTextAlign of
+        TTextAlign.Center: begin
+                             fbufBitmapRect.Offset(((fBufSize.cx * FScreenScale) - fbufBitmapRect.width) / 2, 0);
+                           end;
+        TTextAlign.Trailing: begin
+                               fbufBitmapRect.Offset((fBufSize.cx * FScreenScale) - fbufBitmapRect.width, 0);
+                             end;
+      end;
+      case LOptions.VTextAlign of
+        TTextAlign.Center: begin
+                             fbufBitmapRect.Offset(0, ((fBufSize.cy * FScreenScale) - fbufBitmapRect.Height) / 2);
+                           end;
+        TTextAlign.Trailing: begin
+                               fbufBitmapRect.Offset(0, (fBufSize.cy * FScreenScale) - fbufBitmapRect.Height);
+                             end;
+      end;
+    end;
+    if Autosize then fBufBitmapRect.Offset(-fBufBitmapRect.left, -fBufBitmapRect.top);
+
+    //convert fbufBitmapRect do virtual pixel
+    fbufBitmapRect.Top := fbufBitmapRect.Top / FScreenScale;
+    fbufBitmapRect.right := fbufBitmapRect.right / FScreenScale;
+    fbufBitmapRect.left := fbufBitmapRect.left / FScreenScale;
+    fbufBitmapRect.bottom := fbufBitmapRect.bottom / FScreenScale;
+
+  finally
+    ALFreeAndNil(LOptions);
+  end;
+
+  //update the result
+  result := fBufBitmap;
+
 end;
 
 {***********************************}
 function TALText.TextBroken: Boolean;
 begin
-  if not doubleBuffered then exit(false);
-  result := (TALdoubleBufferedTextLayout(fLayout).fbufBitmap <> nil) and
-            (TALdoubleBufferedTextLayout(fLayout).fBufTextBroken);
+  result := (fbufBitmap <> nil) and (fBufTextBroken);
 end;
 
 {*************************************************}
 procedure TALText.SetMaxWidth(const Value: Single);
 begin
   if compareValue(fMaxWidth, Value, Tepsilon.position) <> 0 then begin
+    clearBufBitmap;
     fMaxWidth := Value;
     AdjustSize;
   end;
@@ -2796,6 +2293,7 @@ end;
 procedure TALText.SetMaxHeight(const Value: Single);
 begin
   if compareValue(fMaxHeight, Value, Tepsilon.position) <> 0 then begin
+    clearBufBitmap;
     fMaxHeight := Value;
     AdjustSize;
   end;
@@ -2818,18 +2316,18 @@ end;
 //realign work is not very efficient for TALText.
 //because when we do endupdate then we will first
 //call endupdate to the most far away childreen:
-//  acontrol1
-//    acontrol2
-//      aalText1
-//So when we do acontrol1.endupdate we will do in this order :
-//      aalText1.endupdate => realign and then adjustsize
-//    acontrol2.endupdate => realign and then maybe again TalText1.adjustsize
-//  acontrol1.endupdate => realign and then maybe again TalText1.adjustsize
+//  Control1
+//    Control2
+//      AlText1
+//So when we do Control1.endupdate we will do in this order :
+//      AlText1.endupdate => adjustsize and realign
+//    Control2.endupdate => realign and then maybe again AlText1.adjustsize
+//  Control1.endupdate => realign and then maybe again AlText1.adjustsize
 //this is a problem because we will calculate several time the bufbitmap
 //to mitigate this we can do
-//  ALLockTexts(acontrol1);
-//  acontrol1.endupdate;
-//  ALUnLockTexts(acontrol1);
+//  ALLockTexts(Control1);
+//  Control1.endupdate;
+//  ALUnLockTexts(Control1);
 procedure ALLockTexts(const aParentControl: Tcontrol);
 var I: Integer;
 begin
@@ -2861,12 +2359,5 @@ end;
 
 initialization
   RegisterFmxClasses([TALImage, TALRectangle, TALCircle, TALLine, TALText]);
-  {$IFDEF debug}
-  AlDebugImageMakeBufBitmapStopWatch := TstopWatch.Create;
-  AlDebugRectangleMakeBufBitmapStopWatch := TstopWatch.Create;
-  AlDebugCircleMakeBufBitmapStopWatch := TstopWatch.Create;
-  AlDebugLineMakeBufBitmapStopWatch := TstopWatch.Create;
-  AlDebugTextMakeBufBitmapStopWatch := TstopWatch.Create;
-  {$endif}
 
 end.

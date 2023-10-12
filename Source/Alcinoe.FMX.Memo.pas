@@ -1183,7 +1183,6 @@ begin
   fTextPromptControl.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
   fTextPromptControl.TextSettings.Assign(FTextSettings);
   fTextPromptControl.color := TalphaColorRec.Null;
-  fTextPromptControl.doubleBuffered := True;
   FOnChangeTracking := nil;
   fReturnKeyType := TReturnKeyType.Default;
   inherited onchangeTracking := OnChangeTrackingImpl;

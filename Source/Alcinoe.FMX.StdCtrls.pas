@@ -767,15 +767,6 @@ type
     property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
   end;
 
-{$IFDEF debug}
-var
-  AlDebugAniIndicatorMakeBufBitmapCount: integer;
-  AlDebugCheckBoxMakeBufBitmapCount: integer;
-
-  AlDebugAniIndicatorMakeBufBitmapStopWatch: TstopWatch;
-  AlDebugCheckBoxMakeBufBitmapStopWatch: TstopWatch;
-{$endif}
-
 procedure Register;
 
 implementation
@@ -866,56 +857,47 @@ begin
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
 
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog('TALAniIndicator.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  {$endif}
   clearBufBitmap;
   fBufSize := Size.Size;
 
-  {$IFDEF debug}
-  ALLog('TALAniIndicator.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
-  inc(AlDebugAniIndicatorMakeBufBitmapCount);
-  AlDebugAniIndicatorMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
-
-    {$IFDEF ALDPK}
-    var LFileName: String := '';
-    if TFile.Exists(getActiveProject.fileName) then begin
-      var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
-      //<RcItem Include="resources\account_100x100.png">
-      //    <ResourceType>RCDATA</ResourceType>
-      //    <ResourceId>account_100x100</ResourceId>
-      //</RcItem>
-      Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+fResourceName+'</ResourceId>', LDProjSrc);
-      While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
-      if (P1 > 0) then begin
-        var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
-        if P2 > P1 then begin
-          LFileName := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
-          if not TFile.Exists(LFileName) then LFileName := '';
-        end;
-      end;
-    end;
-    if LFileName = '' then begin
-      LFileName := extractFilePath(getActiveProject.fileName) + 'Resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
-      if not TFile.Exists(LFileName) then begin
-        LFileName := LFileName + '.png';
+  {$IFDEF ALDPK}
+  var LFileName: String := '';
+  if TFile.Exists(getActiveProject.fileName) then begin
+    var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
+    //<RcItem Include="resources\account_100x100.png">
+    //    <ResourceType>RCDATA</ResourceType>
+    //    <ResourceId>account_100x100</ResourceId>
+    //</RcItem>
+    Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+fResourceName+'</ResourceId>', LDProjSrc);
+    While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
+    if (P1 > 0) then begin
+      var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
+      if P2 > P1 then begin
+        LFileName := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
         if not TFile.Exists(LFileName) then LFileName := '';
       end;
     end;
-    {$ENDIF}
-    fBufBitmapRect := LocalRect;
-    {$IFDEF ALDPK}
-    if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
-    else fBufBitmap := nil;
-    {$ELSE}
-    fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale);
-    {$ENDIF}
-    result := fBufBitmap;
-
-  {$IFDEF debug}
-  finally
-    AlDebugAniIndicatorMakeBufBitmapStopWatch.Stop;
   end;
-  {$endif}
+  if LFileName = '' then begin
+    LFileName := extractFilePath(getActiveProject.fileName) + 'Resources\' + fResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
+    if not TFile.Exists(LFileName) then begin
+      LFileName := LFileName + '.png';
+      if not TFile.Exists(LFileName) then LFileName := '';
+    end;
+  end;
+  {$ENDIF}
+  fBufBitmapRect := LocalRect;
+  {$IFDEF ALDPK}
+  if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale)
+  else fBufBitmap := nil;
+  {$ELSE}
+  fBufBitmap := ALLoadFitIntoResourceImageV3(fResourceName, Width * (fframeCount div fRowCount) * FScreenScale, Height * fRowCount * FScreenScale);
+  {$ENDIF}
+  result := fBufBitmap;
 
 end;
 
@@ -2053,123 +2035,114 @@ begin
      (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) and
      (FbufResourceName = LResourceName) then exit(fBufBitmap);
 
+  {$IFDEF debug}
+  if FBufBitmap <> nil then
+    ALLog('TALCheckbox.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  {$endif}
   clearBufBitmap;
   fBufSize := Size.Size;
   FbufResourceName := LResourceName;
 
-  {$IFDEF debug}
-  ALLog('TALCheckbox.MakeBufBitmap', 'Name: ' + Name, TalLogType.verbose);
-  inc(AlDebugCheckBoxMakeBufBitmapCount);
-  AlDebugCheckBoxMakeBufBitmapStopWatch.Start;
-  try
-  {$endif}
-
-    {$IFDEF ALDPK}
-    LFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + LResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
-    if not TFile.Exists(LFileName) then begin
-      LFileName := LFileName + '.png';
-      if not TFile.Exists(LFileName) then LFileName := '';
-    end;
-    {$ENDIF}
-
-    case FWrapMode of
-
-      //Display the image with its original dimensions:
-      //* The image is placed in the upper-left corner of the rectangle of the control.
-      //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
-      //  which fits in the rectangle of the control, is shown. The image is not resized.
-      TALImageWrapMode.Original:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Best fit the image in the rectangle of the control:
-      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
-      //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
-      //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
-      //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
-      //  should be displayed. The image is displayed centered in the rectangle of the control.
-      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-      //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-      TALImageWrapMode.Fit:
-        begin
-          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
-          {$IFDEF ALDPK}
-          if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := nil;
-          {$ELSE}
-          fBufBitmap := ALLoadFitIntoResourceImageV3(LResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
-          {$ENDIF}
-          result := fBufBitmap;
-          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
-                                                    CenterAt(fBufBitmapRect);
-        end;
-
-      //Stretch the image to fill the entire rectangle of the control.
-      TALImageWrapMode.Stretch:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Tile (multiply) the image to cover the entire rectangle of the control:
-      //* If the image is larger than the rectangle of the control, then only the
-      //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
-      //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
-      //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
-      //  the upper-left corner of the rectangle of the control.
-      TALImageWrapMode.Tile:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Center the image to the rectangle of the control:
-      //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
-      TALImageWrapMode.Center:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Fit the image in the rectangle of the control:
-      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
-      //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
-      //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-      //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
-      TALImageWrapMode.Place:
-        begin
-          Result := nil; // todo
-        end;
-
-      //Best fit the image in the rectangle of the control:
-      //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
-      //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
-      //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
-      //  AND the height of the resized image is equal to the height of the rectangle of the control.
-      // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-      //  the rectangle of the control. Whole the image should be displayed.
-      TALImageWrapMode.FitAndCrop:
-        begin
-          fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
-          {$IFDEF ALDPK}
-          if LFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
-          else fBufBitmap := nil;
-          {$ELSE}
-          fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(LResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
-          {$ENDIF}
-          result := fBufBitmap;
-          if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
-                                                    CenterAt(fBufBitmapRect);
-        end;
-
-      //to hide a stupid warning else
-      else Result := nil;
-
-    end;
-
-  {$IFDEF debug}
-  finally
-    AlDebugCheckBoxMakeBufBitmapStopWatch.Stop;
+  {$IFDEF ALDPK}
+  LFileName := extractFilePath(getActiveProject.fileName) + 'resources\' + LResourceName; // by default all the resources files must be located in the sub-folder /resources/ of the project
+  if not TFile.Exists(LFileName) then begin
+    LFileName := LFileName + '.png';
+    if not TFile.Exists(LFileName) then LFileName := '';
   end;
-  {$endif}
+  {$ENDIF}
+
+  case FWrapMode of
+
+    //Display the image with its original dimensions:
+    //* The image is placed in the upper-left corner of the rectangle of the control.
+    //* If the image is larger than the control's rectangle, then only the upper-left part of the image,
+    //  which fits in the rectangle of the control, is shown. The image is not resized.
+    TALImageWrapMode.Original:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Best fit the image in the rectangle of the control:
+    //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+    //  (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
+    //  of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
+    //  or the height of the resized image is equal to the height of the rectangle of the control. The whole image
+    //  should be displayed. The image is displayed centered in the rectangle of the control.
+    // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+    //  the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+    TALImageWrapMode.Fit:
+      begin
+        fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+        {$IFDEF ALDPK}
+        if LFileName <> '' then fBufBitmap := ALLoadFitIntoFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := nil;
+        {$ELSE}
+        fBufBitmap := ALLoadFitIntoResourceImageV3(LResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+        {$ENDIF}
+        result := fBufBitmap;
+        if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                  CenterAt(fBufBitmapRect);
+      end;
+
+    //Stretch the image to fill the entire rectangle of the control.
+    TALImageWrapMode.Stretch:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Tile (multiply) the image to cover the entire rectangle of the control:
+    //* If the image is larger than the rectangle of the control, then only the
+    //  upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
+    //* If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
+    //  (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
+    //  the upper-left corner of the rectangle of the control.
+    TALImageWrapMode.Tile:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Center the image to the rectangle of the control:
+    //* The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
+    TALImageWrapMode.Center:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Fit the image in the rectangle of the control:
+    //* If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
+    //  to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
+    //  resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+    //* If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
+    TALImageWrapMode.Place:
+      begin
+        Result := nil; // todo
+      end;
+
+    //Best fit the image in the rectangle of the control:
+    //* If any dimension of the image is larger than the rectangle of the control, then scales down the image
+    //  (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
+    //  of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
+    //  AND the height of the resized image is equal to the height of the rectangle of the control.
+    // * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+    //  the rectangle of the control. Whole the image should be displayed.
+    TALImageWrapMode.FitAndCrop:
+      begin
+        fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, FScreenScale); // to have the pixel aligned width and height
+        {$IFDEF ALDPK}
+        if LFileName <> '' then fBufBitmap := ALLoadFitIntoAndCropFileImageV3(LFileName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale)
+        else fBufBitmap := nil;
+        {$ELSE}
+        fBufBitmap := ALLoadFitIntoAndCropResourceImageV3(LResourceName, fBufBitmapRect.Width * FScreenScale, fBufBitmapRect.Height * FScreenScale);
+        {$ENDIF}
+        result := fBufBitmap;
+        if result <> nil then fBufBitmapRect := TrectF.Create(0,0, result.Width/FScreenScale, result.Height/FScreenScale).
+                                                  CenterAt(fBufBitmapRect);
+      end;
+
+    //to hide a stupid warning else
+    else Result := nil;
+
+  end;
 
 end;
 
@@ -2734,9 +2707,5 @@ end;
 
 initialization
   RegisterFmxClasses([TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton, TALSwitch]);
-  {$IFDEF debug}
-  AlDebugAniIndicatorMakeBufBitmapStopWatch := TstopWatch.Create;
-  AlDebugCheckBoxMakeBufBitmapStopWatch := TstopWatch.Create;
-  {$endif}
 
 end.

@@ -424,17 +424,15 @@ Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
 var LChild: TControl;
 begin
 
-  //
-  //if aControl is TPresentedControl then TPresentedControl(aControl).ApplyStyleLookup; // this to generate child controls
-  //                                                                                    // that can be TALText for exemple
-  //                                                                                    // (for the Tlabel)
-  acontrol.DisableDisappear := true; // this to keep the style when the control get out of the visible are
-                                     // else the style will be freed to be reaplied a little later
+  // This is used to generate child controls.
+  // For instance, TALText can be used for the TLabel.
+  //if aControl is TPresentedControl then TPresentedControl(aControl).ApplyStyleLookup;
 
-  if (aControl is TALText) then begin
-    TALText(aControl).doubleBuffered := True;
-    TALText(aControl).MakeBufBitmap;
-  end
+  // This ensures the style is retained when the control exits the visible area.
+  // Otherwise, the style will be released and reapplied shortly after.
+  acontrol.DisableDisappear := true;
+
+  if (aControl is TALText) then TALText(aControl).MakeBufBitmap
   else if (aControl is TALRectangle) then begin
     TALRectangle(aControl).doubleBuffered := True;
     TALRectangle(aControl).MakeBufBitmap;

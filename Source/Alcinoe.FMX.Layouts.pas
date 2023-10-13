@@ -25,8 +25,18 @@ type
   {*************************}
   [ComponentPlatforms($FFFF)]
   TALLayout = class(TLayout)
+  private
+    FAutoSize: Boolean;
+    procedure SetAutoSize(const Value: Boolean);
   protected
     procedure DoRealign; override;
+    procedure AdjustSize; virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
+  published
+    // Dynamically adjusts the dimensions to accommodate child controls,
+    // considering their sizes, positions, margins, and alignments.
+    property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
   end;
 
   {*************************}
@@ -212,9 +222,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
-    {$ENDIF}
     { Drag and Drop events }
     property OnDragEnter;
     property OnDragLeave;
@@ -282,9 +290,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
-    {$ENDIF}
     { Drag and Drop events }
     property OnDragEnter;
     property OnDragLeave;
@@ -352,9 +358,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
-    {$ENDIF}
     { Drag and Drop events }
     property OnDragEnter;
     property OnDragLeave;
@@ -397,20 +401,117 @@ uses
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
-{*******************************************************************************************************}
-// http://stackoverflow.com/questions/39317984/does-the-delphi-firemonkey-dorealign-implemented-correctly
-// https://quality.embarcadero.com/browse/RSP-15768
-// often we assign some event to some control onresize (like TText with autosize=True) to
-// resize their parentcontrols to the same size as them. But in this way the problem is that if
-// we resize the parentcontrol during it's dorealign process then it will not call again dorealign
-{$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was not corrected and adjust the IFDEF'}
-{$ENDIF}
+{***********************************************}
+constructor TALLayout.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  FAutoSize := False;
+end;
+
+{****************************}
 procedure TALLayout.DoRealign;
 begin
-  var LOriginalSize: TPointF := Size.Size;
   inherited DoRealign;
-  if not LOriginalSize.EqualsTo(Size.Size) then DoRealign;
+  AdjustSize;
+end;
+
+{*****************************}
+procedure TALLayout.AdjustSize;
+begin
+  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
+     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
+     (FAutoSize) then begin // if FAutoSize is false nothing to adjust
+
+    var LSize := TSizeF.Create(0,0);
+    for var Lcontrol in Controls do begin
+      case Lcontrol.Align of
+
+        //--
+        TAlignLayout.None,
+        TAlignLayout.Center:;
+
+        //--
+        TAlignLayout.Top,
+        TAlignLayout.MostTop,
+        TAlignLayout.Bottom,
+        TAlignLayout.MostBottom: begin
+          LSize.Width := Max(LSize.Width, Width);
+          LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom);
+        end;
+
+        //--
+        TAlignLayout.Left,
+        TAlignLayout.MostLeft,
+        TAlignLayout.Right,
+        TAlignLayout.MostRight: Begin
+          LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right);
+          LSize.height := Max(LSize.Height, Height);
+        End;
+
+        //--
+        TAlignLayout.Client,
+        TAlignLayout.Contents,
+        TAlignLayout.Scale,
+        TAlignLayout.Fit,
+        TAlignLayout.FitLeft,
+        TAlignLayout.FitRight: Begin
+          LSize.Width := Max(LSize.Width, Width);
+          LSize.height := Max(LSize.Height, Height);
+        End;
+
+        //--
+        TAlignLayout.Horizontal,
+        TAlignLayout.VertCenter: Begin
+          LSize.Width := Max(LSize.Width, Width);
+        End;
+
+        //--
+        TAlignLayout.Vertical,
+        TAlignLayout.HorzCenter: Begin
+          LSize.height := Max(LSize.Height, Height);
+        End;
+
+      end;
+    end;
+
+    // This to take care of the align constraint
+    if Align in [TAlignLayout.Client,
+                 TAlignLayout.Contents,
+                 TAlignLayout.Top,
+                 TAlignLayout.Bottom,
+                 TAlignLayout.MostTop,
+                 TAlignLayout.MostBottom,
+                 TAlignLayout.Horizontal,
+                 TAlignLayout.VertCenter] then begin
+      LSize.Width := Width;
+    end;
+    if Align in [TAlignLayout.Client,
+                 TAlignLayout.Contents,
+                 TAlignLayout.Left,
+                 TAlignLayout.Right,
+                 TAlignLayout.MostLeft,
+                 TAlignLayout.MostRight,
+                 TAlignLayout.Vertical,
+                 TAlignLayout.HorzCenter] then begin
+      LSize.height := height;
+    end;
+
+    if LSize.Width = 0 then LSize.Width := Width;
+    if LSize.Height = 0 then LSize.Height := Height;
+    SetBounds(Position.X, Position.Y, LSize.Width, LSize.Height);
+
+  end;
+end;
+
+{****************************************************}
+procedure TALLayout.SetAutoSize(const Value: Boolean);
+begin
+  if FAutoSize <> Value then
+  begin
+    FAutoSize := Value;
+    AdjustSize;
+    repaint;
+  end;
 end;
 
 {*********************************************************}

@@ -90,9 +90,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
-    {$ENDIF}
   end;
 
   {*************************}
@@ -225,9 +223,7 @@ type
     property OnPainting;
     property OnPaint;
     property OnResize;
-    {$IF CompilerVersion >= 32} // tokyo
     property OnResized;
-    {$ENDIF}
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
     property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;

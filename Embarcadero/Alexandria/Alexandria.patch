@@ -286,7 +286,17 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  end;
  
  function TControl.GetLocked: Boolean;
-@@ -4122,6 +4151,7 @@
+@@ -3935,7 +3964,9 @@
+ begin
+   if not FNeedAlign then
+     Exit;
++  var LOriginalSize: TPointF := Size.Size; // https://quality.embarcadero.com/browse/RSP-15768
+   AlignObjects(Self, FPadding, FSize.Width, FSize.Height, FLastWidth, FLastHeight, FDisableAlign);
++  if not LOriginalSize.EqualsTo(Size.Size) then DoRealign; // https://quality.embarcadero.com/browse/RSP-15768
+ end;
+ 
+ procedure TControl.Realign;
+@@ -4122,6 +4153,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseEnter) then
      FOnMouseEnter(Self);
@@ -294,7 +304,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  end;
  
  procedure TControl.DoMouseLeave;
-@@ -4131,6 +4161,7 @@
+@@ -4131,6 +4163,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseLeave) then
      FOnMouseLeave(Self);
@@ -302,7 +312,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  end;
  
  function TControl.GetCanFocus: Boolean;
-@@ -4422,7 +4453,7 @@
+@@ -4422,7 +4455,7 @@
      end;
  
    if not Handled and (FParent <> nil) and (EventInfo.GestureID <> sgiNoGesture) and Supports(Parent, IGestureControl, LGObj) then
@@ -311,7 +321,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  end;
  
  function TControl.ConvertLocalPointFrom(const AControl: TControl; const AControlLocalPoint: TPointF): TPointF;
-@@ -4547,6 +4578,7 @@
+@@ -4547,6 +4580,7 @@
  
    if Assigned(FOnMouseDown) then
      FOnMouseDown(Self, Button, Shift, X, Y);
@@ -319,7 +329,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
    if FAutoCapture then
      Capture;
    if Button = TMouseButton.mbLeft then
-@@ -4569,6 +4601,7 @@
+@@ -4569,6 +4603,7 @@
  begin
    if Assigned(FOnMouseMove) then
      FOnMouseMove(Self, Shift, X, Y);
@@ -327,7 +337,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  end;
  
  procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-@@ -4577,6 +4610,7 @@
+@@ -4577,6 +4612,7 @@
  
    if Assigned(FOnMouseUp) then
      FOnMouseUp(Self, Button, Shift, X, Y);
@@ -335,7 +345,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
    if FPressed then
    begin
      FPressed := False;
-@@ -4591,6 +4625,41 @@
+@@ -4591,6 +4627,41 @@
      FOnMouseWheel(Self, Shift, WheelDelta, Handled)
  end;
  
@@ -377,7 +387,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
  var
    Operation: TDragOperation;
-@@ -6013,7 +6082,7 @@
+@@ -6013,7 +6084,7 @@
    KillResourceLink;
    if csLoading in ComponentState then
      Exit;
@@ -386,7 +396,7 @@ diff --git a/Embarcadero/Alexandria/fmx/FMX.Controls.pas b/Embarcadero/Alexandri
  end;
  
  procedure TStyledControl.AdjustSize;
-@@ -7171,7 +7240,7 @@
+@@ -7171,7 +7242,7 @@
  var
    LFontColor: TAlphaColor;
  begin

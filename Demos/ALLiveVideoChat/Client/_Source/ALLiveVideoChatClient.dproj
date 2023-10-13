@@ -182,7 +182,7 @@
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <SanitizedProjectName>ALLiveVideoChatClient</SanitizedProjectName>
-    <DCC_UnitSearchPath>..\..\..\..\Embarcadero\Alexandria\fmx;..\..\..\..\Embarcadero\Alexandria\rtl\ios;..\..\..\Embarcadero\Alexandria\rtl\osx;..\..\..\..\Embarcadero\Alexandria\rtl\android;..\..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\..\Embarcadero\Alexandria\fmx;..\..\..\..\Embarcadero\Alexandria\rtl\ios;..\..\..\..\Embarcadero\Alexandria\rtl\osx;..\..\..\..\Embarcadero\Alexandria\rtl\android;..\..\..\..\Source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <OrientationPortrait>true</OrientationPortrait>
     <OrientationPortraitUpsideDown>true</OrientationPortraitUpsideDown>
     <DCC_CodePage>65001</DCC_CodePage>

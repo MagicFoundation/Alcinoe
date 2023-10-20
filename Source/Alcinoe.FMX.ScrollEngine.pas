@@ -21,7 +21,7 @@ top-notch scrolling experience, rooted in established and trusted technologies.
 DEMO :
 ------
 
-https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects
+https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls
 *******************************************************************************}
 unit Alcinoe.FMX.ScrollEngine;
 

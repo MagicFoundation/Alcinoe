@@ -367,8 +367,8 @@ type
     class var FInstance: TALGraphicThreadPool;
   public
     type
-      TCreateInstanceFunct = function: TALGraphicThreadPool;
-    class var CreateInstanceFunct: TCreateInstanceFunct;
+      TCreateInstanceFunc = function: TALGraphicThreadPool;
+    class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALGraphicThreadPool read GetInstance;
   public
     procedure ExecuteProc(
@@ -10297,7 +10297,7 @@ end;
 class function TALGraphicThreadPool.GetInstance: TALGraphicThreadPool;
 begin
   if FInstance = nil then begin
-    var LInstance := CreateInstanceFunct;
+    var LInstance := CreateInstanceFunc;
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
@@ -10373,7 +10373,7 @@ end;
 
 initialization
   TALGraphicThreadPool.FInstance := nil;
-  TALGraphicThreadPool.CreateInstanceFunct := @TALGraphicThreadPool.CreateInstance;
+  TALGraphicThreadPool.CreateInstanceFunc := @TALGraphicThreadPool.CreateInstance;
 
 finalization
   ALFreeAndNil(TALGraphicThreadPool.FInstance);

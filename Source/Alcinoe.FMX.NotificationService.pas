@@ -153,8 +153,8 @@ type
     class var FInstance: TALNotificationService;
   public
     type
-      TCreateInstanceFunct = function: TALNotificationService;
-    class var CreateInstanceFunct: TCreateInstanceFunct;
+      TCreateInstanceFunc = function: TALNotificationService;
+    class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALNotificationService read GetInstance;
   public
     type
@@ -500,7 +500,7 @@ end;
 class function TALNotificationService.GetInstance: TALNotificationService;
 begin
   if FInstance = nil then begin
-    var LInstance := CreateInstanceFunct;
+    var LInstance := CreateInstanceFunc;
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
@@ -985,7 +985,7 @@ end;
 initialization
   TALNotificationService.TmpPath := '';
   TALNotificationService.FInstance := nil;
-  TALNotificationService.CreateInstanceFunct := @TALNotificationService.CreateInstance;
+  TALNotificationService.CreateInstanceFunc := @TALNotificationService.CreateInstance;
 
 finalization
   ALFreeAndNil(TALNotificationService.FInstance);

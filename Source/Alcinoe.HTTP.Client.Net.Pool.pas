@@ -54,8 +54,8 @@ type
     class var FInstance: TALNetHttpClientPool;
   public
     type
-      TCreateInstanceFunct = function: TALNetHttpClientPool;
-    class var CreateInstanceFunct: TCreateInstanceFunct;
+      TCreateInstanceFunc = function: TALNetHttpClientPool;
+    class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALNetHttpClientPool read GetInstance;
   private
     FCacheData: TALNetHttpClientPoolCacheDataProc;
@@ -170,7 +170,7 @@ end;
 class function TALNetHttpClientPool.GetInstance: TALNetHttpClientPool;
 begin
   if FInstance = nil then begin
-    var LInstance := CreateInstanceFunct;
+    var LInstance := CreateInstanceFunc;
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
@@ -413,7 +413,7 @@ end;
 
 initialization
   TALNetHttpClientPool.FInstance := nil;
-  TALNetHttpClientPool.CreateInstanceFunct := @TALNetHttpClientPool.CreateInstance;
+  TALNetHttpClientPool.CreateInstanceFunc := @TALNetHttpClientPool.CreateInstance;
 
 finalization
   ALFreeAndNil(TALNetHttpClientPool.FInstance);

@@ -20,8 +20,8 @@ type
     class var FInstance: TALErrorReporting;
   public
     type
-      TCreateInstanceFunct = function: TALErrorReporting;
-    class var CreateInstanceFunct: TCreateInstanceFunct;
+      TCreateInstanceFunc = function: TALErrorReporting;
+    class var CreateInstanceFunc: TCreateInstanceFunc;
     class property Instance: TALErrorReporting read GetInstance;
   public
     constructor Create; virtual;
@@ -65,7 +65,7 @@ end;
 class function TALErrorReporting.GetInstance: TALErrorReporting;
 begin
   if FInstance = nil then begin
-    var LInstance := CreateInstanceFunct;
+    var LInstance := CreateInstanceFunc;
     if AtomicCmpExchange(Pointer(FInstance), Pointer(LInstance), nil) <> nil then ALFreeAndNil(LInstance)
   end;
   Result := FInstance;
@@ -90,7 +90,7 @@ end;
 
 initialization
   TALErrorReporting.FInstance := nil;
-  TALErrorReporting.CreateInstanceFunct := @TALErrorReporting.CreateInstance;
+  TALErrorReporting.CreateInstanceFunc := @TALErrorReporting.CreateInstance;
 
 finalization
   ALFreeAndNil(TALErrorReporting.FInstance);

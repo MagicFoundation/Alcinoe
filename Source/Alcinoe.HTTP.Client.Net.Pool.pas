@@ -185,8 +185,8 @@ procedure TALNetHttpClientPool.DoGet(var AExtData: Tobject);
     Var LUri := Turi.Create(aUrl);
     var LNetHttpClient := ALAcquireKeepAliveNetHttpClient(LUri);
     try
-      //in case we cut the connection I already see this returning sucess with
-      //a partial content. What a sheet!!
+      // In case we lose the connection, this might return success with
+      // partial content. What a mess!
       result := LNetHttpClient.Get(aUrl, LResponseContent);
     finally
       ALReleaseKeepAliveNetHttpClient(LUri, LNetHttpClient);
@@ -218,6 +218,15 @@ begin
               if (not assigned(RetrieveCachedData)) or
                  (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent)) then begin
                 LHTTPResponse := _HttpGetUrl(LNetHttpClientPoolRequest.Url, LResponseContent);
+                // Client error responses (400 – 499)
+                // Server error responses (500 – 599)
+                if (LHTTPResponse = nil) or
+                   ((LHTTPResponse.StatusCode >= 400) and (LHTTPResponse.StatusCode <= 599)) then begin
+                  if assigned(LNetHttpClientPoolRequest.OnErrorCallBack) then
+                    LNetHttpClientPoolRequest.OnErrorCallBack('HTTP request failed', LNetHttpClientPoolRequest.FExtData);
+                  exit;
+                end;
+                ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
                 if (assigned(CacheData)) then CacheData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent);
               end;
             end
@@ -225,9 +234,6 @@ begin
           end
           else LResponseContent.LoadFromFile(LNetHttpClientPoolRequest.Url);
         end;
-
-        //decode the result if necessary
-        if (LHTTPResponse <> nil) then ALDecompressHttpResponseContent(LHTTPResponse.ContentEncoding, LResponseContent);
 
         //fire the OnSuccess
         LNetHttpClientPoolRequest.OnSuccessCallBack(LHTTPResponse, LResponseContent, LNetHttpClientPoolRequest.FExtData);

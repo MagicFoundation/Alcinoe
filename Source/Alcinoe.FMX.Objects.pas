@@ -370,8 +370,8 @@ type
     property TextSettings: TTextSettings read fTextSettings write SetTextSettings;
     property Visible default True;
     property Width;
-    property MaxWidth: single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored;       // these properties are usefull when used
-    property MaxHeight: single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored;      // with autosize
+    property MaxWidth: single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored;     // These properties are useful
+    property MaxHeight: single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored; // when used with autosize
     {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;

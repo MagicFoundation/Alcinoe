@@ -26,8 +26,8 @@ Dcu
 /Demos/**/Win64/Release
 /Embarcadero/Alexandria/rtl
 /Embarcadero/Alexandria/fmx
-/Embarcadero/Alexandria/rtl
-/Embarcadero/Alexandria/fmx
+/Embarcadero/Athens/rtl
+/Embarcadero/Athens/fmx
 /Libraries/bpl
 /Libraries/ios/firebase
 /Libraries/ios/facebook

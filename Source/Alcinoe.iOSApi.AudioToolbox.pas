@@ -31,20 +31,4 @@ procedure AudioServicesPlayAlertSound(inSystemSoundID: SystemSoundID); cdecl; ex
 
 implementation
 
-{$IF defined(IOS) and NOT defined(CPUARM)}
-
-uses
-  Posix.Dlfcn;
-
-var
-  AudioToolboxModule: THandle;
-
-initialization
-  AudioToolboxModule := dlopen(MarshaledAString(libAudioToolbox), RTLD_LAZY);
-
-finalization
-  dlclose(AudioToolboxModule);
-
-{$ENDIF IOS}
-
 end.

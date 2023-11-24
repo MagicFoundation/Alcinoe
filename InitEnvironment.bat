@@ -15,6 +15,11 @@ REM ---------------
 
 set ALDelphiName=
 IF "%ALDelphiVersion%"=="" (
+  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\23.0\bin\rsvars.bat" (
+    ECHO Found Delphi 12 Athens
+    set ALDelphiName=Athens
+    set ALDelphiVersion=23.0
+  ) ELSE (
   IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\22.0\bin\rsvars.bat" (
     ECHO Found Delphi 11 Alexandria
     set ALDelphiName=Alexandria
@@ -44,8 +49,11 @@ IF "%ALDelphiVersion%"=="" (
     ECHO Found Delphi 10 Seattle
     set ALDelphiName=Seattle
     set ALDelphiVersion=17.0
-  ))))))
+  )))))))
 ) ELSE (
+  IF "%ALDelphiVersion%"=="23.0" (
+    set ALDelphiName=Athens
+  ) ELSE (
   IF "%ALDelphiVersion%"=="22.0" (
     set ALDelphiName=Alexandria
   ) ELSE (
@@ -63,7 +71,7 @@ IF "%ALDelphiVersion%"=="" (
   ) ELSE (
   IF "%ALDelphiVersion%"=="17.0" (
     set ALDelphiName=Seattle
-  ))))))
+  )))))))
 )
 
 IF "%ALDelphiName%"=="" (

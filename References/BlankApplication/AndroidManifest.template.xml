@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BEGIN_INCLUDE(manifest) -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="%package%"
     android:versionCode="%versionCode%"
     android:versionName="%versionName%"
@@ -20,11 +21,23 @@
         android:icon="%icon%"
         android:theme="%theme%"
         android:hardwareAccelerated="%hardwareAccelerated%"
-        android:resizeableActivity="false"
+        android:resizeableActivity="true"
         android:requestLegacyExternalStorage="true">
 <%provider%>
 <%application-meta-data%>
 <%uses-libraries%>
+        <!-- Trigger Google Play services to install the backported photo picker module. -->
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
+            android:enabled="false"
+            android:exported="false"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+            </intent-filter>
+
+            <meta-data android:name="photopicker_activity:0:required" android:value="" />
+        </service>
 <%services%>
         <!-- Our activity is a subclass of the built-in NativeActivity framework class.
              This will take care of integrating with our NDK code. -->
@@ -32,7 +45,7 @@
             android:name="com.embarcadero.firemonkey.FMXNativeActivity"
             android:exported="true"
             android:label="%activityLabel%"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout|uiMode"
             android:launchMode="singleTask">
             <!-- Tell NativeActivity the name of our .so -->
             <meta-data android:name="android.app.lib_name" android:value="%libNameValue%" />

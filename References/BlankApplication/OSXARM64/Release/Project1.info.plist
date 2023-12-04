@@ -50,6 +50,10 @@
 	<string>The reason for accessing files on a removable volume</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>The reason for requesting to send user data to Apple's speech recognition servers</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>The reason for accessing the Bluetooth interface</string>
 
 	<key>CFBundleIconFile</key>
 	<string>Project1.icns</string>

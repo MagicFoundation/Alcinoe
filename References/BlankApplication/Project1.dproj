@@ -1,11 +1,11 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{A55E2D84-A444-4E49-BCA0-584DA26B9320}</ProjectGuid>
+    <ProjectGuid>{F186C8E2-5313-4FFA-968A-D26434B9A120}</ProjectGuid>
     <ProjectVersion>20.1</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
     <Base>True</Base>
-    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
+    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
     <MainSource>Project1.dpr</MainSource>
@@ -107,6 +107,7 @@
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <SanitizedProjectName>Project1</SanitizedProjectName>
+    <DCC_Define>SKIA;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;FireDACCommonDriver;IndyProtocols;IndyIPClient;dbxcds;FmxTeeUI;bindcompfmx;ibmonitor;FireDACSqliteDriver;DbxClientDriver;soapmidas;fmxFireDAC;dbexpress;inet;DataSnapCommon;fmxase;dbrtl;FireDACDBXDriver;CustomIPTransport;DBXInterBaseDriver;IndySystem;ibxbindings;bindcomp;FireDACCommon;IndyCore;RESTBackendComponents;bindcompdbx;rtl;RESTComponents;DBXSqliteDriver;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;DataSnapFireDAC;emsclientfiredac;FireDAC;FireDACDSDriver;xmlrtl;tethering;ibxpress;dsnap;CloudService;DataSnapNativeClient;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>

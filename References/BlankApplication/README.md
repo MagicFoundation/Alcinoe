@@ -27,29 +27,10 @@ Check template files
     iOSSimARM64\Release\Project1.entitlements
   and report any found diffs in your project(s)
 * Commit only the previous template files
-  
-  
-Check DProjNormalizer
----------------------
-
-* Delete everything in this directory except 
-    clean.bat 
-    README.md
-    Project1.dproj.normalize.bat
-    Project1.deployproj.normalize.bat
-* Make a new multi platform blank application (Name it Project1)
-* Build each plateform in debug (ctrl+f9)
-* Build each plateform in release (ctrl+f9)
-* Deploy each plateform in debug (ctrl+alt+shif+f9)
-* Deploy each plateform in release (ctrl+alt+shif+f9)
-* Run clean.bat
-* Run Project1.dproj.normalize.bat
-* Study the diffs with previous commited version
-* Commit
 
 
-Check DeployProjNormalizer
---------------------------
+Check DProjNormalizer/DeployProjNormalizer
+------------------------------------------
 
 * Delete everything in this directory except 
     clean.bat 
@@ -77,13 +58,18 @@ Check DeployProjNormalizer
       <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">BFD2217C-51A5-4855-BA03-B430731C177E</DeviceId>
     </PropertyGroup>
 * close Delphi
-* save somewhere Project1.deployproj
+* commit Project1.deployproj and Project1.deployproj.bak
+* delete Project1.deployproj and Project1.deployproj.bak
 * Run Project1.dproj.normalize.bat
+* Study the diffs between Project1.dproj and the previous commited version
+* Study the diffs between Project1.dproj.bak and the previous commited version
+* commit Project1.dproj and Project1.dproj.bak
 * Build each plateform in debug (ctrl+f9)
 * Build each plateform in release (ctrl+f9)
 * Deploy each plateform in debug (ctrl+alt+shif+f9)
 * Deploy each plateform in release (ctrl+alt+shif+f9)
+* Close Delphi WITHOUT saving the project1
 * run Project1.deployproj.normalize.bat and make a diff compare with 
-  the new generated deployproj vs deployproj.bak.
-* if you do not detect any difference then it's ok else you need
-  to update the source code of DeployProjNormalizer
+  the new generated deployproj vs the commited deployproj
+* Run clean.bat
+* Commit

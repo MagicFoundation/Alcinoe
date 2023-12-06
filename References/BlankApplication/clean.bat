@@ -15,3 +15,5 @@ del Project1 /s
 del Project1.rsm /s
 del Project1.dproj.local /s
 del Project1.identcache /s
+del sk4d.dll /s
+del libsk4d.so /s

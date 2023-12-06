@@ -46,7 +46,7 @@ Check DProjNormalizer/DeployProjNormalizer
 * Deploy each plateform in debug (ctrl+alt+shif+f9)
 * Deploy each plateform in release (ctrl+alt+shif+f9)
 * run Project1.deployproj.normalize.bat and make a diff compare with 
-  the new generated deployproj vs deployproj.bak. 
+  the new generated deployproj vs deployproj.bak
   NOTE: If you see some missing nodes, try to deploy again 
   in configuration of the missing nodes and compare again.
   You can ignore the node:
@@ -72,4 +72,5 @@ Check DProjNormalizer/DeployProjNormalizer
 * run Project1.deployproj.normalize.bat and make a diff compare with 
   the new generated deployproj vs the commited deployproj
 * Run clean.bat
-* Commit
+* Revert Project1.deployproj and Project1.deployproj.bak 
+* Commit all

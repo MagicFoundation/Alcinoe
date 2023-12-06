@@ -1,1 +1,2 @@
-Do not install anything from here, these sources are only for reference
+Please refrain from installing any software from here; they 
+are intended solely for reference purposes.

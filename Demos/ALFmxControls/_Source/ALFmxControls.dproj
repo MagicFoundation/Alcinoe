@@ -327,7 +327,7 @@
     <DCC_DebugInformation>1</DCC_DebugInformation>
     <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
     <Cfg_1_Android>true</Cfg_1_Android>
@@ -337,7 +337,7 @@
     <DCC_DebugInformation>1</DCC_DebugInformation>
     <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath);$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -388,7 +388,7 @@
   <PropertyGroup Condition="&#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
     <Cfg_2_Android>true</Cfg_2_Android>
@@ -396,7 +396,7 @@
     <Cfg_2>true</Cfg_2>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
@@ -437,143 +437,245 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.annotation-annotation-1.3.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.annotation-annotation-experimental-1.1.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.arch.core-core-common-2.1.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.arch.core-core-runtime-2.1.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.collection-collection-1.0.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.concurrent-concurrent-futures-1.0.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.core-core-1.7.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-common-2.3.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.lifecycle-lifecycle-runtime-2.3.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.alcinoe-alcinoe-common-1.0.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.alcinoe-alcinoe-datepicker-1.0.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.alcinoe-alcinoe-edittext-1.0.0.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-common-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-core-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-database-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-datasource-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-decoder-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-extractor-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.android.exoplayer-exoplayer-hls-2.18.2.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.guava-failureaccess-1.0.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\com.google.guava-guava-31.0.1-android.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\32bit\r.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.annotation-annotation-1.3.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.annotation-annotation-experimental-1.1.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.arch.core-core-common-2.1.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.arch.core-core-runtime-2.1.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.collection-collection-1.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.concurrent-concurrent-futures-1.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.core-core-1.7.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-common-2.3.1.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.lifecycle-lifecycle-runtime-2.3.1.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.alcinoe-alcinoe-common-1.0.1.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.alcinoe-alcinoe-datepicker-1.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.alcinoe-alcinoe-edittext-1.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-common-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-core-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-database-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-datasource-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-decoder-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-extractor-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.android.exoplayer-exoplayer-hls-2.18.2.jar">
+    <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-common-1.0.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.guava-failureaccess-1.0.1.jar">
+    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-common-1.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-datepicker-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\com.google.guava-guava-31.0.1-android.jar">
+    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-datepicker-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-edittext-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
-    <JavaReference Include="android\Merged\libs\64bit\r.jar">
+    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-edittext-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-common-2.19.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-common-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-container-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-container-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-core-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-core-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-database-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-database-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-datasource-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-datasource-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-decoder-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-decoder-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-extractor-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-extractor-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-hls-2.19.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.android.exoplayer-exoplayer-hls-2.19.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.guava-guava-31.1-android.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\com.google.guava-guava-31.1-android.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\r.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Android\Merged\libs\r.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <RcItem Include="resources\aniindicator_540x432.png">
       <ResourceId>aniindicator_540x432</ResourceId>
@@ -665,6 +767,34 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android64\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android64\Release\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android\Release\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android64\Debug\styles.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
@@ -717,6 +847,170 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android64\Debug\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android\Debug\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android64\Release\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android\Release\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android64\Debug\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android\Debug\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android64\Release\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android\Release\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android64\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android64\Release\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android\Release\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="Android64\Debug\colors.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
@@ -739,6 +1033,34 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="Android64\Debug\colors-night-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="Android\Debug\colors-night-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Release" LocalName="Android64\Release\colors-night-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Release" LocalName="Android\Release\colors-night-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="Android_LauncherIcon144" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
@@ -1185,7 +1507,147 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_low_normal.9.png">
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_low_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -1197,7 +1659,7 @@
             <RemoteName>notification_bg_low_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_low_pressed.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_low_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -1209,7 +1671,7 @@
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_normal.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -1221,7 +1683,7 @@
             <RemoteName>notification_bg_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_normal_pressed.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_normal_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -1233,7 +1695,7 @@
             <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -1245,7 +1707,7 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi</RemoteDir>
@@ -1257,7 +1719,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi</RemoteDir>
@@ -1269,7 +1731,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi</RemoteDir>
@@ -1281,7 +1743,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_low_normal.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_low_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -1293,7 +1755,7 @@
             <RemoteName>notification_bg_low_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_low_pressed.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_low_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -1305,7 +1767,7 @@
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_normal.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -1317,7 +1779,7 @@
             <RemoteName>notification_bg_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -1329,7 +1791,7 @@
             <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi-v4\notify_panel_notification_icon_bg.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi-v4\notify_panel_notification_icon_bg.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -1341,7 +1803,7 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
@@ -1353,7 +1815,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
@@ -1365,7 +1827,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
@@ -1377,7 +1839,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-v21\notification_action_background.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-v21\notification_action_background.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-v21</RemoteDir>
@@ -1389,7 +1851,7 @@
             <RemoteName>notification_action_background.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_low_normal.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_low_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -1401,7 +1863,7 @@
             <RemoteName>notification_bg_low_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_low_pressed.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_low_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -1413,7 +1875,7 @@
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_normal.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -1425,7 +1887,7 @@
             <RemoteName>notification_bg_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_normal_pressed.9.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_normal_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -1437,7 +1899,7 @@
             <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi-v4\notify_panel_notification_icon_bg.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi-v4\notify_panel_notification_icon_bg.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -1449,7 +1911,7 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
@@ -1461,7 +1923,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
@@ -1473,7 +1935,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
@@ -1485,7 +1947,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
@@ -1497,7 +1959,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
@@ -1509,7 +1971,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
@@ -1521,7 +1983,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable\notification_bg.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable\notification_bg.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -1533,7 +1995,7 @@
             <RemoteName>notification_bg.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable\notification_bg_low.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable\notification_bg_low.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -1545,7 +2007,7 @@
             <RemoteName>notification_bg_low.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable\notification_icon_background.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable\notification_icon_background.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -1557,7 +2019,7 @@
             <RemoteName>notification_icon_background.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\drawable\notification_tile_bg.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable\notification_tile_bg.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -1569,7 +2031,7 @@
             <RemoteName>notification_tile_bg.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout-v16\notification_template_custom_big.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout-v16\notification_template_custom_big.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v16</RemoteDir>
@@ -1581,7 +2043,7 @@
             <RemoteName>notification_template_custom_big.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout-v21\notification_action.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout-v21\notification_action.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -1593,7 +2055,7 @@
             <RemoteName>notification_action.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout-v21\notification_action_tombstone.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout-v21\notification_action_tombstone.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -1605,7 +2067,7 @@
             <RemoteName>notification_action_tombstone.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout-v21\notification_template_custom_big.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout-v21\notification_template_custom_big.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -1617,7 +2079,7 @@
             <RemoteName>notification_template_custom_big.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout-v21\notification_template_icon_group.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout-v21\notification_template_icon_group.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -1629,7 +2091,7 @@
             <RemoteName>notification_template_icon_group.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\custom_dialog.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\custom_dialog.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1641,7 +2103,7 @@
             <RemoteName>custom_dialog.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\notification_action.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\notification_action.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1653,7 +2115,7 @@
             <RemoteName>notification_action.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\notification_action_tombstone.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\notification_action_tombstone.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1665,7 +2127,7 @@
             <RemoteName>notification_action_tombstone.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\notification_template_custom_big.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\notification_template_custom_big.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1677,7 +2139,7 @@
             <RemoteName>notification_template_custom_big.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\notification_template_icon_group.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\notification_template_icon_group.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1689,7 +2151,7 @@
             <RemoteName>notification_template_icon_group.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\notification_template_part_chronometer.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\notification_template_part_chronometer.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1701,7 +2163,7 @@
             <RemoteName>notification_template_part_chronometer.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\layout\notification_template_part_time.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\layout\notification_template_part_time.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -1713,31 +2175,7 @@
             <RemoteName>notification_template_part_time.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\menu\example_menu.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\menu\example_menu2.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu2.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu2.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-hdpi</RemoteDir>
@@ -1749,7 +2187,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-mdpi</RemoteDir>
@@ -1761,7 +2199,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-xhdpi</RemoteDir>
@@ -1773,7 +2211,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
@@ -1785,7 +2223,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-af\values-af.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-af\values-af.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-af</RemoteDir>
@@ -1797,7 +2235,7 @@
             <RemoteName>values-af.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-am\values-am.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-am\values-am.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-am</RemoteDir>
@@ -1809,7 +2247,7 @@
             <RemoteName>values-am.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ar\values-ar.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ar\values-ar.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ar</RemoteDir>
@@ -1821,7 +2259,7 @@
             <RemoteName>values-ar.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-as\values-as.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-as\values-as.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-as</RemoteDir>
@@ -1833,7 +2271,7 @@
             <RemoteName>values-as.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-az\values-az.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-az\values-az.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-az</RemoteDir>
@@ -1845,7 +2283,7 @@
             <RemoteName>values-az.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-b+sr+Latn\values-b+sr+Latn.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-b+sr+Latn\values-b+sr+Latn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-b+sr+Latn</RemoteDir>
@@ -1857,7 +2295,7 @@
             <RemoteName>values-b+sr+Latn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-be\values-be.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-be\values-be.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-be</RemoteDir>
@@ -1869,7 +2307,7 @@
             <RemoteName>values-be.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-bg\values-bg.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-bg\values-bg.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-bg</RemoteDir>
@@ -1881,7 +2319,7 @@
             <RemoteName>values-bg.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-bn\values-bn.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-bn\values-bn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-bn</RemoteDir>
@@ -1893,7 +2331,7 @@
             <RemoteName>values-bn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-bs\values-bs.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-bs\values-bs.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-bs</RemoteDir>
@@ -1905,7 +2343,7 @@
             <RemoteName>values-bs.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ca\values-ca.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ca\values-ca.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ca</RemoteDir>
@@ -1917,7 +2355,7 @@
             <RemoteName>values-ca.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-cs\values-cs.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-cs\values-cs.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-cs</RemoteDir>
@@ -1929,7 +2367,7 @@
             <RemoteName>values-cs.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-da\values-da.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-da\values-da.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-da</RemoteDir>
@@ -1941,7 +2379,7 @@
             <RemoteName>values-da.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-de\values-de.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-de\values-de.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-de</RemoteDir>
@@ -1953,7 +2391,7 @@
             <RemoteName>values-de.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-el\values-el.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-el\values-el.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-el</RemoteDir>
@@ -1965,7 +2403,7 @@
             <RemoteName>values-el.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-en-rAU\values-en-rAU.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-en-rAU\values-en-rAU.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rAU</RemoteDir>
@@ -1977,7 +2415,7 @@
             <RemoteName>values-en-rAU.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-en-rCA\values-en-rCA.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-en-rCA\values-en-rCA.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rCA</RemoteDir>
@@ -1989,7 +2427,7 @@
             <RemoteName>values-en-rCA.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-en-rGB\values-en-rGB.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-en-rGB\values-en-rGB.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rGB</RemoteDir>
@@ -2001,7 +2439,7 @@
             <RemoteName>values-en-rGB.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-en-rIN\values-en-rIN.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-en-rIN\values-en-rIN.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rIN</RemoteDir>
@@ -2013,7 +2451,7 @@
             <RemoteName>values-en-rIN.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-en-rXC\values-en-rXC.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-en-rXC\values-en-rXC.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rXC</RemoteDir>
@@ -2025,7 +2463,7 @@
             <RemoteName>values-en-rXC.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-es-rUS\values-es-rUS.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-es-rUS\values-es-rUS.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-es-rUS</RemoteDir>
@@ -2037,7 +2475,7 @@
             <RemoteName>values-es-rUS.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-es\values-es.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-es\values-es.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-es</RemoteDir>
@@ -2049,7 +2487,7 @@
             <RemoteName>values-es.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-et\values-et.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-et\values-et.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-et</RemoteDir>
@@ -2061,7 +2499,7 @@
             <RemoteName>values-et.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-eu\values-eu.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-eu\values-eu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-eu</RemoteDir>
@@ -2073,7 +2511,7 @@
             <RemoteName>values-eu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-fa\values-fa.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-fa\values-fa.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fa</RemoteDir>
@@ -2085,7 +2523,7 @@
             <RemoteName>values-fa.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-fi\values-fi.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-fi\values-fi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fi</RemoteDir>
@@ -2097,7 +2535,7 @@
             <RemoteName>values-fi.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-fr-rCA\values-fr-rCA.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-fr-rCA\values-fr-rCA.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fr-rCA</RemoteDir>
@@ -2109,7 +2547,7 @@
             <RemoteName>values-fr-rCA.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-fr\values-fr.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-fr\values-fr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fr</RemoteDir>
@@ -2121,7 +2559,7 @@
             <RemoteName>values-fr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-gl\values-gl.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-gl\values-gl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-gl</RemoteDir>
@@ -2133,7 +2571,7 @@
             <RemoteName>values-gl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-gu\values-gu.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-gu\values-gu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-gu</RemoteDir>
@@ -2145,7 +2583,7 @@
             <RemoteName>values-gu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-hi\values-hi.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-hi\values-hi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hi</RemoteDir>
@@ -2157,7 +2595,7 @@
             <RemoteName>values-hi.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-hr\values-hr.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-hr\values-hr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hr</RemoteDir>
@@ -2169,7 +2607,7 @@
             <RemoteName>values-hr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-hu\values-hu.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-hu\values-hu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hu</RemoteDir>
@@ -2181,7 +2619,7 @@
             <RemoteName>values-hu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-hy\values-hy.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-hy\values-hy.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hy</RemoteDir>
@@ -2193,7 +2631,7 @@
             <RemoteName>values-hy.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-in\values-in.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-in\values-in.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-in</RemoteDir>
@@ -2205,7 +2643,7 @@
             <RemoteName>values-in.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-is\values-is.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-is\values-is.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-is</RemoteDir>
@@ -2217,7 +2655,7 @@
             <RemoteName>values-is.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-it\values-it.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-it\values-it.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-it</RemoteDir>
@@ -2229,7 +2667,7 @@
             <RemoteName>values-it.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-iw\values-iw.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-iw\values-iw.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-iw</RemoteDir>
@@ -2241,7 +2679,7 @@
             <RemoteName>values-iw.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ja\values-ja.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ja\values-ja.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ja</RemoteDir>
@@ -2253,7 +2691,7 @@
             <RemoteName>values-ja.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ka\values-ka.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ka\values-ka.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ka</RemoteDir>
@@ -2265,7 +2703,7 @@
             <RemoteName>values-ka.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-kk\values-kk.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-kk\values-kk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-kk</RemoteDir>
@@ -2277,7 +2715,7 @@
             <RemoteName>values-kk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-km\values-km.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-km\values-km.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-km</RemoteDir>
@@ -2289,7 +2727,7 @@
             <RemoteName>values-km.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-kn\values-kn.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-kn\values-kn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-kn</RemoteDir>
@@ -2301,7 +2739,7 @@
             <RemoteName>values-kn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ko\values-ko.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ko\values-ko.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ko</RemoteDir>
@@ -2313,7 +2751,7 @@
             <RemoteName>values-ko.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ky\values-ky.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ky\values-ky.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ky</RemoteDir>
@@ -2325,7 +2763,7 @@
             <RemoteName>values-ky.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-lo\values-lo.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-lo\values-lo.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-lo</RemoteDir>
@@ -2337,7 +2775,7 @@
             <RemoteName>values-lo.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-lt\values-lt.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-lt\values-lt.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-lt</RemoteDir>
@@ -2349,7 +2787,7 @@
             <RemoteName>values-lt.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-lv\values-lv.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-lv\values-lv.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-lv</RemoteDir>
@@ -2361,7 +2799,7 @@
             <RemoteName>values-lv.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-mk\values-mk.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-mk\values-mk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-mk</RemoteDir>
@@ -2373,7 +2811,7 @@
             <RemoteName>values-mk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ml\values-ml.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ml\values-ml.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ml</RemoteDir>
@@ -2385,7 +2823,7 @@
             <RemoteName>values-ml.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-mn\values-mn.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-mn\values-mn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-mn</RemoteDir>
@@ -2397,7 +2835,7 @@
             <RemoteName>values-mn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-mr\values-mr.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-mr\values-mr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-mr</RemoteDir>
@@ -2409,7 +2847,7 @@
             <RemoteName>values-mr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ms\values-ms.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ms\values-ms.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ms</RemoteDir>
@@ -2421,7 +2859,7 @@
             <RemoteName>values-ms.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-my\values-my.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-my\values-my.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-my</RemoteDir>
@@ -2433,7 +2871,7 @@
             <RemoteName>values-my.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-nb\values-nb.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-nb\values-nb.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-nb</RemoteDir>
@@ -2445,7 +2883,7 @@
             <RemoteName>values-nb.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ne\values-ne.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ne\values-ne.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ne</RemoteDir>
@@ -2457,7 +2895,7 @@
             <RemoteName>values-ne.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-nl\values-nl.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-nl\values-nl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-nl</RemoteDir>
@@ -2469,7 +2907,7 @@
             <RemoteName>values-nl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-or\values-or.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-or\values-or.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-or</RemoteDir>
@@ -2481,7 +2919,7 @@
             <RemoteName>values-or.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-pa\values-pa.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-pa\values-pa.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pa</RemoteDir>
@@ -2493,7 +2931,7 @@
             <RemoteName>values-pa.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-pl\values-pl.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-pl\values-pl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pl</RemoteDir>
@@ -2505,7 +2943,7 @@
             <RemoteName>values-pl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-pt-rBR\values-pt-rBR.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-pt-rBR\values-pt-rBR.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pt-rBR</RemoteDir>
@@ -2517,7 +2955,7 @@
             <RemoteName>values-pt-rBR.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-pt-rPT\values-pt-rPT.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-pt-rPT\values-pt-rPT.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pt-rPT</RemoteDir>
@@ -2529,7 +2967,7 @@
             <RemoteName>values-pt-rPT.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-pt\values-pt.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-pt\values-pt.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pt</RemoteDir>
@@ -2541,7 +2979,7 @@
             <RemoteName>values-pt.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ro\values-ro.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ro\values-ro.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ro</RemoteDir>
@@ -2553,7 +2991,7 @@
             <RemoteName>values-ro.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ru\values-ru.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ru\values-ru.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ru</RemoteDir>
@@ -2565,7 +3003,7 @@
             <RemoteName>values-ru.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-si\values-si.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-si\values-si.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-si</RemoteDir>
@@ -2577,7 +3015,7 @@
             <RemoteName>values-si.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-sk\values-sk.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-sk\values-sk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sk</RemoteDir>
@@ -2589,7 +3027,7 @@
             <RemoteName>values-sk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-sl\values-sl.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-sl\values-sl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sl</RemoteDir>
@@ -2601,7 +3039,7 @@
             <RemoteName>values-sl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-sq\values-sq.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-sq\values-sq.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sq</RemoteDir>
@@ -2613,7 +3051,7 @@
             <RemoteName>values-sq.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-sr\values-sr.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-sr\values-sr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sr</RemoteDir>
@@ -2625,7 +3063,7 @@
             <RemoteName>values-sr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-sv\values-sv.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-sv\values-sv.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sv</RemoteDir>
@@ -2637,7 +3075,7 @@
             <RemoteName>values-sv.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-sw\values-sw.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-sw\values-sw.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sw</RemoteDir>
@@ -2649,7 +3087,7 @@
             <RemoteName>values-sw.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ta\values-ta.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ta\values-ta.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ta</RemoteDir>
@@ -2661,7 +3099,7 @@
             <RemoteName>values-ta.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-te\values-te.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-te\values-te.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-te</RemoteDir>
@@ -2673,7 +3111,7 @@
             <RemoteName>values-te.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-th\values-th.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-th\values-th.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-th</RemoteDir>
@@ -2685,7 +3123,7 @@
             <RemoteName>values-th.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-tl\values-tl.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-tl\values-tl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-tl</RemoteDir>
@@ -2697,7 +3135,7 @@
             <RemoteName>values-tl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-tr\values-tr.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-tr\values-tr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-tr</RemoteDir>
@@ -2709,7 +3147,7 @@
             <RemoteName>values-tr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-uk\values-uk.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-uk\values-uk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-uk</RemoteDir>
@@ -2721,7 +3159,7 @@
             <RemoteName>values-uk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-ur\values-ur.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-ur\values-ur.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ur</RemoteDir>
@@ -2733,7 +3171,7 @@
             <RemoteName>values-ur.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-uz\values-uz.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-uz\values-uz.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-uz</RemoteDir>
@@ -2745,7 +3183,7 @@
             <RemoteName>values-uz.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-v16\values-v16.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-v16\values-v16.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-v16</RemoteDir>
@@ -2757,7 +3195,7 @@
             <RemoteName>values-v16.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-v21\styles.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-v21\styles.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-v21</RemoteDir>
@@ -2769,7 +3207,7 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-v21\values-v21.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-v21\values-v21.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-v21</RemoteDir>
@@ -2781,7 +3219,7 @@
             <RemoteName>values-v21.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-vi\values-vi.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-vi\values-vi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-vi</RemoteDir>
@@ -2793,7 +3231,7 @@
             <RemoteName>values-vi.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-zh-rCN\values-zh-rCN.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-zh-rCN\values-zh-rCN.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zh-rCN</RemoteDir>
@@ -2805,7 +3243,7 @@
             <RemoteName>values-zh-rCN.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-zh-rHK\values-zh-rHK.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-zh-rHK\values-zh-rHK.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zh-rHK</RemoteDir>
@@ -2817,7 +3255,7 @@
             <RemoteName>values-zh-rHK.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-zh-rTW\values-zh-rTW.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-zh-rTW\values-zh-rTW.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zh-rTW</RemoteDir>
@@ -2829,7 +3267,7 @@
             <RemoteName>values-zh-rTW.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values-zu\values-zu.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-zu\values-zu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zu</RemoteDir>
@@ -2841,7 +3279,7 @@
             <RemoteName>values-zu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values\attrs.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values\attrs.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
@@ -2853,7 +3291,7 @@
             <RemoteName>attrs.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values\styles.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values\styles.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
@@ -2865,7 +3303,7 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Debug" LocalName="android\Merged\res\values\values.xml">
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values\values.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
@@ -2877,7 +3315,7 @@
             <RemoteName>values.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_low_normal.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_low_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -2889,7 +3327,7 @@
             <RemoteName>notification_bg_low_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_low_pressed.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_low_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -2901,7 +3339,7 @@
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_normal.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -2913,7 +3351,7 @@
             <RemoteName>notification_bg_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi-v4\notification_bg_normal_pressed.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_normal_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -2925,7 +3363,7 @@
             <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
@@ -2937,7 +3375,7 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi</RemoteDir>
@@ -2949,7 +3387,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi</RemoteDir>
@@ -2961,7 +3399,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi</RemoteDir>
@@ -2973,7 +3411,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_low_normal.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_low_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -2985,7 +3423,7 @@
             <RemoteName>notification_bg_low_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_low_pressed.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_low_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -2997,7 +3435,7 @@
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_normal.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -3009,7 +3447,7 @@
             <RemoteName>notification_bg_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi-v4\notification_bg_normal_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -3021,7 +3459,7 @@
             <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi-v4\notify_panel_notification_icon_bg.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi-v4\notify_panel_notification_icon_bg.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
@@ -3033,7 +3471,7 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
@@ -3045,7 +3483,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
@@ -3057,7 +3495,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi</RemoteDir>
@@ -3069,7 +3507,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-v21\notification_action_background.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-v21\notification_action_background.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-v21</RemoteDir>
@@ -3081,7 +3519,7 @@
             <RemoteName>notification_action_background.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_low_normal.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_low_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -3093,7 +3531,7 @@
             <RemoteName>notification_bg_low_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_low_pressed.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_low_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -3105,7 +3543,7 @@
             <RemoteName>notification_bg_low_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_normal.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_normal.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -3117,7 +3555,7 @@
             <RemoteName>notification_bg_normal.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi-v4\notification_bg_normal_pressed.9.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi-v4\notification_bg_normal_pressed.9.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -3129,7 +3567,7 @@
             <RemoteName>notification_bg_normal_pressed.9.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi-v4\notify_panel_notification_icon_bg.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi-v4\notify_panel_notification_icon_bg.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi-v4</RemoteDir>
@@ -3141,7 +3579,7 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
@@ -3153,7 +3591,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
@@ -3165,7 +3603,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
@@ -3177,7 +3615,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
@@ -3189,7 +3627,7 @@
             <RemoteName>text_select_handle_left_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_middle_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
@@ -3201,7 +3639,7 @@
             <RemoteName>text_select_handle_middle_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_right_mtrl_alpha.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xxhdpi</RemoteDir>
@@ -3213,7 +3651,7 @@
             <RemoteName>text_select_handle_right_mtrl_alpha.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable\notification_bg.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable\notification_bg.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -3225,7 +3663,7 @@
             <RemoteName>notification_bg.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable\notification_bg_low.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable\notification_bg_low.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -3237,7 +3675,7 @@
             <RemoteName>notification_bg_low.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable\notification_icon_background.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable\notification_icon_background.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -3249,7 +3687,7 @@
             <RemoteName>notification_icon_background.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\drawable\notification_tile_bg.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable\notification_tile_bg.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable</RemoteDir>
@@ -3261,7 +3699,7 @@
             <RemoteName>notification_tile_bg.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout-v16\notification_template_custom_big.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout-v16\notification_template_custom_big.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v16</RemoteDir>
@@ -3273,7 +3711,7 @@
             <RemoteName>notification_template_custom_big.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout-v21\notification_action.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout-v21\notification_action.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -3285,7 +3723,7 @@
             <RemoteName>notification_action.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout-v21\notification_action_tombstone.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout-v21\notification_action_tombstone.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -3297,7 +3735,7 @@
             <RemoteName>notification_action_tombstone.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout-v21\notification_template_custom_big.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout-v21\notification_template_custom_big.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -3309,7 +3747,7 @@
             <RemoteName>notification_template_custom_big.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout-v21\notification_template_icon_group.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout-v21\notification_template_icon_group.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout-v21</RemoteDir>
@@ -3321,7 +3759,7 @@
             <RemoteName>notification_template_icon_group.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\custom_dialog.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\custom_dialog.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3333,7 +3771,7 @@
             <RemoteName>custom_dialog.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\notification_action.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\notification_action.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3345,7 +3783,7 @@
             <RemoteName>notification_action.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\notification_action_tombstone.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\notification_action_tombstone.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3357,7 +3795,7 @@
             <RemoteName>notification_action_tombstone.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\notification_template_custom_big.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\notification_template_custom_big.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3369,7 +3807,7 @@
             <RemoteName>notification_template_custom_big.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\notification_template_icon_group.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\notification_template_icon_group.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3381,7 +3819,7 @@
             <RemoteName>notification_template_icon_group.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\notification_template_part_chronometer.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\notification_template_part_chronometer.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3393,7 +3831,7 @@
             <RemoteName>notification_template_part_chronometer.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\layout\notification_template_part_time.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\layout\notification_template_part_time.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\layout</RemoteDir>
@@ -3405,31 +3843,7 @@
             <RemoteName>notification_template_part_time.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\menu\example_menu.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\menu\example_menu2.xml">
-          <Platform Name="Android">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu2.xml</RemoteName>
-          </Platform>
-          <Platform Name="Android64">
-            <Overwrite>true</Overwrite>
-            <RemoteDir>res\menu</RemoteDir>
-            <RemoteName>example_menu2.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-hdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-hdpi</RemoteDir>
@@ -3441,7 +3855,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-mdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-mdpi</RemoteDir>
@@ -3453,7 +3867,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-xhdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-xhdpi</RemoteDir>
@@ -3465,7 +3879,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
@@ -3477,7 +3891,7 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-af\values-af.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-af\values-af.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-af</RemoteDir>
@@ -3489,7 +3903,7 @@
             <RemoteName>values-af.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-am\values-am.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-am\values-am.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-am</RemoteDir>
@@ -3501,7 +3915,7 @@
             <RemoteName>values-am.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ar\values-ar.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ar\values-ar.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ar</RemoteDir>
@@ -3513,7 +3927,7 @@
             <RemoteName>values-ar.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-as\values-as.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-as\values-as.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-as</RemoteDir>
@@ -3525,7 +3939,7 @@
             <RemoteName>values-as.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-az\values-az.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-az\values-az.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-az</RemoteDir>
@@ -3537,7 +3951,7 @@
             <RemoteName>values-az.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-b+sr+Latn\values-b+sr+Latn.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-b+sr+Latn\values-b+sr+Latn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-b+sr+Latn</RemoteDir>
@@ -3549,7 +3963,7 @@
             <RemoteName>values-b+sr+Latn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-be\values-be.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-be\values-be.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-be</RemoteDir>
@@ -3561,7 +3975,7 @@
             <RemoteName>values-be.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-bg\values-bg.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-bg\values-bg.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-bg</RemoteDir>
@@ -3573,7 +3987,7 @@
             <RemoteName>values-bg.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-bn\values-bn.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-bn\values-bn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-bn</RemoteDir>
@@ -3585,7 +3999,7 @@
             <RemoteName>values-bn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-bs\values-bs.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-bs\values-bs.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-bs</RemoteDir>
@@ -3597,7 +4011,7 @@
             <RemoteName>values-bs.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ca\values-ca.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ca\values-ca.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ca</RemoteDir>
@@ -3609,7 +4023,7 @@
             <RemoteName>values-ca.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-cs\values-cs.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-cs\values-cs.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-cs</RemoteDir>
@@ -3621,7 +4035,7 @@
             <RemoteName>values-cs.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-da\values-da.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-da\values-da.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-da</RemoteDir>
@@ -3633,7 +4047,7 @@
             <RemoteName>values-da.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-de\values-de.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-de\values-de.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-de</RemoteDir>
@@ -3645,7 +4059,7 @@
             <RemoteName>values-de.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-el\values-el.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-el\values-el.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-el</RemoteDir>
@@ -3657,7 +4071,7 @@
             <RemoteName>values-el.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-en-rAU\values-en-rAU.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-en-rAU\values-en-rAU.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rAU</RemoteDir>
@@ -3669,7 +4083,7 @@
             <RemoteName>values-en-rAU.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-en-rCA\values-en-rCA.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-en-rCA\values-en-rCA.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rCA</RemoteDir>
@@ -3681,7 +4095,7 @@
             <RemoteName>values-en-rCA.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-en-rGB\values-en-rGB.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-en-rGB\values-en-rGB.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rGB</RemoteDir>
@@ -3693,7 +4107,7 @@
             <RemoteName>values-en-rGB.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-en-rIN\values-en-rIN.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-en-rIN\values-en-rIN.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rIN</RemoteDir>
@@ -3705,7 +4119,7 @@
             <RemoteName>values-en-rIN.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-en-rXC\values-en-rXC.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-en-rXC\values-en-rXC.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-en-rXC</RemoteDir>
@@ -3717,7 +4131,7 @@
             <RemoteName>values-en-rXC.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-es-rUS\values-es-rUS.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-es-rUS\values-es-rUS.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-es-rUS</RemoteDir>
@@ -3729,7 +4143,7 @@
             <RemoteName>values-es-rUS.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-es\values-es.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-es\values-es.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-es</RemoteDir>
@@ -3741,7 +4155,7 @@
             <RemoteName>values-es.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-et\values-et.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-et\values-et.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-et</RemoteDir>
@@ -3753,7 +4167,7 @@
             <RemoteName>values-et.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-eu\values-eu.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-eu\values-eu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-eu</RemoteDir>
@@ -3765,7 +4179,7 @@
             <RemoteName>values-eu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-fa\values-fa.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-fa\values-fa.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fa</RemoteDir>
@@ -3777,7 +4191,7 @@
             <RemoteName>values-fa.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-fi\values-fi.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-fi\values-fi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fi</RemoteDir>
@@ -3789,7 +4203,7 @@
             <RemoteName>values-fi.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-fr-rCA\values-fr-rCA.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-fr-rCA\values-fr-rCA.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fr-rCA</RemoteDir>
@@ -3801,7 +4215,7 @@
             <RemoteName>values-fr-rCA.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-fr\values-fr.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-fr\values-fr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-fr</RemoteDir>
@@ -3813,7 +4227,7 @@
             <RemoteName>values-fr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-gl\values-gl.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-gl\values-gl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-gl</RemoteDir>
@@ -3825,7 +4239,7 @@
             <RemoteName>values-gl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-gu\values-gu.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-gu\values-gu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-gu</RemoteDir>
@@ -3837,7 +4251,7 @@
             <RemoteName>values-gu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-hi\values-hi.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-hi\values-hi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hi</RemoteDir>
@@ -3849,7 +4263,7 @@
             <RemoteName>values-hi.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-hr\values-hr.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-hr\values-hr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hr</RemoteDir>
@@ -3861,7 +4275,7 @@
             <RemoteName>values-hr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-hu\values-hu.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-hu\values-hu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hu</RemoteDir>
@@ -3873,7 +4287,7 @@
             <RemoteName>values-hu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-hy\values-hy.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-hy\values-hy.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-hy</RemoteDir>
@@ -3885,7 +4299,7 @@
             <RemoteName>values-hy.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-in\values-in.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-in\values-in.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-in</RemoteDir>
@@ -3897,7 +4311,7 @@
             <RemoteName>values-in.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-is\values-is.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-is\values-is.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-is</RemoteDir>
@@ -3909,7 +4323,7 @@
             <RemoteName>values-is.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-it\values-it.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-it\values-it.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-it</RemoteDir>
@@ -3921,7 +4335,7 @@
             <RemoteName>values-it.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-iw\values-iw.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-iw\values-iw.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-iw</RemoteDir>
@@ -3933,7 +4347,7 @@
             <RemoteName>values-iw.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ja\values-ja.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ja\values-ja.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ja</RemoteDir>
@@ -3945,7 +4359,7 @@
             <RemoteName>values-ja.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ka\values-ka.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ka\values-ka.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ka</RemoteDir>
@@ -3957,7 +4371,7 @@
             <RemoteName>values-ka.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-kk\values-kk.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-kk\values-kk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-kk</RemoteDir>
@@ -3969,7 +4383,7 @@
             <RemoteName>values-kk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-km\values-km.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-km\values-km.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-km</RemoteDir>
@@ -3981,7 +4395,7 @@
             <RemoteName>values-km.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-kn\values-kn.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-kn\values-kn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-kn</RemoteDir>
@@ -3993,7 +4407,7 @@
             <RemoteName>values-kn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ko\values-ko.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ko\values-ko.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ko</RemoteDir>
@@ -4005,7 +4419,7 @@
             <RemoteName>values-ko.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ky\values-ky.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ky\values-ky.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ky</RemoteDir>
@@ -4017,7 +4431,7 @@
             <RemoteName>values-ky.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-lo\values-lo.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-lo\values-lo.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-lo</RemoteDir>
@@ -4029,7 +4443,7 @@
             <RemoteName>values-lo.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-lt\values-lt.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-lt\values-lt.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-lt</RemoteDir>
@@ -4041,7 +4455,7 @@
             <RemoteName>values-lt.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-lv\values-lv.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-lv\values-lv.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-lv</RemoteDir>
@@ -4053,7 +4467,7 @@
             <RemoteName>values-lv.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-mk\values-mk.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-mk\values-mk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-mk</RemoteDir>
@@ -4065,7 +4479,7 @@
             <RemoteName>values-mk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ml\values-ml.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ml\values-ml.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ml</RemoteDir>
@@ -4077,7 +4491,7 @@
             <RemoteName>values-ml.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-mn\values-mn.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-mn\values-mn.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-mn</RemoteDir>
@@ -4089,7 +4503,7 @@
             <RemoteName>values-mn.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-mr\values-mr.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-mr\values-mr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-mr</RemoteDir>
@@ -4101,7 +4515,7 @@
             <RemoteName>values-mr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ms\values-ms.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ms\values-ms.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ms</RemoteDir>
@@ -4113,7 +4527,7 @@
             <RemoteName>values-ms.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-my\values-my.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-my\values-my.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-my</RemoteDir>
@@ -4125,7 +4539,7 @@
             <RemoteName>values-my.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-nb\values-nb.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-nb\values-nb.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-nb</RemoteDir>
@@ -4137,7 +4551,7 @@
             <RemoteName>values-nb.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ne\values-ne.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ne\values-ne.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ne</RemoteDir>
@@ -4149,7 +4563,7 @@
             <RemoteName>values-ne.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-nl\values-nl.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-nl\values-nl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-nl</RemoteDir>
@@ -4161,7 +4575,7 @@
             <RemoteName>values-nl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-or\values-or.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-or\values-or.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-or</RemoteDir>
@@ -4173,7 +4587,7 @@
             <RemoteName>values-or.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-pa\values-pa.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-pa\values-pa.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pa</RemoteDir>
@@ -4185,7 +4599,7 @@
             <RemoteName>values-pa.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-pl\values-pl.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-pl\values-pl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pl</RemoteDir>
@@ -4197,7 +4611,7 @@
             <RemoteName>values-pl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-pt-rBR\values-pt-rBR.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-pt-rBR\values-pt-rBR.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pt-rBR</RemoteDir>
@@ -4209,7 +4623,7 @@
             <RemoteName>values-pt-rBR.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-pt-rPT\values-pt-rPT.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-pt-rPT\values-pt-rPT.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pt-rPT</RemoteDir>
@@ -4221,7 +4635,7 @@
             <RemoteName>values-pt-rPT.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-pt\values-pt.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-pt\values-pt.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-pt</RemoteDir>
@@ -4233,7 +4647,7 @@
             <RemoteName>values-pt.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ro\values-ro.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ro\values-ro.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ro</RemoteDir>
@@ -4245,7 +4659,7 @@
             <RemoteName>values-ro.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ru\values-ru.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ru\values-ru.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ru</RemoteDir>
@@ -4257,7 +4671,7 @@
             <RemoteName>values-ru.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-si\values-si.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-si\values-si.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-si</RemoteDir>
@@ -4269,7 +4683,7 @@
             <RemoteName>values-si.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-sk\values-sk.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-sk\values-sk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sk</RemoteDir>
@@ -4281,7 +4695,7 @@
             <RemoteName>values-sk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-sl\values-sl.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-sl\values-sl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sl</RemoteDir>
@@ -4293,7 +4707,7 @@
             <RemoteName>values-sl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-sq\values-sq.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-sq\values-sq.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sq</RemoteDir>
@@ -4305,7 +4719,7 @@
             <RemoteName>values-sq.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-sr\values-sr.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-sr\values-sr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sr</RemoteDir>
@@ -4317,7 +4731,7 @@
             <RemoteName>values-sr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-sv\values-sv.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-sv\values-sv.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sv</RemoteDir>
@@ -4329,7 +4743,7 @@
             <RemoteName>values-sv.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-sw\values-sw.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-sw\values-sw.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-sw</RemoteDir>
@@ -4341,7 +4755,7 @@
             <RemoteName>values-sw.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ta\values-ta.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ta\values-ta.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ta</RemoteDir>
@@ -4353,7 +4767,7 @@
             <RemoteName>values-ta.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-te\values-te.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-te\values-te.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-te</RemoteDir>
@@ -4365,7 +4779,7 @@
             <RemoteName>values-te.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-th\values-th.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-th\values-th.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-th</RemoteDir>
@@ -4377,7 +4791,7 @@
             <RemoteName>values-th.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-tl\values-tl.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-tl\values-tl.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-tl</RemoteDir>
@@ -4389,7 +4803,7 @@
             <RemoteName>values-tl.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-tr\values-tr.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-tr\values-tr.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-tr</RemoteDir>
@@ -4401,7 +4815,7 @@
             <RemoteName>values-tr.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-uk\values-uk.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-uk\values-uk.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-uk</RemoteDir>
@@ -4413,7 +4827,7 @@
             <RemoteName>values-uk.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-ur\values-ur.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-ur\values-ur.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-ur</RemoteDir>
@@ -4425,7 +4839,7 @@
             <RemoteName>values-ur.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-uz\values-uz.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-uz\values-uz.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-uz</RemoteDir>
@@ -4437,7 +4851,7 @@
             <RemoteName>values-uz.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-v16\values-v16.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-v16\values-v16.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-v16</RemoteDir>
@@ -4449,7 +4863,7 @@
             <RemoteName>values-v16.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-v21\styles.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-v21\styles.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-v21</RemoteDir>
@@ -4461,7 +4875,7 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-v21\values-v21.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-v21\values-v21.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-v21</RemoteDir>
@@ -4473,7 +4887,7 @@
             <RemoteName>values-v21.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-vi\values-vi.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-vi\values-vi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-vi</RemoteDir>
@@ -4485,7 +4899,7 @@
             <RemoteName>values-vi.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-zh-rCN\values-zh-rCN.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-zh-rCN\values-zh-rCN.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zh-rCN</RemoteDir>
@@ -4497,7 +4911,7 @@
             <RemoteName>values-zh-rCN.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-zh-rHK\values-zh-rHK.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-zh-rHK\values-zh-rHK.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zh-rHK</RemoteDir>
@@ -4509,7 +4923,7 @@
             <RemoteName>values-zh-rHK.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-zh-rTW\values-zh-rTW.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-zh-rTW\values-zh-rTW.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zh-rTW</RemoteDir>
@@ -4521,7 +4935,7 @@
             <RemoteName>values-zh-rTW.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values-zu\values-zu.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-zu\values-zu.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values-zu</RemoteDir>
@@ -4533,7 +4947,7 @@
             <RemoteName>values-zu.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values\attrs.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values\attrs.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
@@ -4545,7 +4959,7 @@
             <RemoteName>attrs.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values\styles.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values\styles.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
@@ -4557,7 +4971,7 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="File" Configuration="Release" LocalName="android\Merged\res\values\values.xml">
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values\values.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>

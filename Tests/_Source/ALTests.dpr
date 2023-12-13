@@ -93,9 +93,9 @@ uses
   {$IFNDEF IOSSIMULATOR}
   //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
   //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if a new version of VKontakte/WebRTC are available with a support for IOSSIMULATOR and adjust the IFDEF'}
-  {$IFEND}
+  {$ENDIF}
   Alcinoe.iOSApi.VKontakte,
   Alcinoe.iOSApi.WebRTC,
   {$ENDIF}
@@ -103,9 +103,9 @@ uses
   {$IFNDEF IOSSIMULATOR}
   //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
   //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if a new version of VKontakte/WebRTC are available with a support for IOSSIMULATOR and adjust the IFDEF'}
-  {$IFEND}
+  {$ENDIF}
   Alcinoe.FMX.VKontakte,
   Alcinoe.FMX.WebRTC,
   {$ENDIF}

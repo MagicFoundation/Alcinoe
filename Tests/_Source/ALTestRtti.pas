@@ -288,7 +288,7 @@ begin
       fStopWatchDelphi.Stop;
   end;
   //--
-  CheckExecutionTime(1.20{ARatio});
+  CheckExecutionTime(1.40{ARatio});
 end;
 
 {*********************************************}

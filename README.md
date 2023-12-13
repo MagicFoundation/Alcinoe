@@ -4,7 +4,7 @@ Alcinoe
 Alcinoe is a library of visual and non-visual components for 
 Delphi. These components can be used in commercial, shareware, 
 freeware, and open-source projects at no cost. Alcinoe is 
-compatible with Delphi Alexandria 11.3 (Patch #1). If you find 
+compatible with Delphi Athens 12.0. If you find 
 this project useful, please consider giving it a 'star' on 
 GitHub. It doesn't cost anything, but it helps to promote 
 the code.
@@ -30,17 +30,18 @@ us to patch the original Delphi source files:
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
 * [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
 * [for android compilation, need to use aapt2 instead of aapt](https://quality.embarcadero.com/browse/RSP-27606)
-* [Root Class Not Found' Error in Delphi IDE When Opening a Class Inherited via an Include Directive](https://quality.embarcadero.com/browse/RSP-42021)
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
-* [BeginUpdate/Endupdate block with add or remove of child objects : misconception](https://quality.embarcadero.com/browse/RSP-21013)
 * [The width and height of a TContext3D object must be defined as single-precision, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
 * [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)
 * [Regression in Alexandria: FMX.StrokeBuilder.pas Revamp Leads to TARC Drawing Issues](https://quality.embarcadero.com/browse/RSP-41618)
+* [Multi-Threading for TBitmap, TCanvas, and TContext3D is not working !](https://quality.embarcadero.com/browse/RSP-19673)
+* [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
 * [GL_TEXTURE_EXTERNAL_OES not supported](https://quality.embarcadero.com/browse/RSP-16830)
 * [Make CanvasHelper of TCanvasGpu public](https://quality.embarcadero.com/browse/RSP-18797)
 * [Make that TTexture can define a material (GLSL shader) to use](https://quality.embarcadero.com/browse/RSP-23501)
+* [dorealign implemented badly](https://quality.embarcadero.com/browse/RSP-15768)
 * [On iOS we need to pass options: PNSDictionary with the message TApplicationEvent.FinishedLaunching](https://quality.embarcadero.com/browse/RSP-40351)
 * [AVPlayerItem miss the function addOutput](https://quality.embarcadero.com/browse/RSP-16853)
 * [CLVisit is missing from the implementation of CLLocationManager](https://quality.embarcadero.com/browse/RSP-18621)
@@ -49,17 +50,13 @@ us to patch the original Delphi source files:
 * [Effect ProcessTexture is not working and function TFilter.InputTexture: TTexture do unecessary work](https://quality.embarcadero.com/browse/RSP-20825)
 * [TVirtualKeyboardAndroid.GetVirtualKeyboardState not accurate](https://quality.embarcadero.com/browse/RSP-24737)
 * [Add NSPersonNameComponents in iOSapi.Foundation.pas](https://quality.embarcadero.com/browse/RSP-28096)
-* [FilterServerSupportFunctionProc WinApi badly converted in Delphi](https://quality.embarcadero.com/browse/RSP-33754)
 * [Comparison of 2 interfaces result in bad behavior in TCommonCustomForm.SetHovered and similar](https://quality.embarcadero.com/browse/RSP-36612)
 * [In android, TFormRender must use JChoreographer_FrameCallback not JRunnable](https://quality.embarcadero.com/browse/RSP-38660)
 * [Need JNotificationClass.AUDIO_ATTRIBUTES_DEFAULT and JNotificationChannel.setSound](https://quality.embarcadero.com/browse/RSP-39511)
-* [Declaration of JLocationListener miss somes methods](https://quality.embarcadero.com/browse/RSP-41343)
-* [Miss CLLocationManager.accuracyAuthorization in iOSapi.CoreLocation.pas](https://quality.embarcadero.com/browse/RSP-41352)
-* [Miss constant kCLLocationAccuracyReduced in iOSapi.CoreLocation.pas](https://quality.embarcadero.com/browse/RSP-41388)
 * [iOS/OSX: Declaration for CLRegion.initCircularRegionWithCenter is incorrect](https://quality.embarcadero.com/browse/RSP-15717)
-* [Missing function declaration for maximumFramesPerSecond in iOSapi.UIKit.UIScreen](https://quality.embarcadero.com/browse/RSP-42455)
-
+* [Missing Declaration of maximumFramesPerSecond Function in UIScreen Interface](https://quality.embarcadero.com/browse/RSP-43458)
     
+
 Install Alcinoe
 ---------------
 

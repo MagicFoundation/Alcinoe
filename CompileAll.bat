@@ -13,8 +13,8 @@ echo Compiler
 echo --------
 echo.
 
-echo 1) Alexandria
-echo 2) Sydney (deprecated)
+echo 1) Athens
+echo 2) Alexandria (deprecated)
 
 set COMPILER=
 set /P COMPILER=Enter number to select a compiler (Empty to auto select): %=%
@@ -25,11 +25,11 @@ if "%COMPILER%"=="" (
   goto INIT_ENVIRONMENT
 )
 if "%COMPILER%"=="1" (
-  set ALDelphiVersion=22.0
+  set ALDelphiVersion=23.0
   goto INIT_ENVIRONMENT
 )
 if "%COMPILER%"=="2" (
-  set ALDelphiVersion=21.0
+  set ALDelphiVersion=22.0
   goto INIT_ENVIRONMENT
 )
 echo.

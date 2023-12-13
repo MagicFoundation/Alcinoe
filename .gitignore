@@ -52,5 +52,6 @@ Dcu
 /Tests/OSX64/Release
 /Tests/OSXARM64/Release
 /Tools/AndroidMerger/tmp
+/Tools/AndroidLibScanner/Output
 /Tools/NativeBridgeFileGenerator/OutputAndroid
 /Tools/NativeBridgeFileGenerator/OutputIOS

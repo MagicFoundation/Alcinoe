@@ -26,6 +26,7 @@ mkdir "%FileName%"
 mkdir "%FileName%\ios"
 mkdir "%FileName%\osx"
 mkdir "%FileName%\android"
+mkdir "%FileName%\net"
 
 echo Copy "%EmbSourceDir%\fmx"
 xcopy /Q "%EmbSourceDir%\fmx" "%ALBaseDir%\Embarcadero\Athens\fmx"
@@ -49,6 +50,10 @@ IF EXIST "%EmbSourceDir%\rtl\android" (
   IF ERRORLEVEL 1 goto ERROR
 )
 
+echo Copy "%EmbSourceDir%\rtl\net"
+xcopy /Q "%EmbSourceDir%\rtl\net" "%ALBaseDir%\Embarcadero\Athens\rtl\net"
+IF ERRORLEVEL 1 goto ERROR
+
 echo Patch the locally copied source code
 git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace .\Embarcadero\Athens\Athens.patch -v
 
@@ -67,9 +72,9 @@ IF EXIST "%TmpFileName%" del "%TmpFileName%"
 IF EXIST "%TmpFileName%" goto ERROR
 certutil -dump "%~1" | findstr /C:"ef bb bf" > nul
 if %errorlevel% equ 0 (
-  echo ﻿{$HINTS OFF}{>"%TmpFileName%"
+  echo ﻿{$HINTS OFF}{$WARNINGS OFF}{>"%TmpFileName%"
 ) else (
-  echo {$HINTS OFF}>"%TmpFileName%"
+  echo {$HINTS OFF}{$WARNINGS OFF}>"%TmpFileName%"
 )
 type "%~1">>"%TmpFileName%"
 del "%~1"

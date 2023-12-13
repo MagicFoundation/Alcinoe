@@ -4,6 +4,8 @@ program DeployProjNormalizer;
 
 {$R *.res}
 
+{$I ..\..\..\Source\Alcinoe.inc}
+
 uses
   System.AnsiStrings,
   System.SysUtils,
@@ -15,6 +17,96 @@ uses
   Alcinoe.StringList,
   Alcinoe.Files,
   Alcinoe.StringUtils;
+
+//
+// This process will create from the dproj a new deployproj file from scratch,
+// orders all nodes and performs the following actions:
+//
+// * Add all <DeployFile> nodes found in the dproj
+//
+// * Add all <RcItem> nodes found in the dproj
+//
+// * Add all files which may not necessarily be present in
+//   <DeployFile> or <RcItem>:
+//   * Add iOS resource files:
+//       iOS_AppStore1024
+//       iPhone_AppIcon120
+//       iPhone_AppIcon180
+//       iPad_AppIcon152
+//       iPad_AppIcon167
+//       iPhone_Spotlight80
+//       iPhone_Spotlight120
+//       iPad_SpotLight80
+//       iPhone_Setting58
+//       iPhone_Setting87
+//       iPad_Setting58
+//       iPhone_Notification40
+//       iPhone_Notification60
+//       iPad_Notification40
+//       iPhone_Launch2x
+//       iPhone_LaunchDark2x
+//       iPhone_Launch3x
+//       iPhone_LaunchDark3x
+//       iPad_Launch2x
+//       iPad_LaunchDark2x
+//   * Do NOT add Android resource files. Thoses files must
+//     be added via the AndroidMerger tool:
+//       Android_Strings
+//       Android_Colors
+//       Android_ColorsDark
+//       AndroidSplashImageDef
+//       AndroidSplashImageDefV21
+//       AndroidSplashStyles
+//       AndroidSplashStylesV21
+//       AndroidSplashStylesV31
+//       Android_AdaptiveIcon
+//       Android_AdaptiveIconV33
+//       Android_VectorizedNotificationIcon
+//       Android_AdaptiveIconMonochrome
+//       Android_AdaptiveIconForeground
+//       Android_AdaptiveIconBackground
+//       Android_VectorizedSplash
+//       Android_VectorizedSplashDark
+//       Android_VectorizedSplashV31
+//       Android_VectorizedSplashV31Dark
+//       Android_LauncherIcon36
+//       Android_LauncherIcon48
+//       Android_LauncherIcon72
+//       Android_LauncherIcon96
+//       Android_LauncherIcon144
+//       Android_LauncherIcon192
+//       Android_SplashImage426
+//       Android_SplashImage470
+//       Android_SplashImage640
+//       Android_SplashImage960
+//       Android_NotificationIcon24
+//       Android_NotificationIcon36
+//       Android_NotificationIcon48
+//       Android_NotificationIcon72
+//       Android_NotificationIcon96
+//   * do NOT add the AndroidGDBServer (Android debugger for debugging 32bit Android applications)
+//   * Do NOT add the AndroidLibnativeMipsFile (to show the message "Application does not support this device" at startup)
+//   * Do NOT add the AndroidLibnativeArmeabiFile/AndroidLibnativeArmeabiv7aFile (to show the message "Application does not support this device" at startup)
+//   * Add the ProjectOutput/ProjectOutput_Android32 (The main binary)
+//   * Add the Skia (Skia Binary)
+//   * Add the ProjectAndroidManifest (The Android manifest file)
+//   * Add the AndroidClasses (This file contains the Java libraries that the application uses)
+//   * Add the AndroidClassesDexFile (This file contains the Java libraries that the application uses)
+//   * Add the ProjectOSXDebug (Debugging Information)
+//   * Add the ProjectOSXEntitlements (Key-value pairs that grant an executable permission to use a service or technology)
+//   * Add the ProjectOSXInfoPList (Info.plist file to store configuration data)
+//   * Add the ProjectOSXResource (Icns_MainIcns)
+//   * Add the ProjectiOSDeviceDebug (Debugging Information)
+//   * Add the ProjectiOSEntitlements (Key-value pairs that grant an executable permission to use a service or technology)
+//   * Add the ProjectiOSInfoPList (Info.plist file to store configuration data)
+//   * Add the ProjectiOSLaunchScreen (launch screen)
+//   * Do NOT add any Win32 files
+//   * Do NOT add any Win64 files
+//
+
+{$IFNDEF ALCompilerVersionSupported120}
+  {$MESSAGE WARN 'Check if the structure of the *.deployproj didn''t changed by following the instructions in References\BlankApplication\README.md'}
+{$IFEND}
 
 {***********************************************************}
 Procedure _SortAttributesByNodeName(const aNode: TalXmlNode);
@@ -129,7 +221,8 @@ end;
 Procedure _addDeployFile(
             const aAlreadyDeployedFiles: TALStringListA;
             const aItemGroupNode: TalXmlNode;
-            const aCondition: AnsiString; // ConfigName
+            const aConfigName: AnsiString;
+            const aCondition: AnsiString;
             const aInclude: AnsiString;
             const aDeployClass: AnsiString;
             const aLocalCommand: AnsiString;
@@ -144,7 +237,7 @@ Begin
   var LPlatFormName := aItemGroupNode.Attributes['Condition']; // '$(Platform)'=='Android'
   //-----
   if (aInclude <> '') then begin
-    Var LKey := LPlatFormName+'#'+aCondition+'#'+aInclude; // '$(Platform)'=='Android'#Debug#..\..\Android64\Debug\splash_image_def.xml
+    Var LKey := LPlatFormName+'#'+aConfigName+'#'+aCondition+'#'+aInclude; // '$(Platform)'=='Android'#Debug#'$(SKIADIR)'!=''#..\..\Android64\Debug\splash_image_def.xml
     if aAlreadyDeployedFiles.IndexOf(LKey) >= 0 then exit;
     if not aEnabled then aAlreadyDeployedFiles.Add(LKey);
   end;
@@ -156,7 +249,7 @@ Begin
     Var LRemoteName := aRemoteName;
     while (LRemoteName <> '') and (LRemoteName[low(LRemoteName)] = '\') do delete(LRemoteName,low(LRemoteName),1);
     while (LRemoteName <> '') and (LRemoteName[high(LRemoteName)] = '\') do delete(LRemoteName,high(LRemoteName),1);
-    Var LKey := LPlatFormName+'#'+aCondition+aDeployClass+'#'+LRemoteDir+'#'+LRemoteName; // '$(Platform)'=='Android'#Debug#File#res\drawable-mdpi-v4#abc_scrubber_control_off_mtrl_alpha.png
+    Var LKey := LPlatFormName+'#'+aConfigName+'#'+aCondition+'#'+aDeployClass+'#'+LRemoteDir+'#'+LRemoteName; // '$(Platform)'=='Android'#Debug#'$(SKIADIR)'!=''#File#res\drawable-mdpi-v4#abc_scrubber_control_off_mtrl_alpha.png
     if aAlreadyDeployedFiles.IndexOf(LKey) >= 0 then exit;
     aAlreadyDeployedFiles.Add(LKey);
   end;
@@ -164,7 +257,9 @@ Begin
   if not aEnabled then exit;
   //-----
   Var LDeployFileNode := aItemGroupNode.AddChild('DeployFile');
-  if aCondition <> '' then LDeployFileNode.Attributes['Condition'] := '''$(Config)''=='''+aCondition+'''';
+  if (aConfigName <> '') and (aCondition <> '') then LDeployFileNode.Attributes['Condition'] := '''$(Config)''=='''+aConfigName+''' And ' + aCondition
+  else if (aConfigName <> '') then LDeployFileNode.Attributes['Condition'] := '''$(Config)''=='''+aConfigName+''''
+  else if (aCondition <> '') then LDeployFileNode.Attributes['Condition'] := aCondition;
   if aInclude <> '' then LDeployFileNode.Attributes['Include'] := aInclude;
   with LDeployFileNode.AddChild('DeployClass') do
     if aDeployClass <> '' then Text := aDeployClass;
@@ -184,6 +279,7 @@ Begin
     if aRemoteDir <> '' then text := aRemoteDir;
   with LDeployFileNode.AddChild('RemoteName') do
     if aRemoteName <> '' then text := aRemoteName;
+  If (aRequired = '') and (ALSameTextA(aDeployClass, 'ProjectOutput')) then aRequired := 'True';
   if aRequired <> '' then begin
     aRequired := ALLowercase(aRequired);
     aRequired[low(aRequired)] := ALUpcase(aRequired[low(aRequired)]);
@@ -223,7 +319,8 @@ Begin
     _addDeployFile(
       aAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
       aItemGroupNode, // const aItemGroupNode: TalXmlNode;
-      aConfigName, // const aCondition: AnsiString;
+      aConfigName, // const aConfigName: AnsiString;
+      '', // const aCondition: AnsiString;
       LInclude, // const aInclude: AnsiString;
       aDeployClass, // const aDeployClass: AnsiString;
       aLocalCommand, // const aLocalCommand: AnsiString;
@@ -312,9 +409,9 @@ begin
       var LDeploymentNode := LBorlandProjectNode.ChildNodes.FindNode('Deployment');
       if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
-      //check version attribute <Deployment Version="3">
-      //if LDeploymentNode.Attributes['Version'] <> '3' then
-      //  raise Exception.Create('ProjectExtensions.BorlandProject.Deployment.Version is not in the expected value (3)');
+      //check version attribute <Deployment Version="4">
+      //if LDeploymentNode.Attributes['Version'] <> '4' then
+      //  raise Exception.Create('ProjectExtensions.BorlandProject.Deployment.Version is not in the expected value (4)');
 
       //init LItemGroupNode
       var LItemGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ItemGroup');
@@ -362,15 +459,18 @@ begin
         else if (LPropertyGroupNode.NodeName = 'PropertyGroup') and
                 (LPropertyGroupNode.attributes['Condition'] = '') then begin
           Var LProjectVersionNode := LPropertyGroupNode.ChildNodes.FindNode('ProjectVersion');
-          if (LProjectVersionNode = nil) or
-             ((LProjectVersionNode.Text <> '19.2' {Sydney}) and
-              (LProjectVersionNode.Text <> '19.5' {Alexandria})) then
-            raise Exception.Create('Unsupported Delphi compiler. Please consult Readme.txt');
+          //if (LProjectVersionNode = nil) or
+          //   ((LProjectVersionNode.Text <> '19.2' {Sydney}) and
+          //    (LProjectVersionNode.Text <> '19.5' {Alexandria})) then
+          //  raise Exception.Create('Unsupported Delphi compiler. Please consult Readme.txt');
           LProjectVersion := ALStrToFloat(LProjectVersionNode.Text, ALDefaultFormatSettingsA);
         end;
       end;
       if SameValue(LProjectVersion, 0) then
         raise Exception.Create('Unsupported Delphi compiler. Please consult Readme.txt');
+
+      //init LSkiaEnabled
+      var LSkiaEnabled := ALPosIgnoreCaseA(';SKIA;',';'+LProperties.Values['Base#DCC_Define']+';') > 0;
 
       //Merge DeployClass in DeployFile
       for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
@@ -418,7 +518,7 @@ begin
         raise Exception.Create('ProjectExtensions.ProjectFileVersion is not in the expected value (12)');
       LDeployProjXmlDoc.DocumentElement.AddChild('ProjectExtensions').AddChild('ProjectFileVersion').Text := LProjectFileVersionNode.Text;
 
-      //loop on all items
+      //loop on all Deployment
       for var I := 0 to LDeploymentNode.ChildNodes.Count - 1 do begin
 
         //From DPROJ:
@@ -475,11 +575,6 @@ begin
           var LOperationNode := LPlatformNode.ChildNodes.FindNode('Operation');
           if (LOperationNode <> nil) then LOperation := LOperationNode.Text;
 
-          //<Required>True</Required>
-          Var LRequired: AnsiString := '';
-          var LRequiredNode := LPlatformNode.ChildNodes.FindNode('Required');
-          if (LRequiredNode <> nil) then LRequired := LRequiredNode.Text;
-
           //<RemoteDir>library\lib\arm64-v8a\</RemoteDir>
           Var LRemoteDir: AnsiString := '';
           var LPlatformRemoteDirNode := LPlatformNode.ChildNodes.FindNode('RemoteDir');
@@ -503,7 +598,8 @@ begin
           _addDeployFile(
             LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
             LDeployProjItemGroupNode, // const aItemGroupNode: TalXmlNode;
-            LDeployFileNode.Attributes['Configuration'], // const aCondition: String;
+            LDeployFileNode.Attributes['Configuration'], // const aConfigName: AnsiString;
+            LDeployFileNode.Attributes['Condition'], // const aCondition: AnsiString;
             LDeployFileNode.Attributes['LocalName'], // const aInclude: String;
             LDeployFileNode.Attributes['Class'], // const aDeployClass: String;
             '', // const aLocalCommand: String;
@@ -512,7 +608,7 @@ begin
             '', // const aRemoteCommand: String;
             LRemoteDir, // const aRemoteDir: String;
             LRemoteName, // const aRemoteName: String);
-            LRequired, // aRequired: AnsiString;
+            LDeployFileNode.Attributes['Required'], // aRequired: AnsiString;
             LEnabled); // aEnabled: Boolean
 
         end;
@@ -542,7 +638,6 @@ begin
         //  <RemoteName>stopwatch_viewed_white_120x120.png</RemoteName>
         //</DeployFile>
 
-
         //init LDeployFileNode
         var LRcItemNode := LItemGroupNode.ChildNodes[i];
         if LRcItemNode.NodeName <> 'RcItem' then continue;
@@ -563,7 +658,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[J]), // const aItemGroupNode: TalXmlNode;
-              LConfigs.Names[k], // const aCondition: String;
+              LConfigs.Names[k], // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               LRcItemNode.Attributes['Include'], // const aInclude: String;
               'ProjectFile', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -576,288 +672,11 @@ begin
           end;
       end;
 
-      //Deploy all mandatory files
+      //Deploy all mandatory files, which may not necessarily be present in Deployment/ItemGroup.
       for var I := 0 to LplatForms.Count - 1 do begin
         var LplatFormName := LplatForms[i];
         for var J := 0 to LConfigs.Count - 1 do begin
           var LConfigName := LConfigs.Names[j];
-
-          if (ALSameTextA(LplatFormName, 'Android') or ALSameTextA(LplatFormName, 'Android64')) then begin
-
-            //-----
-            //<Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
-            //<Android_LauncherIcon48>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png</Android_LauncherIcon48>
-            //<Android_LauncherIcon72>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png</Android_LauncherIcon72>
-            //<Android_LauncherIcon96>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png</Android_LauncherIcon96>
-            //<Android_LauncherIcon144>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png</Android_LauncherIcon144>
-            //<Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_LauncherIcon36', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_LauncherIcon36', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-ldpi\', // const aRemoteDir: String;
-              'ic_launcher.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_LauncherIcon48', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_LauncherIcon48', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-mdpi\', // const aRemoteDir: String;
-              'ic_launcher.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_LauncherIcon72', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_LauncherIcon72', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-hdpi\', // const aRemoteDir: String;
-              'ic_launcher.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_LauncherIcon96', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_LauncherIcon96', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xhdpi\', // const aRemoteDir: String;
-              'ic_launcher.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_LauncherIcon144', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_LauncherIcon144', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xxhdpi\', // const aRemoteDir: String;
-              'ic_launcher.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_LauncherIcon192', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_LauncherIcon192', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xxxhdpi\', // const aRemoteDir: String;
-              'ic_launcher.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-
-            //-----
-            //<Android_SplashImage426>$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png</Android_SplashImage426>
-            //<Android_SplashImage470>$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png</Android_SplashImage470>
-            //<Android_SplashImage640>$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png</Android_SplashImage640>
-            //<Android_SplashImage960>$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png</Android_SplashImage960>
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_SplashImage426', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_SplashImage426', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-small\', // const aRemoteDir: String;
-              'splash_image.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_SplashImage470', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_SplashImage470', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-normal\', // const aRemoteDir: String;
-              'splash_image.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_SplashImage640', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_SplashImage640', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-large\', // const aRemoteDir: String;
-              'splash_image.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_SplashImage960', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_SplashImage960', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xlarge\', // const aRemoteDir: String;
-              'splash_image.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-
-            //-----
-            //<Android_NotificationIcon24>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png</Android_NotificationIcon24>
-            //<Android_NotificationIcon36>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png</Android_NotificationIcon36>
-            //<Android_NotificationIcon48>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png</Android_NotificationIcon48>
-            //<Android_NotificationIcon72>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png</Android_NotificationIcon72>
-            //<Android_NotificationIcon96>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png</Android_NotificationIcon96>
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_NotificationIcon24', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_NotificationIcon24', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-mdpi\', // const aRemoteDir: String;
-              'ic_notification.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_NotificationIcon36', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_NotificationIcon36', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-hdpi\', // const aRemoteDir: String;
-              'ic_notification.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_NotificationIcon48', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_NotificationIcon48', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xhdpi\', // const aRemoteDir: String;
-              'ic_notification.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_NotificationIcon72', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_NotificationIcon72', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xxhdpi\', // const aRemoteDir: String;
-              'ic_notification.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-            //-----
-            _addDeployFile(
-              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
-              LProperties, // const aProperties: TALStringListA;
-              LConfigs, // const aConfigs: TALStringListA;
-              LPlatFormName, // const aPlatFormName: ansiString;
-              LConfigName, // const aConfigName: AnsiString;
-              'Android_NotificationIcon96', // const aPropertyName: ansiString;
-              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              'Android_NotificationIcon96', // const aDeployClass: String;
-              '', // const aLocalCommand: AnsiString;
-              '1', // const aOperation: AnsiString;
-              'True', // aOverwrite: AnsiString;
-              '', // const aRemoteCommand: AnsiString;
-              _getProjectRoot(LProjectName, LPlatformName)+'\res\drawable-xxxhdpi\', // const aRemoteDir: String;
-              'ic_notification.png', // const aRemoteName: String;
-              ''); // aRequired: AnsiString;
-
-          end;
 
           if ALSameTextA(LplatFormName, 'iOSDevice64') or
              ALSameTextA(LplatFormName, 'iOSSimulator') or
@@ -1212,6 +1031,44 @@ begin
 
           end;
 
+          //-----------------
+          //Android/Android64
+          //Avoid automatically deploying all these files as they
+          //conflict with the tasks performed by the AndroidMerger tool.
+          //Android_Strings: Do not know how it's used, it's always empty
+          //Android_Colors: Used if "use accent color" is set to something else than black in icons > notification
+          //Android_ColorsDark: (added in 20.1{Athens})
+          //AndroidSplashImageDef: use if "include splash images" is set in icons > splash images
+          //AndroidSplashImageDefV21: (added in 20.1{Athens})
+          //AndroidSplashStyles: use if "include splash images" is set in icons > splash images
+          //AndroidSplashStylesV21: use if "include splash images" is set in icons > splash images
+          //AndroidSplashStylesV31: (added in 20.1{Athens})
+          //Android_AdaptiveIcon: (added in 20.1{Athens})
+          //Android_AdaptiveIconV33: (added in 20.1{Athens})
+          //Android_VectorizedNotificationIcon: (added in 20.1{Athens})
+          //Android_AdaptiveIconMonochrome: (added in 20.1{Athens}) Taken from <Android_AdaptiveIconMonochrome>$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml</Android_AdaptiveIconMonochrome>
+          //Android_AdaptiveIconForeground: (added in 20.1{Athens}) Taken from <Android_AdaptiveIconForeground>$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml</Android_AdaptiveIconForeground>
+          //Android_AdaptiveIconBackground: (added in 20.1{Athens}) Taken from <Android_AdaptiveIconBackground>$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml</Android_AdaptiveIconBackground>
+          //Android_VectorizedSplash: (added in 20.1{Athens}) Taken from <Android_VectorizedSplash>$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml</Android_VectorizedSplash>
+          //Android_VectorizedSplashDark: (added in 20.1{Athens}) Taken from <Android_VectorizedSplashDark>$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml</Android_VectorizedSplashDark>
+          //Android_VectorizedSplashV31: (added in 20.1{Athens}) Taken from <Android_VectorizedSplashV31>$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml</Android_VectorizedSplashV31>
+          //Android_VectorizedSplashV31Dark: (added in 20.1{Athens}) Taken from <Android_VectorizedSplashV31Dark>$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml</Android_VectorizedSplashV31Dark>
+          //Android_LauncherIcon36: Taken from <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
+          //Android_LauncherIcon48: Taken from <Android_LauncherIcon48>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png</Android_LauncherIcon48>
+          //Android_LauncherIcon72: Taken from <Android_LauncherIcon72>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png</Android_LauncherIcon72>
+          //Android_LauncherIcon96: Taken from <Android_LauncherIcon96>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png</Android_LauncherIcon96>
+          //Android_LauncherIcon144: Taken from <Android_LauncherIcon144>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png</Android_LauncherIcon144>
+          //Android_LauncherIcon192: Taken from <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
+          //Android_SplashImage426: Taken from <Android_SplashImage426>$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png</Android_SplashImage426>
+          //Android_SplashImage470: Taken from <Android_SplashImage470>$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png</Android_SplashImage470>
+          //Android_SplashImage640: Taken from <Android_SplashImage640>$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png</Android_SplashImage640>
+          //Android_SplashImage960: Taken from <Android_SplashImage960>$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png</Android_SplashImage960>
+          //Android_NotificationIcon24: Taken from <Android_NotificationIcon24>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png</Android_NotificationIcon24>
+          //Android_NotificationIcon36: Taken from <Android_NotificationIcon36>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png</Android_NotificationIcon36>
+          //Android_NotificationIcon48: Taken from <Android_NotificationIcon48>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png</Android_NotificationIcon48>
+          //Android_NotificationIcon72: Taken from <Android_NotificationIcon72>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png</Android_NotificationIcon72>
+          //Android_NotificationIcon96: Taken from <Android_NotificationIcon96>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png</Android_NotificationIcon96>
+
           //-------
           //Android
           //GDB is Android debugger. Specifically, Delphi uses GDB for debugging 32bit Android applications. For debugging 64bit
@@ -1222,7 +1079,8 @@ begin
           //  _addDeployFile(
           //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
           //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-          //    LConfigName, // const aCondition: String;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '', // const aCondition: AnsiString;
           //    '$(NDKBasePath)\prebuilt\android-arm\gdbserver\gdbserver', // const aInclude: String;
           //    'AndroidGDBServer', // const aDeployClass: String;
           //    '', // const aLocalCommand: String;
@@ -1235,21 +1093,14 @@ begin
 
           //-----------------
           //Android/Android64
-          //Android_Strings: do not know how it's used, it's always empty
-          //Android_Colors: use if "use accent color" is set to something else than black in icons > notification
-          //AndroidSplashImageDef: use if "include splash images" is set in icons > splash images
-          //AndroidSplashStylesV21: use if "include splash images" is set in icons > splash images
-          //AndroidSplashStyles: use if "include splash images" is set in icons > splash images
-
-          //-----------------
-          //Android/Android64
           //mips: code compiled for the MIPS32r1 and later architecture (32 bits, MIPS support has been removed from the Android NDK in r17).
           //this file is simply to show the message "Application does not support this device" at startup
           //if (ALSameTextA(LplatFormName, 'Android') or ALSameTextA(LplatFormName, 'Android64')) then
           //  _addDeployFile(
           //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
           //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-          //    LConfigName, // const aCondition: String;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '', // const aCondition: AnsiString;
           //    '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\mips\libnative-activity.so', // const aInclude: String;
           //    'AndroidLibnativeMipsFile', // const aDeployClass: String;
           //    '', // const aLocalCommand: String;
@@ -1268,7 +1119,8 @@ begin
           //  _addDeployFile(
           //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
           //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-          //    LConfigName, // const aCondition: String;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '', // const aCondition: AnsiString;
           //    '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\armeabi\libnative-activity.so', // const aInclude: String;
           //    'AndroidLibnativeArmeabiFile', // const aDeployClass: String;
           //    '', // const aLocalCommand: String;
@@ -1286,7 +1138,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+'lib'+LProjectName+'.so', // const aInclude: String;
               'ProjectOutput', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1309,7 +1162,8 @@ begin
               _addDeployFile(
                 LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
                 TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-                LConfigName, // const aCondition: String;
+                LConfigName, // const aConfigName: AnsiString;
+                '', // const aCondition: AnsiString;
                 _getExeOutputDir(LProperties,LConfigs,'Android',LConfigName)+'lib'+LProjectName+'.so', // const aInclude: String;
                 'ProjectOutput_Android32', // const aDeployClass: String;
                 '', // const aLocalCommand: String;
@@ -1326,7 +1180,8 @@ begin
             //  _addDeployFile(
             //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
             //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-            //    LConfigName, // const aCondition: String;
+            //    LConfigName, // const aConfigName: AnsiString;
+            //    '', // const aCondition: AnsiString;
             //    '$(BDS)\lib\android\'+ALLowerCase(LConfigName)+'\armeabi-v7a\libnative-activity.so', // const aInclude: String;
             //    'AndroidLibnativeArmeabiv7aFile', // const aDeployClass: String;
             //    '', // const aLocalCommand: String;
@@ -1345,7 +1200,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+'lib'+LProjectName+'.so', // const aInclude: String;
               'ProjectOutput', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1356,6 +1212,106 @@ begin
               'lib'+LProjectName+'.so', // const aRemoteName: String;
               'true'); // aRequired: AnsiString
 
+          //-------
+          //Android
+          //Skia: The compiled skia library
+          if (LSkiaEnabled) and
+             (ALSameTextA(LplatFormName, 'Android')) and
+             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''!=''''', // const aCondition: AnsiString;
+              '$(SKIADIR)\Binary\Shared\Android\libsk4d.so', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
+              'libsk4d.so', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''==''''', // const aCondition: AnsiString;
+              '$(BDS)\binandroid32\libsk4d.so', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
+              'libsk4d.so', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+          end;
+
+          //---------
+          //Android64
+          //Skia: The compiled skia library
+          if (LSkiaEnabled) and
+             (ALSameTextA(LplatFormName, 'Android64')) and
+             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''!='''' and ''$(AndroidAppBundle)''==''true''', // const aCondition: AnsiString;
+              '$(SKIADIR)\Binary\Shared\Android\libsk4d.so', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
+              'libsk4d.so', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''!=''''', // const aCondition: AnsiString;
+              '$(SKIADIR)\Binary\Shared\Android64\libsk4d.so', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\arm64-v8a\', // const aRemoteDir: String;
+              'libsk4d.so', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''=='''' and ''$(AndroidAppBundle)''==''true''', // const aCondition: AnsiString;
+              '$(BDS)\binandroid32\libsk4d.so', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\armeabi-v7a\', // const aRemoteDir: String;
+              'libsk4d.so', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''==''''', // const aCondition: AnsiString;
+              '$(BDS)\binandroid64\libsk4d.so', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\library\lib\arm64-v8a\', // const aRemoteDir: String;
+              'libsk4d.so', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+          end;
+
           //-----------------
           //Android/Android64
           //The manifest file describes essential information about your app to the Android build tools, the Android
@@ -1364,7 +1320,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+ 'AndroidManifest.xml', // const aInclude: String;
               'ProjectAndroidManifest', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1384,7 +1341,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName) + _getProjectRoot(LProjectName, LPlatformName) + '.classes', // const aInclude: String;
               'AndroidClasses', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1404,7 +1362,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+ 'classes.dex', // const aInclude: String;
               'AndroidClassesDexFile', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1415,15 +1374,16 @@ begin
               'classes.dex', // const aRemoteName: String;
               ''); // aRequired: AnsiString
 
-          //-----
-          //OSX64
+          //--------------
+          //OSX64/OSXARM64
           //The main binary
           if (ALSameTextA(LplatFormName, 'OSX64')) or
              (ALSameTextA(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName, // const aInclude: String;
               'ProjectOutput', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1436,6 +1396,78 @@ begin
 
           //-----
           //OSX64
+          //Skia: The compiled skia library
+          if (LSkiaEnabled) and
+             (ALSameTextA(LplatFormName, 'OSX64')) and
+             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''!=''''', // const aCondition: AnsiString;
+              '$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\Contents\MacOS\', // const aRemoteDir: String;
+              'libsk4d.dylib', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''==''''', // const aCondition: AnsiString;
+              '$(BDS)\binosx64\libsk4d.dylib', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\Contents\MacOS\', // const aRemoteDir: String;
+              'libsk4d.dylib', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+          end;
+
+          //--------
+          //OSXARM64
+          //Skia: The compiled skia library
+          if (LSkiaEnabled) and
+             (ALSameTextA(LplatFormName, 'OSXARM64')) and
+             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''!=''''', // const aCondition: AnsiString;
+              '$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\Contents\MacOS\', // const aRemoteDir: String;
+              'libsk4d.dylib', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+            _addDeployFile(
+              LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+              TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+              LConfigName, // const aConfigName: AnsiString;
+              '''$(SKIADIR)''==''''', // const aCondition: AnsiString;
+              '$(BDS)\binosxarm64\libsk4d.dylib', // const aInclude: String;
+              'Skia', // const aDeployClass: String;
+              '', // const aLocalCommand: String;
+              '1', // const aOperation: String;
+              'True', // aOverwrite: String;
+              '', // const aRemoteCommand: String;
+              _getProjectRoot(LProjectName, LPlatformName)+'\Contents\MacOS\', // const aRemoteDir: String;
+              'libsk4d.dylib', // const aRemoteName: String;
+              'True'); // aRequired: AnsiString
+          end;
+
+          //--------------
+          //OSX64/OSXARM64
           //Debugging Information
           //https://developer.apple.com/documentation/xcode/building-your-app-to-include-debugging-information
           if ((ALSameTextA(LplatFormName, 'OSX64')) or
@@ -1445,7 +1477,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.dSYM', // const aInclude: String;
               'ProjectOSXDebug', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1456,15 +1489,16 @@ begin
               LProjectName, // const aRemoteName: String;
               ''); // aRequired: AnsiString
 
-          //-----
-          //OSX64
+          //--------------
+          //OSX64/OSXARM64
           //Key-value pairs that grant an executable permission to use a service or technology.
           if (ALSameTextA(LplatFormName, 'OSX64')) or
              (ALSameTextA(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.entitlements', // const aInclude: String;
               'ProjectOSXEntitlements', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1475,8 +1509,8 @@ begin
               LProjectName+'.entitlements', // const aRemoteName: String;
               ''); // aRequired: AnsiString
 
-          //-----
-          //OSX64
+          //--------------
+          //OSX64/OSXARM64
           //Every app and plug-in uses an Info.plist file to store configuration data in a place
           //where the system can easily access it. macOS and iOS use Info.plist files to determine
           //what icon to display for a bundle, what document types an app supports, and many other
@@ -1486,7 +1520,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.info.plist', // const aInclude: String;
               'ProjectOSXInfoPList', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1497,8 +1532,8 @@ begin
               'Info.plist', // const aRemoteName: String;
               ''); // aRequired: AnsiString
 
-          //-----
-          //OSX64
+          //--------------
+          //OSX64/OSXARM64
           if (ALSameTextA(LplatFormName, 'OSX64')) or
              (ALSameTextA(LplatFormName, 'OSXARM64')) then
             _addDeployFile(
@@ -1527,7 +1562,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName, // const aInclude: String;
               'ProjectOutput', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1549,7 +1585,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.dSYM', // const aInclude: String;
               'ProjectiOSDeviceDebug', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1568,7 +1605,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.entitlements', // const aInclude: String;
               'ProjectiOSEntitlements', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1591,7 +1629,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.info.plist', // const aInclude: String;
               'ProjectiOSInfoPList', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1615,7 +1654,8 @@ begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-              LConfigName, // const aCondition: String;
+              LConfigName, // const aConfigName: AnsiString;
+              '', // const aCondition: AnsiString;
               _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.launchscreen', // const aInclude: String;
               'ProjectiOSLaunchScreen', // const aDeployClass: String;
               '', // const aLocalCommand: String;
@@ -1633,7 +1673,63 @@ begin
           //  _addDeployFile(
           //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
           //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-          //    LConfigName, // const aCondition: String;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '', // const aCondition: AnsiString;
+          //    _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.exe', // const aInclude: String;
+          //    'ProjectOutput', // const aDeployClass: String;
+          //    '', // const aLocalCommand: String;
+          //    '0', // const aOperation: String;
+          //    'True', // aOverwrite: String;
+          //    '', // const aRemoteCommand: String;
+          //    _getProjectRoot(LProjectName, LPlatformName)+'\', // const aRemoteDir: String;
+          //    LProjectName+'.exe', // const aRemoteName: String;
+          //    'True'); // aRequired: AnsiString
+
+          //-----
+          //Win32
+          //Skia: The compiled skia library
+          //if (LSkiaEnabled) and
+          //   (ALSameTextA(LplatFormName, 'Win32')) and
+          //   (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+          //  _addDeployFile(
+          //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+          //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '''$(SKIADIR)''!=''''', // const aCondition: AnsiString;
+          //    '$(SKIADIR)\Binary\Shared\Win32\sk4d.dll', // const aInclude: String;
+          //    'Skia', // const aDeployClass: String;
+          //    '', // const aLocalCommand: String;
+          //    '0', // const aOperation: String;
+          //    'True', // aOverwrite: String;
+          //    '', // const aRemoteCommand: String;
+          //    _getProjectRoot(LProjectName, LPlatformName)+'\', // const aRemoteDir: String;
+          //    'sk4d.dll', // const aRemoteName: String;
+          //    'True'); // aRequired: AnsiString
+          //  _addDeployFile(
+          //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+          //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '''$(SKIADIR)''==''''', // const aCondition: AnsiString;
+          //    '$(BDS)\bin\sk4d.dll', // const aInclude: String;
+          //    'Skia', // const aDeployClass: String;
+          //    '', // const aLocalCommand: String;
+          //    '0', // const aOperation: String;
+          //    'True', // aOverwrite: String;
+          //    '', // const aRemoteCommand: String;
+          //    _getProjectRoot(LProjectName, LPlatformName)+'\', // const aRemoteDir: String;
+          //    'sk4d.dll', // const aRemoteName: String;
+          //    'True'); // aRequired: AnsiString
+          //end;
+
+          //-----
+          //Win64
+          //The main binary
+          //if (ALSameTextA(LplatFormName, 'Win64')) then
+          //  _addDeployFile(
+          //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+          //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '', // const aCondition: AnsiString;
           //    _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.exe', // const aInclude: String;
           //    'ProjectOutput', // const aDeployClass: String;
           //    '', // const aLocalCommand: String;
@@ -1646,21 +1742,39 @@ begin
 
           //-----
           //Win64
-          //The main binary
-          //if (ALSameTextA(LplatFormName, 'Win64')) then
+          //Skia: The compiled skia library
+          //if (LSkiaEnabled) and
+          //   (ALSameTextA(LplatFormName, 'Win64')) and
+          //   (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
           //  _addDeployFile(
           //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
           //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
-          //    LConfigName, // const aCondition: String;
-          //    _getExeOutputDir(LProperties,LConfigs,LPlatFormName,LConfigName)+LProjectName+'.exe', // const aInclude: String;
-          //    'ProjectOutput', // const aDeployClass: String;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '''$(SKIADIR)''!=''''', // const aCondition: AnsiString;
+          //    '$(SKIADIR)\Binary\Shared\Win64\sk4d.dll', // const aInclude: String;
+          //    'Skia', // const aDeployClass: String;
           //    '', // const aLocalCommand: String;
           //    '0', // const aOperation: String;
           //    'True', // aOverwrite: String;
           //    '', // const aRemoteCommand: String;
           //    _getProjectRoot(LProjectName, LPlatformName)+'\', // const aRemoteDir: String;
-          //    LProjectName+'.exe', // const aRemoteName: String;
+          //    'sk4d.dll', // const aRemoteName: String;
           //    'True'); // aRequired: AnsiString
+          //  _addDeployFile(
+          //    LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
+          //    TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
+          //    LConfigName, // const aConfigName: AnsiString;
+          //    '''$(SKIADIR)''==''''', // const aCondition: AnsiString;
+          //    '$(BDS)\bin64\sk4d.dll', // const aInclude: String;
+          //    'Skia', // const aDeployClass: String;
+          //    '', // const aLocalCommand: String;
+          //    '0', // const aOperation: String;
+          //    'True', // aOverwrite: String;
+          //    '', // const aRemoteCommand: String;
+          //    _getProjectRoot(LProjectName, LPlatformName)+'\', // const aRemoteDir: String;
+          //    'sk4d.dll', // const aRemoteName: String;
+          //    'True'); // aRequired: AnsiString
+          //end;
 
         end;
 

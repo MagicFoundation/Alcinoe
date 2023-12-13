@@ -16,6 +16,66 @@ uses
   Alcinoe.Files,
   Alcinoe.StringUtils;
 
+//
+// https://quality.embarcadero.com/browse/RSP-28003
+// This process orders all nodes and performs the following actions:
+//
+// * Remove All DCCReference Nodes:
+//    <DCCReference Include="Unit1.pas">
+//       <Form>Form1</Form>
+//       <FormType>fmx</FormType>
+//    </DCCReference>
+//
+// * Remove Empty <Disabled/> Nodes from JavaReference Nodes:
+//    <JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
+//      <ContainerId>ClassesdexFile64</ContainerId>
+//      <Disabled/>
+//    </JavaReference>
+//   =>
+//    <JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
+//      <ContainerId>ClassesdexFile64</ContainerId>
+//    </JavaReference>
+//
+// * Remove All DeployClass Nodes:
+//    <DeployClass Name="AdditionalDebugSymbols">
+//        <Platform Name="iOSSimulator">
+//            <Operation>1</Operation>
+//        </Platform>
+//        <Platform Name="OSX32">
+//          <RemoteDir>Contents\MacOS</RemoteDir>
+//            <Operation>1</Operation>
+//        </Platform>
+//        <Platform Name="Win32">
+//            <Operation>0</Operation>
+//        </Platform>
+//    </DeployClass>
+//
+// * Remove All ProjectRoot Elements:
+//    <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+//
+// * Deletes <DeployFile> nodes unless they have a Class attribute equal to
+//   'File' and an Enabled attribute not equal to false. Enabled attribute
+//   not equal to false to prevents the IDE from automatically re-adding and
+//   deploying these files when the project is reopened:
+//    <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144">
+//        <Platform Name="Android">
+//            <RemoteName>ic_launcher.png</RemoteName>
+//            <Overwrite>true</Overwrite>
+//        </Platform>
+//    </DeployFile>
+//
+// * Remove Empty ProjectExtensions Nodes:
+//    <ProjectExtensions/>
+//
+// * Transforms nodes with CDATA sections into regular text nodes:
+//    <PreBuildEvent><![CDATA["..\..\..\..\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="false"]]></PreBuildEvent>
+//    <PreBuildEvent>"..\..\..\..\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="false"</PreBuildEvent>
+//
+
+{$IFNDEF ALCompilerVersionSupported120}
+  {$MESSAGE WARN 'Check if the structure of the *.dproj didn''t changed by following the instructions in References\BlankApplication\README.md'}
+{$IFEND}
+
 {***********************************************************}
 Procedure _SortAttributesByNodeName(const aNode: TalXmlNode);
 Begin
@@ -67,8 +127,8 @@ Begin
         aNode.ChildNodes.Delete(i);
 End;
 
-{***************************************************}
-Procedure _RemoveCDataNodes(const aNode: TalXmlNode);
+{***************************************************************}
+Procedure _ReplaceCDataNodesByTextNodes(const aNode: TalXmlNode);
 Begin
   if ANode = nil then exit;
   if aNode.NodeType = ntCData then begin
@@ -82,20 +142,20 @@ Begin
   //-----
   if aNode.ChildNodes <> nil then
     for var i := 0 to aNode.ChildNodes.Count - 1 do
-      _RemoveCDataNodes(aNode.ChildNodes[i]);
+      _ReplaceCDataNodesByTextNodes(aNode.ChildNodes[i]);
 End;
 
 begin
 
   try
 
-    //Init project params
+    // Init project params
     {$IFDEF DEBUG}
     ReportMemoryleaksOnSHutdown := True;
     {$ENDIF}
     SetMultiByteConversionCodePage(CP_UTF8);
 
-    //init LDProjFilename / LCreateBackup
+    // init LDProjFilename / LCreateBackup
     var LDProjFilename: String;
     var LCreateBackup: Boolean;
     var LParamLst := TALStringListW.Create;
@@ -113,35 +173,35 @@ begin
     end;
     if LDProjFilename = '' then raise Exception.Create('Usage: DProjNormalizer.exe -DProj="<DprojFilename>" -CreateBackup=<true/false>');
 
-    //create the LDProjXmlDoc
+    // create the LDProjXmlDoc
     var LDProjXmlDoc := TALXmlDocument.Create('root');
     Try
 
-      //load the LDProjXmlDoc
+      // load the LDProjXmlDoc
       LDProjXmlDoc.Options := [];
       LDProjXmlDoc.ParseOptions := [];
       LDProjXmlDoc.LoadFromFile(LDProjFilename);
 
-      //init LProjectExtensionsNode
+      // init LProjectExtensionsNode
       var LProjectExtensionsNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ProjectExtensions');
       if LProjectExtensionsNode = nil then raise Exception.Create('ProjectExtensions node not found!');
 
-      //init LBorlandProjectNode
+      // init LBorlandProjectNode
       var LBorlandProjectNode := LProjectExtensionsNode.ChildNodes.FindNode('BorlandProject');
       if LBorlandProjectNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject node not found!');
 
-      //init LDeploymentNode
+      // init LDeploymentNode
       var LDeploymentNode := LBorlandProjectNode.ChildNodes.FindNode('Deployment');
 
-      //init LItemGroupNode
+      // init LItemGroupNode
       var LItemGroupNode := LDProjXmlDoc.DocumentElement.ChildNodes.FindNode('ItemGroup');
       if LItemGroupNode = nil then raise Exception.Create('ItemGroup node not found!');
 
-      //order ItemGroup
+      // order ItemGroup
       _SortAttributesByNodeName(LItemGroupNode);
       _SortChildNodesByNodeNameAndAttributes(LItemGroupNode);
 
-      //put DelphiCompile at the top (don't know if it's matter)
+      // put DelphiCompile at the top (don't know if it's matter)
       var LDelphiCompileNodes: Tarray<TalXmlNode>;
       setlength(LDelphiCompileNodes, 0);
       while True do begin
@@ -155,7 +215,7 @@ begin
       for var I := High(LDelphiCompileNodes) downto Low(LDelphiCompileNodes) do
         LItemGroupNode.ChildNodes.insert(0, LDelphiCompileNodes[i]);
 
-      //put BuildConfiguration at the end (don't know if it's matter)
+      // put BuildConfiguration at the end (don't know if it's matter)
       var LBuildConfigurationNodes: Tarray<TalXmlNode>;
       setlength(LBuildConfigurationNodes, 0);
       while True do begin
@@ -169,24 +229,21 @@ begin
       for var I := Low(LBuildConfigurationNodes) to High(LBuildConfigurationNodes) do
         LItemGroupNode.ChildNodes.add(LBuildConfigurationNodes[i]);
 
-      //order LDeploymentNode
+      // order LDeploymentNode
       if LDeploymentNode <> nil then begin
         _SortAttributesByNodeName(LDeploymentNode);
         _SortChildNodesByNodeNameAndAttributes(LDeploymentNode);
       end;
 
-      //remove <Disabled/> node from JavaReference node
-      //<JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
-      //  <ContainerId>ClassesdexFile64</ContainerId>
-      //  <Disabled/>
-      //</JavaReference>
+      // Remove Empty <Disabled/> Nodes from JavaReference Nodes:
+      //  <JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
+      //    <ContainerId>ClassesdexFile64</ContainerId>
+      //    <Disabled/>
+      //  </JavaReference>
       // =>
-      //<JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
-      //  <ContainerId>ClassesdexFile64</ContainerId>
-      //</JavaReference>
-      {$IFNDEF ALCompilerVersionSupported}
-        {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40709 is corrected and update the code below'}
-      {$IFEND}
+      //  <JavaReference Include="android\Merged\libs\androidx.activity-activity-1.5.1.jar">
+      //    <ContainerId>ClassesdexFile64</ContainerId>
+      //  </JavaReference>
       for var I := LItemGroupNode.ChildNodes.Count - 1 downto 0 do begin
         var LJavaReferenceNode := LItemGroupNode.ChildNodes[i];
         if ALSameTextA(LJavaReferenceNode.NodeName, 'JavaReference') then begin
@@ -196,18 +253,44 @@ begin
         end;
       end;
 
-      //remove DCCReference nodes
-      //<DCCReference Include="Unit1.pas">
-      //  <Form>Form1</Form>
-      //</DCCReference>
+      // Remove All DCCReference Nodes:
+      //  <DCCReference Include="Unit1.pas">
+      //     <Form>Form1</Form>
+      //     <FormType>fmx</FormType>
+      //  </DCCReference>
       for var I := LItemGroupNode.ChildNodes.Count - 1 downto 0 do begin
         var LDCCReferenceNode := LItemGroupNode.ChildNodes[i];
         if ALSameTextA(LDccReferenceNode.NodeName, 'DCCReference') then
           LItemGroupNode.ChildNodes.Delete(i);
       end;
 
-      //remove from deployment unnecessary items
-      //https://quality.embarcadero.com/browse/RSP-28003
+      // Remove All DeployClass Nodes:
+      //  <DeployClass Name="AdditionalDebugSymbols">
+      //      <Platform Name="iOSSimulator">
+      //          <Operation>1</Operation>
+      //      </Platform>
+      //      <Platform Name="OSX32">
+      //        <RemoteDir>Contents\MacOS</RemoteDir>
+      //          <Operation>1</Operation>
+      //      </Platform>
+      //      <Platform Name="Win32">
+      //          <Operation>0</Operation>
+      //      </Platform>
+      //  </DeployClass>
+      //
+      // Remove All ProjectRoot Elements:
+      //  <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+      //
+      // Deletes <DeployFile> nodes unless they have a Class attribute equal to
+      // 'File' and an Enabled attribute not equal to false. Enabled attribute
+      // not equal to false to prevents the IDE from automatically re-adding and
+      // deploying these files when the project is reopened:
+      //  <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144">
+      //      <Platform Name="Android">
+      //          <RemoteName>ic_launcher.png</RemoteName>
+      //          <Overwrite>true</Overwrite>
+      //      </Platform>
+      //  </DeployFile>
       if LDeploymentNode <> nil then begin
         for var I := LDeploymentNode.ChildNodes.Count - 1 downto 0 do begin
           var LEnabledNode: TALXmlNode := nil;
@@ -228,38 +311,25 @@ begin
         end;
       end;
 
-      //put ProjectRoot at the end (don't know if it's matter)
-      if LDeploymentNode <> nil then begin
-        var LProjectRootNodes: Tarray<TalXmlNode>;
-        setlength(LProjectRootNodes, 0);
-        while True do begin
-          var LProjectRootNode := LDeploymentNode.ChildNodes.FindNode('ProjectRoot');
-          if LProjectRootNode <> nil then begin
-            Setlength(LProjectRootNodes, length(LProjectRootNodes)+1);
-            LProjectRootNodes[length(LProjectRootNodes) - 1] := LDeploymentNode.ChildNodes.Extract(LProjectRootNode);
-          end
-          else break;
-        end;
-        for var I := Low(LProjectRootNodes) to High(LProjectRootNodes) do
-          LDeploymentNode.ChildNodes.add(LProjectRootNodes[i]);
-      end;
-
-      //Remove Empty ProjectExtensions Node
+      // Remove Empty ProjectExtensions Nodes:
+      //  <ProjectExtensions/>
       _RemoveEmptyProjectExtensionsNode(LDProjXmlDoc.DocumentElement);
 
-      //remove CData nodes
-      _RemoveCDataNodes(LDProjXmlDoc.DocumentElement);
+      // Transforms nodes with CDATA sections into regular text nodes:
+      //  <PreBuildEvent><![CDATA["..\..\..\..\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="false"]]></PreBuildEvent>
+      //  <PreBuildEvent>"..\..\..\..\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="false"</PreBuildEvent>
+      _ReplaceCDataNodesByTextNodes(LDProjXmlDoc.DocumentElement);
 
-      //save the file to LXmlStr
+      // save the file to LXmlStr
       var LXmlStr: AnsiString;
       LDProjXmlDoc.SaveToXML(LXmlStr);
 
-      //now add the indent to the node
+      // now add the indent to the node
       LDProjXmlDoc.Options := [doNodeAutoIndent];
       LDProjXmlDoc.LoadFromXML(LXmlStr);
       LDProjXmlDoc.SaveToXML(LXmlStr);
 
-      //save the dproj
+      // save the dproj
       if LCreateBackup then begin
         if Tfile.Exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
         Tfile.Move(LDProjFilename, LDProjFilename+ '.bak');

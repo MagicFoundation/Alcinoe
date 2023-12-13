@@ -208,7 +208,7 @@ begin
         {$REGION 'Init LPlatform'}
         var LPlatform := ALLowerCase(ansiString(LParamLst.Values['-Platform']));
         if (LPlatform <> 'ios') and
-           (LPlatform <> 'macos') then raise Exception.Create('Invalid Platforms parameter');
+           (LPlatform <> 'macos') then raise Exception.Create('The platform parameter is invalid. Copy is supported only for iOS or macOS');
         {$ENDREGION}
 
         {$REGION 'Init LCustomFrameworksDir'}
@@ -482,7 +482,7 @@ begin
       Writeln('    -OutputDir=Path where are located all the new generated files.');
       Writeln('    -CustomFrameworksDir=Path of the Custom Frameworks to copy in Frameworks.');
       Writeln('    -FrameworksDir=Path of the Frameworks.');
-      Writeln('    -Platform=iOS or MacOS.');
+      Writeln('    -Platform=Android, iOS or MacOS.');
       Writeln('');
       Writeln('Example:');
       Writeln('  NativeBridgeFileGeneratorHelper.exe^');

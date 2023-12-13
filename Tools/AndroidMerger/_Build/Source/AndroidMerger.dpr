@@ -231,7 +231,7 @@ begin
                 var LSrcNode := LSrcXmlDoc.DocumentElement.ChildNodes[i];
                 //https://stackoverflow.com/questions/74385101/values-xml-with-tag-id-name-vs-item-name-type-id
                 //https://stackoverflow.com/questions/74381063/found-tag-id-where-item-is-expected-with-aapt
-                {$IFNDEF ALCompilerVersionSupported}
+                {$IFNDEF ALCompilerVersionSupported120}
                   {$MESSAGE WARN 'Check if Delphi still use aapt (https://quality.embarcadero.com/browse/RSP-27606) and if not remove the code below'}
                 {$IFEND}
                 if (LSrcNode.NodeType = ntElement) and (LSrcNode.NodeName = 'id') and (LSr.Name='values.xml') then begin
@@ -1901,7 +1901,7 @@ begin
     {$ENDREGION}
 
     {$REGION 'Retrieve delphi configuration'}
-    {$IFNDEF ALCompilerVersionSupported}
+    {$IFNDEF ALCompilerVersionSupported120}
       {$MESSAGE WARN 'Check if Delphi still use aapt (https://quality.embarcadero.com/browse/RSP-27606) and if not remove all usage of aapt.exe and use only aapt2.exe'}
     {$IFEND}
     JDKDir := ''; // C:\Program Files\Eclipse Adoptium\jdk-11.0.16.101-hotspot\
@@ -3302,11 +3302,27 @@ begin
           if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
           //init LDeployFilesToDeactivate
+          {$IFNDEF ALCompilerVersionSupported120}
+            {$MESSAGE WARN 'Check if no new Android resource files were added in DeployProjNormalizer'}
+          {$IFEND}
           LDeployFilesToDeactivate.Add('Android_Strings=<PlatForm>\<Config>\strings.xml');
           LDeployFilesToDeactivate.Add('Android_Colors=<PlatForm>\<Config>\colors.xml');
+          LDeployFilesToDeactivate.Add('Android_ColorsDark=<PlatForm>\<Config>\colors-night-v21.xml|colors.xml');
           LDeployFilesToDeactivate.Add('AndroidSplashImageDef=<PlatForm>\<Config>\splash_image_def.xml');
-          LDeployFilesToDeactivate.Add('AndroidSplashStylesV21=<PlatForm>\<Config>\styles-v21.xml|styles.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashImageDefV21=<PlatForm>\<Config>\splash_image_def-v21.xml|splash_image_def.xml');
           LDeployFilesToDeactivate.Add('AndroidSplashStyles=<PlatForm>\<Config>\styles.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashStylesV21=<PlatForm>\<Config>\styles-v21.xml|styles.xml');
+          LDeployFilesToDeactivate.Add('AndroidSplashStylesV31=<PlatForm>\<Config>\styles-v31.xml|styles.xml');
+          LDeployFilesToDeactivate.Add('Android_AdaptiveIcon=<PlatForm>\<Config>\ic_launcher.xml');
+          LDeployFilesToDeactivate.Add('Android_AdaptiveIconV33=<PlatForm>\<Config>\ic_launcher-v33.xml|ic_launcher.xml');
+          LDeployFilesToDeactivate.Add('Android_VectorizedNotificationIcon=$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml|ic_notification.xml');
+          LDeployFilesToDeactivate.Add('Android_AdaptiveIconMonochrome=$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml|ic_launcher_monochrome.xml');
+          LDeployFilesToDeactivate.Add('Android_AdaptiveIconForeground=$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml|ic_launcher_foreground.xml');
+          LDeployFilesToDeactivate.Add('Android_AdaptiveIconBackground=$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml|ic_launcher_background.xml');
+          LDeployFilesToDeactivate.Add('Android_VectorizedSplash=$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml|splash_vector.xml');
+          LDeployFilesToDeactivate.Add('Android_VectorizedSplashDark=$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml|splash_vector.xml');
+          LDeployFilesToDeactivate.Add('Android_VectorizedSplashV31=$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml|splash_vector.xml');
+          LDeployFilesToDeactivate.Add('Android_VectorizedSplashV31Dark=$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml|splash_vector.xml');
           LDeployFilesToDeactivate.Add('Android_LauncherIcon36=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png|ic_launcher.png');
           LDeployFilesToDeactivate.Add('Android_LauncherIcon48=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png|ic_launcher.png');
           LDeployFilesToDeactivate.Add('Android_LauncherIcon72=$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png|ic_launcher.png');
@@ -3465,28 +3481,9 @@ begin
               LItemGroupNode.ChildNodes.Delete(i);
           end;
 
-          //because of https://quality.embarcadero.com/browse/RSP-40709 we must duplicate all libs
-          //in 2 different subdirectories (32bit and 64bit) so that we can add them in Delphi in both
-          //android32 libraries and android64 libraries of the project
-          {$IFNDEF ALCompilerVersionSupported}
-            {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40709 is corrected and update the code below. !!Update also the tool RJarSwapper.bat!!'}
-          {$IFEND}
-          var LLibsFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\r.jar
-          Var LLibs32BitOutputDir := LLibsOutputDir + '32bit\';
-          TDirectory.CreateDirectory(LLibs32BitOutputDir);
-          Var LLibs64BitOutputDir := LLibsOutputDir + '64bit\';
-          TDirectory.CreateDirectory(LLibs64BitOutputDir);
-          for Var I := Low(LLibsFiles) to High(LLibsFiles) do begin
-            if ALSameTextW(ALExtractFileName(LLibsFiles[i]), 'r-apk.jar') or
-               ALSameTextW(ALExtractFileName(LLibsFiles[i]), 'r-aab.jar') then continue;
-            if not ALSameTextW(ALExtractFileExt(LLibsFiles[i]),'.jar') then raise Exception.Create('Error E88BE4F0-B6E5-4EC4-B890-B9B6169FC58B');
-            Tfile.Copy(LLibsFiles[i], LLibs32BitOutputDir + ALExtractFileName(LLibsFiles[i]));
-            Tfile.Move(LLibsFiles[i], LLibs64BitOutputDir + ALExtractFileName(LLibsFiles[i]));
-          end;
-
-          //add to ItemGroup all items from local libs\32bit folder
-          var LLibs32bitFiles := TDirectory.GetFiles(LLibs32bitOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\32bit\r.jar
-          var LLibs32bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibs32bitOutputDir)); // android\libs\32bit\
+          //add to ItemGroup all items from local libs folder (ClassesdexFile)
+          var LLibs32bitFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\32bit\r.jar
+          var LLibs32bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\32bit\
           for Var I := Low(LLibs32bitFiles) to High(LLibs32bitFiles) do begin
             if ALSameTextW(ALExtractFileName(LLibs32bitFiles[i]), 'r-apk.jar') or
                ALSameTextW(ALExtractFileName(LLibs32bitFiles[i]), 'r-aab.jar') then continue;
@@ -3498,9 +3495,9 @@ begin
             end;
           end;
 
-          //add to ItemGroup all items from local libs\64bit folder
-          var LLibs64bitFiles := TDirectory.GetFiles(LLibs64bitOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\64bit\r.jar
-          var LLibs64bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibs64bitOutputDir)); // android\libs\64bit\
+          //add to ItemGroup all items from local libs folder (ClassesdexFile64)
+          var LLibs64bitFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\64bit\r.jar
+          var LLibs64bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\64bit\
           for Var I := Low(LLibs64bitFiles) to High(LLibs64bitFiles) do begin
             if ALSameTextW(ALExtractFileName(LLibs64bitFiles[i]), 'r-apk.jar') or
                ALSameTextW(ALExtractFileName(LLibs64bitFiles[i]), 'r-aab.jar') then continue;

@@ -1,9 +1,18 @@
 @echo off
 SETLOCAL
 
-echo Java2OP require Java 1.8, please set your %%JAVA_HOME%% to
-echo your Java 1.8 bin directory and the same for your %%PATH%%
-echo.
+for /f "tokens=3" %%a in ('java -version 2^>^&1') do (
+    set "java_version=%%a"
+    goto compare_version
+)
+
+:compare_version
+echo Detected Java version: %java_version%
+if not "%java_version:~1,3%"=="1.8" (
+    echo Java2OP requires Java 1.8, please set your %%JAVA_HOME%% to
+    echo your Java 1.8 bin directory and the same for your %%PATH%%
+    echo.
+)
 
 REM ----------------
 REM Init Environment
@@ -72,8 +81,8 @@ REM call NativeBridgeFileGeneratorHelper to compare
 REM -----------------------------------------------
 
 if "%CompareMasterFile%" NEQ "" (
-  echo Compare "%CompareMasterFile%" to "%TMPDir%\System\Library\Frameworks"
-  call "%ALBaseDir%\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorHelper.exe" -Action="Compare" -MasterFile="%CompareMasterFile%" -OutputDir="%OutputDir%" -Platform="iOS"
+  echo Compare "%CompareMasterFile%" to "%OutputDir%"
+  call "%ALBaseDir%\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorHelper.exe" -Action="Compare" -MasterFile="%CompareMasterFile%" -OutputDir="%OutputDir%" -Platform="Android"
 )
 
 

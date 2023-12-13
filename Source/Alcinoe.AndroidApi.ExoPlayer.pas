@@ -1,5 +1,5 @@
 //
-// Made from com.google.android.exoplayer:exoplayer:2.18.2
+// Made from com.google.android.exoplayer:exoplayer:2.19.1
 //
 unit Alcinoe.AndroidApi.ExoPlayer;
 
@@ -7,13 +7,14 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.google.android.exoplayer:exoplayer:xx.xx.xx where xx.xx.xx
-  //is the last version of the exoplayer and gave also the path to
-  //<Alcinoe>\Source\Alcinoe.AndroidApi.ExoPlayer.pas to build the compare source file. Then make a diff
-  //compare between the new generated Alcinoe.AndroidApi.ExoPlayer.pas and this one to see if the api
-  //signature is still the same
+  //is the last version of the exoplayer (You can find this version at
+  //https://maven.google.com/web/index.html#com.google.android.exoplayer:exoplayer) and gave
+  //also the path to <Alcinoe>\Source\Alcinoe.AndroidApi.ExoPlayer.pas to build the
+  //compare source file. Then make a diff compare between the new generated
+  //Alcinoe.AndroidApi.ExoPlayer.pas and this one to see if the api signature is still the same
   {$MESSAGE WARN 'Check if the api signature of the last version of exoplayer (android) is still the same'}
 {$ENDIF}
 
@@ -181,7 +182,6 @@ type
     procedure onSeekBackIncrementChanged(seekBackIncrementMs: Int64); cdecl;
     procedure onSeekForwardIncrementChanged(seekForwardIncrementMs: Int64); cdecl;
     procedure onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Int64); cdecl;
-    procedure onSeekProcessed; cdecl;
     procedure onAudioSessionIdChanged(audioSessionId: Integer); cdecl;
     procedure onAudioAttributesChanged(audioAttributes: JAudioAttributes); cdecl;
     procedure onVolumeChanged(volume: Single); cdecl;

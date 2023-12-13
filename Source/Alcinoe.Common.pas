@@ -182,7 +182,7 @@ type
   TALPointDType = array [0..1] of Double;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$IFEND}
   PALPointD = ^TALPointD;
@@ -202,7 +202,9 @@ type
     class operator Multiply(const AFactor: Double; const APoint: TALPointD): TALPointD;
     class operator Divide(const APoint: TALPointD; const AFactor: Double): TALPointD;
 
-    class function PointInCircle(const Point, Center: TALPointD; const Radius: Integer): Boolean; static; inline;
+    class function PointInCircle(const Point, Center: TALPointD; const Radius: Double): Boolean; static; inline;
+    function IsInCircle(const Center: TALPointD; const Radius: Double): Boolean;
+
     /// <summary> Zero point having values of (0, 0). </summary>
     class function Zero: TALPointD; inline; static;
 
@@ -255,7 +257,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$IFEND}
   PALSizeD = ^TALSizeD;
@@ -294,7 +296,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$IFEND}
   PALRectD = ^TALRectD;
@@ -443,7 +445,7 @@ type
   end;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
 {$IFEND}
 function ALRectWidth(const Rect: TRect): Integer; inline; overload;
@@ -556,7 +558,7 @@ function ALElapsedTimeSecondsAsDouble: Double;
 function ALElapsedTimeSecondsAsInt64: int64;
 
 {$IFDEF MSWINDOWS}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if EnumDynamicTimeZoneInformation/SystemTimeToTzSpecificLocalTimeEx/TzSpecificLocalTimeToSystemTimeEx are still not declared in Winapi.Windows and adjust the IFDEF'}
 {$ENDIF}
 {$WARNINGS OFF}
@@ -1547,10 +1549,19 @@ begin
   Self.Offset(TALPointD.Create(APoint));
 end;
 
-{*****************************************************************************************************}
-class function TALPointD.PointInCircle(const Point, Center: TALPointD; const Radius: Integer): Boolean;
+{************************************************************************************}
+function TALPointD.IsInCircle(const Center: TALPointD; const Radius: Double): Boolean;
+var
+  D: Double;
 begin
-  Result := Point.Distance(Center) <= Radius;
+  D := Distance(Center);
+  Result := (D < Radius) or SameValue(D, Radius);
+end;
+
+{****************************************************************************************************}
+class function TALPointD.PointInCircle(const Point, Center: TALPointD; const Radius: Double): Boolean;
+begin
+  Result := Point.IsInCircle(Center, Radius);
 end;
 
 {***************************************}

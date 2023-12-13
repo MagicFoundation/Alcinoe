@@ -134,7 +134,6 @@ type
         procedure onSeekBackIncrementChanged(seekBackIncrementMs: Int64); cdecl;
         procedure onSeekForwardIncrementChanged(seekForwardIncrementMs: Int64); cdecl;
         procedure onMaxSeekToPreviousPositionChanged(maxSeekToPreviousPositionMs: Int64); cdecl;
-        procedure onSeekProcessed; cdecl;
         procedure onAudioSessionIdChanged(audioSessionId: Integer); cdecl;
         procedure onAudioAttributesChanged(audioAttributes: JAudioAttributes); cdecl;
         procedure onVolumeChanged(volume: Single); cdecl;
@@ -527,7 +526,7 @@ begin
 
   if (fVideoPlayerControl.fbitmap.Width <> fVideoPlayerControl.fVideoWidth) or
      (fVideoPlayerControl.fbitmap.Height <> fVideoPlayerControl.fVideoHeight) then begin
-    {$IFNDEF ALCompilerVersionSupported}
+    {$IFNDEF ALCompilerVersionSupported120}
       {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
     {$ENDIF}
     // we can't use setsize because it's will finalise the texture
@@ -827,14 +826,6 @@ procedure TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChang
 begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidVideoPlayer.TPlayerListener.onMaxSeekToPreviousPositionChanged', TalLogType.verbose);
-  {$ENDIF}
-end;
-
-{**************************************************************}
-procedure TALAndroidVideoPlayer.TPlayerListener.onSeekProcessed;
-begin
-  {$IF defined(DEBUG)}
-  ALLog('TALAndroidVideoPlayer.TPlayerListener.onSeekProcessed', TalLogType.verbose);
   {$ENDIF}
 end;
 
@@ -1421,7 +1412,7 @@ begin
   if CVOpenGLESTextureCacheCreate(
        kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
        nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
-       (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
+       NSObjectToID(TCustomContextIOS.SharedContext), // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
        nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
        @fvideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVOpenGLESTextureCacheCreate failed!'); // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
 
@@ -1612,12 +1603,12 @@ begin
 
                           //-----
                           fNotificationsDelegate := TNotificationsDelegate.Create(self);
-                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
-                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), (FPlayerItem as ILocalObject).GetObjectID);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(FPlayerItem));
 
                           //-----
                           FKVODelegate := TKVODelegate.Create(self);
@@ -1845,7 +1836,7 @@ begin
         cfRElease(pointer(LPrevTextureRef));
 
       //-----
-      {$IFNDEF ALCompilerVersionSupported}
+      {$IFNDEF ALCompilerVersionSupported120}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       TALTextureAccessPrivate(fBitmap).FWidth := LWidth;

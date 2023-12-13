@@ -527,7 +527,7 @@ var LJListIceServers: JList;
 {$IF defined(ios)}
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
   {$ENDIF}
   procedure _InitTexture(const aTexture: TTexture);
@@ -1264,7 +1264,7 @@ begin
   if CVOpenGLESTextureCacheCreate(
        kCFAllocatorDefault, // allocator: The CFAllocatorRef to use for allocating the texture cache. This parameter can be NULL.
        nil, // cacheAttributes: A CFDictionaryRef containing the attributes of the texture cache itself. This parameter can be NULL.
-       (TCustomContextIOS.SharedContext as ILocalObject).GetObjectID, // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
+       NSObjectToID(TCustomContextIOS.SharedContext), // eaglContext: The OpenGLES 2.0 context into which the texture objects will be created. OpenGLES 1.x contexts are not supported.
        nil, // textureAttributes: A CFDictionaryRef containing the attributes to be used for creating the CVOpenGLESTextureRef objects. This parameter can be NULL.
        @fvideoTextureCacheRef) <> kCVReturnSuccess then raise Exception.Create('CVOpenGLESTextureCacheCreate failed!'); // cacheOut: A pointer to a CVOpenGLESTextureCacheRef where the newly created texture cache will be placed.
   //-----
@@ -1497,7 +1497,7 @@ begin
                                      TRTCH264ProfileLevelId.wrap(
                                        TRTCH264ProfileLevelId.OCClass.alloc).
                                          initWithHexString(
-                                           TNSString.Wrap(LVideoCodecInfo.parameters.objectForKey((StrToNsStr('profile-level-id') as IlocalObject).GetObjectID))));
+                                           TNSString.Wrap(LVideoCodecInfo.parameters.objectForKey(NSObjectToID(StrToNsStr('profile-level-id'))))));
             try
               if (LH264ProfileLevelId.profile = RTCH264ProfileConstrainedHigh) or
                  (LH264ProfileLevelId.profile = RTCH264ProfileHigh) then LVideoCodecName := 'H264 High'
@@ -1515,8 +1515,8 @@ begin
                                     TRTCPeerConnectionFactory.Wrap(
                                       TRTCPeerConnectionFactory.OCClass.alloc).
                                         initWithEncoderFactory(
-                                          (LEncoderFactory as ILocalObject).GetObjectID,
-                                          (LDecoderFactory as ILocalObject).GetObjectID));
+                                          NSObjectToID(LEncoderFactory),
+                                          NSObjectToID(LDecoderFactory)));
 
       finally
         LDecoderFactory.release;
@@ -1533,11 +1533,11 @@ begin
            (fIceServers[I].password = '') then LIceServers[I] := TRTCIceServer.Wrap(
                                                                    TRTCIceServer.OCClass.alloc).
                                                                      initWithURLStrings(
-                                                                       TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(fIceServers[I].uri) as ILocalObject).GetObjectID))) // urlStrings: NSArray)
+                                                                       TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(NSObjectToID(StrToNSStr(fIceServers[I].uri))))) // urlStrings: NSArray)
         else LIceServers[I] := TRTCIceServer.Wrap(
                                  TRTCIceServer.OCClass.alloc).
                                     initWithURLStringsUsernameCredential(
-                                      TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(fIceServers[I].uri) as ILocalObject).GetObjectID)), // urlStrings: NSArray;
+                                      TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(NSObjectToID(StrToNSStr(fIceServers[I].uri)))), // urlStrings: NSArray;
                                       StrToNSStr(fIceServers[I].username), // username: NSString;
                                       StrToNSStr(fIceServers[I].password)); // credential: NSString)
       end;
@@ -1551,7 +1551,7 @@ begin
           //-----
           LCertificateParams := TNSMutableDictionary.Create;
           try
-            LCertificateParams.setValue((StrToNSStr('RSASSA-PKCS1-v1_5') as ILocalObject).GetObjectID, StrToNSStr('name'));
+            LCertificateParams.setValue(NSObjectToID(StrToNSStr('RSASSA-PKCS1-v1_5')), StrToNSStr('name'));
             LCertificateParams.setValue(TNSNumber.OCClass.numberWithInt(100000), StrToNSStr('expires'));
             LCertificate := TRTCCertificate.oCClass.generateCertificateWithParams(LCertificateParams); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
             LConfiguration.setCertificate(LCertificate);
@@ -1563,7 +1563,7 @@ begin
           //-----
           LOptionalConstraints := TNSMutableDictionary.Create;
           try
-            LOptionalConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('DtlsSrtpKeyAgreement'));
+            LOptionalConstraints.setValue(NSObjectToID(StrToNSStr('true')), StrToNSStr('DtlsSrtpKeyAgreement'));
             LMediaConstraints := TRTCMediaConstraints.Wrap(
                                    TRTCMediaConstraints.Wrap(
                                      TRTCMediaConstraints.OCClass.alloc).
@@ -1607,7 +1607,7 @@ begin
         LAudioSource := fPeerConnectionFactory.audioSourceWithConstraints(LMediaConstraints); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
         fLocalAudioTrack := fPeerConnectionFactory.audioTrackWithSource(LAudioSource, StrToNSStr(kARDAudioTrackId)); // << we don't need to call release (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
         fLocalAudioTrack.retain;
-        fpeerConnection.addTrack(fLocalAudioTrack, TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(kARDMediaStreamId) as ILocalObject).GetObjectID)));
+        fpeerConnection.addTrack(fLocalAudioTrack, TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(NSObjectToID(StrToNSStr(kARDMediaStreamId)))));
 
         if (fPeerConnectionParameters.videoCallEnabled) then begin
 
@@ -1617,11 +1617,11 @@ begin
                                     TRTCCameraVideoCapturer.Wrap(
                                       TRTCCameraVideoCapturer.OCClass.alloc).
                                         initWithDelegate(
-                                          (fVideoSource as ILocalObject).GetObjectID));
+                                          NSObjectToID(fVideoSource)));
 
           fLocalVideoTrack := fpeerConnectionFactory.videoTrackWithSource(fVideoSource, StrToNSStr(kARDVideoTrackId));
           fLocalVideoTrack.retain; // << we need to call retain as we didn't create it ourself (https://stackoverflow.com/questions/52314334/ios-objective-c-object-when-to-use-release-and-when-to-not-use-it)
-          fpeerConnection.addTrack(fLocalVideoTrack, TNSArray.Wrap(TNSArray.OCClass.arrayWithObject((StrToNSStr(kARDMediaStreamId) as ILocalObject).GetObjectID)));
+          fpeerConnection.addTrack(fLocalVideoTrack, TNSArray.Wrap(TNSArray.OCClass.arrayWithObject(NSObjectToID(StrToNSStr(kARDMediaStreamId)))));
 
           fLocalVideoTrackRenderer := TLocalVideoTrackRenderer.create(self);
           fLocalVideoTrack.addRenderer(fLocalVideoTrackRenderer.GetObjectID);
@@ -1645,7 +1645,7 @@ begin
             else break;
           end;
           if LTransceiver = nil then raise Exception.Create('No remote video track founded');
-          fRemoteVideoTrack := TRTCVideoTrack.Wrap((LTransceiver.receiver.track as ILocalObject).GetObjectID);
+          fRemoteVideoTrack := TRTCVideoTrack.Wrap(NSObjectToID(LTransceiver.receiver.track));
           fRemoteVideoTrack.retain;
           fRemoteVideoTrackRenderer := TRemoteVideoTrackRenderer.create(self);
           fRemoteVideoTrack.addRenderer(fRemoteVideoTrackRenderer.GetObjectID);
@@ -2095,8 +2095,8 @@ begin
 
   LMandatoryConstraints := TNSMutableDictionary.Create;
   try
-    LMandatoryConstraints.setValue((StrToNSStr('true') as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveAudio'));
-    LMandatoryConstraints.setValue((StrToNSStr(ALIfThenW(fPeerConnectionParameters.videoCallEnabled, 'true', 'false')) as ILocalObject).GetObjectID, StrToNSStr('OfferToReceiveVideo'));
+    LMandatoryConstraints.setValue(NSObjectToID(StrToNSStr('true')), StrToNSStr('OfferToReceiveAudio'));
+    LMandatoryConstraints.setValue(NSObjectToID(StrToNSStr(ALIfThenW(fPeerConnectionParameters.videoCallEnabled, 'true', 'false'))), StrToNSStr('OfferToReceiveVideo'));
     result := TRTCMediaConstraints.Wrap(
                 TRTCMediaConstraints.Wrap(
                   TRTCMediaConstraints.OCClass.alloc).
@@ -2505,7 +2505,7 @@ begin
       glBindTexture(GL_TEXTURE_2D, 0);
 
       //-----
-      {$IFNDEF ALCompilerVersionSupported}
+      {$IFNDEF ALCompilerVersionSupported120}
         {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
       {$ENDIF}
       TALTextureAccessPrivate(fiOSWebRTC.fWebRTC.FLocalBitmap).FWidth := LLumaWidth;
@@ -2749,7 +2749,7 @@ begin
 
       LFieldTrials := TNSDictionary.Wrap(TNSDictionary.Wrap(TNSDictionary.OCClass.alloc).init);
       try
-        RTCInitFieldTrialDictionary((LFieldTrials as ILocalObject).GetObjectID);
+        RTCInitFieldTrialDictionary(NSObjectToID(LFieldTrials));
       finally
         LFieldTrials.release;
       end;

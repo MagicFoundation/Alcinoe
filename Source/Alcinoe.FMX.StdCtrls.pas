@@ -4,8 +4,8 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
+{$IFNDEF ALCompilerVersionSupported120}
+  {$MESSAGE WARN 'Check if FMX.StdCtrls.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 uses
@@ -39,6 +39,8 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALAniIndicator = class(Tcontrol)
+  public const
+    DefaultEnabled = False;
   private
     fTimer: TTimer;
     finterval: integer;
@@ -70,7 +72,7 @@ type
     property Cursor default crDefault;
     property DragMode default TDragMode.dmManual;
     property EnableDragHighlight default True;
-    property Enabled default False;
+    property Enabled stored EnabledStored default DefaultEnabled;
     property Locked default False;
     property Height;
     property Hint;
@@ -145,7 +147,7 @@ type
     fScrollCapturedByOther: boolean;
     procedure setScrollCapturedByMe(const Value: boolean);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
-    function PointToValue(X, Y: Single): Single;
+    function PointToValue(X, Y: Single): Double;
   public
     constructor Create(const ATrack: TALCustomTrack; const aValueRange: TValueRange; const aWithGlyphObj: boolean); reintroduce;
     destructor Destroy; override;
@@ -209,16 +211,16 @@ type
     FThumb: TALTrackThumb;
     FBackGround: TALTrackBackground;
     FHighlight: TALTrackHighlight;
-    procedure SetViewportSize(const Value: Single); virtual;
-    function GetViewportSize: Single; virtual;
-    function GetFrequency: Single; virtual;
-    procedure SetFrequency(const Value: Single); virtual;
-    function GetMax: Single; virtual;
-    procedure SetMax(const Value: Single); virtual;
-    function GetMin: Single; virtual;
-    procedure SetMin(const Value: Single); virtual;
-    function GetValue: Single; virtual;
-    procedure SetValue(Value: Single); virtual;
+    procedure SetViewportSize(const Value: Double); virtual;
+    function GetViewportSize: Double; virtual;
+    function GetFrequency: Double; virtual;
+    procedure SetFrequency(const Value: Double); virtual;
+    function GetMax: Double; virtual;
+    procedure SetMax(const Value: Double); virtual;
+    function GetMin: Double; virtual;
+    procedure SetMin(const Value: Double); virtual;
+    function GetValue: Double; virtual;
+    procedure SetValue(Value: Double); virtual;
     function ValueStored: Boolean; virtual;
     function GetData: TValue; override;
     procedure SetData(const Value: TValue); override;
@@ -228,24 +230,24 @@ type
     function GetDefaultTouchTargetExpansion: TRectF; override;
     function GetThumbSize(var IgnoreViewportSize: Boolean): Integer; virtual;
     procedure DoRealign; override;
-    property IsTracking: Boolean read GetIsTracking;
     procedure Loaded; override;
     procedure DoChanged; virtual;
     procedure DoTracking; virtual;
     function CreateValueRangeTrack : TValueRange; virtual;
     property DefaultValueRange: TBaseValueRange read FDefaultValueRange;
     property ValueRange: TValueRange read FValueRange write SetValueRange_ stored ValueStored;
-    property Value: Single read GetValue write SetValue stored ValueStored nodefault;
+    property Value: Double read GetValue write SetValue stored ValueStored nodefault;
     property Thumb: TALTrackThumb read FThumb;
     procedure UpdateHighlight; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AfterConstruction; override;
-    property Min: Single read GetMin write SetMin stored MinStored nodefault;
-    property Max: Single read GetMax write SetMax stored MaxStored nodefault;
-    property Frequency: Single read GetFrequency write SetFrequency stored FrequencyStored nodefault;
-    property ViewportSize: Single read GetViewportSize write SetViewportSize stored ViewportSizeStored nodefault;
+    property IsTracking: Boolean read GetIsTracking;
+    property Min: Double read GetMin write SetMin stored MinStored nodefault;
+    property Max: Double read GetMax write SetMax stored MaxStored nodefault;
+    property Frequency: Double read GetFrequency write SetFrequency stored FrequencyStored nodefault;
+    property ViewportSize: Double read GetViewportSize write SetViewportSize stored ViewportSizeStored nodefault;
     property Orientation: TOrientation read FOrientation write SetOrientation;
     property Tracking: Boolean read FTracking write FTracking default True;
     property ThumbSize: Single read fThumbSize write SetThumbSize Stored ThumbSizeStored; // << 0 mean the thumb will have the height of the track in horizontal or width of the track in vertical
@@ -421,15 +423,15 @@ type
     FMaxValueRange: TValueRange;
   protected
     FMaxThumb: TALTrackThumb;
-    procedure SetViewportSize(const Value: Single); override;
-    procedure SetFrequency(const Value: Single); override;
-    procedure SetMax(const Value: Single); override;
-    procedure SetMin(const Value: Single); override;
+    procedure SetViewportSize(const Value: Double); override;
+    procedure SetFrequency(const Value: Double); override;
+    procedure SetMax(const Value: Double); override;
+    procedure SetMin(const Value: Double); override;
     function MaxValueStored: Boolean; virtual;
     function GetDefaultSize: TSizeF; override;
-    procedure SetValue(Value: Single); override;
-    function GetMaxValue: Single; virtual;
-    procedure SetMaxValue(Value: Single); virtual;
+    procedure SetValue(Value: Double); override;
+    function GetMaxValue: Double; virtual;
+    procedure SetMaxValue(Value: Double); virtual;
     procedure Loaded; override;
     procedure DoRealign; override;
     procedure UpdateHighlight; override;
@@ -461,8 +463,8 @@ type
     property Padding;
     property Min;
     property Max;
-    property MinValue: Single read GetValue write SetValue stored ValueStored nodefault;
-    property MaxValue: Single read GetMaxValue write SetMaxValue stored MaxValueStored nodefault;
+    property MinValue: Double read GetValue write SetValue stored ValueStored nodefault;
+    property MaxValue: Double read GetMaxValue write SetMaxValue stored MaxValueStored nodefault;
     property Orientation;
     property Opacity;
     property Margins;
@@ -527,6 +529,7 @@ type
     FOnChange: TNotifyEvent;
     FIsPressed: Boolean;
     FIsChecked: Boolean;
+    FIsPan: Boolean;
     fImageCheckedResourceName: String;
     fImageUncheckedResourceName: String;
     FWrapMode: TALImageWrapMode;
@@ -547,6 +550,7 @@ type
     destructor Destroy; override;
     function MakeBufBitmap: TALRasterImage; virtual;
     procedure clearBufBitmap; virtual;
+    procedure SetNewScene(AScene: IScene); override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -729,7 +733,6 @@ type
     property AnimationDuration: single read fAnimationDuration write fAnimationDuration stored AnimationDurationStored;
     property Visible default True;
     property Width;
-    property OnApplyStyleLookup;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
@@ -797,7 +800,7 @@ begin
   if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
   else FScreenScale := 1;
   fBufBitmap := nil;
-  Enabled := False;
+  Enabled := DefaultEnabled;
   SetAcceptsControls(False);
 end;
 
@@ -978,8 +981,8 @@ begin
   end;
 end;
 
-{*******************************************************************************************************************************}
-function _ValueToPos(MinValue, MaxValue, ViewportSize, ThumbSize, TrackSize, Value: Single; IgnoreViewportSize: Boolean): Single;
+{***************************************************************************************************************************************}
+function _ValueToPos(MinValue, MaxValue, ViewportSize: Double; ThumbSize, TrackSize, Value: Single; IgnoreViewportSize: Boolean): Single;
 var ValRel: Double;
 begin
   Result := ThumbSize / 2;
@@ -991,8 +994,8 @@ begin
   end;
 end;
 
-{*****************************************************************************************************************************}
-function _PosToValue(MinValue, MaxValue, ViewportSize, ThumbSize, TrackSize, Pos: Single; IgnoreViewportSize: Boolean): Single;
+{*************************************************************************************************************************************}
+function _PosToValue(MinValue, MaxValue, ViewportSize: Double; ThumbSize, TrackSize, Pos: Single; IgnoreViewportSize: Boolean): Double;
 var ValRel: Double;
 begin
   Result := MinValue;
@@ -1049,7 +1052,7 @@ begin
 end;
 
 {********************************************************}
-function TALTrackThumb.PointToValue(X, Y: Single): Single;
+function TALTrackThumb.PointToValue(X, Y: Single): Double;
 var P: TPointF;
 begin
   Result := 0;
@@ -1456,63 +1459,63 @@ begin
 end;
 
 {*************************************}
-function TALCustomTrack.GetMax: Single;
+function TALCustomTrack.GetMax: Double;
 begin
   Result := FValueRange.Max;
 end;
 
 {***************************************************}
-procedure TALCustomTrack.SetMax(const Value: Single);
+procedure TALCustomTrack.SetMax(const Value: Double);
 begin
   if compareValue(Value, Min) < 0 then min := Value;
   FValueRange.Max := Value;
 end;
 
 {***************************************************}
-procedure TALCustomTrack.SetMin(const Value: Single);
+procedure TALCustomTrack.SetMin(const Value: Double);
 begin
   if compareValue(Value, Max) > 0 then max := Value;
   FValueRange.Min := Value;
 end;
 
 {*************************************}
-function TALCustomTrack.GetMin: Single;
+function TALCustomTrack.GetMin: Double;
 begin
   Result := FValueRange.Min;
 end;
 
 {*********************************************************}
-procedure TALCustomTrack.SetFrequency(const Value: Single);
+procedure TALCustomTrack.SetFrequency(const Value: Double);
 begin
   FValueRange.Frequency := Value;
 end;
 
 {*******************************************}
-function TALCustomTrack.GetFrequency: Single;
+function TALCustomTrack.GetFrequency: Double;
 begin
   Result := FValueRange.Frequency;
 end;
 
 {***************************************}
-function TALCustomTrack.GetValue: Single;
+function TALCustomTrack.GetValue: Double;
 begin
   Result := FValueRange.Value;
 end;
 
 {***********************************************}
-procedure TALCustomTrack.SetValue(Value: Single);
+procedure TALCustomTrack.SetValue(Value: Double);
 begin
   FValueRange.Value := Value;
 end;
 
 {**********************************************}
-function TALCustomTrack.GetViewportSize: Single;
+function TALCustomTrack.GetViewportSize: Double;
 begin
   Result := FValueRange.ViewportSize;
 end;
 
 {************************************************************}
-procedure TALCustomTrack.SetViewportSize(const Value: Single);
+procedure TALCustomTrack.SetViewportSize(const Value: Double);
 begin
   FValueRange.ViewportSize := Value;
 end;
@@ -1544,6 +1547,7 @@ begin
     LThumbRect := GetThumbRect(Value, FThumb);
     FThumb.Visible := not LThumbRect.IsEmpty;
     FThumb.BoundsRect := LThumbRect;
+    Repaint;
   end;
   UpdateHighlight;
 end;
@@ -1578,8 +1582,8 @@ end;
 
 {************************************************************************************************}
 procedure TALCustomTrack.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
-var inc: Single;
-    LValue: Single;
+var inc: Double;
+    LValue: Double;
 begin
   inc := Frequency;
   if inc = 0 then inc := 1;
@@ -1847,7 +1851,7 @@ begin
 end;
 
 {*************************************************}
-procedure TALRangeTrackBar.SetValue(Value: Single);
+procedure TALRangeTrackBar.SetValue(Value: Double);
 begin
   inherited SetValue(Value);
   if (not fThumb.IsPressed) and
@@ -1855,13 +1859,13 @@ begin
 end;
 
 {********************************************}
-function TALRangeTrackBar.GetMaxValue: Single;
+function TALRangeTrackBar.GetMaxValue: Double;
 begin
   Result := FMaxValueRange.Value;
 end;
 
 {****************************************************}
-procedure TALRangeTrackBar.SetMaxValue(Value: Single);
+procedure TALRangeTrackBar.SetMaxValue(Value: Double);
 begin
   FMaxValueRange.Value := Value;
   if (not fMaxThumb.IsPressed) and
@@ -1875,14 +1879,14 @@ begin
 end;
 
 {***********************************************************}
-procedure TALRangeTrackBar.SetFrequency(const Value: Single);
+procedure TALRangeTrackBar.SetFrequency(const Value: Double);
 begin
   inherited;
   FMaxValueRange.Frequency := Value;
 end;
 
 {*****************************************************}
-procedure TALRangeTrackBar.SetMax(const Value: Single);
+procedure TALRangeTrackBar.SetMax(const Value: Double);
 begin
   if compareValue(Value, Min) < 0 then min := Value;
   inherited;
@@ -1890,7 +1894,7 @@ begin
 end;
 
 {*****************************************************}
-procedure TALRangeTrackBar.SetMin(const Value: Single);
+procedure TALRangeTrackBar.SetMin(const Value: Double);
 begin
   if compareValue(Value, Max) > 0 then max := Value;
   inherited;
@@ -1898,7 +1902,7 @@ begin
 end;
 
 {**************************************************************}
-procedure TALRangeTrackBar.SetViewportSize(const Value: Single);
+procedure TALRangeTrackBar.SetViewportSize(const Value: Double);
 begin
   inherited;
   FMaxValueRange.ViewportSize := Value;
@@ -1919,6 +1923,7 @@ begin
   FOnChange := nil;
   FIsPressed := False;
   FIsChecked := False;
+  FIsPan := False;
   fImageCheckedResourceName := 'checkbox_checked_88x88';
   fImageUncheckedResourceName := 'checkbox_unchecked_88x88';
   FWrapMode := TALImageWrapMode.Fit;
@@ -1945,6 +1950,18 @@ begin
   Repaint;
 end;
 
+{************************************************}
+procedure TALCheckbox.SetNewScene(AScene: IScene);
+begin
+  if FIsPressed and (Scene <> nil) then
+  begin
+    FIsPressed := False;
+    if AScene <> nil then
+      StartTriggerAnimation(Self, 'IsPressed');
+  end;
+  inherited;
+end;
+
 {**************************************************************************************}
 procedure TALCheckbox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
@@ -1953,20 +1970,31 @@ begin
   begin
     FPressing := True;
     FIsPressed := True;
+    FIsPan := False;
     StartTriggerAnimation(Self, 'IsPressed');
   end;
 end;
 
 {****************************************************************}
 procedure TALCheckbox.MouseMove(Shift: TShiftState; X, Y: Single);
+const
+  ThresholdMouseTap = 5;
+var
+  Distance: Single;
 begin
   inherited;
-  if (ssLeft in Shift) and (FPressing) then
+  if (ssLeft in Shift) and FPressing then
   begin
     if FIsPressed <> LocalRect.Contains(PointF(X, Y)) then
     begin
       FIsPressed := LocalRect.Contains(PointF(X, Y));
       StartTriggerAnimation(Self, 'IsPressed');
+    end;
+    if not FIsPan then
+    begin
+      Distance := LocalToScreen(PressedPosition).Distance(LocalToScreen(TPointF.Create(X, Y)));
+      if Distance > ThresholdMouseTap then
+        FIsPan := True;
     end;
   end;
 end;
@@ -1982,7 +2010,15 @@ begin
 
     if LocalRect.Contains(PointF(X, Y)) then
     begin
-      IsChecked := not IsChecked;
+      // Avoiding a changing "Checked" state if user moves cursor of finger through the control.
+      case TOSVersion.Platform of
+        TOSVersion.TPlatform.pfiOS,
+        TOSVersion.TPlatform.pfAndroid:
+          if not FIsPan then
+            IsChecked := not IsChecked;
+      else
+        IsChecked := not IsChecked;
+      end;
     end
   end;
 end;

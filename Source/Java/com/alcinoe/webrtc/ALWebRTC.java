@@ -460,6 +460,7 @@ public class ALWebRTC {
     return null;
   }
                                                                                 
+  @SuppressWarnings("deprecation")
   public boolean start() throws ClassNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
     
     /* exit if already started */
@@ -601,7 +602,8 @@ public class ALWebRTC {
     return true;
     
   }   
-                                                                                
+                      
+  @SuppressWarnings("deprecation")                                                          
   public void stop() {
 
     // Restore previously stored audio states.

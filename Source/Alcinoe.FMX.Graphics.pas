@@ -3584,10 +3584,10 @@ begin
 
                     LClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
                     LClampFilter.setDefaults;
-                    LClampFilter.setValueforKey((LCIImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
 
                     LBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
-                    LBlurFilter.setValueforKey((LClampFilter.outputImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
                     LBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(LRadius), kCIInputRadiusKey);
 
                     result := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
@@ -3780,10 +3780,10 @@ begin
 
                     LClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
                     LClampFilter.setDefaults;
-                    LClampFilter.setValueforKey((LCIImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
 
                     LBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
-                    LBlurFilter.setValueforKey((LClampFilter.outputImage as ILocalObject).getObjectId, kCIInputImageKey);
+                    LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
                     LBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aRadius), kCIInputRadiusKey);
 
                     result := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
@@ -7542,7 +7542,7 @@ end;
 {$ENDIF}
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Objects.GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
 {$ENDIF}
 //duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
@@ -10315,7 +10315,7 @@ begin
   //TCanvas do not work from a background thread
   //under android/ios we use platform API functions
   //do draw images but under windows/macos we use Tcanvas :(
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,
@@ -10349,7 +10349,7 @@ begin
   //TCanvas do not work from a background thread
   //under android/ios we use platform API functions
   //do draw images but under windows/macos we use Tcanvas :(
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,

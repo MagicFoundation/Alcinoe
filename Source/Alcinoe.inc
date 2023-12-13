@@ -1,12 +1,10 @@
 //https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Compiler_Versions
-{$IF (CompilerVersion <= 35.0) and (not declared(RTLVersion114))} // This mean <= Delphi Alexandria 11.3
-  //When updating this block then first create the define ALCompilerVersionSupported_TMP that
-  //is set for the current compiler version, then progressively replace in all source
-  //files ALCompilerVersionSupported by ALCompilerVersionSupported_TMP and when everything done
-  //delete ALCompilerVersionSupported_TMP from here and replace in all files ALCompilerVersionSupported_TMP
-  //by ALCompilerVersionSupported. This must be done for all the MagicFoundation projects, not only
-  //for the Alcinoe project
-  {$DEFINE ALCompilerVersionSupported}
+{$IF (CompilerVersion <= 36.0) and (not declared(RTLVersion121))} // This mean <= Delphi Athens 12.0
+  //When updating this block delete the define below and add a new define that
+  //is set for the current compiler version. Then progressively replace in all source
+  //files the old define by the new define. This must be done for all the MagicFoundation 
+  //projects, not only for the Alcinoe project.
+  {$DEFINE ALCompilerVersionSupported120}
 {$ENDIF}
 
 {$IF defined(CPUX86) or defined(CPUX64)} // CPU is an Intel 386 or later on any platform.

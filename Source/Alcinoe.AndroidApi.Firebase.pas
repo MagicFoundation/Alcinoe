@@ -1,5 +1,5 @@
 //
-// Made from firebase-messaging 23.1.0
+// Made from firebase-messaging 23.2.0
 //
 unit Alcinoe.AndroidApi.Firebase;
 
@@ -7,10 +7,11 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.google.firebase:firebase-messaging:xx.xx.xx where xx.xx.xx
-  //is the last version of the firebase-messaging and gave also the path to
+  //is the last version of the firebase-messaging (You can find this version at
+  //https://maven.google.com/web/index.html#com.google.firebase:firebase-messaging) and gave also the path to
   //<Alcinoe>\Source\Alcinoe.AndroidApi.Firebase.pas to build the compare source file. Then make a diff
   //compare between the new generated Alcinoe.AndroidApi.Firebase.pas and this one to see if the api
   //signature is still the same. repeat the operation below with the library

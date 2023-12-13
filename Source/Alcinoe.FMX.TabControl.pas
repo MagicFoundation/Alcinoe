@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.TabControl.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -256,10 +256,11 @@ begin
   Enabled := True;
   Visible := True;
   HitTest := False;
-  position.X := -65535; // this because some tab can contain control without z-order like TALEdit and
-                        // when the tab (all the tab) is first created, it's created at a visible pos to be later realigned
-                        // by the tabcontrol. this cause the TALEdit to be show for very short time, waiting the realignment
-                        // so workaround is to create instead the Tabitem at an invisible position
+  // this because some tab can contain control without z-order like TALEdit and
+  // when the tab (all the tab) is first created, it's created at a visible pos to be later realigned
+  // by the tabcontrol. this cause the TALEdit to be show for very short time, waiting the realignment
+  // so workaround is to create instead the Tabitem at an invisible position
+  position.X := -65535;
 end;
 
 {****************************}

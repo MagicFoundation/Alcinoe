@@ -917,7 +917,7 @@ begin
         else LUIColor := AlphaColorToUIColor(fTextPromptColor);
       end
       else LUIColor := AlphaColorToUIColor(fTextSettings.FontColor);
-      LTextAttr.addAttribute(NSForegroundColorAttributeName, (LUIColor as ILocalObject).GetObjectID, LTextRange);
+      LTextAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LUIColor), LTextRange);
       //NOTE: if i try to release the aUIColor i have an exception
       //      so it's seam something acquire it
 
@@ -927,7 +927,7 @@ begin
         LParagraphStyle.setlineHeightMultiple(fLineSpacingMultiplier);
         LParagraphStyle.setLineSpacing(fLineSpacingExtra);
         LParagraphStyle.setAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
-        LTextAttr.addAttribute(NSParagraphStyleAttributeName, (LParagraphStyle as ILocalObject).GetObjectID, LTextRange);
+        LTextAttr.addAttribute(NSParagraphStyleAttributeName, NSObjectToID(LParagraphStyle), LTextRange);
       finally
         LParagraphStyle.release;
       end;

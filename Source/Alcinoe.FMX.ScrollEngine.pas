@@ -64,7 +64,7 @@ type
   {********************************************************}
   // Calculates the velocity of pointer movements over time.
   // Taken from Android VelocityTracker
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if android VelocityTracker was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\VelocityTracker.java with <SDKs>\android\sources\android-33\android\view\VelocityTracker.java
     //Compare <Alcinoe>\References\Android\VelocityTracker.cpp with https://android.googlesource.com/platform/frameworks/native/libs/input/VelocityTracker.cpp
@@ -406,7 +406,7 @@ type
   // ability to overshoot the bounds of a scrolling operation.
   // Taken from Android OverScroller
   // https://www.sobyte.net/post/2022-02/android-over-scroller/
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if android OverScroller was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\OverScroller.java with <SDKs>\android\sources\android-33\android\widget\OverScroller.java
   {$ENDIF}
@@ -559,7 +559,6 @@ type
     procedure DoStart; virtual;
     procedure DoChanged; virtual;
     procedure DoStop; virtual;
-    function Calculate: boolean;
   public
     const
       // taken from android ViewConfiguration TOUCH_SLOP = 8;
@@ -577,6 +576,7 @@ type
   public
     constructor Create; virtual;
     destructor Destroy; override;
+    function Calculate: boolean;
     // Specifies the duration between offset recalculations. We don't use
     // TimerInterval for Android/iOS since we utilize DisplayLink and JChoreographer
     property TimerInterval: Integer read FTimerInterval write SetTimerInterval;

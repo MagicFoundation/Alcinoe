@@ -22,6 +22,7 @@ uses
   Fmx.types,
   FMX.TextLayout,
   FMX.graphics,
+  FMX.Filter,
   FMX.Effects,
   FMX.controls;
 
@@ -99,11 +100,11 @@ function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 
 Type
 
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALControlAccessPrivate = class(TFmxObject)
-  {$IF CompilerVersion >= 32}  // tokyo
+  {$IF CompilerVersion >= 32}  // Tokyo
   private type
     TDelayedEvent = (Resize, Resized);
   {$ENDIF}
@@ -162,7 +163,7 @@ Type
     FRecalcEnabled, FEnabled, FAbsoluteEnabled: Boolean;
     FTabList: TTabList;
     FOnResize: TNotifyEvent;
-    {$IF CompilerVersion >= 32}  // tokyo
+    {$IF CompilerVersion >= 32}  // Tokyo
     FOnResized: TNotifyEvent;
     {$ENDIF}
     FDisableEffect: Boolean;
@@ -182,23 +183,33 @@ Type
     FDisabledOpacity: Single;
     [Weak] FParentControl: TControl;
     FParentContent: IContent;
+    {$IF CompilerVersion >= 36}  // Athens
+    FParentContentObserver: IContentObserver;
+    {$ENDIF}
     FUpdateRect: TRectF;
     FTabStop: Boolean;
     FDisableDisappear: Integer;
     FAnchorMove: Boolean;
     FApplyingEffect: Boolean;
-    {$IF CompilerVersion >= 32}  // tokyo
+    {$IF CompilerVersion >= 32}  // Tokyo
     FExitingOrEntering: Boolean;
     FDelayedEvents: set of TDelayedEvent;
     {$ENDIF}
-    {$IF CompilerVersion >= 34}  // sydney
+    {$IF CompilerVersion >= 34}  // Sydney
     FTabOrder: TTabOrder;
     {$ENDIF}
     FInflated: Boolean;
+    {$IF CompilerVersion >= 36}  // Athens
+    FOnApplyStyle: TNotifyEvent;
+    FOnFreeStyle: TNotifyEvent;
+    {$ELSE}
     FOnApplyStyleLookup: TNotifyEvent;
+    {$ENDIF}
     FAlign: TAlignLayout;
     FAnchors: TAnchors;
-    FUpdateEffects: Boolean; // << i personnally need to access this private field
+    {$IF CompilerVersion < 36}  // Athens
+    FUpdateEffects: Boolean;
+    {$ENDIF}
     FDisableFocusEffect: Boolean;
     FTouchManager: TTouchManager;
     FOnGesture: TGestureEvent;
@@ -207,7 +218,7 @@ Type
     FPressedPosition: TPointF;
     FDoubleClick: Boolean;
     FParentShowHint: Boolean;
-    {$IF CompilerVersion >= 33}  // rio
+    {$IF CompilerVersion >= 33}  // Rio
     FCustomSceneAddRect: TCustomSceneAddRectEvent;
     {$ENDIF}
     FScene: IScene;
@@ -217,7 +228,11 @@ Type
     FLocalMatrix: TMatrix;
     FAbsoluteMatrix: TMatrix;
     FInvAbsoluteMatrix: TMatrix;
+    {$IF CompilerVersion >= 36}  // Athens
+    FEffectCache: IFilterCacheLayer;
+    {$ELSE}
     FEffectBitmap: TBitmap;
+    {$ENDIF}
     FLocked: Boolean;
     FOpacity, FAbsoluteOpacity: Single;
     FInPaintTo: Boolean;
@@ -225,7 +240,7 @@ Type
     FAbsoluteHasEffect: Boolean;
     FAbsoluteHasDisablePaintEffect: Boolean;
     FAbsoluteHasAfterPaintEffect: Boolean;
-    FUpdating: Integer; // << i personnally need to access this protected field
+    FUpdating: Integer;
     FNeedAlign: Boolean;
     FDisablePaint: Boolean;
     FDisableAlign: Boolean;
@@ -248,32 +263,6 @@ Type
     FExplicitTop: Single;
     FExplicitWidth: Single;
     FExplicitHeight: Single;
-  end;
-
-  {$IFNDEF ALCompilerVersionSupported}
-    {$MESSAGE WARN 'Check if FMX.TextLayout.TTextLayout still has the exact same fields and adjust the IFDEF'}
-  {$ENDIF}
-  TALTextLayoutAccessPrivate = class abstract
-  public const
-    MaxLayoutSize: TPointF = (X: $FFFF; Y: $FFFF);
-  public
-    FAttributes: TList<TTextAttributedRange>;
-    FFont: TFont;
-    FColor: TAlphaColor;
-    FText: string;
-    FWordWrap : Boolean;
-    FHorizontalAlign: TTextAlign;
-    FVerticalAlign: TTextAlign;
-    FPadding: TBounds;
-    FNeedUpdate: Boolean;
-    FMaxSize: TPointF;
-    FTopLeft: TPointF;
-    FUpdating: Integer; // << i personnally need to access this protected field
-    FOpacity: Single;
-    FTrimming: TTextTrimming;
-    FRightToLeft: Boolean;
-    [weak] FCanvas: TCanvas;
-    FMessageId: Integer;
   end;
 
 {$IFDEF ANDROID}
@@ -527,7 +516,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if  FMX.Canvas.Mac.TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
 {$ENDIF}
 function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
@@ -647,7 +636,7 @@ begin
   Result := TNSMutableArray.Create;
   for LString in AStrings do begin
     S := StrToNSStr(LString);
-    Result.addObject((S as ILocalObject).GetObjectID);
+    Result.addObject(NSObjectToID(S));
   end;
 end;
 {$ENDIF}

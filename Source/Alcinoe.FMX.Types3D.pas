@@ -6,6 +6,7 @@ interface
 
 uses
   System.Classes,
+  System.Messaging,
   {$IFDEF ANDROID}
   Androidapi.JNI.GraphicsContentViewText,
   FMX.Context.GLES.Android,
@@ -98,7 +99,7 @@ type
   end;
 
   {**********************************}
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALTextureAccessPrivate = class(TInterfacedPersistent)
@@ -110,13 +111,16 @@ type
     FStyle: TTextureStyles;
     FMagFilter: TTextureFilter;
     FMinFilter: TTextureFilter;
-    FTextureScale: Single;  // << i need to access this field
+    FTextureScale: Single;
     FRequireInitializeAfterLost: Boolean;
     FBits: Pointer;
+    {$IF CompilerVersion >= 36}  // Athens
+    FContextLostId: TMessageSubscriptionId;
+    FContextResetId: TMessageSubscriptionId;
+    {$ELSE}
     FContextLostId: Integer;
     FContextResetId: Integer;
-  protected
-  public
+    {$ENDIF}
   end;
 
   {**************************}
@@ -293,11 +297,11 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 //
-// i don't understand the sheet they do in TTexture.assign! they don't copy the Tbitmap data in the TTexture
+// I don't understand the sheet they do in TTexture.assign! they don't copy the Tbitmap data in the TTexture
 // if TCanvasStyle.NeedGPUSurface in TBitmap(Source).CanvasClass.GetCanvasStyle !
 // http://stackoverflow.com/questions/40095054/can-someone-explain-me-this-strange-behavior-in-ttexture-assign
 //
@@ -388,7 +392,7 @@ begin
   if PixelFormat <> TPixelFormat.None then AtomicDecrement(TotalMemoryUsedByTextures, Width * Height * BytesPerPixel);
   {$ENDIF}
 
-  {$IFNDEF ALCompilerVersionSupported}
+  {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if the full flow of FMX.Types3D.TTexture.Assign and FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture are still the same as below and adjust the IFDEF'}
   {$ENDIF}
   if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
@@ -481,7 +485,7 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
 {$ENDIF}
 {$IF defined(ANDROID)}
@@ -528,7 +532,7 @@ end;
 {$ENDIF}
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESTextureMaterial.DoInitialize;
@@ -802,7 +806,7 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESColorAdjustEffectTextureMaterial.DoInitialize;
@@ -1079,7 +1083,7 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.DoInitialize;
@@ -1371,7 +1375,7 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustEffectTextureMaterial.DoInitialize;
@@ -1674,7 +1678,7 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarTextureMaterial.DoInitialize;
@@ -1969,7 +1973,7 @@ begin
 end;
 
 {**********************************}
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarColorAdjustEffectTextureMaterial.DoInitialize;

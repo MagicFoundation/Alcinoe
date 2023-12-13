@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.ScrollBox.iOS.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -76,13 +76,15 @@ type
 
 implementation
 
-uses System.Classes,
-     System.UITypes,
-     System.SysUtils,
-     Macapi.ObjCRuntime,
-     FMX.Platform.iOS,
-     FMX.Types,
-     Alcinoe.Common;
+uses
+  System.Classes,
+  System.UITypes,
+  System.SysUtils,
+  Macapi.Helpers,
+  Macapi.ObjCRuntime,
+  FMX.Platform.iOS,
+  FMX.Types,
+  Alcinoe.Common;
 
 {*********************************}
 constructor TALIosScrollBox.Create;
@@ -139,7 +141,7 @@ function TALIosScrollBox.gestureRecognizerShouldBegin(gestureRecognizer: UIGestu
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function IsOurPanGesture: Boolean;
   begin
-    Result := (gestureRecognizer as ILocalObject).GetObjectID = (FPanRecognizer as ILocalObject).GetObjectID;
+    Result := NSObjectToID(gestureRecognizer) = NSObjectToID(FPanRecognizer);
   end;
 
 var Captured: IControl;

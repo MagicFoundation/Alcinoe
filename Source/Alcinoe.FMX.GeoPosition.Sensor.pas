@@ -314,8 +314,9 @@ begin
   {$REGION ' ANDROID'}
   {$IF defined(android)}
   if (AUseGooglePlayServicesIfAvailable) and
-     (TJGooglePlayServicesUtil
+     (TJGoogleApiAvailability
         .JavaClass
+        .getInstance
         .isGooglePlayServicesAvailable(TAndroidHelper.Activity) = TJConnectionResult.JavaClass.SUCCESS) then begin
     FLocationManager := nil;
     FAndroidLocationListener := nil;

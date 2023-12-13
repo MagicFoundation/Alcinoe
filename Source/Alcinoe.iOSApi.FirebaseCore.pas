@@ -1,5 +1,5 @@
 ﻿//
-// Made from firebase-messaging 10.2.0
+// Made from firebase-messaging 10.12.0
 //
 unit Alcinoe.iOSApi.FirebaseCore;
 
@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FirebaseCore.pas to build
@@ -49,7 +49,7 @@ procedure FirebaseInstallationsLoader; cdecl; external framework 'FirebaseInstal
 //just after installing the app (but if we relaunch it again then everything work good)
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes check if all declarations below are still mandatories.'}
 {$ENDIF}
 procedure libswiftCompatibility50Loader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibility50.a';

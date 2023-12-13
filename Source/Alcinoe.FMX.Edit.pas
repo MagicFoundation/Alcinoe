@@ -1687,7 +1687,7 @@ begin
 
         LTextRange := NSMakeRange(0, aStr.Length);
         LUIColor := AlphaColorToUIColor(aColor);
-        LTextPromptAttr.addAttribute(NSForegroundColorAttributeName, (LUIColor as ILocalObject).GetObjectID, LTextRange);
+        LTextPromptAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LUIColor), LTextRange);
         //NOTE: if i try to release the aUIColor i have an exception
         //      so it's seam something acquire it
 
@@ -1748,7 +1748,7 @@ begin
         LDictionary := TNSDictionary.Wrap(
                          TNSDictionary.OCClass.dictionaryWithObject(
                            LFontRef,
-                           (TNSString.Wrap(kCTFontAttributeName) as ILocalObject).GetObjectID));
+                           NSObjectToID(TNSString.Wrap(kCTFontAttributeName))));
         FTextField.View.setdefaultTextAttributes(LDictionary); // << Setting this property applies the specified attributes to the entire
                                                                // << text of the text field. Unset attributes maintain their default values.
                                                                // << note: seam that i can't later call aDictionary.release or i have an error

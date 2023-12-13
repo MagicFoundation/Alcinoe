@@ -233,11 +233,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40216 is implemented and if yes update the previous documentation regarding "Setup (IOS)"'}
-{$IFEND}
-
-{$IFNDEF ALCompilerVersionSupported}
+{$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes update the previous documentation regarding "Setup (IOS)"'}
 {$IFEND}
 
@@ -915,11 +911,10 @@ end;
 {$REGION ' IOS'}
 {$IF defined(IOS)}
 
-{$IFNDEF ALCompilerVersionSupported}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-40134 is corrected and if yes remove the declaration below'}
+{$IFNDEF ALCompilerVersionSupported120}
+  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-43500 is corrected and if yes remove the declaration below'}
 {$ENDIF}
 const
-  UNNotificationPresentationOptionNone = 0;
   UNNotificationPresentationOptionList = (1 shl 3);
   UNNotificationPresentationOptionBanner = (1 shl 4);
 
@@ -934,7 +929,7 @@ end;
 function _NSDictionaryToJSON(const ADictionary: NSDictionary): string;
 begin
   var LError: NSError;
-  var LData := TNSJSONSerialization.OCClass.dataWithJSONObject((ADictionary as ILocalObject).GetObjectID, 0, Addr(LError));
+  var LData := TNSJSONSerialization.OCClass.dataWithJSONObject(NSObjectToID(ADictionary), 0, Addr(LError));
   if (LData <> nil) and (LError = nil) then begin
     var LString := TNSString.Wrap(TNSString.Alloc.initWithData(LData, NSUTF8StringEncoding));
     Result :=  NSStrToStr(LString);

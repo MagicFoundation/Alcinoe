@@ -7541,7 +7541,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Objects.GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
 {$ENDIF}

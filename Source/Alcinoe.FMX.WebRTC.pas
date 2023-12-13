@@ -526,7 +526,7 @@ var LJListIceServers: JList;
 {$REGION ' IOS'}
 {$IF defined(ios)}
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
   {$ENDIF}

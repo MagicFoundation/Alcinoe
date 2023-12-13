@@ -4954,7 +4954,7 @@ end;
 
 type
 
-  {**********************************}
+  {*************************************}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Generics.Collections.TObjectDictionary<K,V> was not updated and adjust the IFDEF'}
   {$ENDIF}

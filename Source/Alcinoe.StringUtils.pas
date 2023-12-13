@@ -159,7 +159,7 @@ type
   end;
   TALStringStreamW = class(TStringStream);
 
-  {**********************************}
+  {*************************************}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Masks.pas is still the same and adjust the IFDEF'}
   {$IFEND}
@@ -1275,7 +1275,7 @@ begin
   result := System.Masks.MatchesMask(Filename, Mask);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.SysUtils.ConvertErrorFmt is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -1284,7 +1284,7 @@ begin
   raise EConvertError.CreateResFmt(ResString, Args) at ReturnAddress;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.SysUtils.ConvertError is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -1293,7 +1293,7 @@ begin
   raise EConvertError.CreateRes(ResString) at ReturnAddress;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.SysUtils.FormatError is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -1312,7 +1312,7 @@ begin
   ALConvertErrorFmt(FormatErrorStrs[ErrorCode], [PChar(@Buffer)]);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.SysUtils.AnsiFormatError is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -1324,7 +1324,7 @@ begin
   ALFormatError(ErrorCode, PChar(FormatText), FmtLen);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.SysUtils.InternalFloatToText is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -1725,7 +1725,7 @@ end;
   {$R+} {Range-Checking}
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.AnsiStrings.FormatBuf is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -2156,7 +2156,7 @@ begin
   Result := BufPtr - PAnsiChar(@Buffer);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.AnsiStrings.FmtStr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -2412,7 +2412,7 @@ begin
 end;
 {$ENDIF MACOS}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.DateTimeToString is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3026,7 +3026,7 @@ begin
   result := system.sysutils.FormatDateTime(Format, DateTime, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TDatePart/TDateItem/TDateSeq are still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3042,7 +3042,7 @@ type
   end;
   TALDateSeq = array [1 .. 64] of TALDateItem;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ParseDateTimeFormat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3175,7 +3175,7 @@ begin
   Result[I].FPart := TALDatePart.dpNone;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanBlanks is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3189,7 +3189,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanNumber is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3218,7 +3218,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanFractional is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3253,7 +3253,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanString is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3276,7 +3276,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanChar is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3302,7 +3302,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanToNumber is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3317,7 +3317,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanName is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3358,7 +3358,7 @@ begin
   Result := Name <> ''; // not Name.IsEmpty;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanDate is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3633,7 +3633,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTimeRegular is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3683,7 +3683,7 @@ begin
   Result := TryEncodeTime(Hour, Min, Sec, MSec, Time);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTimeUsingShortTimeFormat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3796,7 +3796,7 @@ begin
   Result := TryEncodeTime(Hour, Min, Sec, MSec, Time);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.ScanTime is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3816,7 +3816,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDate is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3840,7 +3840,7 @@ begin
   result := system.sysutils.TryStrToDate(S, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToDate is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3860,7 +3860,7 @@ begin
   result := system.sysutils.StrToDate(S, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToTime is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3884,7 +3884,7 @@ begin
   result := system.sysutils.TryStrToTime(S, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToTime is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -3904,7 +3904,7 @@ begin
   result := system.sysutils.StrToTime(S, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TryStrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4013,7 +4013,7 @@ begin
   result := system.sysutils.TryStrToDateTime(S, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.StrToDateTime is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4033,7 +4033,7 @@ begin
   Result := system.sysutils.StrToDateTime(S, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system._ValLong is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4129,7 +4129,7 @@ end;
   {$R+} {Range-Checking}
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system._ValInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4223,7 +4223,7 @@ end;
   {$R+} {Range-Checking}
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system._ValUInt64 is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4499,7 +4499,7 @@ begin
   Result := system.sysutils.StrToUInt64Def(S, Default);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TwoDigitLookup is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4516,7 +4516,7 @@ const
      '80','81','82','83','84','85','86','87','88','89',
      '90','91','92','93','94','95','96','97','98','99');
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.DivBy100 is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4541,7 +4541,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.DivBy100000000 is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4560,7 +4560,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils._IntToStr32 is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4600,7 +4600,7 @@ begin
     P^ := AnsiChar(I or Ord('0'));
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils._IntToStr64 is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4697,7 +4697,7 @@ begin
     P^ := AnsiChar(I32 or Ord('0'));
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.IntToStr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4712,7 +4712,7 @@ begin
   s := _ALIntToStr32(Abs(Value), Value < 0);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.IntToStr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4751,7 +4751,7 @@ begin
   s := System.SysUtils.IntToStr(Value);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.UIntToStr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -4760,7 +4760,7 @@ begin
   Result := _ALIntToStr32(Value, False);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.UIntToStr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -5690,7 +5690,7 @@ begin
   result := system.sysutils.CurrToStr(Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if declaration below in system.Sysutils is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -5726,7 +5726,7 @@ const
   MXCSRNear: UInt32 = $1F80;
 {$ENDIF CPUX64}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearFPUExceptions is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -5750,7 +5750,7 @@ asm
 end;
 {$ENDIF CPUX86}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TestAndClearSSEExceptions is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -5768,7 +5768,7 @@ end;
 {$WARN SYMBOL_PLATFORM ON}
 
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.GetSpecialValueAC is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -5795,7 +5795,7 @@ begin
     Result := False;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToExtended is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6029,7 +6029,7 @@ begin
 end;
 {$WARN SYMBOL_PLATFORM ON}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalTextToCurrency is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6398,7 +6398,7 @@ begin
 end;
 {$ENDIF !EXTENDEDHAS10BYTES}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.TextToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6412,7 +6412,7 @@ begin
     Result := ALInternalTextToCurrency(Buffer, Currency(Value), AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.SysUtils.InternalFloatToTextFmt is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6905,7 +6905,7 @@ begin
     ApplyFormat;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatFloat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6938,7 +6938,7 @@ begin
   result := system.sysutils.FormatFloat(Format, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatCurr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6971,7 +6971,7 @@ begin
   result := system.sysutils.FormatCurr(Format, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -6987,7 +6987,7 @@ begin
   result := system.sysutils.StrToFloat(S, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToFloatDef is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -7003,7 +7003,7 @@ begin
   result := system.sysutils.StrToFloatDef(S, Default, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -7018,7 +7018,7 @@ begin
   Result := System.sysutils.TryStrToFloat(S, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -7041,7 +7041,7 @@ begin
   Result := System.sysutils.TryStrToFloat(S, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToFloat is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -7064,7 +7064,7 @@ begin
   Result := System.sysutils.TryStrToFloat(S, Value, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToCurr is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -7080,7 +7080,7 @@ begin
   result := system.sysutils.StrToCurr(S, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.StrToCurrDef is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -7096,7 +7096,7 @@ begin
   result := system.sysutils.StrToCurrDef(S, Default, AFormatSettings);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.TryStrToCurr is still the same and adjust the IFDEF'}
 {$IFEND}

@@ -661,7 +661,7 @@ const
   ALBooleanIdentsA: array [Boolean] of AnsiString = ('False', 'True');
   ALBooleanIdentsW: array [Boolean] of String = ('False', 'True');
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.AfterString is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -671,7 +671,7 @@ begin
   Result := P + P^ + 1;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumName(TypeInfo: PTypeInfo; Value: Integer... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -733,7 +733,7 @@ begin
   result := System.TypInfo.GetEnumName(PropInfo^.PropType^, Value);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumNameValue(TypeInfo: PTypeInfo... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -776,7 +776,7 @@ begin
   Result := -1;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumValue(TypeInfo: PTypeInfo... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -815,7 +815,7 @@ begin
   result := ALTryGetEnumValue(PropInfo^.PropType^, Name, EnumValue);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumNameValue(TypeInfo: PTypeInfo... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -856,7 +856,7 @@ begin
   Result := -1;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.GetEnumValue(TypeInfo: PTypeInfo... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -929,7 +929,7 @@ type
   TLargestSet = set of byte;
   PLargestSet = ^TLargestSet;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.SetToString(TypeInfo: PTypeInfo; Value: Integer... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -967,7 +967,7 @@ begin
     Result := '[' + Result + ']';
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.SetToString(PropInfo: PPropInfo; Value: Integer... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -988,7 +988,7 @@ begin
   System.TypInfo.SetToString(PropInfo, Value, Brackets);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.StringToSet(TypeInfo: PTypeInfo; const Value: string)... is still the same and adjust the IFDEF'}
 {$IFEND}
@@ -1063,7 +1063,7 @@ begin
   result := ALTryStringToSet(PropInfo^.PropType^, Value, SetInt);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if System.TypInfo.StringToSet(TypeInfo: PTypeInfo; const Value: string)... is still the same and adjust the IFDEF'}
 {$IFEND}

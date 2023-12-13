@@ -181,7 +181,7 @@ type
 
   TALPointDType = array [0..1] of Double;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Types.TPointf still having the same implementation and adjust the IFDEF'}
   {$IFEND}
@@ -256,7 +256,7 @@ type
           Y: Double;);
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Types.TSizef still having the same implementation and adjust the IFDEF'}
   {$IFEND}
@@ -295,7 +295,7 @@ type
     property Height: Double read cy write cy;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if System.Types.TRectf still having the same implementation and adjust the IFDEF'}
   {$IFEND}
@@ -444,7 +444,7 @@ type
     1: (TopLeft, BottomRight: TALPointD);
   end;
 
-{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+{~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if functions below implemented in System.Types still having the same implementation and adjust the IFDEF'}
 {$IFEND}

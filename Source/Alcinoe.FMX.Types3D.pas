@@ -98,7 +98,7 @@ type
     property ShaderVariables: TALColorAdjustShaderVariables read fShaderVariables;
   end;
 
-  {**********************************}
+  {*************************************}
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if FMX.Types3D.TTexture still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
@@ -296,7 +296,7 @@ begin
 
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.assign is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
@@ -484,7 +484,7 @@ begin
   inherited;
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Context.GLES.TCustomContextOpenGL.DoInitializeTexture still has the same implementation and adjust the IFDEF'}
 {$ENDIF}
@@ -531,7 +531,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
@@ -805,7 +805,7 @@ begin
   fshaderVariables.UpdateContext(Context);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
@@ -1082,7 +1082,7 @@ begin
   Context.SetShaderVariable('texture1', CbCrTexture);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
@@ -1374,7 +1374,7 @@ begin
   fshaderVariables.UpdateContext(Context);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
@@ -1677,7 +1677,7 @@ begin
   Context.SetShaderVariable('texture2', CrTexture);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
@@ -1972,7 +1972,7 @@ begin
   fshaderVariables.UpdateContext(Context);
 end;
 
-{**********************************}
+{*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}

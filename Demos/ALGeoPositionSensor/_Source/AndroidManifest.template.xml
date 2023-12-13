@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- BEGIN_INCLUDE(manifest) -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
           package="%package%"
           android:versionCode="%versionCode%"
           android:versionName="%versionName%"
@@ -43,7 +44,7 @@
                android:icon="@mipmap/ic_launcher"
                android:theme="@android:style/Theme.NoTitleBar"
                android:hardwareAccelerated="%hardwareAccelerated%"
-               android:resizeableActivity="false"
+               android:resizeableActivity="true"
                android:requestLegacyExternalStorage="true">
 
     <%provider%>
@@ -52,6 +53,19 @@
 
     <%uses-libraries%>
 
+    <!-- Trigger Google Play services to install the backported photo picker module. -->
+    <service android:name="com.google.android.gms.metadata.ModuleDependencies"
+             android:enabled="false"
+             android:exported="false"
+             tools:ignore="MissingClass">
+        <intent-filter>
+            <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES"/>
+        </intent-filter>
+
+        <meta-data android:name="photopicker_activity:0:required"
+                   android:value=""/>
+    </service>
+
     <%services%>
   
     <!-- Our activity is a subclass of the built-in NativeActivity framework class.
@@ -59,7 +73,7 @@
     <activity android:name="com.embarcadero.firemonkey.FMXNativeActivity"
               android:exported="true"
               android:label="%activityLabel%"
-              android:configChanges="orientation|keyboard|keyboardHidden|screenSize"
+              android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout|uiMode"
               android:launchMode="singleTask">
         
       <!-- Tell NativeActivity the name of our .so -->
@@ -85,6 +99,31 @@
     <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
               android:theme="@android:style/Theme.Translucent.NoTitleBar"
               android:exported="false"/>
+    <!-- ===== androidx.profileinstaller ===== -->
+    <provider android:name="androidx.startup.InitializationProvider"
+              android:authorities="%package%.androidx-startup"
+              android:exported="false">
+      <meta-data android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+                 android:value="androidx.startup"/>
+    </provider>
+    <receiver android:name="androidx.profileinstaller.ProfileInstallReceiver"
+              android:directBootAware="false"
+              android:enabled="true"
+              android:exported="true"
+              android:permission="android.permission.DUMP">
+      <intent-filter>
+        <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="androidx.profileinstaller.action.SKIP_FILE"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="androidx.profileinstaller.action.SAVE_PROFILE"/>
+      </intent-filter>
+      <intent-filter>
+        <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION"/>
+      </intent-filter>
+    </receiver>
     <!-- ===== com.google.android.gms.common ===== -->
     <meta-data android:name="com.google.android.gms.version"
                android:value="@integer/google_play_services_version"/>

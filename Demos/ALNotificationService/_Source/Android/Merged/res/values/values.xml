@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2" xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <item name="report_drawn" type="id"/>
+    <item name="view_tree_on_back_pressed_dispatcher_owner" type="id"/>
+    <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
     <integer name="google_play_services_version">12451000</integer>
     <string name="common_google_play_services_unknown_issue"><xliff:g id="app_name">%1$s</xliff:g> is having trouble with Google Play services. Please try again.</string>
     <attr format="reference" name="nestedScrollViewStyle"/>
@@ -207,6 +210,8 @@
         <attr name="android:color"/>
     </declare-styleable>
     <item name="view_tree_lifecycle_owner" type="id"/>
+    <item name="view_tree_view_model_store_owner" type="id"/>
+    <string name="androidx_startup" translatable="false">androidx.startup</string>
     <item name="fragment_container_view_tag" type="id"/>
     <item name="special_effects_controller_view_tag" type="id"/>
     <item name="visible_removing_fragment_view_tag" type="id"/>
@@ -219,10 +224,7 @@
         <attr name="android:name"/>
         <attr name="android:tag"/>
     </declare-styleable>
-    <item name="view_tree_view_model_store_owner" type="id"/>
-    <item name="view_tree_on_back_pressed_dispatcher_owner" type="id"/>
     <item name="view_tree_saved_state_registry_owner" type="id"/>
-    <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
     <color name="common_google_signin_btn_text_dark_default">@android:color/white</color>
     <color name="common_google_signin_btn_text_dark_disabled">#1F000000</color>
     <color name="common_google_signin_btn_text_dark_focused">@android:color/black</color>
@@ -3177,7 +3179,6 @@
         
         <attr name="android:drawable"/>
     </declare-styleable>
-    <string name="androidx_startup" translatable="false">androidx.startup</string>
     <string name="default_web_client_id" translatable="false">362697684107-qtsrdt07og0k32bsc2psg6hbij3rf9hn.apps.googleusercontent.com</string>
     <string name="gcm_defaultSenderId" translatable="false">362697684107</string>
     <string name="google_api_key" translatable="false">AIzaSyD06prWqAalrL4LLCX8CxqFJjTepPSfJEI</string>

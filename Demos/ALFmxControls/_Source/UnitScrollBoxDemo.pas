@@ -72,6 +72,14 @@ begin
       invalidate;
     end);
 
+  // When we call invalidate within a loop, there's a potential issue on iOS
+  // where the CADisplayLink might be skipped if the CPU is heavily occupied.
+  // This can lead to a situation where two consecutive form paints occur
+  // without triggering the CADisplayLink in the scroll engine, which is
+  // undesirable.
+  if fScrollEngine <> nil then
+    fScrollEngine.Calculate;
+
   fDebugFpsRenderTimeStopWatch.stop;
   //--
   //if (fDebugFpsStarted) and

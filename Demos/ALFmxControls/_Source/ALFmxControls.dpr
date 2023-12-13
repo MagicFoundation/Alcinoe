@@ -13,6 +13,5 @@ uses
 begin
   Application.Initialize;
   Application.CreateForm(TForm1, Form1);
-  Application.CreateForm(TScrollBoxDemoForm, ScrollBoxDemoForm);
   Application.Run;
 end.

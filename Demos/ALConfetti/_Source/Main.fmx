@@ -23,6 +23,7 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 6
     Text = 'Fire (Custom Config)'
+    TextSettings.Trimming = None
     OnClick = BtnFireCustomConfigClick
   end
   object ConfigMemo: TMemo
@@ -123,6 +124,7 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Fire (School Pride)'
+    TextSettings.Trimming = None
     OnClick = BtnFireSchoolPrideClick
   end
   object BtnFireSnow: TButton
@@ -137,6 +139,7 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Fire (Snow)'
+    TextSettings.Trimming = None
     OnClick = BtnFireSnowClick
   end
   object BtnFireFireworks: TButton
@@ -151,6 +154,7 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Fire (Fireworks)'
+    TextSettings.Trimming = None
     OnClick = BtnFireFireworksClick
   end
   object BtnFireRealisticLook: TButton
@@ -165,6 +169,7 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Fire (Realistic Look)'
+    TextSettings.Trimming = None
     OnClick = BtnFireRealisticLookClick
   end
   object SnowTimer: TTimer
@@ -193,6 +198,7 @@ object TMainForm: TTMainForm
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'Fire (Random Direction)'
+    TextSettings.Trimming = None
     OnClick = BtnRandomDirectionClick
   end
   object FireworksTimer: TTimer
@@ -217,6 +223,7 @@ object TMainForm: TTMainForm
     TextSettings.Font.StyleExt = {00070000000000000004000000}
     TextSettings.FontColor = claBrown
     TextSettings.HorzAlign = Center
+    TextSettings.Trimming = None
     Text = 'TALConfetti Demo'
     TabOrder = 13
   end
@@ -234,6 +241,7 @@ object TMainForm: TTMainForm
       Size.Width = 501.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
+      TextSettings.Trimming = None
       TabOrder = 0
     end
   end

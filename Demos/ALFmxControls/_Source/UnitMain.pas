@@ -669,9 +669,9 @@ begin
       http://videos-f.jwpsrv.com/content/conversions/zWLy8Jer/videos/21ETjILN-588477.m4a.m3u8?token=0_5a709f9d_0x160466a864635c5481a5f70c20b15d4bfa2ada9b
       *)
 
-      ALVideoPlayerSurface1.VideoPlayer.prepare('http://ftp.nl.freebsd.org/ftp/graphics/blender/demo/movies/BBB/bbb_sunflower_1080p_30fps_normal.mp4', True{AutoStartWhenPrepared});
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_1080p_60fps_normal.mp4', True{AutoStartWhenPrepared});
-      //ALVideoPlayerSurface1.VideoPlayer.prepare('http://distribution.bbb3d.renderfarming.net/video/mp4/bbb_sunflower_2160p_60fps_normal.mp4', True{AutoStartWhenPrepared});
+      ALVideoPlayerSurface1.VideoPlayer.prepare('https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflower_1080p_30fps_normal.mp4', True{AutoStartWhenPrepared});
+      //ALVideoPlayerSurface1.VideoPlayer.prepare('https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflower_1080p_60fps_normal.mp4', True{AutoStartWhenPrepared});
+      //ALVideoPlayerSurface1.VideoPlayer.prepare('https://mirror.clarkson.edu/blender/demo/movies/BBB/bbb_sunflower_2160p_60fps_normal.mp4', True{AutoStartWhenPrepared});
       //ALVideoPlayerSurface1.VideoPlayer.prepare('http://techslides.com/demos/samples/sample.mp4', True{AutoStartWhenPrepared}); // << this have sound on ios
 
     end

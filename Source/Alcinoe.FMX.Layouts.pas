@@ -530,7 +530,7 @@ begin
   if AObject.Visible then begin
     Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
               (AObject.Position.Y + AObject.Height > -Position.Y) and
-              (AObject.Position.X < Position.X + FscrollBox.Width) and
+              (AObject.Position.X < -Position.X + FscrollBox.Width) and
               (AObject.Position.X + AObject.Width > Position.X);
   end
   else

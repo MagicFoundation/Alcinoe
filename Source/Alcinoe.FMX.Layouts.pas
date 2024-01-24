@@ -29,6 +29,7 @@ type
     FAutoSize: Boolean;
     procedure SetAutoSize(const Value: Boolean);
   protected
+    function isAutosizedControl(const AControl: Tcontrol): boolean; virtual;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
   public
@@ -399,6 +400,7 @@ uses
   FMX.Ani,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Common,
+  Alcinoe.FMX.Objects,
   Alcinoe.Common;
 
 {***********************************************}
@@ -406,6 +408,14 @@ constructor TALLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FAutoSize := False;
+end;
+
+{***********************************************************************}
+function TALLayout.isAutosizedControl(const AControl: Tcontrol): boolean;
+begin
+  if AControl is TALLayout then result := TALLayout(Acontrol).AutoSize
+  else if AControl is TALText then result := TALText(Acontrol).AutoSize
+  else result := False;
 end;
 
 {****************************}
@@ -435,7 +445,10 @@ begin
         TAlignLayout.MostTop,
         TAlignLayout.Bottom,
         TAlignLayout.MostBottom: begin
-          LSize.Width := Max(LSize.Width, Width);
+          if isAutosizedControl(LControl) then
+            LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right)
+          else
+            LSize.Width := Max(LSize.Width, Width);
           LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom);
         end;
 
@@ -445,7 +458,10 @@ begin
         TAlignLayout.Right,
         TAlignLayout.MostRight: Begin
           LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right);
-          LSize.height := Max(LSize.Height, Height);
+          if isAutosizedControl(LControl) then
+            LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom)
+          else
+            LSize.height := Max(LSize.Height, Height);
         End;
 
         //--
@@ -455,45 +471,35 @@ begin
         TAlignLayout.Fit,
         TAlignLayout.FitLeft,
         TAlignLayout.FitRight: Begin
-          LSize.Width := Max(LSize.Width, Width);
-          LSize.height := Max(LSize.Height, Height);
+          if isAutosizedControl(LControl) then begin
+            LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right);
+            LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom);
+          end
+          else begin
+            LSize.Width := Max(LSize.Width, Width);
+            LSize.height := Max(LSize.Height, Height);
+          end;
         End;
 
         //--
         TAlignLayout.Horizontal,
         TAlignLayout.VertCenter: Begin
-          LSize.Width := Max(LSize.Width, Width);
+          if isAutosizedControl(LControl) then
+            LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right)
+          else
+            LSize.Width := Max(LSize.Width, Width);
         End;
 
         //--
         TAlignLayout.Vertical,
         TAlignLayout.HorzCenter: Begin
-          LSize.height := Max(LSize.Height, Height);
+          if isAutosizedControl(LControl) then
+            LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom)
+          else
+            LSize.height := Max(LSize.Height, Height);
         End;
 
       end;
-    end;
-
-    // This to take care of the align constraint
-    if Align in [TAlignLayout.Client,
-                 TAlignLayout.Contents,
-                 TAlignLayout.Top,
-                 TAlignLayout.Bottom,
-                 TAlignLayout.MostTop,
-                 TAlignLayout.MostBottom,
-                 TAlignLayout.Horizontal,
-                 TAlignLayout.VertCenter] then begin
-      LSize.Width := Width;
-    end;
-    if Align in [TAlignLayout.Client,
-                 TAlignLayout.Contents,
-                 TAlignLayout.Left,
-                 TAlignLayout.Right,
-                 TAlignLayout.MostLeft,
-                 TAlignLayout.MostRight,
-                 TAlignLayout.Vertical,
-                 TAlignLayout.HorzCenter] then begin
-      LSize.height := height;
     end;
 
     if LSize.Width = 0 then LSize.Width := Width;

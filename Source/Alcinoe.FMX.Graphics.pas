@@ -11059,32 +11059,19 @@ begin
 
     {$IF defined(ANDROID)}
 
-    LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
-    (* LSKColorSpace := ALCreateDisplayP3SkColorSpace; *)
-
-    (*
-    if TOSVersion.Check(10, 0) then begin
-      var LColorSpace := TAndroidHelper.Display.getPreferredWideGamutColorSpace;
-      if LColorSpace <> nil then begin
-        if AtomicCmpExchange(Pointer(ALGlobalJColorSpace), Pointer(LColorSpace), nil) <> nil then
-          LColorSpace := nil
-        else begin
-          ALGlobalJColorSpace._AddRef;
-          {$IF defined(debug)}
-          ALLog('GlobalJColorSpace', JStringToString(ALGlobalJColorSpace.getName));
-          {$ENDIF}
-        end;
-      end
-      else begin
-        ALGlobalJColorSpace := nil;
-        {$IF defined(debug)}
-        ALLog('GlobalJColorSpace', 'nil');
-        {$ENDIF}
-      end;
+    if TOSVersion.Check(10, 0) and
+       TAndroidHelper.Display.isWideColorGamut then begin
+      LSKColorSpace := ALCreateDisplayP3SkColorSpace;
+      {$IF defined(debug)}
+      ALLog('GlobalSkColorSpace', 'Display P3');
+      {$ENDIF}
     end
-    else
-      ALGlobalJColorSpace := nil;
-    *)
+    else begin
+      LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+      {$IF defined(debug)}
+      ALLog('GlobalSkColorSpace', 'sRGB');
+      {$ENDIF}
+    end;
 
     {$ELSEIF defined(IOS)}
 

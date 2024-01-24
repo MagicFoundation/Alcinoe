@@ -43,8 +43,10 @@
   {$MESSAGE ERROR 'Unknown Extended type'}
 {$ENDIF}
 
-{$IF Defined(ANDROID) or defined(IOS)}
-  {$DEFINE ALUseTexture}
+{$IF Defined(SKIA)}
+  {$DEFINE ALSkiaCanvas}
+{$ELSEIF Defined(ANDROID) or defined(IOS)}
+  {$DEFINE ALGpuCanvas}
 {$ENDIF}
 
 {$IF defined(MACOS) and not defined(IOS)}

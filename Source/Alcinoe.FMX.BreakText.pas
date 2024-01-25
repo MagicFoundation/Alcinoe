@@ -248,14 +248,14 @@ type
   End;
 
 {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-// their is a bug, if you write something like: abcd#13#10<b>abcd</b>
+// Their is a bug, if you write something like: abcd#13#10<b>abcd</b>
 // then you will obtain
 //     abcd(<b>)abcd(</b>)
 // instead of
 //     abcd(#13#10)
 //     (<b>)abcd(</b>)
-// the workaround is to write instead abcd<b>#13#10abcd</b>
-// not look very hard to correct but i have no time to do it right now
+// The workaround is to write instead abcd<b>#13#10abcd</b>
+// It's not look very hard to correct by the way
 function  ALDrawMultiLineText(
             const aText: String; // support only theses EXACT html tag :
                                  //   <b>...</b>
@@ -376,80 +376,33 @@ function ALBreakText(
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines or truncated
 
-var LBreakTextItemsStartCount: integer;
-    LBreakTextItem: TALBreakTextItem;
-    LNumberOfChars: integer;
-    LSaveNumberOfChars: integer;
-    LSaveNumberOfCharsIsAccurate: Boolean;
-    LLine: jString;
-    LLineIndent: Single;
-    LEllipsisLine: Jstring;
-    LEllipsisLineLn: single;
-    LEllipsisLinePos: TpointF;
-    LEllipsisLineRect: TrectF;
-    LMaxWidth: single;
-    LMaxHeight: single;
-    LMaxLineWidth: single;
-    LLineHeight: single;
-    LTotalLinesHeight: single;
-    LChar: Char;
-    LTextLn: integer;
-    LTextIdx: integer;
-    LCurrLineY: single;
-    LMetrics: JPaint_FontMetricsInt;
-    LMeasuredWidth: TJavaArray<Single>;
-    LOffset: single;
-    LLineEndWithBreakLine: Boolean;
-    I, J: integer;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  //their is a fucking bug on android 4.4.2 that aNumberOfChars
-  //is the number of Glyph and not of char, so ligature like 'fi' are
-  //counted like one glyph :(
-  //very few comments about this on the internet
-  //http://stackoverflow.com/questions/39891726/android-paint-breaktext-not-work-on-kitkat
-  procedure _splitLigature(const _MaxWidth: single);
-  var LTmpMeasuredWidth: Single;
-  begin
-    if (LNumberOfChars < LLine.length) and
-       (TJBuild_VERSION.JavaClass.SDK_INT < 22 {lollipop}) then begin
-      while LNumberOfChars < LLine.length  do begin
-        LTmpMeasuredWidth := aPaint.measureText(
-                               LLine{text},
-                               0,
-                               LNumberOfChars + 1);  // measureText seam to be not soo much accurate as breakText unfortunatly (round up)
-        if compareValue(LTmpMeasuredWidth, _MaxWidth, TEpsilon.Position) > 0 then break
-        else begin
-          inc(LNumberOfChars);
-          LMeasuredWidth[0] := LTmpMeasuredWidth;
-        end;
-      end;
-    end;
-  end;
+var
+  LLineIndent: Single;
+  LEllipsisLine: Jstring;
+  LEllipsisLineLn: single;
+  LEllipsisLinePos: TpointF;
+  LEllipsisLineRect: TrectF;
+  LMetrics: JPaint_FontMetricsInt;
+  LMaxWidth: single;
+  LCurrLineY: single;
 
   {~~~~~~~~~~~~~~~~~~~~~~}
   procedure _initEllipsis;
-  var LSavedColor: TalphaColor;
-      LSavedTypeFace: JTypeface;
-      LTypeFace: JTypeface;
-      LJStr1: Jstring;
   begin
     if LEllipsisLine = nil then begin
       //-----
       if aEllipsisText = nil then LEllipsisLine := StringtoJString(string('…'))
       else LEllipsisLine := aEllipsisText;
       //-----
-      LSavedTypeFace := nil; // stupid warning
+      var LSavedTypeFace: JTypeface := nil; // stupid warning
       if aEllipsisFontName <> '' then begin
         LSavedTypeFace := aPaint.getTypeface;
-        LJStr1 := StringToJString(aEllipsisFontName); // << https://quality.embarcadero.com/browse/RSP-14187
-        LTypeFace := TJTypeface.JavaClass.create(LJStr1, ALfontStyleToAndroidStyle(aEllipsisFontStyle));
+        var LTypeFace: JTypeface := TJTypeface.JavaClass.create(StringToJString(aEllipsisFontName), ALfontStyleToAndroidStyle(aEllipsisFontStyle));
         aPaint.setTypeface(LTypeFace);
         LTypeFace := nil;
-        LJStr1 := nil;
       end;
       //-----
-      LSavedColor := TAlphaColorRec.Null; // stupid warning
+      var LSavedColor := TAlphaColorRec.Null; // stupid warning
       if aEllipsisFontColor <> TAlphaColorRec.Null then begin
         LSavedColor := Cardinal(aPaint.getColor);
         aPaint.setColor(integer(aEllipsisFontColor));
@@ -487,19 +440,19 @@ begin
   aAllTextDrawn := true;
 
   //init aBreakTextItemsStartCount
-  LBreakTextItemsStartCount := aBreakTextItems.Count;
+  var LBreakTextItemsStartCount := aBreakTextItems.Count;
 
   //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight
   if aRect.Width > 16384 then aRect.Width := 16384;  // << because on android kitkat (4.4.2) it's look like that aPaint.breakText with maxWidth > 16384 return 0 :(
   if aRect.height > 16384 then aRect.height := 16384;
   LMaxWidth := ARect.width;
-  LMaxHeight := ARect.Height;
-  LMaxLineWidth := 0;
-  LTotalLinesHeight := 0;
+  var LMaxHeight: single := ARect.Height;
+  var LMaxLineWidth: single := 0;
+  var LTotalLinesHeight: single := 0;
 
   //init ATextIdx / ATextLn
-  LTextIdx := 0;
-  LTextLn := AText.length;
+  var LTextIdx := 0;
+  var LTextLn := AText.length;
 
   //init metics / aCurrLineY / aLineHeight
   LMetrics := aPaint.getFontMetricsInt; // aMetrics.top       => The maximum distance above the baseline for the tallest glyph in the font at a given text size.
@@ -509,7 +462,7 @@ begin
                                         // aMetrics.leading   => The recommended additional space to add between lines of text
   LCurrLineY := aFirstLineIndent.y + (-1*LMetrics.ascent); // aMetrics.top and aMetrics.ascent are always returned in negative value
   aTotalLines := 0;
-  LLineHeight := LMetrics.descent + aLineSpacing + (-1*LMetrics.ascent);
+  var LLineHeight: single := LMetrics.descent + aLineSpacing + (-1*LMetrics.ascent);
 
   //init aEllipsisLine
   LEllipsisLine := nil;
@@ -522,18 +475,19 @@ begin
   if comparevalue(aFirstLineIndent.y + LMetrics.descent + (-1*LMetrics.Ascent),LMaxHeight,Tepsilon.position) <= 0 then begin
 
     //create ameasuredWidth
-    LMeasuredWidth := TJavaArray<Single>.Create(1);
+    var LMeasuredWidth := TJavaArray<Single>.Create(1);
     try
 
       //loop still their is some chars
       while LTextIdx < LTextLn do begin
 
         // init aline
-        LLine := nil; // << https://quality.embarcadero.com/browse/RSP-14187
-        I := aText.indexOf($0D {c}, LTextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
-        J := aText.indexOf($0A {c}, LTextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
+        var LLine: jString := nil;
+        var I := aText.indexOf($0D {c}, LTextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
+        var J := aText.indexOf($0A {c}, LTextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
         if (I >= 0) and (J >= 0) then I := min(I,J)
         else I := max(I, J);
+        var LLineEndWithBreakLine: Boolean;
         if I = LTextIdx then begin
           LLine := StringtoJString(string(''));
           LLineEndWithBreakLine := True;
@@ -555,12 +509,11 @@ begin
         //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
         //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
         //  it's return for exemple 9 when height = 11
-        LNumberOfChars := aPaint.breakText(
-                            LLine {text},
-                            true {measureForwards},
-                            LMaxWidth - LLineIndent, {maxWidth}
-                            LMeasuredWidth {measuredWidth});
-       _splitLigature(LMaxWidth - LLineIndent);
+        var LNumberOfChars := aPaint.breakText(
+                                LLine {text},
+                                true {measureForwards},
+                                LMaxWidth - LLineIndent, {maxWidth}
+                                LMeasuredWidth {measuredWidth});
 
         //init result
         if LNumberOfChars < LLine.length then result := true;
@@ -606,7 +559,6 @@ begin
                                                                true {measureForwards},
                                                                LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
                                                                LMeasuredWidth {measuredWidth});
-                                           _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                                            if LNumberOfChars >= LLine.length then break;
                                          end;
                                          //-----
@@ -615,8 +567,8 @@ begin
                                     //-----
                                     _initEllipsis;
                                     //-----
-                                    LSaveNumberOfChars := LNumberOfChars;
-                                    LSaveNumberOfCharsIsAccurate := False;
+                                    var LSaveNumberOfChars := LNumberOfChars;
+                                    var LSaveNumberOfCharsIsAccurate := False;
                                     while LNumberOfChars > 0 do begin
                                       //----
                                       if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
@@ -624,7 +576,7 @@ begin
                                       end
                                       //----
                                       else if LNumberOfChars >= 2 then begin
-                                        LChar := LLine.charAt(LNumberOfChars-2);
+                                        var LChar := LLine.charAt(LNumberOfChars-2);
                                         if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
                                           dec(LNumberOfChars);
                                           continue;
@@ -650,7 +602,6 @@ begin
                                                               true {measureForwards},
                                                               LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
                                                               LMeasuredWidth {measuredWidth});
-                                          _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                                           if LNumberOfChars >= LLine.length then break;
                                         end;
                                         break;
@@ -666,7 +617,6 @@ begin
                                                           true {measureForwards},
                                                           LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
                                                           LMeasuredWidth {measuredWidth});
-                                      _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                                       if LNumberOfChars >= LLine.length then break
                                       else begin
                                         LSaveNumberOfChars:= LNumberOfChars;
@@ -690,8 +640,8 @@ begin
               aAllTextDrawn := False; // if we are at the last line then in anycase we will not draw all the text
               _initEllipsis;
               //-----
-              LSaveNumberOfChars := LNumberOfChars;
-              LSaveNumberOfCharsIsAccurate := False;
+              var LSaveNumberOfChars := LNumberOfChars;
+              var LSaveNumberOfCharsIsAccurate := False;
               while LNumberOfChars > 0 do begin
                 //----
                 if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
@@ -699,7 +649,7 @@ begin
                 end
                 //----
                 else if (aTrimming = TTextTrimming.Word) and (LNumberOfChars >= 2) then begin
-                  LChar := LLine.charAt(LNumberOfChars-2);
+                  var LChar := LLine.charAt(LNumberOfChars-2);
                   if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
                     dec(LNumberOfChars);
                     continue;
@@ -725,7 +675,6 @@ begin
                                         true {measureForwards},
                                         LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
                                         LMeasuredWidth {measuredWidth});
-                    _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                     if LNumberOfChars >= LLine.length then break;
                   end;
                   break;
@@ -741,7 +690,6 @@ begin
                                     true {measureForwards},
                                     LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
                                     LMeasuredWidth {measuredWidth});
-                _splitLigature(LMaxWidth - LEllipsisLineLn - LLineIndent);
                 if LNumberOfChars >= LLine.length then break
                 else begin
                   LSaveNumberOfChars:= LNumberOfChars;
@@ -761,12 +709,12 @@ begin
                   ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1))) then aAllTextDrawn := False;
 
               //cut the line
-              LSaveNumberOfChars := LNumberOfChars;
+              var LSaveNumberOfChars := LNumberOfChars;
               if LNumberOfChars < LLine.length then inc(LNumberOfChars); // in case the space separator is just after aNumberOfChars
               while LNumberOfChars > 0 do begin
                 //-----
                 if LNumberOfChars >= 2 then begin
-                  LChar := LLine.charAt(LNumberOfChars-1);
+                  var LChar := LLine.charAt(LNumberOfChars-1);
                   if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
                     dec(LNumberOfChars);
                     continue;
@@ -789,7 +737,6 @@ begin
                                         true {measureForwards},
                                         LMaxWidth - LLineIndent, {maxWidth}
                                         LMeasuredWidth {measuredWidth});
-                    _splitLigature(LMaxWidth - LLineIndent);
                     if LNumberOfChars >= LLine.length then break;
                   end;
                   break;
@@ -805,7 +752,6 @@ begin
                                     true {measureForwards},
                                     LMaxWidth - LLineIndent, {maxWidth}
                                     LMeasuredWidth {measuredWidth});
-                _splitLigature(LMaxWidth - LLineIndent);
                 if LNumberOfChars >= LLine.length then begin
                   inc(LNumberOfChars); // to skip the separator
                   break;
@@ -876,7 +822,7 @@ begin
         end;
 
         //init LBreakTextItem
-        LBreakTextItem := TalBreakTextItem.Create;
+        var LBreakTextItem := TalBreakTextItem.Create;
         try
 
           //update aBreakTextItem
@@ -975,7 +921,6 @@ begin
 
     finally
       ALFreeAndNil(LMeasuredWidth);
-      LLine := nil; // << https://quality.embarcadero.com/browse/RSP-14187
     end;
 
   end
@@ -983,7 +928,7 @@ begin
 
   //add the end ellipsis
   if LEllipsisLine <> nil then begin
-    LBreakTextItem := TalBreakTextItem.Create;
+    var LBreakTextItem := TalBreakTextItem.Create;
     try
       LBreakTextItem.line := LEllipsisLine;
       LEllipsisLine := nil;
@@ -1001,10 +946,10 @@ begin
   if compareValue(LMaxLineWidth, LMaxWidth, Tepsilon.Position) < 0 then begin
     case AHTextAlign of
        TTextAlign.Center: begin
-                            LOffset := Floor((aRect.Right - LMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                            var LOffset: single := Floor((aRect.Right - LMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                             aRect.Left := aRect.Left + LOffset;
                             aRect.right := aRect.right - LOffset;
-                            for I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                            for var I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                               aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - LOffset;
                               aBreakTextItems[I].rect.Offset(-LOffset, 0);
                             end;
@@ -1013,9 +958,9 @@ begin
                              aRect.Right := min(aRect.Right, aRect.Left + LMaxLineWidth);
                            end;
        TTextAlign.Trailing: begin
-                              LOffset := Floor(aRect.Right - LMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                              var LOffset: single := Floor(aRect.Right - LMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                               aRect.Left := aRect.Left + LOffset;
-                              for I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                              for var I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                                 aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - LOffset;
                                 aBreakTextItems[I].rect.Offset(-LOffset, 0);
                               end;
@@ -1025,7 +970,7 @@ begin
   if compareValue(LTotalLinesHeight, LMaxHeight, Tepsilon.Position) < 0 then begin
     case AVTextAlign of
        TTextAlign.Center: begin
-                            LOffset := (aRect.bottom - LTotalLinesHeight - arect.top) / 2;
+                            var LOffset: single := (aRect.bottom - LTotalLinesHeight - arect.top) / 2;
                             aRect.top := aRect.top + LOffset;
                             aRect.bottom := aRect.bottom - LOffset;
                           end;
@@ -1033,7 +978,7 @@ begin
                              aRect.bottom := min(aRect.bottom, aRect.top + LTotalLinesHeight);
                            end;
        TTextAlign.Trailing: begin
-                              LOffset := aRect.bottom - LTotalLinesHeight - arect.top;
+                              var LOffset := aRect.bottom - LTotalLinesHeight - arect.top;
                               aRect.top := aRect.top + LOffset;
                             end;
     end;
@@ -2811,7 +2756,6 @@ var {$IF defined(ANDROID)}
     LTypeface: JTypeface;
     LCanvas: Jcanvas;
     LStyle: integer;
-    JStr1, JStr2: JString;
     {$ENDIF}
     {$IF defined(IOS)}
     LImg: CGImageRef;
@@ -3048,11 +2992,9 @@ begin
           //init LPaint
           {$IF defined(ANDROID)}
           LPaint.setColor(integer(LFontColor));
-          JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
-          LTypeface := TJTypeface.JavaClass.create(JStr1, LStyle);
+          LTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), LStyle);
           LPaint.setTypeface(LTypeface);
           LTypeface := nil;
-          JStr1 := nil;
           {$ENDIF}
 
           //init LTmpRect / LBreakTextItemsCount
@@ -3063,12 +3005,10 @@ begin
 
           //break the text
           {$IF defined(ANDROID)}
-          JStr1 := StringtoJString(LCurrText); // << https://quality.embarcadero.com/browse/RSP-14187
-          JStr2 := StringtoJString(aOptions.EllipsisText); // << https://quality.embarcadero.com/browse/RSP-14187
           LTmpTextBroken := ALBreakText(
                               LPaint, // const aPaint: JPaint;
                               LTmpRect, // var ARect: TRectF;
-                              JStr1, // const AText: JString;
+                              StringtoJString(LCurrText), // const AText: JString;
                               aOptions.WordWrap, //const aWordWrap: Boolean;
                               TTextAlign.Leading, TTextAlign.Leading, //const AHTextAlign, AVTextAlign: TTextAlign;
                               aOptions.Trimming, // const aTrimming: TTextTrimming;
@@ -3077,13 +3017,11 @@ begin
                               LTmpAllTextDrawn, // var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
                               LFirstLineIndent, // const aFirstLineIndent: TpointF;
                               aOptions.LineSpacing, // const aLineSpacing: single = 0;
-                              JStr2, //  const aEllipsisText: JString = nil;
+                              StringtoJString(aOptions.EllipsisText), //  const aEllipsisText: JString = nil;
                               aOptions.FontName, // const aEllipsisFontName: String = '';
                               aOptions.EllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
                               aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null
                               aOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
-          JStr1 := nil;
-          JStr2 := nil;
           {$ELSEIF defined(IOS)}
           LTmpTextBroken := ALBreakText(
                               ALGetGlobalCGColorSpace, // const aColorSpace: CGColorSpaceRef;
@@ -3403,11 +3341,9 @@ begin
         else begin
           LPaint.setColor(integer(LBreakTextItem.fontColor));
           //-----
-          JStr1 := StringToJString(aOptions.FontName); // << https://quality.embarcadero.com/browse/RSP-14187
-          LTypeface := TJTypeface.JavaClass.create(JStr1, LBreakTextItem.fontStyle);
+          LTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), LBreakTextItem.fontStyle);
           LPaint.setTypeface(LTypeface);
           LTypeface := nil;
-          JStr1 := nil;
           //-----
           LCanvas.drawText(
             LBreakTextItem.line{text},

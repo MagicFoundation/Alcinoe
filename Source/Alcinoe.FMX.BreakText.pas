@@ -99,7 +99,6 @@ type
 
 {*******************}
 function ALBreakText(
-           const aColorSpace: CGColorSpaceRef;
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -119,7 +118,6 @@ function ALBreakText(
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; overload; // Return true if the text was broken into several lines (truncated or not)
 function ALBreakText(
-           const aColorSpace: CGColorSpaceRef;
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -1004,9 +1002,9 @@ function ALBreakText(
            const aEllipsisFontStyle: TFontStyles = [];
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-var LTotalLines: integer;
-    LAllTextDrawn: boolean;
 begin
+  var LTotalLines: integer;
+  var LAllTextDrawn: boolean;
   result := ALBreakText(
               aPaint, // const aPaint: JPaint;
               ARect, // var ARect: TRectF;
@@ -1052,7 +1050,6 @@ end;
 {****************}
 {$IF defined(IOS)}
 function ALBreakText(
-           const aColorSpace: CGColorSpaceRef;
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -1071,82 +1068,42 @@ function ALBreakText(
            const aEllipsisFontStyle: TFontStyles = [];
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-
-var LBreakTextItemsStartCount: integer;
-    LBreakTextItem: TALBreakTextItem;
-    LEllipsisBreakTextItem: TALBreakTextItem;
-    LEllipsisLine: CtLineRef;
-    LEllipsisWidth: Double;
-    LEllipsisFont: CTFontRef;
-    LEllipsisString: CFStringRef;
-    LEllipsisAttr: CFMutableAttributedStringRef;
-    LEllipsisColor: CGColorRef;
-    LFramePath: CGMutablePathRef;
-    LFrameSetter: CTFramesetterRef;
-    LFrame: CTFrameRef;
-    Llines: CFArrayRef;
-    Lline: CTLineRef;
-    LLinesCount: CFIndex;
-    LLineIndent: single;
-    LTextAttr: CFMutableAttributedStringRef;
-    LTmpTextAttr: CFAttributedStringRef;
-    LMaxWidth: single;
-    LMaxHeight: single;
-    LPrevMaxLineWidth: Single;
-    LMaxLineWidth: single;
-    LCurrLineY: single;
-    LTotalLinesHeight: single;
-    LAscent, LDescent: CGFloat;
-    LMeasuredWidth: Double;
-    LSettings: array of CTParagraphStyleSetting;
-    LParagraphStyle: CTParagraphStyleRef;
-    LCGColor: CGColorRef;
-    LTextString: CFStringRef;
-    LFont: CTFontRef;
-    LOffset: single;
-    LStringRange: CFRange;
-    LFirstLineHeadIndent: CGFloat;
-    LLineSpacingAdjustment: CGFloat;
-    LLineBreakMode: Byte;
-    LAlphaColor: TAlphaColorCGFloat;
-    I: CFIndex;
-
 begin
 
   //init aAllTextDrawn
   aAllTextDrawn := True;
 
   //init aBreakTextItemsStartCount
-  LBreakTextItemsStartCount := aBreakTextItems.Count;
+  var LBreakTextItemsStartCount := aBreakTextItems.Count;
 
   //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight / etc.
   if aRect.Width > 65535 then aRect.Width := 65535;
   if aRect.height > 65535 then aRect.height := 65535;
-  LMaxWidth := ARect.width;
-  LMaxHeight := ARect.Height;
-  LPrevMaxLineWidth := 0; // << need this vars because we must recalculate the maxlineWidth for the last lines after the truncation is maded
-  LMaxLineWidth := 0;
-  LTotalLinesHeight := 0;
+  var LMaxWidth: single := ARect.width;
+  var LMaxHeight: single := ARect.Height;
+  var LPrevMaxLineWidth: Single := 0; // << need this vars because we must recalculate the maxlineWidth for the last lines after the truncation is maded
+  var LMaxLineWidth: single := 0;
+  var LTotalLinesHeight: single := 0;
   aTotalLines := 0;
-  LLineIndent := aFirstLineIndent.x;
+  var LLineIndent: single := aFirstLineIndent.x;
 
   //create aCGColor
-  LAlphaColor := TAlphaColorCGFloat.Create(aFontColor);
-  LCGColor := CGColorCreate(aColorSpace, @LAlphaColor);
+  var LAlphaColor := TAlphaColorCGFloat.Create(aFontColor);
+  var LCGColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
   try
 
     //create aFont
-    LFont := ALGetCTFontRef(aFontName, aFontSize, aFontStyle); // Returns a new font reference for the given name.
+    var LFont := ALGetCTFontRef(aFontName, aFontSize, aFontStyle); // Returns a new font reference for the given name.
     if LFont = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;
     try
 
       //create aTextString
-      LTextString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AText[Low(string)], Length(AText));
+      var LTextString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AText[Low(string)], Length(AText));
       if LTextString = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;
       try
 
         //create aTextAttr
-        LTextAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
+        var LTextAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
         try
 
           CFAttributedStringReplaceString(LTextAttr, CFRangeMake(0, 0), LTextString); // Modifies the string of an attributed string.
@@ -1155,6 +1112,7 @@ begin
             CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTFontAttributeName, LFont);
             CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTForegroundColorAttributeName, LCGColor);
             //-----
+            var LSettings: array of CTParagraphStyleSetting;
             SetLength(LSettings, 0);
             //-----
             //kCTParagraphStyleSpecifierAlignment
@@ -1184,7 +1142,7 @@ begin
             //is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
             if (compareValue(aFirstLineIndent.x, 0, TEpsilon.position) > 0) then begin
               SetLength(LSettings, length(LSettings) + 1);
-              LFirstLineHeadIndent := aFirstLineIndent.x;
+              var LFirstLineHeadIndent: CGFloat := aFirstLineIndent.x;
               LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierFirstLineHeadIndent;
               LSettings[high(LSettings)].valueSize := SizeOf(LFirstLineHeadIndent);
               LSettings[high(LSettings)].value := @LFirstLineHeadIndent;
@@ -1204,6 +1162,7 @@ begin
             //* kCTLineBreakByTruncatingTail: Each line is displayed so that the beginning fits in the container and the missing text is indicated by an ellipsis glyph.
             //* kCTLineBreakByTruncatingMiddle: Each line is displayed so that the beginning and end fit in the container and the missing text is indicated by an ellipsis glyph in the middle.
             if not aWordWrap then begin
+              var LLineBreakMode: Byte;
               SetLength(LSettings, length(LSettings) + 1);
               case aTrimming of
                 TTextTrimming.None: LLineBreakMode := kCTLineBreakByClipping;
@@ -1229,7 +1188,7 @@ begin
             //The space in points added between lines within the paragraph (commonly known as leading).
             if (compareValue(aLineSpacing, 0, TEpsilon.position) > 0) then begin
               SetLength(LSettings, length(LSettings) + 1);
-              LLineSpacingAdjustment := aLineSpacing;
+              var LLineSpacingAdjustment: CGFloat := aLineSpacing;
               LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierLineSpacingAdjustment;
               LSettings[high(LSettings)].valueSize := SizeOf(LLineSpacingAdjustment);
               LSettings[high(LSettings)].value := @LLineSpacingAdjustment;
@@ -1269,7 +1228,7 @@ begin
             //Default: 0.0. Application: CTFramesetter.
             //-----
             if length(LSettings) > 0 then begin
-              LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
+              var LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
               try
                 CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTParagraphStyleAttributeName, LParagraphStyle);
               finally
@@ -1280,6 +1239,8 @@ begin
             CFAttributedStringEndEditing(LTextAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
           end;
 
+          //Declare LStringRange
+          var LStringRange: CFRange;
 
 
           /////////////////////////////
@@ -1287,43 +1248,43 @@ begin
           /////////////////////////////
 
           //Create an immutable path of a rectangle.
-          LFramePath := CGPathCreateWithRect(
-                          ALLowerLeftCGRect(
-                            tpointf.create(0,0){aUpperLeftOrigin},
-                            ARect.Width{aWidth},
-                            ARect.Height - aFirstLineIndent.y{aHeight},
-                            ARect.Height - aFirstLineIndent.y{aGridHeight}),
-                          nil{transform});
+          var LFramePath := CGPathCreateWithRect(
+                              ALLowerLeftCGRect(
+                                tpointf.create(0,0){aUpperLeftOrigin},
+                                ARect.Width{aWidth},
+                                ARect.Height - aFirstLineIndent.y{aHeight},
+                                ARect.Height - aFirstLineIndent.y{aGridHeight}),
+                              nil{transform});
           try
 
             //Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
             //create and fill text frames with the CTFramesetterCreateFrame call.
-            LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LTextAttr));
+            var LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LTextAttr));
             if LFrameSetter = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateWithAttributedString return NULL if unsuccessful.
             try
 
               //Creates an immutable frame using a framesetter.
-              LFrame := CTFramesetterCreateFrame(
-                          LFrameSetter, // framesetter: The framesetter used to create the frame.
-                          CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                             // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                             // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                          LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                      // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                          nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                // or NULL if there are no such attributes.
+              var LFrame := CTFramesetterCreateFrame(
+                              LFrameSetter, // framesetter: The framesetter used to create the frame.
+                              CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
+                                                 // that is to be typeset in lines fitted into the frame. If the length portion of the range is
+                                                 // set to 0, then the framesetter continues to add lines until it runs out of text or space.
+                              LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
+                                          // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
+                              nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
+                                    // or NULL if there are no such attributes.
               if LFrame = nil then begin ARect.Width := 0; ARect.Height := 0; exit(False); end;  // CTFramesetterCreateFrame return NULL if unsuccessful.
               try
 
                 //init alines / aLinesCount
-                Llines := CTFrameGetLines(LFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
-                LLinesCount := CFArrayGetCount(Llines);
+                var Llines := CTFrameGetLines(LFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
+                var LLinesCount := CFArrayGetCount(Llines);
 
                 //init result
                 result := LLinesCount > 1;
 
                 //update aBreakTextItems - loop on all lines
-                for I := 0 to LLinesCount - 1 do begin
+                for var I := 0 to LLinesCount - 1 do begin
 
                   //break if maxline reach
                   if (aMaxlines > 0) and (aTotalLines >= aMaxlines) then break; // << no need to set the result to true because aLinesCount > 1
@@ -1332,19 +1293,22 @@ begin
                   if (not aWordwrap) and (aTotalLines >= 1) then break; // << no need to set the result to true because aLinesCount > 1
 
                   //init aline / aMeasuredWidth
-                  Lline := CFArrayGetValueAtIndex(Llines, I);
-                  LMeasuredWidth := CTLineGetTypographicBounds(
-                                      Lline, // line: The line whose typographic bounds are calculated.
-                                      @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                      @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                      nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                            // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+                  var Lline := CFArrayGetValueAtIndex(Llines, I);
+                  var LAscent: CGFloat;
+                  var LDescent: CGFloat;
+                  var LMeasuredWidth: Double := CTLineGetTypographicBounds(
+                                                  Lline, // line: The line whose typographic bounds are calculated.
+                                                  @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                  @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                  nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                        // >> return the typographic width of the line. If the line is invalid, this function returns 0.
 
                   //unfortunatly the lines that are wrapped are not trimed with the last space
                   //so aMeasuredWidth is inacurate. so i must trim the trailling char
                   if I < LLinesCount - 1 then LMeasuredWidth := LMeasuredWidth - CTLineGetTrailingWhitespaceWidth(Lline);
 
                   //update aCurrLineY
+                  var LCurrLineY: single;
                   if I = 0 then LCurrLineY := aFirstLineIndent.y + LAscent
                   else LCurrLineY := LTotalLinesHeight + aLineSpacing + LAscent;
 
@@ -1371,7 +1335,7 @@ begin
                   LStringRange := CTLineGetStringRange(Lline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
 
                   // update aBreakTextItems
-                  LBreakTextItem := TalBreakTextItem.Create;
+                  var LBreakTextItem := TalBreakTextItem.Create;
                   try
 
                     // aBreakTextItem.Line
@@ -1379,7 +1343,7 @@ begin
 
                     // aBreakTextItem.text
                     if LStringRange.length > 0 then begin
-                      LTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(LTextAttr), LStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
+                      var LTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(LTextAttr), LStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
                       if LTmpTextAttr <> nil then begin
                         try
                           LBreakTextItem.text := CFStringRefToStr(CFAttributedStringGetString(LTmpTextAttr));  // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object.
@@ -1453,21 +1417,21 @@ begin
               //create aEllipsisColor
               if aEllipsisFontColor <> TAlphaColorRec.Null then LAlphaColor := TAlphaColorCGFloat.Create(aEllipsisFontColor)
               else LAlphaColor := TAlphaColorCGFloat.Create(aFontColor);
-              LEllipsisColor := CGColorCreate(aColorSpace, @LAlphaColor);
+              var LEllipsisColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
               try
 
                 //create aEllipsisFont
-                LEllipsisFont := ALGetCTFontRef(aFontName, aFontSize, aEllipsisFontStyle); // Returns a new font reference for the given name.
+                var LEllipsisFont := ALGetCTFontRef(aFontName, aFontSize, aEllipsisFontStyle); // Returns a new font reference for the given name.
                 if LEllipsisFont <> nil then begin
                   try
 
                     //create aEllipsisString
-                    LEllipsisString := CFStringCreateWithCharacters(kCFAllocatorDefault, @aEllipsisText[Low(string)], Length(aEllipsisText));
+                    var LEllipsisString := CFStringCreateWithCharacters(kCFAllocatorDefault, @aEllipsisText[Low(string)], Length(aEllipsisText));
                     if LEllipsisString <> nil then begin
                       try
 
                         //create aEllipsisAttr
-                        LEllipsisAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
+                        var LEllipsisAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
                         try
 
                           CFAttributedStringReplaceString(LEllipsisAttr, CFRangeMake(0, 0), LEllipsisString); // Modifies the string of an attributed string.
@@ -1480,13 +1444,14 @@ begin
                           end;
 
                           //create the aEllipsisLine
-                          LEllipsisLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LEllipsisAttr)); // Creates a single immutable line object directly from an attributed string.
-                          if LEllipsisLine <> nil then begin                                                       // Return Value: A reference to a CTLine object if the call was successful; otherwise, NULL.
+                          var LEllipsisLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LEllipsisAttr)); // Creates a single immutable line object directly from an attributed string.
+                          if LEllipsisLine <> nil then begin                                                           // Return Value: A reference to a CTLine object if the call was successful; otherwise, NULL.
                             try
 
                               CFAttributedStringBeginEditing(LTextAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
                               try
                                 //-----
+                                var LSettings: array of CTParagraphStyleSetting;
                                 SetLength(LSettings, 0);
                                 //-----
                                 //kCTParagraphStyleSpecifierAlignment
@@ -1528,6 +1493,7 @@ begin
                                 //* kCTLineBreakByTruncatingHead: Each line is displayed so that the end fits in the frame and the missing text is indicated by an ellipsis glyph.
                                 //* kCTLineBreakByTruncatingTail: Each line is displayed so that the beginning fits in the container and the missing text is indicated by an ellipsis glyph.
                                 //* kCTLineBreakByTruncatingMiddle: Each line is displayed so that the beginning and end fit in the container and the missing text is indicated by an ellipsis glyph in the middle.
+                                var LLineBreakMode: Byte;
                                 SetLength(LSettings, length(LSettings) + 1);
                                 case aTrimming of
                                   TTextTrimming.None: LLineBreakMode := kCTLineBreakByClipping;
@@ -1585,7 +1551,7 @@ begin
                                 //Default: 0.0. Application: CTFramesetter.
                                 //-----
                                 if length(LSettings) > 0 then begin
-                                  LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
+                                  var LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
                                   try
                                     CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTParagraphStyleAttributeName, LParagraphStyle);
                                   finally
@@ -1598,12 +1564,14 @@ begin
                               end;
 
                               //init aEllipsisWidth
-                              LEllipsisWidth := CTLineGetTypographicBounds(
-                                                  LEllipsisLine, // line: The line whose typographic bounds are calculated.
-                                                  @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                  @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                  nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                        // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+                              var LAscent: CGFloat;
+                              var LDescent: CGFloat;
+                              var LEllipsisWidth: Double := CTLineGetTypographicBounds(
+                                                              LEllipsisLine, // line: The line whose typographic bounds are calculated.
+                                                              @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                              @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                              nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                                    // >> return the typographic width of the line. If the line is invalid, this function returns 0.
 
                               //Create an immutable path of a rectangle.
                               LFramePath := CGPathCreateWithRect(
@@ -1618,41 +1586,41 @@ begin
 
                                 //Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
                                 //create and fill text frames with the CTFramesetterCreateFrame call.
-                                LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LTextAttr));
+                                var LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LTextAttr));
                                 if LFrameSetter <> nil then begin  // CTFramesetterCreateWithAttributedString return NULL if unsuccessful.
                                   try
 
                                     //Creates an immutable frame using a framesetter.
-                                    LFrame := CTFramesetterCreateFrame(
-                                                LFrameSetter, // framesetter: The framesetter used to create the frame.
-                                                CFRangeMake(LStringRange.location, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                                                                       // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                                                                       // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                                                LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                                            // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                                                nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                                      // or NULL if there are no such attributes.
+                                    var LFrame := CTFramesetterCreateFrame(
+                                                    LFrameSetter, // framesetter: The framesetter used to create the frame.
+                                                    CFRangeMake(LStringRange.location, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
+                                                                                           // that is to be typeset in lines fitted into the frame. If the length portion of the range is
+                                                                                           // set to 0, then the framesetter continues to add lines until it runs out of text or space.
+                                                    LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
+                                                                // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
+                                                    nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
+                                                          // or NULL if there are no such attributes.
                                     if LFrame <> nil then begin // CTFramesetterCreateFrame return NULL if unsuccessful.
                                       try
 
                                         //init aBreakTextItem
-                                        LBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
+                                        var LBreakTextItem := aBreakTextItems[aBreakTextItems.count - 1];
                                         cfRelease(LBreakTextItem.Line);
                                         LBreakTextItem.Line := nil; // << i use this as a flag
 
                                         //init alines / aLinesCount
-                                        Llines := CTFrameGetLines(LFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
-                                        LLinesCount := CFArrayGetCount(Llines);
+                                        var Llines := CTFrameGetLines(LFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
+                                        var LLinesCount := CFArrayGetCount(Llines);
                                         if LLinesCount > 0 then begin
 
                                           //init aline / aMeasuredWidth
-                                          Lline := CFArrayGetValueAtIndex(Llines, 0);
-                                          LMeasuredWidth := CTLineGetTypographicBounds(
-                                                              Lline, // line: The line whose typographic bounds are calculated.
-                                                              @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                              @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                              nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                                    // >> return the typographic width of the line. If the line is invalid, this function returns 0.
+                                          var Lline := CFArrayGetValueAtIndex(Llines, 0);
+                                          var LMeasuredWidth: Double := CTLineGetTypographicBounds(
+                                                                          Lline, // line: The line whose typographic bounds are calculated.
+                                                                          @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
+                                                                          @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
+                                                                          nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
+                                                                                // >> return the typographic width of the line. If the line is invalid, this function returns 0.
 
                                           //init aStringRange
                                           LStringRange := CTLineGetStringRange(Lline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
@@ -1670,7 +1638,7 @@ begin
 
                                             //update aBreakTextItems.text
                                             if LStringRange.length > 0 then begin
-                                              LTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(LTextAttr), LStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
+                                              var LTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(LTextAttr), LStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
                                               if LTmpTextAttr <> nil then begin
                                                 try
                                                   LBreakTextItem.text := CFStringRefToStr(CFAttributedStringGetString(LTmpTextAttr));  // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object.
@@ -1709,7 +1677,7 @@ begin
                                         if LBreakTextItem.Line = nil then LBreakTextItem.rect.Width := 0;
 
                                         //add the ellipsis line
-                                        LEllipsisBreakTextItem := TalBreakTextItem.Create;
+                                        var LEllipsisBreakTextItem := TalBreakTextItem.Create;
                                         try
                                           LEllipsisBreakTextItem.Line := CFRetain(LEllipsisLine); // Retains a Core Foundation object.
                                           LEllipsisBreakTextItem.text := aEllipsisText;
@@ -1803,10 +1771,10 @@ begin
   if compareValue(LMaxLineWidth, LMaxWidth, Tepsilon.Position) < 0 then begin
     case AHTextAlign of
        TTextAlign.Center: begin
-                            LOffset := Floor((aRect.Right - LMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                            var LOffset: single := Floor((aRect.Right - LMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                             aRect.Left := aRect.Left + LOffset;
                             aRect.right := aRect.right - LOffset;
-                            for I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                            for var I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                               aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - LOffset;
                               aBreakTextItems[I].rect.Offset(-LOffset, 0);
                             end;
@@ -1815,9 +1783,9 @@ begin
                              aRect.Right := min(aRect.Right, aRect.Left + LMaxLineWidth);
                            end;
        TTextAlign.Trailing: begin
-                              LOffset := Floor(aRect.Right - LMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                              var LOffset: single := Floor(aRect.Right - LMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                               aRect.Left := aRect.Left + LOffset;
-                              for I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                              for var I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                                 aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - LOffset;
                                 aBreakTextItems[I].rect.Offset(-LOffset, 0);
                               end;
@@ -1827,7 +1795,7 @@ begin
   if compareValue(LTotalLinesHeight, LMaxHeight, Tepsilon.Position) < 0 then begin
     case AVTextAlign of
        TTextAlign.Center: begin
-                            LOffset := (aRect.bottom - LTotalLinesHeight - arect.top) / 2;
+                            var LOffset: single := (aRect.bottom - LTotalLinesHeight - arect.top) / 2;
                             aRect.top := aRect.top + LOffset;
                             aRect.bottom := aRect.bottom - LOffset;
                           end;
@@ -1835,7 +1803,7 @@ begin
                              aRect.bottom := min(aRect.bottom, aRect.top + LTotalLinesHeight);
                            end;
        TTextAlign.Trailing: begin
-                              LOffset := aRect.bottom - LTotalLinesHeight - arect.top;
+                              var LOffset: single := aRect.bottom - LTotalLinesHeight - arect.top;
                               aRect.top := aRect.top + LOffset;
                             end;
     end;
@@ -1847,7 +1815,6 @@ end;
 {****************}
 {$IF defined(IOS)}
 function ALBreakText(
-           const aColorSpace: CGColorSpaceRef;
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -1864,11 +1831,10 @@ function ALBreakText(
            const aEllipsisFontStyle: TFontStyles = [];
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; inline; overload; // Return true if the text was broken into several lines (truncated or not)
-var LTotalLines: integer;
-    LAllTextDrawn: boolean;
 begin
+  var LTotalLines: integer;
+  var LAllTextDrawn: boolean;
   result := ALBreakText(
-              aColorSpace, // const aColorSpace: CGColorSpaceRef;
               aFontColor, // const aFontColor: TalphaColor;
               aFontSize, // const aFontSize: single;
               aFontStyle, // const aFontStyle: TFontStyles;
@@ -1899,9 +1865,8 @@ Procedure ALGetTextMetrics(
             const aFontName: String;
             var aAscent:Single; // << return aAscent in negative (like in android)
             var aDescent:Single);
-var LLayout: TTextLayout;
 begin
-  LLayout := TTextLayoutManager.DefaultTextLayout.Create;
+  var LLayout := TTextLayoutManager.DefaultTextLayout.Create;
   try
     LLayout.BeginUpdate;
     LLayout.Text := '^_'; // << seam that aLayout.TextHeight will be the same for all characters so doesn't matter what we set here
@@ -1928,7 +1893,6 @@ function ALbreakText(
            const atext: String;
            const aMaxWidth: Single;
            var aMeasuredWidth: Single): integer;
-var LLayout: TTextLayout;
 begin
   // this is true on macos and on windows
   // if aText = 'A' (only 1 char)
@@ -1944,7 +1908,7 @@ begin
   // NEXT charactere, so it's index-1 that is matter for us and if index <> LOW surrogate then
   // index-1 <> HIGH surrogate). this because in the delphi source code of PositionAtPoint they do at the end:
   //  if (Result >= 0) and (Result < Text.Length) and Text.Chars[Result].IsLowSurrogate then Inc(Result);
-  LLayout := TTextLayoutManager.DefaultTextLayout.Create;
+  var LLayout := TTextLayoutManager.DefaultTextLayout.Create;
   try
     LLayout.BeginUpdate;
     LLayout.Font.Family := aFontName;
@@ -3024,7 +2988,6 @@ begin
                               aOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
           {$ELSEIF defined(IOS)}
           LTmpTextBroken := ALBreakText(
-                              ALGetGlobalCGColorSpace, // const aColorSpace: CGColorSpaceRef;
                               LFontColor, // const aFontColor: TalphaColor;
                               aOptions.FontSize, // const aFontSize: single;
                               LStyle, // const aFontStyle: TFontStyles;

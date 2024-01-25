@@ -1971,31 +1971,15 @@ function ALBreakText(
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
 
-var LBreakTextItemsStartCount: integer;
-    LBreakTextItem: TALBreakTextItem;
-    LNumberOfChars: integer;
-    LSaveNumberOfChars: integer;
-    LSaveNumberOfCharsIsAccurate: Boolean;
-    LLine: String;
-    LLineIndent: Single;
-    LEllipsisLine: String;
-    LEllipsisLineLn: single;
-    LEllipsisLinePos: TpointF;
-    LEllipsisLineRect: TrectF;
-    LMaxWidth: single;
-    LMaxHeight: single;
-    LMaxLineWidth: single;
-    LLineHeight: single;
-    LTotalLinesHeight: single;
-    LChar: Char;
-    LTextLn: integer;
-    LTextIdx: integer;
-    LCurrLineY: single;
-    LAscent, LDescent: Single;
-    LMeasuredWidth: Single;
-    LOffset: single;
-    LLineEndWithBreakLine: Boolean;
-    I, J: integer;
+var
+  LEllipsisLine: String;
+  LEllipsisLineLn: single;
+  LEllipsisLinePos: TpointF;
+  LEllipsisLineRect: TrectF;
+  LMaxWidth: single;
+  LLineIndent: Single;
+  LCurrLineY: single;
+  LAscent, LDescent: Single;
 
   {~~~~~~~~~~~~~~~~~~~~~~}
   procedure _initEllipsis;
@@ -2041,19 +2025,19 @@ begin
   aAllTextDrawn := True;
 
   //init aBreakTextItemsStartCount
-  LBreakTextItemsStartCount := aBreakTextItems.Count;
+  var LBreakTextItemsStartCount := aBreakTextItems.Count;
 
   //init aMaxWidth / aMaxHeight / aMaxLineWidth / aTotalLinesHeight
   if aRect.Width > 65535 then aRect.Width := 65535;
   if aRect.height > 65535 then aRect.height := 65535;
   LMaxWidth := ARect.width;
-  LMaxHeight := ARect.Height;
-  LMaxLineWidth := 0;
-  LTotalLinesHeight := 0;
+  var LMaxHeight: single := ARect.Height;
+  var LMaxLineWidth: single := 0;
+  var LTotalLinesHeight: single := 0;
 
   //init ATextIdx / ATextLn
-  LTextIdx := 0;
-  LTextLn := AText.length;
+  var LTextIdx := 0;
+  var LTextLn := AText.length;
 
   //init metics / aCurrLineY / aLineHeight
   ALGetTextMetrics(
@@ -2064,7 +2048,7 @@ begin
     LDescent);
   LCurrLineY := aFirstLineIndent.y + (-1*LAscent); // aMetrics.top and aMetrics.ascent are always returned in negative value
   aTotalLines := 0;
-  LLineHeight := LDescent + aLineSpacing + (-1*LAscent);
+  var LLineHeight: single := LDescent + aLineSpacing + (-1*LAscent);
 
   //init aEllipsisLine
   LEllipsisLine := '';
@@ -2080,8 +2064,10 @@ begin
     while LTextIdx < LTextLn do begin
 
       // init aline
-      I := aText.indexOf(#13 {c}, LTextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
-      J := aText.indexOf(#10 {c}, LTextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
+      var LLine: String;
+      var LLineEndWithBreakLine: Boolean;
+      var I := aText.indexOf(#13 {c}, LTextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
+      var J := aText.indexOf(#10 {c}, LTextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
       if (I >= 0) and (J >= 0) then I := min(I,J)
       else I := max(I, J);
       if I = LTextIdx then begin
@@ -2100,13 +2086,14 @@ begin
       end;
 
       //calculate the number of char in the current line (this work good also if aline is empty)
-      LNumberOfChars := ALbreakText(
-                          aFontSize,
-                          aFontStyle,
-                          aFontName,
-                          LLine {text},
-                          LMaxWidth - LLineIndent, {amaxWidth}
-                          LMeasuredWidth {measuredWidth});
+      var LMeasuredWidth: Single;
+      var LNumberOfChars := ALbreakText(
+                              aFontSize,
+                              aFontStyle,
+                              aFontName,
+                              LLine {text},
+                              LMaxWidth - LLineIndent, {amaxWidth}
+                              LMeasuredWidth {measuredWidth});
 
       //init result
       if LNumberOfChars < LLine.length then result := true;
@@ -2157,8 +2144,8 @@ begin
                                   //-----
                                   _initEllipsis;
                                   //-----
-                                  LSaveNumberOfChars := LNumberOfChars;
-                                  LSaveNumberOfCharsIsAccurate := False;
+                                  var LSaveNumberOfChars := LNumberOfChars;
+                                  var LSaveNumberOfCharsIsAccurate := False;
                                   while LNumberOfChars > 0 do begin
                                     //----
                                     if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
@@ -2166,7 +2153,7 @@ begin
                                     end
                                     //----
                                     else if LNumberOfChars >= 2 then begin
-                                      LChar := LLine.chars[LNumberOfChars-2];
+                                      var LChar := LLine.chars[LNumberOfChars-2];
                                       if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
                                         dec(LNumberOfChars);
                                         continue;
@@ -2224,8 +2211,8 @@ begin
             aAllTextDrawn := False; // if we are at the last line then in anycase we will not draw all the text
             _initEllipsis;
             //-----
-            LSaveNumberOfChars := LNumberOfChars;
-            LSaveNumberOfCharsIsAccurate := False;
+            var LSaveNumberOfChars := LNumberOfChars;
+            var LSaveNumberOfCharsIsAccurate := False;
             while LNumberOfChars > 0 do begin
               //----
               if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
@@ -2233,7 +2220,7 @@ begin
               end
               //----
               else if (aTrimming = TTextTrimming.Word) and (LNumberOfChars >= 2) then begin
-                LChar := LLine.chars[LNumberOfChars-2];
+                var LChar := LLine.chars[LNumberOfChars-2];
                 if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
                   dec(LNumberOfChars);
                   continue;
@@ -2287,12 +2274,12 @@ begin
                 ((aMaxLines > 0) and (aTotalLines >= aMaxLines - 1))) then aAllTextDrawn := False;
 
             //Cut the line
-            LSaveNumberOfChars := LNumberOfChars;
+            var LSaveNumberOfChars := LNumberOfChars;
             if LNumberOfChars < LLine.length then inc(LNumberOfChars); // in case the space separator is just after aNumberOfChars
             while LNumberOfChars > 0 do begin
               //-----
               if LNumberOfChars >= 2 then begin
-                LChar := LLine.chars[LNumberOfChars-1];
+                var LChar := LLine.chars[LNumberOfChars-1];
                 if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
                   dec(LNumberOfChars);
                   continue;
@@ -2394,7 +2381,7 @@ begin
       end;
 
       //init LBreakTextItem
-      LBreakTextItem := TalBreakTextItem.Create;
+      var LBreakTextItem := TalBreakTextItem.Create;
       try
 
         //update aBreakTextItem
@@ -2496,7 +2483,7 @@ begin
 
   //add the end ellipsis
   if LEllipsisLine <> '' then begin
-    LBreakTextItem := TalBreakTextItem.Create;
+    var LBreakTextItem := TalBreakTextItem.Create;
     try
       LBreakTextItem.line := LEllipsisLine;
       LBreakTextItem.pos := LEllipsisLinePos;
@@ -2513,10 +2500,10 @@ begin
   if compareValue(LMaxLineWidth, LMaxWidth, Tepsilon.Position) < 0 then begin
     case AHTextAlign of
        TTextAlign.Center: begin
-                            LOffset := Floor((aRect.Right - LMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                            var LOffset: single := Floor((aRect.Right - LMaxLineWidth - arect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                             aRect.Left := aRect.Left + LOffset;
                             aRect.right := aRect.right - LOffset;
-                            for I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                            for var I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                               aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - LOffset;
                               aBreakTextItems[I].rect.Offset(-LOffset, 0);
                             end;
@@ -2525,9 +2512,9 @@ begin
                              aRect.Right := min(aRect.Right, aRect.Left + LMaxLineWidth);
                            end;
        TTextAlign.Trailing: begin
-                              LOffset := Floor(aRect.Right - LMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                              var LOffset: single := Floor(aRect.Right - LMaxLineWidth - arect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                               aRect.Left := aRect.Left + LOffset;
-                              for I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
+                              for var I := LBreakTextItemsStartCount to aBreakTextItems.Count - 1 do begin
                                 aBreakTextItems[I].pos.X := aBreakTextItems[I].pos.X - LOffset;
                                 aBreakTextItems[I].rect.Offset(-LOffset, 0);
                               end;
@@ -2537,7 +2524,7 @@ begin
   if compareValue(LTotalLinesHeight, LMaxHeight, Tepsilon.Position) < 0 then begin
     case AVTextAlign of
        TTextAlign.Center: begin
-                            LOffset := (aRect.bottom - LTotalLinesHeight - arect.top) / 2;
+                            var LOffset: single := (aRect.bottom - LTotalLinesHeight - arect.top) / 2;
                             aRect.top := aRect.top + LOffset;
                             aRect.bottom := aRect.bottom - LOffset;
                           end;
@@ -2545,7 +2532,7 @@ begin
                              aRect.bottom := min(aRect.bottom, aRect.top + LTotalLinesHeight);
                            end;
        TTextAlign.Trailing: begin
-                              LOffset := aRect.bottom - LTotalLinesHeight - arect.top;
+                              var LOffset: single := aRect.bottom - LTotalLinesHeight - arect.top;
                               aRect.top := aRect.top + LOffset;
                             end;
     end;
@@ -2557,7 +2544,6 @@ end;
 {*********************************************}
 constructor TALDrawMultiLineTextOptions.Create;
 begin
-  //-----
   FontName := '';
   FontSize := 12;
   FontStyle := [];
@@ -2589,7 +2575,6 @@ begin
   Padding := TRectF.Create(0,0,0,0);
   //-----
   TextIsHtml := false;
-  //-----
 end;
 
 {*********************************************}
@@ -2626,11 +2611,7 @@ function  ALDrawMultiLineText(
               const aTag: String; // color="#ffffff" id="xxx"
               const aSpanIds: TALStringListW;
               const aFontColors: Tlist<TalphaColor>);
-  var LParamList: TALStringListW;
-      LcolorInt: integer;
-      S1: String;
   begin
-
     if aTag = '' then begin
       aSpanIds.Add('');
       if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
@@ -2638,7 +2619,7 @@ function  ALDrawMultiLineText(
       exit;
     end;
 
-    LParamList := TALStringListW.Create;
+    var LParamList := TALStringListW.Create;
     try
 
       ALExtractHeaderFieldsWithQuoteEscaped(
@@ -2652,12 +2633,13 @@ function  ALDrawMultiLineText(
 
       aSpanIds.Add(LParamList.Values['id']);
 
-      S1 := LParamList.Values['color'];
+      var S1 := LParamList.Values['color'];
       if S1 <> '' then begin
 
         if S1[low(S1)] = '#' then begin
           S1[low(S1)] := '$';
           if length(S1) = 7 then insert('ff', S1, 2); // $ffffffff
+          var LcolorInt: integer;
           if not ALTryStrToInt(S1, LcolorInt) then begin
             if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
             else aFontColors.Add(aOptions.FontColor);
@@ -2678,22 +2660,19 @@ function  ALDrawMultiLineText(
     finally
       LParamList.Free;
     end;
-
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _getInfosFromImg(
               const aTag: String; // src="xxx"
               var aSrc: String);
-  var LParamList: TALStringListW;
   begin
-
     if aTag = '' then begin
       aSrc := '';
       exit;
     end;
 
-    LParamList := TALStringListW.Create;
+    var LParamList := TALStringListW.Create;
     try
 
       ALExtractHeaderFieldsWithQuoteEscaped(
@@ -2710,59 +2689,15 @@ function  ALDrawMultiLineText(
     finally
       LParamList.Free;
     end;
-
   end;
-
-var {$IF defined(ANDROID)}
-    LBitmap: Jbitmap;
-    LImg: Jbitmap;
-    LPaint: JPaint;
-    LTypeface: JTypeface;
-    LCanvas: Jcanvas;
-    LStyle: integer;
-    {$ENDIF}
-    {$IF defined(IOS)}
-    LImg: CGImageRef;
-    LContext: CGContextRef;
-    LStyle: TfontStyles;
-    LWhiteSpace: Boolean;
-    {$ENDIF}
-    {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-    LStyle: TfontStyles;
-    LImg: Tbitmap;
-    {$ENDIF}
-    LBreakTextItems: TALBreakTextItems;
-    LBreakTextItem: TALBreakTextItem;
-    LBreakTextItemsCount: integer;
-    LCurrText: String;
-    LCurrImgSrc: String;
-    LTag: String;
-    LBold: integer;
-    LItalic: Integer;
-    LMaxWidth: single;
-    LMaxHeight: Single;
-    LFontColors: Tlist<TalphaColor>;
-    LFontColor: TalphaColor;
-    LSpanIDs: TALStringListW;
-    LSpanID: String;
-    LFirstLineIndent: TpointF;
-    LTmpRect: TrectF;
-    LTotalLines: integer;
-    LTmpTotalLines: integer;
-    LTmpTextBroken: Boolean;
-    LTmpAllTextDrawn: Boolean;
-    LCurrentLineY: single;
-    LOffset: single;
-    P1, P2: integer;
-    i, j: integer;
 
 begin
 
   {$IF defined(ALGpuCanvas)}
-  i := TContextManager.DefaultContextClass.MaxTextureSize;
-  if i > 0 then begin
-    aRect.Width := min(aRect.Width, i);
-    aRect.height := min(aRect.height, i);
+  var LMaxTextureSize := TContextManager.DefaultContextClass.MaxTextureSize;
+  if LMaxTextureSize > 0 then begin
+    aRect.Width := min(aRect.Width, LMaxTextureSize);
+    aRect.height := min(aRect.height, LMaxTextureSize);
   end;
   {$ENDIF}
 
@@ -2778,7 +2713,7 @@ begin
 
   {$IF defined(ANDROID)}
   //create LPaint
-  LPaint := TJPaint.JavaClass.init;
+  var LPaint := TJPaint.JavaClass.init;
   LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
   LPaint.setSubpixelText(true); // Enabling this flag causes glyph advances to be computed with subpixel accuracy.
   LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
@@ -2788,23 +2723,25 @@ begin
 
   //init local var
   {$IFDEF IOS}
-  LWhiteSpace := False;
+  var LWhiteSpace := False;
   {$ENDIF}
-  LFirstLineIndent := aOptions.FirstLineIndent;
-  LMaxWidth := 0;
-  LMaxHeight := 0;
-  LTotalLines := 0;
-  LBold := 0;
-  LItalic := 0;
-  LFontColors := Tlist<TalphaColor>.create;
-  LSpanIDs := TALStringListW.create;
-  LBreakTextItems := TalBreakTextItems.Create(true{aOwnsObjects});
+  var LFirstLineIndent := aOptions.FirstLineIndent;
+  var LMaxWidth: single := 0;
+  var LMaxHeight: Single := 0;
+  var LTotalLines := 0;
+  var LBold := 0;
+  var LItalic := 0;
+  var LFontColors := Tlist<TalphaColor>.create;
+  var LSpanIDs := TALStringListW.create;
+  var LBreakTextItems := TalBreakTextItems.Create(true{aOwnsObjects});
   try
 
     //loop on all the html elements
-    P1 := 1;
+    var P1 := 1;
     while P1 <= length(aText) do begin
 
+      var LCurrText: String;
+      var LCurrImgSrc: String;
 
       /////////////////////////////////////
       //if the text contain html elements//
@@ -2817,10 +2754,10 @@ begin
           //-----
           LCurrImgSrc := '';
           LCurrText := '';
-          P2 := ALPosW('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
-                                          //           ^P1                  ^P2
+          var P2 := ALPosW('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+                                              //           ^P1                  ^P2
           if P2 <= 0 then break;
-          LTag := ALCopyStr(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
+          var LTag: String := ALCopyStr(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
           P1 := P2 + 1; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
                         //                                 ^P1
 
@@ -2882,8 +2819,8 @@ begin
         else begin
 
           LCurrImgSrc := '';
-          P2 := ALPosW('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
-                                         //                                 ^P1      ^P2
+          var P2 := ALPosW('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+                                             //                                 ^P1      ^P2
           if P2 <= 0 then P2 := Maxint;
           LCurrText := ALCopyStr(aText, P1, P2 - P1);  // blablabla
           LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
@@ -2918,6 +2855,7 @@ begin
       ///////////////////////////
       else begin
         LCurrText := aText;
+        LCurrImgSrc := '';
         P1 := Maxint;
       end;
 
@@ -2928,21 +2866,25 @@ begin
       if LCurrText <> '' then begin
 
         //LFontColor
+        var LFontColor: TalphaColor;
         if LFontColors.Count > 0 then LFontColor := LFontColors[LFontColors.Count - 1]
         else LFontColor := aOptions.FontColor;
 
         //LSpanID
+        var LSpanID: String;
         if LSpanIDs.Count > 0 then LSpanID := LSpanIDs[LSpanIDs.Count - 1]
         else LSpanID := '';
 
         //LStyle
         {$IF defined(ANDROID)}
+        var LStyle: integer;
         if ((TFontStyle.fsBold in aOptions.FontStyle) or (LBold > 0)) and
            ((TFontStyle.fsItalic in aOptions.FontStyle) or (LItalic > 0)) then LStyle := TJTypeface.JavaClass.BOLD_ITALIC
         else if ((TFontStyle.fsBold in aOptions.FontStyle) or (LBold > 0)) then LStyle := TJTypeface.JavaClass.BOLD
         else if ((TFontStyle.fsItalic in aOptions.FontStyle) or (LItalic > 0)) then LStyle := TJTypeface.JavaClass.ITALIC
         else LStyle := TJTypeface.JavaClass.NORMAL;
         {$ELSE}
+        var LStyle: TfontStyles;
         if ((TFontStyle.fsBold in aOptions.FontStyle) or (LBold > 0)) and
            ((TFontStyle.fsItalic in aOptions.FontStyle) or (LItalic > 0)) then LStyle := [TFontStyle.fsBold, TFontStyle.fsItalic]
         else if ((TFontStyle.fsBold in aOptions.FontStyle) or (LBold > 0)) then LStyle := [TFontStyle.fsBold]
@@ -2951,12 +2893,17 @@ begin
         {$ENDIF}
 
         //loop style we draw all the text or at least the ellipsis
+        var LTmpRect: TrectF;
+        var LTmpTotalLines: integer;
+        var LTmpAllTextDrawn: Boolean;
+        var LTmpTextBroken: Boolean;
+        var LBreakTextItemsCount: integer;
         while True do begin
 
           //init LPaint
           {$IF defined(ANDROID)}
           LPaint.setColor(integer(LFontColor));
-          LTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), LStyle);
+          var LTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), LStyle);
           LPaint.setTypeface(LTypeface);
           LTypeface := nil;
           {$ENDIF}
@@ -3034,7 +2981,7 @@ begin
           //update the img
           if (LCurrImgSrc <> '') and
              (LBreakTextItems.Count - LBreakTextItemsCount = 1) then begin
-            LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
+            var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
             LBreakTextItem.imgsrc := LCurrImgSrc;
           end;
 
@@ -3049,7 +2996,7 @@ begin
             // their is no item for the text that generate the break line
             // because their is even not enalf of place to write the text himself (all the place was used by the ellipsis)
             // -2 = the previous text
-            LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 2];
+            var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 2];
 
             //if the ellipsis is not on the same line of the LBreakTextItem then it's mean
             //we don't have enalf of place on one full row to draw the ellipsis so break the loop
@@ -3063,7 +3010,7 @@ begin
             LSpanID := LBreakTextItem.id;
             LStyle := LBreakTextItem.fontStyle;
             setlength(LCurrText, 2 * length(LCurrText));                         // << i put some space in the end of the previous text to force
-            for I := Low(LCurrText) to High(LCurrText) do LCurrText[i] := ' ';   // << the draw of the ellipsis
+            for var I := Low(LCurrText) to High(LCurrText) do LCurrText[i] := ' ';   // << the draw of the ellipsis
             {$IF defined(ANDROID)}
             LCurrText := JStringtoString(LBreakTextItem.line) + LCurrText + '_';
             {$ELSEIF defined(IOS)}
@@ -3074,7 +3021,7 @@ begin
             LFirstLineIndent := TpointF.Create(LBreakTextItem.rect.left, LBreakTextItem.rect.Top);
 
             //clean the LBreakTextItems
-            for I := LBreakTextItems.Count - 1 downto LBreakTextItems.Count - 2 do
+            for var I := LBreakTextItems.Count - 1 downto LBreakTextItems.Count - 2 do
               LBreakTextItems.Delete(i);
 
             //try again
@@ -3101,8 +3048,8 @@ begin
         aAllTextDrawn := aAllTextDrawn and LTmpAllTextDrawn;
 
         //update all the LBreakTextItem
-        for I := LBreakTextItemsCount to LBreakTextItems.Count - 1 do begin
-          LBreakTextItem := LBreakTextItems[i];
+        for var I := LBreakTextItemsCount to LBreakTextItems.Count - 1 do begin
+          var LBreakTextItem := LBreakTextItems[i];
           //-----
           if (not LBreakTextItem.isEllipsis) or (aOptions.EllipsisFontColor = TAlphaColorRec.Null) then LBreakTextItem.fontColor := LFontColor
           else LBreakTextItem.fontColor := aOptions.EllipsisFontColor;
@@ -3121,7 +3068,7 @@ begin
 
         //Update LFirstLineIndent
         if LBreakTextItems.count > LBreakTextItemsCount then begin
-          LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
+          var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
           LFirstLineIndent := TpointF.Create(LBreakTextItem.rect.Right, LBreakTextItem.rect.Top);
           if LBreakTextItem.isEllipsis then break;
         end;
@@ -3141,16 +3088,16 @@ begin
     case aOptions.HTextAlign of
       TTextAlign.Center: begin
                            if LBreakTextItems.Count > 0 then begin
-                             LCurrentLineY := LBreakTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
-                             J := 0;
-                             for I := 1 to LBreakTextItems.Count do begin
+                             var LCurrentLineY: single := LBreakTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
+                             var J := 0;
+                             for var I := 1 to LBreakTextItems.Count do begin
                                if (I = LBreakTextItems.Count) or
                                   (compareValue(LCurrentLineY, LBreakTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
-                                 LOffset := Floor(
-                                              (aRect.width -
-                                               LBreakTextItems[I-1].rect.Right -
-                                               aOptions.Padding.Left -
-                                               aOptions.Padding.right) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                                 var LOffset: single := Floor(
+                                                          (aRect.width -
+                                                           LBreakTextItems[I-1].rect.Right -
+                                                           aOptions.Padding.Left -
+                                                           aOptions.Padding.right) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                                  while J < I do begin
                                    LBreakTextItems[j].pos.X := LBreakTextItems[j].pos.X + aOptions.Padding.Left + LOffset;
                                    LBreakTextItems[j].rect.Offset(aOptions.Padding.Left + LOffset, 0);
@@ -3162,23 +3109,23 @@ begin
                            end;
                          end;
       TTextAlign.Leading: begin
-                           for I := 0 to LBreakTextItems.Count - 1 do begin
+                           for var I := 0 to LBreakTextItems.Count - 1 do begin
                              LBreakTextItems[i].pos.X := LBreakTextItems[i].pos.X + aOptions.Padding.Left;
                              LBreakTextItems[i].rect.Offset(aOptions.Padding.Left, 0);
                            end;
                          end;
       TTextAlign.Trailing: begin
                              if LBreakTextItems.Count > 0 then begin
-                               LCurrentLineY := LBreakTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
-                               J := 0;
-                               for I := 1 to LBreakTextItems.Count do begin
+                               var LCurrentLineY: single := LBreakTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
+                               var J := 0;
+                               for var I := 1 to LBreakTextItems.Count do begin
                                  if (I = LBreakTextItems.Count) or
                                     (compareValue(LCurrentLineY, LBreakTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
-                                   LOffset := Floor(
-                                                (aRect.width -
-                                                 LBreakTextItems[I-1].rect.Right -
-                                                 aOptions.Padding.Left -
-                                                 aOptions.Padding.right)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                                   var LOffset: single := Floor(
+                                                            (aRect.width -
+                                                             LBreakTextItems[I-1].rect.Right -
+                                                             aOptions.Padding.Left -
+                                                             aOptions.Padding.right)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
                                    while J < I do begin
                                      LBreakTextItems[j].pos.X := LBreakTextItems[j].pos.X + aOptions.Padding.Left + LOffset;
                                      LBreakTextItems[j].rect.Offset(aOptions.Padding.Left + LOffset, 0);
@@ -3192,29 +3139,29 @@ begin
     end;
     case aOptions.VTextAlign of
       TTextAlign.Center: begin
-                           LOffset := Floor(
-                                        (aRect.height -
-                                         LMaxHeight -
-                                         aOptions.Padding.top -
-                                         aOptions.Padding.bottom) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                           for I := 0 to LBreakTextItems.Count - 1 do begin
+                           var LOffset: single := Floor(
+                                                    (aRect.height -
+                                                     LMaxHeight -
+                                                     aOptions.Padding.top -
+                                                     aOptions.Padding.bottom) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                           for var I := 0 to LBreakTextItems.Count - 1 do begin
                              LBreakTextItems[I].pos.y := LBreakTextItems[i].pos.y + aOptions.Padding.top + LOffset;
                              LBreakTextItems[I].rect.Offset(0, aOptions.Padding.top + LOffset);
                            end;
                          end;
       TTextAlign.Leading: begin
-                           for I := 0 to LBreakTextItems.Count - 1 do begin
+                           for var I := 0 to LBreakTextItems.Count - 1 do begin
                              LBreakTextItems[i].pos.Y := LBreakTextItems[i].pos.Y + aOptions.Padding.top;
                              LBreakTextItems[i].rect.Offset(0, aOptions.Padding.top);
                            end;
                          end;
       TTextAlign.Trailing: begin
-                             LOffset := Floor(
-                                          (aRect.height -
-                                           LMaxHeight -
-                                           aOptions.Padding.top -
-                                           aOptions.Padding.bottom)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                             for I := 0 to LBreakTextItems.Count - 1 do begin
+                             var LOffset: single := Floor(
+                                                      (aRect.height -
+                                                       LMaxHeight -
+                                                       aOptions.Padding.top -
+                                                       aOptions.Padding.bottom)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
+                             for var I := 0 to LBreakTextItems.Count - 1 do begin
                                LBreakTextItems[I].pos.y := LBreakTextItems[i].pos.y + aOptions.Padding.top + LOffset;
                                LBreakTextItems[I].rect.Offset(0, aOptions.Padding.top + LOffset);
                              end;
@@ -3225,7 +3172,7 @@ begin
     // init out vars
     if LBreakTextItems.count > 0 then begin
       aFirstPos := LBreakTextItems[0].pos;
-      LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
+      var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
       aLastPos := LBreakTextItem.pos;
       aLastPos.offset(LBreakTextItem.rect.width, 0);
       aAscent := aLastPos.y - LBreakTextItem.rect.top;
@@ -3235,9 +3182,9 @@ begin
     end;
 
     //update aElements
-    J := 0;
+    var J := 0;
     setlength(aElements, LBreakTextItems.count);
-    for i := 0 to LBreakTextItems.count - 1 do begin
+    for var i := 0 to LBreakTextItems.count - 1 do begin
       if (LBreakTextItems[i].id <> '') then begin
         aElements[j].Id := LBreakTextItems[i].id;
         aElements[j].rect := LBreakTextItems[i].rect;
@@ -3256,6 +3203,8 @@ begin
     {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
 
     //create the drawing surface
+    var LBitmap: Jbitmap;
+    var LCanvas: Jcanvas;
     ALCreateSurface(
       LBitmap, // Var aBitmap: Jbitmap;
       LCanvas, // Var aCanvas: Jcanvas;
@@ -3279,15 +3228,15 @@ begin
       end;
 
       //draw all texts
-      for i := 0 to LBreakTextItems.count - 1 do begin
-        LBreakTextItem := LBreakTextItems[i];
+      for var i := 0 to LBreakTextItems.count - 1 do begin
+        var LBreakTextItem := LBreakTextItems[i];
         if LBreakTextItem.imgSrc <> '' then begin
           LMaxWidth := min(LBreakTextItem.rect.Width, LBreakTextItem.rect.Height);
-          LTmpRect := ALAlignToPixelRound(
-                        TrectF.Create(0,0,LMaxWidth,LMaxWidth).
-                          CenterAt(LBreakTextItem.rect),
-                        1{Scale});
-          LImg := ALLoadFromResourceAndFitIntoToJBitmap(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
+          var LTmpRect := ALAlignToPixelRound(
+                            TrectF.Create(0,0,LMaxWidth,LMaxWidth).
+                              CenterAt(LBreakTextItem.rect),
+                            1{Scale});
+          var LImg := ALLoadFromResourceAndFitIntoToJBitmap(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
           if LImg <> nil then begin
             try
               LPaint.setColor(integer(LBreakTextItem.fontColor)); // sean that the bitmap is paint with the alpha value set via setColor
@@ -3304,7 +3253,7 @@ begin
         else begin
           LPaint.setColor(integer(LBreakTextItem.fontColor));
           //-----
-          LTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), LBreakTextItem.fontStyle);
+          var LTypeface := TJTypeface.JavaClass.create(StringToJString(aOptions.FontName), LBreakTextItem.fontStyle);
           LPaint.setTypeface(LTypeface);
           LTypeface := nil;
           //-----
@@ -3335,6 +3284,7 @@ begin
 
     //create the drawing surface
     var LGridHeight := round(max(1, aRect.Height));
+    var LContext: CGContextRef;
     ALCreateSurface(
       LContext, // out aContext: CGContextRef;
       round(max(1, aRect.Width)), // const w: integer;
@@ -3358,15 +3308,15 @@ begin
       end;
 
       //draw all texts
-      for i := 0 to LBreakTextItems.count - 1 do begin
-        LBreakTextItem := LBreakTextItems[i];
+      for var i := 0 to LBreakTextItems.count - 1 do begin
+        var LBreakTextItem := LBreakTextItems[i];
         if LBreakTextItem.imgSrc <> '' then begin
           LMaxWidth := min(LBreakTextItem.rect.Width, LBreakTextItem.rect.Height);
-          LTmpRect := ALAlignToPixelRound(
-                        TrectF.Create(0,0,LMaxWidth,LMaxWidth).
-                          CenterAt(LBreakTextItem.rect),
-                        1{Scale});
-          LImg := ALLoadFromResourceAndFitIntoToCGImageRef(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
+          var LTmpRect := ALAlignToPixelRound(
+                            TrectF.Create(0,0,LMaxWidth,LMaxWidth).
+                              CenterAt(LBreakTextItem.rect),
+                            1{Scale});
+          var LImg := ALLoadFromResourceAndFitIntoToCGImageRef(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
           if LImg <> nil then begin
             Try
               CGContextSetAlpha(LContext, TAlphaColorF.create(LBreakTextItem.fontColor).A); // to work the same way as with android
@@ -3436,15 +3386,15 @@ begin
         result.Canvas.Fill.Kind := TbrushKind.Solid;
         result.Canvas.Font.Family := aOptions.FontName;
         result.Canvas.Font.size := aOptions.FontSize;
-        for i := 0 to LBreakTextItems.count - 1 do begin
-          LBreakTextItem := LBreakTextItems[i];
+        for var i := 0 to LBreakTextItems.count - 1 do begin
+          var LBreakTextItem := LBreakTextItems[i];
           if LBreakTextItem.imgSrc <> '' then begin
             LMaxWidth := min(LBreakTextItem.rect.Width, LBreakTextItem.rect.Height) * 1.15;
-            LTmpRect := ALAlignToPixelRound(
-                          TrectF.Create(0,0,LMaxWidth,LMaxWidth).
-                            CenterAt(LBreakTextItem.rect),
-                          1{Scale});
-            LImg := ALLoadFromResourceAndFitIntoToBitmap(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
+            var LTmpRect := ALAlignToPixelRound(
+                              TrectF.Create(0,0,LMaxWidth,LMaxWidth).
+                                CenterAt(LBreakTextItem.rect),
+                              1{Scale});
+            var LImg := ALLoadFromResourceAndFitIntoToBitmap(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
             if LImg <> nil then begin
               try
                 result.Canvas.drawBitmap(
@@ -3508,13 +3458,13 @@ function  ALDrawMultiLineText(
             var aTextBroken: boolean; // True if the text was broken into several lines.
             var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis).
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable;
-var LAscent: single;
-    LDescent: Single;
-    LFirstPos: TpointF;
-    LLastPos: TpointF;
-    LElements: TalTextElements;
-    LEllipsisRect: TRectF;
 begin
+  var LAscent: single;
+  var LDescent: Single;
+  var LFirstPos: TpointF;
+  var LLastPos: TpointF;
+  var LElements: TalTextElements;
+  var LEllipsisRect: TRectF;
   result := ALDrawMultiLineText(
               aText,
               aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
@@ -3541,14 +3491,14 @@ function  ALDrawMultiLineText(
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
             var aTextBroken: boolean; // True if the text was broken into several lines
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable;
-var LAscent: single;
-    LDescent: Single;
-    LFirstPos: TpointF;
-    LLastPos: TpointF;
-    LElements: TalTextElements;
-    LEllipsisRect: TRectF;
-    LAllTextDrawn: boolean;
 begin
+  var LAscent: single;
+  var LDescent: Single;
+  var LFirstPos: TpointF;
+  var LLastPos: TpointF;
+  var LElements: TalTextElements;
+  var LEllipsisRect: TRectF;
+  var LAllTextDrawn: boolean;
   result := ALDrawMultiLineText(
               aText,
               aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
@@ -3574,15 +3524,15 @@ function  ALDrawMultiLineText(
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable;
-var LAscent: single;
-    LDescent: Single;
-    LFirstPos: TpointF;
-    LLastPos: TpointF;
-    LElements: TalTextElements;
-    LEllipsisRect: TRectF;
-    LTextBroken: boolean;
-    LAllTextDrawn: boolean;
 begin
+  var LAscent: single;
+  var LDescent: Single;
+  var LFirstPos: TpointF;
+  var LLastPos: TpointF;
+  var LElements: TalTextElements;
+  var LEllipsisRect: TRectF;
+  var LTextBroken: boolean;
+  var LAllTextDrawn: boolean;
   result := ALDrawMultiLineText(
               aText,
               aRect, // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel

@@ -8,6 +8,9 @@ uses
   System.UITypes,
   System.Types,
   System.Generics.Collections,
+  {$IF defined(ALSkiaCanvas)}
+  System.Skia.API,
+  {$ENDIF}
   {$IF defined(ios)}
   iOSapi.CoreGraphics,
   iOSapi.CoreText,
@@ -21,8 +24,14 @@ uses
   Fmx.types,
   FMX.graphics;
 
-{$IF defined(ANDROID)}
+{$REGION ' Skia'}
+{$IF defined(ALSkiaCanvas)}
 
+{$ENDIF}
+{$ENDREGION}
+
+{$REGION ' ANDROID'}
+{$IF defined(ANDROID)}
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -75,9 +84,10 @@ function ALBreakText(
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; inline; overload; // Return true if the text was broken into several lines (truncated or not)
 {$ENDIF}
+{$ENDREGION}
 
+{$REGION ' IOS'}
 {$IF defined(IOS)}
-
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -134,9 +144,10 @@ function ALBreakText(
            const aEllipsisFontStyle: TFontStyles = [];
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; inline; overload; // Return true if the text was broken into several lines (truncated or not)
-
 {$ENDIF}
+{$ENDREGION}
 
+{$REGION ' MSWINDOWS / MACOS'}
 {$IF defined(MSWINDOWS) or defined(ALMacOS)}
 
 {*************************}
@@ -193,6 +204,7 @@ function ALBreakText(
            const aMaxlines: integer = 0): boolean; overload; // Return true if the text was broken into several lines (truncated or not)
 
 {$ENDIF}
+{$ENDREGION}
 
 type
 
@@ -263,14 +275,14 @@ function  ALDrawMultiLineText(
                                  //   <img src="xxx">
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-            var aTextBroken: boolean; // out => True if the text was broken into several lines.
-            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-            var aAscent: single; // out => the Ascent of the last element (in real pixel)
-            var aDescent: Single; // out => the Descent of the last element (in real pixel)
-            var aFirstPos: TpointF; // out => the point of the start of the text
-            var aLastPos: TpointF; // out => the point of the end of the text
-            var aElements: TalTextElements; // out => the list of rect describing all span elements
-            var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+            out aTextBroken: boolean; // out => True if the text was broken into several lines.
+            out aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+            out aAscent: single; // out => the Ascent of the last element (in real pixel)
+            out aDescent: Single; // out => the Descent of the last element (in real pixel)
+            out aFirstPos: TpointF; // out => the point of the start of the text
+            out aLastPos: TpointF; // out => the point of the end of the text
+            out aElements: TalTextElements; // out => the list of rect describing all span elements
+            out aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable; overload;
 function  ALDrawMultiLineText(
             const aText: String; // support only theses EXACT html tag :
@@ -281,9 +293,9 @@ function  ALDrawMultiLineText(
                                  //   <img src="xxx">
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-            var aTextBroken: boolean; // True if the text was broken into several lines
-            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-            const aOptions: TALDrawMultiLineTextOptions): TALDrawable; overload;
+            out aTextBroken: boolean; // True if the text was broken into several lines
+            out aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+            const aOptions: TALDrawMultiLineTextOptions): TALDrawable; inline; overload;
 function  ALDrawMultiLineText(
             const aText: String; // support only theses EXACT html tag :
                                  //   <b>...</b>
@@ -293,7 +305,7 @@ function  ALDrawMultiLineText(
                                  //   <img src="xxx">
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-            var aTextBroken: boolean; // out => True if the text was broken into several lines
+            out aTextBroken: boolean; // out => True if the text was broken into several lines
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable; inline; overload;
 function  ALDrawMultiLineText(
             const aText: String; // support only theses EXACT html tag :
@@ -388,7 +400,6 @@ var
   procedure _initEllipsis;
   begin
     if LEllipsisLine = nil then begin
-      //-----
       if aEllipsisText = nil then LEllipsisLine := StringtoJString(string('…'))
       else LEllipsisLine := aEllipsisText;
       //-----
@@ -427,7 +438,6 @@ var
                                LEllipsisLinePos.Y - (-1*LMetrics.ascent)),
                              LEllipsisLineLn,
                              (-1*LMetrics.ascent) + LMetrics.descent);
-      //-----
     end;
   end;
 
@@ -1985,7 +1995,6 @@ var
   procedure _initEllipsis;
   begin
     if LEllipsisLine = '' then begin
-      //-----
       if aEllipsisText = '' then LEllipsisLine := '…'
       else LEllipsisLine := aEllipsisText;
       //-----
@@ -2014,7 +2023,6 @@ var
                                LEllipsisLinePos.Y - (-1*LAscent)),
                              LEllipsisLineLn,
                              (-1*LAscent) + LDescent);
-      //-----
     end;
   end;
 
@@ -2087,7 +2095,7 @@ begin
 
       //calculate the number of char in the current line (this work good also if aline is empty)
       var LMeasuredWidth: Single;
-      var LNumberOfChars := ALbreakText(
+      var LNumberOfChars := ALBreakText(
                               aFontSize,
                               aFontStyle,
                               aFontName,
@@ -2596,14 +2604,14 @@ function  ALDrawMultiLineText(
                                  //   <img src="xxx">
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-            var aTextBroken: boolean; // out => True if the text was broken into several lines.
-            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-            var aAscent: single; // out => the Ascent of the last element (in real pixel)
-            var aDescent: Single; // out => the Descent of the last element (in real pixel)
-            var aFirstPos: TpointF; // out => the point of the start of the text
-            var aLastPos: TpointF; // out => the point of the end of the text
-            var aElements: TalTextElements; // out => the list of rect describing all span elements
-            var aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
+            out aTextBroken: boolean; // out => True if the text was broken into several lines.
+            out aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+            out aAscent: single; // out => the Ascent of the last element (in real pixel)
+            out aDescent: Single; // out => the Descent of the last element (in real pixel)
+            out aFirstPos: TpointF; // out => the point of the start of the text
+            out aLastPos: TpointF; // out => the point of the end of the text
+            out aElements: TalTextElements; // out => the list of rect describing all span elements
+            out aEllipsisRect: TRectF; // out => the rect of the Ellipsis (if present)
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2633,14 +2641,14 @@ function  ALDrawMultiLineText(
 
       aSpanIds.Add(LParamList.Values['id']);
 
-      var S1 := LParamList.Values['color'];
-      if S1 <> '' then begin
+      var LColorStr := LParamList.Values['color'];
+      if LColorStr <> '' then begin
 
-        if S1[low(S1)] = '#' then begin
-          S1[low(S1)] := '$';
-          if length(S1) = 7 then insert('ff', S1, 2); // $ffffffff
+        if LColorStr[low(LColorStr)] = '#' then begin
+          LColorStr[low(LColorStr)] := '$';
+          if length(LColorStr) = 7 then insert('ff', LColorStr, 2); // $ffffffff
           var LcolorInt: integer;
-          if not ALTryStrToInt(S1, LcolorInt) then begin
+          if not ALTryStrToInt(LColorStr, LcolorInt) then begin
             if aFontColors.Count > 0 then aFontColors.Add(aFontColors[aFontColors.Count - 1])
             else aFontColors.Add(aOptions.FontColor);
           end
@@ -2754,11 +2762,11 @@ begin
           //-----
           LCurrImgSrc := '';
           LCurrText := '';
-          var P2 := ALPosW('>', aText, P1+1); // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+          var P2 := ALPosW('>', aText, P1+1); // blablabla <font color="#ffffff">blablabla</font> blobloblo
                                               //           ^P1                  ^P2
           if P2 <= 0 then break;
           var LTag: String := ALCopyStr(aText, P1, P2 - P1 + 1); // <font color="#ffffff">
-          P1 := P2 + 1; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+          P1 := P2 + 1; // blablabla <font color="#ffffff">blablabla</font> blobloblo
                         //                                 ^P1
 
           //-----
@@ -2819,7 +2827,7 @@ begin
         else begin
 
           LCurrImgSrc := '';
-          var P2 := ALPosW('<', aText, P1);  // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+          var P2 := ALPosW('<', aText, P1);  // blablabla <font color="#ffffff">blablabla</font> blobloblo
                                              //                                 ^P1      ^P2
           if P2 <= 0 then P2 := Maxint;
           LCurrText := ALCopyStr(aText, P1, P2 - P1);  // blablabla
@@ -2843,7 +2851,7 @@ begin
           else LWhiteSpace := False;
           {$ENDIF}
 
-          P1 := P2; // blablabla <font color="#ffffff">bliblibli</font> blobloblo
+          P1 := P2; // blablabla <font color="#ffffff">blablabla</font> blobloblo
                     //                                          ^P1
         end;
 
@@ -2985,8 +2993,8 @@ begin
             LBreakTextItem.imgsrc := LCurrImgSrc;
           end;
 
-          //if their was not enalf of place to write the ellipsis
-          if (LBreakTextItems.Count >= 2) and                                                                                          // << more than 2 items
+          //If there was not enough space to write the ellipsis
+          if (LBreakTextItems.Count >= 2) and                                                                                        // << more than 2 items
              (LBreakTextItems.Count - LBreakTextItemsCount = 1) and                                                                  // << only 1 item (the ellipsis) was added
              (LBreakTextItems[LBreakTextItems.count - 1].isEllipsis) and                                                             // << last item is an elipsis
              (comparevalue(LBreakTextItems[LBreakTextItems.count - 1].rect.right, LTmpRect.Right, Tepsilon.Position) > 0) then begin // << ellipsis is not inside LTmpRect
@@ -3455,8 +3463,8 @@ function  ALDrawMultiLineText(
                                  //   <img src="xxx">
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-            var aTextBroken: boolean; // True if the text was broken into several lines.
-            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis).
+            out aTextBroken: boolean; // True if the text was broken into several lines.
+            out aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis).
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable;
 begin
   var LAscent: single;
@@ -3489,7 +3497,7 @@ function  ALDrawMultiLineText(
                                  //   <img src="xxx">
                                  // other < > must be encoded with &lt; and &gt;
             var aRect: TRectF; // in => the constraint boundaries in real pixel. out => the calculated rect that contain the html in real pixel
-            var aTextBroken: boolean; // True if the text was broken into several lines
+            out aTextBroken: boolean; // True if the text was broken into several lines
             const aOptions: TALDrawMultiLineTextOptions): TALDrawable;
 begin
   var LAscent: single;

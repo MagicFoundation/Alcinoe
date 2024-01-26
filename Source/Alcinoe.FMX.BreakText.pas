@@ -26,7 +26,60 @@ uses
 
 {$REGION ' Skia'}
 {$IF defined(ALSkiaCanvas)}
+type
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALSkBreakTextItem = class(Tobject)
+  public
+    text: String;
+    pos: TpointF; // << pos of the bottom on the text (without descent)
+    rect: TrectF;
+    fontColor: TalphaColor; // << not initialised by ALBreakText
+    fontStyle: TFontStyles; // << not initialised by ALBreakText
+    id: string; // << not initialised by ALBreakText
+    imgSrc: string; // << not initialised by ALBreakText
+    isEllipsis: Boolean;
+    constructor Create;
+  end;
+  TALSkBreakTextItems = class(TobjectList<TALSkBreakTextItem>);
+
+{*********************}
+function ALSkBreakText(
+           const aFontColor: TalphaColor;
+           const aFontSize: single;
+           const aFontStyle: TFontStyles;
+           const aFontName: String;
+           var ARect: TRectF;
+           const AText: string;
+           const aWordWrap: Boolean;
+           const AHTextAlign, AVTextAlign: TTextAlign;
+           const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+           const aBreakTextItems: TALSkBreakTextItems;
+           var aTotalLines: integer;
+           var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+           const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+           const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+           const aEllipsisText: string = '…';
+           const aEllipsisFontStyle: TFontStyles = [];
+           const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+           const aMaxlines: integer = 0): boolean; overload; // Return true if the text was broken into several lines (truncated or not)
+function ALSkBreakText(
+           const aFontColor: TalphaColor;
+           const aFontSize: single;
+           const aFontStyle: TFontStyles;
+           const aFontName: String;
+           var ARect: TRectF;
+           const AText: string;
+           const aWordWrap: Boolean;
+           const AHTextAlign, AVTextAlign: TTextAlign;
+           const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+           const aBreakTextItems: TALSkBreakTextItems;
+           const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+           const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+           const aEllipsisText: string = '…';
+           const aEllipsisFontStyle: TFontStyles = [];
+           const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+           const aMaxlines: integer = 0): boolean; inline; overload; // Return true if the text was broken into several lines (truncated or not)
 {$ENDIF}
 {$ENDREGION}
 
@@ -34,8 +87,8 @@ uses
 {$IF defined(ANDROID)}
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBreakTextItem = class(Tobject)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALJBreakTextItem = class(Tobject)
   public
     line: JString;
     pos: TpointF; // << pos of the bottom on the text (without descent)
@@ -48,17 +101,17 @@ type
     constructor Create;
     destructor Destroy; override;
   end;
-  TALBreakTextItems = class(TobjectList<TALBreakTextItem>);
+  TALJBreakTextItems = class(TobjectList<TALJBreakTextItem>);
 
-{*******************}
-function ALBreakText(
+{********************}
+function ALJBreakText(
            const aPaint: JPaint;
            var ARect: TRectF;
            const AText: JString;
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming;
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALJBreakTextItems;
            var aTotalLines: integer;
            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
            const aFirstLineIndent: TpointF;
@@ -68,14 +121,14 @@ function ALBreakText(
            const aEllipsisFontStyle: TFontStyles = [];
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; overload; // Return true if the text was broken into several lines (truncated or not)
-function ALBreakText(
+function ALJBreakText(
            const aPaint: JPaint;
            var ARect: TRectF;
            const AText: JString;
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming;
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALJBreakTextItems;
            const aFirstLineIndent: TpointF;
            const aLineSpacing: single = 0;
            const aEllipsisText: JString = nil;
@@ -91,7 +144,7 @@ function ALBreakText(
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBreakTextItem = class(Tobject)
+  TALCTBreakTextItem = class(Tobject)
   public
     Line: CTLineRef;
     text: String;
@@ -105,10 +158,10 @@ type
     constructor Create;
     destructor Destroy; override;
   end;
-  TALBreakTextItems = class(TobjectList<TALBreakTextItem>);
+  TALCTBreakTextItems = class(TobjectList<TALCTBreakTextItem>);
 
-{*******************}
-function ALBreakText(
+{*********************}
+function ALCTBreakText(
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -118,7 +171,7 @@ function ALBreakText(
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALCTBreakTextItems;
            var aTotalLines: integer;
            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
            const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
@@ -127,7 +180,7 @@ function ALBreakText(
            const aEllipsisFontStyle: TFontStyles = [];
            const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
            const aMaxlines: integer = 0): boolean; overload; // Return true if the text was broken into several lines (truncated or not)
-function ALBreakText(
+function ALCTBreakText(
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -137,7 +190,7 @@ function ALBreakText(
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALCTBreakTextItems;
            const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
            const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
            const aEllipsisText: string = '…';
@@ -161,7 +214,7 @@ Procedure ALGetTextMetrics(
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBreakTextItem = class(Tobject)
+  TALTLBreakTextItem = class(Tobject)
   public
     Line: String;
     pos: TpointF; // << pos of the bottom on the text (without descent)
@@ -173,17 +226,17 @@ type
     isEllipsis: Boolean;
     constructor Create;
   end;
-  TALBreakTextItems = class(TobjectList<TALBreakTextItem>);
+  TALTLBreakTextItems = class(TobjectList<TALTLBreakTextItem>);
 
 {*******************}
-function ALbreakText(
+function ALTLbreakText(
            const aFontSize: single;
            const aFontStyle: TFontStyles;
            const aFontName: String;
            const atext: String;
            const aMaxWidth: Single;
            var aMeasuredWidth: Single): integer; overload;
-function ALBreakText(
+function ALTLBreakText(
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -193,7 +246,7 @@ function ALBreakText(
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALTLBreakTextItems;
            var aTotalLines: integer;
            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
            const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
@@ -343,9 +396,89 @@ uses
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
+{****************}
+{$IF defined(ALSkiaCanvas)}
+constructor TALSkBreakTextItem.Create;
+begin
+  inherited;
+  Text := '';
+  isEllipsis := False;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALSkiaCanvas)}
+function ALSkBreakText(
+           const aFontColor: TalphaColor;
+           const aFontSize: single;
+           const aFontStyle: TFontStyles;
+           const aFontName: String;
+           var ARect: TRectF;
+           const AText: string;
+           const aWordWrap: Boolean;
+           const AHTextAlign, AVTextAlign: TTextAlign;
+           const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+           const aBreakTextItems: TALSkBreakTextItems;
+           var aTotalLines: integer;
+           var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+           const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+           const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+           const aEllipsisText: string = '…';
+           const aEllipsisFontStyle: TFontStyles = [];
+           const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+           const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
+begin
+
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALSkiaCanvas)}
+function ALSkBreakText(
+           const aFontColor: TalphaColor;
+           const aFontSize: single;
+           const aFontStyle: TFontStyles;
+           const aFontName: String;
+           var ARect: TRectF;
+           const AText: string;
+           const aWordWrap: Boolean;
+           const AHTextAlign, AVTextAlign: TTextAlign;
+           const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+           const aBreakTextItems: TALSkBreakTextItems;
+           const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+           const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+           const aEllipsisText: string = '…';
+           const aEllipsisFontStyle: TFontStyles = [];
+           const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+           const aMaxlines: integer = 0): boolean; inline; overload; // Return true if the text was broken into several lines (truncated or not)
+begin
+  var LTotalLines: integer;
+  var LAllTextDrawn: boolean;
+  result := ALSkBreakText(
+              aFontColor, // const aFontColor: TalphaColor;
+              aFontSize, // const aFontSize: single;
+              aFontStyle, // const aFontStyle: TFontStyles;
+              aFontName, // const aFontName: String;
+              ARect, // var ARect: TRectF;
+              AText, // const AText: string;
+              aWordWrap, // const aWordWrap: Boolean;
+              AHTextAlign, AVTextAlign, // const AHTextAlign, AVTextAlign: TTextAlign;
+              aTrimming, // const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
+              aBreakTextItems, // const aBreakTextItems: TALBreakTextItems;
+              LTotalLines, // var aTotalLines: integer;
+              LAllTextDrawn, // var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+              aFirstLineIndent, // const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
+              aLineSpacing, // const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
+              aEllipsisText, // const aEllipsisText: string = '…';
+              aEllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+              aEllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+              aMaxlines); // const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
+end;
+{$ENDIF}
+
 {********************}
 {$IF defined(ANDROID)}
-constructor TALBreakTextItem.Create;
+constructor TALJBreakTextItem.Create;
 begin
   inherited;
   Line := nil;
@@ -355,7 +488,7 @@ end;
 
 {*********************}
 {$IF defined(ANDROID)}
-destructor TALBreakTextItem.Destroy;
+destructor TALJBreakTextItem.Destroy;
 begin
   line := Nil;
   inherited;
@@ -368,14 +501,14 @@ end;
 // I will simply replace the font ! i will not add custom image
 // (ie: emoticons) in the middle of the text !!
 {$IF defined(ANDROID)}
-function ALBreakText(
+function ALJBreakText(
            const aPaint: JPaint;
            var ARect: TRectF;
            const AText: JString;
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming;
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALJBreakTextItems;
            var aTotalLines: integer;
            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
            const aFirstLineIndent: TpointF;
@@ -830,7 +963,7 @@ begin
         end;
 
         //init LBreakTextItem
-        var LBreakTextItem := TalBreakTextItem.Create;
+        var LBreakTextItem := TALJBreakTextItem.Create;
         try
 
           //update aBreakTextItem
@@ -888,7 +1021,7 @@ begin
         if (LTextIdx >= LTextLn) and LLineEndWithBreakLine and (LEllipsisLine = nil) then begin
 
           //init LBreakTextItem
-          LBreakTextItem := TalBreakTextItem.Create;
+          LBreakTextItem := TALJBreakTextItem.Create;
           try
 
             //update aBreakTextItem
@@ -936,7 +1069,7 @@ begin
 
   //add the end ellipsis
   if LEllipsisLine <> nil then begin
-    var LBreakTextItem := TalBreakTextItem.Create;
+    var LBreakTextItem := TALJBreakTextItem.Create;
     try
       LBreakTextItem.line := LEllipsisLine;
       LEllipsisLine := nil;
@@ -997,14 +1130,14 @@ end;
 
 {********************}
 {$IF defined(ANDROID)}
-function ALBreakText(
+function ALJBreakText(
            const aPaint: JPaint;
            var ARect: TRectF;
            const AText: JString;
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming;
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALJBreakTextItems;
            const aFirstLineIndent: TpointF;
            const aLineSpacing: single = 0;
            const aEllipsisText: JString = nil;
@@ -1015,7 +1148,7 @@ function ALBreakText(
 begin
   var LTotalLines: integer;
   var LAllTextDrawn: boolean;
-  result := ALBreakText(
+  Result := ALJBreakText(
               aPaint, // const aPaint: JPaint;
               ARect, // var ARect: TRectF;
               AText, // const AText: JString;
@@ -1037,7 +1170,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-constructor TALBreakTextItem.Create;
+constructor TALCTBreakTextItem.Create;
 begin
   inherited;
   Line := nil;
@@ -1047,7 +1180,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-destructor TALBreakTextItem.Destroy;
+destructor TALCTBreakTextItem.Destroy;
 begin
   if line <> nil then begin
     cfRelease(Line);
@@ -1059,7 +1192,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-function ALBreakText(
+function ALCTBreakText(
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -1069,7 +1202,7 @@ function ALBreakText(
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALCTBreakTextItems;
            var aTotalLines: integer;
            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
            const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
@@ -1345,7 +1478,7 @@ begin
                   LStringRange := CTLineGetStringRange(Lline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
 
                   // update aBreakTextItems
-                  var LBreakTextItem := TalBreakTextItem.Create;
+                  var LBreakTextItem := TALCTBreakTextItem.Create;
                   try
 
                     // aBreakTextItem.Line
@@ -1687,7 +1820,7 @@ begin
                                         if LBreakTextItem.Line = nil then LBreakTextItem.rect.Width := 0;
 
                                         //add the ellipsis line
-                                        var LEllipsisBreakTextItem := TalBreakTextItem.Create;
+                                        var LEllipsisBreakTextItem := TALCTBreakTextItem.Create;
                                         try
                                           LEllipsisBreakTextItem.Line := CFRetain(LEllipsisLine); // Retains a Core Foundation object.
                                           LEllipsisBreakTextItem.text := aEllipsisText;
@@ -1824,7 +1957,7 @@ end;
 
 {****************}
 {$IF defined(IOS)}
-function ALBreakText(
+function ALCTBreakText(
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -1834,7 +1967,7 @@ function ALBreakText(
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALCTBreakTextItems;
            const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
            const aLineSpacing: single = 0; // kCTParagraphStyleSpecifierLineSpacingAdjustment must also have been set with aLineSpacing in aTextAttr
            const aEllipsisText: string = '…';
@@ -1844,7 +1977,7 @@ function ALBreakText(
 begin
   var LTotalLines: integer;
   var LAllTextDrawn: boolean;
-  result := ALBreakText(
+  result := ALCTBreakText(
               aFontColor, // const aFontColor: TalphaColor;
               aFontSize, // const aFontSize: single;
               aFontStyle, // const aFontStyle: TFontStyles;
@@ -1865,7 +1998,6 @@ begin
               aMaxlines); // const aMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
 end;
 {$ENDIF}
-
 
 {*****************************************}
 {$IF defined(MSWINDOWS) or defined(ALMacOS)}
@@ -1896,7 +2028,7 @@ end;
 
 {*****************************************}
 {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-function ALbreakText(
+function ALTLbreakText(
            const aFontSize: single;
            const aFontStyle: TFontStyles;
            const aFontName: String;
@@ -1951,7 +2083,7 @@ end;
 
 {*****************************************}
 {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-constructor TALBreakTextItem.Create;
+constructor TALTLBreakTextItem.Create;
 begin
   inherited;
   Line := '';
@@ -1961,7 +2093,7 @@ end;
 
 {*****************************************}
 {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-function ALBreakText(
+function ALTLBreakText(
            const aFontColor: TalphaColor;
            const aFontSize: single;
            const aFontStyle: TFontStyles;
@@ -1971,7 +2103,7 @@ function ALBreakText(
            const aWordWrap: Boolean;
            const AHTextAlign, AVTextAlign: TTextAlign;
            const aTrimming: TTextTrimming; // TTextTrimming.word not yet supported - TTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const aBreakTextItems: TALBreakTextItems;
+           const aBreakTextItems: TALTLBreakTextItems;
            var aTotalLines: integer;
            var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
            const aFirstLineIndent: TpointF;// kCTParagraphStyleSpecifierFirstLineHeadIndent must also have been set with aFirstLineIndent.x in aTextAttr
@@ -1998,7 +2130,7 @@ var
       if aEllipsisText = '' then LEllipsisLine := '…'
       else LEllipsisLine := aEllipsisText;
       //-----
-      ALbreakText(
+      ALTLBreakText(
         aFontSize, // const aFontSize: single;
         aEllipsisFontStyle, // const aFontStyle: TFontStyles;
         aFontName, // const aFontName: String;
@@ -2095,7 +2227,7 @@ begin
 
       //calculate the number of char in the current line (this work good also if aline is empty)
       var LMeasuredWidth: Single;
-      var LNumberOfChars := ALBreakText(
+      var LNumberOfChars := ALTLBreakText(
                               aFontSize,
                               aFontStyle,
                               aFontName,
@@ -2137,7 +2269,7 @@ begin
                                        if (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                                        while LNumberOfChars > 0 do begin
                                          LLine := LLine.substring(0, LNumberOfChars);
-                                         LNumberOfChars := ALbreakText(
+                                         LNumberOfChars := ALTLbreakText(
                                                              aFontSize,
                                                              aFontStyle,
                                                              aFontName,
@@ -2177,7 +2309,7 @@ begin
                                       if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                                       while LNumberOfChars > 0 do begin
                                         LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                                        LNumberOfChars := ALbreakText(
+                                        LNumberOfChars := ALTLbreakText(
                                                             aFontSize,
                                                             aFontStyle,
                                                             aFontName,
@@ -2189,7 +2321,7 @@ begin
                                       break;
                                     end;
                                     //----
-                                    LNumberOfChars := ALbreakText(
+                                    LNumberOfChars := ALTLbreakText(
                                                         aFontSize,
                                                         aFontStyle,
                                                         aFontName,
@@ -2244,7 +2376,7 @@ begin
                 if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
                 while LNumberOfChars > 0 do begin
                   LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                  LNumberOfChars := ALbreakText(
+                  LNumberOfChars := ALTLbreakText(
                                       aFontSize,
                                       aFontStyle,
                                       aFontName,
@@ -2256,7 +2388,7 @@ begin
                 break;
               end;
               //----
-              LNumberOfChars := ALbreakText(
+              LNumberOfChars := ALTLBreakText(
                                   aFontSize,
                                   aFontStyle,
                                   aFontName,
@@ -2300,7 +2432,7 @@ begin
                 if compareValue(LLineIndent, 0, TEpsilon.position) > 0 then LNumberOfChars := 0;
                 while LNumberOfChars > 0 do begin
                   LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                  LNumberOfChars := ALbreakText(
+                  LNumberOfChars := ALTLBreakText(
                                       aFontSize,
                                       aFontStyle,
                                       aFontName,
@@ -2312,7 +2444,7 @@ begin
                 break;
               end;
               //-----
-              LNumberOfChars := ALbreakText(
+              LNumberOfChars := ALTLBreakText(
                                   aFontSize,
                                   aFontStyle,
                                   aFontName,
@@ -2389,7 +2521,7 @@ begin
       end;
 
       //init LBreakTextItem
-      var LBreakTextItem := TalBreakTextItem.Create;
+      var LBreakTextItem := TALTLBreakTextItem.Create;
       try
 
         //update aBreakTextItem
@@ -2447,7 +2579,7 @@ begin
       if (LTextIdx >= LTextLn) and LLineEndWithBreakLine and (LEllipsisLine = '') then begin
 
         //init LBreakTextItem
-        LBreakTextItem := TalBreakTextItem.Create;
+        LBreakTextItem := TALTLBreakTextItem.Create;
         try
 
           //update aBreakTextItem
@@ -2491,7 +2623,7 @@ begin
 
   //add the end ellipsis
   if LEllipsisLine <> '' then begin
-    var LBreakTextItem := TalBreakTextItem.Create;
+    var LBreakTextItem := TALTLBreakTextItem.Create;
     try
       LBreakTextItem.line := LEllipsisLine;
       LBreakTextItem.pos := LEllipsisLinePos;
@@ -2741,7 +2873,15 @@ begin
   var LItalic := 0;
   var LFontColors := Tlist<TalphaColor>.create;
   var LSpanIDs := TALStringListW.create;
-  var LBreakTextItems := TalBreakTextItems.Create(true{aOwnsObjects});
+  {$IF defined(ALSkiaCanvas)}
+  var LBreakTextItems := TALSkBreakTextItems.Create(true{aOwnsObjects});
+  {$ELSEIF defined(ANDROID)}
+  var LBreakTextItems := TALJBreakTextItems.Create(true{aOwnsObjects});
+  {$ELSEIF defined(IOS)}
+  var LBreakTextItems := TALCTBreakTextItems.Create(true{aOwnsObjects});
+  {$ELSE}
+  var LBreakTextItems := TALTLBreakTextItems.Create(true{aOwnsObjects});
+  {$ENDIF}
   try
 
     //loop on all the html elements
@@ -2923,8 +3063,28 @@ begin
           LBreakTextItemsCount := LBreakTextItems.Count;
 
           //break the text
-          {$IF defined(ANDROID)}
-          LTmpTextBroken := ALBreakText(
+          {$IF defined(ALSkiaCanvas)}
+          LTmpTextBroken := ALSkBreakText(
+                              LFontColor, // const aFontColor: TalphaColor;
+                              aOptions.FontSize, // const aFontSize: single;
+                              LStyle, // const aFontStyle: TFontStyles;
+                              aOptions.FontName, // const aFontName: String;
+                              LTmpRect, // var ARect: TRectF;
+                              LCurrText, // const AText: string;
+                              aOptions.WordWrap, // const aWordWrap: Boolean;
+                              TTextAlign.Leading, TTextAlign.Leading, // const AHTextAlign, AVTextAlign: TTextAlign;
+                              aOptions.Trimming, // const aTrimming: TTextTrimming;
+                              LBreakTextItems, // const aBreakTextItems: TALBreakTextItems;
+                              LTmpTotalLines, // var aTotalLines: integer;
+                              LTmpAllTextDrawn, // var aAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
+                              LFirstLineIndent, // const aFirstLineIndent: TpointF;
+                              aOptions.LineSpacing, // const aLineSpacing: single = 0;
+                              aOptions.EllipsisText, // const aEllipsisText: string = '…';
+                              aOptions.EllipsisFontStyle, // const aEllipsisFontStyle: TFontStyles = [];
+                              aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
+                              aOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
+          {$ELSEIF defined(ANDROID)}
+          LTmpTextBroken := ALJBreakText(
                               LPaint, // const aPaint: JPaint;
                               LTmpRect, // var ARect: TRectF;
                               StringtoJString(LCurrText), // const AText: JString;
@@ -2942,7 +3102,7 @@ begin
                               aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null
                               aOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
           {$ELSEIF defined(IOS)}
-          LTmpTextBroken := ALBreakText(
+          LTmpTextBroken := ALCTBreakText(
                               LFontColor, // const aFontColor: TalphaColor;
                               aOptions.FontSize, // const aFontSize: single;
                               LStyle, // const aFontStyle: TFontStyles;
@@ -2962,7 +3122,7 @@ begin
                               aOptions.EllipsisFontColor, // const aEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
                               aOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const aMaxlines: integer = 0
           {$ELSE}
-          LTmpTextBroken := ALBreakText(
+          LTmpTextBroken := ALTLBreakText(
                               LFontColor, // const aFontColor: TalphaColor;
                               aOptions.FontSize, // const aFontSize: single;
                               LStyle, // const aFontStyle: TFontStyles;
@@ -3019,7 +3179,9 @@ begin
             LStyle := LBreakTextItem.fontStyle;
             setlength(LCurrText, 2 * length(LCurrText));                         // << i put some space in the end of the previous text to force
             for var I := Low(LCurrText) to High(LCurrText) do LCurrText[i] := ' ';   // << the draw of the ellipsis
-            {$IF defined(ANDROID)}
+            {$IF defined(ALSkiaCanvas)}
+            LCurrText := LBreakTextItem.text + LCurrText + '_';
+            {$ELSEIF defined(ANDROID)}
             LCurrText := JStringtoString(LBreakTextItem.line) + LCurrText + '_';
             {$ELSEIF defined(IOS)}
             LCurrText := LBreakTextItem.text + LCurrText + '_';

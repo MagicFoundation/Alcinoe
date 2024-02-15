@@ -10,7 +10,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/
 -    if TrailingHit then
 -      Result := Result + Integer(HitTestMetrics.length);
 +    //https://quality.embarcadero.com/browse/RSP-39734
-+    if Result >= 0 then Inc(Result); // HitTestMetrics.textPosition look like zero based
++    if TrailingHit then Inc(Result); // HitTestMetrics.textPosition look like zero based
 +    //if TrailingHit then
 +    //  Result := Result + Integer(HitTestMetrics.length);
    end

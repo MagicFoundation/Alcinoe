@@ -105,20 +105,20 @@ type
     fFileName: String;
     fResourceName: String;
     FWrapMode: TALImageWrapMode;
-    fBufBitmap: TALDrawable;
-    fBufBitmapRect: TRectF;
+    fBufDrawable: TALDrawable;
+    fBufDrawableRect: TRectF;
     fBufSize: TsizeF;
     procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure setFileName(const Value: String);
     procedure setResourceName(const Value: String);
   protected
     procedure Paint; override;
-    property BufBitmap: TALDrawable read fBufBitmap;
+    property BufDrawable: TALDrawable read fBufDrawable;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function MakeBufBitmap: TALDrawable; virtual;
-    procedure clearBufBitmap; virtual;
+    function MakeBufDrawable: TALDrawable; virtual;
+    procedure clearBufDrawable; virtual;
   published
     property Align;
     property Anchors;
@@ -176,8 +176,8 @@ type
   TALRectangle = class(TRectangle)
   private
     fdoubleBuffered: boolean;
-    fBufBitmap: TALDrawable;
-    fBufBitmapRect: TRectF;
+    fBufDrawable: TALDrawable;
+    fBufDrawableRect: TRectF;
     fBufSize: TsizeF;
     fShadow: TALShadow;
     procedure SetdoubleBuffered(const Value: Boolean);
@@ -187,12 +187,12 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); virtual;
     procedure Paint; override;
-    property BufBitmap: TALDrawable read fBufBitmap;
+    property BufDrawable: TALDrawable read fBufDrawable;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function MakeBufBitmap: TALDrawable; virtual;
-    procedure clearBufBitmap; virtual;
+    function MakeBufDrawable: TALDrawable; virtual;
+    procedure clearBufDrawable; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property shadow: TALShadow read fshadow write SetShadow;
@@ -203,8 +203,8 @@ type
   TALCircle = class(TCircle)
   private
     fdoubleBuffered: boolean;
-    fBufBitmap: TALDrawable;
-    fBufBitmapRect: TRectF;
+    fBufDrawable: TALDrawable;
+    fBufDrawableRect: TRectF;
     fBufSize: TsizeF;
     fShadow: TALShadow;
     procedure SetdoubleBuffered(const Value: Boolean);
@@ -214,12 +214,12 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); virtual;
     procedure Paint; override;
-    property BufBitmap: TALDrawable read fBufBitmap;
+    property BufDrawable: TALDrawable read fBufDrawable;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function MakeBufBitmap: TALDrawable; virtual;
-    procedure clearBufBitmap; virtual;
+    function MakeBufDrawable: TALDrawable; virtual;
+    procedure clearBufDrawable; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
     property shadow: TALShadow read fshadow write SetShadow;
@@ -230,20 +230,20 @@ type
   TALLine = class(TLine)
   private
     fdoubleBuffered: boolean;
-    fBufBitmap: TALDrawable;
-    fBufBitmapRect: TRectF;
+    fBufDrawable: TALDrawable;
+    fBufDrawableRect: TRectF;
     fBufSize: TsizeF;
     procedure SetdoubleBuffered(const Value: Boolean);
   protected
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
-    property BufBitmap: TALDrawable read fBufBitmap;
+    property BufDrawable: TALDrawable read fBufDrawable;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure Paint; override;
-    function MakeBufBitmap: TALDrawable; virtual;
-    procedure clearBufBitmap; virtual;
+    function MakeBufDrawable: TALDrawable; virtual;
+    procedure clearBufDrawable; virtual;
   published
     property doubleBuffered: Boolean read fdoubleBuffered write setdoubleBuffered default true;
   end;
@@ -266,8 +266,8 @@ type
     FOnElementMouseLeave: TElementNotifyEvent;
     FHoveredElement: TALTextElement;
     FPressedElement: TALTextElement;
-    fBufBitmap: TALDrawable;
-    fBufBitmapRect: TRectF;
+    fBufDrawable: TALDrawable;
+    fBufDrawableRect: TRectF;
     fBufSize: TsizeF;
     fBufTextBroken: Boolean;
     fBufAllTextDrawn: Boolean;
@@ -305,7 +305,7 @@ type
     procedure DoMouseLeave; override;
     procedure Click; override;
     procedure DblClick; override;
-    property BufBitmap: TALDrawable read FBufBitmap;
+    property BufDrawable: TALDrawable read FBufDrawable;
     procedure PaddingChanged; override;
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
@@ -324,8 +324,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure SetNewScene(AScene: IScene); override;
-    function MakeBufBitmap: TALDrawable; virtual;
-    procedure clearBufBitmap; virtual;
+    function MakeBufDrawable: TALDrawable; virtual;
+    procedure clearBufDrawable; virtual;
     function TextBroken: Boolean;
     property Elements: TALTextElements read fBufElements;
   published
@@ -392,16 +392,150 @@ type
     property TouchTargetExpansion;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALButtonStateStyleBrush = class(TBrush)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor); virtual;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALButtonStateStyleStrokeBrush = class(TStrokeBrush)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor); virtual;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALButtonStateStyleTextSettings = class(TALBaseTextSettings)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+    property Font;
+    property Decoration;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALButtonStateStyleShadow = class(TALShadow)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALButtonStateStyle = class(TPersistent)
+  private
+    FFill: TALButtonStateStyleBrush;
+    FStroke: TALButtonStateStyleStrokeBrush;
+    FTextSettings: TALButtonStateStyleTextSettings;
+    FShadow: TALButtonStateStyleShadow;
+    FOnChanged: TNotifyEvent;
+    procedure SetFill(const AValue: TALButtonStateStyleBrush);
+    procedure SetStroke(const AValue: TALButtonStateStyleStrokeBrush);
+    procedure SetTextSettings(const AValue: TALButtonStateStyleTextSettings);
+    procedure SetShadow(const AValue: TALButtonStateStyleShadow);
+    procedure FillChanged(ASender: TObject);
+    procedure StrokeChanged(ASender: TObject);
+    procedure TextSettingsChanged(ASender: TObject);
+    procedure ShadowChanged(ASender: TObject);
+  protected
+    procedure DoChanged; virtual;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+  published
+    property Fill: TALButtonStateStyleBrush read FFill write SetFill;
+    property Stroke: TALButtonStateStyleStrokeBrush read FStroke write SetStroke;
+    property TextSettings: TALButtonStateStyleTextSettings read fTextSettings write SetTextSettings;
+    property Shadow: TALButtonStateStyleShadow read FShadow write SetShadow;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALButtonStateStyles = class(TPersistent)
+  private
+    FDisabled: TALButtonStateStyle;
+    FHovered: TALButtonStateStyle;
+    FPressed: TALButtonStateStyle;
+    FOnChanged: TNotifyEvent;
+    procedure SetDisabled(const AValue: TALButtonStateStyle);
+    procedure SetHovered(const AValue: TALButtonStateStyle);
+    procedure SetPressed(const AValue: TALButtonStateStyle);
+    procedure DisabledChanged(ASender: TObject);
+    procedure HoveredChanged(ASender: TObject);
+    procedure PressedChanged(ASender: TObject);
+  protected
+    procedure DoChanged; virtual;
+  public
+    constructor Create; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+  published
+    property Disabled: TALButtonStateStyle read FDisabled write SetDisabled;
+    property Hovered: TALButtonStateStyle read FHovered write SetHovered;
+    property Pressed: TALButtonStateStyle read FPressed write SetPressed;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALButton = class(TALText)
+  private
+    FPressed: Boolean;
+    FHovered: Boolean;
+    FStateStyles: TALButtonStateStyles;
+    //--
+    fBufPressedDrawable: TALDrawable;
+    fBufPressedDrawableRect: TRectF;
+    fBufPressedSize: TsizeF;
+    //--
+    fBufHoveredDrawable: TALDrawable;
+    fBufHoveredDrawableRect: TRectF;
+    fBufHoveredSize: TsizeF;
+    //--
+    fBufDisabledDrawable: TALDrawable;
+    fBufDisabledDrawableRect: TRectF;
+    fBufDisabledSize: TsizeF;
   protected
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure DoMouseEnter; override;
+    procedure DoMouseLeave; override;
     procedure SetName(const Value: TComponentName); override;
+    procedure SetStateStyles(const AValue: TALButtonStateStyles);
+    procedure StateStylesChanged(Sender: TObject); virtual;
+    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
   published
     property HitTest default True;
     property AutoSize default False;
+    //property Theme: TALButtonTheme read FTheme write SetTheme;
+    property StateStyles: TALButtonStateStyles read FStateStyles write SetStateStyles;
+    //property TouchEffect: TALTouchEffectSettings read xxx write xxx;
   end;
 
 procedure ALLockTexts(const aParentControl: Tcontrol);
@@ -447,47 +581,47 @@ begin
   fFileName := '';
   fResourceName := '';
   FWrapMode := TALImageWrapMode.Fit;
-  fBufBitmap := ALNullDrawable;
+  fBufDrawable := ALNullDrawable;
   SetAcceptsControls(False);
 end;
 
 {**************************}
 destructor TALImage.Destroy;
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {********************************}
-procedure TALImage.clearBufBitmap;
+procedure TALImage.clearBufDrawable;
 begin
-  ALFreeAndNilDrawable(fBufBitmap);
+  ALFreeAndNilDrawable(fBufDrawable);
 end;
 
 {*******************************************}
-function TALImage.MakeBufBitmap: TALDrawable;
+function TALImage.MakeBufDrawable: TALDrawable;
 begin
 
   if (Scene = nil) or
-     //--- don't do bufbitmap if size=0
+     //--- don't do BufDrawable if size=0
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
-     //--- don't do bufbitmap if fFileName or fResourceName is empty
+     //--- don't do BufDrawable if fFileName or fResourceName is empty
      ((fFileName = '') and (fResourceName = ''))
   then begin
-    clearBufBitmap;
+    clearBufDrawable;
     exit(ALNullDrawable);
   end;
 
-  if (not ALIsDrawableNull(fBufBitmap)) and
+  if (not ALIsDrawableNull(fBufDrawable)) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
-     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufDrawable);
 
   {$IFDEF debug}
-  if not ALIsDrawableNull(fBufBitmap) then
-    ALLog('TALImage.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  if not ALIsDrawableNull(fBufDrawable) then
+    ALLog('TALImage.MakeBufDrawable', 'BufDrawable is being recreated | Name: ' + Name, TalLogType.warn);
   {$endif}
-  clearBufBitmap;
+  clearBufDrawable;
   fBufSize := Size.Size;
 
   {$IFDEF ALDPK}
@@ -507,8 +641,8 @@ begin
   if fExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
                               TalExifOrientationInfo.ROTATE_90,
                               TalExifOrientationInfo.TRANSVERSE,
-                              TalExifOrientationInfo.ROTATE_270] then fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), ALGetScreenScale) // to have the pixel aligned width and height
-  else fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
+                              TalExifOrientationInfo.ROTATE_270] then fBufDrawableRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), ALGetScreenScale) // to have the pixel aligned width and height
+  else fBufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
                                                                                     // TalExifOrientationInfo.FLIP_HORIZONTAL:;
                                                                                     // TalExifOrientationInfo.FLIP_VERTICAL:;
                                                                                     // TalExifOrientationInfo.NORMAL:;
@@ -537,26 +671,26 @@ begin
     TALImageWrapMode.Fit:
       begin
         {$IFDEF ALDPK}
-        if LFileName <> '' then fBufBitmap := ALLoadFromFileAndFitIntoToDrawable(LFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALNullDrawable;
+        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALNullDrawable;
         {$ELSE}
-        if fResourceName <> '' then fBufBitmap := ALLoadFromResourceAndFitIntoToDrawable(fResourceName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALLoadFromFileAndFitIntoToDrawable(fFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale);
+        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
         {$ENDIF}
-        result := fBufBitmap;
+        result := fBufDrawable;
       end;
 
     //Stretch the image to fill the entire rectangle of the control.
     TALImageWrapMode.Stretch:
       begin
         {$IFDEF ALDPK}
-        if LFileName <> '' then fBufBitmap := ALLoadFromFileAndStretchToDrawable(LFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALNullDrawable;
+        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndStretchToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALNullDrawable;
         {$ELSE}
-        if fResourceName <> '' then fBufBitmap := ALLoadFromResourceAndStretchToDrawable(fResourceName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALLoadFromFileAndStretchToDrawable(fFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale);
+        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndStretchToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALLoadFromFileAndStretchToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
         {$ENDIF}
-        result := fBufBitmap;
+        result := fBufDrawable;
       end;
 
     //Tile (multiply) the image to cover the entire rectangle of the control:
@@ -585,13 +719,13 @@ begin
     TALImageWrapMode.Place:
       begin
         {$IFDEF ALDPK}
-        if LFileName <> '' then fBufBitmap := ALLoadFromFileAndPlaceIntoToDrawable(LFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALNullDrawable;
+        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndPlaceIntoToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALNullDrawable;
         {$ELSE}
-        if fResourceName <> '' then fBufBitmap := ALLoadFromResourceAndPlaceIntoToDrawable(fResourceName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALLoadFromFileAndPlaceIntoToDrawable(fFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale);
+        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndPlaceIntoToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALLoadFromFileAndPlaceIntoToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
         {$ENDIF}
-        result := fBufBitmap;
+        result := fBufDrawable;
       end;
 
     //Best fit the image in the rectangle of the control:
@@ -604,13 +738,13 @@ begin
     TALImageWrapMode.FitAndCrop:
       begin
         {$IFDEF ALDPK}
-        if LFileName <> '' then fBufBitmap := ALLoadFromFileAndFitIntoAndCropToDrawable(LFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALNullDrawable;
+        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoAndCropToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALNullDrawable;
         {$ELSE}
-        if fResourceName <> '' then fBufBitmap := ALLoadFromResourceAndFitIntoAndCropToDrawable(fResourceName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale)
-        else fBufBitmap := ALLoadFromFileAndFitIntoAndCropToDrawable(fFileName, fBufBitmapRect.Width * ALGetScreenScale, fBufBitmapRect.Height * ALGetScreenScale);
+        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndFitIntoAndCropToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+        else fBufDrawable := ALLoadFromFileAndFitIntoAndCropToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
         {$ENDIF}
-        result := fBufBitmap;
+        result := fBufDrawable;
       end;
 
     //to hide a stupid warning else
@@ -619,7 +753,7 @@ begin
   end;
 
   if not ALIsDrawableNull(Result) then
-    fBufBitmapRect := TrectF.Create(0,0, ALGetDrawableWidth(result)/ALGetScreenScale, ALGetDrawableHeight(result)/ALGetScreenScale).
+    fBufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(result)/ALGetScreenScale, ALGetDrawableHeight(result)/ALGetScreenScale).
                         CenterAt(LocalRect);
 
 end;
@@ -635,9 +769,9 @@ begin
     Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
   end;
 
-  MakeBufBitmap;
+  MakeBufDrawable;
 
-  if ALIsDrawableNull(fBufBitmap) then begin
+  if ALIsDrawableNull(fBufDrawable) then begin
     inherited paint;
     exit;
   end;
@@ -709,8 +843,8 @@ begin
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
-    fBufBitmap, // const ADrawable: TALDrawable;
-    fBufBitmapRect.TopLeft, // const ATopLeft: TpointF;
+    fBufDrawable, // const ADrawable: TALDrawable;
+    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
 end;
@@ -719,7 +853,7 @@ end;
 procedure TALImage.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if FWrapMode <> Value then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FWrapMode := Value;
     Repaint;
   end;
@@ -729,7 +863,7 @@ end;
 procedure TALImage.setFileName(const Value: String);
 begin
   if FFileName <> Value then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FFileName := Value;
     Repaint;
   end;
@@ -739,7 +873,7 @@ end;
 procedure TALImage.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FResourceName := Value;
     Repaint;
   end;
@@ -750,7 +884,7 @@ constructor TALRectangle.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   fdoubleBuffered := true;
-  fBufBitmap := ALNullDrawable;
+  fBufDrawable := ALNullDrawable;
   fShadow := TalShadow.Create;
   fShadow.OnChanged := ShadowChanged;
 end;
@@ -758,48 +892,48 @@ end;
 {******************************}
 destructor TALRectangle.Destroy;
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   alFreeAndNil(fShadow);
   inherited;
 end;
 
 {************************************}
-procedure TALRectangle.clearBufBitmap;
+procedure TALRectangle.clearBufDrawable;
 begin
-  ALFreeAndNilDrawable(fBufBitmap);
+  ALFreeAndNilDrawable(fBufDrawable);
 end;
 
 {**************************************************}
 procedure TALRectangle.FillChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {****************************************************}
 procedure TALRectangle.StrokeChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {****************************************************}
 procedure TALRectangle.ShadowChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   Repaint;
 end;
 
 {***********************************************}
-function TALRectangle.MakeBufBitmap: TALDrawable;
+function TALRectangle.MakeBufDrawable: TALDrawable;
 begin
 
   if (not fdoubleBuffered) or
      (Scene = nil) or
-     //--- don't do bufbitmap if size=0
+     //--- don't do BufDrawable if size=0
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
-     //--- don't do bufbitmap if only fill with solid color
+     //--- don't do BufDrawable if only fill with solid color
      (((Stroke.Kind = TBrushKind.None) or
        (sides = []))
       and
@@ -811,26 +945,26 @@ begin
       and
       (Fill.Kind in [TBrushKind.None, TBrushKind.Solid]))
   then begin
-    clearBufBitmap;
+    clearBufDrawable;
     exit(ALNullDrawable);
   end;
 
-  if (not ALIsDrawableNull(fBufBitmap)) and
+  if (not ALIsDrawableNull(fBufDrawable)) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
-     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufDrawable);
 
   {$IFDEF debug}
-  if not ALIsDrawableNull(fBufBitmap) then
-    ALLog('TALRectangle.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  if not ALIsDrawableNull(fBufDrawable) then
+    ALLog('TALRectangle.MakeBufDrawable', 'BufDrawable is being recreated | Name: ' + Name, TalLogType.warn);
   {$endif}
-  clearBufBitmap;
+  clearBufDrawable;
   fBufSize := Size.Size;
 
-  fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
-  var LRect := TrectF.Create(0, 0, fBufBitmapRect.Width, fBufBitmapRect.height);
+  fBufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
+  var LRect := TrectF.Create(0, 0, fBufDrawableRect.Width, fBufDrawableRect.height);
   if Shadow.enabled then begin
-    fBufBitmapRect.Inflate(Shadow.blur, Shadow.blur); // add the extra space needed to draw the shadow
-    fBufBitmapRect := ALAlignDimensionToPixelRound(fBufBitmapRect, ALGetScreenScale); // to have the pixel aligned width and height
+    fBufDrawableRect.Inflate(Shadow.blur, Shadow.blur); // add the extra space needed to draw the shadow
+    fBufDrawableRect := ALAlignDimensionToPixelRound(fBufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
     LRect.Offset(Shadow.blur, Shadow.blur);
   end;
 
@@ -840,8 +974,8 @@ begin
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
     ALGetScreenScale, // const AScale: Single;
-    fBufBitmapRect.Width, // const w: integer;
-    fBufBitmapRect.height);// const h: integer)
+    fBufDrawableRect.Width, // const w: integer;
+    fBufDrawableRect.height);// const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
@@ -863,13 +997,13 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufBitmap := ALSurfaceToDrawable(LSurface);
+    fBufDrawable := ALSurfaceToDrawable(LSurface);
 
   finally
     ALFreeSurface(LSurface, LCanvas);
   end;
 
-  result := fBufBitmap;
+  result := fBufDrawable;
 
 end;
 
@@ -877,17 +1011,17 @@ end;
 procedure TALRectangle.Paint;
 begin
 
-  MakeBufBitmap;
+  MakeBufDrawable;
 
-  if ALIsDrawableNull(fBufBitmap) then begin
+  if ALIsDrawableNull(fBufDrawable) then begin
     inherited paint;
     exit;
   end;
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
-    fBufBitmap, // const ADrawable: TALDrawable;
-    fBufBitmapRect.TopLeft, // const ATopLeft: TpointF;
+    fBufDrawable, // const ADrawable: TALDrawable;
+    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
 end;
@@ -897,7 +1031,7 @@ procedure TALRectangle.SetdoubleBuffered(const Value: Boolean);
 begin
   if Value <> fDoubleBuffered then begin
     fDoubleBuffered := value;
-    if not fDoubleBuffered then clearbufBitmap;
+    if not fDoubleBuffered then clearBufDrawable;
   end;
 end;
 
@@ -912,7 +1046,7 @@ constructor TALCircle.Create(AOwner: TComponent);
 begin
   inherited;
   fdoubleBuffered := true;
-  fBufBitmap := ALNullDrawable;
+  fBufDrawable := ALNullDrawable;
   fShadow := TalShadow.Create;
   fShadow.OnChanged := ShadowChanged;
 end;
@@ -920,67 +1054,67 @@ end;
 {***************************}
 destructor TALCircle.Destroy;
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   alFreeAndNil(fShadow);
   inherited;
 end;
 
 {*********************************}
-procedure TALCircle.clearBufBitmap;
+procedure TALCircle.clearBufDrawable;
 begin
-  ALFreeAndNilDrawable(fBufBitmap);
+  ALFreeAndNilDrawable(fBufDrawable);
 end;
 
 {***********************************************}
 procedure TALCircle.FillChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {*************************************************}
 procedure TALCircle.StrokeChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {*************************************************}
 procedure TALCircle.ShadowChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   Repaint;
 end;
 
 {********************************************}
-function TALCircle.MakeBufBitmap: TALDrawable;
+function TALCircle.MakeBufDrawable: TALDrawable;
 begin
 
   if (not fdoubleBuffered) or
      (Scene = nil) or
-     //--- don't do bufbitmap if size=0
+     //--- don't do BufDrawable if size=0
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) then begin
-    clearBufBitmap;
+    clearBufDrawable;
     exit(ALNullDrawable);
   end;
 
-  if (not ALIsDrawableNull(fBufBitmap)) and
+  if (not ALIsDrawableNull(fBufDrawable)) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
-     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufDrawable);
 
   {$IFDEF debug}
-  if not ALIsDrawableNull(fBufBitmap) then
-    ALLog('TALCircle.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  if not ALIsDrawableNull(fBufDrawable) then
+    ALLog('TALCircle.MakeBufDrawable', 'BufDrawable is being recreated | Name: ' + Name, TalLogType.warn);
   {$endif}
-  clearBufBitmap;
+  clearBufDrawable;
   fBufSize := Size.Size;
 
-  fBufBitmapRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), ALGetScreenScale); // to have the pixel aligned width and height
-  var LRect := TrectF.Create(0, 0, fBufBitmapRect.Width, fBufBitmapRect.height);
+  fBufDrawableRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), ALGetScreenScale); // to have the pixel aligned width and height
+  var LRect := TrectF.Create(0, 0, fBufDrawableRect.Width, fBufDrawableRect.height);
   if Shadow.enabled then begin
-    fBufBitmapRect.Inflate(Shadow.blur, Shadow.blur); // add the extra space needed to draw the shadow
-    fBufBitmapRect := ALAlignDimensionToPixelRound(fBufBitmapRect, ALGetScreenScale); // to have the pixel aligned width and height
+    fBufDrawableRect.Inflate(Shadow.blur, Shadow.blur); // add the extra space needed to draw the shadow
+    fBufDrawableRect := ALAlignDimensionToPixelRound(fBufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
     LRect.Offset(Shadow.blur, Shadow.blur);
   end;
 
@@ -990,8 +1124,8 @@ begin
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
     ALGetScreenScale, // const AScale: Single;
-    fBufBitmapRect.Width, // const w: integer;
-    fBufBitmapRect.Height); // const h: integer)
+    fBufDrawableRect.Width, // const w: integer;
+    fBufDrawableRect.Height); // const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
@@ -1009,13 +1143,13 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufBitmap := ALSurfaceToDrawable(LSurface);
+    fBufDrawable := ALSurfaceToDrawable(LSurface);
 
   finally
     ALFreeSurface(LSurface, LCanvas);
   end;
 
-  result := fBufBitmap;
+  result := fBufDrawable;
 
 end;
 
@@ -1023,17 +1157,17 @@ end;
 procedure TALCircle.Paint;
 begin
 
-  MakeBufBitmap;
+  MakeBufDrawable;
 
-  if ALIsDrawableNull(fBufBitmap) then begin
+  if ALIsDrawableNull(fBufDrawable) then begin
     inherited paint;
     exit;
   end;
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
-    fBufBitmap, // const ADrawable: TALDrawable;
-    fBufBitmapRect.TopLeft, // const ATopLeft: TpointF;
+    fBufDrawable, // const ADrawable: TALDrawable;
+    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
 end;
@@ -1043,7 +1177,7 @@ procedure TALCircle.SetdoubleBuffered(const Value: Boolean);
 begin
   if Value <> fDoubleBuffered then begin
     fDoubleBuffered := value;
-    if not fDoubleBuffered then clearbufBitmap;
+    if not fDoubleBuffered then clearBufDrawable;
   end;
 end;
 
@@ -1058,62 +1192,62 @@ constructor TALLine.Create(AOwner: TComponent);
 begin
   inherited;
   fdoubleBuffered := true;
-  fBufBitmap := ALNullDrawable;
+  fBufDrawable := ALNullDrawable;
 end;
 
 {*************************}
 destructor TALLine.Destroy;
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {*******************************}
-procedure TALLine.clearBufBitmap;
+procedure TALLine.clearBufDrawable;
 begin
-  ALFreeAndNilDrawable(fBufBitmap);
+  ALFreeAndNilDrawable(fBufDrawable);
 end;
 
 {*********************************************}
 procedure TALLine.FillChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {***********************************************}
 procedure TALLine.StrokeChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   inherited;
 end;
 
 {******************************************}
-function TALLine.MakeBufBitmap: TALDrawable;
+function TALLine.MakeBufDrawable: TALDrawable;
 begin
 
   if (not fdoubleBuffered) or
      (Scene = nil) or
-     //--- don't do bufbitmap if size=0
+     //--- don't do BufDrawable if size=0
      (SameValue(Size.Size.cx, 0, TEpsilon.position)) or
      (SameValue(Size.Size.cy, 0, TEpsilon.position)) or
-     //--- don't do bufbitmap if stroke is none
+     //--- don't do BufDrawable if stroke is none
      (Stroke.Kind = TBrushKind.None) or
-     //--- don't do bufbitmap if Thickness is 0
+     //--- don't do BufDrawable if Thickness is 0
      (SameValue(Stroke.Thickness, 0, TEpsilon.position)) then begin
-    clearBufBitmap;
+    clearBufDrawable;
     exit(ALNullDrawable);
   end;
 
-  if (not ALIsDrawableNull(fBufBitmap)) and
+  if (not ALIsDrawableNull(fBufDrawable)) and
      (SameValue(fBufSize.cx, Size.Size.cx, TEpsilon.position)) and
-     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufBitmap);
+     (SameValue(fBufSize.cy, Size.Size.cy, TEpsilon.position)) then exit(fBufDrawable);
 
   {$IFDEF debug}
-  if not ALIsDrawableNull(fBufBitmap) then
-    ALLog('TALLine.MakeBufBitmap', 'BufBitmap is being recreated | Name: ' + Name, TalLogType.warn);
+  if not ALIsDrawableNull(fBufDrawable) then
+    ALLog('TALLine.MakeBufDrawable', 'BufDrawable is being recreated | Name: ' + Name, TalLogType.warn);
   {$endif}
-  clearBufBitmap;
+  clearBufDrawable;
   fBufSize := Size.Size;
 
   //init LStrokeWidth
@@ -1121,27 +1255,27 @@ begin
   if (LineLocation = TLineLocation.InnerWithin) then LStrokeWidth := Min(Stroke.Thickness, Min(Width, Height))
   else LStrokeWidth := Stroke.Thickness;
 
-  //init fBufBitmapRect / LRect
+  //init fBufDrawableRect / LRect
   case lineType of
-    TLineType.Diagonal: fBufBitmapRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
+    TLineType.Diagonal: fBufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
     TLineType.Top: begin
-                     fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, Width, LStrokeWidth), ALGetScreenScale); // to have the pixel aligned width and height
-                     if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(0, -LStrokeWidth/2);
+                     fBufDrawableRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, Width, LStrokeWidth), ALGetScreenScale); // to have the pixel aligned width and height
+                     if LineLocation = TlineLocation.Boundary then fBufDrawableRect.Offset(0, -LStrokeWidth/2);
                    end;
     TLineType.Left: begin
-                      fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, LStrokeWidth, height), ALGetScreenScale); // to have the pixel aligned width and height
-                      if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(-LStrokeWidth/2, 0);
+                      fBufDrawableRect := ALAlignDimensionToPixelRound(TrectF.Create(0, 0, LStrokeWidth, height), ALGetScreenScale); // to have the pixel aligned width and height
+                      if LineLocation = TlineLocation.Boundary then fBufDrawableRect.Offset(-LStrokeWidth/2, 0);
                     end;
     TLineType.Bottom: begin
-                        fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(0, height - LStrokeWidth, Width, height), ALGetScreenScale); // to have the pixel aligned width and height
-                        if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(0, LStrokeWidth/2);
+                        fBufDrawableRect := ALAlignDimensionToPixelRound(TrectF.Create(0, height - LStrokeWidth, Width, height), ALGetScreenScale); // to have the pixel aligned width and height
+                        if LineLocation = TlineLocation.Boundary then fBufDrawableRect.Offset(0, LStrokeWidth/2);
                       end;
     TLineType.Right: begin
-                       fBufBitmapRect := ALAlignDimensionToPixelRound(TrectF.Create(width - LStrokeWidth, 0, width, height), ALGetScreenScale); // to have the pixel aligned width and height
-                       if LineLocation = TlineLocation.Boundary then fBufBitmapRect.Offset(LStrokeWidth/2, 0);
+                       fBufDrawableRect := ALAlignDimensionToPixelRound(TrectF.Create(width - LStrokeWidth, 0, width, height), ALGetScreenScale); // to have the pixel aligned width and height
+                       if LineLocation = TlineLocation.Boundary then fBufDrawableRect.Offset(LStrokeWidth/2, 0);
                      end;
   end;
-  var LRect := TrectF.Create(0, 0, round(fBufBitmapRect.Width * ALGetScreenScale), round(fBufBitmapRect.height * ALGetScreenScale));
+  var LRect := TrectF.Create(0, 0, round(fBufDrawableRect.Width * ALGetScreenScale), round(fBufDrawableRect.height * ALGetScreenScale));
 
   {$IF DEFINED(ALSkiaEngine)}
 
@@ -1216,7 +1350,7 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufBitmap := ALSurfaceToDrawable(LSurface);
+    fBufDrawable := ALSurfaceToDrawable(LSurface);
 
   finally
     ALFreeSurface(LSurface, LCanvas);
@@ -1284,7 +1418,7 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufBitmap := ALSurfaceToDrawable(LSurface);
+    fBufDrawable := ALSurfaceToDrawable(LSurface);
 
   finally
     ALFreeSurface(LSurface, LCanvas);
@@ -1341,7 +1475,7 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufBitmap := ALSurfaceToDrawable(LCanvas);
+    fBufDrawable := ALSurfaceToDrawable(LCanvas);
 
   finally
     ALFreeSurface(LSurface, LCanvas); // Var aContext: CGContextRef;
@@ -1349,7 +1483,7 @@ begin
 
   {$ENDIF}
 
-  result := fBufBitmap;
+  result := fBufDrawable;
 
 end;
 
@@ -1357,17 +1491,17 @@ end;
 procedure TALLine.Paint;
 begin
 
-  MakeBufBitmap;
+  MakeBufDrawable;
 
-  if ALIsDrawableNull(fBufBitmap) then begin
+  if ALIsDrawableNull(fBufDrawable) then begin
     inherited paint;
     exit;
   end;
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
-    fBufBitmap, // const ADrawable: TALDrawable;
-    fBufBitmapRect.TopLeft, // const ATopLeft: TpointF;
+    fBufDrawable, // const ADrawable: TALDrawable;
+    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
 end;
@@ -1377,7 +1511,7 @@ procedure TALLine.SetdoubleBuffered(const Value: Boolean);
 begin
   if Value <> fDoubleBuffered then begin
     fDoubleBuffered := value;
-    if not fDoubleBuffered then clearbufBitmap;
+    if not fDoubleBuffered then clearBufDrawable;
   end;
 end;
 
@@ -1396,7 +1530,7 @@ begin
   FHoveredElement := TALTextElement.Empty;
   FPressedElement := TALTextElement.Empty;
   //-----
-  fBufBitmap := ALNullDrawable;
+  fBufDrawable := ALNullDrawable;
   //-----
   FFill := TBrush.Create(TBrushKind.none, $FFE0E0E0);
   FFill.OnChanged := FillChanged;
@@ -1422,7 +1556,7 @@ end;
 {*************************}
 destructor TALText.Destroy;
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FFill);
@@ -1481,8 +1615,8 @@ begin
      (Text <> '') and // if Text is empty do not do autosize
      (scene <> nil) then begin // SetNewScene will call again AdjustSize
 
-    MakeBufBitmap;
-    var R := FBufBitmapRect;
+    MakeBufDrawable;
+    var R := FBufDrawableRect;
 
     // This to take care of the align constraint
     if Align in [TAlignLayout.Client,
@@ -1516,7 +1650,7 @@ end;
 {********************************************************************}
 function TALText.GetElementAtPos(const APos: TPointF): TALTextElement;
 begin
-  if (not ALIsDrawableNull(fBufBitmap)) then begin
+  if (not ALIsDrawableNull(fBufDrawable)) then begin
     for var I := Low(fBufElements) to High(fBufElements) do
       if fBufElements[i].Rect.Contains(APos) then begin
         Result := fBufElements[i];
@@ -1611,7 +1745,7 @@ end;
 {*******************************}
 procedure TALText.PaddingChanged;
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   AdjustSize;
   Repaint;
 end;
@@ -1619,14 +1753,14 @@ end;
 {*********************************************}
 procedure TALText.FillChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   Repaint;
 end;
 
 {***********************************************}
 procedure TALText.StrokeChanged(Sender: TObject);
 begin
-  clearBufBitmap;
+  clearBufDrawable;
   Repaint;
 end;
 
@@ -1658,7 +1792,7 @@ end;
 procedure TALText.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FCorners := Value;
     Repaint;
   end;
@@ -1672,7 +1806,7 @@ begin
   if csDesigning in ComponentState then NewValue := Min(Value, Min(Width / 2, Height / 2))
   else NewValue := Value;
   if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FXRadius := NewValue;
     Repaint;
   end;
@@ -1686,7 +1820,7 @@ begin
   if csDesigning in ComponentState then NewValue := Min(Value, Min(Width / 2, Height / 2))
   else NewValue := Value;
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FYRadius := NewValue;
     Repaint;
   end;
@@ -1696,7 +1830,7 @@ end;
 procedure TALText.SetSides(const Value: TSides);
 begin
   if FSides <> Value then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FSides := Value;
     Repaint;
   end;
@@ -1705,7 +1839,7 @@ end;
 {*******************************************************}
 procedure TALText.OnTextSettingsChanged(Sender: TObject);
 begin
-  ClearBufBitmap;
+  ClearBufDrawable;
   AdjustSize;
   Repaint;
 end;
@@ -1732,12 +1866,12 @@ end;
 procedure TALText.Paint;
 begin
 
-  MakeBufBitmap;
+  MakeBufDrawable;
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
-    fBufBitmap, // const ADrawable: TALDrawable;
-    fBufBitmapRect.TopLeft, // const ATopLeft: TpointF;
+    fBufDrawable, // const ADrawable: TALDrawable;
+    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
   if (csDesigning in ComponentState) and not Locked then
@@ -1750,7 +1884,7 @@ procedure TALText.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
   begin
-    clearBufBitmap;
+    clearBufDrawable;
     FAutoSize := Value;
     AdjustSize;
     repaint;
@@ -1761,7 +1895,7 @@ end;
 procedure TALText.SetText(const Value: string);
 begin
   if FText <> Value then begin
-    clearBufBitmap;
+    clearBufDrawable;
     FText := Value;
     AdjustSize;
     Repaint;
@@ -1769,18 +1903,18 @@ begin
 end;
 
 {*******************************}
-procedure TALText.clearBufBitmap;
+procedure TALText.clearBufDrawable;
 begin
-  ALFreeAndNilDrawable(fBufBitmap);
+  ALFreeAndNilDrawable(fBufDrawable);
   setlength(fBufElements, 0);
 end;
 
 {******************************************}
-function TALText.MakeBufBitmap: TALDrawable;
+function TALText.MakeBufDrawable: TALDrawable;
 begin
 
   if (Scene = nil) then begin
-    clearBufBitmap;
+    clearBufDrawable;
     exit(ALNullDrawable);
   end;
 
@@ -1805,25 +1939,25 @@ begin
   end
   else LMaxSize := TSizeF.Create(width, height);
 
-  if (not ALIsDrawableNull(fBufBitmap)) and
+  if (not ALIsDrawableNull(fBufDrawable)) and
      (SameValue(fBufSize.cx, LMaxSize.cx, TEpsilon.position)) and
-     (SameValue(fBufSize.cy, LMaxSize.cy, TEpsilon.position)) then exit(fBufBitmap);
+     (SameValue(fBufSize.cy, LMaxSize.cy, TEpsilon.position)) then exit(fBufDrawable);
 
   {$IFDEF debug}
-  if not ALIsDrawableNull(fBufBitmap) then
+  if not ALIsDrawableNull(fBufDrawable) then
     ALLog(
-      'TALText.MakeBufBitmap',
-      'BufBitmap is being recreated | ' +
+      'TALText.MakeBufDrawable',
+      'BufDrawable is being recreated | ' +
       'Name: ' + Name + ' | ' +
       'text:' + Text + ' | ' +
       'MaxSize: '+floattostr(LMaxSize.cX)+'x'+floattostr(LMaxSize.cY),
       TalLogType.warn);
   {$endif}
-  clearBufBitmap;
+  clearBufDrawable;
   fBufSize := LMaxSize;
 
-  //init fBufBitmapRect
-  fBufBitmapRect := TRectF.Create(0, 0, fBufSize.cX, fBufSize.cY);
+  //init fBufDrawableRect
+  fBufDrawableRect := TRectF.Create(0, 0, fBufSize.cX, fBufSize.cY);
 
   //create LOptions
   var LOptions := TALMultiLineTextOptions.Create;
@@ -1844,6 +1978,8 @@ begin
     LOptions.DecorationColor := TextSettings.Decoration.Color;
     //--
     LOptions.EllipsisText := TextSettings.Ellipsis;
+    LOptions.EllipsisInheritSettings := TextSettings.EllipsisSettings.inherit;
+    //--
     LOptions.EllipsisFontFamily := TextSettings.EllipsisSettings.font.Family;
     LOptions.EllipsisFontSize := TextSettings.EllipsisSettings.font.Size;
     LOptions.EllipsisFontWeight := TextSettings.EllipsisSettings.font.Weight;
@@ -1905,10 +2041,10 @@ begin
     //--
     LOptions.TextIsHtml := TextSettings.IsHtml;
 
-    //build fBufBitmap
-    fBufBitmap := ALCreateMultiLineTextDrawable(
+    //build fBufDrawable
+    fBufDrawable := ALCreateMultiLineTextDrawable(
                     Text,
-                    fBufBitmapRect,
+                    fBufDrawableRect,
                     fBufTextBroken,
                     fBufAllTextDrawn,
                     fBufElements,
@@ -1918,26 +2054,26 @@ begin
     //To avoid to call again ALDrawMultiLineText on each paint
     //return a "blank" drawable. Also to avoid to have a control
     //with a "zero" size, do not do any autoresize
-    if (ALIsDrawableNull(fBufBitmap)) and (not LocalRect.IsEmpty) then begin
-      fBufBitmapRect := LocalRect;
-      fBufBitmapRect.Width := Min(MaxWidth, fBufBitmapRect.Width);
-      fBufBitmapRect.Height := Min(MaxHeight, fBufBitmapRect.Height);
-      fBufBitmapRect := ALAlignDimensionToPixelRound(fBufBitmapRect, ALGetScreenScale);
+    if (ALIsDrawableNull(fBufDrawable)) and (not LocalRect.IsEmpty) then begin
+      fBufDrawableRect := LocalRect;
+      fBufDrawableRect.Width := Min(MaxWidth, fBufDrawableRect.Width);
+      fBufDrawableRect.Height := Min(MaxHeight, fBufDrawableRect.Height);
+      fBufDrawableRect := ALAlignDimensionToPixelRound(fBufDrawableRect, ALGetScreenScale);
       var LSurface: TALSurface;
       var LCanvas: TALCanvas;
       ALCreateSurface(
         LSurface, // out ASurface: sk_surface_t;
         LCanvas, // out ACanvas: sk_canvas_t;
         ALGetScreenScale, // const AScale: Single;
-        fBufBitmapRect.Width, // const w: integer;
-        fBufBitmapRect.height);// const h: integer)
+        fBufDrawableRect.Width, // const w: integer;
+        fBufDrawableRect.height);// const h: integer)
       try
         if ALCanvasBeginScene(LCanvas) then
         try
           ALDrawRectangle(
             LCanvas, // const ACanvas: sk_canvas_t;
             ALGetScreenScale, // const AScale: Single;
-            fBufBitmapRect, // const Rect: TrectF;
+            fBufDrawableRect, // const Rect: TrectF;
             Fill, // const Fill: TBrush;
             Stroke, // const Stroke: TStrokeBrush;
             nil, // const Shadow: TALShadow
@@ -1948,7 +2084,7 @@ begin
         finally
           ALCanvasEndScene(LCanvas)
         end;
-        fBufBitmap := ALSurfaceToDrawable(LSurface);
+        fBufDrawable := ALSurfaceToDrawable(LSurface);
       finally
         ALFreeSurface(LSurface, LCanvas);
       end;
@@ -1959,21 +2095,21 @@ begin
   end;
 
   //update the result
-  result := fBufBitmap;
+  result := fBufDrawable;
 
 end;
 
 {***********************************}
 function TALText.TextBroken: Boolean;
 begin
-  result := (not ALIsDrawableNull(fBufBitmap)) and (fBufTextBroken);
+  result := (not ALIsDrawableNull(fBufDrawable)) and (fBufTextBroken);
 end;
 
 {*************************************************}
 procedure TALText.SetMaxWidth(const Value: Single);
 begin
   if compareValue(fMaxWidth, Value, Tepsilon.position) <> 0 then begin
-    clearBufBitmap;
+    clearBufDrawable;
     fMaxWidth := Value;
     AdjustSize;
   end;
@@ -1983,7 +2119,7 @@ end;
 procedure TALText.SetMaxHeight(const Value: Single);
 begin
   if compareValue(fMaxHeight, Value, Tepsilon.position) <> 0 then begin
-    clearBufBitmap;
+    clearBufDrawable;
     fMaxHeight := Value;
     AdjustSize;
   end;
@@ -2013,7 +2149,7 @@ end;
 //      AlText1.endupdate => adjustsize and realign
 //    Control2.endupdate => realign and then maybe again AlText1.adjustsize
 //  Control1.endupdate => realign and then maybe again AlText1.adjustsize
-//this is a problem because we will calculate several time the bufbitmap
+//this is a problem because we will calculate several time the BufDrawable
 //to mitigate this we can do
 //  ALLockTexts(Control1);
 //  Control1.endupdate;
@@ -2041,26 +2177,362 @@ begin
     ALUnLockTexts(aParentControl.Controls[i]);
 end;
 
+{*************************************}
+constructor TALButtonStateStyleBrush.Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultKind, ADefaultColor);
+  FInherit := True;
+end;
+
+{**************************************************************}
+procedure TALButtonStateStyleBrush.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    if Assigned(OnChanged) then
+      OnChanged(Self);
+  end;
+end;
+
+{********************************************************}
+procedure TALButtonStateStyleBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALButtonStateStyleBrush then begin
+    FInherit := TALButtonStateStyleBrush(Source).FInherit;
+  end;
+  inherited Assign(Source);
+end;
+
+{*************************************}
+constructor TALButtonStateStyleStrokeBrush.Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultKind, ADefaultColor);
+  FInherit := True;
+end;
+
+{**************************************************************}
+procedure TALButtonStateStyleStrokeBrush.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    if Assigned(OnChanged) then
+      OnChanged(Self);
+  end;
+end;
+
+{********************************************************}
+procedure TALButtonStateStyleStrokeBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALButtonStateStyleStrokeBrush then begin
+    FInherit := TALButtonStateStyleStrokeBrush(Source).FInherit;
+  end;
+  inherited Assign(Source);
+end;
+
+{*************************************}
+constructor TALButtonStateStyleTextSettings.Create;
+begin
+  inherited create;
+  FInherit := True;
+end;
+
+{**************************************************************}
+procedure TALButtonStateStyleTextSettings.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    DoChanged;
+  end;
+end;
+
+{********************************************************}
+procedure TALButtonStateStyleTextSettings.Assign(Source: TPersistent);
+begin
+  if Source is TALButtonStateStyleTextSettings then begin
+    FInherit := TALButtonStateStyleTextSettings(Source).FInherit;
+  end;
+  inherited Assign(Source);
+end;
+
+{*************************************}
+constructor TALButtonStateStyleShadow.Create;
+begin
+  inherited create;
+  FInherit := True;
+end;
+
+{**************************************************************}
+procedure TALButtonStateStyleShadow.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    DoChanged;
+  end;
+end;
+
+{********************************************************}
+procedure TALButtonStateStyleShadow.Assign(Source: TPersistent);
+begin
+  if Source is TALButtonStateStyleShadow then begin
+    FInherit := TALButtonStateStyleShadow(Source).FInherit;
+  end;
+  inherited Assign(Source);
+end;
+
+{***********************************}
+constructor TALButtonStateStyle.Create;
+begin
+  inherited Create;
+  FFill := TALButtonStateStyleBrush.Create(TBrushKind.Solid{ADefaultKind}, $FFE1E1E1{ADefaultColor});
+  FFill.OnChanged := FillChanged;
+  //--
+  FStroke := TALButtonStateStyleStrokeBrush.Create(TBrushKind.Solid{ADefaultKind}, $FFADADAD{ADefaultColor});
+  FStroke.OnChanged := StrokeChanged;
+  //--
+  FTextSettings := TALButtonStateStyleTextSettings.Create;
+  FTextSettings.OnChanged := TextSettingsChanged;
+  //--
+  FShadow := TALButtonStateStyleShadow.Create;
+  FShadow.OnChanged := ShadowChanged;
+  //--
+  FOnChanged := nil;
+end;
+
+{*************************************}
+destructor TALButtonStateStyle.Destroy;
+begin
+  ALFreeAndNil(FFill);
+  ALFreeAndNil(FStroke);
+  ALFreeAndNil(FTextSettings);
+  ALFreeAndNil(FShadow);
+  inherited Destroy;
+end;
+
+{******************************************************}
+procedure TALButtonStateStyle.Assign(Source: TPersistent);
+begin
+  if Source is TALButtonStateStyle then begin
+    FFill         := TALButtonStateStyle(Source).FFill;
+    FStroke       := TALButtonStateStyle(Source).FStroke;
+    FTextSettings := TALButtonStateStyle(Source).FTextSettings;
+    FShadow       := TALButtonStateStyle(Source).FShadow;
+    DoChanged;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{****************************************************************************}
+procedure TALButtonStateStyle.SetFill(const AValue: TALButtonStateStyleBrush);
+begin
+  FFill.Assign(AValue);
+end;
+
+{************************************************************************************}
+procedure TALButtonStateStyle.SetStroke(const AValue: TALButtonStateStyleStrokeBrush);
+begin
+  FStroke.Assign(AValue);
+end;
+
+{*******************************************************************************************}
+procedure TALButtonStateStyle.SetTextSettings(const AValue: TALButtonStateStyleTextSettings);
+begin
+  FTextSettings.Assign(AValue);
+end;
+
+{*******************************************************************************}
+procedure TALButtonStateStyle.SetShadow(const AValue: TALButtonStateStyleShadow);
+begin
+  FShadow.Assign(AValue);
+end;
+
+{************************************}
+procedure TALButtonStateStyle.DoChanged;
+begin
+  if Assigned(FOnChanged) then
+    FOnChanged(Self);
+end;
+
+{**********************************************************}
+procedure TALButtonStateStyle.FillChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
+{************************************************************}
+procedure TALButtonStateStyle.StrokeChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
+{******************************************************************}
+procedure TALButtonStateStyle.TextSettingsChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
+{************************************************************}
+procedure TALButtonStateStyle.ShadowChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
+{*************************************}
+constructor TALButtonStateStyles.Create;
+begin
+  inherited Create;
+  FDisabled := TALButtonStateStyle.Create;
+  FDisabled.OnChanged := DisabledChanged;
+  //--
+  FHovered := TALButtonStateStyle.Create;
+  FHovered.OnChanged := HoveredChanged;
+  //--
+  FPressed := TALButtonStateStyle.Create;
+  FPressed.OnChanged := PressedChanged;
+  //--
+  FOnChanged := nil;
+end;
+
+{*************************************}
+destructor TALButtonStateStyles.Destroy;
+begin
+  ALFreeAndNil(FDisabled);
+  ALFreeAndNil(FHovered);
+  ALFreeAndNil(FPressed);
+  inherited Destroy;
+end;
+
+{******************************************************}
+procedure TALButtonStateStyles.Assign(Source: TPersistent);
+begin
+  if Source is TALButtonStateStyles then begin
+    FDisabled  := TALButtonStateStyles(Source).FDisabled;
+    FHovered   := TALButtonStateStyles(Source).FHovered;
+    FPressed   := TALButtonStateStyles(Source).FPressed;
+    DoChanged;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{****************************************************************************}
+procedure TALButtonStateStyles.SetDisabled(const AValue: TALButtonStateStyle);
+begin
+  FDisabled.Assign(AValue);
+end;
+
+{************************************************************************************}
+procedure TALButtonStateStyles.SetHovered(const AValue: TALButtonStateStyle);
+begin
+  FHovered.Assign(AValue);
+end;
+
+{*******************************************************************************************}
+procedure TALButtonStateStyles.SetPressed(const AValue: TALButtonStateStyle);
+begin
+  FPressed.Assign(AValue);
+end;
+
+{************************************}
+procedure TALButtonStateStyles.DoChanged;
+begin
+  if Assigned(FOnChanged) then
+    FOnChanged(Self);
+end;
+
+{**********************************************************}
+procedure TALButtonStateStyles.DisabledChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
+{************************************************************}
+procedure TALButtonStateStyles.HoveredChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
+{******************************************************************}
+procedure TALButtonStateStyles.PressedChanged(ASender: TObject);
+begin
+  DoChanged;
+end;
+
 {***********************************************}
 constructor TALButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //--
-  FFill.Kind := TBrushKind.Solid;
-  FFill.Color := $FFE1E1E1;
-  FFill.DefaultKind := FFill.Kind;
-  FFill.DefaultColor := FFill.Color;
+  FPressed := False;
+  FHovered := False;
   //--
-  FStroke.Kind := TBrushKind.Solid;
-  FStroke.Color := $FFADADAD;
-  FStroke.DefaultKind := FStroke.Kind;
-  FStroke.DefaultColor := FStroke.Color;
+  FStateStyles := TALButtonStateStyles.Create;
+  FStateStyles.OnChanged := StateStylesChanged;
+  //--
+  FFill.DefaultKind := TBrushKind.Solid;
+  FFill.DefaultColor := $FFE1E1E1;
+  FFill.Kind := FFill.DefaultKind;
+  FFill.Color := FFill.DefaultColor;
+  //--
+  FStroke.DefaultKind := TBrushKind.Solid;
+  FStroke.DefaultColor := $FFADADAD;
+  FStroke.Kind := FStroke.DefaultKind;
+  FStroke.Color := FStroke.DefaultColor;
   //--
   HitTest := True;
   FAutoSize := True;
-  TextSettings.HorzAlign := TALTextHorzAlign.center;
-  Padding.rect := TRectF.create(24,8,24,8);
-  Padding.DefaultValue := Padding.rect;
+  TextSettings.DefaultHorzAlign := TALTextHorzAlign.center;
+  TextSettings.HorzAlign := TextSettings.DefaultHorzAlign;
+  Padding.DefaultValue := TRectF.create(24,8,24,8);
+  Padding.rect := Padding.rect;
+end;
+
+{***************************}
+destructor TALButton.Destroy;
+begin
+  ALFreeAndNil(FStateStyles);
+  inherited Destroy;
+end;
+
+{**********************************************************************************}
+procedure TALButton.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited MouseDown(Button, Shift, X, Y);
+  FPressed := True;
+  Repaint;
+end;
+
+{************************************************************}
+procedure TALButton.MouseMove(Shift: TShiftState; X, Y: Single);
+begin
+  inherited MouseMove(Shift, X, Y);
+  if not FHovered then
+    Repaint;
+  FHovered := True;
+end;
+
+{********************************************************************************}
+procedure TALButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+begin
+  inherited MouseUp(Button, Shift, X, Y);
+  FPressed := False;
+  Repaint;
+end;
+
+{*****************************}
+procedure TALButton.DoMouseEnter;
+begin
+  inherited DoMouseEnter;
+  FHovered := True;
+  Repaint;
+end;
+
+{*****************************}
+procedure TALButton.DoMouseLeave;
+begin
+  inherited DoMouseLeave;
+  FHovered := False;
+  Repaint;
 end;
 
 {*******************************************************}
@@ -2071,6 +2543,52 @@ begin
   inherited SetName(Value);
   if LChangeText then
     Text := Value;
+end;
+
+{*********************************************************************}
+procedure TALButton.SetStateStyles(const AValue: TALButtonStateStyles);
+begin
+  FStateStyles.Assign(AValue);
+end;
+
+{******************************************************}
+procedure TALButton.StateStylesChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  Repaint;
+end;
+
+{************************}
+procedure TALButton.Paint;
+begin
+
+  if Not Enabled then begin
+
+
+  end
+  else if FHovered then begin
+
+
+  end
+  else if FPressed then begin
+
+
+  end
+  else begin
+
+    MakeBufDrawable;
+
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      fBufDrawable, // const ADrawable: TALDrawable;
+      fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single);
+
+    if (csDesigning in ComponentState) and not Locked then
+      DrawDesignBorder;
+
+  end;
+
 end;
 
 {*****************}

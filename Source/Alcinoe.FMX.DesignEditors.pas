@@ -14,7 +14,8 @@ uses
   FMX.Types,
   DesignIntf,
   DesignEditors,
-  DesignMenus;
+  DesignMenus,
+  StrEdit;
 
 resourcestring
   SNewItem = 'Add Item';
@@ -95,6 +96,24 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if FMX.Skia.Designtime.pas was not updated and adjust the IFDEF'}
+  {$ENDIF}
+
+  {****************************************************}
+  TALTextTextPropertyEditor = class(TStringListProperty)
+  private
+    FStrings: TStrings;
+  protected
+    function GetStrings: TStrings; override;
+    procedure SetStrings(const AValue: TStrings); override;
+  public
+    procedure Edit; override;
+    function GetAttributes: TPropertyAttributes; override;
+    function GetValue: string; override;
+    procedure SetValue(const AValue: string); override;
+  end;
+
 procedure Register;
 
 implementation
@@ -103,6 +122,7 @@ uses
   System.SysUtils,
   Vcl.Menus,
   fmx.controls,
+  Alcinoe.FMX.Objects,
   Alcinoe.FMX.TabControl;
 
 {**********************************}
@@ -390,11 +410,60 @@ begin
   end;
 end;
 
+{***************************************}
+procedure TALTextTextPropertyEditor.Edit;
+begin
+  inherited;
+  FreeAndNil(FStrings);
+end;
+
+{********************************************************************}
+function TALTextTextPropertyEditor.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paDialog, paMultiSelect, paAutoUpdate];
+end;
+
+{******************************************************}
+function TALTextTextPropertyEditor.GetStrings: TStrings;
+begin
+  if FStrings = nil then
+  begin
+    FStrings := TStringList.Create;
+    {$IF CompilerVersion >= 31}
+    FStrings.Options := FStrings.Options - [TStringsOption.soTrailingLineBreak];
+    {$ENDIF}
+  end;
+  FStrings.Text := GetStrValue;
+  Result := FStrings;
+end;
+
+{**************************************************}
+function TALTextTextPropertyEditor.GetValue: string;
+begin
+  Result := GetStrValue;
+end;
+
+{*********************************************************************}
+procedure TALTextTextPropertyEditor.SetStrings(const AValue: TStrings);
+begin
+  if AValue.Text.EndsWith(AValue.LineBreak) then
+    SetStrValue(AValue.Text.Substring(0, Length(AValue.Text) - Length(AValue.LineBreak)))
+  else
+    SetStrValue(AValue.Text);
+end;
+
+{*****************************************************************}
+procedure TALTextTextPropertyEditor.SetValue(const AValue: string);
+begin
+  SetStrValue(AValue);
+end;
+
 {*****************}
 procedure Register;
 begin
   RegisterComponentEditor(TALTabControl, TALTabControlEditor);
   RegisterComponentEditor(TALTabItem, TALTabItemEditor);
+  RegisterPropertyEditor(TypeInfo(string), TALText, 'Text', TALTextTextPropertyEditor);
 end;
 
 initialization

@@ -110,7 +110,6 @@ type
     FPadding: TBounds;
     fOnChangeTracking: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
-    FScreenScale: single;
     FTextSettings: TTextSettings;
     fMaxLength: integer;
     fApplicationEventMessageID: integer;
@@ -746,16 +745,12 @@ end;
 
 {******************************************************************************************************************************************************************}
 constructor TalAndroidEdit.Create(const AOwner: TComponent; Const aIsMultiline: Boolean = False; const aDefStyleAttr: String = ''; const aDefStyleRes: String = '');
-var LScreenSrv: IFMXScreenService;
 begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEdit.Create', 'start', TalLogType.VERBOSE);
   {$ENDIF}
   //-----
   inherited create(AOwner);
-  //-----
-  if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenSrv) then FScreenScale := LScreenSrv.GetScreenScale
-  else FScreenScale := 1;
   //-----
   FPadding := TBounds.Create(TRectF.Empty);
   fMaxLength := 0;
@@ -992,7 +987,7 @@ end;
 procedure TALAndroidEdit.SetPadding(const Value: TBounds);
 begin
   FPadding.Assign(Value);
-  fEditText.view.setPadding(round(Value.Left * fScreenScale), round(Value.Top * fScreenScale), round(Value.Right * fScreenScale), round(Value.Bottom * fScreenScale));
+  fEditText.view.setPadding(round(Value.Left * ALGetScreenScale), round(Value.Top * ALGetScreenScale), round(Value.Right * AlGetScreenScale), round(Value.Bottom * ALGetScreenScale));
 end;
 
 {******************************************}
@@ -1254,7 +1249,7 @@ end;
 {********************************************}
 function TALAndroidEdit.getLineHeight: Single;
 begin
-  result := FEditText.view.getLineHeight / FScreenScale;
+  result := FEditText.view.getLineHeight / ALGetScreenScale;
 end;
 
 {********************************************}

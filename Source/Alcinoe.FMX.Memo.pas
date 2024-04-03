@@ -1182,7 +1182,7 @@ begin
   fTextPromptControl.Height := Height;
   fTextPromptControl.Anchors := [TAnchorKind.akLeft, TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
   fTextPromptControl.TextSettings.Assign(FTextSettings);
-  fTextPromptControl.color := TalphaColorRec.Null;
+  fTextPromptControl.TextSettings.Font.color := TalphaColorRec.Null;
   FOnChangeTracking := nil;
   fReturnKeyType := TReturnKeyType.Default;
   inherited onchangeTracking := OnChangeTrackingImpl;
@@ -1340,14 +1340,14 @@ end;
 {*****************************************************}
 function TALStyledMemo.GetTextPromptColor: TAlphaColor;
 begin
-  result := fTextPromptControl.Color;
+  result := fTextPromptControl.TextSettings.Font.Color;
 end;
 
 {*******************************************************************}
 procedure TALStyledMemo.setTextPromptColor(const Value: TAlphaColor);
 begin
-  fTextPromptControl.Color := Value;
-  fTextPromptControl.clearBufBitmap;
+  fTextPromptControl.TextSettings.Font.Color := Value;
+  fTextPromptControl.clearBufDrawable;
 end;
 
 {******************************************************************}
@@ -1365,15 +1365,14 @@ end;
 
 {*****************************************************}
 procedure TALStyledMemo.OnFontChanged(Sender: TObject);
-var LPreviousColor: TalphaColor;
 begin
-  fTextPromptControl.TextSettings.BeginUpdate;
+  fTextPromptControl.BeginUpdate;
   try
-    LPreviousColor := fTextPromptControl.Color;
+    var LPreviousColor := fTextPromptControl.TextSettings.Font.Color;
     fTextPromptControl.TextSettings.Assign(FTextSettings);
-    fTextPromptControl.color := LPreviousColor;
+    fTextPromptControl.TextSettings.Font.color := LPreviousColor;
   finally
-    fTextPromptControl.TextSettings.EndUpdate;
+    fTextPromptControl.EndUpdate;
   end;
   inherited TextSettings := fTextSettings;
 end;

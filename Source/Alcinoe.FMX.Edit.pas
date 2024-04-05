@@ -29,16 +29,25 @@ uses
   FMX.types,
   Fmx.Graphics,
   Fmx.controls,
+  Alcinoe.FMX.Common,
   Alcinoe.FMX.Objects;
 
 Type
 
-  {**********************************}
-  TALAutoCapitalizationType = (acNone, // Specifies that there is no automatic text capitalization.
-                               acWords, // Specifies automatic capitalization of the first letter of each word.
-                               acSentences, // Specifies automatic capitalization of the first letter of each sentence.
-                               acAllCharacters); // Specifies automatic capitalization of all characters, such as for entry of two-character state abbreviations for the United States.
+  {**********************************************}
+  TALEditTextSettings = class(TALBaseTextSettings)
+  published
+    property Font;
+    property HorzAlign;
+    property VertAlign;
+  end;
 
+  {***************************}
+  TALAutoCapitalizationType = (
+    acNone, // Specifies that there is no automatic text capitalization.
+    acWords, // Specifies automatic capitalization of the first letter of each word.
+    acSentences, // Specifies automatic capitalization of the first letter of each sentence.
+    acAllCharacters); // Specifies automatic capitalization of all characters, such as for entry of two-character state abbreviations for the United States.
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
@@ -110,7 +119,7 @@ type
     FPadding: TBounds;
     fOnChangeTracking: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
-    FTextSettings: TTextSettings;
+    FTextSettings: TALEditTextSettings;
     fMaxLength: integer;
     fApplicationEventMessageID: integer;
     fReturnKeyType: TReturnKeyType;
@@ -136,8 +145,8 @@ type
     procedure setTextPrompt(const Value: String);
     function GetTextPromptColor: TAlphaColor;
     procedure setTextPromptColor(const Value: TAlphaColor);
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
+    function GetTextSettings: TALEditTextSettings;
+    procedure SetTextSettings(const Value: TALEditTextSettings);
     function getText: String;
     procedure SetText(const Value: String);
     function GetLineSpacingMultiplier: single;
@@ -188,7 +197,7 @@ type
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
     property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     property Text: String read getText write SetText;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TALEditTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
     property EditText: TALAndroidEditText read FEditText;
     property LineSpacingMultiplier: single read GetLineSpacingMultiplier write SetLineSpacingMultiplier; // <<  Each line will have its height multiplied by LineSpacingMultiplier
@@ -261,7 +270,7 @@ type
     fTextPromptColor: TalphaColor;
     fOnChangeTracking: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
-    FTextSettings: TTextSettings;
+    FTextSettings: TALEditTextSettings;
     fMaxLength: integer;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
@@ -280,8 +289,8 @@ type
     procedure applyTextPromptWithColor(const aStr: String; const aColor: TAlphaColor);
     function GetTintColor: TAlphaColor;
     procedure setTintColor(const Value: TAlphaColor);
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
+    function GetTextSettings: TALEditTextSettings;
+    procedure SetTextSettings(const Value: TALEditTextSettings);
     function getText: String;
     procedure SetText(const Value: String);
     procedure DoFontChanged;
@@ -322,7 +331,7 @@ type
     property TintColor: TAlphaColor read GetTintColor write setTintColor; // << null mean use the default color
     property MaxLength: integer read fMaxLength write fMaxLength default 0;
     property Text: String read getText write SetText;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TALEditTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
     property TextField: TALIosTextField read FTextField;
   end;
@@ -339,12 +348,11 @@ type
     fDefStyleAttr: String;
     fDefStyleRes: String;
     FAutoTranslate: Boolean;
-    FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
     fOnEnter: TNotifyEvent;
     fOnExit: TNotifyEvent;
-    FTextSettings: TTextSettings;
+    FTextSettings: TALEditTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
     fAutoCapitalizationType: TALAutoCapitalizationType;
@@ -365,8 +373,8 @@ type
     procedure setTextPromptColor(const Value: TAlphaColor);
     function GetTintColor: TAlphaColor;
     procedure setTintColor(const Value: TAlphaColor);
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
+    function GetTextSettings: TALEditTextSettings;
+    procedure SetTextSettings(const Value: TALEditTextSettings);
     procedure OnFontChanged(Sender: TObject);
     function getText: String;
     procedure SetText(const Value: String);
@@ -439,13 +447,12 @@ type
     property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     //property FilterChar;
     property Text: String read getText write SetText;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TALEditTextSettings read GetTextSettings write SetTextSettings;
     property Hint;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default TextPromptColor
     property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColorRec.null; // << IOS only - the color of the cursor caret and the text selection handles. null mean use the default TintColor
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // << just the TextPrompt
-    property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
     property TouchTargetExpansion;
     //property Caret;
     //property KillFocusByReturn; => always true
@@ -493,28 +500,7 @@ uses
   FMX.Consts,
   {$endif}
   Alcinoe.Common,
-  Alcinoe.StringUtils,
-  Alcinoe.FMX.Common;
-
-{**}
-type
-  TALEditTextSettings = class(TTextSettings)
-  public
-    constructor Create(const AOwner: TPersistent); override;
-  published
-    property Font;
-    property FontColor;
-    property HorzAlign default TTextAlign.Leading;
-    property VertAlign default TTextAlign.Center;
-  end;
-
-{****************************************************************}
-constructor TALEditTextSettings.Create(const AOwner: TPersistent);
-begin
-  inherited;
-  HorzAlign := TTextAlign.Leading;
-  VertAlign := TTextAlign.Center;
-end;
+  Alcinoe.StringUtils;
 
 {$REGION ' ANDROID'}
 {$IF defined(android)}
@@ -668,9 +654,8 @@ end;
 
 {********************************************}
 function TALAndroidEditText.CreateView: JView;
-Var LSDKVersion: integer;
 begin
-  LSDKVersion := TJBuild_VERSION.JavaClass.SDK_INT;
+  var LSDKVersion := TJBuild_VERSION.JavaClass.SDK_INT;
   //-----
   if (fDefStyleAttr = '') and
      ((LSDKVersion < 22{lollipop}) or (fDefStyleRes='')) then
@@ -758,7 +743,7 @@ begin
   fOnChangeTracking := nil;
   FOnReturnKey := nil;
   fApplicationEventMessageID := TMessageManager.DefaultManager.SubscribeToMessage(TApplicationEventMessage, ApplicationEventHandler);
-  FTextSettings := TALEditTextSettings.Create(Self);
+  FTextSettings := TALEditTextSettings.Create;
   FTextSettings.OnChanged := OnFontChanged;
   fReturnKeyType := tReturnKeyType.Default;
   fKeyboardType := TVirtualKeyboardType.default;
@@ -799,7 +784,6 @@ procedure TALAndroidEdit.DoSetInputType(
             const aPassword: Boolean;
             const aCheckSpelling: Boolean;
             const aIsMultiline: Boolean);
-var LInputType: integer;
 begin
 
   // TYPE_CLASS_DATETIME: Class for dates and times.
@@ -841,6 +825,7 @@ begin
   // TYPE_TEXT_VARIATION_WEB_EMAIL_ADDRESS: Variation of TYPE_CLASS_TEXT: entering e-mail address inside of a web form.
   // TYPE_TEXT_VARIATION_WEB_PASSWORD: Variation of TYPE_CLASS_TEXT: entering password inside of a web form.
 
+  var LInputType: integer;
   case aKeyboardType of
     TVirtualKeyboardType.Alphabet:              LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
     TVirtualKeyboardType.URL:                   LInputType := TJInputType.JavaClass.TYPE_CLASS_TEXT or TJInputType.JavaClass.TYPE_TEXT_VARIATION_URI;
@@ -931,8 +916,8 @@ end;
 
 {********************************************************************************}
 procedure TALAndroidEdit.DoSetReturnKeyType(const aReturnKeyType: TReturnKeyType);
-var LImeOptions: integer;
 begin
+  var LImeOptions: integer;
   case aReturnKeyType of
     TReturnKeyType.Done:          LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_DONE;
     TReturnKeyType.Go:            LImeOptions := TJEditorInfo.JavaClass.IME_ACTION_NONE; // TJEditorInfo.JavaClass.IME_ACTION_GO; => https://stackoverflow.com/questions/44708338/setimeactionlabel-or-setimeoptions-not-work-i-always-have-caption-done-on-the
@@ -1048,22 +1033,30 @@ end;
 
 {******************************************************}
 procedure TALAndroidEdit.OnFontChanged(Sender: TObject);
-var LTypeface: JTypeface;
-    LGravity: integer;
-    LFontColor: integer;
-    LFontSize: single;
-    LFontStyle: integer;
-    LFontFamily: String;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _getFontFamily(const AFontFamilies: String): String;
+  begin
+    Result := '';
+    var LFontFamilies := AFontFamilies.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+    for var I := low(LFontFamilies) to high(LFontFamilies) do begin
+      Result := ALTrim(LFontFamilies[I]);
+      if Result <> '' then break;
+    end;
+  end;
+
 begin
 
-  LFontColor := integer(ftextsettings.fontcolor);
-  LFontSize := ftextsettings.font.size;
-  if (TFontStyle.fsBold in ftextsettings.font.style) and
-     (TFontStyle.fsItalic in ftextsettings.font.style) then LFontStyle := TJTypeface.JavaClass.BOLD_ITALIC
-  else if (TFontStyle.fsBold in ftextsettings.font.style) then LFontStyle := TJTypeface.JavaClass.BOLD
-  else if (TFontStyle.fsItalic in ftextsettings.font.style) then LFontStyle := TJTypeface.JavaClass.ITALIC
-  else LFontStyle := TJTypeface.JavaClass.NORMAL;
-  LFontFamily := ftextsettings.font.Family;
+  var LFontColor := integer(ftextsettings.font.color);
+  var LFontSize: single := ftextsettings.font.size;
+
+  var LFontStyles: TFontStyles := [];
+  if ftextsettings.font.Weight in [TFontWeight.Bold,
+                                   TFontWeight.UltraBold,
+                                   TFontWeight.Black,
+                                   TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
+  if ftextsettings.font.Slant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
+  var LFontFamily := _getFontFamily(ftextsettings.font.Family);
   //-----
   //top	              0x30	     	Push object to the top of its container, not changing its size.
   //bottom	          0x50	     	Push object to the bottom of its container, not changing its size.
@@ -1079,40 +1072,41 @@ begin
   //clip_horizontal	  0x08       	Additional option that can be set to have the left and/or right edges of the child clipped to its container's bounds. The clip will be based on the horizontal gravity: a left gravity will clip the right edge, a right gravity will clip the left edge, and neither will clip both edges.
   //start	            0x00800003	Push object to the beginning of its container, not changing its size.
   //end	              0x00800005	Push object to the end of its container, not changing its size.
+  var LGravity: integer;
   case ftextsettings.HorzAlign of
-    TTextAlign.Center: LGravity := $01; // center_horizontal 0x01
-    TTextAlign.Leading: LGravity := $03; // left 0x03
-    TTextAlign.Trailing: LGravity := $05; // right 0x05
+    TALTextHorzAlign.Center: LGravity := $01; // center_horizontal 0x01
+    TALTextHorzAlign.Leading: LGravity := $03; // left 0x03
+    TALTextHorzAlign.Trailing: LGravity := $05; // right 0x05
     else LGravity := $03; // left 0x03
   end;
   case ftextsettings.VertAlign of
-    TTextAlign.Center: LGravity := LGravity or $10; // center_vertical 0x10
-    TTextAlign.Leading: LGravity := LGravity or $30; // top 0x30
-    TTextAlign.Trailing: LGravity := LGravity or $50; // bottom 0x50
+    TALTextVertAlign.Center: LGravity := LGravity or $10; // center_vertical 0x10
+    TALTextVertAlign.Leading: LGravity := LGravity or $30; // top 0x30
+    TALTextVertAlign.Trailing: LGravity := LGravity or $50; // bottom 0x50
     else LGravity := LGravity or $10; // center_vertical 0x10
   end;
 
   //-----
-  fEditText.view.setTextColor(LFontColor); // << Sets the text color for all the states (normal, selected, focused) to be this color.
-  fEditText.view.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, LFontSize); // << Set the default text size to a given unit and value.
+  fEditText.view.setTextColor(LFontColor); // Sets the text color for all the states (normal, selected, focused) to be this color.
+  fEditText.view.setTextSize(TJTypedValue.javaclass.COMPLEX_UNIT_DIP, LFontSize); // Set the default text size to a given unit and value.
   //-----
-  LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), LFontStyle);
-  fEditText.view.setTypeface(LTypeface); // << Sets the typeface and style in which the text should be displayed. Note that not all
-                                    //    Typeface families actually have bold and italic variants, so you may need to use setTypeface(Typeface, int)
-                                    //     to get the appearance that you actually want.
+  var LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
+  // Note that not all Typeface families actually have bold and italic variants, so you may
+  // need to use setTypeface(Typeface, int) to get the appearance that you actually want.
+  fEditText.view.setTypeface(LTypeface);
   LTypeface := nil;
   fEditText.view.setgravity(LGravity);
 
 end;
 
 {*****************************************************}
-function TALAndroidEdit.GetTextSettings: TTextSettings;
+function TALAndroidEdit.GetTextSettings: TALEditTextSettings;
 begin
   Result := FTextSettings;
 end;
 
 {*******************************************************************}
-procedure TALAndroidEdit.SetTextSettings(const Value: TTextSettings);
+procedure TALAndroidEdit.SetTextSettings(const Value: TALEditTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
@@ -1424,7 +1418,6 @@ end;
 
 {***********************************************************************************************************************************************}
 function TALIosTextFieldDelegate.textField(textField: UITextField; shouldChangeCharactersInRange: NSRange; replacementString: NSString): Boolean;
-var LText: NSString;
 begin
   {$IF defined(DEBUG)}
   ALLog(
@@ -1436,7 +1429,7 @@ begin
   if FTextField.FEditControl.maxLength > 0 then begin
 
     //https://stackoverflow.com/questions/433337/set-the-maximum-character-length-of-a-uitextfield
-    LText := TNSString.Wrap(textField.text);
+    var LText: NSString := TNSString.Wrap(textField.text);
     if shouldChangeCharactersInRange.length + shouldChangeCharactersInRange.location > LText.length then exit(false);
     result := LText.length + replacementString.length - shouldChangeCharactersInRange.length <= NSUInteger(FTextField.FEditControl.maxLength);
 
@@ -1520,8 +1513,8 @@ end;
 
 {**********************************************************************}
 procedure TalIosEdit.SetKeyboardType(const Value: TVirtualKeyboardType);
-var LUIKeyboardType: UIKeyboardType;
 begin
+  var LUIKeyboardType: UIKeyboardType;
   case Value of
     TVirtualKeyboardType.NumbersAndPunctuation: LUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
     TVirtualKeyboardType.NumberPad:             LUIKeyboardType := UIKeyboardTypeNumberPad;
@@ -1537,9 +1530,8 @@ end;
 
 {********************************************************}
 function TalIosEdit.GetKeyboardType: TVirtualKeyboardType;
-var LUIKeyboardType: UIKeyboardType;
 begin
-  LUIKeyboardType := FTextField.View.KeyboardType;
+  var LUIKeyboardType := FTextField.View.KeyboardType;
   case LUIKeyboardType of
     UIKeyboardTypeNumbersAndPunctuation: result := TVirtualKeyboardType.NumbersAndPunctuation;
     UIKeyboardTypeNumberPad:             result := TVirtualKeyboardType.NumberPad;
@@ -1553,8 +1545,8 @@ end;
 
 {*************************************************************************************}
 procedure TalIosEdit.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
-var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
+  var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
   case Value of
     TALAutoCapitalizationType.acWords:          LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
     TALAutoCapitalizationType.acSentences:      LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
@@ -1566,9 +1558,8 @@ end;
 
 {***********************************************************************}
 function TalIosEdit.GetAutoCapitalizationType: TALAutoCapitalizationType;
-var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
-  LUITextAutoCapitalizationType := FTextField.View.AutoCapitalizationType;
+  var LUITextAutoCapitalizationType := FTextField.View.AutoCapitalizationType;
   case LUITextAutoCapitalizationType of
     UITextAutoCapitalizationTypeWords:         result := TALAutoCapitalizationType.acWords;
     UITextAutoCapitalizationTypeSentences:     result := TALAutoCapitalizationType.acSentences;
@@ -1610,8 +1601,8 @@ end;
 
 {*****************************************************************}
 procedure TalIosEdit.setReturnKeyType(const Value: TReturnKeyType);
-var LUIReturnKeyType: UIReturnKeyType;
 begin
+  var LUIReturnKeyType: UIReturnKeyType;
   case Value of
     TReturnKeyType.Done:           LUIReturnKeyType := UIReturnKeyDone;
     TReturnKeyType.Go:             LUIReturnKeyType := UIReturnKeyGo;
@@ -1625,9 +1616,8 @@ end;
 
 {***************************************************}
 function TalIosEdit.GetReturnKeyType: TReturnKeyType;
-var LUIReturnKeyType: UIReturnKeyType;
 begin
-  LUIReturnKeyType := FTextField.View.ReturnKeyType;
+  var LUIReturnKeyType := FTextField.View.ReturnKeyType;
   case LUIReturnKeyType of
     UIReturnKeyDone:    result := TReturnKeyType.Done;
     UIReturnKeyGo:      result := TReturnKeyType.Go;
@@ -1701,11 +1691,11 @@ end;
 
 {********************************************}
 function TalIosEdit.GetTintColor: TAlphaColor;
-var red: CGFloat;
-    green: CGFloat;
-    blue: CGFloat;
-    alpha: CGFloat;
 begin
+  var red: CGFloat;
+  var green: CGFloat;
+  var blue: CGFloat;
+  var alpha: CGFloat;
   if not FTextField.View.tintColor.getRed(@red, @green, @blue, @alpha) then result := TalphaColorRec.Null
   else result := TAlphaColorF.Create(red, green, blue, alpha).ToAlphaColor;
 end;
@@ -1794,13 +1784,13 @@ begin
 end;
 
 {*************************************************}
-function TalIosEdit.GetTextSettings: TTextSettings;
+function TalIosEdit.GetTextSettings: TALEditTextSettings;
 begin
   Result := FTextSettings;
 end;
 
 {***************************************************************}
-procedure TalIosEdit.SetTextSettings(const Value: TTextSettings);
+procedure TalIosEdit.SetTextSettings(const Value: TALEditTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
@@ -1946,7 +1936,6 @@ begin
   fDefStyleAttr := '';
   fDefStyleRes := '';
   FAutoTranslate := true;
-  FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
   FOnReturnKey := nil;
   fOnEnter := nil;
@@ -1973,7 +1962,7 @@ begin
   fAutoCapitalizationType := TALAutoCapitalizationType.acNone;
   {$ENDIF}
   //-----
-  FTextSettings := TALEditTextSettings.Create(Self);
+  FTextSettings := TALEditTextSettings.Create;
   FTextSettings.OnChanged := OnFontChanged;
   //-----
   fill.DefaultColor := $ffffffff;
@@ -2038,19 +2027,21 @@ end;
 procedure TALEdit.Loaded;
 begin
   if FEditControl = nil then CreateEditControl;
-  //-----
-  if (AutoConvertFontFamily) and
+  //--
+  // csLoading is in ComponentState
+  if (TextSettings.Font.AutoConvert) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
-      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
-  //-----
+    TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
+  //--
+  // remove csLoading from ComponentState
   inherited;
-  //-----
+  //--
   if (AutoTranslate) and
      (TextPrompt <> '') and
      (not (csDesigning in ComponentState)) then
-      TextPrompt := ALTranslate(TextPrompt);
-  //-----
+    TextPrompt := ALTranslate(TextPrompt);
+  //--
   StrokeChanged(stroke);
   OnFontChanged(nil);
 end;
@@ -2108,13 +2099,13 @@ end;
 {$ENDIF}
 
 {**********************************************}
-function TALEdit.GetTextSettings: TTextSettings;
+function TALEdit.GetTextSettings: TALEditTextSettings;
 begin
   Result := FTextSettings;
 end;
 
 {************************************************************}
-procedure TALEdit.SetTextSettings(const Value: TTextSettings);
+procedure TALEdit.SetTextSettings(const Value: TALEditTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
@@ -2124,13 +2115,7 @@ procedure TALEdit.OnFontChanged(Sender: TObject);
 begin
   if csLoading in componentState then exit;
   if FEditControl = nil then CreateEditControl;
-  FEditControl.TextSettings.BeginUpdate;
-  try
-    FEditControl.TextSettings.IsChanged := True;
-    FEditControl.TextSettings.Assign(ftextsettings);
-  finally
-    FEditControl.TextSettings.EndUpdate;
-  end;
+  FEditControl.TextSettings.Assign(ftextsettings);
 end;
 
 {*********************************************}
@@ -2351,14 +2336,13 @@ end;
 
 {***********************************************}
 procedure TALEdit.StrokeChanged(Sender: TObject);
-var LRect: TrectF;
 begin
   inherited StrokeChanged(Sender);
   if csLoading in componentState then exit;
   if FEditControl = nil then CreateEditControl;
   if Stroke.Kind = TbrushKind.None then fEditControl.Margins.Rect := TrectF.Create(0,0,0,0)
   else begin
-    LRect := TrectF.Create(0,0,0,0);
+    var LRect := TrectF.Create(0,0,0,0);
     if (TSide.Top in Sides) then LRect.Top := Stroke.Thickness;
     if (TSide.bottom in Sides) then LRect.bottom := Stroke.Thickness;
     if (TSide.right in Sides) then LRect.right := Stroke.Thickness;

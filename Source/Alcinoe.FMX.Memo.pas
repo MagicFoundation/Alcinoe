@@ -27,7 +27,20 @@ uses
   Fmx.Graphics,
   Fmx.controls,
   Alcinoe.FMX.Edit,
+  Alcinoe.FMX.Common,
   Alcinoe.FMX.Objects;
+
+type
+
+  {**********************************************}
+  TALMemoTextSettings = class(TALBaseTextSettings)
+  public
+    constructor Create; override;
+  published
+    property Font;
+    property HorzAlign;
+    property VertAlign;
+  end;
 
 {$REGION ' IOS'}
 {$IF defined(ios)}
@@ -98,7 +111,7 @@ type
     fLineSpacingMultiplier: single;
     fLineSpacingExtra: single;
     fOnChangeTracking: TNotifyEvent;
-    FTextSettings: TTextSettings;
+    FTextSettings: TALMemoTextSettings;
     fMaxLength: integer;
     procedure setKeyboardType(const Value: TVirtualKeyboardType);
     function GetKeyboardType: TVirtualKeyboardType;
@@ -116,8 +129,8 @@ type
     procedure setTextPromptColor(const Value: TAlphaColor);
     function GetTintColor: TAlphaColor;
     procedure setTintColor(const Value: TAlphaColor);
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
+    function GetTextSettings: TALMemoTextSettings;
+    procedure SetTextSettings(const Value: TALMemoTextSettings);
     function getText: String;
     procedure SetText(const Value: String);
     function GetLineSpacingMultiplier: single;
@@ -165,7 +178,7 @@ type
     property TintColor: TAlphaColor read GetTintColor write setTintColor; // << null mean use the default color
     property MaxLength: integer read fMaxLength write fMaxLength default 0;
     property Text: String read getText write SetText;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TALMemoTextSettings read GetTextSettings write SetTextSettings;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
     property LineSpacingMultiplier: single read GetLineSpacingMultiplier write SetLineSpacingMultiplier; // <<  Each line will have its height multiplied by LineSpacingMultiplier
     property LineSpacingExtra: single read GetLineSpacingExtra write SetLineSpacingExtra; // <<  Each line will have its height added by LineSpacingExtra
@@ -189,7 +202,7 @@ type
     [Weak] FVertScrollBar: TscrollBar;
     fTextPromptControl: TalText;
     FOnChangeTracking: TNotifyEvent;
-    FTextSettings: TTextSettings;
+    FTextSettings: TALMemoTextSettings;
     procedure OnApplyStyleLookupImpl(sender: Tobject);
     procedure SetPadding(const Value: TBounds);
     function GetPadding: TBounds;
@@ -198,8 +211,8 @@ type
     function GetTextPromptColor: TAlphaColor;
     procedure setTextPromptColor(const Value: TAlphaColor);
     procedure OnChangeTrackingImpl(sender: Tobject);
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
+    function GetTextSettings: TALMemoTextSettings;
+    procedure SetTextSettings(const Value: TALMemoTextSettings);
     procedure OnFontChanged(Sender: TObject);
   protected
     procedure DoEnter; override;
@@ -215,7 +228,7 @@ type
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default color
     property Padding: TBounds read GetPadding write SetPadding;
     property OnChangeTracking: TNotifyEvent read FOnChangeTracking write FOnChangeTracking;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TALMemoTextSettings read GetTextSettings write SetTextSettings;
     property ReturnKeyType: TReturnKeyType read fReturnKeyType write fReturnKeyType default TReturnKeyType.Default; // << we don't use it
   end;
 
@@ -231,11 +244,10 @@ type
     fPadding: TBounds;
     fDefStyleAttr: String;
     FAutoTranslate: Boolean;
-    FAutoConvertFontFamily: boolean;
     fOnChangeTracking: TNotifyEvent;
     fOnEnter: TNotifyEvent;
     fOnExit: TNotifyEvent;
-    FTextSettings: TTextSettings;
+    FTextSettings: TALMemoTextSettings;
     {$IF defined(android)}
     fTintColor: TalphaColor;
     fAutoCapitalizationType: TALAutoCapitalizationType;
@@ -263,8 +275,8 @@ type
     function GetLineSpacingExtra: single;
     procedure SetLineSpacingExtra(const Value: single);
     function LineSpacingExtraStored: boolean;
-    function GetTextSettings: TTextSettings;
-    procedure SetTextSettings(const Value: TTextSettings);
+    function GetTextSettings: TALMemoTextSettings;
+    procedure SetTextSettings(const Value: TALMemoTextSettings);
     procedure OnFontChanged(Sender: TObject);
     function getText: String;
     procedure SetText(const Value: String);
@@ -328,7 +340,7 @@ type
     property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
     //property FilterChar;
     property Text: String read getText write SetText;
-    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TALMemoTextSettings read GetTextSettings write SetTextSettings;
     property Hint;
     property TextPrompt: String read GetTextPrompt write setTextPrompt;
     property TextPromptColor: TAlphaColor read GetTextPromptColor write setTextPromptColor default TalphaColorRec.null; // << null mean use the default TextPromptColor
@@ -336,7 +348,6 @@ type
     property LineSpacingExtra: single read GetLineSpacingExtra write SetLineSpacingExtra stored LineSpacingExtraStored; // <<  Each line will have its height added LineSpacingExtra
     property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColorRec.null; // << IOS only - the color of the cursor caret and the text selection handles. null mean use the default TintColor
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // << just the TextPrompt
-    property AutoConvertFontFamily: Boolean read FAutoConvertFontFamily write fAutoConvertFontFamily default true;
     property TouchTargetExpansion;
     //property Caret;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
@@ -376,29 +387,14 @@ uses
   system.Math,
   system.Math.Vectors,
   fmx.consts,
-  Alcinoe.Common,
-  Alcinoe.FMX.Common;
+  Alcinoe.Common;
 
-{**}
-type
-  TALMemoTextSettings = class(TTextSettings)
-  public
-    constructor Create(const AOwner: TPersistent); override;
-  published
-    property Font;
-    property FontColor;
-    property HorzAlign default TTextAlign.Leading;
-    property VertAlign default TTextAlign.Leading;
-    property WordWrap default True;
-  end;
-
-{****************************************************************}
-constructor TALMemoTextSettings.Create(const AOwner: TPersistent);
+{*************************************}
+constructor TALMemoTextSettings.Create;
 begin
-  inherited;
-  HorzAlign := TTextAlign.Leading;
-  VertAlign := TTextAlign.Leading;
-  WordWrap := True;
+  inherited Create;
+  DefaultVertAlign := TALTextVertAlign.Leading;
+  VertAlign := DefaultVertAlign;
 end;
 
 {$REGION ' IOS'}
@@ -406,11 +402,10 @@ end;
 
 {********************************}
 constructor TALIosTextView.Create;
-var LUIColor: UIColor;
 begin
   inherited;
   View.setExclusiveTouch(True);
-  LUIColor := AlphaColorToUIColor(TalphaColorRec.Null);
+  var LUIColor := AlphaColorToUIColor(TalphaColorRec.Null);
   View.setbackgroundColor(LUIColor);
   //NOTE: if i try to release the aUIColor i have an exception
   //      so it's seam something acquire it
@@ -489,13 +484,12 @@ end;
 
 {********************************************************************************}
 procedure TALIosTextViewDelegate.textViewDidChangeSelection(textView: UITextView);
-var LSelectedTextRange: NSRange;
 begin
   {$IF defined(DEBUG)}
   //ALLog('TALIosTextViewDelegate.textViewDidChangeSelection', TalLogType.VERBOSE);
   {$ENDIF}
   if FTextView.FMemoControl.fTextPromptVisible then begin
-    LSelectedTextRange := textView.selectedRange;
+    var LSelectedTextRange: NSRange := textView.selectedRange;
     if (LSelectedTextRange.location <> 0) or (LSelectedTextRange.length <> 0) then begin // << else i have a infinite loop when i cut a big text
       LSelectedTextRange.location := 0;
       LSelectedTextRange.length := 0;
@@ -617,9 +611,8 @@ end;
 
 {****************************************}
 function TALIosMemo.getLineCount: integer;
-var LLineHeight: Single;
 begin
-  LLineHeight := getLineHeight;
+  var LLineHeight: Single := getLineHeight;
   if compareValue(LLineHeight, 0, Tepsilon.Position) > 0 then result := round(FTextView.View.contentSize.height / LLineHeight)
   else result := 0;
   {$IF defined(DEBUG)}
@@ -636,8 +629,8 @@ end;
 
 {**********************************************************************}
 procedure TALIosMemo.SetKeyboardType(const Value: TVirtualKeyboardType);
-var LUIKeyboardType: UIKeyboardType;
 begin
+  var LUIKeyboardType: UIKeyboardType;
   case Value of
     TVirtualKeyboardType.NumbersAndPunctuation: LUIKeyboardType := UIKeyboardTypeNumbersAndPunctuation;
     TVirtualKeyboardType.NumberPad:             LUIKeyboardType := UIKeyboardTypeNumberPad;
@@ -653,9 +646,8 @@ end;
 
 {********************************************************}
 function TALIosMemo.GetKeyboardType: TVirtualKeyboardType;
-var LUIKeyboardType: UIKeyboardType;
 begin
-  LUIKeyboardType := FTextView.View.KeyboardType;
+  var LUIKeyboardType := FTextView.View.KeyboardType;
   case LUIKeyboardType of
     UIKeyboardTypeNumbersAndPunctuation: result := TVirtualKeyboardType.NumbersAndPunctuation;
     UIKeyboardTypeNumberPad:             result := TVirtualKeyboardType.NumberPad;
@@ -669,8 +661,8 @@ end;
 
 {*************************************************************************************}
 procedure TALIosMemo.setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
-var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
+  var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
   case Value of
     TALAutoCapitalizationType.acWords:          LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeWords;
     TALAutoCapitalizationType.acSentences:      LUITextAutoCapitalizationType := UITextAutoCapitalizationTypeSentences;
@@ -682,9 +674,8 @@ end;
 
 {***********************************************************************}
 function TALIosMemo.GetAutoCapitalizationType: TALAutoCapitalizationType;
-var LUITextAutoCapitalizationType: UITextAutoCapitalizationType;
 begin
-  LUITextAutoCapitalizationType := FTextView.View.AutoCapitalizationType;
+  var LUITextAutoCapitalizationType := FTextView.View.AutoCapitalizationType;
   case LUITextAutoCapitalizationType of
     UITextAutoCapitalizationTypeWords:         result := TALAutoCapitalizationType.acWords;
     UITextAutoCapitalizationTypeSentences:     result := TALAutoCapitalizationType.acSentences;
@@ -726,8 +717,8 @@ end;
 
 {*****************************************************************}
 procedure TALIosMemo.setReturnKeyType(const Value: TReturnKeyType);
-var LUIReturnKeyType: UIReturnKeyType;
 begin
+  var LUIReturnKeyType: UIReturnKeyType;
   case Value of
     TReturnKeyType.Done:           LUIReturnKeyType := UIReturnKeyDone;
     TReturnKeyType.Go:             LUIReturnKeyType := UIReturnKeyGo;
@@ -741,9 +732,8 @@ end;
 
 {***************************************************}
 function TALIosMemo.GetReturnKeyType: TReturnKeyType;
-var LUIReturnKeyType: UIReturnKeyType;
 begin
-  LUIReturnKeyType := FTextView.View.ReturnKeyType;
+  var LUIReturnKeyType := FTextView.View.ReturnKeyType;
   case LUIReturnKeyType of
     UIReturnKeyDone:    result := TReturnKeyType.Done;
     UIReturnKeyGo:      result := TReturnKeyType.Go;
@@ -790,11 +780,11 @@ end;
 
 {********************************************}
 function TALIosMemo.GetTintColor: TAlphaColor;
-var red: CGFloat;
-    green: CGFloat;
-    blue: CGFloat;
-    alpha: CGFloat;
 begin
+  var red: CGFloat;
+  var green: CGFloat;
+  var blue: CGFloat;
+  var alpha: CGFloat;
   if not FTextView.View.tintColor.getRed(@red, @green, @blue, @alpha) then result := TalphaColorRec.Null
   else result := TAlphaColorF.Create(red, green, blue, alpha).ToAlphaColor;
 end;
@@ -1005,13 +995,13 @@ begin
 end;
 
 {*************************************************}
-function TALIosMemo.GetTextSettings: TTextSettings;
+function TALIosMemo.GetTextSettings: TALMemoTextSettings;
 begin
   Result := FTextSettings;
 end;
 
 {***************************************************************}
-procedure TALIosMemo.SetTextSettings(const Value: TTextSettings);
+procedure TALIosMemo.SetTextSettings(const Value: TALMemoTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
@@ -1025,11 +1015,11 @@ end;
 
 {**************************}
 procedure TALIosMemo.Resize;
-var LContentOffset: NSPoint;
 begin
   inherited;
   FTextView.size := Size.size;
   if compareValue(FTextView.View.contentSize.height, Size.size.cy, Tepsilon.Position) <= 0 then begin
+    var LContentOffset: NSPoint;
     LContentOffset.x := 0;
     LContentOffset.y := 0;
     FTextView.View.setContentOffset(LContentOffset, false{animated}); // << Scroll to top to avoid wrong contentOffset" artefact when line count changes
@@ -1168,7 +1158,7 @@ begin
   OnApplyStyleLookup := OnApplyStyleLookupImpl;
   FVertScrollBar := nil;
   FPadding := TBounds.Create(TRectF.Empty);
-  FTextSettings := TALMemoTextSettings.Create(Self);
+  FTextSettings := TALMemoTextSettings.Create;
   FTextSettings.OnChanged := OnFontChanged;
   fTextPromptControl := TalText.Create(self);
   fTextPromptControl.Parent := Self;
@@ -1282,20 +1272,18 @@ end;
 
 {*****************************}
 procedure TALStyledMemo.Resize;
-var LText: String;
 begin
   inherited;
-  LText := Lines.Text;   // => need to do this bullsheet because sometime the lines are not corectly aligned and it's the
-  Lines.Text := '';      // => only way i found to force this function to run: TStyledMemo.TLines.RenderLayouts;
-  Lines.Text := LText;   // => i m lazzy to open a bug report (and to make the bug demo program) for emb, i do not work for them after all ...
+  var LText := Lines.Text; // => Need to do this bullsheet because sometime the lines are not corectly aligned and it's the
+  Lines.Text := '';        // => only way i found to force this function to run: TStyledMemo.TLines.RenderLayouts;
+  Lines.Text := LText;     // => I m lazzy to open a bug report
   realignScrollBars;
 end;
 
 {*******************************************************}
 procedure TALStyledMemo.SetPadding(const Value: TBounds);
-var LRect: Trectf;
 begin
-  LRect := Value.Rect;
+  var LRect := Value.Rect;
   if fVertScrollBar <> nil then LRect.Right := LRect.Right + fVertScrollBar.Width;
   margins.Rect := LRect;
   FPadding.Assign(Value);
@@ -1351,14 +1339,14 @@ begin
 end;
 
 {******************************************************************}
-procedure TALStyledMemo.SetTextSettings(const Value: TTextSettings);
+procedure TALStyledMemo.SetTextSettings(const Value: TALMemoTextSettings);
 begin
   fTextSettings.Assign(Value);
-  inherited TextSettings := Value;
+  (inherited TextSettings).Assign(Value);
 end;
 
 {****************************************************}
-function TALStyledMemo.GetTextSettings: TTextSettings;
+function TALStyledMemo.GetTextSettings: TALMemoTextSettings;
 begin
   Result := fTextSettings;
 end;
@@ -1374,7 +1362,7 @@ begin
   finally
     fTextPromptControl.EndUpdate;
   end;
-  inherited TextSettings := fTextSettings;
+  (inherited TextSettings).Assign(fTextSettings);
 end;
 
 {*******************************************}
@@ -1387,9 +1375,8 @@ end;
 
 {*******************************************}
 function TALStyledMemo.getLineCount: integer;
-var LLineHeight: Single;
 begin
-  LLineHeight := getLineHeight;
+  var LLineHeight: Single := getLineHeight;
   if compareValue(LLineHeight, 0, Tepsilon.Position) > 0 then result := round(ContentBounds.Height / LLineHeight)
   else result := 0;
 end;
@@ -1405,7 +1392,6 @@ begin
   fPadding.OnChange := PaddingChangedHandler;
   fDefStyleAttr := '';
   FAutoTranslate := true;
-  FAutoConvertFontFamily := True;
   fOnChangeTracking := nil;
   fOnEnter := nil;
   fOnExit := nil;
@@ -1432,7 +1418,7 @@ begin
   fAutoCapitalizationType := TALAutoCapitalizationType.acNone;
   {$ENDIF}
   //-----
-  FTextSettings := TALMemoTextSettings.Create(Self);
+  FTextSettings := TALMemoTextSettings.Create;
   FTextSettings.OnChanged := OnFontChanged;
   //-----
   fill.DefaultColor := $ffffffff;
@@ -1497,19 +1483,21 @@ end;
 procedure TALMemo.Loaded;
 begin
   if FMemoControl = nil then CreateMemoControl;
-  //-----
-  if (AutoConvertFontFamily) and
+  //--
+  // csLoading is in ComponentState
+  if (TextSettings.Font.AutoConvert) and
      (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
-      TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
-  //-----
+    TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
+  //--
+  // remove csLoading from ComponentState
   inherited;
-  //-----
+  //--
   if (AutoTranslate) and
      (TextPrompt <> '') and
      (not (csDesigning in ComponentState)) then
-      TextPrompt := ALTranslate(TextPrompt);
-  //-----
+    TextPrompt := ALTranslate(TextPrompt);
+  //--
   StrokeChanged(stroke);
   OnFontChanged(nil);
   PaddingChangedHandler(fPadding);
@@ -1552,13 +1540,13 @@ end;
 {$ENDIF}
 
 {**********************************************}
-function TALMemo.GetTextSettings: TTextSettings;
+function TALMemo.GetTextSettings: TALMemoTextSettings;
 begin
   Result := FTextSettings;
 end;
 
 {************************************************************}
-procedure TALMemo.SetTextSettings(const Value: TTextSettings);
+procedure TALMemo.SetTextSettings(const Value: TALMemoTextSettings);
 begin
   FTextSettings.Assign(Value);
 end;
@@ -1568,13 +1556,7 @@ procedure TALMemo.OnFontChanged(Sender: TObject);
 begin
   if csLoading in componentState then exit;
   if FMemoControl = nil then CreateMemoControl;
-  FMemoControl.TextSettings.BeginUpdate;
-  try
-    FMemoControl.TextSettings.IsChanged := True;
-    FMemoControl.TextSettings.Assign(ftextsettings);
-  finally
-    FMemoControl.TextSettings.EndUpdate;
-  end;
+  FMemoControl.TextSettings.Assign(ftextsettings);
 end;
 
 {*********************************************}
@@ -1826,14 +1808,13 @@ end;
 
 {***********************************************}
 procedure TALMemo.StrokeChanged(Sender: TObject);
-var LRect: TrectF;
 begin
   inherited StrokeChanged(Sender);
   if csLoading in componentState then exit;
   if FMemoControl = nil then CreateMemoControl;
   if Stroke.Kind = TbrushKind.None then FMemoControl.Margins.Rect := TrectF.Create(0,0,0,0)
   else begin
-    LRect := TrectF.Create(0,0,0,0);
+    var LRect := TrectF.Create(0,0,0,0);
     if (TSide.Top in Sides) then LRect.Top := Stroke.Thickness;
     if (TSide.bottom in Sides) then LRect.bottom := Stroke.Thickness;
     if (TSide.right in Sides) then LRect.right := Stroke.Thickness;
@@ -1853,7 +1834,7 @@ end;
 function TALMemo.GetCanFocus: Boolean;
 begin
   {$IF defined(DEBUG)}
-  ALLog('TALEdit.GetCanFocus', 'name: ' + Name, TalLogType.VERBOSE);
+  ALLog('TALMemo.GetCanFocus', 'name: ' + Name, TalLogType.VERBOSE);
   {$ENDIF}
   if FMemoControl = nil then CreateMemoControl;
   result := inherited GetCanFocus;

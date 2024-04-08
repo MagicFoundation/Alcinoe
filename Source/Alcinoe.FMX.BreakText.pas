@@ -7,153 +7,10 @@ interface
 uses
   System.UITypes,
   System.Types,
-  System.Generics.Collections,
-  {$IF defined(ALSkiaCanvas)}
-  System.Skia.API,
-  {$ENDIF}
-  {$IF defined(ios)}
-  iOSapi.CoreGraphics,
-  iOSapi.CoreText,
-  {$ENDIF}
-  {$IF defined(ANDROID)}
-  Androidapi.JNI.GraphicsContentViewText,
-  Androidapi.JNI.JavaTypes,
-  fmx.types3D,
-  {$ENDIF}
-  Alcinoe.FMX.Common,
-  Alcinoe.FMX.Graphics,
   Fmx.types,
-  FMX.graphics;
-
-{$REGION ' ANDROID'}
-{$IF defined(ANDROID)}
-type
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALJBreakTextItem = class(Tobject)
-  public
-    TypeFace: JTypeface;
-    line: JString;
-    pos: TpointF; // << Pos of the bottom of the text (without descent)
-    rect: TrectF;
-    fontColor: TalphaColor; // << Not initialised by ALBreakText
-    fontStyle: TFontStyles; // << Not initialised by ALBreakText
-    id: string; // << Not initialised by ALBreakText
-    imgSrc: string; // << Not initialised by ALBreakText
-    isEllipsis: Boolean;
-    constructor Create;
-    destructor Destroy; override;
-  end;
-  TALJBreakTextItems = class(TobjectList<TALJBreakTextItem>);
-
-{********************}
-function ALJBreakText(
-           const APaint: JPaint;
-           const AFontFamily: String;
-           const AFontSize: single;
-           const AFontStyle: TFontStyles;
-           const AFontColor: TalphaColor;
-           var ARect: TRectF;
-           const AText: JString;
-           const AWordWrap: Boolean;
-           const AHTextAlign, AVTextAlign: TTextAlign;
-           const ATrimming: TALTextTrimming;
-           const ABreakTextItems: TALJBreakTextItems;
-           out ATotalLines: integer;
-           out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-           const AFirstLineIndent: TpointF;
-           const ALineSpacing: single = 0;
-           const AEllipsisText: JString = nil;
-           const AEllipsisFontStyle: TFontStyles = [];
-           const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-           const AMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-{$ENDIF}
-{$ENDREGION}
-
-{$REGION ' IOS'}
-{$IF defined(IOS)}
-type
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCTBreakTextItem = class(Tobject)
-  public
-    Line: CTLineRef;
-    text: String;
-    pos: TpointF; // << Pos of the bottom of the text (without descent)
-    rect: TrectF;
-    fontColor: TalphaColor; // << Not initialised by ALBreakText
-    fontStyle: TFontStyles; // << Not initialised by ALBreakText
-    id: string; // << Not initialised by ALBreakText
-    imgSrc: string; // << Not initialised by ALBreakText
-    isEllipsis: Boolean;
-    constructor Create;
-    destructor Destroy; override;
-  end;
-  TALCTBreakTextItems = class(TobjectList<TALCTBreakTextItem>);
-
-{*********************}
-function ALCTBreakText(
-           const AFontFamily: String;
-           const AFontSize: single;
-           const AFontStyle: TFontStyles;
-           const AFontColor: TalphaColor;
-           var ARect: TRectF;
-           const AText: string;
-           const AWordWrap: Boolean;
-           const AHTextAlign, AVTextAlign: TTextAlign;
-           const ATrimming: TALTextTrimming; // TALTextTrimming.word not yet supported - TALTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const ABreakTextItems: TALCTBreakTextItems;
-           out ATotalLines: integer;
-           out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-           const AFirstLineIndent: TpointF;
-           const ALineSpacing: single = 0;
-           const AEllipsisText: string = '…';
-           const AEllipsisFontStyle: TFontStyles = [];
-           const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-           const AMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-{$ENDIF}
-{$ENDREGION}
-
-{$REGION ' ALL'}
-type
-
-  {~~~~~~~~~~~~~~~~~}
-  //TL for TextLayout
-  TALTLBreakTextItem = class(Tobject)
-  public
-    Line: String;
-    pos: TpointF; // << Pos of the bottom of the text (without descent)
-    rect: TrectF;
-    fontColor: TalphaColor; // << Not initialised by ALBreakText
-    fontStyle: TFontStyles; // << Not initialised by ALBreakText
-    id: string; // << Not initialised by ALBreakText
-    imgSrc: string; // << Not initialised by ALBreakText
-    isEllipsis: Boolean;
-    constructor Create;
-  end;
-  TALTLBreakTextItems = class(TobjectList<TALTLBreakTextItem>);
-
-{*******************}
-function ALTLBreakText(
-           const AFontFamily: String;
-           const AFontSize: single;
-           const AFontStyle: TFontStyles;
-           const AFontColor: TalphaColor;
-           var ARect: TRectF;
-           const AText: string;
-           const AWordWrap: Boolean;
-           const AHTextAlign, AVTextAlign: TTextAlign;
-           const ATrimming: TALTextTrimming;
-           const ABreakTextItems: TALTLBreakTextItems;
-           out ATotalLines: integer;
-           out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-           const AFirstLineIndent: TpointF;
-           const ALineSpacing: single = 0;
-           const AEllipsisText: string = '…';
-           const AEllipsisFontStyle: TFontStyles = [];
-           const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-           const AMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-{$ENDREGION}
+  FMX.graphics,
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.Graphics;
 
 type
 
@@ -165,13 +22,15 @@ type
   end;
   TALTextElements = array of TALTextElement;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALDrawMultiLineTextOptions = class(Tobject)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALMultiLineTextOptions = class(Tobject)
   private
     FFill: TBrush;  // default = nil
     FStroke: TStrokeBrush; // default = nil
+    FShadow: TALShadow; // default = nil
     function GetFill: TBrush;
     function GetStroke: TStrokeBrush;
+    function GetShadow: TALShadow;
   public
     Scale: Single; // default = 1
     //--
@@ -187,13 +46,12 @@ type
     DecorationThicknessMultiplier: Single; // default = 1
     DecorationColor: TAlphaColor; // default = TAlphaColors.Null
     //--
-    // If EllipsisFontFamily is set to an empty string (''), then all ellipsis
-    // font settings (like font size, style, weight, decoration, etc.) will be
-    // inherited from the main font settings.
     EllipsisText: String; // default = '…';
+    EllipsisInheritSettings: Boolean; // default = True;
+    //--
     EllipsisFontFamily: String; // default = ''
     EllipsisFontSize: single; // default = 14
-    EllipsisFontWeight: TFontWeight; // default = TFontWeight.Regular;
+    EllipsisFontWeight: TFontWeight; // default = TFontWeight.Regular
     EllipsisFontSlant: TFontSlant; // default = TFontSlant.Regular
     EllipsisFontStretch: TFontStretch; // default = TFontStretch.Regular
     EllipsisFontColor: TalphaColor; // default = TAlphaColors.Black
@@ -203,23 +61,28 @@ type
     EllipsisDecorationThicknessMultiplier: Single; // default = 1
     EllipsisDecorationColor: TAlphaColor; // default = TAlphaColors.Null
     //--
-    AutoSize: Boolean; // default = True;
-    AutoSizeX: Boolean; // default = False;
-    AutoSizeY: Boolean; // default = False;
-    MaxLines: integer; // default = 65535;
-    LineHeight: single; // default = 0;
-    LineSpacing: single; // default = 0;
-    LetterSpacing: Single; // default = 0;
-    Trimming: TALTextTrimming; // default = TALTextTrimming.Word;
+    AutoSize: Boolean; // default = True
+    AutoSizeX: Boolean; // default = False
+    AutoSizeY: Boolean; // default = False
+    MaxLines: integer; // default = 65535
+    // When LineHeightMultiplier = 0 the line height will be the sum of the font ascent + font descent + font leading.
+    // When LineHeightMultiplier is non-null, the line height of the span of text will be a multiple of fontSize and be exactly fontSize * height logical pixels tall
+    LineHeightMultiplier: single; // default = 0
+    LetterSpacing: Single; // default = 0
+    Trimming: TALTextTrimming; // default = TALTextTrimming.Word
     FailIfTextBroken: boolean; // default = false
     //--
     Direction: TALTextDirection; // default = TALTextDirection.LeftToRight
-    HTextAlign: TALTextHorzAlign; // default = TALTextHorzAlign.Leading;
-    VTextAlign: TALTextVertAlign; // default = TALTextVertAlign.Leading;
+    HTextAlign: TALTextHorzAlign; // default = TALTextHorzAlign.Leading
+    VTextAlign: TALTextVertAlign; // default = TALTextVertAlign.Leading
     //--
     FillColor: TAlphaColor; // default = TAlphaColors.null - not used if Fill is provided
     StrokeColor: TalphaColor; // default = TAlphaColors.null - not used if Stroke is provided
     StrokeThickness: Single; // default = 1 - not used if Stroke is provided
+    ShadowColor: TAlphaColor; // default = TAlphaColors.null - not used if Shadow is provided
+    ShadowBlur: Single; // default = 12 - not used if Shadow is provided
+    ShadowOffsetX: Single; // default = 0 - not used if Shadow is provided
+    ShadowOffsetY: Single; // default = 0 - not used if Shadow is provided
     //--
     Sides: TSides; // default = AllSides
     XRadius: Single; // default = 0
@@ -231,22 +94,12 @@ type
     //   * <br>
     //   * <b>...</b>
     //   * <i>...</i>
-    //   * <font color="#FFFFFF">...</font>
-    //   * <span id="xxx"
-    //           color="#FFFFFF"
-    //           font-weight="bold"
-    //           font-style="italic">...</span>
-    //   * <img src="{ResourceName}">
-    //   * Other "<" and ">" must be encoded with "&lt;" and "&gt;"
-    //
-    // Tags supported only when Skia is enabled:
     //   * <font color="#FFFFFF"
-    //           size="14"
     //           face="Roboto">...</font>
     //   * <span id="xxx"
     //           color="#FFFFFF"
     //           font-family="Roboto"
-    //           font-size="14"
+    //           font-size="14px"
     //           font-weight="bold"
     //           font-style="italic"
     //           font-stretch="condensed"
@@ -254,15 +107,16 @@ type
     //           text-decoration-style="solid"
     //           text-decoration-thickness="3"
     //           text-decoration-color="#FFFFFF"
-    //           line-height="15px"
+    //           line-height="1.6"
     //           letter-spacing="2px"
     //           background-color="#FFFFFF">...</span>
     //   * <img src="{ResourceName}"
     //          width="xxx"
     //          height="xxx">
+    //   * Other "<" and ">" must be encoded with "&lt;" and "&gt;"
     //
     // Note: You can also use the "style" attribute for inline styling
-    // Ex: <span style="font-size=14; font-style=italic">
+    // Ex: <span style="font-size:14px;font-style:italic">
     TextIsHtml: boolean; // default = false;
     //--
     constructor Create;
@@ -270,14 +124,17 @@ type
     //--
     property Fill: TBrush read GetFill;  // default = nil
     property Stroke: TStrokeBrush read GetStroke; // default = nil
+    property Shadow: TALShadow read GetShadow; // default = nil
     function IsFillAssigned: Boolean;
     function IsStrokeAssigned: Boolean;
+    function IsShadowAssigned: Boolean;
     function GetScaledFontSize: Single; inline;
     function GetScaledEllipsisFontSize: Single; inline;
-    function GetScaledLineHeight: Single; inline;
-    function GetScaledLineSpacing: Single; inline;
     function GetScaledLetterSpacing: Single; inline;
     function GetScaledStrokeThickness: Single; inline;
+    function GetScaledShadowBlur: Single; inline;
+    function GetScaledShadowOffsetX: Single; inline;
+    function GetScaledShadowOffsetY: Single; inline;
     function GetScaledXRadius: Single; inline;
     function GetScaledYRadius: Single; inline;
     function GetScaledPaddingTop: Single; inline;
@@ -286,28 +143,40 @@ type
     function GetScaledPaddingBottom: Single; inline;
   End;
 
-function ALDrawMultiLineText(
-           const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALDrawMultiLineTextOptions.TextIsHtml field declaration.
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
+function ALCreateMultiLineTextDrawable(
+           const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable; overload;
-function ALDrawMultiLineText(
+           const AOptions: TALMultiLineTextOptions): TALDrawable; overload;
+function ALCreateMultiLineTextDrawable(
            const AText: String;
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable; inline; overload;
-function ALDrawMultiLineText(
+           const AOptions: TALMultiLineTextOptions): TALDrawable; inline; overload;
+function ALCreateMultiLineTextDrawable(
            const AText: String;
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable; inline; overload;
-function ALDrawMultiLineText(
+           const AOptions: TALMultiLineTextOptions): TALDrawable; inline; overload;
+function ALCreateMultiLineTextDrawable(
            const AText: String;
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable; inline; overload;
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+           const AOptions: TALMultiLineTextOptions): TALDrawable; inline; overload;
 
 function ALGetTextElementsByID(Const ATextElements: TALTextElements; Const AId: String): TALTextElements;
 
@@ -318,25 +187,69 @@ uses
   system.SysUtils,
   System.Character,
   System.Math,
-  {$IF defined(ANDROID)}
-  Androidapi.JNIBridge,
-  Androidapi.Helpers,
-  Androidapi.JNI.Os,
-  {$ENDIF}
-  {$IF defined(IOS)}
-  iOSapi.CocoaTypes,
-  Macapi.CoreFoundation,
-  Macapi.Helpers,
-  fmx.types3D,
-  fmx.surfaces,
-  {$ENDIF}
-  {$IF defined(ALSkiaCanvas)}
+  System.Generics.Collections,
+  {$IF defined(ALSkiaEngine)}
+  System.Skia.API,
   Fmx.skia,
   {$ENDIF}
-  FMX.TextLayout,
+  {$IF not defined(ALSkiaEngine)}
+  System.SyncObjs,
+  Alcinoe.Cipher,
+  {$ENDIF}
+  {$IF defined(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
+  Androidapi.JNI.JavaTypes,
+  Androidapi.JNIBridge,
+  Androidapi.Helpers,
+  {$ENDIF}
+  {$IF defined(ios)}
+  iOSapi.CoreGraphics,
+  iOSapi.CoreText,
+  Macapi.CoreFoundation,
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
+  Macapi.CocoaTypes,
+  Macapi.CoreGraphics,
+  Macapi.CoreText,
+  Macapi.CoreFoundation,
+  {$ENDIF}
+  {$IF defined(MSWINDOWS)}
+  Winapi.Windows,
+  FMX.Helpers.Win,
+  FMX.Utils,
+  {$ENDIF}
   Alcinoe.StringList,
   Alcinoe.StringUtils,
   Alcinoe.Common;
+
+{*****************************}
+{$IF not defined(ALSkiaEngine)}
+Type
+
+  TALFontMetrics = record
+    Ascent: Single; // The recommended distance above the baseline for singled spaced text.
+    Descent: Single; // The recommended distance below the baseline for singled spaced text.
+  end;
+
+  // packed because of https://stackoverflow.com/questions/61731462/is-this-declaration-good-tdictionarytpairint32-int64-bool
+  TALFontMetricsKey = packed record
+    FontFamily: TALSHA1Digest;
+    FontSize: single;
+    FontWeight: TFontWeight;
+    FontSlant: TFontSlant;
+    FontStretch: TFontStretch;
+    FontColor: TalphaColor;
+    DecorationKinds: TALTextDecorationKinds;
+    DecorationStyle: TALTextDecorationStyle;
+    DecorationThicknessMultiplier: Single;
+    DecorationColor: TAlphaColor;
+    LetterSpacing: Single;
+  end;
+
+var
+  ALFontMetricsCache: TDictionary<TALFontMetricsKey, TALFontMetrics>;
+  ALFontMetricsCacheLock: TLightweightMREW;
+{$ENDIF}
 
 {**************************************************}
 class function TALTextElement.Empty: TALTextElement;
@@ -345,2055 +258,8 @@ begin
   Result.Rect := TRectF.Empty;
 end;
 
-{********************}
-{$IF defined(ANDROID)}
-constructor TALJBreakTextItem.Create;
-begin
-  inherited;
-  TypeFace := nil;
-  Line := nil;
-  isEllipsis := False;
-end;
-{$ENDIF}
-
-{*********************}
-{$IF defined(ANDROID)}
-destructor TALJBreakTextItem.Destroy;
-begin
-  TypeFace := nil;
-  line := Nil;
-  inherited;
-end;
-{$ENDIF}
-
-{*****************************************************************************}
-// !! This function is duplicated in ALTLBreakText. Should there be any updates
-// to this function, ensure to apply the same changes to ALTLBreakText as well.
-{$IF defined(ANDROID)}
-function ALJBreakText(
-           const APaint: JPaint;
-           const AFontFamily: String;
-           const AFontSize: single;
-           const AFontStyle: TFontStyles;
-           const AFontColor: TalphaColor;
-           var ARect: TRectF;
-           const AText: JString;
-           const AWordWrap: Boolean;
-           const AHTextAlign, AVTextAlign: TTextAlign;
-           const ATrimming: TALTextTrimming;
-           const ABreakTextItems: TALJBreakTextItems;
-           out ATotalLines: integer;
-           out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-           const AFirstLineIndent: TpointF;
-           const ALineSpacing: single = 0;
-           const AEllipsisText: JString = nil;
-           const AEllipsisFontStyle: TFontStyles = [];
-           const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-           const AMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines or truncated
-
-var
-  LLineIndent: Single;
-  LTypeface: JTypeFace;
-  LEllipsisTypeface: JTypeFace;
-  LEllipsisLine: Jstring;
-  LEllipsisLineLn: single;
-  LEllipsisLinePos: TpointF;
-  LEllipsisLineRect: TrectF;
-  LFontMetrics: JPaint_FontMetricsInt;
-  LMaxWidth: single;
-  LCurrLineY: single;
-
-  {~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _initEllipsis;
-  begin
-    if LEllipsisLine = nil then begin
-      if AEllipsisText = nil then LEllipsisLine := StringtoJString(string('…'))
-      else LEllipsisLine := AEllipsisText;
-      //-----
-      LEllipsisTypeface := TJTypeface.JavaClass.create(StringToJString(AFontFamily), ALfontStyleToAndroidStyle(AEllipsisFontStyle));
-      APaint.setTypeface(LEllipsisTypeface);
-      if AEllipsisFontColor <> TAlphaColorRec.Null then APaint.setColor(integer(AEllipsisFontColor));
-      //-----
-      LEllipsisLineLn := APaint.measureText(LEllipsisLine);
-      //-----
-      APaint.setTypeface(LTypeFace);
-      if AEllipsisFontColor <> TAlphaColorRec.Null then APaint.setColor(integer(integer(AFontColor)));
-      //-----
-      case AHTextAlign of
-        TTextAlign.Center: begin
-                             LEllipsisLinePos := TpointF.create((LMaxWidth - LEllipsisLineLn - LLineIndent) / 2, LCurrLineY);
-                           end;
-        TTextAlign.Leading: begin
-                              LEllipsisLinePos := TpointF.create(LLineIndent, LCurrLineY);
-                            end;
-        TTextAlign.Trailing: begin
-                               LEllipsisLinePos := TpointF.create(LMaxWidth - LEllipsisLineLn, LCurrLineY);
-                             end;
-      end;
-      LEllipsisLineRect := Trectf.Create(
-                             TPointF.Create(
-                               LEllipsisLinePos.x,
-                               LEllipsisLinePos.Y - (-1*LFontMetrics.ascent)),
-                             LEllipsisLineLn,
-                             (-1*LFontMetrics.ascent) + LFontMetrics.descent);
-    end;
-  end;
-
-begin
-
-  //init result
-  result := false;
-  AAllTextDrawn := true;
-
-  //init ABreakTextItemsStartCount
-  var LBreakTextItemsStartCount := ABreakTextItems.Count;
-
-  //init aMaxWidth / aMaxHeight / aMaxLineWidth / ATotalLinesHeight
-  if ARect.Width > 65535 then ARect.Width := 65535;
-  if ARect.height > 65535 then ARect.height := 65535;
-  LMaxWidth := ARect.width;
-  var LMaxHeight: single := ARect.Height;
-  var LMaxLineWidth: single := 0;
-  var LTotalLinesHeight: single := 0;
-
-  //init ATextIdx / ATextLn
-  var LTextIdx := 0;
-  var LTextLn := AText.length;
-
-  //init APaint
-  LTypeface := TJTypeface.JavaClass.create(StringToJString(AFontFamily), ALfontStyleToAndroidStyle(AFontStyle));
-  APaint.setTypeface(LTypeface);
-  APaint.setColor(integer(AFontColor));
-
-  //Init metrics / aCurrLineY / aLineHeight
-  LFontMetrics := APaint.getFontMetricsInt; // aMetrics.top       => The maximum distance above the baseline for the tallest glyph in the font at a given text size.
-                                            // aMetrics.ascent    => The recommended distance above the baseline for singled spaced text.
-                                            // aMetrics.descent   => The recommended distance below the baseline for singled spaced text.
-                                            // aMetrics.bottom    => The maximum distance below the baseline for the lowest glyph in the font at a given text size
-                                            // aMetrics.leading   => The recommended additional space to add between lines of text
-  LCurrLineY := AFirstLineIndent.y + (-1*LFontMetrics.ascent); // aMetrics.top and aMetrics.ascent are always returned in negative value
-  ATotalLines := 0;
-  var LLineHeight: single := LFontMetrics.descent + ALineSpacing + (-1*LFontMetrics.ascent);
-
-  //init AEllipsisLine
-  LEllipsisLine := nil;
-  LEllipsisLineLn := 0;
-
-  //init aLineIndent
-  LLineIndent := AFirstLineIndent.x;
-
-  //if we have at least enalf of height to write the 1rt row
-  if comparevalue(AFirstLineIndent.y + LFontMetrics.descent + (-1*LFontMetrics.Ascent),LMaxHeight,Tepsilon.position) <= 0 then begin
-
-    //create ameasuredWidth
-    var LMeasuredWidth := TJavaArray<Single>.Create(1);
-    try
-
-      //loop still their is some chars
-      while LTextIdx < LTextLn do begin
-
-        // init aline
-        var LLine: jString := nil;
-        var I := AText.indexOf($0D {c}, LTextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
-        var J := AText.indexOf($0A {c}, LTextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
-        if (I >= 0) and (J >= 0) then I := min(I,J)
-        else I := max(I, J);
-        var LLineEndWithBreakLine: Boolean;
-        if I = LTextIdx then begin
-          LLine := StringtoJString(string(''));
-          LLineEndWithBreakLine := True;
-          result := true;
-        end
-        else if I > 0 then begin
-          LLine := AText.substring(LTextIdx{start}, I{end_}); // skip the $0D/$0A
-          LLineEndWithBreakLine := True;
-          result := true;
-        end
-        else begin
-          LLine := AText.substring(LTextIdx{start});
-          LLineEndWithBreakLine := False;
-        end;
-
-        //Calculate the number of char in the current line (this work good also if aline is empty)
-        //http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
-        //* getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
-        //* measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
-        //  bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
-        //  it's return for exemple 9 when height = 11
-        var LNumberOfChars := APaint.breakText(
-                                LLine {text},
-                                true {measureForwards},
-                                LMaxWidth - LLineIndent, {maxWidth}
-                                LMeasuredWidth {measuredWidth});
-
-        //init result
-        if LNumberOfChars < LLine.length then result := true;
-
-        //if we need to break the text
-        if (LNumberOfChars < LLine.length) or // << if aNumberOfChars < aLine.length it's evident we will need to break the text
-           (                                                                                                        // <<
-            (LLineEndWithBreakLine) and                                                                             // <<
-            (AEllipsisText <> nil) and                                                                              // <<
-            (                                                                                                       // << we need this check to add the ellipsis on the last line
-             (not AWordWrap) or                                                                                     // << when the last line finish by a break line (#13#10)
-             ((compareValue(LCurrLineY + LLineHeight + LFontMetrics.descent, LMaxHeight, Tepsilon.position) > 0) or // <<
-              ((AMaxlines > 0) and (ATotalLines >= AMaxlines - 1)))                                                 // <<
-            )                                                                                                       // <<
-           )                                                                                                        // <<
-        then begin
-
-          //if not AWordWrap
-          if not AWordWrap then begin
-            AAllTextDrawn := False; // aNumberOfChars < aLine.length so in anycase we will not draw all the text
-            if AEllipsisText = nil then begin
-              if LNumberOfChars > 0 then
-                LLine := LLine.substring(0, LNumberOfChars);
-            end
-            else begin
-              case ATrimming of
-                TALTextTrimming.Character: begin
-                  _initEllipsis;
-                  //(aNumberOfChars < aLine.length) to know that we are not here
-                  //because of manual linebreak and dec(aNumberOfChars) because initialy
-                  //we considere that AEllipsisText is only one char
-                  if (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
-                  while LNumberOfChars > 0 do begin
-                    LLine := LLine.substring(0, LNumberOfChars);
-                    LNumberOfChars := APaint.breakText(
-                                        LLine {text},
-                                        true {measureForwards},
-                                        LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                        LMeasuredWidth {measuredWidth});
-                    if LNumberOfChars >= LLine.length then break;
-                  end;
-                end;
-
-                TALTextTrimming.Word: begin
-                  _initEllipsis;
-                  var LSaveNumberOfChars := LNumberOfChars;
-                  var LSaveNumberOfCharsIsAccurate := False;
-                  while LNumberOfChars > 0 do begin
-                    if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
-                      LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                    end
-                    //----
-                    else if LNumberOfChars >= 2 then begin
-                      var LChar := LLine.charAt(LNumberOfChars-2);
-                      if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
-                        dec(LNumberOfChars);
-                        continue;
-                      end;
-                      LLine := LLine.substring(0, LNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish with space
-                    end
-                    //----
-                    else begin
-                      LNumberOfChars := LSaveNumberOfChars;
-                      //(aNumberOfChars < aLine.length) to know that we are not here
-                      //because of manual linebreak and dec(aNumberOfChars) because initialy
-                      //we considere that AEllipsisText is only one char
-                      if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
-                      while LNumberOfChars > 0 do begin
-                        LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                        LNumberOfChars := APaint.breakText(
-                                            LLine {text},
-                                            true {measureForwards},
-                                            LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                            LMeasuredWidth {measuredWidth});
-                        if LNumberOfChars >= LLine.length then break;
-                      end;
-                      break;
-                    end;
-                    //----
-                    LNumberOfChars := APaint.breakText(
-                                        LLine {text},
-                                        true {measureForwards},
-                                        LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                        LMeasuredWidth {measuredWidth});
-                    if LNumberOfChars >= LLine.length then break
-                    else begin
-                      LSaveNumberOfChars:= LNumberOfChars;
-                      LSaveNumberOfCharsIsAccurate := True;
-                    end;
-                  end;
-                end;
-
-                else
-                  raise Exception.Create('Error #F88E3622-E91E-4678-AA84-CA0C3093BCE3');
-              end;
-            end;
-          end
-
-          //if AWordWrap
-          else begin
-
-            //We are at the last line and AEllipsisText <> ''
-            if ((compareValue(LCurrLineY + LLineHeight + LFontMetrics.descent, LMaxHeight, Tepsilon.position) > 0) or
-                ((AMaxlines > 0) and (ATotalLines >= AMaxlines - 1))) and
-               (AEllipsisText <> nil) then begin
-
-              AAllTextDrawn := False; // if we are at the last line then in anycase we will not draw all the text
-              _initEllipsis;
-              //-----
-              var LSaveNumberOfChars := LNumberOfChars;
-              var LSaveNumberOfCharsIsAccurate := False;
-              while LNumberOfChars > 0 do begin
-                if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
-                  LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                end
-                //----
-                else if (ATrimming = TALTextTrimming.Word) and (LNumberOfChars >= 2) then begin
-                  var LChar := LLine.charAt(LNumberOfChars-2);
-                  if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
-                    dec(LNumberOfChars);
-                    continue;
-                  end;
-                  LLine := LLine.substring(0, LNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish with space
-                end
-                //----
-                else begin
-                  LNumberOfChars := LSaveNumberOfChars;
-                  //(aNumberOfChars < aLine.length) to know that we are not here
-                  //because of manual linebreak and dec(aNumberOfChars) because initialy
-                  //we considere that AEllipsisText is only one char
-                  if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
-                  while LNumberOfChars > 0 do begin
-                    LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                    LNumberOfChars := APaint.breakText(
-                                        LLine {text},
-                                        true {measureForwards},
-                                        LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                        LMeasuredWidth {measuredWidth});
-                    if LNumberOfChars >= LLine.length then break;
-                  end;
-                  break;
-                end;
-                //----
-                LNumberOfChars := APaint.breakText(
-                                    LLine {text},
-                                    true {measureForwards},
-                                    LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                    LMeasuredWidth {measuredWidth});
-                if LNumberOfChars >= LLine.length then break
-                else begin
-                  LSaveNumberOfChars:= LNumberOfChars;
-                  LSaveNumberOfCharsIsAccurate := True;
-                end;
-              end;
-
-            end
-
-            //We are not at the last line or AEllipsisText = ''
-            else begin
-
-              //We are at the last line and AEllipsisText = '' and more line available
-              if (AEllipsisText = nil) and
-                 ((compareValue(LCurrLineY + LLineHeight + LFontMetrics.descent, LMaxHeight, Tepsilon.position) > 0) or
-                  ((AMaxlines > 0) and (ATotalLines >= AMaxlines - 1))) then AAllTextDrawn := False;
-
-              //cut the line
-              var LSaveNumberOfChars := LNumberOfChars;
-              if LNumberOfChars < LLine.length then inc(LNumberOfChars); // in case the space separator is just after aNumberOfChars
-              while LNumberOfChars > 0 do begin
-                if LNumberOfChars >= 2 then begin
-                  var LChar := LLine.charAt(LNumberOfChars-1);
-                  if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
-                    dec(LNumberOfChars);
-                    continue;
-                  end;
-                  LLine := LLine.substring(0, LNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish just before the space
-                end
-                //-----
-                else begin
-                  LNumberOfChars := LSaveNumberOfChars;
-                  if compareValue(LLineIndent, 0, TEpsilon.position) > 0 then LNumberOfChars := 0;
-                  while LNumberOfChars > 0 do begin
-                    LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                    LNumberOfChars := APaint.breakText(
-                                        LLine {text},
-                                        true {measureForwards},
-                                        LMaxWidth - LLineIndent, {maxWidth}
-                                        LMeasuredWidth {measuredWidth});
-                    if LNumberOfChars >= LLine.length then break;
-                  end;
-                  break;
-                end;
-                //-----
-                LNumberOfChars := APaint.breakText(
-                                    LLine {text},
-                                    true {measureForwards},
-                                    LMaxWidth - LLineIndent, {maxWidth}
-                                    LMeasuredWidth {measuredWidth});
-                if LNumberOfChars >= LLine.length then begin
-                  inc(LNumberOfChars); // to skip the separator
-                  break;
-                end
-                else LSaveNumberOfChars:= LNumberOfChars;
-              end;
-
-            end;
-
-          end;
-
-        end;
-
-        //init aMaxLineWidth
-        LMaxLineWidth := max(LMaxLineWidth, LMeasuredWidth[0] + LEllipsisLineLn + LLineIndent);
-
-        //update ATotalLinesHeight
-        LTotalLinesHeight := LCurrLineY + LFontMetrics.descent;
-
-        //their is not enalf of place to write at least one char or
-        //we are on the #13/#10
-        //NOTE: we need to remove the breakline because for exemple we have
-        //coco sur le cocotier#13#10
-        //then aline will be equal to
-        //coco sur le cocotier
-        //we draw this line, and then we increase aCurrLineY := aCurrLineY + aLineHeight;
-        //so it's mean the #13#10 was already taking in account, so we must delete it
-        if LNumberOfChars <= 0 then begin
-          if (LTextIdx + 1 < LTextLn) and
-             (AText.codePointAt(LTextIdx) = $0D) and
-             (AText.codePointAt(LTextIdx + 1) = $0A) then LTextIdx := LTextIdx + 2 // (MSWINDOWS linebreak = #13#10)
-          else if (LTextIdx < LTextLn) and
-                  (AText.codePointAt(LTextIdx) = $0A) then LTextIdx := LTextIdx + 1 // (UNIX linebreak = #10)
-          else if (LTextIdx < LTextLn) and
-                  ((AText.charAT(LTextIdx).IsWhiteSpace) and
-                   (AText.charAT(LTextIdx).ToUCS4Char <> $00A0{No-break Space})) then LTextIdx := LTextIdx + 1 // (white space) if we don't have place to write
-                                                                                                               // ' blabla' then break it in
-                                                                                                               //
-                                                                                                               //  |yoyoyoyo|
-                                                                                                               //  |blabla  |
-                                                                                                               //
-                                                                                                               //  and not in
-                                                                                                               //
-                                                                                                               //  |yoyoyoyo|
-                                                                                                               //  | blabla |
-                                                                                                               //
-          else if compareValue(LLineIndent, 0, Tepsilon.Position) <= 0 then begin // if aLineIndent > 0 then maybe we don't have enalf of place to write one char because of the aLineIndent.
-            LTextIdx := LTextIdx + 1; // skip the current char
-            if (LTextIdx < LTextLn) and
-               (AText.CharAT(LTextIdx).IsLowSurrogate) then inc(LTextIdx);
-          end;
-          LCurrLineY := LCurrLineY + LLineHeight; // go to next line
-          inc(ATotalLines);
-          LLineIndent := 0;
-          if (not AWordWrap) or
-             ((AMaxlines > 0) and (ATotalLines >= AMaxlines)) or
-             (compareValue(LCurrLineY + LFontMetrics.descent, LMaxHeight, TEpsilon.position) > 0) then break
-          else continue;
-        end
-        else begin
-          LTextIdx := LTextIdx + LNumberOfChars;
-          if (LTextIdx + 1 < LTextLn) and
-             (AText.codePointAt(LTextIdx) = $0D) and
-             (AText.codePointAt(LTextIdx + 1) = $0A) then LTextIdx := LTextIdx + 2 // (MSWINDOWS linebreak = #13#10)
-          else if (LTextIdx < LTextLn) and
-                  (AText.codePointAt(LTextIdx) = $0A) then LTextIdx := LTextIdx + 1;
-        end;
-
-        //init LBreakTextItem
-        var LBreakTextItem := TALJBreakTextItem.Create;
-        try
-
-          //update aBreakTextItem
-          LBreakTextItem.TypeFace := LTypeFace;
-          LBreakTextItem.line := LLine;
-          case AHTextAlign of
-            TTextAlign.Center: begin
-                                 LBreakTextItem.pos := TpointF.create((LMaxWidth - LMeasuredWidth[0] - LEllipsisLineLn - LLineIndent) / 2, LCurrLineY);
-                               end;
-            TTextAlign.Leading: begin
-                                  LBreakTextItem.pos := TpointF.create(LLineIndent, LCurrLineY);
-                                end;
-            TTextAlign.Trailing: begin
-                                   LBreakTextItem.pos := TpointF.create(LMaxWidth - LMeasuredWidth[0] - LEllipsisLineLn, LCurrLineY);
-                                 end;
-          end;
-          LBreakTextItem.rect := Trectf.Create(
-                                   TPointF.Create(
-                                     LBreakTextItem.pos.x,
-                                     LBreakTextItem.pos.Y - (-1*LFontMetrics.ascent)),
-                                   LMeasuredWidth[0],
-                                   (-1*LFontMetrics.ascent) + LFontMetrics.descent);
-
-          //update AEllipsisLinePos / AEllipsisLinerect
-          if LEllipsisLine <> nil then begin
-            LEllipsisLinePos := TpointF.Create(LBreakTextItem.pos.x + LMeasuredWidth[0], LCurrLineY);
-            LEllipsisLineRect := Trectf.Create(
-                                   TPointF.Create(
-                                     LBreakTextItem.pos.x + LMeasuredWidth[0],
-                                     LBreakTextItem.pos.Y - (-1*LFontMetrics.ascent)),
-                                   LEllipsisLineLn,
-                                   (-1*LFontMetrics.ascent) + LFontMetrics.descent);
-          end;
-
-          // update ABreakTextItems
-          ABreakTextItems.Add(LBreakTextItem);
-
-        except
-          ALFreeAndNil(LBreakTextItem);
-          raise;
-        end;
-
-        //update aCurrLineY
-        LCurrLineY := LCurrLineY + LLineHeight;
-        inc(ATotalLines);
-
-        //update aLineIndent
-        LLineIndent := 0;
-
-        // stop if not AWordWrap or after maxheight
-        if (not AWordWrap) or
-           ((AMaxlines > 0) and (ATotalLines >= AMaxlines)) or
-           (compareValue(LCurrLineY + LFontMetrics.descent, LMaxHeight, TEpsilon.position) > 0) then break;
-
-        //add the last empty row if their is one
-        if (LTextIdx >= LTextLn) and LLineEndWithBreakLine and (LEllipsisLine = nil) then begin
-
-          //init LBreakTextItem
-          LBreakTextItem := TALJBreakTextItem.Create;
-          try
-
-            //update aBreakTextItem
-            LBreakTextItem.TypeFace := LTypeFace;
-            LBreakTextItem.line := StringToJstring('');
-            case AHTextAlign of
-              TTextAlign.Center: begin
-                                   LBreakTextItem.pos := TpointF.create((LMaxWidth - LEllipsisLineLn - LLineIndent) / 2, LCurrLineY);
-                                 end;
-              TTextAlign.Leading: begin
-                                    LBreakTextItem.pos := TpointF.create(LLineIndent, LCurrLineY);
-                                  end;
-              TTextAlign.Trailing: begin
-                                     LBreakTextItem.pos := TpointF.create(LMaxWidth - LEllipsisLineLn, LCurrLineY);
-                                   end;
-            end;
-            LBreakTextItem.rect := Trectf.Create(
-                                     TPointF.Create(
-                                       LBreakTextItem.pos.x,
-                                       LBreakTextItem.pos.Y - (-1*LFontMetrics.Ascent)),
-                                     0,
-                                     (-1*LFontMetrics.Ascent) + LFontMetrics.Descent);
-
-            // update ABreakTextItems
-            ABreakTextItems.Add(LBreakTextItem);
-
-          except
-            ALFreeAndNil(LBreakTextItem);
-            raise;
-          end;
-
-          //update aCurrLineY
-          LCurrLineY := LCurrLineY + LLineHeight;
-          inc(ATotalLines);
-
-        end;
-
-      end;
-
-    finally
-      ALFreeAndNil(LMeasuredWidth);
-    end;
-
-  end
-  else result := true;
-
-  //add the end ellipsis
-  if LEllipsisLine <> nil then begin
-    var LBreakTextItem := TALJBreakTextItem.Create;
-    try
-      LBreakTextItem.TypeFace := LEllipsisTypeFace;
-      LBreakTextItem.line := LEllipsisLine;
-      LBreakTextItem.pos := LEllipsisLinePos;
-      LBreakTextItem.rect := LEllipsisLineRect;
-      LBreakTextItem.isEllipsis := True;
-      ABreakTextItems.Add(LBreakTextItem);
-    except
-      ALFreeAndNil(LBreakTextItem);
-      raise;
-    end;
-  end;
-
-  //initialise ARect
-  if compareValue(LMaxLineWidth, LMaxWidth, Tepsilon.Position) < 0 then begin
-    case AHTextAlign of
-       TTextAlign.Center: begin
-                            var LOffset: single := Floor((ARect.Right - LMaxLineWidth - ARect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                            ARect.Left := ARect.Left + LOffset;
-                            ARect.right := ARect.right - LOffset;
-                            for var I := LBreakTextItemsStartCount to ABreakTextItems.Count - 1 do begin
-                              ABreakTextItems[I].pos.X := ABreakTextItems[I].pos.X - LOffset;
-                              ABreakTextItems[I].rect.Offset(-LOffset, 0);
-                            end;
-                          end;
-       TTextAlign.Leading: begin
-                             ARect.Right := min(ARect.Right, ARect.Left + LMaxLineWidth);
-                           end;
-       TTextAlign.Trailing: begin
-                              var LOffset: single := Floor(ARect.Right - LMaxLineWidth - ARect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                              ARect.Left := ARect.Left + LOffset;
-                              for var I := LBreakTextItemsStartCount to ABreakTextItems.Count - 1 do begin
-                                ABreakTextItems[I].pos.X := ABreakTextItems[I].pos.X - LOffset;
-                                ABreakTextItems[I].rect.Offset(-LOffset, 0);
-                              end;
-                            end;
-    end;
-  end;
-  if compareValue(LTotalLinesHeight, LMaxHeight, Tepsilon.Position) < 0 then begin
-    case AVTextAlign of
-       TTextAlign.Center: begin
-                            var LOffset: single := (ARect.bottom - LTotalLinesHeight - ARect.top) / 2;
-                            ARect.top := ARect.top + LOffset;
-                            ARect.bottom := ARect.bottom - LOffset;
-                          end;
-       TTextAlign.Leading: begin
-                             ARect.bottom := min(ARect.bottom, ARect.top + LTotalLinesHeight);
-                           end;
-       TTextAlign.Trailing: begin
-                              var LOffset: single := ARect.bottom - LTotalLinesHeight - ARect.top;
-                              ARect.top := ARect.top + LOffset;
-                            end;
-    end;
-  end;
-
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-constructor TALCTBreakTextItem.Create;
-begin
-  inherited;
-  Line := nil;
-  isEllipsis := False;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-destructor TALCTBreakTextItem.Destroy;
-begin
-  if line <> nil then begin
-    cfRelease(Line);
-    line := Nil;
-  end;
-  inherited;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-function ALCTBreakText(
-           const AFontFamily: String;
-           const AFontSize: single;
-           const AFontStyle: TFontStyles;
-           const AFontColor: TalphaColor;
-           var ARect: TRectF;
-           const AText: string;
-           const AWordWrap: Boolean;
-           const AHTextAlign, AVTextAlign: TTextAlign;
-           const ATrimming: TALTextTrimming; // TALTextTrimming.word not yet supported - TALTextTrimming.character will be used instead (if someone need, it's not really hard to implement)
-           const ABreakTextItems: TALCTBreakTextItems;
-           out ATotalLines: integer;
-           out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-           const AFirstLineIndent: TpointF;
-           const ALineSpacing: single = 0;
-           const AEllipsisText: string = '…';
-           const AEllipsisFontStyle: TFontStyles = [];
-           const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-           const AMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-begin
-
-  // Init AAllTextDrawn
-  AAllTextDrawn := True;
-
-  // Init LBreakTextItemsStartCount
-  var LBreakTextItemsStartCount := ABreakTextItems.Count;
-
-  // Init LMaxWidth / LMaxHeight / LMaxLineWidth / LTotalLinesHeight / etc.
-  if ARect.Width > 65535 then ARect.Width := 65535;
-  if ARect.height > 65535 then ARect.height := 65535;
-  var LMaxWidth: single := ARect.width;
-  var LMaxHeight: single := ARect.Height;
-  var LPrevMaxLineWidth: Single := 0; // << need this var because we must recalculate the LMaxLineWidth for the last lines after the truncation is maded
-  var LMaxLineWidth: single := 0;
-  var LTotalLinesHeight: single := 0;
-  ATotalLines := 0;
-  var LLineIndent: single := AFirstLineIndent.x;
-
-  // Create LCGColor
-  var LAlphaColor := TAlphaColorCGFloat.Create(AFontColor);
-  var LCGColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-  try
-
-    // Create LFont
-    var LFont := ALGetCTFontRef(AFontFamily, AFontSize, AFontStyle); // Returns a new font reference for the given name.
-    if LFont = nil then raise Exception.Create('Failed to create font');
-    try
-
-      // Create ATextString
-      var LTextString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AText[Low(string)], Length(AText));
-      if LTextString = nil then raise Exception.Create('Failed to create CFString');
-      try
-
-        // Create ATextAttr
-        var LTextAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
-        try
-
-          CFAttributedStringReplaceString(LTextAttr, CFRangeMake(0, 0), LTextString); // Modifies the string of an attributed string.
-          CFAttributedStringBeginEditing(LTextAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
-          try
-            CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTFontAttributeName, LFont);
-            CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTForegroundColorAttributeName, LCGColor);
-            //-----
-            var LSettings: array of CTParagraphStyleSetting;
-            SetLength(LSettings, 0);
-            //-----
-            //kCTParagraphStyleSpecifierAlignment
-            //The text alignment. Natural text alignment is realized as left or right alignment, depending on the line sweep direction
-            //of the first script contained in the paragraph. Type: CTTextAlignment. Default: kCTNaturalTextAlignment.
-            //* kCTTextAlignmentCenter
-            //* kCTTextAlignmentJustified
-            //* kCTTextAlignmentLeft
-            //* kCTTextAlignmentNatural
-            //* kCTTextAlignmentRight
-            //-----
-            //kCTParagraphStyleSpecifierBaseWritingDirection
-            //The base writing direction of the lines. Type: CTWritingDirection. Default: kCTWritingDirectionNatural. Application: CTFramesetter, CTTypesetter.
-            //* kCTWritingDirectionNatural: The writing direction is algorithmically determined using the Unicode Bidirectional Algorithm rules P2 and P3.
-            //* kCTWritingDirectionLeftToRight: The writing direction is left to right.
-            //* kCTWritingDirectionRightToLeft: The writing direction is right to left.
-            //-----
-            //kCTParagraphStyleSpecifierCount
-            //The number of style specifiers. The purpose is to simplify validation of style specifiers
-            //-----
-            //kCTParagraphStyleSpecifierDefaultTabInterval
-            //The documentwide default tab interval. Tabs after the last specified by kCTParagraphStyleSpecifierTabStops are placed at
-            //integer multiples of this distance (if positive). Type: CGFloat. Default: 0.0. Application: CTFramesetter, CTTypesetter.
-            //-----
-            //kCTParagraphStyleSpecifierFirstLineHeadIndent
-            //The distance, in points, from the leading margin of a frame to the beginning of the paragraph's first line. This value
-            //is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            if (compareValue(AFirstLineIndent.x, 0, TEpsilon.position) > 0) then begin
-              SetLength(LSettings, length(LSettings) + 1);
-              var LFirstLineHeadIndent: CGFloat := AFirstLineIndent.x;
-              LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierFirstLineHeadIndent;
-              LSettings[high(LSettings)].valueSize := SizeOf(LFirstLineHeadIndent);
-              LSettings[high(LSettings)].value := @LFirstLineHeadIndent;
-            end;
-            //-----
-            //kCTParagraphStyleSpecifierHeadIndent
-            //The distance, in points, from the leading margin of a text container to the beginning of lines other than the first.
-            //This value is always nonnegative. Type: CGFloat Default: 0.0 Application: CTFramesetter
-            //-----
-            //kCTParagraphStyleSpecifierLineBreakMode
-            //The mode that should be used to break lines when laying out the paragraph's text. Type: CTLineBreakMode.
-            //Default: kCTLineBreakByWordWrapping. Application: CTFramesetter
-            //* kCTLineBreakByWordWrapping: Wrapping occurs at word boundaries unless the word itself doesn't fit on a single line.
-            //* kCTLineBreakByCharWrapping: Wrapping occurs before the first character that doesn't fit.
-            //* kCTLineBreakByClipping: Lines are simply not drawn past the edge of the frame.
-            //* kCTLineBreakByTruncatingHead: Each line is displayed so that the end fits in the frame and the missing text is indicated by an ellipsis glyph.
-            //* kCTLineBreakByTruncatingTail: Each line is displayed so that the beginning fits in the container and the missing text is indicated by an ellipsis glyph.
-            //* kCTLineBreakByTruncatingMiddle: Each line is displayed so that the beginning and end fit in the container and the missing text is indicated by an ellipsis glyph in the middle.
-            if not AWordWrap then begin
-              var LLineBreakMode: Byte;
-              SetLength(LSettings, length(LSettings) + 1);
-              case ATrimming of
-                TALTextTrimming.None: LLineBreakMode := kCTLineBreakByClipping;
-                TALTextTrimming.Character: LLineBreakMode := kCTLineBreakByCharWrapping;
-                TALTextTrimming.Word: LLineBreakMode := kCTLineBreakByWordWrapping;
-              end;
-              LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierLineBreakMode;
-              LSettings[high(LSettings)].valueSize := SizeOf(LLineBreakMode);
-              LSettings[high(LSettings)].value := @LLineBreakMode;
-            end;
-            //-----
-            //kCTParagraphStyleSpecifierLineHeightMultiple
-            //The line height multiple. The natural line height of the receiver is multiplied by this factor (if positive) before
-            //being constrained by minimum and maximum line height. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            //-----
-            //kCTParagraphStyleSpecifierLineSpacing
-            //Deprecated. Use kCTParagraphStyleSpecifierMaximumLineSpacing, kCTParagraphStyleSpecifierMinimumLineSpacing, and
-            //kCTParagraphStyleSpecifierLineSpaceAdjustment to control space between lines. The space in points added between
-            //lines within the paragraph (commonly known as leading). This value is always nonnegative. Type: CGFloat.
-            //Default: 0.0. Application: CTFramesetter.
-            //-----
-            //kCTParagraphStyleSpecifierLineSpacingAdjustment
-            //The space in points added between lines within the paragraph (commonly known as leading).
-            if (compareValue(ALineSpacing, 0, TEpsilon.position) > 0) then begin
-              SetLength(LSettings, length(LSettings) + 1);
-              var LLineSpacingAdjustment: CGFloat := ALineSpacing;
-              LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierLineSpacingAdjustment;
-              LSettings[high(LSettings)].valueSize := SizeOf(LLineSpacingAdjustment);
-              LSettings[high(LSettings)].value := @LLineSpacingAdjustment;
-            end;
-            //-----
-            //kCTParagraphStyleSpecifierMaximumLineHeight
-            //The maximum height that any line in the frame will occupy, regardless of the font size or size of any
-            //attached graphic. Glyphs and graphics exceeding this height will overlap neighboring lines.
-            //A maximum height of 0 implies no line height limit. This value is always nonnegative.
-            //Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            //-----
-            //kCTParagraphStyleSpecifierMaximumLineSpacing
-            //The maximum space in points between lines within the paragraph (commonly known as leading). This value is always nonnegative.
-            //-----
-            //kCTParagraphStyleSpecifierMinimumLineHeight
-            //The minimum height that any line in the frame will occupy, regardless of the font size or size of any attached graphic.
-            //This value is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            //-----
-            //kCTParagraphStyleSpecifierMinimumLineSpacing
-            //The minimum space in points between lines within the paragraph (commonly known as leading). This value is always nonnegative.
-            //-----
-            //kCTParagraphStyleSpecifierParagraphSpacing
-            //The space added at the end of the paragraph to separate it from the following paragraph. This value is always nonnegative
-            //and is determined by adding the previous paragraph's kCTParagraphStyleSpecifierParagraphSpacing setting and the current paragraph's
-            //kCTParagraphStyleSpecifierParagraphSpacingBefore setting. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            //-----
-            //kCTParagraphStyleSpecifierParagraphSpacingBefore
-            //The distance between the paragraph's top and the beginning of its text content. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-            //-----
-            //kCTParagraphStyleSpecifierTabStops
-            //The CTTextTab objects, sorted by location, that define the tab stops for the paragraph style. Type: CFArray of CTTextTabRef.
-            //Default: 12 left-aligned tabs, spaced by 28.0 points. Application: CTFramesetter, CTTypesetter.
-            //-----
-            //kCTParagraphStyleSpecifierTailIndent
-            //The distance, in points, from the margin of a frame to the end of lines. If positive, this value is the distance from the leading margin
-            //(for example, the left margin in left-to-right text). If 0 or negative, it's the distance from the trailing margin. Type: CGFloat.
-            //Default: 0.0. Application: CTFramesetter.
-            //-----
-            if length(LSettings) > 0 then begin
-              var LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
-              try
-                CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTParagraphStyleAttributeName, LParagraphStyle);
-              finally
-                CFRelease(LParagraphStyle);
-              end;
-            end;
-          finally
-            CFAttributedStringEndEditing(LTextAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
-          end;
-
-          // Declare LStringRange
-          var LStringRange: CFRange;
-
-
-          /////////////////////////////
-          //Break the text in line(s)//
-          /////////////////////////////
-
-          // Create an immutable path of a rectangle.
-          var LFramePath := CGPathCreateWithRect(
-                              ALLowerLeftCGRect(
-                                tpointf.create(0,0){aUpperLeftOrigin},
-                                ARect.Width{aWidth},
-                                ARect.Height - AFirstLineIndent.y{aHeight},
-                                ARect.Height - AFirstLineIndent.y{aGridHeight}),
-                              nil{transform});
-          try
-
-            // Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
-            // create and fill text frames with the CTFramesetterCreateFrame call.
-            var LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LTextAttr));
-            if LFrameSetter = nil then raise Exception.Create('Failed to create CTFramesetter');
-            try
-
-              // Creates an immutable frame using a framesetter.
-              var LFrame := CTFramesetterCreateFrame(
-                              LFrameSetter, // framesetter: The framesetter used to create the frame.
-                              CFRangeMake(0, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                                 // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                                 // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                              LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                          // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                              nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                    // or NULL if there are no such attributes.
-              if LFrame = nil then raise Exception.Create('Failed to create CTFrame');
-              try
-
-                // Init Llines / LLinesCount
-                var Llines := CTFrameGetLines(LFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
-                var LLinesCount := CFArrayGetCount(Llines);
-
-                // Init result
-                result := LLinesCount > 1;
-
-                // Update ABreakTextItems - loop on all lines
-                for var I := 0 to LLinesCount - 1 do begin
-
-                  // Break if maxline reach
-                  if (AMaxlines > 0) and (ATotalLines >= AMaxlines) then break; // << No need to set the result to true because aLinesCount > 1
-
-                  // Break if not wordwrap
-                  if (not AWordWrap) and (ATotalLines >= 1) then break; // << No need to set the result to true because aLinesCount > 1
-
-                  // init Lline / LMeasuredWidth
-                  var Lline := CFArrayGetValueAtIndex(Llines, I);
-                  var LAscent: CGFloat;
-                  var LDescent: CGFloat;
-                  var LMeasuredWidth: Double := CTLineGetTypographicBounds(
-                                                  Lline, // line: The line whose typographic bounds are calculated.
-                                                  @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                  @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                  nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                        // >> return the typographic width of the line. If the line is invalid, this function returns 0.
-
-                  // Unfortunatly the lines that are wrapped are not trimed with the last space
-                  // so LMeasuredWidth is inacurate. so i must trim the trailling char
-                  if I < LLinesCount - 1 then LMeasuredWidth := LMeasuredWidth - CTLineGetTrailingWhitespaceWidth(Lline);
-
-                  // Update LCurrLineY
-                  var LCurrLineY: single;
-                  if I = 0 then LCurrLineY := AFirstLineIndent.y + LAscent
-                  else LCurrLineY := LTotalLinesHeight + ALineSpacing + LAscent;
-
-                  // Stop the process if the height exceeds the maximum allowed height
-                  if (compareValue(LCurrLineY + LDescent, LMaxHeight, TEpsilon.position) > 0) then begin
-                    result := True;
-                    AAllTextDrawn := False;
-                    break;
-                  end;
-
-                  // Update LTotalLinesHeight and LTotalLines
-                  LTotalLinesHeight := LCurrLineY + LDescent;
-                  inc(ATotalLines);
-
-                  // Llineindent must be initialized here (following the break)
-                  // because it needs to correspond to the last item in
-                  // ABreakTextItems.
-                  if I > 0 then LLineIndent := 0;
-
-                  // Calculate LMaxLineWidth
-                  LPrevMaxLineWidth := LMaxLineWidth;
-                  LMaxLineWidth := max(LMaxLineWidth, LMeasuredWidth + LLineIndent);
-
-                  // Init LStringRange
-                  LStringRange := CTLineGetStringRange(Lline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
-
-                  // Update LBreakTextItems
-                  var LBreakTextItem := TALCTBreakTextItem.Create;
-                  try
-
-                    // LBreakTextItem.Line
-                    LBreakTextItem.Line := CFRetain(Lline); // Retains a Core Foundation object. we need this because we will later free the aFrame but still need to access the Line
-
-                    // LBreakTextItem.text
-                    if LStringRange.length > 0 then begin
-                      var LTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(LTextAttr), LStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
-                      if LTmpTextAttr = nil then raise Exception.Create('Failed to create CFAttributedString');
-                      try
-                        LBreakTextItem.text := CFStringRefToStr(CFAttributedStringGetString(LTmpTextAttr));  // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object.
-                      finally
-                        cfRelease(LTmpTextAttr);
-                      end;
-                    end
-                    else LBreakTextItem.text := '';
-
-                    // LBreakTextItem.pos / LBreakTextItem.rect
-                    case AHTextAlign of
-                      TTextAlign.Center: begin
-                                           LBreakTextItem.pos := TpointF.create((LMaxWidth - LMeasuredWidth - LLineIndent) / 2, LCurrLineY);
-                                         end;
-                      TTextAlign.Leading: begin
-                                            LBreakTextItem.pos := TpointF.create(LLineIndent, LCurrLineY);
-                                          end;
-                      TTextAlign.Trailing: begin
-                                             LBreakTextItem.pos := TpointF.create(LMaxWidth - LMeasuredWidth, LCurrLineY);
-                                           end;
-                    end;
-                    LBreakTextItem.rect := Trectf.Create(
-                                             TPointF.Create(
-                                               LBreakTextItem.pos.x,
-                                               LBreakTextItem.pos.Y - LAscent),
-                                             LMeasuredWidth,
-                                             LAscent + LDescent);
-
-                    // Add LBreakTextItem to ABreakTextItems
-                    ABreakTextItems.Add(LBreakTextItem);
-
-                  except
-                    ALFreeAndNil(LBreakTextItem);
-                    raise;
-                  end;
-
-                end;
-
-              finally
-                CFRelease(LFrame);
-              end;
-
-            finally
-              CFRelease(LFrameSetter);
-            end;
-
-          finally
-            CFRelease(LFramePath);
-          end;
-
-
-
-          //////////////////////////
-          //truncate the last line//
-          //////////////////////////
-
-          if (ABreakTextItems.Count > LBreakTextItemsStartCount) and  // if the text was broken into at least one line
-             (LStringRange.length > 0) and  // LStringRange was initialised previously
-             (LStringRange.location + LStringRange.length < CFAttributedStringGetLength(CFAttributedStringRef(LTextAttr))) then begin // if the last line do not contain all the chars
-
-            // Init result
-            result := True;
-            AAllTextDrawn := False;
-
-            // If ATrimming = TALTextTrimming.None or AEllipsisText = '' then nothing todo
-            if (ATrimming <> TALTextTrimming.None) and
-               (AEllipsisText <> '') then begin
-
-              // Create LEllipsisColor
-              if AEllipsisFontColor <> TAlphaColorRec.Null then LAlphaColor := TAlphaColorCGFloat.Create(AEllipsisFontColor)
-              else LAlphaColor := TAlphaColorCGFloat.Create(AFontColor);
-              var LEllipsisColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-              try
-
-                // Create LEllipsisFont
-                var LEllipsisFont := ALGetCTFontRef(AFontFamily, AFontSize, AEllipsisFontStyle); // Returns a new font reference for the given name.
-                if LEllipsisFont = nil then raise Exception.Create('Failed to create font');
-                try
-
-                  // Create LEllipsisString
-                  var LEllipsisString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AEllipsisText[Low(string)], Length(AEllipsisText));
-                  if LEllipsisString = nil then raise Exception.Create('Failed to create CFString');
-                  try
-
-                    // Create LEllipsisAttr
-                    var LEllipsisAttr := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength}); // Creates a mutable attributed string.
-                    try
-
-                      CFAttributedStringReplaceString(LEllipsisAttr, CFRangeMake(0, 0), LEllipsisString); // Modifies the string of an attributed string.
-                      CFAttributedStringBeginEditing(LEllipsisAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
-                      try
-                        CFAttributedStringSetAttribute(LEllipsisAttr, CFRangeMake(0, CFStringGetLength(LEllipsisString)), kCTFontAttributeName, LEllipsisFont);
-                        CFAttributedStringSetAttribute(LEllipsisAttr, CFRangeMake(0, CFStringGetLength(LEllipsisString)), kCTForegroundColorAttributeName, LEllipsisColor);
-                      finally
-                        CFAttributedStringEndEditing(LEllipsisAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
-                      end;
-
-                      // Create LEllipsisLine
-                      var LEllipsisLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LEllipsisAttr)); // Creates a single immutable line object directly from an attributed string.
-                      if LEllipsisLine = nil then raise exception.create('Failed to create CTLine');               // Return Value: A reference to a CTLine object if the call was successful; otherwise, NULL.
-                      try
-
-                        CFAttributedStringBeginEditing(LTextAttr); // Defers internal consistency-checking and coalescing for a mutable attributed string.
-                        try
-                          //-----
-                          var LSettings: array of CTParagraphStyleSetting;
-                          SetLength(LSettings, 0);
-                          //-----
-                          //kCTParagraphStyleSpecifierAlignment
-                          //The text alignment. Natural text alignment is realized as left or right alignment, depending on the line sweep direction
-                          //of the first script contained in the paragraph. Type: CTTextAlignment. Default: kCTNaturalTextAlignment.
-                          //* kCTTextAlignmentCenter
-                          //* kCTTextAlignmentJustified
-                          //* kCTTextAlignmentLeft
-                          //* kCTTextAlignmentNatural
-                          //* kCTTextAlignmentRight
-                          //-----
-                          //kCTParagraphStyleSpecifierBaseWritingDirection
-                          //The base writing direction of the lines. Type: CTWritingDirection. Default: kCTWritingDirectionNatural. Application: CTFramesetter, CTTypesetter.
-                          //* kCTWritingDirectionNatural: The writing direction is algorithmically determined using the Unicode Bidirectional Algorithm rules P2 and P3.
-                          //* kCTWritingDirectionLeftToRight: The writing direction is left to right.
-                          //* kCTWritingDirectionRightToLeft: The writing direction is right to left.
-                          //-----
-                          //kCTParagraphStyleSpecifierCount
-                          //The number of style specifiers. The purpose is to simplify validation of style specifiers
-                          //-----
-                          //kCTParagraphStyleSpecifierDefaultTabInterval
-                          //The documentwide default tab interval. Tabs after the last specified by kCTParagraphStyleSpecifierTabStops are placed at
-                          //integer multiples of this distance (if positive). Type: CGFloat. Default: 0.0. Application: CTFramesetter, CTTypesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierFirstLineHeadIndent
-                          //The distance, in points, from the leading margin of a frame to the beginning of the paragraph's first line. This value
-                          //is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierHeadIndent
-                          //The distance, in points, from the leading margin of a text container to the beginning of lines other than the first.
-                          //This value is always nonnegative. Type: CGFloat Default: 0.0 Application: CTFramesetter
-                          //-----
-                          //kCTParagraphStyleSpecifierLineBreakMode
-                          //The mode that should be used to break lines when laying out the paragraph's text. Type: CTLineBreakMode.
-                          //Default: kCTLineBreakByWordWrapping. Application: CTFramesetter
-                          //* kCTLineBreakByWordWrapping: Wrapping occurs at word boundaries unless the word itself doesn't fit on a single line.
-                          //* kCTLineBreakByCharWrapping: Wrapping occurs before the first character that doesn't fit.
-                          //* kCTLineBreakByClipping: Lines are simply not drawn past the edge of the frame.
-                          //* kCTLineBreakByTruncatingHead: Each line is displayed so that the end fits in the frame and the missing text is indicated by an ellipsis glyph.
-                          //* kCTLineBreakByTruncatingTail: Each line is displayed so that the beginning fits in the container and the missing text is indicated by an ellipsis glyph.
-                          //* kCTLineBreakByTruncatingMiddle: Each line is displayed so that the beginning and end fit in the container and the missing text is indicated by an ellipsis glyph in the middle.
-                          var LLineBreakMode: Byte;
-                          SetLength(LSettings, length(LSettings) + 1);
-                          case ATrimming of
-                            TALTextTrimming.None: LLineBreakMode := kCTLineBreakByClipping;
-                            TALTextTrimming.Character: LLineBreakMode := kCTLineBreakByCharWrapping;
-                            TALTextTrimming.Word: LLineBreakMode := kCTLineBreakByWordWrapping;
-                          end;
-                          LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierLineBreakMode;
-                          LSettings[high(LSettings)].valueSize := SizeOf(LLineBreakMode);
-                          LSettings[high(LSettings)].value := @LLineBreakMode;
-                          //-----
-                          //kCTParagraphStyleSpecifierLineHeightMultiple
-                          //The line height multiple. The natural line height of the receiver is multiplied by this factor (if positive) before
-                          //being constrained by minimum and maximum line height. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierLineSpacing
-                          //Deprecated. Use kCTParagraphStyleSpecifierMaximumLineSpacing, kCTParagraphStyleSpecifierMinimumLineSpacing, and
-                          //kCTParagraphStyleSpecifierLineSpaceAdjustment to control space between lines. The space in points added between
-                          //lines within the paragraph (commonly known as leading). This value is always nonnegative. Type: CGFloat.
-                          //Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierLineSpacingAdjustment
-                          //The space in points added between lines within the paragraph (commonly known as leading).
-                          //-----
-                          //kCTParagraphStyleSpecifierMaximumLineHeight
-                          //The maximum height that any line in the frame will occupy, regardless of the font size or size of any
-                          //attached graphic. Glyphs and graphics exceeding this height will overlap neighboring lines.
-                          //A maximum height of 0 implies no line height limit. This value is always nonnegative.
-                          //Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierMaximumLineSpacing
-                          //The maximum space in points between lines within the paragraph (commonly known as leading). This value is always nonnegative.
-                          //-----
-                          //kCTParagraphStyleSpecifierMinimumLineHeight
-                          //The minimum height that any line in the frame will occupy, regardless of the font size or size of any attached graphic.
-                          //This value is always nonnegative. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierMinimumLineSpacing
-                          //The minimum space in points between lines within the paragraph (commonly known as leading). This value is always nonnegative.
-                          //-----
-                          //kCTParagraphStyleSpecifierParagraphSpacing
-                          //The space added at the end of the paragraph to separate it from the following paragraph. This value is always nonnegative
-                          //and is determined by adding the previous paragraph's kCTParagraphStyleSpecifierParagraphSpacing setting and the current paragraph's
-                          //kCTParagraphStyleSpecifierParagraphSpacingBefore setting. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierParagraphSpacingBefore
-                          //The distance between the paragraph's top and the beginning of its text content. Type: CGFloat. Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierTabStops
-                          //The CTTextTab objects, sorted by location, that define the tab stops for the paragraph style. Type: CFArray of CTTextTabRef.
-                          //Default: 12 left-aligned tabs, spaced by 28.0 points. Application: CTFramesetter, CTTypesetter.
-                          //-----
-                          //kCTParagraphStyleSpecifierTailIndent
-                          //The distance, in points, from the margin of a frame to the end of lines. If positive, this value is the distance from the leading margin
-                          //(for example, the left margin in left-to-right text). If 0 or negative, it's the distance from the trailing margin. Type: CGFloat.
-                          //Default: 0.0. Application: CTFramesetter.
-                          //-----
-                          if length(LSettings) > 0 then begin
-                            var LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
-                            try
-                              CFAttributedStringSetAttribute(LTextAttr, CFRangeMake(0, CFStringGetLength(LTextString)), kCTParagraphStyleAttributeName, LParagraphStyle);
-                            finally
-                              CFRelease(LParagraphStyle);
-                            end;
-                          end;
-                          //-----
-                        finally
-                          CFAttributedStringEndEditing(LTextAttr); // Re-enables internal consistency-checking and coalescing for a mutable attributed string.
-                        end;
-
-                        // Init LEllipsisWidth
-                        var LAscent: CGFloat;
-                        var LDescent: CGFloat;
-                        var LEllipsisWidth: Double := CTLineGetTypographicBounds(
-                                                        LEllipsisLine, // line: The line whose typographic bounds are calculated.
-                                                        @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                        @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                        nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                              // >> return the typographic width of the line. If the line is invalid, this function returns 0.
-
-                        // Create an immutable path of a rectangle.
-                        LFramePath := CGPathCreateWithRect(
-                                        ALLowerLeftCGRect(
-                                          tpointf.create(0,0){aUpperLeftOrigin},
-                                          LMaxWidth - LEllipsisWidth - LLineIndent{aWidth},
-                                          ceil(LAscent+LDescent){aHeight}, // +1 because it's seam when height is exact then it's not work
-                                          ceil(LAscent+LDescent){aGridHeight}),
-                                        nil{transform});
-                        try
-
-                          // Creates an immutable framesetter object from an attributed string. The resultant framesetter object can be used to
-                          // create and fill text frames with the CTFramesetterCreateFrame call.
-                          var LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LTextAttr));
-                          if LFrameSetter = nil then raise Exception.Create('Failed to create CTFramesetter');
-                          try
-
-                            // Creates an immutable frame using a framesetter.
-                            var LFrame := CTFramesetterCreateFrame(
-                                            LFrameSetter, // framesetter: The framesetter used to create the frame.
-                                            CFRangeMake(LStringRange.location, 0), // stringRange: The range, of the attributed string that was used to create the framesetter,
-                                                                                   // that is to be typeset in lines fitted into the frame. If the length portion of the range is
-                                                                                   // set to 0, then the framesetter continues to add lines until it runs out of text or space.
-                                            LFramePath, // path: A CGPath object that specifies the shape of the frame. The path may be non-rectangular
-                                                        // in versions of OS X v10.7 or later and versions of iOS 4.2 or later.
-                                            nil); // frameAttributes: Additional attributes that control the frame filling process can be specified here,
-                                                  // or NULL if there are no such attributes.
-                            if LFrame = nil then raise Exception.Create('Failed to create CTFrame');
-                            try
-
-                              // Init LBreakTextItem
-                              var LBreakTextItem := ABreakTextItems[ABreakTextItems.count - 1];
-                              cfRelease(LBreakTextItem.Line);
-                              LBreakTextItem.Line := nil; // << I use this as a flag
-
-                              // Init Llines / LLinesCount
-                              var Llines := CTFrameGetLines(LFrame); // Return a CFArray object containing the CTLine objects that make up the frame, or, if there are no lines in the frame, an array with no elements.
-                              var LLinesCount := CFArrayGetCount(Llines);
-                              if LLinesCount > 0 then begin
-
-                                // Init Lline / LMeasuredWidth
-                                var Lline := CFArrayGetValueAtIndex(Llines, 0);
-                                var LMeasuredWidth: Double := CTLineGetTypographicBounds(
-                                                                Lline, // line: The line whose typographic bounds are calculated.
-                                                                @LAscent, // ascent: On output, the ascent of the line. This parameter can be set to NULL if not needed.
-                                                                @LDescent, // descent: On output, the descent of the line. This parameter can be set to NULL if not needed.
-                                                                nil); // leading: On output, the leading of the line. This parameter can be set to NULL if not needed. (it's look like to be always 0)
-                                                                      // >> return the typographic width of the line. If the line is invalid, this function returns 0.
-
-                                // Init LStringRange
-                                LStringRange := CTLineGetStringRange(Lline); // return a CFRange structure that contains the range over the backing store string that spawned the glyphs
-
-                                // If there is enough space for the text plus ellipsis.
-                                if (LStringRange.length > 0) and
-                                   (compareValue(LMeasuredWidth - CTLineGetTrailingWhitespaceWidth(Lline), 0, TEpsilon.Position) > 0) and
-                                   (compareValue(LMeasuredWidth + LEllipsisWidth, LMaxWidth - LLineIndent, TEpsilon.Position) <= 0) then begin
-
-                                  // Calculate LMaxLineWidth
-                                  LMaxLineWidth := max(LPrevMaxLineWidth, LMeasuredWidth + LLineIndent + LEllipsisWidth);
-
-                                  // Update LBreakTextItems.Line
-                                  LBreakTextItem.Line := CFRetain(Lline); // Retains a Core Foundation object. we need this because we will later free the aFrame but still need to access the Line
-
-                                  // Update LBreakTextItems.text
-                                  if LStringRange.length > 0 then begin
-                                    var LTmpTextAttr := CFAttributedStringCreateWithSubstring(kCFAllocatorDefault, CFAttributedStringRef(LTextAttr), LStringRange); // return A new attributed string whose string and attributes are copied from the specified range of the supplied attributed string. Returns NULL if there was a problem copying the object.
-                                    if LTmpTextAttr = nil then raise Exception.Create('Failed to create CFAttributedString');
-                                    try
-                                      LBreakTextItem.text := CFStringRefToStr(CFAttributedStringGetString(LTmpTextAttr));  // Return An immutable string containing the characters from aStr, or NULL if there was a problem creating the object.
-                                    finally
-                                      cfRelease(LTmpTextAttr);
-                                    end;
-                                  end
-                                  else LBreakTextItem.text := '';
-
-                                  // Update LBreakTextItems.pos & LBreakTextItems.rect
-                                  case AHTextAlign of
-                                    TTextAlign.Center: begin
-                                                         LBreakTextItem.pos := TpointF.create((LMaxWidth - LMeasuredWidth - LEllipsisWidth - LLineIndent) / 2, LBreakTextItem.pos.y);
-                                                       end;
-                                    TTextAlign.Leading: begin
-                                                          LBreakTextItem.pos := TpointF.create(LLineIndent, LBreakTextItem.pos.y);
-                                                        end;
-                                    TTextAlign.Trailing: begin
-                                                           LBreakTextItem.pos := TpointF.create(LMaxWidth - LMeasuredWidth - LEllipsisWidth, LBreakTextItem.pos.y);
-                                                         end;
-                                  end;
-                                  LBreakTextItem.rect := Trectf.Create(
-                                                           TPointF.Create(
-                                                             LBreakTextItem.pos.x,
-                                                             LBreakTextItem.pos.Y - LAscent),
-                                                           LMeasuredWidth,
-                                                           LAscent + LDescent);
-
-                                end;
-
-                              end;
-
-                              // Update LBreakTextItem.rect.Width
-                              if LBreakTextItem.Line = nil then LBreakTextItem.rect.Width := 0;
-
-                              // Add the ellipsis line
-                              var LEllipsisBreakTextItem := TALCTBreakTextItem.Create;
-                              try
-                                LEllipsisBreakTextItem.Line := CFRetain(LEllipsisLine); // Retains a Core Foundation object.
-                                LEllipsisBreakTextItem.text := AEllipsisText;
-                                LEllipsisBreakTextItem.isEllipsis := true;
-                                LEllipsisBreakTextItem.pos := TpointF.create(LBreakTextItem.pos.x + LBreakTextItem.rect.Width, LBreakTextItem.pos.y);
-                                LEllipsisBreakTextItem.rect := Trectf.Create(
-                                                                 TPointF.Create(
-                                                                   LEllipsisBreakTextItem.pos.x,
-                                                                   LEllipsisBreakTextItem.pos.Y - LAscent), // if LBreakTextItem.Line = nil then AAscent = ascent of the ellipsis
-                                                                 LEllipsisWidth,
-                                                                 LAscent + LDescent); // if LBreakTextItem.Line = nil then AAscent/ADescent = ascent/descent of the ellipsis
-                                ABreakTextItems.Add(LEllipsisBreakTextItem);
-                              except
-                                ALFreeAndNil(LEllipsisBreakTextItem);
-                                raise;
-                              end;
-
-                              // Delete the last line if there is not enough space
-                              if LBreakTextItem.Line = nil then begin
-                                LMaxLineWidth := max(LPrevMaxLineWidth, LLineIndent + LEllipsisWidth);
-                                ABreakTextItems.Delete(ABreakTextItems.count - 2);
-                              end;
-
-                            finally
-                              CFRelease(LFrame);
-                            end;
-
-                          finally
-                            CFRelease(LFrameSetter);
-                          end;
-
-                        finally
-                          CFRelease(LFramePath);
-                        end;
-
-                      finally
-                        cfRelease(LEllipsisLine);
-                      end;
-
-                    finally
-                      CFRelease(LEllipsisAttr);
-                    end;
-
-                  finally
-                    CFRelease(LEllipsisString);
-                  end;
-
-                finally
-                  CFRelease(LEllipsisFont);
-                end;
-
-              finally
-                CGColorRelease(LEllipsisColor);
-              end;
-
-            end;
-
-          end
-          else if (ABreakTextItems.Count = LBreakTextItemsStartCount) and  // If no line was added
-                  (not AText.IsEmpty) then begin // and the text was not empty
-
-            //init result
-            result := True;
-            AAllTextDrawn := False;
-
-          end
-
-        finally
-          CFRelease(LTextAttr);
-        end;
-
-      finally
-        CFRelease(LTextString);
-      end;
-
-    finally
-      CFRelease(LFont);
-    end;
-
-  finally
-    CGColorRelease(LCGColor);
-  end;
-
-
-  // Initialise ARect
-  if compareValue(LMaxLineWidth, LMaxWidth, Tepsilon.Position) < 0 then begin
-    case AHTextAlign of
-       TTextAlign.Center: begin
-                            var LOffset: single := Floor((ARect.Right - LMaxLineWidth - ARect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                            ARect.Left := ARect.Left + LOffset;
-                            ARect.right := ARect.right - LOffset;
-                            for var I := LBreakTextItemsStartCount to ABreakTextItems.Count - 1 do begin
-                              ABreakTextItems[I].pos.X := ABreakTextItems[I].pos.X - LOffset;
-                              ABreakTextItems[I].rect.Offset(-LOffset, 0);
-                            end;
-                          end;
-       TTextAlign.Leading: begin
-                             ARect.Right := min(ARect.Right, ARect.Left + LMaxLineWidth);
-                           end;
-       TTextAlign.Trailing: begin
-                              var LOffset: single := Floor(ARect.Right - LMaxLineWidth - ARect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                              ARect.Left := ARect.Left + LOffset;
-                              for var I := LBreakTextItemsStartCount to ABreakTextItems.Count - 1 do begin
-                                ABreakTextItems[I].pos.X := ABreakTextItems[I].pos.X - LOffset;
-                                ABreakTextItems[I].rect.Offset(-LOffset, 0);
-                              end;
-                            end;
-    end;
-  end;
-  if compareValue(LTotalLinesHeight, LMaxHeight, Tepsilon.Position) < 0 then begin
-    case AVTextAlign of
-       TTextAlign.Center: begin
-                            var LOffset: single := (ARect.bottom - LTotalLinesHeight - ARect.top) / 2;
-                            ARect.top := ARect.top + LOffset;
-                            ARect.bottom := ARect.bottom - LOffset;
-                          end;
-       TTextAlign.Leading: begin
-                             ARect.bottom := min(ARect.bottom, ARect.top + LTotalLinesHeight);
-                           end;
-       TTextAlign.Trailing: begin
-                              var LOffset: single := ARect.bottom - LTotalLinesHeight - ARect.top;
-                              ARect.top := ARect.top + LOffset;
-                            end;
-    end;
-  end;
-
-end;
-{$ENDIF}
-
-{************************************}
-constructor TALTLBreakTextItem.Create;
-begin
-  inherited;
-  Line := '';
-  isEllipsis := False;
-end;
-
-{****************************************************************************}
-// !! This function is duplicated in ALJBreakText. Should there be any updates
-// to this function, ensure to apply the same changes to ALJBreakText as well.
-function ALTLBreakText(
-           const AFontFamily: String;
-           const AFontSize: single;
-           const AFontStyle: TFontStyles;
-           const AFontColor: TalphaColor;
-           var ARect: TRectF;
-           const AText: string;
-           const AWordWrap: Boolean;
-           const AHTextAlign, AVTextAlign: TTextAlign;
-           const ATrimming: TALTextTrimming;
-           const ABreakTextItems: TALTLBreakTextItems;
-           out ATotalLines: integer;
-           out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-           const AFirstLineIndent: TpointF;
-           const ALineSpacing: single = 0;
-           const AEllipsisText: string = '…';
-           const AEllipsisFontStyle: TFontStyles = [];
-           const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-           const AMaxlines: integer = 0): boolean; // Return true if the text was broken into several lines (truncated or not)
-
-var
-  LEllipsisLine: String;
-  LEllipsisLineLn: single;
-  LEllipsisLinePos: TpointF;
-  LEllipsisLineRect: TrectF;
-  LMaxWidth: single;
-  LLineIndent: Single;
-  LCurrLineY: single;
-  LAscent, LDescent: Single;
-
-  {~~~~~~~~~~~~~~~~~~}
-  function _BreakText(
-             const AFontFamily: String;
-             const AFontSize: single;
-             const AFontStyle: TFontStyles;
-             const AText: String;
-             const AMaxWidth: Single;
-             var AMeasuredWidth: Single): integer;
-  begin
-    // this is true on macos and on windows
-    // if AText = 'A' (only 1 char)
-    // then aLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0))
-    // will return 1 BUT
-    // aLayout.PositionAtPoint(TpointF.Create(0,0))
-    // will return 0
-    // so the conclusion is that aLayout.PositionAtPoint return at the right border
-    // the position of the NEXT character (it's good it's what we need)
-    // -------
-    // also it's seam than aLayout.PositionAtPoint never return an index on a LOW surrogate
-    // (remember that aLayout.PositionAtPoint return at the right border the index of the
-    // NEXT charactere, so it's index-1 that is matter for us and if index <> LOW surrogate then
-    // index-1 <> HIGH surrogate). this because in the delphi source code of PositionAtPoint they do at the end:
-    //  if (Result >= 0) and (Result < Text.Length) and Text.Chars[Result].IsLowSurrogate then Inc(Result);
-    var LLayout := TTextLayoutManager.DefaultTextLayout.Create;
-    try
-      LLayout.BeginUpdate;
-      LLayout.Font.Family := AFontFamily;
-      LLayout.Font.Size := AFontSize;
-      LLayout.Font.Style := AFontStyle;
-      LLayout.MaxSize := Tpointf.Create(aMaxWidth, 65535);
-      LLayout.Trimming := TTextTrimming.Character;
-      LLayout.VerticalAlign := TTextAlign.Leading;
-      LLayout.HorizontalAlign := TTextAlign.Leading;
-      //seam to not work when LLayout.WordWrap := False;
-      //https://quality.embarcadero.com/browse/RSP-39734
-      LLayout.WordWrap := True;
-      //https://quality.embarcadero.com/browse/RSP-16649
-      if (AText <> '') and (AText.Chars[AText.Length - 1].IsLowSurrogate) then LLayout.Text := AText + ' '
-      else LLayout.Text := AText;
-      LLayout.EndUpdate;
-      aMeasuredWidth := LLayout.TextWidth;
-      //On macos this function is buggy and you need to update fmx.canvas.mac
-      //see https://quality.embarcadero.com/browse/RSP-16648 and https://quality.embarcadero.com/browse/RSP-16649
-      //Tepsilon.Position because if PositionAtPoint = exactly aMeasuredWidth then it's return -1
-      result := LLayout.PositionAtPoint(TpointF.Create(aMeasuredWidth - Tepsilon.Position,0));
-      // remove the extra space we added because of https://quality.embarcadero.com/browse/RSP-16649
-      result := min(AText.Length, result);
-      if result < 0 then result := 0;
-    finally
-      ALFreeAndNil(LLayout);
-    end;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _initEllipsis;
-  begin
-    if LEllipsisLine = '' then begin
-      if AEllipsisText = '' then LEllipsisLine := '…'
-      else LEllipsisLine := AEllipsisText;
-      //-----
-      _BreakText(
-        AFontFamily, // const AFontFamily: String;
-        AFontSize, // const AFontSize: single;
-        AEllipsisFontStyle, // const AFontStyle: TFontStyles;
-        LEllipsisLine, // const AText: String;
-        65535, // const aMaxWidth: Single;
-        LEllipsisLineLn); // var aMeasuredWidth: Single)
-      //-----
-      case AHTextAlign of
-        TTextAlign.Center: begin
-                             LEllipsisLinePos := TpointF.create((LMaxWidth - LEllipsisLineLn - LLineIndent) / 2, LCurrLineY);
-                           end;
-        TTextAlign.Leading: begin
-                              LEllipsisLinePos := TpointF.create(LLineIndent, LCurrLineY);
-                            end;
-        TTextAlign.Trailing: begin
-                               LEllipsisLinePos := TpointF.create(LMaxWidth - LEllipsisLineLn, LCurrLineY);
-                             end;
-      end;
-      LEllipsisLineRect := Trectf.Create(
-                             TPointF.Create(
-                               LEllipsisLinePos.x,
-                               LEllipsisLinePos.Y - (-1*LAscent)),
-                             LEllipsisLineLn,
-                             (-1*LAscent) + LDescent);
-    end;
-  end;
-
-begin
-
-  //init result
-  result := false;
-  AAllTextDrawn := True;
-
-  //init ABreakTextItemsStartCount
-  var LBreakTextItemsStartCount := ABreakTextItems.Count;
-
-  //init aMaxWidth / aMaxHeight / aMaxLineWidth / ATotalLinesHeight
-  if ARect.Width > 65535 then ARect.Width := 65535;
-  if ARect.height > 65535 then ARect.height := 65535;
-  LMaxWidth := ARect.width;
-  var LMaxHeight: single := ARect.Height;
-  var LMaxLineWidth: single := 0;
-  var LTotalLinesHeight: single := 0;
-
-  //init ATextIdx / ATextLn
-  var LTextIdx := 0;
-  var LTextLn := AText.length;
-
-  //Init metrics / aCurrLineY / aLineHeight
-  var LLayout := TTextLayoutManager.DefaultTextLayout.Create;
-  try
-    LLayout.BeginUpdate;
-    LLayout.Text := '^_'; // << seam that aLayout.TextHeight will be the same for all characters so doesn't matter what we set here
-    LLayout.Font.Family := AFontFamily;
-    LLayout.Font.Size := AFontSize;
-    LLayout.Font.Style := AFontStyle;
-    LLayout.EndUpdate;
-    // Unfortunatly TTextlayout don't gave any ascent/descent ( https://quality.embarcadero.com/browse/RSP-16645
-    // also the canvas.FillText don't ask the base line of the text but the top/left corner so it's better to say
-    // that ascent = 0 and descent = height of the font
-    LAscent := 0;
-    LDescent := LLayout.TextHeight;
-  finally
-    ALFreeAndNil(LLayout);
-  end;
-  LCurrLineY := AFirstLineIndent.y + (-1*LAscent); // aMetrics.top and aMetrics.ascent are always returned in negative value
-  ATotalLines := 0;
-  var LLineHeight: single := LDescent + ALineSpacing + (-1*LAscent);
-
-  //init AEllipsisLine
-  LEllipsisLine := '';
-  LEllipsisLineLn := 0;
-
-  //init aLineIndent
-  LLineIndent := AFirstLineIndent.x;
-
-  //if we have at least enalf of height to write the 1rt row
-  if comparevalue(AFirstLineIndent.y + LDescent + (-1*LAscent),LMaxHeight,Tepsilon.position) <= 0 then begin
-
-    //loop still their is some chars
-    while LTextIdx < LTextLn do begin
-
-      // init aline
-      var LLine: String := '';
-      var I := AText.indexOf(#13 {c}, LTextIdx{start}); // find if their is some #13 (MSWINDOWS linebreak = #13#10)
-      var J := AText.indexOf(#10 {c}, LTextIdx{start}); // find if their is some #10 (UNIX linebreak = #10)
-      if (I >= 0) and (J >= 0) then I := min(I,J)
-      else I := max(I, J);
-      var LLineEndWithBreakLine: Boolean;
-      if I = LTextIdx then begin
-        LLine := '';
-        LLineEndWithBreakLine := True;
-        result := true;
-      end
-      else if I > 0 then begin
-        LLine := AText.substring(LTextIdx{startIndex}, I - LTextIdx{length}); // skip the $0D/$0A
-        LLineEndWithBreakLine := True;
-        result := true;
-      end
-      else begin
-        LLine := AText.substring(LTextIdx{startIndex});
-        LLineEndWithBreakLine := False;
-      end;
-
-      //calculate the number of char in the current line (this work good also if aline is empty)
-      var LMeasuredWidth: Single;
-      var LNumberOfChars := _BreakText(
-                              AFontFamily,
-                              AFontSize,
-                              AFontStyle,
-                              LLine {text},
-                              LMaxWidth - LLineIndent, {maxWidth}
-                              LMeasuredWidth {measuredWidth});
-
-      //init result
-      if LNumberOfChars < LLine.length then result := true;
-
-      //if we need to break the text
-      if (LNumberOfChars < LLine.length) or // << if aNumberOfChars < aLine.length it's evident we will need to break the text
-         (                                                                                                // <<
-          (LLineEndWithBreakLine) and                                                                     // <<
-          (AEllipsisText <> '') and                                                                       // <<
-          (                                                                                               // << we need this check to add the ellipsis on the last line
-           (not AWordWrap) or                                                                             // << when the last line finish by a break line (#13#10)
-           ((compareValue(LCurrLineY + LLineHeight + LDescent, LMaxHeight, Tepsilon.position) > 0) or     // <<
-            ((AMaxlines > 0) and (ATotalLines >= AMaxlines - 1)))                                         // <<
-          )                                                                                               // <<
-         )                                                                                                // <<
-      then begin
-
-        //if not AWordWrap
-        if not AWordWrap then begin
-          AAllTextDrawn := False; // aNumberOfChars < aLine.length so in anycase we will not draw all the text
-          if AEllipsisText = '' then begin
-            if LNumberOfChars > 0 then
-              LLine := LLine.substring(0, LNumberOfChars);
-          end
-          else begin
-            case ATrimming of
-              TALTextTrimming.Character: begin
-                _initEllipsis;
-                //(aNumberOfChars < aLine.length) to know that we are not here
-                //because of manual linebreak and dec(aNumberOfChars) because initialy
-                //we considere that AEllipsisText is only one char
-                if (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
-                while LNumberOfChars > 0 do begin
-                  LLine := LLine.substring(0, LNumberOfChars);
-                  LNumberOfChars := _BreakText(
-                                      AFontFamily,
-                                      AFontSize,
-                                      AFontStyle,
-                                      LLine {text},
-                                      LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                      LMeasuredWidth {measuredWidth});
-                  if LNumberOfChars >= LLine.length then break;
-                end;
-              end;
-
-              TALTextTrimming.Word: begin
-                _initEllipsis;
-                var LSaveNumberOfChars := LNumberOfChars;
-                var LSaveNumberOfCharsIsAccurate := False;
-                while LNumberOfChars > 0 do begin
-                  if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
-                    LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                  end
-                  //----
-                  else if LNumberOfChars >= 2 then begin
-                    var LChar := LLine.chars[LNumberOfChars-2];
-                    if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
-                      dec(LNumberOfChars);
-                      continue;
-                    end;
-                    LLine := LLine.substring(0, LNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish with space
-                  end
-                  //----
-                  else begin
-                    LNumberOfChars := LSaveNumberOfChars;
-                    //(aNumberOfChars < aLine.length) to know that we are not here
-                    //because of manual linebreak and dec(aNumberOfChars) because initialy
-                    //we considere that AEllipsisText is only one char
-                    if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
-                    while LNumberOfChars > 0 do begin
-                      LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                      LNumberOfChars := _BreakText(
-                                          AFontFamily,
-                                          AFontSize,
-                                          AFontStyle,
-                                          LLine {text},
-                                          LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                          LMeasuredWidth {measuredWidth});
-                      if LNumberOfChars >= LLine.length then break;
-                    end;
-                    break;
-                  end;
-                  //----
-                  LNumberOfChars := _BreakText(
-                                      AFontFamily,
-                                      AFontSize,
-                                      AFontStyle,
-                                      LLine {text},
-                                      LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                      LMeasuredWidth {measuredWidth});
-                  if LNumberOfChars >= LLine.length then break
-                  else begin
-                    LSaveNumberOfChars:= LNumberOfChars;
-                    LSaveNumberOfCharsIsAccurate := True;
-                  end;
-                end;
-              end;
-
-              else
-                raise Exception.Create('Error #F88E3622-E91E-4678-AA84-CA0C3093BCE3');
-            end;
-          end;
-        end
-
-        //if AWordWrap
-        else begin
-
-          //We are at the last line and AEllipsisText <> ''
-          if ((compareValue(LCurrLineY + LLineHeight + LDescent, LMaxHeight, Tepsilon.position) > 0) or
-              ((AMaxlines > 0) and (ATotalLines >= AMaxlines - 1))) and
-             (AEllipsisText <> '') then begin
-
-            AAllTextDrawn := False; // if we are at the last line then in anycase we will not draw all the text
-            _initEllipsis;
-            //-----
-            var LSaveNumberOfChars := LNumberOfChars;
-            var LSaveNumberOfCharsIsAccurate := False;
-            while LNumberOfChars > 0 do begin
-              if (LNumberOfChars >= LLine.length) then begin // if (aNumberOfChars >= aLine.length) then we are here because of manual linebreak
-                LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-              end
-              //----
-              else if (ATrimming = TALTextTrimming.Word) and (LNumberOfChars >= 2) then begin
-                var LChar := LLine.chars[LNumberOfChars-2];
-                if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
-                  dec(LNumberOfChars);
-                  continue;
-                end;
-                LLine := LLine.substring(0, LNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish with space
-              end
-              //----
-              else begin
-                LNumberOfChars := LSaveNumberOfChars;
-                //(aNumberOfChars < aLine.length) to know that we are not here
-                //because of manual linebreak and dec(aNumberOfChars) because initialy
-                //we considere that AEllipsisText is only one char
-                if (not LSaveNumberOfCharsIsAccurate) and (LNumberOfChars < LLine.length) then dec(LNumberOfChars);
-                while LNumberOfChars > 0 do begin
-                  LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                  LNumberOfChars := _BreakText(
-                                      AFontFamily,
-                                      AFontSize,
-                                      AFontStyle,
-                                      LLine {text},
-                                      LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                      LMeasuredWidth {measuredWidth});
-                  if LNumberOfChars >= LLine.length then break;
-                end;
-                break;
-              end;
-              //----
-              LNumberOfChars := _BreakText(
-                                  AFontFamily,
-                                  AFontSize,
-                                  AFontStyle,
-                                  LLine {text},
-                                  LMaxWidth - LEllipsisLineLn - LLineIndent, {maxWidth}
-                                  LMeasuredWidth {measuredWidth});
-              if LNumberOfChars >= LLine.length then break
-              else begin
-                LSaveNumberOfChars:= LNumberOfChars;
-                LSaveNumberOfCharsIsAccurate := True;
-              end;
-            end;
-
-          end
-
-          //We are not at the last line or AEllipsisText = ''
-          else begin
-
-            //We are at the last line and AEllipsisText = '' and more line available
-            if (AEllipsisText = '') and
-               ((compareValue(LCurrLineY + LLineHeight + LDescent, LMaxHeight, Tepsilon.position) > 0) or
-                ((AMaxlines > 0) and (ATotalLines >= AMaxlines - 1))) then AAllTextDrawn := False;
-
-            //Cut the line
-            var LSaveNumberOfChars := LNumberOfChars;
-            if LNumberOfChars < LLine.length then inc(LNumberOfChars); // in case the space separator is just after aNumberOfChars
-            while LNumberOfChars > 0 do begin
-              if LNumberOfChars >= 2 then begin
-                var LChar := LLine.chars[LNumberOfChars-1];
-                if (not LChar.IsWhiteSpace) or (LChar.ToUCS4Char = $00A0{No-break Space}) then begin
-                  dec(LNumberOfChars);
-                  continue;
-                end;
-                LLine := LLine.substring(0, LNumberOfChars-1); // length of aLine is now aNumberOfChars - 1 and finish just before the space
-              end
-              //-----
-              else begin
-                LNumberOfChars := LSaveNumberOfChars;
-                if compareValue(LLineIndent, 0, TEpsilon.position) > 0 then LNumberOfChars := 0;
-                while LNumberOfChars > 0 do begin
-                  LLine := LLine.substring(0, LNumberOfChars); // length of aLine is now aNumberOfChars
-                  LNumberOfChars := _BreakText(
-                                      AFontFamily,
-                                      AFontSize,
-                                      AFontStyle,
-                                      LLine {text},
-                                      LMaxWidth - LLineIndent, {maxWidth}
-                                      LMeasuredWidth {measuredWidth});
-                  if LNumberOfChars >= LLine.length then break;
-                end;
-                break;
-              end;
-              //-----
-              LNumberOfChars := _BreakText(
-                                  AFontFamily,
-                                  AFontSize,
-                                  AFontStyle,
-                                  LLine {text},
-                                  LMaxWidth - LLineIndent, {maxWidth}
-                                  LMeasuredWidth {measuredWidth});
-              if LNumberOfChars >= LLine.length then begin
-                inc(LNumberOfChars); // to skip the separator
-                break;
-              end
-              else LSaveNumberOfChars:= LNumberOfChars;
-            end;
-
-          end;
-
-        end;
-
-      end;
-
-      //init aMaxLineWidth
-      LMaxLineWidth := max(LMaxLineWidth, LMeasuredWidth + LEllipsisLineLn + LLineIndent);
-
-      // update ATotalLinesHeight
-      LTotalLinesHeight := LCurrLineY + LDescent;
-
-      // their is not enalf of place to write at least one char or
-      // we are on the #13/#10
-      // NOTE: we need to remove the breakline because for exemple we have
-      // coco sur le cocotier#13#10
-      // then aline will be equal to
-      // coco sur le cocotier
-      // we draw this line, and then we increase aCurrLineY := aCurrLineY + aLineHeight;
-      // so it's mean the #13#10 was already taking in account, so we must delete it
-      if LNumberOfChars <= 0 then begin
-        if (LTextIdx + 1 < LTextLn) and
-           (AText.Chars[LTextIdx] = #13) and
-           (AText.Chars[LTextIdx + 1] = #10) then LTextIdx := LTextIdx + 2 // (MSWINDOWS linebreak = #13#10)
-        else if (LTextIdx < LTextLn) and
-                (AText.Chars[LTextIdx] = #10) then LTextIdx := LTextIdx + 1 // (UNIX linebreak = #10)
-        else if (LTextIdx < LTextLn) and
-                ((AText.Chars[LTextIdx].IsWhiteSpace) and
-                 (AText.Chars[LTextIdx].ToUCS4Char <> $00A0{No-break Space})) then LTextIdx := LTextIdx + 1 // (white space) if we don't have place to write
-                                                                                                            // ' blabla' then break it in
-                                                                                                            //
-                                                                                                            //  |yoyoyoyo|
-                                                                                                            //  |blabla  |
-                                                                                                            //
-                                                                                                            //  and not in
-                                                                                                            //
-                                                                                                            //  |yoyoyoyo|
-                                                                                                            //  | blabla |
-                                                                                                            //
-        else if compareValue(LLineIndent, 0, Tepsilon.Position) <= 0 then begin // if aLineIndent > 0 then maybe we don't have enalf of place to write one char because of the aLineIndent.
-          LTextIdx := LTextIdx + 1; // skip the current char
-          if (LTextIdx < LTextLn) and
-             (AText.Chars[LTextIdx].IsLowSurrogate) then inc(LTextIdx);
-        end;
-        LCurrLineY := LCurrLineY + LLineHeight; // go to next line
-        inc(ATotalLines);
-        LLineIndent := 0;
-        if (not AWordWrap) or
-           ((AMaxlines > 0) and (ATotalLines >= AMaxlines)) or
-           (compareValue(LCurrLineY + LDescent, LMaxHeight, TEpsilon.position) > 0) then break
-        else continue;
-      end
-      else begin
-        LTextIdx := LTextIdx + LNumberOfChars;
-        if (LTextIdx + 1 < LTextLn) and
-           (AText.Chars[LTextIdx] = #13) and
-           (AText.Chars[LTextIdx + 1] = #10) then LTextIdx := LTextIdx + 2 // (MSWINDOWS linebreak = #13#10)
-        else if (LTextIdx < LTextLn) and
-                (AText.Chars[LTextIdx] = #10) then LTextIdx := LTextIdx + 1;
-      end;
-
-      //init LBreakTextItem
-      var LBreakTextItem := TALTLBreakTextItem.Create;
-      try
-
-        //update aBreakTextItem
-        LBreakTextItem.line := LLine;
-        case AHTextAlign of
-          TTextAlign.Center: begin
-                               LBreakTextItem.pos := TpointF.create((LMaxWidth - LMeasuredWidth - LEllipsisLineLn - LLineIndent) / 2, LCurrLineY);
-                             end;
-          TTextAlign.Leading: begin
-                                LBreakTextItem.pos := TpointF.create(LLineIndent, LCurrLineY);
-                              end;
-          TTextAlign.Trailing: begin
-                                 LBreakTextItem.pos := TpointF.create(LMaxWidth - LMeasuredWidth - LEllipsisLineLn, LCurrLineY);
-                               end;
-        end;
-        LBreakTextItem.rect := Trectf.Create(
-                                 TPointF.Create(
-                                   LBreakTextItem.pos.x,
-                                   LBreakTextItem.pos.Y - (-1*LAscent)),
-                                 LMeasuredWidth,
-                                 (-1*LAscent) + LDescent);
-
-        //update AEllipsisLinePos / AEllipsisLinerect
-        if LEllipsisLine <> '' then begin
-          LEllipsisLinePos := TpointF.Create(LBreakTextItem.pos.x + LMeasuredWidth, LCurrLineY);
-          LEllipsisLineRect := Trectf.Create(
-                                 TPointF.Create(
-                                   LBreakTextItem.pos.x + LMeasuredWidth,
-                                   LBreakTextItem.pos.Y - (-1*LAscent)),
-                                 LEllipsisLineLn,
-                                 (-1*LAscent) + LDescent);
-        end;
-
-        // update ABreakTextItems
-        ABreakTextItems.Add(LBreakTextItem);
-
-      except
-        ALFreeAndNil(LBreakTextItem);
-        raise;
-      end;
-
-      //update aCurrLineY
-      LCurrLineY := LCurrLineY + LLineHeight;
-      inc(ATotalLines);
-
-      //update aLineIndent
-      LLineIndent := 0;
-
-      // stop if not AWordWrap or after maxheight
-      if (not AWordWrap) or
-         ((AMaxlines > 0) and (ATotalLines >= AMaxlines)) or
-         (compareValue(LCurrLineY + LDescent, LMaxHeight, TEpsilon.position) > 0) then break;
-
-      //add the last empty row if their is one
-      if (LTextIdx >= LTextLn) and LLineEndWithBreakLine and (LEllipsisLine = '') then begin
-
-        //init LBreakTextItem
-        LBreakTextItem := TALTLBreakTextItem.Create;
-        try
-
-          //update aBreakTextItem
-          LBreakTextItem.line := '';
-          case AHTextAlign of
-            TTextAlign.Center: begin
-                                 LBreakTextItem.pos := TpointF.create((LMaxWidth - LEllipsisLineLn - LLineIndent) / 2, LCurrLineY);
-                               end;
-            TTextAlign.Leading: begin
-                                  LBreakTextItem.pos := TpointF.create(LLineIndent, LCurrLineY);
-                                end;
-            TTextAlign.Trailing: begin
-                                   LBreakTextItem.pos := TpointF.create(LMaxWidth - LEllipsisLineLn, LCurrLineY);
-                                 end;
-          end;
-          LBreakTextItem.rect := Trectf.Create(
-                                   TPointF.Create(
-                                     LBreakTextItem.pos.x,
-                                     LBreakTextItem.pos.Y - (-1*LAscent)),
-                                   0,
-                                   (-1*LAscent) + LDescent);
-
-          // update ABreakTextItems
-          ABreakTextItems.Add(LBreakTextItem);
-
-        except
-          ALFreeAndNil(LBreakTextItem);
-          raise;
-        end;
-
-        //update aCurrLineY
-        LCurrLineY := LCurrLineY + LLineHeight;
-        inc(ATotalLines);
-
-      end;
-
-    end;
-
-  end
-  else result := true;
-
-  //add the end ellipsis
-  if LEllipsisLine <> '' then begin
-    var LBreakTextItem := TALTLBreakTextItem.Create;
-    try
-      LBreakTextItem.line := LEllipsisLine;
-      LBreakTextItem.pos := LEllipsisLinePos;
-      LBreakTextItem.rect := LEllipsisLineRect;
-      LBreakTextItem.isEllipsis := True;
-      ABreakTextItems.Add(LBreakTextItem);
-    except
-      ALFreeAndNil(LBreakTextItem);
-      raise;
-    end;
-  end;
-
-  //initialise ARect
-  if compareValue(LMaxLineWidth, LMaxWidth, Tepsilon.Position) < 0 then begin
-    case AHTextAlign of
-       TTextAlign.Center: begin
-                            var LOffset: single := Floor((ARect.Right - LMaxLineWidth - ARect.Left) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                            ARect.Left := ARect.Left + LOffset;
-                            ARect.right := ARect.right - LOffset;
-                            for var I := LBreakTextItemsStartCount to ABreakTextItems.Count - 1 do begin
-                              ABreakTextItems[I].pos.X := ABreakTextItems[I].pos.X - LOffset;
-                              ABreakTextItems[I].rect.Offset(-LOffset, 0);
-                            end;
-                          end;
-       TTextAlign.Leading: begin
-                             ARect.Right := min(ARect.Right, ARect.Left + LMaxLineWidth);
-                           end;
-       TTextAlign.Trailing: begin
-                              var LOffset: single := Floor(ARect.Right - LMaxLineWidth - ARect.Left); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                              ARect.Left := ARect.Left + LOffset;
-                              for var I := LBreakTextItemsStartCount to ABreakTextItems.Count - 1 do begin
-                                ABreakTextItems[I].pos.X := ABreakTextItems[I].pos.X - LOffset;
-                                ABreakTextItems[I].rect.Offset(-LOffset, 0);
-                              end;
-                            end;
-    end;
-  end;
-  if compareValue(LTotalLinesHeight, LMaxHeight, Tepsilon.Position) < 0 then begin
-    case AVTextAlign of
-       TTextAlign.Center: begin
-                            var LOffset: single := (ARect.bottom - LTotalLinesHeight - ARect.top) / 2;
-                            ARect.top := ARect.top + LOffset;
-                            ARect.bottom := ARect.bottom - LOffset;
-                          end;
-       TTextAlign.Leading: begin
-                             ARect.bottom := min(ARect.bottom, ARect.top + LTotalLinesHeight);
-                           end;
-       TTextAlign.Trailing: begin
-                              var LOffset: single := ARect.bottom - LTotalLinesHeight - ARect.top;
-                              ARect.top := ARect.top + LOffset;
-                            end;
-    end;
-  end;
-
-end;
-
-{*********************************************}
-constructor TALDrawMultiLineTextOptions.Create;
+{*****************************************}
+constructor TALMultiLineTextOptions.Create;
 begin
   Scale := 1;
   //--
@@ -2410,6 +276,8 @@ begin
   DecorationColor := TAlphaColors.Null;
   //--
   EllipsisText := '…';
+  EllipsisInheritSettings := True;
+  //--
   EllipsisFontFamily := '';
   EllipsisFontSize := 14;
   EllipsisFontWeight := TFontWeight.Regular;
@@ -2426,8 +294,7 @@ begin
   AutoSizeX := False;
   AutoSizeY := False;
   MaxLines := 65535;
-  LineHeight := 0;
-  LineSpacing := 0;
+  LineHeightMultiplier := 0;
   LetterSpacing := 0;
   Trimming := TALTextTrimming.Word;
   FailIfTextBroken := false;
@@ -2439,9 +306,14 @@ begin
   FillColor := TAlphaColors.Null;
   StrokeColor := TalphaColors.Null;
   StrokeThickness := 1;
+  ShadowColor := TAlphaColors.Null;
+  ShadowBlur := 12;
+  ShadowOffsetX := 0;
+  ShadowOffsetY := 0;
   //--
   FFill := nil;
   FStroke := nil;
+  FShadow := nil;
   //--
   Sides := AllSides;
   XRadius := 0;
@@ -2452,122 +324,217 @@ begin
   TextIsHtml := false;
 end;
 
-{***************************************************}
-function TALDrawMultiLineTextOptions.GetFill: TBrush;
+{***********************************************}
+function TALMultiLineTextOptions.GetFill: TBrush;
 begin
   if FFill = nil then
     FFill := TBrush.Create(TbrushKind.None, $FFE0E0E0);
   result := FFill;
 end;
 
-{***********************************************************}
-function TALDrawMultiLineTextOptions.GetStroke: TStrokeBrush;
+{*******************************************************}
+function TALMultiLineTextOptions.GetStroke: TStrokeBrush;
 begin
   if FStroke = nil then
     FStroke := TStrokeBrush.Create(TbrushKind.None,  $FF000000);
   result := FStroke;
 end;
 
-{***********************************************************}
-function TALDrawMultiLineTextOptions.IsFillAssigned: Boolean;
+{****************************************************}
+function TALMultiLineTextOptions.GetShadow: TALShadow;
+begin
+  if FShadow = nil then
+    FShadow := TALShadow.Create;
+  result := FShadow;
+end;
+
+{*******************************************************}
+function TALMultiLineTextOptions.IsFillAssigned: Boolean;
 begin
   result := FFill <> nil;
 end;
 
-{*************************************************************}
-function TALDrawMultiLineTextOptions.IsStrokeAssigned: Boolean;
+{*********************************************************}
+function TALMultiLineTextOptions.IsStrokeAssigned: Boolean;
 begin
   result := FStroke <> nil;
 end;
 
-{*************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledFontSize: Single;
+{*********************************************************}
+function TALMultiLineTextOptions.IsShadowAssigned: Boolean;
+begin
+  result := FShadow <> nil;
+end;
+
+{*********************************************************}
+function TALMultiLineTextOptions.GetScaledFontSize: Single;
 begin
   Result := FontSize * Scale;
 end;
 
-{************************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledEllipsisFontSize: Single;
+{*****************************************************************}
+function TALMultiLineTextOptions.GetScaledEllipsisFontSize: Single;
 begin
   Result := EllipsisFontSize * Scale;
 end;
 
-{****************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledLineSpacing: Single;
-begin
-  Result := LineSpacing * Scale;
-end;
-
-{***************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledLineHeight: Single;
-begin
-  Result := LineHeight * Scale;
-end;
-
-{******************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledLetterSpacing: Single;
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledLetterSpacing: Single;
 begin
   Result := LetterSpacing * Scale;
 end;
 
-{********************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledStrokeThickness: Single;
+{****************************************************************}
+function TALMultiLineTextOptions.GetScaledStrokeThickness: Single;
 begin
   Result := StrokeThickness * Scale;
 end;
 
-{************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledXRadius: Single;
+{***********************************************************}
+function TALMultiLineTextOptions.GetScaledShadowBlur: Single;
+begin
+  Result := ShadowBlur * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledShadowOffsetX: Single;
+begin
+  Result := ShadowOffsetX * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledShadowOffsetY: Single;
+begin
+  Result := ShadowOffsetY * Scale;
+end;
+
+{********************************************************}
+function TALMultiLineTextOptions.GetScaledXRadius: Single;
 begin
   Result := XRadius * Scale;
 end;
 
-{************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledYRadius: Single;
+{********************************************************}
+function TALMultiLineTextOptions.GetScaledYRadius: Single;
 begin
   Result := YRadius * Scale;
 end;
 
-{***************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledPaddingTop: Single;
+{***********************************************************}
+function TALMultiLineTextOptions.GetScaledPaddingTop: Single;
 begin
   Result := Padding.Top * Scale;
 end;
 
-{*****************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledPaddingRight: Single;
+{*************************************************************}
+function TALMultiLineTextOptions.GetScaledPaddingRight: Single;
 begin
   Result := Padding.Right * Scale;
 end;
 
-{****************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledPaddingLeft: Single;
+{************************************************************}
+function TALMultiLineTextOptions.GetScaledPaddingLeft: Single;
 begin
   Result := Padding.Left * Scale;
 end;
 
-{******************************************************************}
-function TALDrawMultiLineTextOptions.GetScaledPaddingBottom: Single;
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledPaddingBottom: Single;
 begin
   Result := Padding.Bottom * Scale;
 end;
 
-{*********************************************}
-destructor TALDrawMultiLineTextOptions.Destroy;
+{*****************************************}
+destructor TALMultiLineTextOptions.Destroy;
 begin
   ALFreeAndNil(FFill);
   ALFreeAndNil(FStroke);
+  ALFreeAndNil(FShadow);
   inherited destroy;
 end;
 
-{***************************}
-function ALDrawMultiLineText(
-           const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALDrawMultiLineTextOptions.TextIsHtml field declaration.
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
+{*************************************}
+function ALCreateMultiLineTextDrawable(
+           const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable;
+           const AOptions: TALMultiLineTextOptions): TALDrawable;
+
+  {$REGION 'TRangeIndex'}
+  {$IF defined(ALSkiaEngine)}
+  type
+    TRangeIndex = record
+      SpanID: String;
+      start: Integer;
+      &end: Integer;
+    end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'TExtendedTextElement'}
+  {$IF not defined(ALSkiaEngine)}
+  Type
+    TExtendedTextElement = record
+      Id: string;
+      LineIndex: Integer;
+      Rect: TrectF;
+      DrawTextOffsetY: Single;
+      Ascent: Single;
+      Descent: Single;
+      LineHeightMultiplier: Single;
+      LetterSpacing: Single;
+      Text: String;
+      IsEllipsis: Boolean;
+      IsBreakLine: Boolean;
+      BackgroundColor: TAlphaColor;
+      FontFamily: String;
+      FontSize: single;
+      FontWeight: TFontWeight;
+      FontSlant: TFontSlant;
+      FontStretch: TFontStretch;
+      FontColor: TalphaColor;
+      DecorationKinds: TALTextDecorationKinds;
+      DecorationStyle: TALTextDecorationStyle;
+      DecorationThicknessMultiplier: Single;
+      DecorationColor: TAlphaColor;
+      ImgSrc: String;
+    end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'TWinBitmap'}
+  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+  Type
+    TWinBitmap = record
+      BitmapInfo: TBitmapInfo;
+      DC: HDC;
+      Bitmap: HBITMAP;
+      Bits: PAlphaColorRecArray;
+      Width, Height: Integer;
+    end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_findLastBreakPosition'}
+  // Returns zero-based index or, if you prefer, the number of characters
+  // If ANumberOfChars <= 0 returns ANumberOfChars
+  function _findLastBreakPosition(const AText: String; Const ANumberOfChars: Integer): integer;
+  begin
+    if ANumberOfChars <= 0 then exit(ANumberOfChars);
+    Var Ln := AText.Length;
+    Result := Min(ANumberOfChars, Ln);
+    While Result > 0 do begin
+      if (AText.Chars[Result-1] = '-') or
+         ((Result < Ln) and (AText.Chars[Result].IsWhiteSpace) and (not AText.Chars[Result-1].IsWhiteSpace)) then break
+      else dec(Result);
+    end;
+  end;
+  {$ENDREGION}
 
   {$REGION '_TryStrColorToInt'}
   Function _TryStrColorToInt(const AColorStr: String; out AColorInt: Cardinal): boolean;
@@ -2579,6 +546,14 @@ function ALDrawMultiLineText(
       if length(LColorStr) = 7 then insert('ff', LColorStr, 2); // $ffffffff
       Result := ALTryStrToUInt(LColorStr, AColorInt);
     end;
+  end;
+  {$ENDREGION}
+
+  {$REGION '_TryStrPxValueToFloat'}
+  Function _TryStrPxValueToFloat(const AValueStr: String; out AValueFloat: Single): boolean;
+  begin
+    if AlPosW('px', AValueStr) <= 0 then exit(False)
+    else result := ALTryStrToFloat(ALStringReplaceW(AValueStr, 'px', '', []), AValueFloat, ALDefaultFormatSettingsW);
   end;
   {$ENDREGION}
 
@@ -2597,7 +572,7 @@ function ALDrawMultiLineText(
               const ADecorationThicknessMultipliers: TList<Single>;
               const ADecorationColors: TList<TAlphaColor>;
               const ABackgroundColors: TList<TAlphaColor>;
-              const ALineHeights: TList<Single>;
+              const ALineHeightMultipliers: TList<Single>;
               const ALetterSpacings: TList<Single>;
               out AImgSrc: String;
               out AImgWidth: Single;
@@ -2618,6 +593,7 @@ function ALDrawMultiLineText(
       if LStyle <> '' then begin
         var LStyleParamList := TALStringListW.Create;
         try
+          LStyleParamList.NameValueSeparator := ':';
           ALExtractHeaderFieldsWithQuoteEscaped(
             [';']{Separators},
             [' ', #9, #13, #10]{WhiteSpace},
@@ -2626,15 +602,28 @@ function ALDrawMultiLineText(
             LStyleParamList{Strings},
             False{HttpDecode},
             True{StripQuotes});
+          //--
+          var LValue := ALLowerCase(LStyleParamList.Values['width']);
+          If ALPosW('px', LValue) > 0 then LStyleParamList.Values['width'] := ALStringReplaceW(LValue, 'px', '', [])
+          else LStyleParamList.Values['width'] := '';
+          //--
+          LValue := ALLowerCase(LStyleParamList.Values['height']);
+          If ALPosW('px', LValue) > 0 then LStyleParamList.Values['height'] := ALStringReplaceW(LValue, 'px', '', [])
+          else LStyleParamList.Values['height'] := '';
+          //--
           for var I := 0 to LStyleParamList.Count - 1 do
-            LParamList.Values[LStyleParamList.Names[i]] := LStyleParamList.ValueFromIndex[i];
+            LParamList.Values[LStyleParamList.Names[i]] := ALTrim(LStyleParamList.ValueFromIndex[i]);
         finally
           ALFreeAndNil(LStyleParamList);
         end;
       end;
       //--
-      if ASpanIds <> nil then
-        ASpanIds.Add(LParamList.Values['id']);
+      if ASpanIds <> nil then begin
+        var LSpanID := LParamList.Values['id'];
+        if LSpanID <> '' then ASpanIds.Add(LParamList.Values['id'])
+        else if ASpanIds.Count > 0 then ASpanIds.Add(ASpanIds[ASpanIds.Count - 1])
+        else ASpanIds.Add('');
+      end;
       //--
       if AFontFamilies <> nil then begin
         var LFontFamily := LParamList.Values['face']; // <font face="Arial">
@@ -2645,9 +634,8 @@ function ALDrawMultiLineText(
       end;
       //--
       if AFontSizes <> nil then begin
-        var LFontSize: Single := ALStrToFloatDef(LParamList.Values['size'], 0, ALDefaultFormatSettingsW); // <font size="16">
-        if CompareValue(LFontSize, 0, Tepsilon.FontSize) <= 0 then LFontSize := ALStrToFloatDef(LParamList.Values['font-size'], 0, ALDefaultFormatSettingsW); // <span font-size="16">
-        if CompareValue(LFontSize, 0, Tepsilon.FontSize) > 0 then AFontSizes.Add(LFontSize * AOptions.Scale)
+        var LFontSizeFloat: Single;
+        if _TryStrPxValueToFloat(ALLowerCase(LParamList.Values['font-size']), LFontSizeFloat) then AFontSizes.Add(LFontSizeFloat * AOptions.Scale) // <span font-size="14px">
         else if AFontSizes.Count > 0 then AFontSizes.Add(AFontSizes[AFontSizes.Count - 1])
         else AFontSizes.Add(AOptions.GetScaledFontSize);
       end;
@@ -2726,9 +714,8 @@ function ALDrawMultiLineText(
       end;
       //--
       If ADecorationThicknessMultipliers <> nil then begin
-        var LDecorationThicknessMultiplierStr := ALLowerCase(LParamList.Values['text-decoration-thickness']); // <span text-decoration-thickness="3">
         var LDecorationThicknessMultiplierFloat: Single;
-        if ALTryStrToFloat(LDecorationThicknessMultiplierStr, LDecorationThicknessMultiplierFloat, ALDefaultFormatSettingsW) then ADecorationThicknessMultipliers.Add(LDecorationThicknessMultiplierFloat)
+        if ALTryStrToFloat(LParamList.Values['text-decoration-thickness'], LDecorationThicknessMultiplierFloat, ALDefaultFormatSettingsW) then ADecorationThicknessMultipliers.Add(LDecorationThicknessMultiplierFloat) // <span text-decoration-thickness="3">
         else if ADecorationThicknessMultipliers.Count > 0 then ADecorationThicknessMultipliers.Add(ADecorationThicknessMultipliers[ADecorationThicknessMultipliers.Count - 1])
         else ADecorationThicknessMultipliers.Add(AOptions.DecorationThicknessMultiplier);
       end;
@@ -2747,22 +734,16 @@ function ALDrawMultiLineText(
         else ABackgroundColors.Add(TalphaColors.Null);
       end;
       //--
-      If ALineHeights <> nil then begin
-        var LLineHeightStr := ALLowerCase(LParamList.Values['line-height']); // <span line-height="15px">
-        var LIsWithPx := AlPosW('px', LLineHeightStr) > 0;
-        if LIsWithPx then LLineHeightStr := ALStringReplaceW(LLineHeightStr, 'px', '', []);
-        var LLineHeightFloat: Single;
-        if LIsWithPx and ALTryStrToFloat(LLineHeightStr, LLineHeightFloat, ALDefaultFormatSettingsW) then ALineHeights.Add(LLineHeightFloat * AOptions.Scale)
-        else if ALineHeights.Count > 0 then ALineHeights.Add(ALineHeights[ALineHeights.Count - 1])
-        else ALineHeights.Add(AOptions.GetScaledLineHeight);
+      If ALineHeightMultipliers <> nil then begin
+        var LLineHeightMultiplierFloat: Single;
+        if ALTryStrToFloat(LParamList.Values['line-height'], LLineHeightMultiplierFloat, ALDefaultFormatSettingsW) then ALineHeightMultipliers.Add(LLineHeightMultiplierFloat) // <span line-height="1.6">
+        else if ALineHeightMultipliers.Count > 0 then ALineHeightMultipliers.Add(ALineHeightMultipliers[ALineHeightMultipliers.Count - 1])
+        else ALineHeightMultipliers.Add(AOptions.LineHeightMultiplier);
       end;
       //--
       If ALetterSpacings <> nil then begin
-        var LLetterSpacingStr := ALLowerCase(LParamList.Values['letter-spacing']); // <span letter-spacing="3px">
-        var LIsWithPx := AlPosW('px', LLetterSpacingStr) > 0;
-        if LIsWithPx then LLetterSpacingStr := ALStringReplaceW(LLetterSpacingStr, 'px', '', []);
         var LLetterSpacingFloat: Single;
-        if LIsWithPx and ALTryStrToFloat(LLetterSpacingStr, LLetterSpacingFloat, ALDefaultFormatSettingsW) then ALetterSpacings.Add(LLetterSpacingFloat * AOptions.Scale)
+        if _TryStrPxValueToFloat(ALLowerCase(LParamList.Values['letter-spacing']), LLetterSpacingFloat) then ALetterSpacings.Add(LLetterSpacingFloat * AOptions.Scale) // <span letter-spacing="3px">
         else if ALetterSpacings.Count > 0 then ALetterSpacings.Add(ALetterSpacings[ALetterSpacings.Count - 1])
         else ALetterSpacings.Add(AOptions.GetScaledLetterSpacing);
       end;
@@ -2793,7 +774,7 @@ function ALDrawMultiLineText(
               const ADecorationThicknessMultipliers: TList<Single>;
               const ADecorationColors: TList<TAlphaColor>;
               const ABackgroundColors: TList<TAlphaColor>;
-              const ALineHeights: TList<Single>;
+              const ALineHeightMultipliers: TList<Single>;
               const ALetterSpacings: TList<Single>); overload;
   begin
     Var LImgSrc: String;
@@ -2813,7 +794,7 @@ function ALDrawMultiLineText(
       ADecorationThicknessMultipliers, // const ADecorationThicknessMultipliers: TList<Single>;
       ADecorationColors, // const ADecorationColors: TList<TAlphaColor>;
       ABackgroundColors, // const ABackgroundColors: TList<TAlphaColor>;
-      ALineHeights, // const ALineHeights: TList<Single>;
+      ALineHeightMultipliers, // const ALineHeightMultipliers: TList<Single>;
       ALetterSpacings, // const ALetterSpacings: TList<Single>;
       LImgSrc, // out AImgSrc: String;
       LImgWidth, // out AImgWidth: Single;
@@ -2846,7 +827,7 @@ function ALDrawMultiLineText(
       nil, // const ADecorationThicknessMultipliers: TList<Single>;
       nil, // const ADecorationColors: TList<TAlphaColor>;
       nil, // const ABackgroundColors: TList<TAlphaColor>;
-      nil, // const ALineHeights: TList<Single>;
+      nil, // const ALineHeightMultipliers: TList<Single>;
       nil, // const ALetterSpacings: TList<Single>;
       LImgSrc, // out AImgSrc: String;
       LImgWidth, // out AImgWidth: Single;
@@ -2876,7 +857,7 @@ function ALDrawMultiLineText(
       nil, // const ADecorationThicknessMultipliers: TList<Single>;
       nil, // const ADecorationColors: TList<TAlphaColor>;
       nil, // const ABackgroundColors: TList<TAlphaColor>;
-      nil, // const ALineHeights: TList<Single>;
+      nil, // const ALineHeightMultipliers: TList<Single>;
       nil, // const ALetterSpacings: TList<Single>;
       LImgSrc, // out AImgSrc: String;
       LImgWidth, // out AImgWidth: Single;
@@ -2905,7 +886,7 @@ function ALDrawMultiLineText(
       nil, // const ADecorationThicknessMultipliers: TList<Single>;
       nil, // const ADecorationColors: TList<TAlphaColor>;
       nil, // const ABackgroundColors: TList<TAlphaColor>;
-      nil, // const ALineHeights: TList<Single>;
+      nil, // const ALineHeightMultipliers: TList<Single>;
       nil, // const ALetterSpacings: TList<Single>;
       AImgSrc, // out AImgSrc: String;
       AImgWidth, // out AImgWidth: Single;
@@ -2914,7 +895,7 @@ function ALDrawMultiLineText(
   {$ENDREGION}
 
   {$REGION '_GetSkFontStyle'}
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
   Function _GetSkFontStyle(
               const AFontWeight: TFontWeight;
               const AFontSlant: TFontSlant;
@@ -2990,14 +971,705 @@ function ALDrawMultiLineText(
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'TRangeIndex'}
-  {$IF defined(ALSkiaCanvas)}
-  type
-    TRangeIndex = record
-      SpanID: String;
-      start: Integer;
-      &end: Integer;
+  {$REGION '_getFontFamily'}
+  {$IF not defined(ALSkiaEngine)}
+  function _getFontFamily(const AFontFamilies: String): String;
+  begin
+    Result := '';
+    var LFontFamilies := AFontFamilies.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+    for var I := low(LFontFamilies) to high(LFontFamilies) do begin
+      Result := ALTrim(LFontFamilies[I]);
+      if Result <> '' then break;
     end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_getFontStyleExt'}
+  {$IF not defined(ALSkiaEngine)}
+  function _getFontStyleExt(const AFontWeight: TFontWeight; const AFontSlant: TFontSlant; const AFontStretch: TFontStretch; const ADecorationKinds: TALTextDecorationKinds): TFontStyleExt;
+  begin
+    var LOtherStyles: TFontStyles := [];
+    if TALTextDecorationKind.Underline in ADecorationKinds then LOtherStyles := LOtherStyles + [TFontStyle.fsUnderline];
+    if TALTextDecorationKind.LineThrough in ADecorationKinds then LOtherStyles := LOtherStyles + [TFontStyle.fsStrikeOut];
+    Result := TFontStyleExt.Create(AFontWeight, AFontSlant, AFontStretch, LOtherStyles);
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_MeasureBitmap'}
+  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+  var
+    _MeasureBitmap: TWinBitmap;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_CreateMeasureBitmap'}
+  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+  procedure _CreateMeasureBitmap;
+  begin
+    _MeasureBitmap.Width := 1;
+    _MeasureBitmap.Height := 1;
+    _MeasureBitmap.DC := CreateCompatibleDC(0);
+    if _MeasureBitmap.DC = 0 then raiseLastOsError;
+    ZeroMemory(@(_MeasureBitmap.BitmapInfo.bmiHeader), SizeOf(TBitmapInfoHeader));
+    _MeasureBitmap.BitmapInfo.bmiHeader.biSize := SizeOf(TBitmapInfoHeader);
+    _MeasureBitmap.BitmapInfo.bmiHeader.biWidth := 1;
+    _MeasureBitmap.BitmapInfo.bmiHeader.biHeight := -1;
+    _MeasureBitmap.BitmapInfo.bmiHeader.biPlanes := 1;
+    _MeasureBitmap.BitmapInfo.bmiHeader.biCompression := BI_RGB;
+    _MeasureBitmap.BitmapInfo.bmiHeader.biBitCount := 32;
+    _MeasureBitmap.Bitmap := CreateDIBSection(_MeasureBitmap.DC, _MeasureBitmap.BitmapInfo, DIB_RGB_COLORS, Pointer(_MeasureBitmap.Bits), 0, 0);
+    if _MeasureBitmap.Bitmap = 0 then raiseLastOsError;
+    if SetMapMode(_MeasureBitmap.DC, MM_TEXT) = 0 then raiseLastOsError;
+    if SelectObject(_MeasureBitmap.DC, _MeasureBitmap.Bitmap) = 0 then raiseLastOsError;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_FreeMeasureBitmap'}
+  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+  procedure _FreeMeasureBitmap;
+  begin
+    _MeasureBitmap.Bits := nil;
+    if not DeleteObject(_MeasureBitmap.Bitmap) then raiseLastOsError;
+    if not DeleteDC(_MeasureBitmap.DC) then raiseLastOsError;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_Paint'}
+  {$IF not defined(ALSkiaEngine) and defined(ANDROID)}
+  var
+    _Paint: JPaint;
+    _CurrFontFamily: String;
+    _CurrFontSize: single;
+    _CurrFontWeight: TFontWeight;
+    _CurrFontSlant: TFontSlant;
+    _CurrFontStretch: TFontStretch;
+    _CurrFontColor: TalphaColor;
+    _CurrDecorationKinds: TALTextDecorationKinds;
+    _CurrDecorationStyle: TALTextDecorationStyle;
+    _CurrDecorationThicknessMultiplier: Single;
+    _CurrDecorationColor: TAlphaColor;
+    _CurrLetterSpacing: Single;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_UpdatePaint'}
+  {$IF not defined(ALSkiaEngine) and defined(ANDROID)}
+  procedure _UpdatePaint(
+              const AFontFamily: String;
+              const AFontSize: single;
+              const AFontWeight: TFontWeight;
+              const AFontSlant: TFontSlant;
+              const AFontStretch: TFontStretch;
+              const AFontColor: TalphaColor;
+              const ADecorationKinds: TALTextDecorationKinds;
+              const ADecorationStyle: TALTextDecorationStyle;
+              const ADecorationThicknessMultiplier: Single;
+              const ADecorationColor: TAlphaColor;
+              const ALetterSpacing: Single);
+  begin
+
+    if (AFontFamily = _CurrFontFamily) and
+       (SameValue(AFontSize, _CurrFontSize, TEpsilon.FontSize)) and
+       (AFontWeight = _CurrFontWeight) and
+       (AFontSlant = _CurrFontSlant) and
+       (AFontStretch = _CurrFontStretch) and
+       (AFontColor = _CurrFontColor) and
+       (ADecorationKinds = _CurrDecorationKinds) and
+       (ADecorationStyle = _CurrDecorationStyle) and
+       (SameValue(ADecorationThicknessMultiplier, _CurrDecorationThicknessMultiplier, TEpsilon.Scale)) and
+       (ADecorationColor = _CurrDecorationColor) and
+       (SameValue(ALetterSpacing, _CurrLetterSpacing, TEpsilon.FontSize)) then exit;
+
+    _CurrFontFamily := AFontFamily;
+    _CurrFontSize := AFontSize;
+    _CurrFontWeight := AFontWeight;
+    _CurrFontSlant := AFontSlant;
+    _CurrFontStretch := AFontStretch;
+    _CurrFontColor := AFontColor;
+    _CurrDecorationKinds := ADecorationKinds;
+    _CurrDecorationStyle := ADecorationStyle;
+    _CurrDecorationThicknessMultiplier := ADecorationThicknessMultiplier;
+    _CurrDecorationColor := ADecorationColor;
+    _CurrLetterSpacing := ALetterSpacing;
+
+    var LFontFamily := _getFontFamily(AFontFamily);
+    var LFontStyles: TFontStyles := [];
+    if AFontWeight in [TFontWeight.Bold,
+                       TFontWeight.UltraBold,
+                       TFontWeight.Black,
+                       TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
+    if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
+    var LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
+    if TOSVersion.Check(28, 0) then begin
+      var LfontWeightInt: Integer;
+      case AFontWeight of
+        TFontWeight.Thin: LfontWeightInt := 100; //	Thin;
+        TFontWeight.UltraLight: LfontWeightInt := 200; //	Extra Light
+        TFontWeight.Light: LfontWeightInt := 300; //	Light
+        TFontWeight.SemiLight: LfontWeightInt := 350;
+        TFontWeight.Regular: LfontWeightInt := 400; //	Normal
+        TFontWeight.Medium: LfontWeightInt := 500; //	Medium
+        TFontWeight.Semibold: LfontWeightInt := 600; //	Semi Bold
+        TFontWeight.Bold: LfontWeightInt := 700; //	Bold
+        TFontWeight.UltraBold: LfontWeightInt := 800; //	Extra Bold
+        TFontWeight.Black: LfontWeightInt := 900; //	Black
+        TFontWeight.UltraBlack: LfontWeightInt := 1000;
+      end;
+      LTypeface := TJTypeface.JavaClass.create(
+                     LTypeface, {family}
+                     LfontWeightInt, {weight}
+                     AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique]{italic});
+    end;
+    _Paint.setTypeface(LTypeface);
+    _Paint.setTextSize(AFontSize);
+    if (Not SameValue(AfontSize, 0, TEpsilon.FontSize)) then
+      _Paint.setLetterSpacing(ALetterSpacing / AfontSize)
+    else
+      _Paint.setLetterSpacing(0);
+    _Paint.setColor(integer(AFontColor));
+    _Paint.setUnderlineText(TALTextDecorationKind.Underline in ADecorationKinds);
+    _Paint.setStrikeThruText(TALTextDecorationKind.LineThrough in ADecorationKinds);
+
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_CreateAttributedString'}
+  {$IF not defined(ALSkiaEngine) and (defined(ALAppleOS))}
+  function _CreateAttributedString(
+             const AText: String;
+             const AFontFamily: String;
+             const AFontSize: single;
+             const AFontWeight: TFontWeight;
+             const AFontSlant: TFontSlant;
+             const AFontStretch: TFontStretch;
+             const AFontColor: TalphaColor;
+             const ADecorationKinds: TALTextDecorationKinds;
+             const ADecorationStyle: TALTextDecorationStyle;
+             const ADecorationThicknessMultiplier: Single;
+             const ADecorationColor: TAlphaColor;
+             const ALetterSpacing: Single;
+             const ADirection: TALTextDirection): CFMutableAttributedStringRef;
+  begin
+    var LFontAlphaColor := TAlphaColorCGFloat.Create(AFontColor);
+    var LFontCGColor := CGColorCreate(ALGetGlobalCGColorSpace, @LFontAlphaColor);
+    if LFontCGColor = nil then raise Exception.Create('Failed to create CGColor');
+    try
+      var LCTFontRef := ALCreateCTFontRef(AFontFamily, AFontSize, AFontWeight, AFontSlant);
+      try
+        var LTextString := CFStringCreateWithCharacters(kCFAllocatorDefault, @AText[Low(string)], Length(AText));
+        if LTextString = nil then raise Exception.Create('Failed to create CFString');
+        try
+          var LTextRange := CFRangeMake(0, CFStringGetLength(LTextString));
+          Result := CFAttributedStringCreateMutable(kCFAllocatorDefault{alloc}, 0{maxLength});
+          if Result = nil then raise Exception.Create('Failed to create CFMutableAttributedStringRef');
+          try
+            CFAttributedStringReplaceString(Result, CFRangeMake(0, 0), LTextString);
+            CFAttributedStringBeginEditing(Result);
+            Try
+              CFAttributedStringSetAttribute(Result, LTextRange, kCTFontAttributeName, LCTFontRef);
+              //--
+              CFAttributedStringSetAttribute(Result, LTextRange, kCTForegroundColorAttributeName, LFontCGColor);
+              //--
+              if ADirection = TALTextDirection.RightToLeft then begin
+                var LSettings: array of CTParagraphStyleSetting;
+                SetLength(LSettings, 1);
+                //--
+                //kCTParagraphStyleSpecifierBaseWritingDirection
+                //The base writing direction of the lines. Type: CTWritingDirection. Default: kCTWritingDirectionNatural. Application: CTFramesetter, CTTypesetter.
+                //* kCTWritingDirectionNatural: The writing direction is algorithmically determined using the Unicode Bidirectional Algorithm rules P2 and P3.
+                //* kCTWritingDirectionLeftToRight: The writing direction is left to right.
+                //* kCTWritingDirectionRightToLeft: The writing direction is right to left.
+                var LWritingDirection: Byte := kCTWritingDirectionRightToLeft;
+                SetLength(LSettings, length(LSettings) + 1);
+                LSettings[high(LSettings)].spec := kCTParagraphStyleSpecifierBaseWritingDirection;
+                LSettings[high(LSettings)].valueSize := SizeOf(LWritingDirection);
+                LSettings[high(LSettings)].value := @LWritingDirection;
+                //--
+                var LParagraphStyle := CTParagraphStyleCreate(@LSettings[0], Length(LSettings));
+                try
+                  CFAttributedStringSetAttribute(Result, LTextRange, kCTParagraphStyleAttributeName, LParagraphStyle);
+                finally
+                  CFRelease(LParagraphStyle);
+                end;
+              end;
+              //--
+              if TALTextDecorationKind.Underline in ADecorationKinds then begin
+                var LValue: Cardinal;
+                case ADecorationStyle of
+                  TALTextDecorationStyle.Double: LValue := kCTUnderlineStyleDouble;
+                  TALTextDecorationStyle.Dotted: LValue := kCTUnderlineStyleSingle or kCTUnderlinePatternDot;
+                  TALTextDecorationStyle.Dashed: LValue := kCTUnderlineStyleSingle or kCTUnderlinePatternDash;
+                  else {Solid, Wavy} LValue := kCTUnderlineStyleSingle;
+                end;
+                var LUnderlineStyleAttributeValue := CFNumberCreate(nil, kCFNumberSInt32Type, @LValue);
+                if LUnderlineStyleAttributeValue = nil then raise Exception.Create('Failed to create CFNumber');
+                try
+                  CFAttributedStringSetAttribute(Result, LTextRange, kCTUnderlineStyleAttributeName, LUnderlineStyleAttributeValue);
+                finally
+                  CFRelease(LUnderlineStyleAttributeValue);
+                end;
+                //--
+                if ADecorationColor <> TAlphaColors.Null then begin
+                  var LDecorationAlphaColor := TAlphaColorCGFloat.Create(ADecorationColor);
+                  var LDecorationCGColor := CGColorCreate(ALGetGlobalCGColorSpace, @LDecorationAlphaColor);
+                  if LDecorationCGColor = nil then raise Exception.Create('Failed to create CGColor');
+                  try
+                    CFAttributedStringSetAttribute(Result, LTextRange, kCTUnderlineColorAttributeName, LDecorationCGColor);
+                  finally
+                    CGColorRelease(LDecorationCGColor);
+                  end;
+                end;
+              end;
+              //--
+              if not sameValue(ALetterSpacing, 0, TEpsilon.FontSize) then begin
+                var LValue: Single := ALetterSpacing;
+                var LKernAttributeValue := CFNumberCreate(nil, kCFNumberFloat32Type, @LValue);
+                if LKernAttributeValue = nil then raise Exception.Create('Failed to create CFNumber');
+                try
+                  CFAttributedStringSetAttribute(Result, LTextRange, kCTKernAttributeName, LKernAttributeValue);
+                finally
+                  CFRelease(LKernAttributeValue);
+                end;
+              end;
+            finally
+              CFAttributedStringEndEditing(Result);
+            end;
+          Except
+            CFRelease(Result);
+            Raise;
+          end;
+        finally
+          CFRelease(LTextString);
+        end;
+      finally
+        CFRelease(LCTFontRef);
+      end;
+    finally
+      CGColorRelease(LFontCGColor);
+    end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_GetFontMetrics'}
+  {$IF not defined(ALSkiaEngine)}
+  function _GetFontMetrics(
+             const AFontFamily: String;
+             const AFontSize: single;
+             const AFontWeight: TFontWeight;
+             const AFontSlant: TFontSlant;
+             const AFontStretch: TFontStretch;
+             const AFontColor: TalphaColor;
+             const ADecorationKinds: TALTextDecorationKinds;
+             const ADecorationStyle: TALTextDecorationStyle;
+             const ADecorationThicknessMultiplier: Single;
+             const ADecorationColor: TAlphaColor;
+             const ALetterSpacing: Single): TALFontMetrics;
+  begin
+
+    var LFontMetricsKey: TALFontMetricsKey;
+    ALStringHashSHA1(LFontMetricsKey.FontFamily, AFontFamily, TEncoding.Utf8);
+    LFontMetricsKey.FontSize:= AFontSize;
+    LFontMetricsKey.FontWeight:= AFontWeight;
+    LFontMetricsKey.FontSlant:= AFontSlant;
+    LFontMetricsKey.FontStretch:= AFontStretch;
+    LFontMetricsKey.FontColor:= AFontColor;
+    LFontMetricsKey.DecorationKinds:= ADecorationKinds;
+    LFontMetricsKey.DecorationStyle:= ADecorationStyle;
+    LFontMetricsKey.DecorationThicknessMultiplier:= ADecorationThicknessMultiplier;
+    LFontMetricsKey.DecorationColor:= ADecorationColor;
+    LFontMetricsKey.LetterSpacing:= ALetterSpacing;
+    ALFontMetricsCacheLock.beginRead;
+    Try
+      if ALFontMetricsCache.TryGetValue(LFontMetricsKey, Result) then exit;
+    finally
+      ALFontMetricsCacheLock.endRead;
+    end;
+
+    {$IF defined(ANDROID)}
+
+    _UpdatePaint(
+      AFontFamily,
+      AFontSize,
+      AFontWeight,
+      AFontSlant,
+      AFontStretch,
+      AFontColor,
+      ADecorationKinds,
+      ADecorationStyle,
+      ADecorationThicknessMultiplier,
+      ADecorationColor,
+      ALetterSpacing);
+
+    var LFontMetrics := _Paint.getFontMetrics;
+    Result.Ascent := LFontMetrics.Ascent;
+    Result.Descent := LFontMetrics.Descent;
+    if LFontMetrics.Leading > 0 then begin
+      Result.Ascent := Result.Ascent - (LFontMetrics.Leading/2);
+      Result.Descent := Result.Descent + (LFontMetrics.Leading/2);
+    end;
+
+    {$ENDIF}
+
+    {$IF defined(ALAppleOS)}
+
+    var Lfont := ALCreateCTFontRef(AFontFamily, AFontSize, AFontWeight, AFontSlant);
+    try
+      Result.Ascent := -CTFontGetAscent(Lfont);
+      Result.Descent := CTFontGetDescent(Lfont);
+      var LLeading := CTFontGetLeading(Lfont);
+      if LLeading > 0 then begin
+        Result.Ascent := Result.Ascent - (LLeading/2);
+        Result.Descent := Result.Descent + (LLeading/2);
+      end;
+      {$IF defined(DEBUG)}
+      //ALLog(
+      //  'ALCreateMultiLineTextDrawable._GetFontMetrics',
+      //  'FontFamily: '+ AFontFamily + ' | '+
+      //  'FontSize: '+ ALFloatToStrW(AFontSize, ALDefaultFormatSettingsW) + ' | '+
+      //  'CTFontGetAscent: ' + ALFloatToStrW(CTFontGetAscent(Lfont), ALDefaultFormatSettingsW) + ' | '+
+      //  'CTFontGetDescent: ' + ALFloatToStrW(CTFontGetDescent(Lfont), ALDefaultFormatSettingsW) + ' | '+
+      //  'CTFontGetLeading: ' + ALFloatToStrW(CTFontGetLeading(Lfont), ALDefaultFormatSettingsW) + ' | '+
+      //  'CTFontGetBoundingBox.height: ' + ALFloatToStrW(CTFontGetBoundingBox(Lfont).size.height, ALDefaultFormatSettingsW));
+      {$ENDIF}
+    finally
+      CFRelease(LFont);
+    end;
+
+    {$ENDIF}
+
+    {$IF defined(MSWINDOWS)}
+
+    // Since the Windows API only works with integers, I multiply the font size by 100
+    // and later divide the result by 100 to achieve better precision.
+
+    var LFontFamily := _getFontFamily(AFontFamily);
+    var LFont := CreateFont(
+                   -Round(AFontSize*100), // nHeight: Integer;
+                   0, // nWidth: Integer;
+                   0, // nEscapement: Integer;
+                   0, // nOrientaion: Integer;
+                   FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
+                   Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
+                   cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
+                   cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
+                   DEFAULT_CHARSET, // fdwCharSet: DWORD
+                   OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
+                   CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
+                   DEFAULT_QUALITY, // fdwQuality: DWORD
+                   DEFAULT_PITCH or FF_DONTCARE, // fdwPitchAndFamily: DWORD
+                   PChar(LFontFamily)); // lpszFace: LPCWSTR
+    if LFont = 0 then raiseLastOsError;
+    try
+      if SelectObject(_MeasureBitmap.DC, LFont) = 0 then raiseLastOsError;
+      var LMetrics: TTextMetric;
+      if not GetTextMetrics(_MeasureBitmap.DC, LMetrics) then raiseLastOsError;
+      Result.Ascent := -LMetrics.tmAscent/100;
+      Result.Descent := LMetrics.tmDescent/100;
+      if LMetrics.tmExternalLeading > 0 then begin
+        Result.Ascent := Result.Ascent - (LMetrics.tmExternalLeading/200);
+        Result.Descent := Result.Descent + (LMetrics.tmExternalLeading/200);
+      end;
+    finally
+      if not DeleteObject(LFont) then raiseLastOsError;
+    end;
+
+    {$ENDIF}
+
+    ALFontMetricsCacheLock.beginWrite;
+    Try
+      ALFontMetricsCache.TryAdd(LFontMetricsKey, Result);
+    finally
+      ALFontMetricsCacheLock.endWrite;
+    end;
+
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_BreakText'}
+  {$IF not defined(ALSkiaEngine)}
+  function _BreakText(
+             const AText: String;
+             const AFontFamily: String;
+             const AFontSize: single;
+             const AFontWeight: TFontWeight;
+             const AFontSlant: TFontSlant;
+             const AFontStretch: TFontStretch;
+             const AFontColor: TalphaColor;
+             const ADecorationKinds: TALTextDecorationKinds;
+             const ADecorationStyle: TALTextDecorationStyle;
+             const ADecorationThicknessMultiplier: Single;
+             const ADecorationColor: TAlphaColor;
+             const ALetterSpacing: Single;
+             const ADirection: TALTextDirection;
+             const AMaxWidth: Single;
+             out AMeasuredWidth: Single;
+             out AMeasuredHeight: Single): integer;
+  begin
+
+    If CompareValue(AMaxWidth, 0, TEpsilon.Position) <= 0 then begin
+      Result := 0;
+      AMeasuredWidth := 0;
+      AMeasuredHeight := 0;
+      Exit;
+    end;
+
+    {$IF defined(ANDROID)}
+
+    _UpdatePaint(
+      AFontFamily,
+      AFontSize,
+      AFontWeight,
+      AFontSlant,
+      AFontStretch,
+      AFontColor,
+      ADecorationKinds,
+      ADecorationStyle,
+      ADecorationThicknessMultiplier,
+      ADecorationColor,
+      ALetterSpacing);
+
+    // http://stackoverflow.com/questions/7549182/android-paint-measuretext-vs-gettextbounds
+    // * getTextBounds will return the absolute (ie integer rounded) minimal bounding rect
+    // * measureText adds some advance value to the text on both sides, while getTextBounds computes minimal
+    //   bounds where given text will fit - getTextBounds is also not accurate at all regarding the height,
+    //   it's return for exemple 9 when height = 11
+    var LMeasuredWidth := TJavaArray<Single>.Create(1);
+    try
+
+      // breakText
+      Result := _Paint.breakText(
+                  StringToJString(AText) {text},
+                  true {measureForwards},
+                  AMaxWidth, {maxWidth}
+                  LMeasuredWidth {measuredWidth});
+
+      {$IF defined(debug)}
+      if (Result < 0) or (Result > AText.Length) then
+        Raise Exception.create('Error B8C38471-D5C6-43E9-8A2D-4E1BDDB3713A');
+      {$ENDIF}
+
+      // Not enough space to write at least one character
+      if Result = 0 then begin
+        AMeasuredWidth := 0;
+        AMeasuredHeight := 0;
+      end
+
+      // Enough space to write all characters
+      else If Result = AText.Length then begin
+        AMeasuredWidth := LMeasuredWidth[0];
+        AMeasuredHeight := 0;
+      end
+
+      // The text must be broken
+      else begin
+
+        // Calculate the correct position where the text should break
+        var LBreakPosition := _findLastBreakPosition(AText, Result);
+
+        // No good position found
+        if LBreakPosition = 0 then begin
+          AMeasuredWidth := 0;
+          AMeasuredHeight := 0;
+        end
+
+        // Result already fell within a good position
+        else if LBreakPosition = result then begin
+          AMeasuredWidth := LMeasuredWidth[0];
+          AMeasuredHeight := 0;
+        end
+
+        // Result did not fall within a good position
+        else begin
+          var LText := AlCopyStr(AText,1,LBreakPosition);
+          Result := _Paint.breakText(
+                      StringToJString(LText) {text},
+                      true {measureForwards},
+                      65535, {maxWidth}
+                      LMeasuredWidth {measuredWidth});
+          {$IF defined(debug)}
+          if result <> LBreakPosition then
+            Raise Exception.Create('Error 195DA1C6-5054-45C2-824C-B2C1C3ED3FE0');
+          {$ENDIF}
+          AMeasuredWidth := LMeasuredWidth[0];
+          AMeasuredHeight := 0;
+        end;
+      end;
+
+    finally
+      ALFreeAndNil(LMeasuredWidth);
+    end;
+
+    {$ENDIF}
+
+    {$IF defined(ALAppleOS)}
+
+    var LAttributedString := _CreateAttributedString(
+                               AText, // const AText: String;
+                               AFontFamily, // const AFontFamily: String;
+                               AFontSize, // const AFontSize: single;
+                               AFontWeight, // const AFontWeight: TFontWeight;
+                               AFontSlant, // const AFontSlant: TFontSlant;
+                               AFontStretch, // const AFontStretch: TFontStretch;
+                               AFontColor, // const AFontColor: TalphaColor;
+                               ADecorationKinds, // const ADecorationKinds: TALTextDecorationKinds;
+                               ADecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
+                               ADecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
+                               ADecorationColor, // const ADecorationColor: TAlphaColor;
+                               ALetterSpacing, // const ALetterSpacing: Single;
+                               ADirection); // const ADirection: TALTextDirection
+    try
+      var LFrameSetter := CTFramesetterCreateWithAttributedString(CFAttributedStringRef(LAttributedString));
+      if LFrameSetter = nil then raise Exception.Create('Failed to create CTFramesetter');
+      try
+
+        // Break the text using CTFramesetterSuggestFrameSizeWithConstraints
+        var Lmetrics := _GetFontMetrics(
+                          AFontFamily, // const AFontFamily: String;
+                          AFontSize, // const AFontSize: single;
+                          AFontWeight, // const AFontWeight: TFontWeight;
+                          AFontSlant, // const AFontSlant: TFontSlant;
+                          AFontStretch, // const AFontStretch: TFontStretch;
+                          AFontColor, // const AFontColor: TalphaColor;
+                          ADecorationKinds, // const ADecorationKinds: TALTextDecorationKinds;
+                          ADecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
+                          ADecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
+                          ADecorationColor, // const ADecorationColor: TAlphaColor;
+                          ALetterSpacing); // const ALetterSpacing: Single)
+        var LfitRange: CFRange;
+        var LSize := CTFramesetterSuggestFrameSizeWithConstraints(
+                       LFrameSetter, //framesetter: CTFramesetterRef;
+                       CFRangeMake(0, Atext.Length), // stringRange: CFRange;
+                       nil, // frameAttributes: CFDictionaryRef;
+                       // Multiplying by 1.8 to be on the safe side, since in the event of a font fallback,
+                       // the fallback font could have a larger ascent/descent than the original font.
+                       CGSizeMake(AMaxWidth, ((-1 *Lmetrics.ascent) + Lmetrics.descent) * 1.8), // constraints: CGSize;
+                       @LfitRange); // fitRange: PCFRange
+        Result := LfitRange.length;
+        {$IF defined(debug)}
+        if (Result < 0) or (Result > AText.Length) then
+          Raise Exception.create('Error B8C38471-D5C6-43E9-8A2D-4E1BDDB3713A');
+        {$ENDIF}
+
+        // https://stackoverflow.com/questions/78144915/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
+        if Result < AText.Length then begin
+          var LBreakPosition := _findLastBreakPosition(AText, Result);
+          if LBreakPosition <= 0 then begin
+            Result := 0;
+            AMeasuredWidth := 0;
+            AMeasuredHeight := 0;
+            exit;
+          end;
+        end;
+
+        // Get the trailing whitespace
+        var LTrailingWhitespaceWidth: double := 0;
+        If Result = Atext.Length then begin
+          Var LLineAttributedString := _CreateAttributedString(
+                                         ALCopyStr(Atext,1,Result), // const AText: String;
+                                         AFontFamily, // const AFontFamily: String;
+                                         AFontSize, // const AFontSize: single;
+                                         AFontWeight, // const AFontWeight: TFontWeight;
+                                         AFontSlant, // const AFontSlant: TFontSlant;
+                                         AFontStretch, // const AFontStretch: TFontStretch;
+                                         AFontColor, // const AFontColor: TalphaColor;
+                                         ADecorationKinds, // const ADecorationKinds: TALTextDecorationKinds;
+                                         ADecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
+                                         ADecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
+                                         ADecorationColor, // const ADecorationColor: TAlphaColor;
+                                         ALetterSpacing, // const ALetterSpacing: Single;
+                                         ADirection); // const ADirection: TALTextDirection
+          try
+            var LLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LLineAttributedString));
+            try
+              LTrailingWhitespaceWidth := CTLineGetTrailingWhitespaceWidth(Lline);
+            finally
+              CFRelease(LLine);
+            end;
+          finally
+            CFRelease(LLineAttributedString);
+          end;
+        end;
+
+        // Update AMeasuredWidth
+        AMeasuredWidth := LSize.width + LTrailingWhitespaceWidth;
+        AMeasuredHeight := LSize.height;
+
+        {$IF defined(DEBUG)}
+        //ALLog(
+        //  'ALCreateMultiLineTextDrawable._BreakText',
+        //  'Text: '+ Atext + ' | '+
+        //  'MaxWidth: '+ ALFloatToStrW(AMaxWidth, ALDefaultFormatSettingsW) + ' | '+
+        //  'Result: ' + ALInttoStrW(Result) + ' | '+
+        //  'MeasuredWidth: ' + ALFloatToStrW(AMeasuredWidth, ALDefaultFormatSettingsW) + ' | '+
+        //  'MeasuredHeight: ' + ALFloatToStrW(AMeasuredHeight, ALDefaultFormatSettingsW) + ' | '+
+        //  'TrailingWhitespaceWidth: ' + ALFloatToStrW(LTrailingWhitespaceWidth, ALDefaultFormatSettingsW) + ' | '+
+        //  'Metrics.ascent: ' + ALFloatToStrW(Lmetrics.Ascent, ALDefaultFormatSettingsW) + ' | '+
+        //  'Metrics.descent: ' + ALFloatToStrW(Lmetrics.descent, ALDefaultFormatSettingsW));
+        {$ENDIF}
+
+      finally
+        CFRelease(LFrameSetter);
+      end;
+    finally
+      CFRelease(LAttributedString);
+    end;
+
+    {$ENDIF}
+
+    {$IF defined(MSWINDOWS)}
+
+    // Since the Windows API only works with integers, I multiply the font size by 100
+    // and later divide the result by 100 to achieve better precision.
+
+    var LFontFamily := _getFontFamily(AFontFamily);
+    var LFont := CreateFont(
+                   -Round(AFontSize*100), // nHeight: Integer;
+                   0, // nWidth: Integer;
+                   0, // nEscapement: Integer;
+                   0, // nOrientaion: Integer;
+                   FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
+                   Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
+                   cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
+                   cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
+                   DEFAULT_CHARSET, // fdwCharSet: DWORD
+                   OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
+                   CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
+                   DEFAULT_QUALITY, // fdwQuality: DWORD
+                   DEFAULT_PITCH or FF_DONTCARE, // fdwPitchAndFamily: DWORD
+                   PChar(LFontFamily)); // lpszFace: LPCWSTR
+    if LFont = 0 then raiseLastOsError;
+    try
+      if SelectObject(_MeasureBitmap.DC, LFont) = 0 then raiseLastOsError;
+      var LText: String := Atext;
+      Result := LText.Length;
+      While Result > 0 do begin
+        var LSize: TSize;
+        if not GetTextExtentPoint32(_MeasureBitmap.DC, LText, LText.Length, LSize) then raiseLastOsError;
+        If CompareValue(LSize.Width, AMaxWidth*100, Tepsilon.Position) <= 0 then begin
+          AMeasuredWidth := LSize.Width/100;
+          AMeasuredHeight := LSize.Height/100;
+          exit;
+        end;
+        Result := _findLastBreakPosition(LText, Result-1);
+        If Result > 0 then
+          LText := LText.Remove(Result);
+      end;
+      AMeasuredWidth := 0;
+      AMeasuredHeight := 0;
+    finally
+      if not DeleteObject(LFont) then raiseLastOsError;
+    end;
+
+    {$ENDIF}
+
+  end;
   {$ENDIF}
   {$ENDREGION}
 
@@ -3009,7 +1681,7 @@ begin
   Try
 
     {$REGION 'SKIA'}
-    {$IF defined(ALSkiaCanvas)}
+    {$IF defined(ALSkiaEngine)}
 
     // Init out var
     ATextBroken := false;
@@ -3033,7 +1705,7 @@ begin
     var LDecorationThicknessMultipliers := TList<Single>.Create;
     var LDecorationColors := TList<TAlphaColor>.Create;
     var LBackgroundColors := TList<TAlphaColor>.Create;
-    var LLineHeights := TList<Single>.Create;
+    var LLineHeightMultipliers := TList<Single>.Create;
     var LLetterSpacings := TList<Single>.Create;
     var LSpanIDs := TALStringListW.create;
     var LPlaceHolders := TALStringListW.create;
@@ -3046,17 +1718,23 @@ begin
       sk4d_paint_set_dither(LPaint, true);
 
       // Format LText
-      var Ltext: String := AText;
+      var Ltext: String := ALTrimRight(AText);
       if AOptions.TextIsHtml then begin
         LText := ALStringReplaceW(Ltext, #13, ' ', [RfReplaceALL]);
         LText := ALStringReplaceW(Ltext, #10, ' ', [RfReplaceALL]);
         LText := ALStringReplaceW(Ltext, #9, ' ', [RfReplaceALL]);
         While ALPosW('  ', LText) > 0 do
           LText := ALStringReplaceW(Ltext, '  ', ' ', [RfReplaceALL]);
-        LText := ALStringReplaceW(Ltext, '<br>', #13#10, [RfReplaceALL, RfIgnoreCase]);
-        LText := ALStringReplaceW(Ltext, '<br/>', #13#10, [RfReplaceALL, RfIgnoreCase]);
-        LText := ALStringReplaceW(Ltext, '&nbsp;', #160{0x00A0}, [RfReplaceALL, RfIgnoreCase]);
-      end;
+        LText := ALStringReplaceW(Ltext, '<br>', #10, [RfReplaceALL, RfIgnoreCase]);
+        LText := ALStringReplaceW(Ltext, '<br/>', #10, [RfReplaceALL, RfIgnoreCase]);
+        While ALPosW(' '#10, LText) > 0 do
+          LText := ALStringReplaceW(Ltext, ' '#10, #10, [RfReplaceALL]);
+        While ALPosW(#10' ', LText) > 0 do
+          LText := ALStringReplaceW(Ltext, #10' ', #10, [RfReplaceALL]);
+        LText := ALStringReplaceW(Ltext, '&nbsp;', Chr($A0){0x00A0}, [RfReplaceALL, RfIgnoreCase]);
+      end
+      else
+        LText := ALStringReplaceW(Ltext, #13#10, #10, [RfReplaceALL]);
 
       // In Skia, there is no direct way to set the maximum height for a SkParagraph in advance.
       // We can primarily control the paragraph height by adjusting the 'maxLines' property.
@@ -3077,7 +1755,7 @@ begin
         LDecorationThicknessMultipliers.clear;
         LDecorationColors.clear;
         LBackgroundColors.Clear;
-        LLineHeights.clear;
+        LLineHeightMultipliers.clear;
         LLetterSpacings.Clear;
         LSpanIDs.Clear;
         LPlaceHolders.Clear;
@@ -3090,806 +1768,766 @@ begin
         var LParagraphstyle := sk4d_paragraphstyle_create;
         Try
 
-          // https://api.flutter.dev/flutter/painting/StrutStyle-class.html
-          // Defines the strut, which sets the minimum height a line can be relative to the baseline.
-          // Strut applies to all lines in the paragraph. Strut is a feature that allows minimum
-          // line heights to be set. The effect is as if a zero width space was included at the
-          // beginning of each line in the paragraph. This imaginary space is 'shaped' according the
-          // properties defined in this class.
-          // No lines may be shorter than the strut. The ascent and descent of the strut are calculated,
-          // and any laid out text that has a shorter ascent or descent than the strut's ascent or
-          // descent will take the ascent and descent of the strut. Text with ascents or descents
-          // larger than the strut's ascent or descent will layout as normal and extend past the strut.
-          var LStrutstyle := sk4d_strutstyle_create;
+          // https://api.flutter.dev/flutter/dart-ui/TextHeightBehavior-class.html
+          // Defines how to apply TextStyle.height over and under text.
+          // TextHeightBehavior.applyHeightToFirstAscent and TextHeightBehavior.applyHeightToLastDescent
+          // represent whether the TextStyle.height modifier will be applied to the corresponding metric.
+          // By default both properties are true, and TextStyle.height is applied as normal. When set to
+          // false, the font's default ascent will be used.
+          // applyHeightToFirstAscent → bool
+          // Whether to apply the TextStyle.height modifier to the ascent of the first line in the paragraph.
+          // applyHeightToLastDescent → bool
+          // Whether to apply the TextStyle.height modifier to the descent of the last line in the paragraph.
+          // var LSkTextHeightBehaviors: TSkTextHeightBehaviors := [TSkTextHeightBehavior.DisableFirstAscent, TSkTextHeightBehavior.DisableLastDescent];
+          // sk4d_paragraphstyle_set_text_height_behaviors(LParagraphstyle, Byte(LSkTextHeightBehaviors));
+
+          // Direction
+          if AOptions.Direction = TALTextDirection.RightToLeft then
+            sk4d_paragraphstyle_set_text_direction(LParagraphstyle, sk_textdirection_t.RIGHT_TO_LEFT_SK_TEXTDIRECTION);
+
+          // HTextAlign
+          // https://api.flutter.dev/flutter/dart-ui/TextAlign.html
+          // Whether and how to align text horizontally.
+          // * left → const TextAlign
+          //     Align the text on the left edge of the container.
+          // * right → const TextAlign
+          //     Align the text on the right edge of the container.
+          // * center → const TextAlign
+          //     Align the text in the center of the container.
+          // * justify → const TextAlign
+          //     Stretch lines of text that end with a soft line break to fill the width of the container.
+          //     Lines that end with hard line breaks are aligned towards the start edge.
+          // * start → const TextAlign
+          //     Align the text on the leading edge of the container.
+          //     For left-to-right text (TextDirection.ltr), this is the left edge.
+          //     For right-to-left text (TextDirection.rtl), this is the right edge.
+          // * end → const TextAlign
+          //     Align the text on the trailing edge of the container.
+          //     For left-to-right text (TextDirection.ltr), this is the right edge.
+          //     For right-to-left text (TextDirection.rtl), this is the left edge.
+          case AOptions.HTextAlign of
+            TALTextHorzAlign.Center: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.CENTER_SK_TEXTALIGN);
+            TALTextHorzAlign.Leading: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.START_SK_TEXTALIGN);
+            TALTextHorzAlign.Trailing: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.TERMINATE_SK_TEXTALIGN);
+            TALTextHorzAlign.Justify: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.JUSTIFY_SK_TEXTALIGN);
+            Else raise Exception.Create('Error C3E64ECA-147F-4EE8-A4CA-EBCB48ACD08C');
+          end;
+
+          // https://en.wikipedia.org/wiki/Font_hinting
+          // With the advent of high-DPI displays (generally considered to be displays with
+          // more than 300 pixels per inch), font hinting has become less relevant, as
+          // aliasing effects become un-noticeable to the human eye. As a result
+          // Apple's Quartz text renderer, which is targeted for Apple's Retina
+          // displays, now ignores font hint information completely.
+          // Note: I tried to disable the font hinting, but it seems to change nothing, so
+          // I need a practical example to show what exactly font hinting does.
+          // In the meantime, I prefer not to touch these settings.
+          // sk4d_paragraphstyle_disable_hinting(LParagraphstyle);
+
+          // MaxLines
+          // https://api.flutter.dev/flutter/dart-ui/ParagraphStyle/ParagraphStyle.html
+          // The maximum number of lines painted. Lines beyond this number are silently dropped.
+          // For example, if maxLines is 1, then only one line is rendered. If maxLines is null,
+          // but ellipsis is not null, then lines after the first one that overflows the width
+          // constraints are dropped. The width constraints are those set in the ParagraphConstraints
+          // object passed to the Paragraph.layout method.
+          sk4d_paragraphstyle_set_max_lines(LParagraphstyle, LMaxLines);
+
+          // Create LParagraphBuilder
+          var LParagraphBuilder := sk4d_paragraphbuilder_create2(
+                                     LParagraphstyle, // const paragraph_style: sk_paragraphstyle_t;
+                                     TSkDefaultProviders.TypefaceFont.Handle, // font_provider: sk_fontmgr_t;
+                                     true); // enable_font_fallback: _bool): sk_paragraphbuilder_t; cdecl;
           try
 
-            // https://api.flutter.dev/flutter/painting/StrutStyle/fontFamily.html
-            // the name of the font to use when calculating the strut (e.g., Roboto). No glyphs from
-            // the font will be drawn and the font will be used purely for metrics.
-            var LUTF16FontFamilies: TArray<String>;
-            var LUTF8FontFamilies: TArray<UTF8String>;
-            var LMarshaledFontFamilies: TArray<MarshaledAString>;
-            LUTF16FontFamilies := AOptions.FontFamily.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
-            if Length(LUTF16FontFamilies) > 0 then begin
-              SetLength(LUTF8FontFamilies, Length(LUTF16FontFamilies));
-              SetLength(LMarshaledFontFamilies, Length(LUTF16FontFamilies));
-              var I: Integer := 0;
-              for var J := low(LUTF16FontFamilies) to high(LUTF16FontFamilies) do begin
-                var LUTF16FontFamily := ALTrim(LUTF16FontFamilies[J]);
-                if LUTF16FontFamily <> '' then begin
-                  LUTF8FontFamilies[I] := UTF8String(LUTF16FontFamily);
-                  LMarshaledFontFamilies[I] := MarshaledAString(LUTF8FontFamilies[I]);
-                  inc(I);
+
+            ///////////////////////////////////
+            // loop on all the html elements //
+            ///////////////////////////////////
+
+            var LCurrIndex := 0;
+            var P1 := low(Ltext);
+            while P1 <= high(Ltext) do begin
+
+              var LCurrText: String;
+              var LCurrImgSrc: String;
+              var LcurrImgWidth: Single;
+              var LcurrImgHeight: Single;
+
+
+              /////////////////////////
+              // Insert the ellipsis //
+              /////////////////////////
+
+              if LCurrIndex = LInsertEllipsisAt then begin
+                if not AOptions.EllipsisInheritSettings then begin
+                  LFontFamilies.Add(AOptions.EllipsisFontFamily);
+                  LFontSizes.Add(AOptions.GetScaledEllipsisFontSize);
+                  LFontWeights.Add(AOptions.EllipsisFontWeight);
+                  LFontSlants.Add(AOptions.EllipsisFontSlant);
+                  LFontStretchs.Add(AOptions.EllipsisFontStretch);
+                  LFontColors.Add(AOptions.EllipsisFontColor);
+                  LDecorationKinds.Add(AOptions.EllipsisDecorationKinds);
+                  LDecorationStyles.Add(AOptions.EllipsisDecorationStyle);
+                  LDecorationThicknessMultipliers.Add(AOptions.EllipsisDecorationThicknessMultiplier);
+                  LDecorationColors.Add(AOptions.EllipsisDecorationColor);
+                  LBackgroundColors.Add(TALphaColors.Null);
+                  LLineHeightMultipliers.Add(AOptions.LineHeightMultiplier);
+                  LLetterSpacings.Add(AOptions.GetScaledLetterSpacing);
                 end;
-              end;
-              if I > 0 then
-                sk4d_strutstyle_set_font_families(LStrutstyle, @LMarshaledFontFamilies[0], I);
-            end;
+                LSpanIDs.Add('ellipsis');
+                if (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1) then
+                  LCurrText := ALCopyStr(AOptions.EllipsisText, 3, maxint)
+                else
+                  LCurrText := AOptions.EllipsisText;
+                LCurrImgSrc := '';
+                LcurrImgWidth := 0;
+                LcurrImgHeight := 0;
+                LInsertEllipsisAt := Maxint;
+                P1 := Maxint;
+              end
 
-            // https://api.flutter.dev/flutter/painting/StrutStyle/fontSize.html
-            // The size of text (in logical pixels) to use when obtaining metrics from the font.
-            // The fontSize is used to get the base set of metrics that are then
-            // used to calculated the metrics of strut. The height and leading are expressed as a multiple of fontSize.
-            // The default fontSize is 14 logical pixels.
-            if (not sameValue(AOptions.GetScaledfontsize, 0, TEpsilon.FontSize)) then
-              sk4d_strutstyle_set_font_size(LStrutstyle, AOptions.GetScaledFontSize);
+              /////////////////////////////////////
+              // The text contains HTML elements //
+              /////////////////////////////////////
 
-            // https://api.flutter.dev/flutter/painting/StrutStyle/fontStyle.html
-            // https://api.flutter.dev/flutter/painting/StrutStyle/fontWeight.html
-            // The typeface variant to use when calculating the strut (e.g., italics). The default fontStyle is FontStyle.normal.
-            // The typeface thickness to use when calculating the strut (e.g., bold). The default fontWeight is FontWeight.w400.
-            var LSkfontstyle := _GetSkFontStyle(AOptions.FontWeight, AOptions.FontSlant, AOptions.FontStretch);
-            sk4d_strutstyle_set_font_style(LStrutstyle, @LSkfontstyle);
+              else if AOptions.TextIsHtml then begin
 
-            // https://api.flutter.dev/flutter/painting/StrutStyle/forceStrutHeight.html
-            // when true, all lines will be laid out with the height of the strut. All line and
-            // run-specific metrics will be ignored/overridden and only strut metrics will be
-            // used instead. This property guarantees uniform line spacing, however text in
-            // adjacent lines may overlap. This property should be enabled with caution as it
-            // bypasses a large portion of the vertical layout system. The default value is false.
-            // sk4d_strutstyle_set_force_height(LStrutstyle, True);
+                // Extract LCurrText / LCurrImgSrc
+                if Ltext[P1] = '<' then begin
 
-            // https://api.flutter.dev/flutter/dart-ui/TextLeadingDistribution.html
-            // proportional (half_leading: FALSE)
-            //     Distributes the leading of the text proportionally above and below the text,
-            //     to the font's ascent/descent ratio. The leading of a text run is defined as
-            //     TextStyle.height * TextStyle.fontSize - TextStyle.fontSize.
-            //     When TextStyle.height is not set, the text run uses the leading specified
-            //     by the font instead.
-            // even (half_leading: TRUE)
-            //     Distributes the "leading" of the text evenly above and below the text
-            //     (i.e. evenly above the font's ascender and below the descender).
-            //     The leading of a text run is defined as
-            //     TextStyle.height * TextStyle.fontSize - TextStyle.fontSize.
-            //     When TextStyle.height is not set, the text run uses the leading specified
-            //     by the font instead.
-            //     The leading can become negative when TextStyle.height is smaller than 1.0.
-            //     This is the default strategy used by CSS, known as "half-leading".
-            // Default is proportional
-            // Note: This setting work only with sk4d_strutstyle_set_height_multiplier and have no
-            // influence on sk4d_strutstyle_set_leading where the spacing is equally distributed
-            // above and below the baseline
-            sk4d_strutstyle_set_half_leading(LStrutstyle, true);
+                  // Proper HTML requires that elements are correctly nested and
+                  // closed in the order they are opened.
 
-            // https://api.flutter.dev/flutter/painting/StrutStyle/height.html
-            // the multiple of fontSize the line's height should be. The line's height
-            // will take the font's ascent and descent values if height{multiplier} is
-            // omitted or null. If provided, the EM-square ascent and descent (which sum
-            // to fontSize) is scaled by height{multiplier}. The height{multiplier} will
-            // impact the spacing above and below the baseline differently depending on
-            // the ratios between the font's ascent and descent. This property is separate
-            // from the leading multiplier, which is controlled through leading. Default is null.
-            if (not sameValue(AOptions.GetScaledLineHeight, 0, TEpsilon.FontSize)) and
-               (not sameValue(AOptions.GetScaledfontsize, 0, TEpsilon.FontSize)) then
-              sk4d_strutstyle_set_height_multiplier(LStrutstyle, AOptions.GetScaledLineHeight / AOptions.GetScaledfontsize); // LineHeight is given in PX
+                  //-----
+                  LCurrImgSrc := '';
+                  LCurrText := '';
+                  LcurrImgWidth := 0;
+                  LcurrImgHeight := 0;
+                  var P2 := ALPosW('>', Ltext, P1+1); // blablabla <font color="#ffffff">blablabla</font> blablabla
+                                                      //           ^P1                  ^P2
+                  if P2 <= 0 then break;
+                  var LTag: String := ALCopyStr(Ltext, P1, P2 - P1 + 1); // <font color="#ffffff">
+                  P1 := P2 + 1; // blablabla <font color="#ffffff">blablabla</font> blablabla
+                                //                                 ^P1
 
-            // https://api.flutter.dev/flutter/painting/StrutStyle/leading.html
-            // the custom leading to apply to the strut as a multiple of fontSize. Leading is
-            // additional spacing between lines. Half of the leading is added to the top and
-            // the other half to the bottom of the line height. This differs from height since
-            // the spacing is equally distributed above and below the baseline. Default is null,
-            // which will use the font-specified leading.
-            if not sameValue(AOptions.GetScaledLineSpacing, 0, TEpsilon.FontSize) then
-              sk4d_strutstyle_set_leading(LStrutstyle, AOptions.GetScaledLineSpacing / AOptions.GetScaledfontsize); // LineSpacing is given in PX
+                  //-----
+                  if (ALPosW('<b ', LTag) = 1) or
+                     (LTag = '<b>') then begin
+                    _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs);
+                    LFontWeights.Add(TFontWeight.Bold);
+                  end
+                  else if LTag = '</b>' then begin
+                    if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
+                    if LFontWeights.count > 0 then LFontWeights.Delete(LFontWeights.Count - 1);
+                  end
 
-            // Enable strut
-            sk4d_strutstyle_set_enabled(LStrutstyle, true);
+                  //-----
+                  else if (ALPosW('<i ', LTag) = 1) or
+                          (LTag = '<i>') then begin
+                    _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs);
+                    LFontSlants.Add(TFontSlant.Italic);
+                  end
+                  else if LTag = '</i>' then begin
+                    if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
+                    if LFontSlants.count > 0 then LFontSlants.Delete(LFontSlants.Count - 1);
+                  end
 
-            // Set strut style
-            sk4d_paragraphstyle_set_strut_style(LParagraphstyle, LStrutstyle);
+                  //-----
+                  else if (ALPosW('<img ', LTag) = 1) or
+                          (LTag = '<img/>') then begin // <img src="xxx">
+                    _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight);
+                  end
 
-            // Direction
-            if AOptions.Direction = TALTextDirection.RightToLeft then
-              sk4d_paragraphstyle_set_text_direction(LParagraphstyle, sk_textdirection_t.RIGHT_TO_LEFT_SK_TEXTDIRECTION);
+                  //-----
+                  else if (ALPosW('<font ', LTag) = 1) or
+                          (LTag = '<font>')  then begin   // <font color="#ffffff">
+                    _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontFamilies, LFontSizes, LFontColors);
+                  end
+                  else if LTag = '</font>' then begin
+                    if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
+                    if LFontFamilies.count > 0 then LFontFamilies.Delete(LFontFamilies.Count - 1);
+                    if LFontSizes.count > 0 then LFontSizes.Delete(LFontSizes.Count - 1);
+                    if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
+                  end
 
-            // HTextAlign
-            // https://api.flutter.dev/flutter/dart-ui/TextAlign.html
-            // Whether and how to align text horizontally.
-            // * left → const TextAlign
-            //     Align the text on the left edge of the container.
-            // * right → const TextAlign
-            //     Align the text on the right edge of the container.
-            // * center → const TextAlign
-            //     Align the text in the center of the container.
-            // * justify → const TextAlign
-            //     Stretch lines of text that end with a soft line break to fill the width of the container.
-            //     Lines that end with hard line breaks are aligned towards the start edge.
-            // * start → const TextAlign
-            //     Align the text on the leading edge of the container.
-            //     For left-to-right text (TextDirection.ltr), this is the left edge.
-            //     For right-to-left text (TextDirection.rtl), this is the right edge.
-            // * end → const TextAlign
-            //     Align the text on the trailing edge of the container.
-            //     For left-to-right text (TextDirection.ltr), this is the right edge.
-            //     For right-to-left text (TextDirection.rtl), this is the left edge.
-            case AOptions.HTextAlign of
-              TALTextHorzAlign.Center: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.CENTER_SK_TEXTALIGN);
-              TALTextHorzAlign.Leading: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.START_SK_TEXTALIGN);
-              TALTextHorzAlign.Trailing: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.TERMINATE_SK_TEXTALIGN);
-              TALTextHorzAlign.Justify: sk4d_paragraphstyle_set_text_align(LParagraphstyle, sk_textalign_t.JUSTIFY_SK_TEXTALIGN);
-              Else raise Exception.Create('Error C3E64ECA-147F-4EE8-A4CA-EBCB48ACD08C');
-            end;
-
-            // https://en.wikipedia.org/wiki/Font_hinting
-            // With the advent of high-DPI displays (generally considered to be displays with
-            // more than 300 pixels per inch), font hinting has become less relevant, as
-            // aliasing effects become un-noticeable to the human eye. As a result
-            // Apple's Quartz text renderer, which is targeted for Apple's Retina
-            // displays, now ignores font hint information completely.
-            // Note: I tried to disable the font hinting, but it seems to change nothing, so
-            // I need a practical example to show what exactly font hinting does.
-            // In the meantime, I prefer not to touch these settings.
-            // sk4d_paragraphstyle_disable_hinting(LParagraphstyle);
-
-            // MaxLines
-            // https://api.flutter.dev/flutter/dart-ui/ParagraphStyle/ParagraphStyle.html
-            // The maximum number of lines painted. Lines beyond this number are silently dropped.
-            // For example, if maxLines is 1, then only one line is rendered. If maxLines is null,
-            // but ellipsis is not null, then lines after the first one that overflows the width
-            // constraints are dropped. The width constraints are those set in the ParagraphConstraints
-            // object passed to the Paragraph.layout method.
-            sk4d_paragraphstyle_set_max_lines(LParagraphstyle, LMaxLines);
-
-            // Create LParagraphBuilder
-            var LParagraphBuilder := sk4d_paragraphbuilder_create2(
-                                       LParagraphstyle, // const paragraph_style: sk_paragraphstyle_t;
-                                       TSkDefaultProviders.TypefaceFont.Handle, // font_provider: sk_fontmgr_t;
-                                       true); // enable_font_fallback: _bool): sk_paragraphbuilder_t; cdecl;
-            try
-
-
-              ///////////////////////////////////
-              // loop on all the html elements //
-              ///////////////////////////////////
-
-              var LCurrIndex := 0;
-              var P1 := low(Ltext);
-              while P1 <= high(Ltext) do begin
-
-                var LCurrText: String;
-                var LCurrImgSrc: String;
-                var LcurrImgWidth: Single;
-                var LcurrImgHeight: Single;
-
-
-                /////////////////////////
-                // Insert the ellipsis //
-                /////////////////////////
-
-                if LCurrIndex = LInsertEllipsisAt then begin
-                  if AOptions.EllipsisFontFamily <> '' then begin
-                    LFontFamilies.Add(AOptions.EllipsisFontFamily);
-                    LFontSizes.Add(AOptions.GetScaledEllipsisFontSize);
-                    LFontWeights.Add(AOptions.EllipsisFontWeight);
-                    LFontSlants.Add(AOptions.EllipsisFontSlant);
-                    LFontStretchs.Add(AOptions.EllipsisFontStretch);
-                    LFontColors.Add(AOptions.EllipsisFontColor);
-                    LDecorationKinds.Add(AOptions.EllipsisDecorationKinds);
-                    LDecorationStyles.Add(AOptions.EllipsisDecorationStyle);
-                    LDecorationThicknessMultipliers.Add(AOptions.EllipsisDecorationThicknessMultiplier);
-                    if AOptions.EllipsisDecorationColor <> Talphacolors.Null then LDecorationColors.Add(AOptions.EllipsisDecorationColor)
-                    else LDecorationColors.Add(AOptions.DecorationColor);
-                    LBackgroundColors.Add(TALphaColors.Null);
+                  //-----
+                  else if (ALPosW('<span ', LTag) = 1) or
+                          (LTag = '<span>') then begin // <span id="xxx">
+                    _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontFamilies, LFontSizes, LFontWeights, LFontSlants, LFontStretchs, LFontColors, LDecorationKinds, LDecorationStyles, LDecorationThicknessMultipliers, LDecorationColors, LBackgroundColors, LLineHeightMultipliers, LLetterSpacings);
+                  end
+                  else if LTag = '</span>' then begin
+                    if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
+                    if LFontFamilies.count > 0 then LFontFamilies.Delete(LFontFamilies.Count - 1);
+                    if LFontSizes.count > 0 then LFontSizes.Delete(LFontSizes.Count - 1);
+                    if LFontWeights.count > 0 then LFontWeights.Delete(LFontWeights.Count - 1);
+                    if LFontSlants.count > 0 then LFontSlants.Delete(LFontSlants.Count - 1);
+                    if LFontStretchs.count > 0 then LFontStretchs.Delete(LFontStretchs.Count - 1);
+                    if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
+                    if LDecorationKinds.count > 0 then LDecorationKinds.Delete(LDecorationKinds.Count - 1);
+                    if LDecorationStyles.count > 0 then LDecorationStyles.Delete(LDecorationStyles.Count - 1);
+                    if LDecorationThicknessMultipliers.count > 0 then LDecorationThicknessMultipliers.Delete(LDecorationThicknessMultipliers.Count - 1);
+                    if LDecorationColors.count > 0 then LDecorationColors.Delete(LDecorationColors.Count - 1);
+                    if LBackgroundColors.count > 0 then LBackgroundColors.Delete(LBackgroundColors.Count - 1);
+                    if LLineHeightMultipliers.count > 0 then LLineHeightMultipliers.Delete(LLineHeightMultipliers.Count - 1);
+                    if LLetterSpacings.count > 0 then LLetterSpacings.Delete(LLetterSpacings.Count - 1);
                   end;
-                  LSpanIDs.Add('ellipsis');
-                  if (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1) then
-                    LCurrText := ALCopyStr(AOptions.EllipsisText, 3, maxint)
-                  else
-                    LCurrText := AOptions.EllipsisText;
+
+                end
+                else begin
+
                   LCurrImgSrc := '';
                   LcurrImgWidth := 0;
                   LcurrImgHeight := 0;
-                  LInsertEllipsisAt := Maxint;
-                  P1 := Maxint;
-                end
+                  var P2 := ALPosW('<', Ltext, P1);  // blablabla <font color="#ffffff">blablabla</font> blablabla
+                                                     //                                 ^P1      ^P2
+                  if P2 <= 0 then P2 := Maxint;
+                  LCurrText := ALCopyStr(Ltext, P1, P2 - P1);  // blablabla
+                  LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
+                  LCurrText := ALStringReplaceW(LCurrText, '&lt;', '<', [rfReplaceALL]);
+                  P1 := P2; // blablabla <font color="#ffffff">blablabla</font> blablabla
+                            //                                          ^P1
+                end;
 
-                /////////////////////////////////////
-                // The text contains HTML elements //
-                /////////////////////////////////////
+              end
 
-                else if AOptions.TextIsHtml then begin
+              /////////////////////////////////////////////
+              // The text does NOT contain HTML elements //
+              /////////////////////////////////////////////
 
-                  // Extract LCurrText / LCurrImgSrc
-                  if Ltext[P1] = '<' then begin
+              else begin
+                LCurrText := Ltext;
+                LCurrImgSrc := '';
+                LcurrImgWidth := 0;
+                LcurrImgHeight := 0;
+                P1 := Maxint;
+              end;
 
-                    // Proper HTML requires that elements are correctly nested and
-                    // closed in the order they are opened. Here's your original
-                    // snippet for reference:
 
-                    //-----
-                    LCurrImgSrc := '';
-                    LCurrText := '';
-                    LcurrImgWidth := 0;
-                    LcurrImgHeight := 0;
-                    var P2 := ALPosW('>', Ltext, P1+1); // blablabla <font color="#ffffff">blablabla</font> blablabla
-                                                        //           ^P1                  ^P2
-                    if P2 <= 0 then break;
-                    var LTag: String := ALCopyStr(Ltext, P1, P2 - P1 + 1); // <font color="#ffffff">
-                    P1 := P2 + 1; // blablabla <font color="#ffffff">blablabla</font> blablabla
-                                  //                                 ^P1
+              //////////////////////////////////////////////////
+              // Add the current text to the ParagraphBuilder //
+              //////////////////////////////////////////////////
 
-                    //-----
-                    if (ALPosW('<b ', LTag) = 1) or
-                       (LTag = '<b>') then begin
-                      _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs);
-                      LFontWeights.Add(TFontWeight.Bold);
-                    end
-                    else if LTag = '</b>' then begin
-                      if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
-                      if LFontWeights.count > 0 then LFontWeights.Delete(LFontWeights.Count - 1);
-                    end
+              if (LCurrText <> '') or (LCurrImgSrc <> '') then begin
 
-                    //-----
-                    else if (ALPosW('<i ', LTag) = 1) or
-                            (LTag = '<i>') then begin
-                      _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs);
-                      LFontSlants.Add(TFontSlant.Italic);
-                    end
-                    else if LTag = '</i>' then begin
-                      if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
-                      if LFontSlants.count > 0 then LFontSlants.Delete(LFontSlants.Count - 1);
-                    end
+                // Init LFontFamily
+                var LFontFamily: String;
+                if LFontFamilies.Count > 0 then LFontFamily := LFontFamilies[LFontFamilies.Count - 1]
+                else LFontFamily := AOptions.FontFamily;
 
-                    //-----
-                    else if (ALPosW('<img ', LTag) = 1) or
-                            (LTag = '<img/>') then begin // <img src="xxx">
-                      _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight);
-                    end
+                // Init LFontSize
+                var LFontSize: Single;
+                if LFontSizes.Count > 0 then LFontSize := LFontSizes[LFontSizes.Count - 1]
+                else LFontSize := AOptions.GetScaledFontSize;
 
-                    //-----
-                    else if (ALPosW('<font ', LTag) = 1) or
-                            (LTag = '<font>')  then begin   // <font color="#ffffff">
-                      _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontFamilies, LFontSizes, LFontColors);
-                    end
-                    else if LTag = '</font>' then begin
-                      if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
-                      if LFontFamilies.count > 0 then LFontFamilies.Delete(LFontFamilies.Count - 1);
-                      if LFontSizes.count > 0 then LFontSizes.Delete(LFontSizes.Count - 1);
-                      if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
-                    end
+                // Init LFontWeight
+                var LFontWeight: TFontWeight;
+                if LFontWeights.Count > 0 then LFontWeight := LFontWeights[LFontWeights.Count - 1]
+                else LFontWeight := AOptions.FontWeight;
 
-                    //-----
-                    else if (ALPosW('<span ', LTag) = 1) or
-                            (LTag = '<span>') then begin // <span id="xxx">
-                      _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontFamilies, LFontSizes, LFontWeights, LFontSlants, LFontStretchs, LFontColors, LDecorationKinds, LDecorationStyles, LDecorationThicknessMultipliers, LDecorationColors, LBackgroundColors, LLineHeights, LLetterSpacings);
-                    end
-                    else if LTag = '</span>' then begin
-                      if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
-                      if LFontFamilies.count > 0 then LFontFamilies.Delete(LFontFamilies.Count - 1);
-                      if LFontSizes.count > 0 then LFontSizes.Delete(LFontSizes.Count - 1);
-                      if LFontWeights.count > 0 then LFontWeights.Delete(LFontWeights.Count - 1);
-                      if LFontSlants.count > 0 then LFontSlants.Delete(LFontSlants.Count - 1);
-                      if LFontStretchs.count > 0 then LFontStretchs.Delete(LFontStretchs.Count - 1);
-                      if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
-                      if LDecorationKinds.count > 0 then LDecorationKinds.Delete(LDecorationKinds.Count - 1);
-                      if LDecorationStyles.count > 0 then LDecorationStyles.Delete(LDecorationStyles.Count - 1);
-                      if LDecorationThicknessMultipliers.count > 0 then LDecorationThicknessMultipliers.Delete(LDecorationThicknessMultipliers.Count - 1);
-                      if LDecorationColors.count > 0 then LDecorationColors.Delete(LDecorationColors.Count - 1);
-                      if LBackgroundColors.count > 0 then LBackgroundColors.Delete(LBackgroundColors.Count - 1);
-                      if LLineHeights.count > 0 then LLineHeights.Delete(LLineHeights.Count - 1);
-                      if LLetterSpacings.count > 0 then LLetterSpacings.Delete(LLetterSpacings.Count - 1);
+                // Init LFontSlant
+                var LFontSlant: TFontSlant;
+                if LFontSlants.Count > 0 then LFontSlant := LFontSlants[LFontSlants.Count - 1]
+                else LFontSlant := AOptions.FontSlant;
+
+                // Init LFontStretch
+                var LFontStretch: TFontStretch;
+                if LFontStretchs.Count > 0 then LFontStretch := LFontStretchs[LFontStretchs.Count - 1]
+                else LFontStretch := AOptions.FontStretch;
+
+                // Init LFontColor
+                var LFontColor: TalphaColor;
+                if LFontColors.Count > 0 then LFontColor := LFontColors[LFontColors.Count - 1]
+                else LFontColor := AOptions.FontColor;
+
+                // Init LDecorationKind
+                var LDecorationKind: TALTextDecorationKinds;
+                if LDecorationKinds.Count > 0 then LDecorationKind := LDecorationKinds[LDecorationKinds.Count - 1]
+                else LDecorationKind := AOptions.DecorationKinds;
+
+                // Init LDecorationStyle
+                var LDecorationStyle: TALTextDecorationStyle;
+                if LDecorationStyles.Count > 0 then LDecorationStyle := LDecorationStyles[LDecorationStyles.Count - 1]
+                else LDecorationStyle := AOptions.DecorationStyle;
+
+                // Init LDecorationThicknessMultiplier
+                var LDecorationThicknessMultiplier: Single;
+                if LDecorationThicknessMultipliers.Count > 0 then LDecorationThicknessMultiplier := LDecorationThicknessMultipliers[LDecorationThicknessMultipliers.Count - 1]
+                else LDecorationThicknessMultiplier := AOptions.DecorationThicknessMultiplier;
+
+                // Init LDecorationColor
+                var LDecorationColor: TalphaColor;
+                if LDecorationColors.Count > 0 then LDecorationColor := LDecorationColors[LDecorationColors.Count - 1]
+                else LDecorationColor := AOptions.DecorationColor;
+
+                // Init LBackgroundColor
+                var LBackgroundColor: TalphaColor;
+                if LBackgroundColors.Count > 0 then LBackgroundColor := LBackgroundColors[LBackgroundColors.Count - 1]
+                else LBackgroundColor := TalphaColors.Null;
+
+                // Init LLineHeightMultiplier
+                var LLineHeightMultiplier: Single;
+                if LLineHeightMultipliers.Count > 0 then LLineHeightMultiplier := LLineHeightMultipliers[LLineHeightMultipliers.Count - 1]
+                else LLineHeightMultiplier := AOptions.LineHeightMultiplier;
+
+                // Init LLetterSpacing
+                var LLetterSpacing: Single;
+                if LLetterSpacings.Count > 0 then LLetterSpacing := LLetterSpacings[LLetterSpacings.Count - 1]
+                else LLetterSpacing := AOptions.GetScaledLetterSpacing;
+
+                // Init LSpanID
+                var LSpanID: String;
+                if LSpanIDs.Count > 0 then LSpanID := LSpanIDs[LSpanIDs.Count - 1]
+                else LSpanID := '';
+
+                // Init LLength
+                var LLength: Integer;
+                if LCurrImgSrc <> '' then LLength := 1
+                else LLength := LCurrText.Length;
+
+                // Init LPrevCurrIndex / LCurrIndex
+                var LPrevCurrIndex := LCurrIndex;
+                LCurrIndex := LCurrIndex + LLength;
+
+                // Handle LInsertEllipsisAt
+                if LCurrIndex > LInsertEllipsisAt then begin
+                  // It is not possible to have a non-empty LCurrImgSrc here. When LCurrImgSrc is not empty (''),
+                  // LLength is set to 1. Therefore, L(Prev)CurrIndex + 1 cannot exceed LInsertEllipsisAt because to reach the condition
+                  // where L(Prev)CurrIndex = LInsertEllipsisAt (the only way to have  L(Prev)CurrIndex + 1 > LInsertEllipsisAt), we
+                  // would have already entered the "Insert the ellipsis" block (i.e., if LCurrIndex = LInsertEllipsisAt then ...). This
+                  // block would insert text and reset LCurrImgSrc to an empty string ('').
+                  if LCurrImgSrc <> '' then
+                    raise Exception.Create('Error 90AD8D31-4CEA-4AE3-8D84-51B5EB6E171B');
+                  LCurrText := ALCopyStr(LCurrText, 1, LCurrText.Length - (LCurrIndex - LInsertEllipsisAt));
+                  if (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1) then begin
+                    LCurrText := LCurrText + '… ';
+                    LInsertEllipsisAt := LInsertEllipsisAt + 2;
+                  end;
+                  LLength := LCurrText.Length;
+                  LCurrIndex := LInsertEllipsisAt;
+                  P1 := high(Ltext);
+                end;
+
+                // Update LRangeIndexes
+                if LSpanID <> '' then begin
+                  Var LRangeIndex: TRangeIndex;
+                  LRangeIndex.SpanID := LSpanID;
+                  LRangeIndex.start := LPrevCurrIndex;
+                  LRangeIndex.&end := LPrevCurrIndex + LLength;
+                  LRangeIndexes.Add(LRangeIndex);
+                end;
+
+                //break the text
+                var LTextStyle := sk4d_textstyle_create;
+                try
+
+                  // Set the font families
+                  // https://api.flutter.dev/flutter/painting/TextStyle/fontFamily.html
+                  // The name of the font to use when painting the text (e.g., Roboto).
+                  var LUTF16FontFamilies: TArray<String>;
+                  var LUTF8FontFamilies: TArray<UTF8String>;
+                  var LMarshaledFontFamilies: TArray<MarshaledAString>;
+                  LUTF16FontFamilies := LFontFamily.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+                  if Length(LUTF16FontFamilies) > 0 then begin
+                    SetLength(LUTF8FontFamilies, Length(LUTF16FontFamilies));
+                    SetLength(LMarshaledFontFamilies, Length(LUTF16FontFamilies));
+                    var I: Integer := 0;
+                    for var J := low(LUTF16FontFamilies) to high(LUTF16FontFamilies) do begin
+                      var LUTF16FontFamily := ALTrim(LUTF16FontFamilies[J]);
+                      if LUTF16FontFamily <> '' then begin
+                        LUTF8FontFamilies[I] := UTF8String(LUTF16FontFamily);
+                        LMarshaledFontFamilies[I] := MarshaledAString(LUTF8FontFamilies[I]);
+                        inc(I);
+                      end;
                     end;
+                    if I > 0 then
+                      sk4d_textstyle_set_font_families(LTextStyle, @LMarshaledFontFamilies[0], I);
+                  end;
 
+                  // Set the font size
+                  // https://api.flutter.dev/flutter/painting/TextStyle/fontSize.html
+                  // The size of fonts (in logical pixels) to use when painting the text.
+                  // The getParagraphStyle method defaults to 14 logical pixels if fontSize is set to null.
+                  sk4d_textstyle_set_font_size(LTextStyle, LFontSize);
+
+                  // Set the font Weight, Slant and Stretch
+                  var LSkfontstyle := _GetSkFontStyle(LFontWeight, LFontSlant, LFontStretch);
+                  sk4d_textstyle_set_font_style(LTextStyle, @LSkfontstyle);
+
+                  // Set the font color
+                  sk4d_textstyle_set_color(LTextStyle, LFontColor);
+
+                  // Set decoration kinds
+                  // https://api.flutter.dev/flutter/painting/TextStyle/decoration.html
+                  // The decorations to paint near the text (e.g., an underline).
+                  {$IFNDEF ALCompilerVersionSupported120}
+                    {$MESSAGE WARN 'Check if declaration of System.Skia.API.TSkTextDecoration didn''t changed'}
+                  {$ENDIF}
+                  sk4d_textstyle_set_decorations(LTextStyle, Byte(LDecorationKind));
+
+                  // Set decoration style
+                  // https://api.flutter.dev/flutter/painting/TextStyle/decorationStyle.html
+                  // The style in which to paint the text decorations (e.g., dashed).
+                  if LDecorationKind <> [] then begin
+                    var Ltextdecorationstyle: sk_textdecorationstyle_t;
+                    case LDecorationStyle of
+                      TALTextDecorationStyle.Solid: Ltextdecorationstyle := sk_textdecorationstyle_t.SOLID_SK_TEXTDECORATIONSTYLE;
+                      TALTextDecorationStyle.Double: Ltextdecorationstyle := sk_textdecorationstyle_t.DOUBLE_SK_TEXTDECORATIONSTYLE;
+                      TALTextDecorationStyle.Dotted: Ltextdecorationstyle := sk_textdecorationstyle_t.DOTTED_SK_TEXTDECORATIONSTYLE;
+                      TALTextDecorationStyle.Dashed: Ltextdecorationstyle := sk_textdecorationstyle_t.DASHED_SK_TEXTDECORATIONSTYLE;
+                      TALTextDecorationStyle.Wavy: Ltextdecorationstyle := sk_textdecorationstyle_t.WAVY_SK_TEXTDECORATIONSTYLE;
+                      else raise Exception.Create('Error 4ECD41C9-4D7B-4BDE-AA1B-BA27FB57C106');
+                    end;
+                    sk4d_textstyle_set_decoration_style(LTextStyle, Ltextdecorationstyle);
+                  end;
+
+                  // Set decoration thickness
+                  // https://api.flutter.dev/flutter/painting/TextStyle/decorationThickness.html
+                  // The thickness of the decoration stroke as a multiplier of the thickness defined by the font.
+                  // The font provides a base stroke width for decorations which scales off of the fontSize.
+                  // This property may be used to achieve a thinner or thicker decoration stroke, without
+                  // changing the fontSize. For example, a decorationThickness of 2.0 will draw a decoration
+                  // twice as thick as the font defined decoration thickness.
+                  if (LDecorationKind <> []) and
+                     (not samevalue(LDecorationThicknessMultiplier, 0, Tepsilon.Scale)) then
+                    sk4d_textstyle_set_decoration_thickness(LTextStyle, LDecorationThicknessMultiplier);
+
+                  // Set decoration color
+                  // https://api.flutter.dev/flutter/painting/TextStyle/decorationColor.html
+                  // The color in which to paint the text decorations.
+                  if (LDecorationKind <> []) and
+                     (LDecorationColor <> Talphacolors.Null) then
+                    sk4d_textstyle_set_decoration_color(LTextStyle, LDecorationColor);
+
+                  // set background color
+                  // https://api.flutter.dev/flutter/painting/TextStyle/backgroundColor.html
+                  // The color to use as the background for the text.
+                  if LBackgroundColor <> TalphaColors.Null then begin
+                    sk4d_paint_set_color(LPaint, LBackgroundColor);
+                    sk4d_textstyle_set_background_color(LTextStyle, Lpaint);
+                  end;
+
+                  // set letter spacing
+                  // https://api.flutter.dev/flutter/painting/TextStyle/letterSpacing.html
+                  // The amount of space (in logical pixels) to add between each letter. A negative value
+                  // can be used to bring the letters closer.
+                  if not SameValue(LLetterSpacing, 0, TEpsilon.FontSize) then
+                    sk4d_textstyle_set_letter_spacing(LTextStyle, LLetterSpacing);
+
+                  // set half_leading
+                  // https://api.flutter.dev/flutter/painting/TextStyle/leadingDistribution.html
+                  // How the vertical space added by the height multiplier should be distributed over
+                  // and under the text. When a non-null height is specified, after accommodating the
+                  // glyphs of the text, the remaining vertical space from the allotted line height will
+                  // be distributed over and under the text, according to the leadingDistribution property.
+                  // When height is null, leadingDistribution does not affect the text layout.
+                  // Defaults to null, which defers to the paragraph's
+                  // ParagraphStyle.textHeightBehavior's leadingDistribution (IE: TextLeadingDistribution.proportional)
+                  sk4d_textstyle_set_half_leading(LTextStyle, true);
+
+                  // set height multiplier
+                  // https://api.flutter.dev/flutter/painting/TextStyle/height.html
+                  // By default, text will layout with line height as defined by the font. Font-metrics defined line height may be
+                  // taller or shorter than the font size. The height property allows manual adjustment of the height of the line
+                  // as a multiple of fontSize. For most fonts, setting height to 1.0 is not the same as omitting or setting
+                  // height to null.
+                  if not SameValue(LLineHeightMultiplier, 0, TEpsilon.Scale) then
+                    sk4d_textstyle_set_height_multiplier(LTextStyle, LLineHeightMultiplier);
+
+                  // Push the style
+                  // https://api.flutter.dev/flutter/dart-ui/ParagraphBuilder/pushStyle.html
+                  // Applies the given style to the added text until pop is called.
+                  sk4d_paragraphbuilder_push_style(LParagraphBuilder, LTextStyle);
+
+                  // Add the text or PlaceHolder
+                  if LCurrImgSrc <> '' then begin
+                    {$IFNDEF ALCompilerVersionSupported120}
+                      {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
+                    {$ENDIF}
+                    var LPlaceholderStyle: sk_placeholderstyle_t;
+                    if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.GetScaledFontSize;
+                    if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.GetScaledFontSize;
+                    LPlaceholderStyle.width := LcurrImgWidth;
+                    LPlaceholderStyle.height := LcurrImgHeight;
+                    LPlaceholderStyle.alignment := sk_placeholderalignment_t.MIDDLE_SK_PLACEHOLDERALIGNMENT;
+                    LPlaceholderStyle.baseline := sk_textbaseline_t.ALPHABETIC_SK_TEXTBASELINE;
+                    LPlaceholderStyle.baseline_offset := 0.0;
+                    sk4d_paragraphbuilder_add_placeholder(LParagraphBuilder, @LPlaceholderStyle);
+                    LTextForRange := LTextForRange + '_';
+                    LPlaceHolders.Add(LCurrImgSrc);
                   end
                   else begin
-
-                    LCurrImgSrc := '';
-                    LcurrImgWidth := 0;
-                    LcurrImgHeight := 0;
-                    var P2 := ALPosW('<', Ltext, P1);  // blablabla <font color="#ffffff">blablabla</font> blablabla
-                                                       //                                 ^P1      ^P2
-                    if P2 <= 0 then P2 := Maxint;
-                    LCurrText := ALCopyStr(Ltext, P1, P2 - P1);  // blablabla
-                    LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
-                    LCurrText := ALStringReplaceW(LCurrText, '&lt;', '<', [rfReplaceALL]);
-                    P1 := P2; // blablabla <font color="#ffffff">blablabla</font> blablabla
-                              //                                          ^P1
+                    sk4d_paragraphbuilder_add_text(LParagraphBuilder, MarshaledAString(UTF8String(LCurrText)));
+                    LTextForRange := LTextForRange + LCurrText;
                   end;
 
-                end
+                  // Pop the style
+                  // https://api.flutter.dev/flutter/dart-ui/ParagraphBuilder/pop.html
+                  // Ends the effect of the most recent call to pushStyle.
+                  sk4d_paragraphbuilder_pop(LParagraphBuilder);
 
-                /////////////////////////////////////////////
-                // The text does NOT contain HTML elements //
-                /////////////////////////////////////////////
-
-                else begin
-                  LCurrText := Ltext;
-                  LCurrImgSrc := '';
-                  LcurrImgWidth := 0;
-                  LcurrImgHeight := 0;
-                  P1 := Maxint;
-                end;
-
-
-                //////////////////////////////////////////////////
-                // Add the current text to the ParagraphBuilder //
-                //////////////////////////////////////////////////
-
-                if (LCurrText <> '') or (LCurrImgSrc <> '') then begin
-
-                  // Init LSpanID
-                  var LSpanID: String;
-                  if LSpanIDs.Count > 0 then LSpanID := LSpanIDs[LSpanIDs.Count - 1]
-                  else LSpanID := '';
-
-                  // Init LFontFamily
-                  var LFontFamily: String;
-                  if LFontFamilies.Count > 0 then LFontFamily := LFontFamilies[LFontFamilies.Count - 1]
-                  else LFontFamily := AOptions.FontFamily;
-
-                  // Init LFontSize
-                  var LFontSize: Single;
-                  if LFontSizes.Count > 0 then LFontSize := LFontSizes[LFontSizes.Count - 1]
-                  else LFontSize := AOptions.GetScaledFontSize;
-
-                  // Init LFontWeight
-                  var LFontWeight: TFontWeight;
-                  if LFontWeights.Count > 0 then LFontWeight := LFontWeights[LFontWeights.Count - 1]
-                  else LFontWeight := AOptions.FontWeight;
-
-                  // Init LFontSlant
-                  var LFontSlant: TFontSlant;
-                  if LFontSlants.Count > 0 then LFontSlant := LFontSlants[LFontSlants.Count - 1]
-                  else LFontSlant := AOptions.FontSlant;
-
-                  // Init LFontStretch
-                  var LFontStretch: TFontStretch;
-                  if LFontStretchs.Count > 0 then LFontStretch := LFontStretchs[LFontStretchs.Count - 1]
-                  else LFontStretch := AOptions.FontStretch;
-
-                  // Init LFontColor
-                  var LFontColor: TalphaColor;
-                  if LFontColors.Count > 0 then LFontColor := LFontColors[LFontColors.Count - 1]
-                  else LFontColor := AOptions.FontColor;
-
-                  // Init LDecorationKind
-                  var LDecorationKind: TALTextDecorationKinds;
-                  if LDecorationKinds.Count > 0 then LDecorationKind := LDecorationKinds[LDecorationKinds.Count - 1]
-                  else LDecorationKind := AOptions.DecorationKinds;
-
-                  // Init LDecorationStyle
-                  var LDecorationStyle: TALTextDecorationStyle;
-                  if LDecorationStyles.Count > 0 then LDecorationStyle := LDecorationStyles[LDecorationStyles.Count - 1]
-                  else LDecorationStyle := AOptions.DecorationStyle;
-
-                  // Init LDecorationThicknessMultiplier
-                  var LDecorationThicknessMultiplier: Single;
-                  if LDecorationThicknessMultipliers.Count > 0 then LDecorationThicknessMultiplier := LDecorationThicknessMultipliers[LDecorationThicknessMultipliers.Count - 1]
-                  else LDecorationThicknessMultiplier := AOptions.DecorationThicknessMultiplier;
-
-                  // Init LDecorationColor
-                  var LDecorationColor: TalphaColor;
-                  if LDecorationColors.Count > 0 then LDecorationColor := LDecorationColors[LDecorationColors.Count - 1]
-                  else LDecorationColor := AOptions.DecorationColor;
-
-                  // Init LBackgroundColor
-                  var LBackgroundColor: TalphaColor;
-                  if LBackgroundColors.Count > 0 then LBackgroundColor := LBackgroundColors[LBackgroundColors.Count - 1]
-                  else LBackgroundColor := TalphaColors.Null;
-
-                  // Init LLineHeight
-                  var LLineHeight: Single;
-                  if LLineHeights.Count > 0 then LLineHeight := LLineHeights[LLineHeights.Count - 1]
-                  else LLineHeight := AOptions.GetScaledLineHeight;
-
-                  // Init LLetterSpacing
-                  var LLetterSpacing: Single;
-                  if LLetterSpacings.Count > 0 then LLetterSpacing := LLetterSpacings[LLetterSpacings.Count - 1]
-                  else LLetterSpacing := AOptions.GetScaledLetterSpacing;
-
-                  // Init LLength
-                  var LLength: Integer;
-                  if LCurrImgSrc <> '' then LLength := 1
-                  else LLength := LCurrText.Length;
-
-                  // Init LPrevCurrIndex / LCurrIndex
-                  var LPrevCurrIndex := LCurrIndex;
-                  LCurrIndex := LCurrIndex + LLength;
-
-                  // Handle LInsertEllipsisAt
-                  if LCurrIndex > LInsertEllipsisAt then begin
-                    // It is not possible to have a non-empty LCurrImgSrc here. When LCurrImgSrc is not empty (''),
-                    // LLength is set to 1. Therefore, L(Prev)CurrIndex + 1 cannot exceed LInsertEllipsisAt because to reach the condition
-                    // where L(Prev)CurrIndex = LInsertEllipsisAt (the only way to have  L(Prev)CurrIndex + 1 > LInsertEllipsisAt), we
-                    // would have already entered the "Insert the ellipsis" block (i.e., if LCurrIndex = LInsertEllipsisAt then ...). This
-                    // block would insert text and reset LCurrImgSrc to an empty string ('').
-                    if LCurrImgSrc <> '' then
-                      raise Exception.Create('Error #90AD8D31-4CEA-4AE3-8D84-51B5EB6E171B');
-                    LCurrText := ALCopyStr(LCurrText, 1, LCurrText.Length - (LCurrIndex - LInsertEllipsisAt));
-                    if (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1) then begin
-                      LCurrText := LCurrText + '… ';
-                      LInsertEllipsisAt := LInsertEllipsisAt + 2;
-                    end;
-                    LLength := LCurrText.Length;
-                    LCurrIndex := LInsertEllipsisAt;
-                    P1 := high(Ltext);
-                  end;
-
-                  // Update LRangeIndexes
-                  if LSpanID <> '' then begin
-                    Var LRangeIndex: TRangeIndex;
-                    LRangeIndex.SpanID := LSpanID;
-                    LRangeIndex.start := LPrevCurrIndex;
-                    LRangeIndex.&end := LPrevCurrIndex + LLength;
-                    LRangeIndexes.Add(LRangeIndex);
-                  end;
-
-                  //break the text
-                  var LTextStyle := sk4d_textstyle_create;
-                  try
-
-                    // Set the font families
-                    // https://api.flutter.dev/flutter/painting/TextStyle/fontFamily.html
-                    // The name of the font to use when painting the text (e.g., Roboto).
-                    LUTF16FontFamilies := LFontFamily.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
-                    if Length(LUTF16FontFamilies) > 0 then begin
-                      SetLength(LUTF8FontFamilies, Length(LUTF16FontFamilies));
-                      SetLength(LMarshaledFontFamilies, Length(LUTF16FontFamilies));
-                      var I: Integer := 0;
-                      for var J := low(LUTF16FontFamilies) to high(LUTF16FontFamilies) do begin
-                        var LUTF16FontFamily := ALTrim(LUTF16FontFamilies[J]);
-                        if LUTF16FontFamily <> '' then begin
-                          LUTF8FontFamilies[I] := UTF8String(LUTF16FontFamily);
-                          LMarshaledFontFamilies[I] := MarshaledAString(LUTF8FontFamilies[I]);
-                          inc(I);
-                        end;
-                      end;
-                      if I > 0 then
-                        sk4d_textstyle_set_font_families(LTextStyle, @LMarshaledFontFamilies[0], I);
-                    end;
-
-                    // Set the font size
-                    // https://api.flutter.dev/flutter/painting/TextStyle/fontSize.html
-                    // The size of fonts (in logical pixels) to use when painting the text.
-                    // The getParagraphStyle method defaults to 14 logical pixels if fontSize is set to null.
-                    if not sameValue(LFontSize, 0, TEpsilon.FontSize) then
-                      sk4d_textstyle_set_font_size(LTextStyle, LFontSize);
-
-                    // Set the font Weight, Slant and Stretch
-                    LSkfontstyle := _GetSkFontStyle(LFontWeight, LFontSlant, LFontStretch);
-                    sk4d_textstyle_set_font_style(LTextStyle, @LSkfontstyle);
-
-                    // Set the font color
-                    sk4d_textstyle_set_color(LTextStyle, LFontColor);
-
-                    // Set decoration kinds
-                    // https://api.flutter.dev/flutter/painting/TextStyle/decoration.html
-                    // The decorations to paint near the text (e.g., an underline).
-                    {$IFNDEF ALCompilerVersionSupported120}
-                      {$MESSAGE WARN 'Check if declaration of System.Skia.API.TSkTextDecoration didn''t changed'}
-                    {$ENDIF}
-                    sk4d_textstyle_set_decorations(LTextStyle, Byte(LDecorationKind));
-
-                    // Set decoration style
-                    // https://api.flutter.dev/flutter/painting/TextStyle/decorationStyle.html
-                    // The style in which to paint the text decorations (e.g., dashed).
-                    if LDecorationKind <> [] then begin
-                      var Ltextdecorationstyle: sk_textdecorationstyle_t;
-                      case LDecorationStyle of
-                        TALTextDecorationStyle.Solid: Ltextdecorationstyle := sk_textdecorationstyle_t.SOLID_SK_TEXTDECORATIONSTYLE;
-                        TALTextDecorationStyle.Double: Ltextdecorationstyle := sk_textdecorationstyle_t.DOUBLE_SK_TEXTDECORATIONSTYLE;
-                        TALTextDecorationStyle.Dotted: Ltextdecorationstyle := sk_textdecorationstyle_t.DOTTED_SK_TEXTDECORATIONSTYLE;
-                        TALTextDecorationStyle.Dashed: Ltextdecorationstyle := sk_textdecorationstyle_t.DASHED_SK_TEXTDECORATIONSTYLE;
-                        TALTextDecorationStyle.Wavy: Ltextdecorationstyle := sk_textdecorationstyle_t.WAVY_SK_TEXTDECORATIONSTYLE;
-                        else raise Exception.Create('Error 4ECD41C9-4D7B-4BDE-AA1B-BA27FB57C106');
-                      end;
-                      sk4d_textstyle_set_decoration_style(LTextStyle, Ltextdecorationstyle);
-                    end;
-
-                    // Set decoration thickness
-                    // https://api.flutter.dev/flutter/painting/TextStyle/decorationThickness.html
-                    // The thickness of the decoration stroke as a multiplier of the thickness defined by the font.
-                    // The font provides a base stroke width for decorations which scales off of the fontSize.
-                    // This property may be used to achieve a thinner or thicker decoration stroke, without
-                    // changing the fontSize. For example, a decorationThickness of 2.0 will draw a decoration
-                    // twice as thick as the font defined decoration thickness.
-                    if (LDecorationKind <> []) and
-                       (not samevalue(LDecorationThicknessMultiplier, 0, Tepsilon.Scale)) then
-                      sk4d_textstyle_set_decoration_thickness(LTextStyle, LDecorationThicknessMultiplier);
-
-                    // Set decoration color
-                    // https://api.flutter.dev/flutter/painting/TextStyle/decorationColor.html
-                    // The color in which to paint the text decorations.
-                    if (LDecorationKind <> []) and
-                       (LDecorationColor <> Talphacolors.Null) then
-                      sk4d_textstyle_set_decoration_color(LTextStyle, LDecorationColor);
-
-                    // set background color
-                    // https://api.flutter.dev/flutter/painting/TextStyle/backgroundColor.html
-                    // The color to use as the background for the text.
-                    if LBackgroundColor <> TalphaColors.Null then begin
-                      sk4d_paint_set_color(LPaint, LBackgroundColor);
-                      sk4d_textstyle_set_background_color(LTextStyle, Lpaint);
-                    end;
-
-                    // set letter spacing
-                    // https://api.flutter.dev/flutter/painting/TextStyle/letterSpacing.html
-                    // The amount of space (in logical pixels) to add between each letter. A negative value
-                    // can be used to bring the letters closer.
-                    if not SameValue(LLetterSpacing, 0, TEpsilon.FontSize) then
-                      sk4d_textstyle_set_letter_spacing(LTextStyle, LLetterSpacing);
-
-                    // set half_leading
-                    // https://api.flutter.dev/flutter/painting/TextStyle/leadingDistribution.html
-                    // How the vertical space added by the height multiplier should be distributed over
-                    // and under the text. When a non-null height is specified, after accommodating the
-                    // glyphs of the text, the remaining vertical space from the allotted line height will
-                    // be distributed over and under the text, according to the leadingDistribution property.
-                    // When height is null, leadingDistribution does not affect the text layout.
-                    // Defaults to null, which defers to the paragraph's
-                    // ParagraphStyle.textHeightBehavior's leadingDistribution (IE: TextLeadingDistribution.proportional)
-                    sk4d_textstyle_set_half_leading(LTextStyle, true);
-
-                    // set height multiplier
-                    // https://api.flutter.dev/flutter/painting/TextStyle/height.html
-                    // By default, text will layout with line height as defined by the font. Font-metrics defined line height may be
-                    // taller or shorter than the font size. The height property allows manual adjustment of the height of the line
-                    // as a multiple of fontSize. For most fonts, setting height to 1.0 is not the same as omitting or setting
-                    // height to null.
-                    if (not SameValue(LLineHeight, 0, TEpsilon.FontSize)) and
-                       (not SameValue(LFontSize, 0, TEpsilon.FontSize)) then
-                      sk4d_textstyle_set_height_multiplier(LTextStyle, LLineHeight / LFontSize); // LineHeight is given in PX
-
-                    // Push the style
-                    // https://api.flutter.dev/flutter/dart-ui/ParagraphBuilder/pushStyle.html
-                    // Applies the given style to the added text until pop is called.
-                    sk4d_paragraphbuilder_push_style(LParagraphBuilder, LTextStyle);
-
-                    // Add the text or PlaceHolder
-                    if LCurrImgSrc <> '' then begin
-                      {$IFNDEF ALCompilerVersionSupported120}
-                        {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
-                      {$ENDIF}
-                      var LPlaceholderStyle: sk_placeholderstyle_t;
-                      if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.GetScaledFontSize;
-                      if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.GetScaledFontSize;
-                      LPlaceholderStyle.width := LcurrImgWidth;
-                      LPlaceholderStyle.height := LcurrImgHeight;
-                      LPlaceholderStyle.alignment := sk_placeholderalignment_t.MIDDLE_SK_PLACEHOLDERALIGNMENT;
-                      LPlaceholderStyle.baseline := sk_textbaseline_t.ALPHABETIC_SK_TEXTBASELINE;
-                      LPlaceholderStyle.baseline_offset := 0.0;
-                      sk4d_paragraphbuilder_add_placeholder(LParagraphBuilder, @LPlaceholderStyle);
-                      LTextForRange := LTextForRange + '_';
-                      LPlaceHolders.Add(LCurrImgSrc);
-                    end
-                    else begin
-                      sk4d_paragraphbuilder_add_text(LParagraphBuilder, MarshaledAString(UTF8String(LCurrText)));
-                      LTextForRange := LTextForRange + LCurrText;
-                    end;
-
-                    // Pop the style
-                    // https://api.flutter.dev/flutter/dart-ui/ParagraphBuilder/pop.html
-                    // Ends the effect of the most recent call to pushStyle.
-                    sk4d_paragraphbuilder_pop(LParagraphBuilder);
-
-                  finally
-                    sk4d_textstyle_destroy(LTextStyle);
-                  end;
-
+                finally
+                  sk4d_textstyle_destroy(LTextStyle);
                 end;
 
               end;
 
+            end;
 
-              /////////////////////////
-              // Paint the paragraph //
-              /////////////////////////
 
-              // https://api.flutter.dev/flutter/dart-ui/ParagraphBuilder/build.html
-              // Applies the given paragraph style and returns a Paragraph containing the added text and associated styling.
-              // After calling this function, the paragraph builder object is invalid and cannot be used further.
-              var LParagraph := sk4d_paragraphbuilder_build(LParagraphBuilder);
+            /////////////////////////
+            // Paint the paragraph //
+            /////////////////////////
+
+            // https://api.flutter.dev/flutter/dart-ui/ParagraphBuilder/build.html
+            // Applies the given paragraph style and returns a Paragraph containing the added text and associated styling.
+            // After calling this function, the paragraph builder object is invalid and cannot be used further.
+            var LParagraph := sk4d_paragraphbuilder_build(LParagraphBuilder);
+            try
+
+              // Layout the paragraph
+              // https://api.flutter.dev/flutter/dart-ui/Paragraph/layout.html
+              // Computes the size and position of each glyph in the paragraph.
+              var LMaxWidth := ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight;
+              sk4d_paragraph_layout(Lparagraph, LMaxWidth);
+
+              // Get the Metrics of each lines
+              var LMetrics: Tarray<sk_metrics_t>;
+              SetLength(LMetrics, sk4d_paragraph_get_line_metrics(Lparagraph, nil));
+              if length(LMetrics) = 0 then begin
+                ARect.Width := 0;
+                ARect.Height := 0;
+                exit(ALNullDrawable);
+              end;
+              sk4d_paragraph_get_line_metrics(Lparagraph, @LMetrics[0]);
+
+              // Update AAllTextDrawn
+              // https://api.flutter.dev/flutter/dart-ui/Paragraph/didExceedMaxLines.html
+              // True if there is more vertical content, but the text was truncated, either because
+              /// we reached maxLines lines of text or because the maxLines was null, ellipsis was
+              // not null, and one of the lines exceeded the width constraint.
+              var LDidExceedMaxLines := sk4d_paragraph_did_exceed_max_lines(Lparagraph);
+              if AAllTextDrawn then
+                AAllTextDrawn := not LDidExceedMaxLines;
+
+              // Update ATextBroken
+              ATextBroken := ATextBroken or (length(LMetrics) > 1) or LDidExceedMaxLines;
+              if AOptions.FailIfTextBroken and ATextBroken then begin
+                ARect.Width := 0;
+                ARect.Height := 0;
+                exit(ALNullDrawable);
+              end;
+
+              // Update ARect
+              var LReLayout: Boolean := False;
+              var LMaxHeight := ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom;
+              Var LParagraphRect := TrectF.Empty;
+              for var I := Low(LMetrics) to High(LMetrics) do begin
+                LParagraphRect.Width := Max(LParagraphRect.Width, LMetrics[I].width);
+                LParagraphRect.Height := LParagraphRect.Height + LMetrics[I].height;
+                // We have too many lines to fit within the maxHeight constraint.
+                // Note: There is a bug in Skia related to setting a very large font size for the
+                // ellipsis. This issue occurs when the last line is significantly short,
+                // containing only 2 characters (e.g., when rect.width = 35). Under these circumstances,
+                // the last line may exceed the maximum width constraint specified in sk4d_paragraph_layout.
+                if (CompareValue(LParagraphRect.Height, LMaxHeight, TEpsilon.Position) > 0) or
+                   (CompareValue(LParagraphRect.Width, LMaxWidth, TEpsilon.Position) > 0) then begin
+                  if I = 0 then begin
+                    ARect.Width := 0;
+                    ARect.Height := 0;
+                    exit(ALNullDrawable);
+                  end;
+                  // Although it's impossible to have LMaxLines = I, I prefer to crash rather
+                  // than enter an infinite loop.
+                  if LMaxLines <= I then
+                    Raise exception.Create('Error 47772843-A4B1-4133-9FD2-3DA7D4DBB2ED');
+                  LMaxLines := I {0 based};
+                  AAllTextDrawn := False;
+                  LInsertEllipsisAt := LMetrics[i-1].end_excluding_whitespaces;
+                  LPrevInsertEllipsisAt := LInsertEllipsisAt;
+                  LReLayout := True;
+                  Break;
+                end
+                // We have exceeded the maxLines, so add the EllipsisText.
+                else if ((I = High(LMetrics)) and (LDidExceedMaxLines) and (AOptions.EllipsisText <> '')) then begin
+                  AAllTextDrawn := False;
+                  // Note: With Skia, only TALTextTrimming.Word is supported.
+                  // Normally, LMetrics[i].end_excluding_whitespaces, as determined by sk4d_paragraph_layout,
+                  // indicates the correct position for inserting the ellipsis. However, in certain scenarios,
+                  // such as when processing "The house of WOLFESCHLEGELSTEIN", the engine suggests a break
+                  // after "of" at position 12. In the next iteration, when attempting to break "The house of… more[+]",
+                  // the engine now advises a break after the ellipsis at position 13 (where 13 > 12). This is why
+                  // the management of LPrevInsertEllipsisAt is crucial.
+                  LInsertEllipsisAt := LMetrics[i].end_excluding_whitespaces;
+                  if LInsertEllipsisAt >= LPrevInsertEllipsisAt then
+                    LInsertEllipsisAt := _findLastBreakPosition(LTextForRange, LPrevInsertEllipsisAt-1);
+                  // _findLastBreakPosition return -1 when LPrevInsertEllipsisAt = 0
+                  if LInsertEllipsisAt < 0 then begin
+                    ARect.Width := 0;
+                    ARect.Height := 0;
+                    exit(ALNullDrawable);
+                  end;
+                  LPrevInsertEllipsisAt := LInsertEllipsisAt;
+                  LReLayout := True;
+                  Break;
+                end;
+              end;
+              if LReLayout then continue;
+              //
+              // We must round up (ceil) the value of LMetrics[I].width. For example, if we return a width
+              // of 21.82, and later attempt to layout the same paragraph with a constraint
+              // width of 21.82, it will fail. This issue seems to arise because Skia requires
+              // at least a full pixel's space to determine if it can break at 21.82. Otherwise, it will
+              // break the text at the previous word, thinking there isn't enough space
+              // to accommodate the last 0.82. Internally it's round 21.82 down to 21 like you can
+              // see in ParagraphImpl.cpp :
+              //
+              //   void ParagraphImpl::layout(SkScalar rawWidth) {
+              //       TODO: This rounding is done to match Flutter tests. Must be removed...
+              //       auto floorWidth = SkScalarFloorToScalar(rawWidth);
+              //
+              var LOriginalRectWidth: Single := ARect.Width;
+              if AOptions.Autosize or (AOptions.AutosizeX and AOptions.AutosizeY) then begin
+                ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight);
+                ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+              end
+              else if AOptions.AutosizeX then ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight)
+              else if AOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+
+              // init LParagraphRect.topleft
+              case AOptions.VTextAlign of
+                TALTextVertAlign.Center: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, AOptions.GetScaledPaddingTop + ((ARect.Height - LParagraphRect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom) / 2));
+                TALTextVertAlign.Leading: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, AOptions.GetScaledPaddingTop);
+                TALTextVertAlign.Trailing: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, ARect.Height - AOptions.GetScaledPaddingBottom - LParagraphRect.Height);
+                Else raise Exception.Create('Error 6DBA0B08-4F9E-4D89-9998-6B054D527F1F');
+              end;
+
+              // Update AElements
+              var Ltextboxes: TArray<sk_textbox_t>;
+              for var I := 0 to LRangeIndexes.Count - 1 do begin
+                SetLength(Ltextboxes, sk4d_paragraph_get_rects_for_range(LParagraph, LRangeIndexes[I].start{start}, LRangeIndexes[I].&end{&end}, sk_rectheightstyle_t.MAX_SK_RECTHEIGHTSTYLE{rect_height_style}, sk_rectwidthstyle_t.TIGHT_SK_RECTWIDTHSTYLE{rect_width_style}, nil{result}));
+                if length(Ltextboxes) > 0 then begin
+                  sk4d_paragraph_get_rects_for_range(LParagraph, LRangeIndexes[I].start{start}, LRangeIndexes[I].&end{&end}, sk_rectheightstyle_t.MAX_SK_RECTHEIGHTSTYLE{rect_height_style}, sk_rectwidthstyle_t.TIGHT_SK_RECTWIDTHSTYLE{rect_width_style}, @Ltextboxes[0]{result});
+                  var J := high(AElements) + 1;
+                  setlength(AElements, length(AElements) + length(Ltextboxes));
+                  For var K := low(Ltextboxes) to high(Ltextboxes) do begin
+                    var Ltextbox := Ltextboxes[K];
+                    AElements[J+K].Id := LRangeIndexes[I].SpanID;
+                    AElements[J+K].rect := TRectF.Create(
+                                             (LParagraphRect.Left + Ltextbox.rect.Left) / AOptions.Scale,
+                                             (LParagraphRect.Top + Ltextbox.rect.Top) / AOptions.Scale,
+                                             (LParagraphRect.Left + Ltextbox.rect.Right) / AOptions.Scale,
+                                             (LParagraphRect.Top + Ltextbox.rect.Bottom) / AOptions.Scale);
+                  end;
+                end;
+              end;
+
+              // Though it's an unlikely scenario, this ensures avoidance of a crash in
+              // the subsequent ALCreateSurface call.
+              If (Round(ARect.Width) = 0) or
+                 (Round(ARect.Height) = 0)then begin
+                ARect.Width := 0;
+                ARect.Height := 0;
+                exit(ALNullDrawable);
+              end;
+
+              // Handle Shadow
+              var LRect := ARect;
+              if ((AOptions.IsShadowAssigned) and (AOptions.shadow.Enabled)) or
+                 ((not AOptions.IsShadowAssigned) and (AOptions.ShadowColor <> TalphaColors.Null)) then begin
+                var LShadowBlur: Single;
+                var LShadowOffsetX: Single;
+                var LShadowOffsetY: Single;
+                if AOptions.IsShadowAssigned then begin
+                  LShadowBlur := AOptions.Shadow.blur * AOptions.Scale;
+                  LShadowOffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
+                  LShadowOffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
+                end
+                else begin
+                  LShadowBlur := AOptions.GetScaledShadowblur;
+                  LShadowOffsetX := AOptions.GetScaledShadowOffsetX;
+                  LShadowOffsetY := AOptions.GetScaledShadowOffsetY;
+                end;
+                var LShadowRect := LRect;
+                LShadowRect.Inflate(LShadowblur, LShadowblur);
+                LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
+                LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
+                ARect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
+                LParagraphRect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
+              end;
+
+              // Create the drawing surface
+              var LSurface: TALSurface;
+              var LCanvas: TALCanvas;
+              ALCreateSurface(
+                LSurface, // out ASurface: TALSurface;
+                LCanvas, // out ACanvas: TALCanvas;
+                round(LRect.Width), // const w: integer;
+                round(LRect.Height));// const h: integer)
               try
 
-                // Layout the paragraph
-                // https://api.flutter.dev/flutter/dart-ui/Paragraph/layout.html
-                // Computes the size and position of each glyph in the paragraph.
-                sk4d_paragraph_layout(Lparagraph, ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight);
-
-                // Get the Metrics of each lines
-                var LMetrics: Tarray<sk_metrics_t>;
-                SetLength(LMetrics, sk4d_paragraph_get_line_metrics(Lparagraph, nil));
-                if length(LMetrics) = 0 then begin
-                  ARect.Width := 0;
-                  ARect.Height := 0;
-                  exit(ALNullDrawable);
-                end;
-                sk4d_paragraph_get_line_metrics(Lparagraph, @LMetrics[0]);
-
-                // Update AAllTextDrawn
-                // https://api.flutter.dev/flutter/dart-ui/Paragraph/didExceedMaxLines.html
-                // True if there is more vertical content, but the text was truncated, either because
-                /// we reached maxLines lines of text or because the maxLines was null, ellipsis was
-                // not null, and one of the lines exceeded the width constraint.
-                var LDidExceedMaxLines := sk4d_paragraph_did_exceed_max_lines(Lparagraph);
-                if AAllTextDrawn then
-                  AAllTextDrawn := not LDidExceedMaxLines;
-
-                // Update ATextBroken
-                ATextBroken := ATextBroken or (length(LMetrics) > 1) or LDidExceedMaxLines;
-                if AOptions.FailIfTextBroken and ATextBroken then begin
-                  ARect.Width := 0;
-                  ARect.Height := 0;
-                  exit(ALNullDrawable);
-                end;
-
-                // Update ARect
-                var LReLayout: Boolean := False;
-                var LMaxHeight := ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom;
-                Var LParagraphRect := TrectF.Empty;
-                for var I := Low(LMetrics) to High(LMetrics) do begin
-                  // We must round up (ceil) the value of LMetrics[I].width. For example, if we return a width
-                  // of 21.82, and later attempt to layout the same paragraph with a constraint
-                  // width of 21.82, it will fail. This issue seems to arise because Skia requires
-                  // at least a full pixel's space to determine if it can break at 21.82. Otherwise, it will
-                  // break the text at the previous word, thinking there isn't enough space
-                  // to accommodate the last 0.82. Internally it's round 21.82 down to 21 like you can
-                  // see in ParagraphImpl.cpp :
-                  //
-                  //   void ParagraphImpl::layout(SkScalar rawWidth) {
-                  //       TODO: This rounding is done to match Flutter tests. Must be removed...
-                  //       auto floorWidth = SkScalarFloorToScalar(rawWidth);
-                  //
-                  LParagraphRect.Width := Max(LParagraphRect.Width, Ceil(LMetrics[I].width));
-                  LParagraphRect.Height := LParagraphRect.Height + Ceil(LMetrics[I].height);
-                  // We have too many lines to fit within the maxHeight constraint.
-                  if (CompareValue(LParagraphRect.Height, LMaxHeight, TEpsilon.Position) > 0) then begin
-                    if I = 0 then begin
-                      ARect.Width := 0;
-                      ARect.Height := 0;
-                      exit(ALNullDrawable);
-                    end;
-                    // Although it's impossible to have LMaxLines = I, I prefer to crash rather
-                    // than enter an infinite loop.
-                    if LMaxLines <= I then
-                      Raise exception.Create('Error #47772843-A4B1-4133-9FD2-3DA7D4DBB2ED');
-                    LMaxLines := I {0 based};
-                    AAllTextDrawn := False;
-                    LInsertEllipsisAt := LMetrics[i-1].end_excluding_whitespaces;
-                    LPrevInsertEllipsisAt := LInsertEllipsisAt;
-                    LReLayout := True;
-                    Break;
-                  end
-                  // We have exceeded the maxLines, so add the EllipsisText.
-                  else if ((I = High(LMetrics)) and (LDidExceedMaxLines) and (AOptions.EllipsisText <> '')) then begin
-                    AAllTextDrawn := False;
-                    LInsertEllipsisAt := Min(LMetrics[i].end_excluding_whitespaces, LPrevInsertEllipsisAt - 1);
-                    if LInsertEllipsisAt < 0 then begin
-                      ARect.Width := 0;
-                      ARect.Height := 0;
-                      exit(ALNullDrawable);
-                    end;
-                    case AOptions.Trimming of
-                      TALTextTrimming.Word: begin
-                        While LInsertEllipsisAt > 0 do begin
-                          if (LTextForRange.Chars[LInsertEllipsisAt].IsWhiteSpace) and (not LTextForRange.Chars[LInsertEllipsisAt-1].IsWhiteSpace) then break
-                          else dec(LInsertEllipsisAt);
-                        end;
-                      end;
-                      //--
-                      TALTextTrimming.Character: begin
-                        While LInsertEllipsisAt > 0 do begin
-                          if (not LTextForRange.Chars[LInsertEllipsisAt-1].IsWhiteSpace) then break
-                          else dec(LInsertEllipsisAt);
-                        end;
-                      end;
-                      //--
-                      else
-                        raise Exception.Create('Error 3FB3E49C-A73D-468C-A4FA-32830BEBF896');
-                    end;
-                    LPrevInsertEllipsisAt := LInsertEllipsisAt;
-                    LReLayout := True;
-                    Break;
-                  end;
-                end;
-                if LReLayout then continue;
-                if AOptions.Autosize or (AOptions.AutosizeX and AOptions.AutosizeY) then begin
-                  ARect.Width := LParagraphRect.Width + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight;
-                  ARect.Height := LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom;
-                end
-                else if AOptions.AutosizeX then ARect.Width := LParagraphRect.Width + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight
-                else if AOptions.AutosizeY then ARect.Height := LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom;
-
-                // init LParagraphRect.topleft
-                case AOptions.VTextAlign of
-                  TALTextVertAlign.Center: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, AOptions.GetScaledPaddingTop + ((ARect.Height - LParagraphRect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom) / 2));
-                  TALTextVertAlign.Leading: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, AOptions.GetScaledPaddingTop);
-                  TALTextVertAlign.Trailing: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, ARect.Height - AOptions.GetScaledPaddingBottom - LParagraphRect.Height);
-                  Else raise Exception.Create('Error 6DBA0B08-4F9E-4D89-9998-6B054D527F1F');
-                end;
-
-                // Update AElements
-                var Ltextboxes: TArray<sk_textbox_t>;
-                for var I := 0 to LRangeIndexes.Count - 1 do begin
-                  SetLength(Ltextboxes, sk4d_paragraph_get_rects_for_range(LParagraph, LRangeIndexes[I].start{start}, LRangeIndexes[I].&end{&end}, sk_rectheightstyle_t.MAX_SK_RECTHEIGHTSTYLE{rect_height_style}, sk_rectwidthstyle_t.TIGHT_SK_RECTWIDTHSTYLE{rect_width_style}, nil{result}));
-                  if length(Ltextboxes) > 0 then begin
-                    sk4d_paragraph_get_rects_for_range(LParagraph, LRangeIndexes[I].start{start}, LRangeIndexes[I].&end{&end}, sk_rectheightstyle_t.MAX_SK_RECTHEIGHTSTYLE{rect_height_style}, sk_rectwidthstyle_t.TIGHT_SK_RECTWIDTHSTYLE{rect_width_style}, @Ltextboxes[0]{result});
-                    var J := high(AElements) + 1;
-                    setlength(AElements, length(AElements) + length(Ltextboxes));
-                    For var K := low(Ltextboxes) to high(Ltextboxes) do begin
-                      var Ltextbox := Ltextboxes[K];
-                      AElements[J+K].Id := LRangeIndexes[I].SpanID;
-                      AElements[J+K].rect := TRectF.Create(
-                                               (LParagraphRect.Left + Ltextbox.rect.Left) / AOptions.Scale,
-                                               (LParagraphRect.Top + Ltextbox.rect.Top) / AOptions.Scale,
-                                               (LParagraphRect.Left + Ltextbox.rect.Right) / AOptions.Scale,
-                                               (LParagraphRect.Top + Ltextbox.rect.Bottom) / AOptions.Scale);
-                    end;
-                  end;
-                end;
-
-                // Nothing to draw then exit with a null drawable
-                If (Round(ARect.Width) = 0) or
-                   (Round(ARect.Height) = 0) then exit(ALNullDrawable);
-
-                // Create the drawing surface
-                var LSurface: sk_surface_t;
-                var LCanvas: sk_canvas_t;
-                ALCreateSurface(
-                  LSurface, // out ASurface: sk_surface_t;
-                  LCanvas, // out ACanvas: sk_canvas_t;
-                  round(ARect.Width), // const w: integer;
-                  round(ARect.Height));// const h: integer)
+                if ALCanvasBeginScene(LCanvas) then
                 try
 
                   // Draw the background
-                  if ((AOptions.IsFillAssigned) and (AOptions.Fill.Kind <> TbrushKind.None)) or
-                     ((AOptions.IsStrokeAssigned) and (AOptions.stroke.Kind <> TbrushKind.None)) then begin
-                    Tmonitor.Enter(AOptions.Stroke);
-                    var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
-                    var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
-                    try
-                      AOptions.Stroke.Thickness := AOptions.Stroke.Thickness * AOptions.Scale;
-                      ALDrawRectangle(
-                        LCanvas, // const ACanvas: sk_canvas_t;
-                        1, // const AScale: Single;
-                        ARect, // const ARect: TrectF;
-                        AOptions.Fill, // const Fill: TBrush;
-                        AOptions.Stroke, // const Stroke: TStrokeBrush;
-                        nil, // const Shadow: TALShadow
-                        AOptions.Sides, // const Sides: TSides;
-                        AOptions.Corners, // const Corners: TCorners;
-                        AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                        AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-                    finally
-                      AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
-                      AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
-                      Tmonitor.Exit(AOptions.Stroke);
+                  if (AOptions.IsFillAssigned) or
+                     (AOptions.IsStrokeAssigned) or
+                     (AOptions.IsShadowAssigned) then begin
+                    if (AOptions.Fill.Kind <> TbrushKind.None) or
+                       (AOptions.stroke.Kind <> TbrushKind.None) or
+                       (AOptions.shadow.Enabled) then begin
+                      Tmonitor.Enter(AOptions.Stroke);
+                      Tmonitor.Enter(AOptions.Shadow);
+                      var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
+                      var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
+                      var LShadowOnChangedRestoreValue := AOptions.Shadow.OnChanged;
+                      var LShadowBlurRestoreValue: Single := AOptions.Shadow.Blur;
+                      var LShadowOffsetXRestoreValue: Single := AOptions.Shadow.OffsetX;
+                      var LShadowOffsetYRestoreValue: Single := AOptions.Shadow.OffsetY;
+                      try
+                        AOptions.Stroke.OnChanged := nil;
+                        AOptions.Stroke.Thickness := AOptions.Stroke.Thickness * AOptions.Scale;
+                        AOptions.Shadow.OnChanged := nil;
+                        AOptions.Shadow.Blur := AOptions.Shadow.Blur * AOptions.Scale;
+                        AOptions.Shadow.OffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
+                        AOptions.Shadow.OffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
+                        ALDrawRectangle(
+                          LCanvas, // const ACanvas: TALCanvas;
+                          1, // const AScale: Single;
+                          ARect, // const ARect: TrectF;
+                          AOptions.Fill, // const Fill: TBrush;
+                          AOptions.Stroke, // const Stroke: TStrokeBrush;
+                          AOptions.Shadow, // const Shadow: TALShadow
+                          AOptions.Sides, // const Sides: TSides;
+                          AOptions.Corners, // const Corners: TCorners;
+                          AOptions.GetScaledXRadius, // const XRadius: Single = 0;
+                          AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+                      finally
+                        AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
+                        AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
+                        Tmonitor.Exit(AOptions.Stroke);
+                        AOptions.Shadow.Blur := LShadowBlurRestoreValue;
+                        AOptions.Shadow.OffsetX := LShadowOffsetXRestoreValue;
+                        AOptions.Shadow.OffsetY := LShadowOffsetYRestoreValue;
+                        AOptions.Shadow.OnChanged := LShadowOnChangedRestoreValue;
+                        Tmonitor.Exit(AOptions.Shadow);
+                      end;
                     end;
                   end
                   else if (AOptions.FillColor <> TalphaColors.Null) or
-                          (AOptions.StrokeColor <> TalphaColors.Null) then begin
+                          (AOptions.StrokeColor <> TalphaColors.Null) or
+                          (AOptions.ShadowColor <> TalphaColors.Null) then begin
                     ALDrawRectangle(
-                      LCanvas, // const ACanvas: sk_canvas_t;
+                      LCanvas, // const ACanvas: TALCanvas;
                       1, // const AScale: Single;
                       ARect, // const ARect: TrectF;
                       AOptions.FillColor, // const AFillColor: TAlphaColor;
                       AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
                       AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-                      TAlphaColors.null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-                      0, // const AShadowBlur: Single;
-                      0, // const AShadowOffsetX: Single;
-                      0, // const AShadowOffsetY: Single;
+                      AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+                      AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
+                      AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
+                      AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
                       AOptions.Sides, // const Sides: TSides;
                       AOptions.Corners, // const Corners: TCorners;
                       AOptions.GetScaledXRadius, // const XRadius: Single = 0;
@@ -3897,15 +2535,21 @@ begin
                   end;
 
                   // Paint the paragraph
+                  Var LOffsetX: Single;
+                  If (AOptions.hTextAlign = TALTextHorzAlign.Center) then LOffsetX := (LOriginalRectWidth - ARect.Width) / 2
+                  else if ((AOptions.Direction = TALTextDirection.RightToLeft) and (AOptions.hTextAlign = TALTextHorzAlign.Leading)) or
+                          ((AOptions.Direction <> TALTextDirection.RightToLeft) and (AOptions.hTextAlign = TALTextHorzAlign.Trailing)) then LOffsetX := (LOriginalRectWidth - ARect.Width)
+                  else LOffsetX := 0;
                   sk4d_paragraph_paint(
                     LParagraph, // self: sk_paragraph_t;
                     LCanvas, // canvas: sk_canvas_t;
-                    LParagraphRect.left, // x: float;
+                    LParagraphRect.left - LOffsetX, // x: float;
                     LParagraphRect.top); // y: float
 
                   // retrieve the rect of all placeholders
                   SetLength(LTextBoxes, sk4d_paragraph_get_rects_for_placeholders(LParagraph, nil));
-                  sk4d_paragraph_get_rects_for_placeholders(LParagraph, @LTextBoxes[0]);
+                  if length(LTextBoxes) > 0 then
+                    sk4d_paragraph_get_rects_for_placeholders(LParagraph, @LTextBoxes[0]);
 
                   // Paint all images
                   if Length(LTextBoxes) > LPlaceHolders.Count then
@@ -3930,7 +2574,7 @@ begin
                       {$ELSE}
                       var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
                       {$ENDIF}
-                      If not ALIsDrawableNull(LImg) then begin
+                      If LImg <> 0 then begin
                         try
                           var LSamplingoptions := ALGetNearestSkSamplingoptions;
                           sk4d_canvas_draw_image_rect(
@@ -3948,26 +2592,28 @@ begin
                     end;
                   end;
 
-                  // Create the result
-                  result := ALCreateSkImageFromSurface(LSurface);
-
-                  // break the loop
-                  Break;
-
                 finally
-                  ALFreeSurface(LSurface, LCanvas);
+                  ALCanvasEndScene(LCanvas);
                 end;
 
+                // Create the result
+                result := ALSurfaceToDrawable(LSurface);
+
+                // break the loop
+                Break;
+
               finally
-                sk4d_paragraph_destroy(LParagraph);
+                ALFreeSurface(LSurface, LCanvas);
               end;
 
             finally
-              sk4d_paragraphbuilder_destroy(LParagraphBuilder);
+              sk4d_paragraph_destroy(LParagraph);
             end;
+
           finally
-            sk4d_strutstyle_destroy(LStrutstyle);
+            sk4d_paragraphbuilder_destroy(LParagraphBuilder);
           end;
+
         finally
           sk4d_paragraphstyle_destroy(LParagraphstyle);
         end;
@@ -3987,7 +2633,7 @@ begin
       ALFreeAndNil(LDecorationThicknessMultipliers);
       ALFreeAndNil(LDecorationColors);
       ALFreeAndNil(LBackGroundColors);
-      ALFreeAndNil(LLineHeights);
+      ALFreeAndNil(LLineHeightMultipliers);
       ALFreeAndNil(LLetterSpacings);
       ALFreeAndNil(LSpanIDs);
       ALFreeAndNil(LPlaceHolders);
@@ -3997,173 +2643,493 @@ begin
     {$ENDIF}
     {$ENDREGION}
 
-    {$REGION 'OTHER'}
-    {$IF not defined(ALSkiaCanvas)}
-
-ARect.Width := 0;
-ARect.Height := 0;
-exit(ALNullDrawable);
-
-(*
-    {$IF defined(ALGpuCanvas)}
-    var LMaxTextureSize := TContextManager.DefaultContextClass.MaxTextureSize;
-    if LMaxTextureSize > 0 then begin
-      ARect.Width := min(ARect.Width, LMaxTextureSize);
-      ARect.height := min(ARect.height, LMaxTextureSize);
-    end;
-    {$ENDIF}
+    {$REGION 'ANDROID/IOS/MACOS/MSWINDOWS'}
+    {$IF not defined(ALSkiaEngine)}
 
     // Init out var
     ATextBroken := false;
     AAllTextDrawn := True;
-    AAscent := 0;
-    ADescent := 0;
-    AFirstPos := TpointF.Create(0,0);
-    ALastPos := TpointF.Create(0,0);
     setlength(AElements, 0);
-    AEllipsisRect := TRectF.Create(0,0,0,0);
 
     // Init local var
-    {$IFDEF IOS}
-    var LWhiteSpace := False;
-    {$ENDIF}
-    var LFirstLineIndent := AOptions.GetScaledFirstLineIndent;
-    var LMaxWidth: single := 0;
-    var LMaxHeight: Single := 0;
-    var LTotalLines := 0;
-    var LBold := 0;
-    var LItalic := 0;
-    var LFontColors := Tlist<TalphaColor>.create;
+    var LAddEllipsis: Integer := 0;
+    var LCurrLineIndex: Integer := 0;
+    var LCurrLineWidth: Single := 0;
+    var LCurrLineHeight: Single := 0;
+    var LCurrParagraphHeight: Single := 0;
+    var LMaxLines: Integer;
+    if AOptions.MaxLines > 0 then LMaxLines := AOptions.MaxLines
+    else LMaxLines := MaxInt;
+    var LFontFamilies := TALStringListW.create;
+    var LFontSizes := Tlist<Single>.Create;
+    var LFontWeights:= Tlist<TFontWeight>.Create;
+    var LFontSlants := TList<TFontSlant>.Create;
+    var LFontStretchs := TList<TFontStretch>.Create;
+    var LFontColors := Tlist<TAlphaColor>.create;
+    var LDecorationKinds := TList<TALTextDecorationKinds>.Create;
+    var LDecorationStyles := TList<TALTextDecorationStyle>.Create;
+    var LDecorationThicknessMultipliers := TList<Single>.Create;
+    var LDecorationColors := TList<TAlphaColor>.Create;
+    var LBackgroundColors := TList<TAlphaColor>.Create;
+    var LLineHeightMultipliers := TList<Single>.Create;
+    var LLetterSpacings := TList<Single>.Create;
     var LSpanIDs := TALStringListW.create;
-
+    var LExtendedTextElements := TList<TExtendedTextElement>.Create;
     {$IF defined(ANDROID)}
-    var LPaint := TJPaint.JavaClass.init;
-    LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
-    LPaint.setSubpixelText(true); // Enabling this flag causes glyph advances to be computed with subpixel accuracy.
-    LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
-    LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
-    LPaint.setTextSize(AOptions.GetScaledFontSize);
-    //-----
-    var LBreakTextItems := TALJBreakTextItems.Create(true{aOwnsObjects});
-    {$ELSEIF defined(IOS)}
-    var LBreakTextItems := TALCTBreakTextItems.Create(true{aOwnsObjects});
-    {$ELSE}
-    var LBreakTextItems := TALTLBreakTextItems.Create(true{aOwnsObjects});
+    _Paint := TJPaint.JavaClass.init;
+    {$ENDIF}
+    {$IF defined(MSWINDOWS)}
+    _CreateMeasureBitmap;
     {$ENDIF}
     try
+
+      {$IF defined(ANDROID)}
+      // Enabling this flag will cause all draw operations that support antialiasing to use it.
+      _Paint.setAntiAlias(true);
+      // Enabling this flag causes glyph advances to be computed with subpixel accuracy.
+      _Paint.setSubpixelText(true);
+      // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn
+      // with nearest neighbor sampling, likely resulting in artifacts.
+      _Paint.setFilterBitmap(True);
+      // Enabling this flag applies a dither to any blit operation where the target's
+      // colour space is more constrained than the source.
+      _Paint.setDither(true);
+
+      _CurrFontFamily := '';
+      _CurrFontSize := 0;
+      _CurrFontWeight := TFontWeight.Regular;
+      _CurrFontSlant := TFontSlant.Regular;
+      _CurrFontStretch := TFontStretch.Regular;
+      _CurrFontColor := TAlphaColors.Null;
+      _CurrDecorationKinds := [];
+      _CurrDecorationStyle := TALTextDecorationStyle.Solid;
+      _CurrDecorationThicknessMultiplier := 1;
+      _CurrDecorationColor := TAlphaColors.Null;
+      _CurrLetterSpacing := 0;
+      {$ENDIF}
+
+      // Format LText
+      var Ltext: String := ALTrimRight(AText);
+      if AOptions.TextIsHtml then begin
+        LText := ALStringReplaceW(Ltext, #13, ' ', [RfReplaceALL]);
+        LText := ALStringReplaceW(Ltext, #10, ' ', [RfReplaceALL]);
+        LText := ALStringReplaceW(Ltext, #9, ' ', [RfReplaceALL]);
+        While ALPosW('  ', LText) > 0 do
+          LText := ALStringReplaceW(Ltext, '  ', ' ', [RfReplaceALL]);
+        LText := ALStringReplaceW(Ltext, '<br>', #10, [RfReplaceALL, RfIgnoreCase]);
+        LText := ALStringReplaceW(Ltext, '<br/>', #10, [RfReplaceALL, RfIgnoreCase]);
+        While ALPosW(' '#10, LText) > 0 do
+          LText := ALStringReplaceW(Ltext, ' '#10, #10, [RfReplaceALL]);
+        While ALPosW(#10' ', LText) > 0 do
+          LText := ALStringReplaceW(Ltext, #10' ', #10, [RfReplaceALL]);
+        LText := ALStringReplaceW(Ltext, '&nbsp;', Chr($A0){0x00A0}, [RfReplaceALL, RfIgnoreCase]);
+      end
+      else
+        LText := ALStringReplaceW(Ltext, #13#10, #10, [RfReplaceALL]);
 
 
       ///////////////////////////////////
       // loop on all the html elements //
       ///////////////////////////////////
 
-      var P1 := low(AText);
-      while P1 <= high(AText) do begin
+      var P1 := low(Ltext);
+      while P1 <= high(Ltext) do begin
 
+        var LIsEllipsis := False;
         var LCurrText: String;
         var LCurrImgSrc: String;
+        var LcurrImgWidth: Single;
+        var LcurrImgHeight: Single;
 
+
+        /////////////////////////
+        // Insert the ellipsis //
+        /////////////////////////
+
+        if LAddEllipsis > 0 then begin
+
+          // Update AAllTextDrawn
+          AAllTextDrawn := False;
+
+          // Clear all accumulators
+          LFontFamilies.Clear;
+          LFontSizes.Clear;
+          LFontWeights.Clear;
+          LFontSlants.Clear;
+          LFontStretchs.Clear;
+          LFontColors.Clear;
+          LDecorationKinds.clear;
+          LDecorationStyles.clear;
+          LDecorationThicknessMultipliers.clear;
+          LDecorationColors.clear;
+          LBackgroundColors.Clear;
+          LLineHeightMultipliers.clear;
+          LLetterSpacings.Clear;
+          LSpanIDs.Clear;
+
+          // Remove the ellipsis element if present
+          While (LExtendedTextElements.Count > 0) and
+                (LExtendedTextElements[LExtendedTextElements.Count-1].IsEllipsis) do
+            LExtendedTextElements.Delete(LExtendedTextElements.Count-1);
+
+          // Init LPartialEllipsis
+          var LPartialEllipsis := (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1);
+
+          // Internal Loop
+          While True do begin
+
+            // LAddEllipsis = 1 indicates it's the first time an ellipsis is being
+            // added. In this scenario, we do not truncate the previous element.
+            // Instead, we append the ellipsis '…' to its end if the ellispis is
+            // like "… more[+]". In the subsequent loop, we will add the ellipsis span.
+            if LAddEllipsis = 1 then begin
+
+              // On the next loop add the ellipsis
+              LAddEllipsis := 2;
+
+              // Handle special case where ellispis is like "… more[+]"
+              if LPartialEllipsis then begin
+                While true do begin
+                  if LExtendedTextElements.Count > 0 then begin
+                    Var LExtendedTextElement := LExtendedTextElements[LExtendedTextElements.Count-1];
+                    //--
+                    if LExtendedTextElement.ImgSrc <> '' then begin
+                      LCurrText := '… ';
+                    end
+                    else begin
+                      LExtendedTextElements.Delete(LExtendedTextElements.Count-1);
+                      LCurrText := ALTrimRight(LExtendedTextElement.Text);
+                      While (LCurrText <> '') and (LCurrText.Chars[LCurrText.Length-1] = '-') do
+                        LCurrText := ALTrimRight(LCurrText.Remove(LCurrText.Length-1));
+                      if LCurrText = '' then continue;
+                      LCurrText := LCurrText + '… ';
+                    end;
+                    LCurrImgSrc := '';
+                    LcurrImgWidth := 0;
+                    LcurrImgHeight := 0;
+                    P1 := -1;
+                    //--
+                    LFontFamilies.Add(LExtendedTextElement.FontFamily);
+                    LFontSizes.Add(LExtendedTextElement.FontSize);
+                    LFontWeights.Add(LExtendedTextElement.FontWeight);
+                    LFontSlants.Add(LExtendedTextElement.FontSlant);
+                    LFontStretchs.Add(LExtendedTextElement.FontStretch);
+                    LFontColors.Add(LExtendedTextElement.FontColor);
+                    LDecorationKinds.Add(LExtendedTextElement.DecorationKinds);
+                    LDecorationStyles.Add(LExtendedTextElement.DecorationStyle);
+                    LDecorationThicknessMultipliers.Add(LExtendedTextElement.DecorationThicknessMultiplier);
+                    LDecorationColors.Add(LExtendedTextElement.DecorationColor);
+                    LBackgroundColors.Add(LExtendedTextElement.BackgroundColor);
+                    LLineHeightMultipliers.Add(LExtendedTextElement.LineHeightMultiplier);
+                    LLetterSpacings.Add(LExtendedTextElement.LetterSpacing);
+                    LSpanIDs.Add(LExtendedTextElement.Id);
+                    //--
+                    break; // While true do (2)
+                  end
+                  else begin
+                    LCurrText := '';
+                    break; // While true do (2)
+                  end;
+                end;
+                IF LCurrText = '' then
+                  Continue; // => Go to => else if LAddEllipsis = 2 then
+                break; // While true do (1)
+              end
+
+              // => Go to => else if LAddEllipsis = 2 then
+              else
+                Continue;
+
+            end
+
+            // If LAddEllipsis = 2, it means we must add the ellipsis element.
+            else if LAddEllipsis = 2 then begin
+              if LPartialEllipsis then
+                LCurrText := ALCopyStr(AOptions.EllipsisText, 3, maxint)
+              else
+                LCurrText := AOptions.EllipsisText;
+              LCurrImgSrc := '';
+              LcurrImgWidth := 0;
+              LcurrImgHeight := 0;
+              P1 := Maxint;
+              //--
+              if not AOptions.EllipsisInheritSettings then begin
+                LFontFamilies.Add(AOptions.EllipsisFontFamily);
+                LFontSizes.Add(AOptions.GetScaledEllipsisFontSize);
+                LFontWeights.Add(AOptions.EllipsisFontWeight);
+                LFontSlants.Add(AOptions.EllipsisFontSlant);
+                LFontStretchs.Add(AOptions.EllipsisFontStretch);
+                LFontColors.Add(AOptions.EllipsisFontColor);
+                LDecorationKinds.Add(AOptions.EllipsisDecorationKinds);
+                LDecorationStyles.Add(AOptions.EllipsisDecorationStyle);
+                LDecorationThicknessMultipliers.Add(AOptions.EllipsisDecorationThicknessMultiplier);
+                LDecorationColors.Add(AOptions.EllipsisDecorationColor);
+                LBackgroundColors.Add(TALphaColors.Null);
+                LLineHeightMultipliers.Add(AOptions.LineHeightMultiplier);
+                LLetterSpacings.Add(AOptions.GetScaledLetterSpacing);
+                LSpanIDs.Add('ellipsis');
+              end
+              else if LExtendedTextElements.Count > 0 then begin
+                Var LExtendedTextElement := LExtendedTextElements[LExtendedTextElements.Count-1];
+                LFontFamilies.Add(LExtendedTextElement.FontFamily);
+                LFontSizes.Add(LExtendedTextElement.FontSize);
+                LFontWeights.Add(LExtendedTextElement.FontWeight);
+                LFontSlants.Add(LExtendedTextElement.FontSlant);
+                LFontStretchs.Add(LExtendedTextElement.FontStretch);
+                LFontColors.Add(LExtendedTextElement.FontColor);
+                LDecorationKinds.Add(LExtendedTextElement.DecorationKinds);
+                LDecorationStyles.Add(LExtendedTextElement.DecorationStyle);
+                LDecorationThicknessMultipliers.Add(LExtendedTextElement.DecorationThicknessMultiplier);
+                LDecorationColors.Add(LExtendedTextElement.DecorationColor);
+                LBackgroundColors.Add(LExtendedTextElement.BackgroundColor);
+                LLineHeightMultipliers.Add(LExtendedTextElement.LineHeightMultiplier);
+                LLetterSpacings.Add(LExtendedTextElement.LetterSpacing);
+                LSpanIDs.Add('ellipsis');
+              end;
+              // Else we have previously cleared all accumulators so setting will
+              // be taken from the AOptions
+              //--
+              LIsEllipsis := True;
+              //--
+              break; // While true do (1)
+            end
+
+            // If LAddEllipsis = 3, it means we must remove the ellipsis element
+            // and trunc the last element.
+            else if LAddEllipsis > 2 then begin
+
+              LAddEllipsis := Maxint;
+              Var LExtendedTextElement: TExtendedTextElement;
+              While LAddEllipsis = Maxint do begin
+
+                // Remove the breaklines located at the end
+                While (LExtendedTextElements.Count > 0) and (LExtendedTextElements[LExtendedTextElements.Count-1].IsBreakLine) do
+                  LExtendedTextElements.Delete(LExtendedTextElements.Count-1);
+
+                // If LExtendedTextElements.Count equals 0, we cannot truncate further. Since
+                // LAddEllipsis is greater than or equal to 2, it means we have already attempted
+                // to add just an ellipsis, and it failed. Therefore, we have no other choice but
+                // to return an empty result.
+                if LExtendedTextElements.Count = 0 then begin
+                  ARect.Width := 0;
+                  ARect.Height := 0;
+                  exit(ALNullDrawable);
+                end;
+
+                // Get the previous element
+                LExtendedTextElement := LExtendedTextElements[LExtendedTextElements.Count-1];
+                LExtendedTextElements.Delete(LExtendedTextElements.Count-1);
+
+                // The element is an Image
+                if LExtendedTextElement.ImgSrc <> '' then begin
+                  LAddEllipsis := 1;
+                  continue; // => Go to => else if LAddEllipsis = 1 then
+                end
+
+                // The element is a Text
+                else begin
+                  LCurrText := ALTrimRight(LExtendedTextElement.Text);
+                  // Special case LPartialEllipsis = true and LCurrText = '…'
+                  // Remove this element and redo the loop to trunk the previous
+                  // element instead of this one
+                  if LPartialEllipsis and (LCurrText = '…') then
+                    continue; // => Go to => While LAddEllipsis = Maxint do begin
+                  var LNumberOfChars: Integer;
+                  if LPartialEllipsis then LNumberOfChars := LCurrText.Length - 2 // skip the '…'
+                  else LNumberOfChars := LCurrText.Length - 1;
+                  var LBreakPos := _findLastBreakPosition(LCurrText, LNumberOfChars);
+                  While (LBreakPos > 0) and (LCurrText.Chars[LBreakPos-1] = '-') do
+                    Dec(LBreakPos);
+                  if LBreakPos <= 0 then begin
+                    LAddEllipsis := 1;
+                    continue; // => Go to => else if LAddEllipsis = 1 then
+                  end;
+                  LCurrText := LCurrText.Remove(LBreakPos);
+                  if LPartialEllipsis then
+                    LCurrText := LCurrText + '… ';
+                  // On the next loop add the ellipsis
+                  LAddEllipsis := 2;
+                end;
+
+              end;
+
+              //--
+              if LAddEllipsis <> 2 then
+                continue; // => Go to => else if LAddEllipsis = xxx then
+              //--
+              LCurrImgSrc := '';
+              LcurrImgWidth := 0;
+              LcurrImgHeight := 0;
+              P1 := -1;
+              //--
+              LFontFamilies.Add(LExtendedTextElement.FontFamily);
+              LFontSizes.Add(LExtendedTextElement.FontSize);
+              LFontWeights.Add(LExtendedTextElement.FontWeight);
+              LFontSlants.Add(LExtendedTextElement.FontSlant);
+              LFontStretchs.Add(LExtendedTextElement.FontStretch);
+              LFontColors.Add(LExtendedTextElement.FontColor);
+              LDecorationKinds.Add(LExtendedTextElement.DecorationKinds);
+              LDecorationStyles.Add(LExtendedTextElement.DecorationStyle);
+              LDecorationThicknessMultipliers.Add(LExtendedTextElement.DecorationThicknessMultiplier);
+              LDecorationColors.Add(LExtendedTextElement.DecorationColor);
+              LBackgroundColors.Add(LExtendedTextElement.BackgroundColor);
+              LLineHeightMultipliers.Add(LExtendedTextElement.LineHeightMultiplier);
+              LLetterSpacings.Add(LExtendedTextElement.LetterSpacing);
+              LSpanIDs.Add(LExtendedTextElement.Id);
+              //--
+              break; // While true do (2)
+
+            end;
+
+          end;
+
+          // Update LCurrLineIndex
+          If LExtendedTextElements.Count > 0 then begin
+            LCurrLineIndex := 0;
+            LCurrLineHeight := 0;
+            LCurrParagraphHeight := 0;
+            for var I := 0 to LExtendedTextElements.Count - 1 do begin
+              Var LExtendedTextElement := LExtendedTextElements[I];
+              if LExtendedTextElement.LineIndex <> LCurrLineIndex then begin
+                LCurrLineIndex := LExtendedTextElement.LineIndex;
+                LCurrParagraphHeight := LCurrParagraphHeight + LCurrLineHeight;
+                LCurrLineHeight := -LExtendedTextElement.Ascent + LExtendedTextElement.Descent;
+              end
+              else begin
+                LCurrLineHeight := max(LCurrLineHeight, -LExtendedTextElement.Ascent + LExtendedTextElement.Descent);
+              end;
+            end;
+            Var LExtendedTextElement := LExtendedTextElements[LExtendedTextElements.Count-1];
+            LCurrLineIndex := LExtendedTextElement.LineIndex;
+            LCurrLineWidth := LExtendedTextElement.Rect.Right;
+          end
+          else begin
+            LCurrLineIndex := 0;
+            LCurrLineHeight := 0;
+            LCurrParagraphHeight := 0;
+            LCurrLineWidth := 0;
+          end;
+
+        end
+
+        ////////////////////////////
+        // We are on a Break Line //
+        ////////////////////////////
+
+        else if Ltext[P1] = #10 then begin
+
+          LCurrText := #10;
+          LCurrImgSrc := '';
+          LcurrImgWidth := 0;
+          LcurrImgHeight := 0;
+          P1 := P1 + 1;
+
+        end
 
         /////////////////////////////////////
         // The text contains HTML elements //
         /////////////////////////////////////
 
-        if AOptions.TextIsHtml then begin
+        else if AOptions.TextIsHtml then begin
 
           // Extract LCurrText / LCurrImgSrc
-          if AText[P1] = '<' then begin
+          if Ltext[P1] = '<' then begin
+
+            // Proper HTML requires that elements are correctly nested and
+            // closed in the order they are opened.
 
             //-----
             LCurrImgSrc := '';
             LCurrText := '';
-            var P2 := ALPosW('>', AText, P1+1); // blablabla <font color="#ffffff">blablabla</font> blablabla
+            LcurrImgWidth := 0;
+            LcurrImgHeight := 0;
+            var P2 := ALPosW('>', Ltext, P1+1); // blablabla <font color="#ffffff">blablabla</font> blablabla
                                                 //           ^P1                  ^P2
             if P2 <= 0 then break;
-            var LTag: String := ALCopyStr(AText, P1, P2 - P1 + 1); // <font color="#ffffff">
+            var LTag: String := ALCopyStr(Ltext, P1, P2 - P1 + 1); // <font color="#ffffff">
             P1 := P2 + 1; // blablabla <font color="#ffffff">blablabla</font> blablabla
                           //                                 ^P1
 
             //-----
             if (ALPosW('<b ', LTag) = 1) or
                (LTag = '<b>') then begin
-              _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs, LFontColors);
-              inc(LBold);
+              _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs);
+              LFontWeights.Add(TFontWeight.Bold);
             end
             else if LTag = '</b>' then begin
               if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
-              if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
-              dec(LBold);
-            end
-
-            //-----
-            else if (ALPosW('<img ', LTag) = 1) or
-                    (LTag = '<img/>') then begin // <img src="xxx">
-              _getInfosFromImg(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc);
-              LCurrText := '⬛';
+              if LFontWeights.count > 0 then LFontWeights.Delete(LFontWeights.Count - 1);
             end
 
             //-----
             else if (ALPosW('<i ', LTag) = 1) or
                     (LTag = '<i>') then begin
-              _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs, LFontColors);
-              inc(LItalic)
+              _getInfosFromTag(ALCopyStr(LTag, 4, length(LTag) - 4), LSpanIDs);
+              LFontSlants.Add(TFontSlant.Italic);
             end
             else if LTag = '</i>' then begin
               if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
-              if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
-              dec(LItalic)
+              if LFontSlants.count > 0 then LFontSlants.Delete(LFontSlants.Count - 1);
+            end
+
+            //-----
+            else if (ALPosW('<img ', LTag) = 1) or
+                    (LTag = '<img/>') then begin // <img src="xxx">
+              _getInfosFromTag(ALCopyStr(LTag, 6, length(LTag) - 6), LCurrImgSrc, LcurrImgWidth, LcurrImgHeight);
             end
 
             //-----
             else if (ALPosW('<font ', LTag) = 1) or
                     (LTag = '<font>')  then begin   // <font color="#ffffff">
-              _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontColors);
+              _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontFamilies, LFontSizes, LFontColors);
             end
             else if LTag = '</font>' then begin
               if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
+              if LFontFamilies.count > 0 then LFontFamilies.Delete(LFontFamilies.Count - 1);
+              if LFontSizes.count > 0 then LFontSizes.Delete(LFontSizes.Count - 1);
               if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
             end
 
             //-----
             else if (ALPosW('<span ', LTag) = 1) or
                     (LTag = '<span>') then begin // <span id="xxx">
-              _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontColors);
+              _getInfosFromTag(ALCopyStr(LTag, 7, length(LTag) - 7), LSpanIDs, LFontFamilies, LFontSizes, LFontWeights, LFontSlants, LFontStretchs, LFontColors, LDecorationKinds, LDecorationStyles, LDecorationThicknessMultipliers, LDecorationColors, LBackgroundColors, LLineHeightMultipliers, LLetterSpacings);
             end
             else if LTag = '</span>' then begin
               if LSpanIDs.count > 0 then LSpanIDs.Delete(LSpanIDs.Count - 1);
+              if LFontFamilies.count > 0 then LFontFamilies.Delete(LFontFamilies.Count - 1);
+              if LFontSizes.count > 0 then LFontSizes.Delete(LFontSizes.Count - 1);
+              if LFontWeights.count > 0 then LFontWeights.Delete(LFontWeights.Count - 1);
+              if LFontSlants.count > 0 then LFontSlants.Delete(LFontSlants.Count - 1);
+              if LFontStretchs.count > 0 then LFontStretchs.Delete(LFontStretchs.Count - 1);
               if LFontColors.count > 0 then LFontColors.Delete(LFontColors.Count - 1);
+              if LDecorationKinds.count > 0 then LDecorationKinds.Delete(LDecorationKinds.Count - 1);
+              if LDecorationStyles.count > 0 then LDecorationStyles.Delete(LDecorationStyles.Count - 1);
+              if LDecorationThicknessMultipliers.count > 0 then LDecorationThicknessMultipliers.Delete(LDecorationThicknessMultipliers.Count - 1);
+              if LDecorationColors.count > 0 then LDecorationColors.Delete(LDecorationColors.Count - 1);
+              if LBackgroundColors.count > 0 then LBackgroundColors.Delete(LBackgroundColors.Count - 1);
+              if LLineHeightMultipliers.count > 0 then LLineHeightMultipliers.Delete(LLineHeightMultipliers.Count - 1);
+              if LLetterSpacings.count > 0 then LLetterSpacings.Delete(LLetterSpacings.Count - 1);
             end;
 
           end
           else begin
 
             LCurrImgSrc := '';
-            var P2 := ALPosW('<', AText, P1);  // blablabla <font color="#ffffff">blablabla</font> blablabla
+            LcurrImgWidth := 0;
+            LcurrImgHeight := 0;
+            var P2 := ALPosW('<', Ltext, P1);  // blablabla <font color="#ffffff">blablabla</font> blablabla
                                                //                                 ^P1      ^P2
             if P2 <= 0 then P2 := Maxint;
-            LCurrText := ALCopyStr(AText, P1, P2 - P1);  // blablabla
+            var P3 := ALPosW(#10, Ltext, P1);
+            if P3 <= 0 then P3 := Maxint;
+            P2 := Min(P2,P3);
+            LCurrText := ALCopyStr(Ltext, P1, P2 - P1);  // blablabla
             LCurrText := ALStringReplaceW(LCurrText, '&gt;', '>', [rfReplaceALL]);
             LCurrText := ALStringReplaceW(LCurrText, '&lt;', '<', [rfReplaceALL]);
-            {$IFDEF IOS}
-            //because of this http://stackoverflow.com/questions/41334425/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
-            if LWhiteSpace then LCurrText := ' ' + LCurrText;
-            if (P2 <= length(AText) - 3) and
-               (AText[P2 + 1] = 'i') and
-               (AText[P2 + 2] = 'm') and
-               (AText[P2 + 3] = 'g') then begin
-              LWhiteSpace := False;
-            end
-            else if (P2 > 1) and
-                    (P2 <= length(AText)) and
-                    (AText[P2 - 1].IsWhiteSpace) then begin
-              setlength(LCurrText, length(LCurrText) - 1);
-              LWhiteSpace := True;
-            end
-            else LWhiteSpace := False;
-            {$ENDIF}
-
             P1 := P2; // blablabla <font color="#ffffff">blablabla</font> blablabla
                       //                                          ^P1
+
           end;
 
         end
@@ -4173,211 +3139,417 @@ exit(ALNullDrawable);
         /////////////////////////////////////////////
 
         else begin
-          LCurrText := AText;
+
           LCurrImgSrc := '';
-          P1 := Maxint;
+          LcurrImgWidth := 0;
+          LcurrImgHeight := 0;
+          var P2 := ALPosW(#10, Ltext, P1);  // blablabla #10blablabla#10 blablabla
+                                             // ^P1       ^P2
+          if P2 <= 0 then P2 := Maxint;
+          LCurrText := ALCopyStr(Ltext, P1, P2 - P1);  // blablabla
+          P1 := P2; // blablabla #10blablabla#10 blablabla
+                    //           ^P1
+
         end;
 
 
-        ////////////////////////////
-        // Break the current text //
-        ////////////////////////////
+        //////////////////////////////////////////////////
+        // Add the current text to the ParagraphBuilder //
+        //////////////////////////////////////////////////
 
-        if LCurrText <> '' then begin
+        if (LCurrText <> '') or (LCurrImgSrc <> '') then begin
+
+          // Init LFontFamily
+          var LFontFamily: String;
+          if LFontFamilies.Count > 0 then LFontFamily := LFontFamilies[LFontFamilies.Count - 1]
+          else LFontFamily := AOptions.FontFamily;
+
+          // Init LFontSize
+          var LFontSize: Single;
+          if LFontSizes.Count > 0 then LFontSize := LFontSizes[LFontSizes.Count - 1]
+          else LFontSize := AOptions.GetScaledFontSize;
+
+          // Init LFontWeight
+          var LFontWeight: TFontWeight;
+          if LFontWeights.Count > 0 then LFontWeight := LFontWeights[LFontWeights.Count - 1]
+          else LFontWeight := AOptions.FontWeight;
+
+          // Init LFontSlant
+          var LFontSlant: TFontSlant;
+          if LFontSlants.Count > 0 then LFontSlant := LFontSlants[LFontSlants.Count - 1]
+          else LFontSlant := AOptions.FontSlant;
+
+          // Init LFontStretch
+          var LFontStretch: TFontStretch;
+          if LFontStretchs.Count > 0 then LFontStretch := LFontStretchs[LFontStretchs.Count - 1]
+          else LFontStretch := AOptions.FontStretch;
 
           // Init LFontColor
           var LFontColor: TalphaColor;
           if LFontColors.Count > 0 then LFontColor := LFontColors[LFontColors.Count - 1]
           else LFontColor := AOptions.FontColor;
 
+          // Init LDecorationKind
+          var LDecorationKind: TALTextDecorationKinds;
+          if LDecorationKinds.Count > 0 then LDecorationKind := LDecorationKinds[LDecorationKinds.Count - 1]
+          else LDecorationKind := AOptions.DecorationKinds;
+
+          // Init LDecorationStyle
+          var LDecorationStyle: TALTextDecorationStyle;
+          if LDecorationStyles.Count > 0 then LDecorationStyle := LDecorationStyles[LDecorationStyles.Count - 1]
+          else LDecorationStyle := AOptions.DecorationStyle;
+
+          // Init LDecorationThicknessMultiplier
+          var LDecorationThicknessMultiplier: Single;
+          if LDecorationThicknessMultipliers.Count > 0 then LDecorationThicknessMultiplier := LDecorationThicknessMultipliers[LDecorationThicknessMultipliers.Count - 1]
+          else LDecorationThicknessMultiplier := AOptions.DecorationThicknessMultiplier;
+
+          // Init LDecorationColor
+          var LDecorationColor: TalphaColor;
+          if LDecorationColors.Count > 0 then LDecorationColor := LDecorationColors[LDecorationColors.Count - 1]
+          else LDecorationColor := AOptions.DecorationColor;
+
+          // Init LBackgroundColor
+          var LBackgroundColor: TalphaColor;
+          if LBackgroundColors.Count > 0 then LBackgroundColor := LBackgroundColors[LBackgroundColors.Count - 1]
+          else LBackgroundColor := TalphaColors.Null;
+
+          // Init LLineHeightMultiplier
+          var LLineHeightMultiplier: Single;
+          if LLineHeightMultipliers.Count > 0 then LLineHeightMultiplier := LLineHeightMultipliers[LLineHeightMultipliers.Count - 1]
+          else LLineHeightMultiplier := AOptions.LineHeightMultiplier;
+
+          // Init LLetterSpacing
+          var LLetterSpacing: Single;
+          if LLetterSpacings.Count > 0 then LLetterSpacing := LLetterSpacings[LLetterSpacings.Count - 1]
+          else LLetterSpacing := AOptions.GetScaledLetterSpacing;
+
           // Init LSpanID
           var LSpanID: String;
           if LSpanIDs.Count > 0 then LSpanID := LSpanIDs[LSpanIDs.Count - 1]
           else LSpanID := '';
 
-          // Init LFontStyle
-          var LFontStyle: TfontStyles;
-          if ((TFontStyle.fsBold in AOptions.FontStyle) or (LBold > 0)) and
-             ((TFontStyle.fsItalic in AOptions.FontStyle) or (LItalic > 0)) then LFontStyle := [TFontStyle.fsBold, TFontStyle.fsItalic]
-          else if ((TFontStyle.fsBold in AOptions.FontStyle) or (LBold > 0)) then LFontStyle := [TFontStyle.fsBold]
-          else if ((TFontStyle.fsItalic in AOptions.FontStyle) or (LItalic > 0)) then LFontStyle := [TFontStyle.fsItalic]
-          else LFontStyle := [];
+          // It's a text
+          if LCurrText <> '' then begin
 
-          //loop style we draw all the text or at least the ellipsis
-          var LTmpRect: TrectF;
-          var LTmpTotalLines: integer;
-          var LTmpAllTextDrawn: Boolean;
-          var LTmpTextBroken: Boolean;
-          var LBreakTextItemsCount: integer;
-          while True do begin
+            // First get the Font Metrics
+            var LFontMetrics := _GetFontMetrics(
+                                  LFontFamily, // const AFontFamily: String;
+                                  LFontSize, // const AFontSize: single;
+                                  LFontWeight, // const AFontWeight: TFontWeight;
+                                  LFontSlant, // const AFontSlant: TFontSlant;
+                                  LFontStretch, // const AFontStretch: TFontStretch;
+                                  LFontColor, // const AFontColor: TalphaColor;
+                                  LDecorationKind, // const ADecorationKinds: TALTextDecorationKinds;
+                                  LDecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
+                                  LDecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
+                                  LDecorationColor, // const ADecorationColor: TAlphaColor;
+                                  LLetterSpacing); // const ALetterSpacing: Single;
 
-            //init LTmpRect / LBreakTextItemsCount
-            LTmpRect := ARect;
-            LTmpRect.Width := LTmpRect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight;
-            LTmpRect.Height := LTmpRect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom;
-            LBreakTextItemsCount := LBreakTextItems.Count;
+            // Handle ALineHeightMultiplier
+            var LDrawTextOffsetY: Single;
+            if not sameValue(LLineHeightMultiplier, 0, TEpsilon.Scale) then begin
+              var LOldAscent := LFontMetrics.Ascent;
+              var LRatio: Single := (LFontSize / (-LFontMetrics.Ascent + LFontMetrics.Descent));
+              LFontMetrics.Ascent := -1 * LRatio * -LFontMetrics.Ascent * LLineHeightMultiplier;
+              LFontMetrics.Descent := LRatio * LFontMetrics.Descent * LLineHeightMultiplier;
+              LDrawTextOffsetY :=  (-1 * LFontMetrics.Ascent) - (-1 * LOldAscent);
+            end
+            else LDrawTextOffsetY := 0;
 
-            //break the text
-            {$IF defined(ANDROID)}
-            LTmpTextBroken := ALJBreakText(
-                                LPaint, // const APaint: JPaint;
-                                AOptions.FontFamily, // const AFontFamily: String;
-                                AOptions.GetScaledFontSize, // const AFontSize: single;
-                                LFontStyle, // const AFontStyle: TFontStyles;
-                                LFontColor, // const AFontColor: TalphaColor;
-                                LTmpRect, // var ARect: TRectF;
-                                StringtoJString(LCurrText), // const AText: JString;
-                                AOptions.WordWrap, //const AWordWrap: Boolean;
-                                TTextAlign.Leading, TTextAlign.Leading, //const AHTextAlign, AVTextAlign: TTextAlign;
-                                AOptions.Trimming, // const ATrimming: TALTextTrimming;
-                                LBreakTextItems, // var aBreakTexts: Tarray<Tpair<JString, TpointF>>);
-                                LTmpTotalLines, // var ATotalLines: integer
-                                LTmpAllTextDrawn, // out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-                                LFirstLineIndent, // const AFirstLineIndent: TpointF;
-                                AOptions.GetScaledLineSpacing, // const ALineSpacing: single = 0;
-                                StringtoJString(AOptions.EllipsisText), //  const AEllipsisText: JString = nil;
-                                AOptions.EllipsisFontStyle, // const AEllipsisFontStyle: TFontStyles = [];
-                                AOptions.EllipsisFontColor, // const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null
-                                AOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const AMaxlines: integer = 0
-            {$ELSEIF defined(IOS)}
-            LTmpTextBroken := ALCTBreakText(
-                                AOptions.FontFamily, // const AFontFamily: String;
-                                AOptions.GetScaledFontSize, // const AFontSize: single;
-                                LFontStyle, // const AFontStyle: TFontStyles;
-                                LFontColor, // const AFontColor: TalphaColor;
-                                LTmpRect, // var ARect: TRectF;
-                                LCurrText, // const AText: string;
-                                AOptions.WordWrap, // const AWordWrap: Boolean;
-                                TTextAlign.Leading, TTextAlign.Leading, // const AHTextAlign, AVTextAlign: TTextAlign;
-                                AOptions.Trimming, // const ATrimming: TALTextTrimming;
-                                LBreakTextItems, // const ABreakTextItems: TALBreakTextItems;
-                                LTmpTotalLines, // var ATotalLines: integer;
-                                LTmpAllTextDrawn, // out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-                                LFirstLineIndent, // const AFirstLineIndent: TpointF;
-                                AOptions.GetScaledLineSpacing, // const ALineSpacing: single = 0;
-                                AOptions.EllipsisText, // const AEllipsisText: string = '…';
-                                AOptions.EllipsisFontStyle, // const AEllipsisFontStyle: TFontStyles = [];
-                                AOptions.EllipsisFontColor, // const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                                AOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const AMaxlines: integer = 0
-            {$ELSE}
-            LTmpTextBroken := ALTLBreakText(
-                                AOptions.FontFamily, // const AFontFamily: String;
-                                AOptions.GetScaledFontSize, // const AFontSize: single;
-                                LFontStyle, // const AFontStyle: TFontStyles;
-                                LFontColor, // const AFontColor: TalphaColor;
-                                LTmpRect, // var ARect: TRectF;
-                                LCurrText, // const AText: string;
-                                AOptions.WordWrap, // const AWordWrap: Boolean;
-                                TTextAlign.Leading, TTextAlign.Leading, // const AHTextAlign, AVTextAlign: TTextAlign;
-                                AOptions.Trimming, // const ATrimming: TALTextTrimming;
-                                LBreakTextItems, // const ABreakTextItems: TALBreakTextItems;
-                                LTmpTotalLines, // var ATotalLines: integer;
-                                LTmpAllTextDrawn, // out AAllTextDrawn: boolean; // out => True if all the text was drawn (no need for any ellipsis)
-                                LFirstLineIndent, // const AFirstLineIndent: TpointF;
-                                AOptions.GetScaledLineSpacing, // const ALineSpacing: single = 0;
-                                AOptions.EllipsisText, // const AEllipsisText: string = '…';
-                                AOptions.EllipsisFontStyle, // const AEllipsisFontStyle: TFontStyles = [];
-                                AOptions.EllipsisFontColor, // const AEllipsisFontColor: TalphaColor = TAlphaColorRec.Null;
-                                AOptions.MaxLines - LTotalLines + AlifThen(LTotalLines > 0, 1, 0)); // const AMaxlines: integer = 0
-            {$ENDIF}
 
-            //handle FailIfTextBroken
-            if LTmpTextBroken and AOptions.FailIfTextBroken then begin
-              ARect.Width := 0;
-              ARect.Height := 0;
-              exit(ALNullDrawable);
+            // Now break the line
+            While LCurrText <> '' do begin
+
+              // No line left to add the text
+              if LCurrLineIndex >= LMaxLines then begin
+                inc(LAddEllipsis);
+                P1 := -1;
+                Break; // => break the loop => While LCurrText <> '' do begin => Go to the loop => while P1 <= high(Ltext) do begin
+              end;
+
+              // Do some measurements
+              var LMeasuredWidth: Single;
+              var LMeasuredHeight: Single;
+              var LNumberOfChars: Integer;
+              if LCurrText <> #10 then
+                LNumberOfChars := _BreakText(
+                                    LCurrText, // const AText: String;
+                                    LFontFamily, // const AFontFamily: String;
+                                    LFontSize, // const AFontSize: single;
+                                    LFontWeight, // const AFontWeight: TFontWeight;
+                                    LFontSlant, // const AFontSlant: TFontSlant;
+                                    LFontStretch, // const AFontStretch: TFontStretch;
+                                    LFontColor, // const AFontColor: TalphaColor;
+                                    LDecorationKind, // const ADecorationKinds: TALTextDecorationKinds;
+                                    LDecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
+                                    LDecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
+                                    LDecorationColor, // const ADecorationColor: TAlphaColor;
+                                    LLetterSpacing, // const ALetterSpacing: Single;
+                                    AOptions.Direction, // const ADirection: TALTextDirection
+                                    ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight - LCurrLineWidth, // const AMaxWidth: Single;
+                                    LMeasuredWidth, // out AMeasuredWidth: Single): integer;
+                                    LMeasuredHeight) // out AMeasuredHeight: Single): integer;
+              else begin
+                LMeasuredWidth := 0;
+                LMeasuredHeight := 0;
+                LNumberOfChars := 0;
+              end;
+
+              // No horizontal space left to add the text
+              If LNumberOfChars = 0 then begin
+                if (LCurrText <> #10) and samevalue(LCurrLineWidth, 0, TEpsilon.Position) then begin
+                  inc(LAddEllipsis);
+                  P1 := -1;
+                  Break; // => break the loop => While LCurrText <> '' do begin => Go to the loop => while P1 <= high(Ltext) do begin
+                end;
+                //--
+                inc(LCurrLineIndex);
+                LCurrParagraphHeight := LCurrParagraphHeight + LCurrLineHeight;
+                LCurrLineWidth := 0;
+                LCurrLineHeight := 0;
+                ATextBroken := True;
+                if AOptions.FailIfTextBroken then begin
+                  ARect.Width := 0;
+                  ARect.Height := 0;
+                  exit(ALNullDrawable);
+                end;
+                //--
+                var LExtendedTextElement: TExtendedTextElement;
+                LExtendedTextElement.Id := '';
+                LExtendedTextElement.LineIndex := LCurrLineIndex;
+                LExtendedTextElement.Rect := TrectF.Create(TpointF.Create(0, 0), 0, -LFontMetrics.Ascent + LFontMetrics.Descent);
+                LExtendedTextElement.DrawTextOffsetY := 0;
+                LExtendedTextElement.Ascent := LFontMetrics.Ascent;
+                LExtendedTextElement.Descent := LFontMetrics.Descent;
+                LExtendedTextElement.LineHeightMultiplier := LLineHeightMultiplier;
+                LExtendedTextElement.LetterSpacing := LLetterSpacing;
+                LExtendedTextElement.Text := '';
+                LExtendedTextElement.IsEllipsis := LIsEllipsis;
+                LExtendedTextElement.IsBreakLine := True;
+                LExtendedTextElement.BackgroundColor := LBackgroundColor;
+                LExtendedTextElement.FontFamily := LFontFamily;
+                LExtendedTextElement.FontSize := LFontSize;
+                LExtendedTextElement.FontWeight := LFontWeight;
+                LExtendedTextElement.FontSlant := LFontSlant;
+                LExtendedTextElement.FontStretch := LFontStretch;
+                LExtendedTextElement.FontColor := LFontColor;
+                LExtendedTextElement.DecorationKinds := LDecorationKind;
+                LExtendedTextElement.DecorationStyle := LDecorationStyle;
+                LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
+                LExtendedTextElement.DecorationColor := LDecorationColor;
+                LExtendedTextElement.ImgSrc := '';
+                LExtendedTextElements.add(LExtendedTextElement);
+                //--
+                if LCurrText = #10 then break // => break the loop => While LCurrText <> '' do begin => Go to the loop => while P1 <= high(Ltext) do begin
+                else Continue; // => redo the loop => While LCurrText <> '' do begin
+              end;
+
+              // No Vertical space left to add the Image
+              If CompareValue(LCurrParagraphHeight + (-1 * LFontMetrics.Ascent) + LFontMetrics.Descent, ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom, TEpsilon.Position) > 0 then begin
+                inc(LAddEllipsis);
+                P1 := -1;
+                Break; // => break the loop => While LCurrText <> '' do begin => Go to the loop => while P1 <= high(Ltext) do begin
+              end;
+
+              // Everything is fine, add the Element
+              var LExtendedTextElement: TExtendedTextElement;
+              LExtendedTextElement.Id := LspanID;
+              LExtendedTextElement.LineIndex := LCurrLineIndex;
+              if CompareValue(LMeasuredHeight, ceil(-LFontMetrics.Ascent + LFontMetrics.Descent), Tepsilon.Position) > 0 then begin
+                var LOldLineHeight := -LFontMetrics.Ascent + LFontMetrics.Descent;
+                LExtendedTextElement.Ascent := (LFontMetrics.Ascent / LOldLineHeight) * LMeasuredHeight;
+                LExtendedTextElement.Descent := (LFontMetrics.Descent / LOldLineHeight) * LMeasuredHeight;
+                LExtendedTextElement.DrawTextOffsetY := LDrawTextOffsetY + (-1 * LExtendedTextElement.Ascent) - (-1 * LFontMetrics.Ascent);
+              end
+              else begin
+                LExtendedTextElement.Ascent := LFontMetrics.Ascent;
+                LExtendedTextElement.Descent := LFontMetrics.Descent;
+                LExtendedTextElement.DrawTextOffsetY := LDrawTextOffsetY;
+              end;
+              LExtendedTextElement.Rect := TrectF.Create(TpointF.Create(LCurrLineWidth, 0), LMeasuredWidth, -LExtendedTextElement.Ascent + LExtendedTextElement.Descent);
+              LCurrLineWidth := LCurrLineWidth + LMeasuredWidth;
+              LCurrLineHeight := Max(LCurrLineHeight, -LExtendedTextElement.Ascent + LExtendedTextElement.Descent);
+              LExtendedTextElement.LineHeightMultiplier := LLineHeightMultiplier;
+              LExtendedTextElement.LetterSpacing := LLetterSpacing;
+              LExtendedTextElement.Text := LCurrText.Substring(0, LNumberOfChars);
+              LExtendedTextElement.IsEllipsis := LIsEllipsis;
+              LExtendedTextElement.IsBreakLine := False;
+              LExtendedTextElement.BackgroundColor := LBackgroundColor;
+              LExtendedTextElement.FontFamily := LFontFamily;
+              LExtendedTextElement.FontSize := LFontSize;
+              LExtendedTextElement.FontWeight := LFontWeight;
+              LExtendedTextElement.FontSlant := LFontSlant;
+              LExtendedTextElement.FontStretch := LFontStretch;
+              LExtendedTextElement.FontColor := LFontColor;
+              LExtendedTextElement.DecorationKinds := LDecorationKind;
+              LExtendedTextElement.DecorationStyle := LDecorationStyle;
+              LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
+              LExtendedTextElement.DecorationColor := LDecorationColor;
+              LExtendedTextElement.ImgSrc := '';
+              LExtendedTextElements.add(LExtendedTextElement);
+
+              // Increase the number of lines
+              if LNumberOfChars < LCurrText.Length then begin
+                inc(LCurrLineIndex);
+                LCurrParagraphHeight := LCurrParagraphHeight + LCurrLineHeight;
+                LCurrLineWidth := 0;
+                LCurrLineHeight := 0;
+                ATextBroken := True;
+                if AOptions.FailIfTextBroken then begin
+                  ARect.Width := 0;
+                  ARect.Height := 0;
+                  exit(ALNullDrawable);
+                end;
+                //--
+                //var LExtendedTextElement: TExtendedTextElement;
+                LExtendedTextElement.Id := '';
+                LExtendedTextElement.LineIndex := LCurrLineIndex;
+                LExtendedTextElement.Rect := TrectF.Create(TpointF.Create(0, 0), 0, -LFontMetrics.Ascent + LFontMetrics.Descent);
+                LExtendedTextElement.DrawTextOffsetY := 0;
+                LExtendedTextElement.Ascent := LFontMetrics.Ascent;
+                LExtendedTextElement.Descent := LFontMetrics.Descent;
+                LExtendedTextElement.LineHeightMultiplier := LLineHeightMultiplier;
+                LExtendedTextElement.LetterSpacing := LLetterSpacing;
+                LExtendedTextElement.Text := '';
+                LExtendedTextElement.IsEllipsis := LIsEllipsis;
+                LExtendedTextElement.IsBreakLine := True;
+                LExtendedTextElement.BackgroundColor := LBackgroundColor;
+                LExtendedTextElement.FontFamily := LFontFamily;
+                LExtendedTextElement.FontSize := LFontSize;
+                LExtendedTextElement.FontWeight := LFontWeight;
+                LExtendedTextElement.FontSlant := LFontSlant;
+                LExtendedTextElement.FontStretch := LFontStretch;
+                LExtendedTextElement.FontColor := LFontColor;
+                LExtendedTextElement.DecorationKinds := LDecorationKind;
+                LExtendedTextElement.DecorationStyle := LDecorationStyle;
+                LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
+                LExtendedTextElement.DecorationColor := LDecorationColor;
+                LExtendedTextElement.ImgSrc := '';
+                LExtendedTextElements.add(LExtendedTextElement);
+              end;
+
+              // Remove white space between lines
+              While (LNumberOfChars < LCurrText.Length) and (LCurrText.Chars[LNumberOfChars].IsWhiteSpace) do
+                inc(LNumberOfChars, 1);
+
+              // Update LCurrText
+              LCurrText := LCurrText.remove(0, LNumberOfChars);
+
             end;
 
-            //update the img
-            if (LCurrImgSrc <> '') and
-               (LBreakTextItems.Count - LBreakTextItemsCount = 1) then begin
-              var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
-              LBreakTextItem.imgsrc := LCurrImgSrc;
+          end
+
+          // It's an Image
+          else if LCurrImgSrc <> '' then begin
+
+            // Update LCurrImgWidth / LCurrImgHeight
+            if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.GetScaledFontSize;
+            if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.GetScaledFontSize;
+
+            // No horizontal space left to add the Image
+            If CompareValue(LCurrLineWidth + LCurrImgWidth, ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight, TEpsilon.Position) > 0 then begin
+              if samevalue(LCurrLineWidth, 0, TEpsilon.Position) then begin
+                inc(LAddEllipsis);
+                P1 := -1;
+                continue; // => => Go to the loop => while P1 <= high(Ltext) do begin
+              end;
+              //--
+              inc(LCurrLineIndex);
+              LCurrParagraphHeight := LCurrParagraphHeight + LCurrLineHeight;
+              LCurrLineWidth := 0;
+              LCurrLineHeight := 0;
+              ATextBroken := True;
+              if AOptions.FailIfTextBroken then begin
+                ARect.Width := 0;
+                ARect.Height := 0;
+                exit(ALNullDrawable);
+              end;
+              //--
+              var LFontMetrics := _GetFontMetrics(
+                                    LFontFamily, // const AFontFamily: String;
+                                    LFontSize, // const AFontSize: single;
+                                    LFontWeight, // const AFontWeight: TFontWeight;
+                                    LFontSlant, // const AFontSlant: TFontSlant;
+                                    LFontStretch, // const AFontStretch: TFontStretch;
+                                    LFontColor, // const AFontColor: TalphaColor;
+                                    LDecorationKind, // const ADecorationKinds: TALTextDecorationKinds;
+                                    LDecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
+                                    LDecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
+                                    LDecorationColor, // const ADecorationColor: TAlphaColor;
+                                    LLetterSpacing); // const ALetterSpacing: Single;
+              //--
+              var LExtendedTextElement: TExtendedTextElement;
+              LExtendedTextElement.Id := '';
+              LExtendedTextElement.LineIndex := LCurrLineIndex;
+              LExtendedTextElement.Rect := TrectF.Create(TpointF.Create(0, 0), 0, -LFontMetrics.Ascent + LFontMetrics.Descent);
+              LExtendedTextElement.DrawTextOffsetY := 0;
+              LExtendedTextElement.Ascent := LFontMetrics.Ascent;
+              LExtendedTextElement.Descent := LFontMetrics.Descent;
+              LExtendedTextElement.LineHeightMultiplier := LLineHeightMultiplier;
+              LExtendedTextElement.LetterSpacing := LLetterSpacing;
+              LExtendedTextElement.Text := '';
+              LExtendedTextElement.IsEllipsis := LIsEllipsis;
+              LExtendedTextElement.IsBreakLine := True;
+              LExtendedTextElement.BackgroundColor := LBackgroundColor;
+              LExtendedTextElement.FontFamily := LFontFamily;
+              LExtendedTextElement.FontSize := LFontSize;
+              LExtendedTextElement.FontWeight := LFontWeight;
+              LExtendedTextElement.FontSlant := LFontSlant;
+              LExtendedTextElement.FontStretch := LFontStretch;
+              LExtendedTextElement.FontColor := LFontColor;
+              LExtendedTextElement.DecorationKinds := LDecorationKind;
+              LExtendedTextElement.DecorationStyle := LDecorationStyle;
+              LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
+              LExtendedTextElement.DecorationColor := LDecorationColor;
+              LExtendedTextElement.ImgSrc := '';
+              LExtendedTextElements.add(LExtendedTextElement);
             end;
 
-            //If there was not enough space to write the ellipsis
-            if (LBreakTextItems.Count >= 2) and                                                                                        // << more than 2 items
-               (LBreakTextItems.Count - LBreakTextItemsCount = 1) and                                                                  // << only 1 item (the ellipsis) was added
-               (LBreakTextItems[LBreakTextItems.count - 1].isEllipsis) and                                                             // << last item is an elipsis
-               (comparevalue(LBreakTextItems[LBreakTextItems.count - 1].rect.right, LTmpRect.Right, Tepsilon.Position) > 0) then begin // << ellipsis is not inside LTmpRect
-
-              //init LBreakTextItem
-              // -1 = the ellipsis '...' (the last item)
-              // their is no item for the text that generate the break line
-              // because their is even not enalf of place to write the text himself (all the place was used by the ellipsis)
-              // -2 = the previous text
-              var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 2];
-
-              //if the ellipsis is not on the same line of the LBreakTextItem then it's mean
-              //we don't have enalf of place on one full row to draw the ellipsis so break the loop
-              if compareValue(
-                   LBreakTextItem.rect.Top,  // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
-                   LBreakTextItems[LBreakTextItems.count - 1].rect.top,
-                   Tepsilon.Position) <> 0 then break;
-
-              //get the params from LBreakTextItem
-              LFontColor := LBreakTextItem.fontColor;
-              LSpanID := LBreakTextItem.id;
-              LFontStyle := LBreakTextItem.fontStyle;
-              setlength(LCurrText, 2 * length(LCurrText));                            // << I put some space in the end of the previous text to force
-              for var I := Low(LCurrText) to High(LCurrText) do LCurrText[i] := ' ';  // << the draw of the ellipsis
-              {$IF defined(ANDROID)}
-              LCurrText := JStringtoString(LBreakTextItem.line) + LCurrText + '_';
-              {$ELSEIF defined(IOS)}
-              LCurrText := LBreakTextItem.text + LCurrText + '_';
-              {$ELSE}
-              LCurrText := LBreakTextItem.line + LCurrText + '_';
-              {$ENDIF}
-              LFirstLineIndent := TpointF.Create(LBreakTextItem.rect.left, LBreakTextItem.rect.Top);
-
-              //clean the LBreakTextItems
-              for var I := LBreakTextItems.Count - 1 downto LBreakTextItems.Count - 2 do
-                LBreakTextItems.Delete(i);
-
-              //try again
-              P1 := maxint;
-              continue;
-
+            // No Vertical space left to add the Image
+            If CompareValue(LCurrParagraphHeight + LCurrImgHeight, ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom, TEpsilon.Position) > 0 then begin
+              inc(LAddEllipsis);
+              P1 := -1;
+              continue; // => => Go to the loop => while P1 <= high(Ltext) do begin
             end;
 
-            //stop the loop
-            break;
+            // No line left to add the Image
+            if LCurrLineIndex >= LMaxLines then begin
+              inc(LAddEllipsis);
+              P1 := -1;
+              continue; // => => Go to the loop => while P1 <= high(Ltext) do begin
+            end;
+
+            // Everything is fine, add the Element
+            var LExtendedTextElement: TExtendedTextElement;
+            LExtendedTextElement.Id := LspanID;
+            LExtendedTextElement.LineIndex := LCurrLineIndex;
+            LExtendedTextElement.Rect := TrectF.Create(TpointF.Create(LCurrLineWidth, 0), LcurrImgWidth, LcurrImgHeight);
+            LCurrLineWidth := LCurrLineWidth + LCurrImgWidth;
+            LCurrLineHeight := Max(LCurrLineHeight, LCurrImgHeight);
+            LExtendedTextElement.DrawTextOffsetY := 0;
+            LExtendedTextElement.Ascent := 0;
+            LExtendedTextElement.Descent := 0;
+            LExtendedTextElement.LineHeightMultiplier := LLineHeightMultiplier;
+            LExtendedTextElement.LetterSpacing := LLetterSpacing;
+            LExtendedTextElement.Text := '';
+            LExtendedTextElement.IsEllipsis := LIsEllipsis;
+            LExtendedTextElement.IsBreakLine := False;
+            LExtendedTextElement.BackgroundColor := LBackgroundColor;
+            LExtendedTextElement.FontFamily := LFontFamily;
+            LExtendedTextElement.FontSize := LFontSize;
+            LExtendedTextElement.FontWeight := LFontWeight;
+            LExtendedTextElement.FontSlant := LFontSlant;
+            LExtendedTextElement.FontStretch := LFontStretch;
+            LExtendedTextElement.FontColor := LFontColor;
+            LExtendedTextElement.DecorationKinds := LDecorationKind;
+            LExtendedTextElement.DecorationStyle := LDecorationStyle;
+            LExtendedTextElement.DecorationThicknessMultiplier := LDecorationThicknessMultiplier;
+            LExtendedTextElement.DecorationColor := LDecorationColor;
+            LExtendedTextElement.ImgSrc := LCurrImgSrc;
+            LExtendedTextElements.add(LExtendedTextElement);
 
           end;
-
-          // Update LTotalLines
-          if LTotalLines = 0 then LTotalLines := LTmpTotalLines
-          else LTotalLines := LTotalLines + LTmpTotalLines - 1;
-
-          // Update LMaxWidth/LMaxHeight
-          LMaxWidth := max(LMaxWidth, LTmpRect.Width);
-          LMaxHeight := max(LMaxHeight, LTmpRect.height);
-
-          // Update ATextBroken
-          ATextBroken := ATextBroken or LTmpTextBroken;
-          AAllTextDrawn := AAllTextDrawn and LTmpAllTextDrawn;
-
-          //update all the LBreakTextItem
-          for var I := LBreakTextItemsCount to LBreakTextItems.Count - 1 do begin
-            var LBreakTextItem := LBreakTextItems[i];
-            //-----
-            if (not LBreakTextItem.isEllipsis) or (AOptions.EllipsisFontColor = TAlphaColorRec.Null) then LBreakTextItem.fontColor := LFontColor
-            else LBreakTextItem.fontColor := AOptions.EllipsisFontColor;
-            //-----
-            if (not LBreakTextItem.isEllipsis) then LBreakTextItem.FontStyle := LFontStyle
-            else LBreakTextItem.FontStyle := AOptions.EllipsisFontStyle;
-            //-----
-            if (not LBreakTextItem.isEllipsis) then LBreakTextItem.Id := LSpanID
-            else LBreakTextItem.Id := '';
-          end;
-
-          //Update LFirstLineIndent
-          if LBreakTextItems.count > LBreakTextItemsCount then begin
-            var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
-            LFirstLineIndent := TpointF.Create(LBreakTextItem.rect.Right, LBreakTextItem.rect.Top);
-            if LBreakTextItem.isEllipsis then break;
-          end;
-          // else break; << we can't break here, it's maybe juste a ' ' we try to write at the end of the line that was deleted by ALBreakText
 
         end;
 
@@ -4388,436 +3560,465 @@ exit(ALNullDrawable);
       // Paint the paragraph //
       /////////////////////////
 
+      // Order elements inside LExtendedTextElements
+      var LPrevParagraphHeight: single := 0;
+      var LParagraphRect := TrectF.Empty;
+      var LBaseLine: Single := 0;
+      var LTextLineHeight: Single := 0;
+      var LImgLineHeight: Single := 0;
+      LCurrLineIndex := -1;
+      For var I := 0 to LExtendedTextElements.count - 1 do begin
+        var LExtendedTextElement := LExtendedTextElements[i];
+        //--
+        if (LExtendedTextElement.isbreakline) and
+           (I < LExtendedTextElements.count - 1) and
+           (LExtendedTextElement.LineIndex = LExtendedTextElements[I + 1].LineIndex) then
+          continue;
+        //--
+        If LExtendedTextElement.LineIndex <> LCurrLineIndex then begin
+          LCurrLineIndex := LExtendedTextElement.LineIndex;
+          //--
+          var LMaxAscent: Single := -LExtendedTextElement.Ascent;
+          var LMaxDescent: Single := LExtendedTextElement.Descent;
+          if LExtendedTextElement.ImgSrc <> '' then begin
+            LTextLineHeight := 0;
+            LImgLineHeight := LExtendedTextElement.Rect.Height;
+          end
+          else begin
+            LTextLineHeight := LMaxAscent + LMaxDescent;
+            LImgLineHeight := 0;
+          end;
+          //--
+          for var J := I + 1 to LExtendedTextElements.count - 1 do begin
+            var L_TMP_ExtendedTextElement := LExtendedTextElements[j];
+            if L_TMP_ExtendedTextElement.LineIndex <> LExtendedTextElement.LineIndex then break;
+            LMaxAscent := max(LMaxAscent, -L_TMP_ExtendedTextElement.Ascent);
+            LMaxDescent := max(LMaxDescent, L_TMP_ExtendedTextElement.Descent);
+            if L_TMP_ExtendedTextElement.ImgSrc <> '' then begin
+              var LPrevImgLineHeight := LImgLineHeight;
+              LImgLineHeight := max(LImgLineHeight, L_TMP_ExtendedTextElement.Rect.Height);
+            end
+            else begin
+              var LPrevTextLineHeight := LTextLineHeight;
+              LTextLineHeight := max(LTextLineHeight, LMaxAscent + LMaxDescent);
+            end;
+          end;
+          //--
+          LPrevParagraphHeight := LParagraphRect.height;
+          LParagraphRect.height := LParagraphRect.height + max(LImgLineHeight, LTextLineHeight);
+          LBaseLine := LMaxAscent;
+        end;
+        //--
+        LParagraphRect.Width := Max(LParagraphRect.Width, LExtendedTextElement.Rect.Right);
+        //--
+        if LExtendedTextElement.ImgSrc <> '' then
+          LExtendedTextElement.Rect.Offset(0, LPrevParagraphHeight - LExtendedTextElement.Rect.Top + max(0, (LTextLineHeight - LImgLineHeight) / 2))
+        else
+          LExtendedTextElement.Rect.Offset(0, LBaseLine - (-1 * LExtendedTextElement.Ascent) + LPrevParagraphHeight - LExtendedTextElement.Rect.Top + max(0, (LImgLineHeight - LTextLineHeight) / 2));
+        LExtendedTextElements[i] := LExtendedTextElement;
+      end;
+      LParagraphRect.height := LParagraphRect.height;
+
+      // Autosize
       if AOptions.Autosize or (AOptions.AutosizeX and AOptions.AutosizeY) then begin
-        ARect.Width := LMaxWidth + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight;
-        ARect.Height := LMaxHeight + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom;
+        ARect.Width := Min(ARect.Width, LParagraphRect.Width + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight);
+        ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
       end
-      else if AOptions.AutosizeX then ARect.Width := LMaxWidth + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight
-      else if AOptions.AutosizeY then ARect.Height := LMaxHeight + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom;
-      case AOptions.HTextAlign of
-        TTextAlign.Center: begin
-                             if LBreakTextItems.Count > 0 then begin
-                               var LCurrentLineY: single := LBreakTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
-                               var J := 0;
-                               for var I := 1 to LBreakTextItems.Count do begin
-                                 if (I = LBreakTextItems.Count) or
-                                    (compareValue(LCurrentLineY, LBreakTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
-                                   var LOffset: single := Floor(
-                                                            (ARect.width -
-                                                             LBreakTextItems[I-1].rect.Right -
-                                                             AOptions.GetScaledPaddingLeft -
-                                                             AOptions.GetScaledPaddingRight) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                                   while J < I do begin
-                                     LBreakTextItems[j].pos.X := LBreakTextItems[j].pos.X + AOptions.GetScaledPaddingLeft + LOffset;
-                                     LBreakTextItems[j].rect.Offset(AOptions.GetScaledPaddingLeft + LOffset, 0);
-                                     inc(J);
-                                   end;
-                                   if (I <> LBreakTextItems.Count) then LCurrentLineY := LBreakTextItems[I].rect.top;
-                                 end;
-                               end;
-                             end;
-                           end;
-        TTextAlign.Leading: begin
-                             for var I := 0 to LBreakTextItems.Count - 1 do begin
-                               LBreakTextItems[i].pos.X := LBreakTextItems[i].pos.X + AOptions.GetScaledPaddingLeft;
-                               LBreakTextItems[i].rect.Offset(AOptions.GetScaledPaddingLeft, 0);
-                             end;
-                           end;
-        TTextAlign.Trailing: begin
-                               if LBreakTextItems.Count > 0 then begin
-                                 var LCurrentLineY: single := LBreakTextItems[0].rect.top; // << we can not use pos.y because on ios bold text can be 1 or 2 pixel more high the normal text :(
-                                 var J := 0;
-                                 for var I := 1 to LBreakTextItems.Count do begin
-                                   if (I = LBreakTextItems.Count) or
-                                      (compareValue(LCurrentLineY, LBreakTextItems[I].rect.top, Tepsilon.Position) <> 0) then begin
-                                     var LOffset: single := Floor(
-                                                              (ARect.width -
-                                                               LBreakTextItems[I-1].rect.Right -
-                                                               AOptions.GetScaledPaddingLeft -
-                                                               AOptions.GetScaledPaddingRight)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                                     while J < I do begin
-                                       LBreakTextItems[j].pos.X := LBreakTextItems[j].pos.X + AOptions.GetScaledPaddingLeft + LOffset;
-                                       LBreakTextItems[j].rect.Offset(AOptions.GetScaledPaddingLeft + LOffset, 0);
-                                       inc(J);
-                                     end;
-                                     if (I <> LBreakTextItems.Count) then LCurrentLineY := LBreakTextItems[I].rect.top;
-                                   end;
-                                 end;
-                               end;
-                             end;
+      else if AOptions.AutosizeX then ARect.Width := Min(ARect.Width, LParagraphRect.Width + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight)
+      else if AOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+
+      // HTextAlign/VTextAlign
+      // TALTextHorzAlign.Justify is not yet supported
+      var LHTextAlign := AOptions.HTextAlign;
+      if AOptions.Direction = TALTextDirection.RightToLeft then begin
+        case LHTextAlign of
+          TALTextHorzAlign.Center:;
+          TALTextHorzAlign.Leading: LHTextAlign := TALTextHorzAlign.Trailing;
+          TALTextHorzAlign.Trailing: LHTextAlign := TALTextHorzAlign.Leading;
+          TALTextHorzAlign.Justify:;
+          else raise Exception.Create('Error A8C0EAAF-8B9F-4941-A533-5A5A0C4B4709');
+        end;
+      end;
+      case LHTextAlign of
+        TALTextHorzAlign.Center: begin
+          LCurrLineIndex := -1;
+          LCurrLineWidth := 0;
+          for var I := LExtendedTextElements.count - 1 downto 0 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            If LExtendedTextElement.LineIndex <> LCurrLineIndex then begin
+              LCurrLineIndex := LExtendedTextElement.LineIndex;
+              LCurrLineWidth := LExtendedTextElement.Rect.Right;
+            end;
+            LExtendedTextElement.Rect.Offset((LParagraphRect.Width - LCurrLineWidth) / 2, 0);
+            LExtendedTextElements[i] := LExtendedTextElement;
+          end;
+          LParagraphRect.Offset(AOptions.GetScaledPaddingLeft + ((ARect.Width-AOptions.GetScaledPaddingLeft-AOptions.GetScaledPaddingRight-LParagraphRect.Width) / 2), 0);
+        end;
+        //--
+        TALTextHorzAlign.Leading,
+        TALTextHorzAlign.Justify: begin
+          LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, 0);
+        end;
+        //--
+        TALTextHorzAlign.Trailing: begin
+          LCurrLineIndex := -1;
+          LCurrLineWidth := 0;
+          for var I := LExtendedTextElements.count - 1 downto 0 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            If LExtendedTextElement.LineIndex <> LCurrLineIndex then begin
+              LCurrLineIndex := LExtendedTextElement.LineIndex;
+              LCurrLineWidth := LExtendedTextElement.Rect.Right;
+            end;
+            LExtendedTextElement.Rect.Offset(LParagraphRect.Width - LCurrLineWidth, 0);
+            LExtendedTextElements[i] := LExtendedTextElement;
+          end;
+          LParagraphRect.Offset((ARect.Width-LParagraphRect.Width-AOptions.GetScaledPaddingRight), 0);
+        end;
+        //--
+        else raise Exception.Create('Error 768AE40A-1C99-47BD-BD6E-1F7AABFB018C');
       end;
       case AOptions.VTextAlign of
-        TTextAlign.Center: begin
-                             var LOffset: single := Floor(
-                                                      (ARect.height -
-                                                       LMaxHeight -
-                                                       AOptions.GetScaledPaddingTop -
-                                                       AOptions.GetScaledPaddingBottom) / 2); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                             for var I := 0 to LBreakTextItems.Count - 1 do begin
-                               LBreakTextItems[I].pos.y := LBreakTextItems[i].pos.y + AOptions.GetScaledPaddingTop + LOffset;
-                               LBreakTextItems[I].rect.Offset(0, AOptions.GetScaledPaddingTop + LOffset);
-                             end;
-                           end;
-        TTextAlign.Leading: begin
-                             for var I := 0 to LBreakTextItems.Count - 1 do begin
-                               LBreakTextItems[i].pos.Y := LBreakTextItems[i].pos.Y + AOptions.GetScaledPaddingTop;
-                               LBreakTextItems[i].rect.Offset(0, AOptions.GetScaledPaddingTop);
-                             end;
-                           end;
-        TTextAlign.Trailing: begin
-                               var LOffset: single := Floor(
-                                                        (ARect.height -
-                                                         LMaxHeight -
-                                                         AOptions.GetScaledPaddingTop -
-                                                         AOptions.GetScaledPaddingBottom)); // Floor to stay perfectly pixel aligned (but i don't really know if it's really matter, because visually hard to see the difference)
-                               for var I := 0 to LBreakTextItems.Count - 1 do begin
-                                 LBreakTextItems[I].pos.y := LBreakTextItems[i].pos.y + AOptions.GetScaledPaddingTop + LOffset;
-                                 LBreakTextItems[I].rect.Offset(0, AOptions.GetScaledPaddingTop + LOffset);
-                               end;
-                             end;
-      end;
-      ARect := ALAlignDimensionToPixelCeil(ARect, 1{Scale});
-
-      // Init out vars
-      if LBreakTextItems.count > 0 then begin
-        AFirstPos := LBreakTextItems[0].pos;
-        var LBreakTextItem := LBreakTextItems[LBreakTextItems.count - 1];
-        ALastPos := LBreakTextItem.pos;
-        ALastPos.offset(LBreakTextItem.rect.width, 0);
-        AAscent := ALastPos.y - LBreakTextItem.rect.top;
-        ADescent := LBreakTextItem.rect.bottom - ALastPos.y;
-        if LBreakTextItem.isEllipsis then AEllipsisRect := LBreakTextItem.rect
-        else AEllipsisRect := Trectf.Create(0,0,0,0);
+        TALTextVertAlign.Center: LParagraphRect.Offset(0, AOptions.GetScaledPaddingTop + ((ARect.Height - LParagraphRect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom) / 2));
+        TALTextVertAlign.Leading: LParagraphRect.Offset(0, AOptions.GetScaledPaddingTop);
+        TALTextVertAlign.Trailing: LParagraphRect.Offset(0, ARect.Height - AOptions.GetScaledPaddingBottom - LParagraphRect.Height);
+        Else raise Exception.Create('Error 6DBA0B08-4F9E-4D89-9998-6B054D527F1F');
       end;
 
       // Update AElements
-      var J := 0;
-      setlength(AElements, LBreakTextItems.count);
-      for var i := 0 to LBreakTextItems.count - 1 do begin
-        if (LBreakTextItems[i].id <> '') then begin
-          AElements[j].Id := LBreakTextItems[i].id;
-          AElements[j].rect := LBreakTextItems[i].rect;
-          inc(j);
+      Var I := 0;
+      Setlength(AElements, LExtendedTextElements.Count);
+      for var J := 0 to LExtendedTextElements.Count - 1 do begin
+        var LExtendedTextElement := LExtendedTextElements[J];
+        If LExtendedTextElement.id <> '' then begin
+          AElements[I].Id := LExtendedTextElement.ID;
+          AElements[I].rect := TRectF.Create(
+                                 (LParagraphRect.Left + LExtendedTextElement.Rect.Left) / AOptions.Scale,
+                                 (LParagraphRect.Top + LExtendedTextElement.Rect.Top) / AOptions.Scale,
+                                 (LParagraphRect.Left + LExtendedTextElement.Rect.Right) / AOptions.Scale,
+                                 (LParagraphRect.Top + LExtendedTextElement.Rect.Bottom) / AOptions.Scale);
+          inc(I);
         end;
       end;
-      setlength(AElements, J);
+      setlength(AElements, I);
 
-      {$REGION 'ANDROID'}
-      {$IF defined(ANDROID)}
+      // Though it's an unlikely scenario, this ensures avoidance of a crash in
+      // the subsequent ALCreateSurface call.
+      If (Round(ARect.Width) = 0) or
+         (Round(ARect.Height) = 0) then begin
+        ARect.Width := 0;
+        ARect.Height := 0;
+        exit(ALNullDrawable);
+      end;
 
-      // Create the drawing surface
-      var LBitmap: Jbitmap;
-      var LCanvas: Jcanvas;
-      ALCreateSurface(
-        LBitmap, // Var aBitmap: Jbitmap;
-        LCanvas, // Var aCanvas: Jcanvas;
-        round(max(1, ARect.Width)), // const w: integer;
-        round(max(1, ARect.Height)));// const h: integer)
-      try
-
-        // Draw the background
-        if ((AOptions.IsFillAssigned) and (AOptions.Fill.Kind <> TbrushKind.None)) or
-           ((AOptions.IsStrokeAssigned) and (AOptions.stroke.Kind <> TbrushKind.None)) then begin
-          Tmonitor.Enter(AOptions.Stroke);
-          var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
-          var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
-          try
-            ALDrawRectangle(
-              LCanvas, // const ACanvas: Jcanvas;
-              1, // const AScale: Single;
-              ARect, // const ARect: TrectF;
-              AOptions.Fill, // const Fill: TBrush;
-              AOptions.Stroke, // const Stroke: TStrokeBrush;
-              nil, // const Shadow: TALShadow
-              AOptions.Sides, // const Sides: TSides;
-              AOptions.Corners, // const Corners: TCorners;
-              AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-              AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-            finally
-              AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
-              AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
-              Tmonitor.Exit(AOptions.Stroke);
-            end;
+      // Handle Shadow
+      var LRect := ARect;
+      if ((AOptions.IsShadowAssigned) and (AOptions.shadow.Enabled)) or
+         ((not AOptions.IsShadowAssigned) and (AOptions.ShadowColor <> TalphaColors.Null)) then begin
+        var LShadowBlur: Single;
+        var LShadowOffsetX: Single;
+        var LShadowOffsetY: Single;
+        if AOptions.IsShadowAssigned then begin
+          LShadowBlur := AOptions.Shadow.blur * AOptions.Scale;
+          LShadowOffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
+          LShadowOffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
         end
-        else if (AOptions.FillColor <> TalphaColors.Null) or
-                (AOptions.StrokeColor <> TalphaColors.Null) then begin
-          ALDrawRectangle(
-            LCanvas, // const ACanvas: Jcanvas;
-            1, // const AScale: Single;
-            ARect, // const ARect: TrectF;
-            AOptions.FillColor, // const AFillColor: TAlphaColor;
-            AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-            AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-            TAlphaColors.null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-            0, // const AShadowBlur: Single;
-            0, // const AShadowOffsetX: Single;
-            0, // const AShadowOffsetY: Single;
-            AOptions.Sides, // const Sides: TSides;
-            AOptions.Corners, // const Corners: TCorners;
-            AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-            AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+        else begin
+          LShadowBlur := AOptions.GetScaledShadowblur;
+          LShadowOffsetX := AOptions.GetScaledShadowOffsetX;
+          LShadowOffsetY := AOptions.GetScaledShadowOffsetY;
         end;
-
-        // Draw all texts
-        for var i := 0 to LBreakTextItems.count - 1 do begin
-          var LBreakTextItem := LBreakTextItems[i];
-          if LBreakTextItem.imgSrc <> '' then begin
-            LMaxWidth := min(LBreakTextItem.rect.Width, LBreakTextItem.rect.Height);
-            var LTmpRect := ALAlignToPixelRound(
-                              TrectF.Create(0,0,LMaxWidth,LMaxWidth).
-                                CenterAt(LBreakTextItem.rect),
-                              1{Scale});
-            var LImg := ALLoadFromResourceAndFitIntoToJBitmap(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
-            try
-              LPaint.setColor(integer(LBreakTextItem.fontColor)); // sean that the bitmap is paint with the alpha value set via setColor
-                                                                  // ideally I would prefer to draw bitmap with alpha = 1 but drawText
-                                                                  // don't draw emoji with alpha 1 (that is not the case under iOS) and we
-                                                                  // we need do work the same way as LCanvas.drawText work :(
-              LCanvas.drawBitmap(LImg, LTmpRect.left {left}, LTmpRect.top {top}, LPaint {paint});
-            finally
-              LImg.recycle;
-              LImg := nil;
-            end;
-          end
-          else begin
-            LPaint.setTypeface(LBreakTextItem.TypeFace);
-            LPaint.setColor(integer(LBreakTextItem.fontColor));
-            //-----
-            LCanvas.drawText(
-              LBreakTextItem.line{text},
-              LBreakTextItem.pos.x {x},
-              LBreakTextItem.pos.y {y},
-              LPaint {paint});
-          end;
-        end;
-
-        // Create the result
-        result := ALJBitmaptoTexture(LBitmap);
-
-      finally
-        ALFreeSurface(LBitmap, LCanvas);
+        var LShadowRect := LRect;
+        LShadowRect.Inflate(LShadowblur, LShadowblur);
+        LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
+        LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
+        ARect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
+        LParagraphRect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
       end;
 
-      {$ENDIF}
-      {$ENDREGION}
-
-      {$REGION 'IOS'}
-      {$IF defined(IOS)}
-
       // Create the drawing surface
-      var LGridHeight := round(max(1, ARect.Height));
-      var LContext: CGContextRef;
+      var LSurface: TALSurface;
+      var LCanvas: TALCanvas;
       ALCreateSurface(
-        LContext, // out aContext: CGContextRef;
-        round(max(1, ARect.Width)), // const w: integer;
-        LGridHeight); // const h: integer;
+        LSurface, // out ASurface: TALSurface;
+        LCanvas, // out ACanvas: TALCanvas;
+        round(LRect.Width), // const w: integer;
+        round(LRect.Height));// const h: integer)
       try
 
-        // Draw the background
-        if ((AOptions.IsFillAssigned) and (AOptions.Fill.Kind <> TbrushKind.None)) or
-           ((AOptions.IsStrokeAssigned) and (AOptions.stroke.Kind <> TbrushKind.None)) then begin
-          Tmonitor.Enter(AOptions.Stroke);
-          var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
-          var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
-          try
-            ALDrawRectangle(
-              LContext, // const aContext: CGContextRef;
-              LGridHeight, // const aGridHeight: Single;
-              1, // const AScale: Single;
-              ARect, // const ARect: TrectF;
-              AOptions.Fill, // const Fill: TBrush;
-              AOptions.Stroke, // const Stroke: TStrokeBrush;
-              nil, // const Shadow: TALShadow
-              AOptions.Sides, // const Sides: TSides;
-              AOptions.Corners, // const Corners: TCorners;
-              AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-              AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-            finally
-              AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
-              AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
-              Tmonitor.Exit(AOptions.Stroke);
-            end;
-        end
-        else if (AOptions.FillColor <> TalphaColors.Null) or
-                (AOptions.StrokeColor <> TalphaColors.Null) then begin
-          ALDrawRectangle(
-            LContext, // const aContext: CGContextRef;
-            LGridHeight, // const aGridHeight: Single;
-            1, // const AScale: Single;
-            ARect, // const ARect: TrectF;
-            AOptions.FillColor, // const AFillColor: TAlphaColor;
-            AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-            AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-            TAlphaColors.null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-            0, // const AShadowBlur: Single;
-            0, // const AShadowOffsetX: Single;
-            0, // const AShadowOffsetY: Single;
-            AOptions.Sides, // const Sides: TSides;
-            AOptions.Corners, // const Corners: TCorners;
-            AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-            AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-        end;
-
-        // Draw all texts
-        for var i := 0 to LBreakTextItems.count - 1 do begin
-          var LBreakTextItem := LBreakTextItems[i];
-          if LBreakTextItem.imgSrc <> '' then begin
-            LMaxWidth := min(LBreakTextItem.rect.Width, LBreakTextItem.rect.Height);
-            var LTmpRect := ALAlignToPixelRound(
-                              TrectF.Create(0,0,LMaxWidth,LMaxWidth).
-                                CenterAt(LBreakTextItem.rect),
-                              1{Scale});
-            var LImg := ALLoadFromResourceAndFitIntoToCGImageRef(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
-            Try
-              CGContextSetAlpha(LContext, TAlphaColorF.create(LBreakTextItem.fontColor).A); // to work the same way as with android
-              CGContextDrawImage(
-                LContext, // c: The graphics context in which to draw the image.
-                ALLowerLeftCGRect(
-                  TPointF.Create(LTmpRect.left, LTmpRect.top),
-                  LTmpRect.Width,
-                  LTmpRect.Height,
-                  LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                LImg); // image The image to draw.
-            finally
-              CGImageRelease(LImg);
-            End;
-          end
-          else begin
-            CGContextSetAlpha(LContext, 1);
-            CGContextSetTextPosition(
-              LContext,
-              LBreakTextItem.pos.x {x},
-              LGridHeight - LBreakTextItem.pos.Y);{y}
-            CTLineDraw(LBreakTextItem.Line, LContext); // Draws a complete line.
-          end;
-        end;
-
-        // Convert the LContext to texture
-        result := ALCGContextReftoTexture(LContext);
-
-      finally
-        ALFreeSurface(LContext);
-      end;
-
-      {$ENDIF}
-      {$ENDREGION}
-
-      {$REGION 'Other'}
-      {$IF (not defined(ANDROID)) and (not defined(IOS))}
-
-      // Create the drawing surface
-      ALCreateSurface(
-        result, // Var aBitmap: Jbitmap;
-        round(max(1, ARect.Width)), // const w: integer;
-        round(max(1, ARect.Height)));// const h: integer)
-      try
-
-        // Begin the scene
-        if result.Canvas.BeginScene then
+        if ALCanvasBeginScene(LCanvas) then
         try
 
           // Draw the background
-          if ((AOptions.IsFillAssigned) and (AOptions.Fill.Kind <> TbrushKind.None)) or
-             ((AOptions.IsStrokeAssigned) and (AOptions.stroke.Kind <> TbrushKind.None)) then begin
-            Tmonitor.Enter(AOptions.Stroke);
-            var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
-            var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
-            try
-              ALDrawRectangle(
-                result.Canvas, // const ACanvas: Tcanvas;
-                1, // const AScale: Single;
-                ARect, // const ARect: TrectF;
-                AOptions.Fill, // const Fill: TBrush;
-                AOptions.Stroke, // const Stroke: TStrokeBrush;
-                nil, // const Shadow: TALShadow
-                AOptions.Sides, // const Sides: TSides;
-                AOptions.Corners, // const Corners: TCorners;
-                AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+          if (AOptions.IsFillAssigned) or
+             (AOptions.IsStrokeAssigned) or
+             (AOptions.IsShadowAssigned) then begin
+            if (AOptions.Fill.Kind <> TbrushKind.None) or
+               (AOptions.stroke.Kind <> TbrushKind.None) or
+               (AOptions.shadow.Enabled) then begin
+              Tmonitor.Enter(AOptions.Stroke);
+              Tmonitor.Enter(AOptions.Shadow);
+              var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
+              var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
+              var LShadowOnChangedRestoreValue := AOptions.Shadow.OnChanged;
+              var LShadowBlurRestoreValue: Single := AOptions.Shadow.Blur;
+              var LShadowOffsetXRestoreValue: Single := AOptions.Shadow.OffsetX;
+              var LShadowOffsetYRestoreValue: Single := AOptions.Shadow.OffsetY;
+              try
+                AOptions.Stroke.OnChanged := nil;
+                AOptions.Stroke.Thickness := AOptions.Stroke.Thickness * AOptions.Scale;
+                AOptions.Shadow.OnChanged := nil;
+                AOptions.Shadow.Blur := AOptions.Shadow.Blur * AOptions.Scale;
+                AOptions.Shadow.OffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
+                AOptions.Shadow.OffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
+                ALDrawRectangle(
+                  LCanvas, // const ACanvas: TALCanvas;
+                  1, // const AScale: Single;
+                  ARect, // const ARect: TrectF;
+                  AOptions.Fill, // const Fill: TBrush;
+                  AOptions.Stroke, // const Stroke: TStrokeBrush;
+                  AOptions.shadow, // const Shadow: TALShadow
+                  AOptions.Sides, // const Sides: TSides;
+                  AOptions.Corners, // const Corners: TCorners;
+                  AOptions.GetScaledXRadius, // const XRadius: Single = 0;
+                  AOptions.GetScaledYRadius); // const YRadius: Single = 0);
               finally
                 AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
                 AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
                 Tmonitor.Exit(AOptions.Stroke);
+                AOptions.Shadow.Blur := LShadowBlurRestoreValue;
+                AOptions.Shadow.OffsetX := LShadowOffsetXRestoreValue;
+                AOptions.Shadow.OffsetY := LShadowOffsetYRestoreValue;
+                AOptions.Shadow.OnChanged := LShadowOnChangedRestoreValue;
+                Tmonitor.Exit(AOptions.Shadow);
               end;
+            end;
           end
           else if (AOptions.FillColor <> TalphaColors.Null) or
-                  (AOptions.StrokeColor <> TalphaColors.Null) then begin
+                  (AOptions.StrokeColor <> TalphaColors.Null) or
+                  (AOptions.ShadowColor <> TalphaColors.Null) then begin
             ALDrawRectangle(
-              result.Canvas, // const ACanvas: Tcanvas;
+              LCanvas, // const ACanvas: TALCanvas;
               1, // const AScale: Single;
               ARect, // const ARect: TrectF;
               AOptions.FillColor, // const AFillColor: TAlphaColor;
               AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
               AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-              TAlphaColors.null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-              0, // const AShadowBlur: Single;
-              0, // const AShadowOffsetX: Single;
-              0, // const AShadowOffsetY: Single;
+              AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+              AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
+              AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
+              AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
               AOptions.Sides, // const Sides: TSides;
               AOptions.Corners, // const Corners: TCorners;
               AOptions.GetScaledXRadius, // const XRadius: Single = 0;
               AOptions.GetScaledYRadius); // const YRadius: Single = 0);
           end;
 
-          // Draw all texts
-          result.Canvas.Fill.Kind := TbrushKind.Solid;
-          result.Canvas.Font.Family := AOptions.FontFamily;
-          result.Canvas.Font.size := AOptions.GetScaledFontSize;
-          for var i := 0 to LBreakTextItems.count - 1 do begin
-            var LBreakTextItem := LBreakTextItems[i];
-            if LBreakTextItem.imgSrc <> '' then begin
-              LMaxWidth := min(LBreakTextItem.rect.Width, LBreakTextItem.rect.Height) * 1.15;
-              var LTmpRect := ALAlignToPixelRound(
-                                TrectF.Create(0,0,LMaxWidth,LMaxWidth).
-                                  CenterAt(LBreakTextItem.rect),
-                                1{Scale});
-              var LImg := ALLoadFromResourceAndFitIntoToBitmap(LBreakTextItem.imgSrc, LTmpRect.Width, LTmpRect.Height);
+          {$REGION 'ANDROID'}
+          {$IF defined(ANDROID)}
+
+          for i := 0 to LExtendedTextElements.count - 1 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            if LExtendedTextElement.imgSrc <> '' then begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+              var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
               try
-                result.Canvas.drawBitmap(
+                LCanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
+              finally
+                LImg.recycle;
+                LImg := nil;
+              end;
+            end
+            else begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              _UpdatePaint(
+                LExtendedTextElement.FontFamily,
+                LExtendedTextElement.FontSize,
+                LExtendedTextElement.FontWeight,
+                LExtendedTextElement.FontSlant,
+                LExtendedTextElement.FontStretch,
+                LExtendedTextElement.FontColor,
+                LExtendedTextElement.DecorationKinds,
+                LExtendedTextElement.DecorationStyle,
+                LExtendedTextElement.DecorationThicknessMultiplier,
+                LExtendedTextElement.DecorationColor,
+                LExtendedTextElement.LetterSpacing);
+              LCanvas.drawText(
+                StringToJString(LExtendedTextElement.text){text},
+                LDstRect.left {x},
+                LDstRect.Top + (-1 * LExtendedTextElement.Ascent){y},
+                _Paint {paint});
+            end;
+          end;
+
+          {$ENDIF}
+          {$ENDREGION}
+
+          {$REGION 'IOS/MACOS'}
+          {$IF defined(ALAppleOS)}
+
+          var LGridHeight := CGBitmapContextGetHeight(LCanvas);
+          for i := 0 to LExtendedTextElements.count - 1 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            if LExtendedTextElement.imgSrc <> '' then begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+              var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              try
+                CGContextDrawImage(
+                  LCanvas, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    TPointF.Create(LDstRect.left, LDstRect.top),
+                    LDstRect.Width,
+                    LDstRect.Height,
+                    LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LImg); // image The image to draw.
+              finally
+                CGImageRelease(LImg);
+              end;
+            end
+            else begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
+                var LAlphaColor := TAlphaColorCGFloat.Create(LExtendedTextElement.BackgroundColor);
+                CGContextSetRGBFillColor(LCanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+                CGContextFillRect(
+                  LCanvas,
+                  ALLowerLeftCGRect(
+                    LDstRect.TopLeft,
+                    LDstRect.Width,
+                    LDstRect.Height,
+                    LGridHeight));
+              end;
+              var LAttributedString := _CreateAttributedString(
+                                         LExtendedTextElement.Text, //const AText: String;
+                                         LExtendedTextElement.FontFamily, //const AFontFamily: String;
+                                         LExtendedTextElement.FontSize, //const AFontSize: single;
+                                         LExtendedTextElement.FontWeight, //const AFontWeight: TFontWeight;
+                                         LExtendedTextElement.FontSlant, //const AFontSlant: TFontSlant;
+                                         LExtendedTextElement.FontStretch, //const AFontStretch: TFontStretch;
+                                         LExtendedTextElement.FontColor, //const AFontColor: TalphaColor;
+                                         LExtendedTextElement.DecorationKinds, //const ADecorationKinds: TALTextDecorationKinds;
+                                         LExtendedTextElement.DecorationStyle, //const ADecorationStyle: TALTextDecorationStyle;
+                                         LExtendedTextElement.DecorationThicknessMultiplier, //const ADecorationThicknessMultiplier: Single;
+                                         LExtendedTextElement.DecorationColor, //const ADecorationColor: TAlphaColor;
+                                         LExtendedTextElement.LetterSpacing, //const ALetterSpacing: Single
+                                         AOptions.Direction); // const ADirection: TALTextDirection
+              try
+                var LLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LAttributedString));
+                try
+                  CGContextSetTextPosition(
+                    LCanvas,
+                    LDstRect.left {x},
+                    LGridHeight - (LDstRect.Top + (-1 * LExtendedTextElement.Ascent)));{y}
+                  CTLineDraw(LLine, LCanvas); // Draws a complete line.
+                finally
+                  CFRelease(LLine);
+                end;
+              finally
+                CFRelease(LAttributedString);
+              end;
+            end;
+          end;
+
+          {$ENDIF}
+          {$ENDREGION}
+
+          {$REGION 'MSWINDOWS'}
+          {$IF defined(MSWINDOWS)}
+
+          LCanvas.Fill.Kind := TbrushKind.Solid;
+          for i := 0 to LExtendedTextElements.count - 1 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            if LExtendedTextElement.imgSrc <> '' then begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+              var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              try
+                LCanvas.drawBitmap(
                   LImg,
-                  TrectF.Create(0,0,LTmpRect.Width,LTmpRect.Height),
-                  LTmpRect{DstRect},
-                  TAlphaColorF.create(LBreakTextItem.fontColor).A{AOpacity}, // to work the same way as with android
+                  LSrcRect,
+                  LDstRect,
+                  1{AOpacity},
                   false{HighSpeed});
               finally
                 ALFreeAndNil(LImg);
               end;
             end
             else begin
-              result.Canvas.Fill.Color := LBreakTextItem.fontColor;
-              result.Canvas.Font.style := LBreakTextItem.fontStyle;
-              //-----
-              result.Canvas.FillText(
-                LBreakTextItem.rect, // const ARect: TRectF;
-                LBreakTextItem.line, // const AText: string;
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              LCanvas.Font.Family := _getFontFamily(LExtendedTextElement.FontFamily);
+              LCanvas.Font.Size := LExtendedTextElement.FontSize;
+              LCanvas.Font.StyleExt := _getFontStyleExt(LExtendedTextElement.FontWeight, LExtendedTextElement.FontSlant, LExtendedTextElement.FontStretch, LExtendedTextElement.DecorationKinds);
+              If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
+                LCanvas.Fill.Color := LExtendedTextElement.BackgroundColor;
+                LCanvas.FillRect(
+                  LDstRect,
+                  1{AOpacity});
+              end;
+              LCanvas.Fill.Color := LExtendedTextElement.FontColor;
+              var LFlags: TFillTextFlags;
+              if AOptions.Direction = TALTextDirection.RightToLeft then
+                LFlags := [TFillTextFlag.RightToLeft]
+              else
+                LFlags := [];
+              LDstRect.Offset(0, LExtendedTextElement.DrawTextOffsetY);
+              // It appears that FillText includes the default font leading,
+              // which is not included in LDstRect.
+              LCanvas.FillText(
+                LDstRect, // const ARect: TRectF;
+                LExtendedTextElement.Text, // const AText: string;
                 False, // const WordWrap: Boolean;
                 1, // const AOpacity: Single;
-                [], // const Flags: TFillTextFlags;
+                LFlags, // const Flags: TFillTextFlags;
                 TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
             end;
           end;
 
+          {$ENDIF}
+          {$ENDREGION}
+
         finally
-          result.Canvas.EndScene;
+          ALCanvasEndScene(LCanvas);
         end;
 
-      except
-        ALFreeSurface(result);
-        raise;
+        // Create the result
+        result := ALSurfaceToDrawable(LSurface);
+
+      finally
+        ALFreeSurface(LSurface, LCanvas);
       end;
 
-      {$ENDIF}
-      {$ENDREGION}
-
     finally
-      ALFreeAndNil(LBreakTextItems);
+      ALFreeAndNil(LFontFamilies);
+      ALFreeAndNil(LFontSizes);
+      ALFreeAndNil(LFontWeights);
+      ALFreeAndNil(LFontSlants);
+      ALFreeAndNil(LFontStretchs);
       ALFreeAndNil(LFontColors);
+      ALFreeAndNil(LDecorationKinds);
+      ALFreeAndNil(LDecorationStyles);
+      ALFreeAndNil(LDecorationThicknessMultipliers);
+      ALFreeAndNil(LDecorationColors);
+      ALFreeAndNil(LBackGroundColors);
+      ALFreeAndNil(LLineHeightMultipliers);
+      ALFreeAndNil(LLetterSpacings);
       ALFreeAndNil(LSpanIDs);
+      ALFreeAndNil(LExtendedTextElements);
       {$IF defined(ANDROID)}
-      LPaint := nil;
+      _Paint := nil;
+      {$ENDIF}
+      {$IF defined(MSWINDOWS)}
+      _FreeMeasureBitmap;
       {$ENDIF}
     end;
-*)
+
     {$ENDIF}
     {$ENDREGION}
 
@@ -4829,16 +4030,19 @@ exit(ALNullDrawable);
   end;
 end;
 
-{***************************}
-function ALDrawMultiLineText(
+{*************************************}
+function ALCreateMultiLineTextDrawable(
            const AText: String;
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable;
+           const AOptions: TALMultiLineTextOptions): TALDrawable;
 begin
   var LElements: TALTextElements;
-  result := ALDrawMultiLineText(
+  result := ALCreateMultiLineTextDrawable(
               AText,
               ARect,
               ATextBroken,
@@ -4847,16 +4051,19 @@ begin
               AOptions);
 end;
 
-{***************************}
-function ALDrawMultiLineText(
+{*************************************}
+function ALCreateMultiLineTextDrawable(
            const AText: String;
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable;
+           const AOptions: TALMultiLineTextOptions): TALDrawable;
 begin
   var LElements: TALTextElements;
   var LAllTextDrawn: boolean;
-  result := ALDrawMultiLineText(
+  result := ALCreateMultiLineTextDrawable(
               AText,
               ARect,
               ATextBroken,
@@ -4865,16 +4072,19 @@ begin
               AOptions);
 end;
 
-{***************************}
-function ALDrawMultiLineText(
+{*************************************}
+function ALCreateMultiLineTextDrawable(
            const AText: String;
-           var ARect: TRectF; // in => The constraint boundaries in real pixels. out => The calculated rect that contains the text, also in real pixels.
-           const AOptions: TALDrawMultiLineTextOptions): TALDrawable;
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+           const AOptions: TALMultiLineTextOptions): TALDrawable;
 begin
   var LElements: TALTextElements;
   var LTextBroken: boolean;
   var LAllTextDrawn: boolean;
-  result := ALDrawMultiLineText(
+  result := ALCreateMultiLineTextDrawable(
               AText,
               ARect,
               LTextBroken,
@@ -4895,5 +4105,16 @@ begin
     end;
   Setlength(Result, I);
 end;
+
+initialization
+  {$IF not defined(ALSkiaEngine)}
+  ALFontMetricsCache := TDictionary<TALFontMetricsKey, TALFontMetrics>.Create;
+  //_FontMetricsCacheLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  {$ENDIF}
+
+finalization
+  {$IF not defined(ALSkiaEngine)}
+  AlFreeAndNil(ALFontMetricsCache);
+  {$ENDIF}
 
 end.

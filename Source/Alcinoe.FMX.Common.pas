@@ -10,7 +10,14 @@ uses
   System.Types,
   System.Generics.Collections,
   System.Math.Vectors,
+  {$IF defined(ALMacOS)}
+  Macapi.CocoaTypes,
+  Macapi.Foundation,
+  Macapi.CoreGraphics,
+  Macapi.CoreText,
+  {$ENDIF}
   {$IF defined(ios)}
+  iOSapi.CocoaTypes,
   iOSapi.Foundation,
   iOSapi.CoreGraphics,
   iOSapi.CoreText,
@@ -28,15 +35,49 @@ uses
 
 type
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  IALDoubleBufferedControl = interface
+    ['{5BD426B8-2EE7-4225-920D-887721617504}']
+    procedure MakeBufDrawable;
+    function GetDoubleBuffered: boolean;
+    procedure SetDoubleBuffered(const AValue: Boolean);
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALShadow = class(TPersistent)
+  IALAutosizeControl = interface
+    ['{901BE104-058B-41A9-A4A9-CA313FCC79A0}']
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALPersistentObserver = class(TPersistent)
   private
-    fenabled: boolean;
-    fblur: Single;
-    fOffsetX: Single;
-    fOffsetY: Single;
-    fColor: TAlphaColor;
+    FUpdateCount: Integer;
+    FIsChanged: Boolean;
     FOnChanged: TNotifyEvent;
+  private
+    procedure DoChanged; virtual;
+  public
+    constructor Create; virtual;
+    procedure Reset; virtual;
+    procedure BeginUpdate; virtual;
+    procedure EndUpdate; virtual;
+    procedure Change; virtual;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+    property IsChanged: Boolean read FIsChanged write FIsChanged;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALShadow = class(TALPersistentObserver)
+  private
+    FEnabled: boolean;
+    FBlur: Single;
+    FOffsetX: Single;
+    FOffsetY: Single;
+    FColor: TAlphaColor;
+    FDefaultBlur: Single;
+    FDefaultOffsetX: Single;
+    FDefaultOffsetY: Single;
+    FDefaultColor: TAlphaColor;
     procedure SetEnabled(const Value: boolean);
     procedure setblur(const Value: Single);
     procedure setOffsetX(const Value: Single);
@@ -45,43 +86,273 @@ type
     function IsblurStored: Boolean;
     function IsOffsetXStored: Boolean;
     function IsOffsetYStored: Boolean;
-  protected
+    function IsColorStored: Boolean;
   public
-    constructor Create;
+    constructor Create; override;
     procedure Assign(Source: TPersistent); override;
-    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+    procedure Reset; override;
+    property Defaultblur: Single read fDefaultblur write fDefaultblur;
+    property DefaultOffsetX: Single read fDefaultOffsetX write fDefaultOffsetX;
+    property DefaultOffsetY: Single read fDefaultOffsetY write fDefaultOffsetY;
+    property DefaultColor: TAlphaColor read fDefaultColor write fDefaultColor;
   published
     property enabled: boolean read fEnabled Write SetEnabled default false;
     property blur: Single read fblur write setblur stored IsblurStored;
     property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored;
     property OffsetY: Single read fOffsetY write setOffsetY stored IsOffsetYStored;
-    property Color: TAlphaColor read fColor write setColor default $96000000;
+    property Color: TAlphaColor read fColor write setColor stored IsColorStored;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTextDecorationKind = (Underline, Overline, LineThrough);
+  TALTextDecorationKinds = set of TALTextDecorationKind;
+  TALTextDecorationStyle = (Solid, Double, Dotted, Dashed, Wavy);
+  TALTextHorzAlign = (Center, Leading, Trailing, Justify);
+  TALTextVertAlign = (Center, Leading, Trailing);
+  TALTextDirection = (RightToLeft, LeftToRight);
+  TALTextTrimming = (Character, Word);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALFont = class(TALPersistentObserver)
+  private
+    FFamily: TFontName;
+    FSize: Single;
+    FWeight: TFontWeight;
+    FSlant: TFontSlant;
+    FStretch: TFontStretch;
+    FColor: TAlphaColor;
+    FAutoConvert: Boolean;
+    FDefaultFamily: TFontName;
+    FDefaultSize: Single;
+    FDefaultWeight: TFontWeight;
+    FDefaultSlant: TFontSlant;
+    FDefaultStretch: TFontStretch;
+    FDefaultColor: TAlphaColor;
+    FDefaultAutoConvert: Boolean;
+    procedure SetFamily(const AValue: TFontName);
+    procedure SetSize(const AValue: Single);
+    procedure SetWeight(const AValue: TFontWeight);
+    procedure SetSlant(const AValue: TFontSlant);
+    procedure SetStretch(const AValue: TFontStretch);
+    procedure SetColor(const AValue: TAlphaColor);
+    procedure SetAutoConvert(const AValue: Boolean);
+    function IsFamilyStored: Boolean;
+    function IsSizeStored: Boolean;
+    function IsWeightStored: Boolean;
+    function IsSlantStored: Boolean;
+    function IsStretchStored: Boolean;
+    function IsColorStored: Boolean;
+    function IsAutoConvertStored: Boolean;
+  protected
+    procedure AssignTo(Dest: TPersistent); override;
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    property DefaultFamily: TFontName read FDefaultFamily write FDefaultFamily;
+    property DefaultSize: Single read FDefaultSize write FDefaultSize;
+    property DefaultWeight: TFontWeight read FDefaultWeight write FDefaultWeight;
+    property DefaultSlant: TFontSlant read FDefaultSlant write FDefaultSlant;
+    property DefaultStretch: TFontStretch read FDefaultStretch write FDefaultStretch;
+    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+    property DefaultAutoConvert: Boolean read FDefaultAutoConvert write FDefaultAutoConvert;
+  published
+    property Family: TFontName read FFamily write SetFamily stored IsFamilyStored;
+    property Size: Single read FSize write SetSize stored IsSizeStored;
+    property Weight: TFontWeight read FWeight write SetWeight stored IsWeightStored;
+    property Slant: TFontSlant read FSlant write SetSlant stored IsSlantStored;
+    property Stretch: TFontStretch read FStretch write SetStretch stored IsStretchStored;
+    property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property AutoConvert: Boolean read FAutoConvert write SetAutoConvert stored IsAutoConvertStored;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTextDecoration = class(TALPersistentObserver)
+  private
+    FKinds: TALTextDecorationKinds;
+    FStyle: TALTextDecorationStyle;
+    FThicknessMultiplier: Single;
+    FColor: TAlphaColor;
+    FDefaultKinds: TALTextDecorationKinds;
+    FDefaultStyle: TALTextDecorationStyle;
+    FDefaultThicknessMultiplier: Single;
+    FDefaultColor: TAlphaColor;
+    procedure SetKinds(const AValue: TALTextDecorationKinds);
+    procedure SetStyle(const AValue: TALTextDecorationStyle);
+    procedure SetThicknessMultiplier(const AValue: Single);
+    procedure SetColor(const AValue: TAlphaColor);
+    function IsKindsStored: Boolean;
+    function IsStyleStored: Boolean;
+    function IsThicknessMultiplierStored: Boolean;
+    function IsColorStored: Boolean;
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    property DefaultKinds: TALTextDecorationKinds read FDefaultKinds write FDefaultKinds;
+    property DefaultStyle: TALTextDecorationStyle read FDefaultStyle write FDefaultStyle;
+    property DefaultThicknessMultiplier: Single read FDefaultThicknessMultiplier write FDefaultThicknessMultiplier;
+    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+  published
+    property Kinds: TALTextDecorationKinds read FKinds write SetKinds Stored IsKindsStored;
+    property Style: TALTextDecorationStyle read FStyle write SetStyle Stored IsStyleStored;
+    property ThicknessMultiplier: Single read FThicknessMultiplier write SetThicknessMultiplier Stored IsThicknessMultiplierStored;
+    property Color: TAlphaColor read FColor write SetColor Stored IsColorStored;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALEllipsisSettings = class(TALPersistentObserver)
+  private
+    FInherit: Boolean;
+    FFont: TALFont;
+    FDecoration: TALTextDecoration;
+    procedure SetInherit(const AValue: Boolean);
+    procedure SetFont(const AValue: TALFont);
+    procedure SetDecoration(const AValue: TALTextDecoration);
+    procedure FontChanged(ASender: TObject);
+    procedure DecorationChanged(ASender: TObject);
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+    property Font: TALFont read FFont write SetFont;
+    property Decoration: TALTextDecoration read FDecoration write SetDecoration;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBaseTextSettings = class(TALPersistentObserver)
+  private
+    FFont: TALFont;
+    FDecoration: TALTextDecoration;
+    FEllipsis: String;
+    FEllipsisSettings: TALEllipsisSettings;
+    FTrimming: TALTextTrimming;
+    FMaxLines: integer;
+    FHorzAlign: TALTextHorzAlign;
+    FVertAlign: TALTextVertAlign;
+    FLineHeightMultiplier: Single;
+    FLetterSpacing: Single;
+    FIsHtml: Boolean;
+    FDefaultEllipsis: String;
+    FDefaultTrimming: TALTextTrimming;
+    FDefaultMaxLines: integer;
+    FDefaultHorzAlign: TALTextHorzAlign;
+    FDefaultVertAlign: TALTextVertAlign;
+    FDefaultLineHeightMultiplier: Single;
+    FDefaultLetterSpacing: Single;
+    FDefaultIsHtml: Boolean;
+    procedure SetFont(const AValue: TALFont);
+    procedure SetDecoration(const AValue: TALTextDecoration);
+    procedure SetEllipsis(const AValue: String);
+    procedure SetEllipsisSettings(const AValue: TALEllipsisSettings);
+    procedure SetTrimming(const AValue: TALTextTrimming);
+    procedure SetMaxLines(const AValue: Integer);
+    procedure SetHorzAlign(const AValue: TALTextHorzAlign);
+    procedure SetVertAlign(const AValue: TALTextVertAlign);
+    procedure SetLineHeightMultiplier(const AValue: Single);
+    procedure SetLetterSpacing(const AValue: Single);
+    procedure SetIsHtml(const AValue: Boolean);
+    procedure FontChanged(ASender: TObject);
+    procedure DecorationChanged(ASender: TObject);
+    procedure EllipsisSettingsChanged(ASender: TObject);
+    function IsEllipsisStored: Boolean;
+    function IsTrimmingStored: Boolean;
+    function IsMaxLinesStored: Boolean;
+    function IsHorzAlignStored: Boolean;
+    function IsVertAlignStored: Boolean;
+    function IsLineHeightMultiplierStored: Boolean;
+    function IsLetterSpacingStored: Boolean;
+    function IsIsHtmlStored: Boolean;
+  protected
+    procedure AssignTo(Dest: TPersistent); override;
+  public
+    constructor Create; override;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    //--
+    property DefaultEllipsis: String read FDefaultEllipsis write FDefaultEllipsis;
+    property DefaultTrimming: TALTextTrimming read FDefaultTrimming write FDefaultTrimming;
+    property DefaultMaxLines: Integer read FDefaultMaxLines write FDefaultMaxLines;
+    property DefaultHorzAlign: TALTextHorzAlign read FDefaultHorzAlign write FDefaultHorzAlign;
+    property DefaultVertAlign: TALTextVertAlign read FDefaultVertAlign write FDefaultVertAlign;
+    property DefaultLineHeightMultiplier: Single read FDefaultLineHeightMultiplier write FDefaultLineHeightMultiplier;
+    property DefaultLetterSpacing: Single read FDefaultLetterSpacing write FDefaultLetterSpacing;
+    property DefaultIsHtml: Boolean read FDefaultIsHtml write FDefaultIsHtml;
+    //--
+    property Font: TALFont read FFont write SetFont;
+    property Decoration: TALTextDecoration read FDecoration write SetDecoration;
+    property Ellipsis: String read FEllipsis write SetEllipsis stored IsEllipsisStored;
+    property EllipsisSettings: TALEllipsisSettings read FEllipsisSettings write SetEllipsisSettings;
+    property Trimming: TALTextTrimming read FTrimming write SetTrimming stored IsTrimmingStored;
+    property MaxLines: Integer read FMaxLines write SetMaxLines stored IsMaxLinesStored;
+    property HorzAlign: TALTextHorzAlign read FHorzAlign write SetHorzAlign stored IsHorzAlignStored;
+    property VertAlign: TALTextVertAlign read FVertAlign write SetVertAlign stored IsVertAlignStored;
+    property LineHeightMultiplier: Single read FLineHeightMultiplier write SetLineHeightMultiplier stored IsLineHeightMultiplierStored;
+    property LetterSpacing: Single read FLetterSpacing write SetLetterSpacing stored IsLetterSpacingStored;
+    property IsHtml: Boolean read FIsHtml write SetIsHtml stored IsIsHtmlStored;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALTextSettings = class(TALBaseTextSettings)
+  private
+  public
+  published
+    property Font;
+    property Decoration;
+    property Trimming;
+    property MaxLines;
+    property Ellipsis;
+    property EllipsisSettings;
+    property HorzAlign;
+    property VertAlign;
+    property LineHeightMultiplier;
+    property LetterSpacing;
+    property IsHtml;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~}
+  TALFontManager = class
+  public
+    class procedure RegisterTypefaceFromResource(const AResourceName: string); static;
   end;
 
 type
 
-  TALCustomConvertFontFamilyProc = function(const AFamily: TFontName): TFontName;
+  TALCustomConvertFontFamilyProc = function(const AFontFamily: TFontName): TFontName;
 
 var
 
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
 
-{*****************************************************************}
-function  ALConvertFontFamily(const AFamily: TFontName): TFontName;
+{*********************************************************************}
+function  ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
 function  ALTranslate(const AText: string): string;
-Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
-function  ALAlignAbsolutePointToPixelRound(const Point: TPointF; const Scale: single): TpointF;
+Procedure ALEnableDoubleBuffering(const AControl: TControl);
+procedure ALAutoSize(const AControl: TControl);
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single; overload;
-function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single): single; overload;
-function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF; overload;
-function  ALAlignToPixelRound(const Rect: TRectF): TRectF;
+function  ALAlignToPixelRound(const Point: TPointF; const Scale: single): TpointF; overload;
+function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 
-{$IF defined(IOS)}
+{$IF defined(IOS) or defined(ALMacOS)}
+type
+  PAlphaColorCGFloat = ^TAlphaColorCGFloat;
+  TAlphaColorCGFloat = record
+  public
+    R, G, B, A: CGFloat;
+    class function Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat; overload; static; inline;
+    class function Create(const Color: TAlphaColor): TAlphaColorCGFloat; overload; static; inline;
+    class function Create(const Color: TAlphaColorF): TAlphaColorCGFloat; overload; static; inline;
+  end;
+
 function  ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
-function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
+function  ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -93,9 +364,13 @@ function ALStringsToJArrayList(const AStrings: TArray<String>): JArrayList;
 function ALJSetToStrings(const ASet: JSet): TArray<String>;
 {$ENDIF}
 
-{$IF defined(IOS)}
+{$IF defined(IOS) or defined(ALMacOS)}
 function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
 function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
+{$ENDIF}
+
+{$IFDEF ALDPK}
+function ALDPKGetResourceFilename(const AResourceName: String): String;
 {$ENDIF}
 
 Type
@@ -273,70 +548,177 @@ var ALViewStackCount: integer;
 function getRenderScript: JRenderScript;
 {$ENDIF}
 
+var
+  ALScreenScale: Single;
+procedure ALInitScreenScale;
+function ALGetScreenScale: Single; Inline;
+
 implementation
 
 uses
+  system.SysUtils,
   System.Math,
+  Fmx.Platform,
+  {$IF defined(ALSkiaEngine)}
+  FMX.Skia,
+  {$ENDIF}
   {$IF defined(ANDROID)}
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,
   Androidapi.Helpers,
   FMX.forms,
   {$ENDIF}
-  {$IF defined(IOS)}
+  {$IF defined(ALMacOS)}
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
   {$ENDIF}
+  {$IF defined(IOS)}
+  Macapi.ObjectiveC,
+  Macapi.CoreFoundation,
+  Macapi.Helpers,
+  iOSapi.UIKit,
+  {$ENDIF}
+  {$IFDEF ALDPK}
+  System.IOutils,
+  ToolsAPI,
+  {$ENDIF}
   Alcinoe.FMX.Objects,
-  Alcinoe.FMX.StdCtrls;
+  Alcinoe.FMX.StdCtrls,
+  Alcinoe.Common,
+  ALcinoe.StringUtils;
+
+{***************************************}
+constructor TALPersistentObserver.Create;
+begin
+  inherited create;
+  FUpdateCount := 0;
+  FIsChanged := False;
+  FOnChanged := nil;
+end;
+
+{************************************}
+procedure TALPersistentObserver.Reset;
+begin
+  // Virtual
+end;
+
+{***************************************}
+procedure TALPersistentObserver.BeginUpdate;
+begin
+  Inc(FUpdateCount);
+end;
+
+{***************************************}
+procedure TALPersistentObserver.EndUpdate;
+begin
+  if FUpdateCount > 0 then
+  begin
+    Dec(FUpdateCount);
+    if (FUpdateCount = 0) and (FIsChanged) then
+      try
+        DoChanged;
+      finally
+        FIsChanged := False;
+      end;
+  end;
+end;
+
+{***************************************}
+procedure TALPersistentObserver.DoChanged;
+begin
+  if Assigned(OnChanged) then
+    OnChanged(Self);
+end;
+
+{***************************************}
+procedure TALPersistentObserver.Change;
+begin
+  FIsChanged := True;
+  if (FUpdateCount = 0) then
+  begin
+    try
+      DoChanged;
+    finally
+      FIsChanged := False;
+    end;
+  end;
+end;
 
 {***************************}
 constructor TALShadow.Create;
 begin
   inherited Create;
-  fenabled := False;
-  fblur := 12;
-  fOffsetX := 0;
-  fOffsetY := 0;
-  fColor := $96000000;
-  FOnChanged := nil;
+  FEnabled := False;
+
+  FDefaultblur := 12;
+  FDefaultOffsetX := 0;
+  FDefaultOffsetY := 0;
+  FDefaultColor := $96000000;
+
+  Fblur := FDefaultBlur;
+  FOffsetX := FDefaultOffsetX;
+  FOffsetY := FDefaultOffsetY;
+  FColor := FDefaultColor;
 end;
 
 {**********************************************}
 procedure TALShadow.Assign(Source: TPersistent);
-var LSaveChange: TNotifyEvent;
 begin
   if Source is TALShadow then begin
-    LSaveChange := FOnChanged;
-    FOnChanged := nil;
-    fenabled := TALShadow(Source).fenabled;
-    fblur := TALShadow(Source).fblur;
-    fOffsetX := TALShadow(Source).fOffsetX;
-    fOffsetY := TALShadow(Source).fOffsetY;
-    fColor := TALShadow(Source).fColor;
-    FOnChanged := LSaveChange;
-    if Assigned(FOnChanged) then FOnChanged(Self);
+    BeginUpdate;
+    Try
+      Enabled := TALShadow(Source).Enabled;
+      Blur    := TALShadow(Source).Blur;
+      OffsetX := TALShadow(Source).OffsetX;
+      OffsetY := TALShadow(Source).OffsetY;
+      Color   := TALShadow(Source).Color;
+    Finally
+      EndUpdate;
+    End;
   end
-  else inherited;
+  else
+    inherited Assign(Source);
+end;
+
+{************************}
+procedure TALShadow.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Enabled := False;
+    blur := DefaultBlur;
+    OffsetX := DefaultOffsetX;
+    OffsetY := DefaultOffsetY;
+    Color := DefaultColor;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {***************************************}
 function TALShadow.IsblurStored: Boolean;
 begin
-  result := not SameValue(fBlur, 12, Tepsilon.Position);
+  result := not SameValue(fBlur, FDefaultBlur, Tepsilon.Position);
 end;
 
 {******************************************}
 function TALShadow.IsOffsetXStored: Boolean;
 begin
-  result := not SameValue(fBlur, 0, Tepsilon.Position);
+  result := not SameValue(fOffsetX, FDefaultOffsetX, Tepsilon.Position);
 end;
 
 {******************************************}
 function TALShadow.IsOffsetYStored: Boolean;
 begin
-  result := not SameValue(fBlur, 0, Tepsilon.Position);
+  result := not SameValue(fOffsetY, FDefaultOffsetY, Tepsilon.Position);
+end;
+
+{****************************************}
+function TALShadow.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor;
 end;
 
 {***************************************************}
@@ -344,34 +726,34 @@ procedure TALShadow.SetEnabled(const Value: boolean);
 begin
   if fEnabled <> Value then begin
     fEnabled := Value;
-    if Assigned(FOnChanged) then FOnChanged(Self);
+    Change;
   end;
 end;
 
 {***********************************************}
 procedure TALShadow.setblur(const Value: Single);
 begin
-  if Fblur <> Value then begin
+  if not SameValue(fBlur, Value, Tepsilon.Position) then begin
     Fblur := Value;
-    if Assigned(FOnChanged) then FOnChanged(Self);
+    Change;
   end;
 end;
 
 {**************************************************}
 procedure TALShadow.setOffsetX(const Value: Single);
 begin
-  if fOffsetX <> Value then begin
+  if not SameValue(fOffsetX, Value, Tepsilon.Position) then begin
     fOffsetX := Value;
-    if Assigned(FOnChanged) then FOnChanged(Self);
+    Change;
   end;
 end;
 
 {**************************************************}
 procedure TALShadow.setOffsetY(const Value: Single);
 begin
-  if fOffsetY <> Value then begin
+  if not SameValue(fOffsetY, Value, Tepsilon.Position) then begin
     fOffsetY := Value;
-    if Assigned(FOnChanged) then FOnChanged(Self);
+    Change;
   end;
 end;
 
@@ -380,20 +762,853 @@ procedure TALShadow.setColor(const Value: TAlphaColor);
 begin
   if FColor <> Value then begin
     FColor := Value;
-    if Assigned(FOnChanged) then FOnChanged(Self);
+    Change;
   end;
 end;
 
-{****************************************************************}
-function ALConvertFontFamily(const AFamily: TFontName): TFontName;
+{*************************}
+constructor TALFont.Create;
 begin
-  if AFamily = '' then Exit('');
-  if Assigned(ALCustomConvertFontFamilyProc) then begin
-    Result := ALCustomConvertFontFamilyProc(AFamily);
-    if Result = '' then Result := AFamily;
-    Exit;
+  inherited Create;
+
+  FDefaultFamily := 'sans-serif';
+  FDefaultSize := 14;
+  FDefaultWeight := TFontWeight.Regular;
+  FDefaultSlant := TFontSlant.Regular;
+  FDefaultStretch := TFontStretch.Regular;
+  FDefaultColor := TAlphaColorRec.Black;
+  FDefaultAutoConvert := True;
+
+  FFamily := FDefaultFamily;
+  FSize := FDefaultSize;
+  FWeight := FDefaultWeight;
+  FSlant := FDefaultSlant;
+  FStretch := FDefaultStretch;
+  FColor := FDefaultColor;
+  FAutoConvert := FDefaultAutoConvert;
+end;
+
+{********************************************}
+procedure TALFont.AssignTo(Dest: TPersistent);
+begin
+  if Dest is TALFont then begin
+    TALFont(Dest).Assign(self);
+  end
+  else if Dest is TFont then begin
+    TFont(Dest).SetSettings(
+      Family,
+      Size,
+      TFontStyleExt.Create(
+        Weight, // const AWeight: TFontWeight = TFontWeight.Regular;
+        Slant, // const AStant: TFontSlant = TFontSlant.Regular;
+        Stretch, // const AStretch: TFontStretch = TFontStretch.Regular;
+        [])); // const AOtherStyles: TFontStyles = []
+  end
+  else
+    inherited AssignTo(Dest);
+end;
+
+{********************************************}
+procedure TALFont.Assign(Source: TPersistent);
+begin
+  if Source is TALFont then begin
+    BeginUpdate;
+    Try
+      Family      := TALFont(Source).Family;
+      Size        := TALFont(Source).Size;
+      Weight      := TALFont(Source).Weight;
+      Slant       := TALFont(Source).Slant;
+      Stretch     := TALFont(Source).Stretch;
+      Color       := TALFont(Source).Color;
+      AutoConvert := TALFont(Source).AutoConvert;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else if Source is TFont then begin
+    BeginUpdate;
+    Try
+      Family      := TFont(Source).Family;
+      Size        := TFont(Source).Size;
+      Weight      := TFont(Source).StyleExt.Weight;
+      Slant       := TFont(Source).StyleExt.Slant;
+      Stretch     := TFont(Source).StyleExt.Stretch;
+      Color       := DefaultColor;
+      AutoConvert := DefaultAutoConvert;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{**********************}
+procedure TALFont.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Family := DefaultFamily;
+    Size := DefaultSize;
+    Weight := DefaultWeight;
+    Slant := DefaultSlant;
+    Stretch := DefaultStretch;
+    Color := DefaultColor;
+    AutoConvert := DefaultAutoConvert;
+  finally
+    EndUpdate;
   end;
-  Result := AFamily;
+end;
+
+{***************************************}
+function TALFont.IsFamilyStored: Boolean;
+begin
+  Result := FFamily <> FDefaultFamily;
+end;
+
+{*************************************}
+function TALFont.IsSizeStored: Boolean;
+begin
+  Result := not SameValue(FSize, FDefaultSize, TEpsilon.FontSize);
+end;
+
+{***************************************}
+function TALFont.IsWeightStored: Boolean;
+begin
+  result := FWeight <> FDefaultWeight;
+end;
+
+{**************************************}
+function TALFont.IsSlantStored: Boolean;
+begin
+  result := FSlant <> FDefaultSlant;
+end;
+
+{****************************************}
+function TALFont.IsStretchStored: Boolean;
+begin
+  result := FStretch <> FDefaultStretch;
+end;
+
+{**************************************}
+function TALFont.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor;
+end;
+
+{********************************************}
+function TALFont.IsAutoConvertStored: Boolean;
+begin
+  result := FAutoConvert <> FDefaultAutoConvert;
+end;
+
+{***************************************************}
+procedure TALFont.SetFamily(const AValue: TFontName);
+
+  function NormalizeFamily(const AValue: string): string;
+  var
+    LSplitted: TArray<string>;
+    LFamilies: TArray<string>;
+    I: Integer;
+  begin
+    LSplitted := AValue.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+    LFamilies := [];
+    for I := 0 to Length(LSplitted) - 1 do
+    begin
+      LSplitted[I] := LSplitted[I].Trim;
+      if LSplitted[I] <> '' then
+        LFamilies := LFamilies + [LSplitted[I]];
+    end;
+    if LFamilies = nil then
+      Exit('');
+    Result := string.Join(', ', LFamilies);
+  end;
+
+begin
+  Var LFamily := NormalizeFamily(AValue);
+  if FFamily <> LFamily then begin
+    FFamily := LFamily;
+    Change;
+  end;
+end;
+
+{**********************************************}
+procedure TALFont.SetSize(const AValue: Single);
+begin
+  if not SameValue(FSize, AValue, TEpsilon.FontSize) then begin
+    FSize := AValue;
+    Change;
+  end;
+end;
+
+{*****************************************************}
+procedure TALFont.SetWeight(const AValue: TFontWeight);
+begin
+  if FWeight <> AValue then begin
+    FWeight := AValue;
+    change;
+  end;
+end;
+
+{***************************************************}
+procedure TALFont.SetSlant(const AValue: TFontSlant);
+begin
+  If FSlant <> AValue then begin
+    FSlant := AValue;
+    Change;
+  end;
+end;
+
+{*******************************************************}
+procedure TALFont.SetStretch(const AValue: TFontStretch);
+begin
+  If FStretch <> AValue then begin
+    FStretch := AValue;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALFont.SetColor(const AValue: TAlphaColor);
+begin
+  if FColor <> AValue then begin
+    FColor := AValue;
+    change;
+  end;
+end;
+
+{******************************************************}
+procedure TALFont.SetAutoConvert(const AValue: Boolean);
+begin
+  if FAutoConvert <> AValue then begin
+    FAutoConvert := AValue;
+    change;
+  end;
+end;
+
+{***********************************}
+constructor TALTextDecoration.Create;
+begin
+  inherited Create;
+
+  FDefaultKinds := [];
+  FDefaultStyle := TALTextDecorationStyle.Solid;
+  FDefaultThicknessMultiplier := 1;
+  FDefaultColor := TAlphaColors.Null;
+
+  FKinds := FDefaultKinds;
+  FStyle := FDefaultStyle;
+  FThicknessMultiplier := FDefaultThicknessMultiplier;
+  FColor := FDefaultColor;
+end;
+
+{******************************************************}
+procedure TALTextDecoration.Assign(Source: TPersistent);
+begin
+  if Source is TALTextDecoration then begin
+    BeginUpdate;
+    Try
+      Kinds := TALTextDecoration(Source).Kinds;
+      Style := TALTextDecoration(Source).Style;
+      ThicknessMultiplier := TALTextDecoration(Source).ThicknessMultiplier;
+      Color  := TALTextDecoration(Source).Color;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{********************************}
+procedure TALTextDecoration.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Kinds := DefaultKinds;
+    Style := DefaultStyle;
+    ThicknessMultiplier := DefaultThicknessMultiplier;
+    Color := DefaultColor;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{************************************************}
+function TALTextDecoration.IsKindsStored: Boolean;
+begin
+  result := FKinds <> FDefaultKinds
+end;
+
+{************************************************}
+function TALTextDecoration.IsStyleStored: Boolean;
+begin
+  result := FStyle <> FDefaultStyle
+end;
+
+{**************************************************************}
+function TALTextDecoration.IsThicknessMultiplierStored: Boolean;
+begin
+  Result := not SameValue(FThicknessMultiplier, FDefaultThicknessMultiplier, TEpsilon.Vector);
+end;
+
+{************************************************}
+function TALTextDecoration.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor
+end;
+
+{*************************************************************************}
+procedure TALTextDecoration.SetKinds(const AValue: TALTextDecorationKinds);
+begin
+  If FKinds <> AValue then begin
+    FKinds := AValue;
+    Change;
+  end;
+end;
+
+{*************************************************************************}
+procedure TALTextDecoration.SetStyle(const AValue: TALTextDecorationStyle);
+begin
+  If FStyle <> AValue then begin
+    FStyle := AValue;
+    Change;
+  end;
+end;
+
+{***********************************************************************}
+procedure TALTextDecoration.SetThicknessMultiplier(const AValue: Single);
+begin
+  if not SameValue(FThicknessMultiplier, AValue, TEpsilon.Vector) then begin
+    FThicknessMultiplier := AValue;
+    Change;
+  end;
+end;
+
+{**************************************************************}
+procedure TALTextDecoration.SetColor(const AValue: TAlphaColor);
+begin
+  If FColor <> AValue then begin
+    FColor := AValue;
+    Change;
+  end;
+end;
+
+{*************************************}
+constructor TALEllipsisSettings.Create;
+begin
+  inherited Create;
+  FInherit := True;
+  FFont := TALFont.Create;
+  FFont.OnChanged := FontChanged;
+  FDecoration := TALTextDecoration.Create;
+  FDecoration.OnChanged := DecorationChanged;
+end;
+
+{*************************************}
+destructor TALEllipsisSettings.Destroy;
+begin
+  ALFreeAndNil(FFont);
+  ALFreeAndNil(FDecoration);
+  inherited Destroy;
+end;
+
+{********************************************************}
+procedure TALEllipsisSettings.Assign(Source: TPersistent);
+begin
+  if Source is TALEllipsisSettings then begin
+    BeginUpdate;
+    Try
+      Inherit := TALEllipsisSettings(Source).Inherit;
+      Font.Assign(TALEllipsisSettings(Source).Font);
+      Decoration.Assign(TALEllipsisSettings(Source).Decoration);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else if Source is TTextSettings then begin
+    BeginUpdate;
+    Try
+      Inherit := False;
+      Font.assign(TTextSettings(Source).Font);
+      Font.color := TTextSettings(Source).FontColor;
+      Decoration.reset;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{**********************************}
+procedure TALEllipsisSettings.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Inherit := True;
+    Font.reset;
+    Decoration.reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************************************}
+procedure TALEllipsisSettings.FontChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{****************************************************************}
+procedure TALEllipsisSettings.DecorationChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{**************************************************************}
+procedure TALEllipsisSettings.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    Change;
+  end;
+end;
+
+{***********************************************************}
+procedure TALEllipsisSettings.SetFont(const AValue: TALFont);
+begin
+  FFont.Assign(AValue);
+end;
+
+{***************************************************************************}
+procedure TALEllipsisSettings.SetDecoration(const AValue: TALTextDecoration);
+begin
+  FDecoration.Assign(AValue);
+end;
+
+{*************************************}
+constructor TALBaseTextSettings.Create;
+begin
+  inherited Create;
+  FFont := TALFont.Create;
+  FFont.OnChanged := FontChanged;
+  FDecoration := TALTextDecoration.Create;
+  FDecoration.OnChanged := DecorationChanged;
+  FEllipsisSettings := TALEllipsisSettings.create;
+  FEllipsisSettings.OnChanged := EllipsisSettingsChanged;
+
+  FDefaultEllipsis := '…';
+  FDefaultTrimming := TALTextTrimming.Word;
+  FDefaultMaxLines := 65535;
+  FDefaultHorzAlign := TALTextHorzAlign.Leading;
+  FDefaultVertAlign := TALTextVertAlign.Center;
+  FDefaultLineHeightMultiplier := 0;
+  FDefaultLetterSpacing := 0;
+  FDefaultIsHtml := False;
+
+  FEllipsis := FDefaultEllipsis;
+  FTrimming := FDefaultTrimming;
+  FMaxLines := FDefaultMaxLines;
+  FHorzAlign := FDefaultHorzAlign;
+  FVertAlign := FDefaultVertAlign;
+  FLineHeightMultiplier := FDefaultLineHeightMultiplier;
+  FLetterSpacing := FDefaultLetterSpacing;
+  FIsHtml := FDefaultIsHtml;
+end;
+
+{*************************************}
+destructor TALBaseTextSettings.Destroy;
+begin
+  ALFreeAndNil(FFont);
+  ALFreeAndNil(FDecoration);
+  ALFreeAndNil(FEllipsisSettings);
+  inherited Destroy;
+end;
+
+{********************************************************}
+procedure TALBaseTextSettings.AssignTo(Dest: TPersistent);
+begin
+  if Dest is TALBaseTextSettings then begin
+    TALBaseTextSettings(Dest).Assign(self);
+  end
+  else if Dest is TTextSettings then begin
+    TTextSettings(Dest).BeginUpdate;
+    try
+      TTextSettings(Dest).Font.Assign(Font);
+      if TALTextDecorationKind.Underline in Decoration.Kinds then TTextSettings(Dest).Font.Style := TTextSettings(Dest).Font.Style + [TfontStyle.fsUnderline];
+      if TALTextDecorationKind.LineThrough in Decoration.Kinds then TTextSettings(Dest).Font.Style := TTextSettings(Dest).Font.Style + [TfontStyle.fsStrikeOut];
+      TTextSettings(Dest).FontColor := Font.color;
+      if Ellipsis = '' then TTextSettings(Dest).Trimming := TTextTrimming.None
+      else begin
+        case Trimming of
+          TALTextTrimming.Character: TTextSettings(Dest).Trimming := TTextTrimming.Character;
+          TALTextTrimming.Word:      TTextSettings(Dest).Trimming := TTextTrimming.Word;
+          else raise Exception.Create('Error 66A0235E-FC1D-4FD9-82B1-1C58AF792AE6');
+        end;
+      end;
+      TTextSettings(Dest).WordWrap := MaxLines > 1;
+      case HorzAlign of
+        TALTextHorzAlign.Center:   TTextSettings(Dest).HorzAlign := TTextAlign.Center;
+        TALTextHorzAlign.Leading:  TTextSettings(Dest).HorzAlign := TTextAlign.Leading;
+        TALTextHorzAlign.Trailing: TTextSettings(Dest).HorzAlign := TTextAlign.Trailing;
+        TALTextHorzAlign.Justify:  TTextSettings(Dest).HorzAlign := TTextAlign.Leading;
+        else raise Exception.Create('Error 1D7E69B8-1EA0-4DB1-8A6D-A69712D6BB00');
+      end;
+      case VertAlign of
+        TALTextVertAlign.Center:   TTextSettings(Dest).VertAlign := TTextAlign.Center;
+        TALTextVertAlign.Leading:  TTextSettings(Dest).VertAlign := TTextAlign.Leading;
+        TALTextVertAlign.Trailing: TTextSettings(Dest).VertAlign := TTextAlign.Trailing;
+        else raise Exception.Create('Error 09066A04-9DF9-492B-8836-5C16027E9CDF');
+      end;
+    finally
+      TTextSettings(Dest).EndUpdate;
+    end;
+  end
+  else
+    inherited AssignTo(Dest);
+end;
+
+{********************************************************}
+procedure TALBaseTextSettings.Assign(Source: TPersistent);
+begin
+  if Source is TALBaseTextSettings then begin
+    BeginUpdate;
+    Try
+      Font.Assign(TALBaseTextSettings(Source).Font);
+      Decoration.Assign(TALBaseTextSettings(Source).Decoration);
+      EllipsisSettings.Assign(TALBaseTextSettings(Source).EllipsisSettings);
+      Ellipsis             := TALBaseTextSettings(Source).Ellipsis;
+      Trimming             := TALBaseTextSettings(Source).Trimming;
+      MaxLines             := TALBaseTextSettings(Source).MaxLines;
+      HorzAlign            := TALBaseTextSettings(Source).HorzAlign;
+      VertAlign            := TALBaseTextSettings(Source).VertAlign;
+      LineHeightMultiplier := TALBaseTextSettings(Source).LineHeightMultiplier;
+      LetterSpacing        := TALBaseTextSettings(Source).LetterSpacing;
+      IsHtml               := TALBaseTextSettings(Source).IsHtml;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else if Source is TTextSettings then begin
+    BeginUpdate;
+    Try
+      Font.assign(TTextSettings(Source).Font);
+      Font.color := TTextSettings(Source).FontColor;
+      Decoration.reset;
+      if TfontStyle.fsUnderline in TTextSettings(Source).Font.Style then Decoration.Kinds := Decoration.Kinds + [TALTextDecorationKind.Underline];
+      if TfontStyle.fsStrikeOut in TTextSettings(Source).Font.Style then Decoration.Kinds := Decoration.Kinds + [TALTextDecorationKind.LineThrough];
+      EllipsisSettings.reset;
+      Ellipsis := DefaultEllipsis;
+      case TTextSettings(Source).Trimming of
+        TTextTrimming.None:      Trimming := DefaultTrimming;
+        TTextTrimming.Character: Trimming := TALTextTrimming.Character;
+        TTextTrimming.Word:      Trimming := TALTextTrimming.Word;
+        else raise Exception.Create('Error FAFCFC8A-6C5F-464C-B2F3-0283C0D6072E');
+      end;
+      if not TTextSettings(Source).WordWrap then MaxLines := 1
+      else                                       MaxLines := DefaultMaxLines;
+      case TTextSettings(Source).HorzAlign of
+        TTextAlign.Center:   HorzAlign := TALTextHorzAlign.Center;
+        TTextAlign.Leading:  HorzAlign := TALTextHorzAlign.Leading;
+        TTextAlign.Trailing: HorzAlign := TALTextHorzAlign.Trailing;
+        else raise Exception.Create('Error AB8E03CB-3C96-4052-8BF1-1906836BD90B');
+      end;
+      case TTextSettings(Source).VertAlign of
+        TTextAlign.Center:   VertAlign := TALTextVertAlign.Center;
+        TTextAlign.Leading:  VertAlign := TALTextVertAlign.Leading;
+        TTextAlign.Trailing: VertAlign := TALTextVertAlign.Trailing;
+        else raise Exception.Create('Error F25E554C-CF12-4686-A99B-19927FC7E18D');
+      end;
+      LineHeightMultiplier := DefaultLineHeightMultiplier;
+      LetterSpacing        := DefaultLetterSpacing;
+      IsHtml               := DefaultIsHtml;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{**********************************}
+procedure TALBaseTextSettings.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Font.reset;
+    Decoration.reset;
+    EllipsisSettings.reset;
+    Ellipsis := DefaultEllipsis;
+    Trimming := DefaultTrimming;
+    MaxLines := DefaultMaxLines;
+    HorzAlign := DefaultHorzAlign;
+    VertAlign := DefaultVertAlign;
+    LineHeightMultiplier := DefaultLineHeightMultiplier;
+    LetterSpacing := DefaultLetterSpacing;
+    IsHtml := DefaultIsHtml;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************************************}
+procedure TALBaseTextSettings.FontChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{****************************************************************}
+procedure TALBaseTextSettings.DecorationChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{******************************************************************}
+procedure TALBaseTextSettings.EllipsisSettingsChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{*************************************************}
+function TALBaseTextSettings.IsEllipsisStored: Boolean;
+begin
+  Result := FEllipsis <> FDefaultEllipsis;
+end;
+
+{*****************************************************}
+function TALBaseTextSettings.IsTrimmingStored: Boolean;
+begin
+  Result := FTrimming <> FDefaultTrimming;
+end;
+
+{*****************************************************}
+function TALBaseTextSettings.IsMaxLinesStored: Boolean;
+begin
+  Result := FMaxLines <> FDefaultMaxLines;
+end;
+
+{******************************************************}
+function TALBaseTextSettings.IsHorzAlignStored: Boolean;
+begin
+  Result := FHorzAlign <> FDefaultHorzAlign;
+end;
+
+{******************************************************}
+function TALBaseTextSettings.IsVertAlignStored: Boolean;
+begin
+  Result := FVertAlign <> FDefaultVertAlign;
+end;
+
+{*****************************************************************}
+function TALBaseTextSettings.IsLineHeightMultiplierStored: Boolean;
+begin
+  Result := not SameValue(FLineHeightMultiplier, FDefaultLineHeightMultiplier, TEpsilon.Scale);
+end;
+
+{**********************************************************}
+function TALBaseTextSettings.IsLetterSpacingStored: Boolean;
+begin
+  Result := not SameValue(FLetterSpacing, FDefaultLetterSpacing, TEpsilon.FontSize);
+end;
+
+{***************************************************}
+function TALBaseTextSettings.IsIsHtmlStored: Boolean;
+begin
+  Result := FIsHtml <> FDefaultIsHtml;
+end;
+
+{***********************************************************}
+procedure TALBaseTextSettings.SetFont(const AValue: TALFont);
+begin
+  FFont.Assign(AValue);
+end;
+
+{***************************************************************************}
+procedure TALBaseTextSettings.SetDecoration(const AValue: TALTextDecoration);
+begin
+  FDecoration.Assign(AValue);
+end;
+
+{*******************************************************************************}
+procedure TALBaseTextSettings.SetEllipsisSettings(const AValue: TALEllipsisSettings);
+begin
+  FEllipsisSettings.Assign(AValue);
+end;
+
+{**************************************************************}
+procedure TALBaseTextSettings.SetEllipsis(const AValue: String);
+begin
+  If FEllipsis <> AValue then begin
+    FEllipsis := AValue;
+    Change;
+  end;
+end;
+
+{***********************************************************************}
+procedure TALBaseTextSettings.SetTrimming(const AValue: TALTextTrimming);
+begin
+  If FTrimming <> AValue then begin
+    FTrimming := AValue;
+    Change;
+  end;
+end;
+
+{***************************************************************}
+procedure TALBaseTextSettings.SetMaxLines(const AValue: Integer);
+begin
+  If FMaxLines <> AValue then begin
+    FMaxLines := AValue;
+    Change;
+  end;
+end;
+
+{*************************************************************************}
+procedure TALBaseTextSettings.SetHorzAlign(const AValue: TALTextHorzAlign);
+begin
+  If FHorzAlign <> AValue then begin
+    FHorzAlign := AValue;
+    Change;
+  end;
+end;
+
+{*************************************************************************}
+procedure TALBaseTextSettings.SetVertAlign(const AValue: TALTextVertAlign);
+begin
+  If FVertAlign <> AValue then begin
+    FVertAlign := AValue;
+    Change;
+  end;
+end;
+
+{**************************************************************************}
+procedure TALBaseTextSettings.SetLineHeightMultiplier(const AValue: Single);
+begin
+  if not SameValue(FLineHeightMultiplier, AValue, TEpsilon.Scale) then begin
+    FLineHeightMultiplier := AValue;
+    Change;
+  end;
+end;
+
+{*******************************************************************}
+procedure TALBaseTextSettings.SetLetterSpacing(const AValue: Single);
+begin
+  if not SameValue(FLetterSpacing, AValue, TEpsilon.FontSize) then begin
+    FLetterSpacing := AValue;
+    Change;
+  end;
+end;
+
+{*************************************************************}
+procedure TALBaseTextSettings.SetIsHtml(const AValue: Boolean);
+begin
+  If FIsHtml <> AValue then begin
+    FIsHtml := AValue;
+    Change;
+  end;
+end;
+
+{***************************************************************************************}
+class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName: string);
+begin
+
+  {$IF defined(ALSkiaEngine)}
+  var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  try
+    TSkDefaultProviders.RegisterTypeface(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+  {$ENDIF}
+
+  {$IF not defined(ALSkiaEngine) and (defined(AppleOS))}
+  var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  try
+    var LDataProviderRef := CGDataProviderCreateWithData(nil, LStream.Memory, LStream.Size, nil);
+    if LDataProviderRef = nil then raise Exception.Create('Failed to create data provider from resource stream');
+    Try
+      var LFontRef := CGFontCreateWithDataProvider(LDataProviderRef);
+      if LFontRef = nil then raise Exception.Create('Failed to create CGFontRef from data provider');
+      try
+        var LErrorRef: PCFErrorRef;
+        if CTFontManagerRegisterGraphicsFont(LFontRef, @LErrorRef) = 0 then begin
+          var LNSError: NSError := TNSError.Wrap(LErrorRef);
+          Raise Exception.createFmt('Cannot register font: code="%d", description="%s"', [LNSError.code, NSStrToStr(LNSError.localizedDescription)]);
+        end;
+        {$IF defined(DEBUG)}
+        ALLog(
+          'TALFontManager.RegisterTypefaceFromResource',
+          'ResourceName: '+ AResourceName + ' | '+
+          'FullName: '+ NSStrToStr(TNSString.Wrap(CGFontCopyFullName(LFontRef))));
+        {$ENDIF}
+      finally
+         CGFontRelease(LFontRef);
+      end;
+    Finally
+      CGDataProviderRelease(LDataProviderRef);
+    end;
+  finally
+    ALfreeandNil(LStream);
+  end;
+  {$ENDIF}
+
+end;
+
+{********************************************************************}
+function ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
+begin
+  var LFontFamily := ALTrim(AFontFamily);
+  If AlposW(',', LFontFamily) > 0 then begin
+    Result := '';
+    var LFontFamilies := LFontFamily.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+    for var I := low(LFontFamilies) to high(LFontFamilies) do begin
+      LFontFamily := ALConvertFontFamily(ALTrim(LFontFamilies[I]));
+      if LFontFamily <> '' then Result := Result + ALIfthenW(Result <> '', ',') + LFontFamily;
+    end;
+  end
+  else if Assigned(ALCustomConvertFontFamilyProc) then begin
+    Result := ALCustomConvertFontFamilyProc(LFontFamily)
+  end
+  else begin
+    {$if defined(ANDROID)}
+    // In Android, when you want to use the default system font, you should
+    // specify "sans-serif" as the font name. Roboto has been the default font
+    // for Android since Android 4.0 (Ice Cream Sandwich), and specifying
+    // "sans-serif" in your Java/Kotlin code will use Roboto or whichever font
+    // is the system default on the user's device. This approach ensures that
+    // your application uses the default system font, which provides a consistent
+    // user experience across different devices and versions of Android.
+    //   sans-serif
+    //   sans-serif-thin
+    //   sans-serif-light
+    //   sans-serif-medium
+    //   sans-serif-black
+    //   sans-serif-condensed
+    //   sans-serif-smallcaps
+    result := LFontFamily;
+    {$ELSEif defined(IOS) or defined(ALMacOS)}
+    // https://developer.apple.com/fonts/system-fonts/
+    if ALSametextW(LFontFamily, 'sans-serif') then result := 'Helvetica Neue'
+    else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Helvetica Neue Thin'
+    else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Helvetica Neue Light'
+    else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Helvetica Neue Medium'
+    else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Helvetica Neue Bold'
+    else result := LFontFamily;
+    {$ELSEIF defined(MSWINDOWS)}
+    if ALSametextW(LFontFamily, 'sans-serif') then result := 'Segoe UI'
+    else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Segoe UI Light'
+    else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Segoe UI Light'
+    else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Segoe UI Semibold'
+    else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Segoe UI Black'
+    else result := LFontFamily;
+    {$ELSE}
+    result := LFontFamily;
+    {$endif}
+  end;
 end;
 
 {*************************************************}
@@ -408,46 +1623,106 @@ begin
   Result := translate(AText);
 end;
 
-{******************************************************}
-Procedure ALFmxMakeBufBitmaps(const aControl: TControl);
-var LChild: TControl;
+{**********************************************************}
+Procedure ALEnableDoubleBuffering(const AControl: TControl);
 begin
-
-  // This is used to generate child controls.
-  // For instance, TALText can be used for the TLabel.
-  //if aControl is TPresentedControl then TPresentedControl(aControl).ApplyStyleLookup;
-
   // This ensures the style is retained when the control exits the visible area.
   // Otherwise, the style will be released and reapplied shortly after.
-  acontrol.DisableDisappear := true;
+  AControl.DisableDisappear := true;
 
-  if (aControl is TALText) then TALText(aControl).MakeBufBitmap
-  else if (aControl is TALRectangle) then begin
-    TALRectangle(aControl).doubleBuffered := True;
-    TALRectangle(aControl).MakeBufBitmap;
-  end
-  else if (aControl is TALCircle) then begin
-    TALCircle(aControl).doubleBuffered := True;
-    TALCircle(aControl).MakeBufBitmap;
-  end
-  else if (aControl is TALImage) then TALImage(aControl).MakeBufBitmap
-  else if (aControl is TALAniIndicator) then TALAniIndicator(aControl).MakeBufBitmap
-  else if (aControl is TALCheckBox) then TALCheckBox(aControl).MakeBufBitmap
-  else if (aControl is TALLine) then begin
-    TALLine(aControl).doubleBuffered := True;
-    TALLine(aControl).MakeBufBitmap;
+  var LDoubleBufferedControl: IALDoubleBufferedControl;
+  if Supports(AControl, IALDoubleBufferedControl, LDoubleBufferedControl) then begin
+    LDoubleBufferedControl.SetDoubleBuffered(True);
+    LDoubleBufferedControl.MakeBufDrawable;
   end;
 
-  for LChild in aControl.Controls do
-    ALFmxMakeBufBitmaps(LChild);
-
+  for var LChild in aControl.Controls do
+    ALEnableDoubleBuffering(LChild);
 end;
 
-{*********************************************************************************************}
-function  ALAlignAbsolutePointToPixelRound(const Point: TPointF; const Scale: single): TpointF;
+{*********************************************}
+procedure ALAutoSize(const AControl: TControl);
 begin
-  result.x := round(Point.x * Scale) / Scale;
-  result.y := round(Point.y * Scale) / Scale;
+  var LSize := TSizeF.Create(0,0);
+  for var LChildControl in AControl.Controls do begin
+    if (csDesigning in AControl.ComponentState) and (LChildControl.ClassName = 'TGrabHandle.TGrabHandleRectangle') then
+      continue;
+    case LChildControl.Align of
+
+      //--
+      TAlignLayout.None: begin
+        LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
+        LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
+      end;
+
+      //--
+      TAlignLayout.Center:;
+
+      //--
+      TAlignLayout.Top,
+      TAlignLayout.MostTop,
+      TAlignLayout.Bottom,
+      TAlignLayout.MostBottom: begin
+        if Supports(LChildControl, IALAutosizeControl) then
+          LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
+        else
+          LSize.Width := Max(LSize.Width, AControl.Width);
+        LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
+      end;
+
+      //--
+      TAlignLayout.Left,
+      TAlignLayout.MostLeft,
+      TAlignLayout.Right,
+      TAlignLayout.MostRight: Begin
+        LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
+        if Supports(LChildControl, IALAutosizeControl)  then
+          LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
+        else
+          LSize.height := Max(LSize.Height, AControl.Height);
+      End;
+
+      //--
+      TAlignLayout.Client,
+      TAlignLayout.Contents,
+      TAlignLayout.Scale,
+      TAlignLayout.Fit,
+      TAlignLayout.FitLeft,
+      TAlignLayout.FitRight: Begin
+        if Supports(LChildControl, IALAutosizeControl)  then begin
+          LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
+          LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
+        end
+        else begin
+          LSize.Width := Max(LSize.Width, AControl.Width);
+          LSize.height := Max(LSize.Height, AControl.Height);
+        end;
+      End;
+
+      //--
+      TAlignLayout.Horizontal,
+      TAlignLayout.VertCenter: Begin
+        if Supports(LChildControl, IALAutosizeControl)  then
+          LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
+        else
+          LSize.Width := Max(LSize.Width, AControl.Width);
+      End;
+
+      //--
+      TAlignLayout.Vertical,
+      TAlignLayout.HorzCenter: Begin
+        if Supports(LChildControl, IALAutosizeControl)  then
+          LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
+        else
+          LSize.height := Max(LSize.Height, AControl.Height);
+      End;
+
+    end;
+  end;
+
+  if LSize.Width = 0 then LSize.Width := AControl.Width;
+  if LSize.Height = 0 then LSize.Height := AControl.Height;
+  AControl.SetBounds(AControl.Position.X, AControl.Position.Y, LSize.Width, LSize.Height);
 end;
 
 {**************************************************************************************}
@@ -464,14 +1739,6 @@ begin
   result := Round(Dimension * Scale) / Scale;
 end;
 
-{*****************************************************************}
-function  ALAlignDimensionToPixelRound(const Rect: TRectF): TRectF;
-begin
-  result := Rect;
-  result.Width := Round(Rect.Width);
-  result.height := Round(Rect.height);
-end;
-
 {*************************************************************************************}
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
 begin
@@ -486,25 +1753,57 @@ begin
   result := ceil(Dimension * Scale - TEpsilon.Vector) / Scale;
 end;
 
-{****************************************************************}
-function  ALAlignDimensionToPixelCeil(const Rect: TRectF): TRectF;
+{********************************************************************************}
+function  ALAlignToPixelRound(const Point: TPointF; const Scale: single): TpointF;
 begin
-  result := Rect;
-  result.Width := ceil(Rect.Width - TEpsilon.Vector);
-  result.height := ceil(Rect.height - TEpsilon.Vector);
+  result.x := round(Point.x * Scale) / Scale;
+  result.y := round(Point.y * Scale) / Scale;
 end;
 
-{********************************************************}
-function  ALAlignToPixelRound(const Rect: TRectF): TRectF;
+{*****************************************************************************}
+function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
 begin
-  Result.Left := round(Rect.Left);
-  Result.Top := round(Rect.Top);
-  Result.Right := Result.Left + Round(Rect.Width); // keep ratio horizontally
-  Result.Bottom := Result.Top + Round(Rect.Height); // keep ratio vertically
+  Result.Left := round(Rect.Left * Scale) / Scale;
+  Result.Top := round(Rect.Top * Scale) / Scale;
+  Result.Right := Result.Left + (Round(Rect.Width * Scale) / Scale); // keep ratio horizontally
+  Result.Bottom := Result.Top + (Round(Rect.Height * Scale) / Scale); // keep ratio vertically
 end;
 
-{****************}
-{$IF defined(IOS)}
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
+class function TAlphaColorCGFloat.Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat;
+begin
+  Result.R := R;
+  Result.G := G;
+  Result.B := B;
+  Result.A := A;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
+class function TAlphaColorCGFloat.Create(const Color: TAlphaColor): TAlphaColorCGFloat;
+begin
+  Result.R := TAlphaColorRec(Color).R / 255;
+  Result.G := TAlphaColorRec(Color).G / 255;
+  Result.B := TAlphaColorRec(Color).B / 255;
+  Result.A := TAlphaColorRec(Color).A / 255;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
+class function TAlphaColorCGFloat.Create(const Color: TAlphaColorf): TAlphaColorCGFloat;
+begin
+  Result.R := Color.R;
+  Result.G := Color.G;
+  Result.B := Color.B;
+  Result.A := Color.A;
+end;
+{$ENDIF}
+
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
 function ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
 begin
   Result.origin.x := aUpperLeftOrigin.x;
@@ -514,67 +1813,105 @@ begin
 end;
 {$ENDIF}
 
-{****************}
-{$IF defined(IOS)}
-{$IFNDEF ALCompilerVersionSupported120}
-  {$MESSAGE WARN 'Check if  FMX.Canvas.Mac.TTextLayoutCT.GetCTFontRef is still the same as below and adjust the IFDEF'}
-{$ENDIF}
-function  ALGetCTFontRef(const AFontFamily: String; const aFontSize: single; const aFontStyle: TFontStyles): CTFontRef;
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
+function  ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
 
-const
-  /// <summary> Rotating matrix to simulate Italic font attribute </summary>
-  ItalicMatrix: CGAffineTransform = (
-    a: 1;
-    b: 0;
-    c: 0.176326981; //~tan(10 degrees)
-    d: 1;
-    tx: 0;
-    ty: 0
-  );
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateFontTraitsAttribute(Const AAttributes: NSMutableDictionary);
+  begin
+    if (AFontWeight <> TFontWeight.Regular) or (AFontSlant = TFontSlant.Italic) then begin
+      var LFontTraits := TNSMutableDictionary.Create;
+      try
 
-var
-  LFontRef, NewFontRef: CTFontRef;
-  Matrix: PCGAffineTransform;
-
-begin
-
-  Result := nil;
-  Matrix := nil;
-  LFontRef := CTFontCreateWithName(CFSTR(AFontFamily){name}, AFontSize{size}, nil{matrix}); // Returns a CTFontRef that best matches the name provided with size and matrix attributes.
-  try
-
-    if TFontStyle.fsItalic in AFontStyle then begin
-      NewFontRef := CTFontCreateCopyWithSymbolicTraits(LFontRef, 0, nil, kCTFontItalicTrait, kCTFontItalicTrait);  // Return a new font reference in the same family with the given symbolic traits. or NULL if none is found in the system.
-      if NewFontRef <> nil then begin
-        CFRelease(LFontRef);
-        LFontRef := NewFontRef;
-      end
-      else begin
-        // Font has no Italic version, applying transform matrix
-        Matrix := @ItalicMatrix;
-        NewFontRef := CTFontCreateWithName(CFSTR(AFontFamily), AFontSize, @ItalicMatrix);
-        if NewFontRef <> nil then begin
-          CFRelease(LFontRef);
-          LFontRef := NewFontRef;
+        if (AFontWeight <> TFontWeight.Regular) then begin
+          var LCTFontWeight: Single;
+          case AFontWeight of
+            TFontWeight.Thin: LCTFontWeight := -0.80; // 100 - NSFontWeightUltraLight
+            TFontWeight.UltraLight: LCTFontWeight := -0.60; // 200 - NSFontWeightThin
+            TFontWeight.Light: LCTFontWeight := -0.40; // 300 - NSFontWeightLight
+            TFontWeight.SemiLight: LCTFontWeight := -0.20; // 350
+            TFontWeight.Regular: LCTFontWeight := 0.0; // 400 - NSFontWeightRegular
+            TFontWeight.Medium: LCTFontWeight := 0.23; // 500 - NSFontWeightMedium
+            TFontWeight.Semibold: LCTFontWeight := 0.30; // 600 - NSFontWeightSemibold
+            TFontWeight.Bold: LCTFontWeight := 0.40; // 700 - NSFontWeightBold
+            TFontWeight.UltraBold: LCTFontWeight := 0.56; // 800 - NSFontWeightHeavy
+            TFontWeight.Black: LCTFontWeight := 0.62; // 900 - NSFontWeightBlack
+            TFontWeight.UltraBlack: LCTFontWeight := 1.00; // 1000
+            else raise Exception.Create('Error 9F8E0D0B-78A0-4EBE-A4C6-B4098DEE7EFF');
+          end;
+          LFontTraits.setValue(TNSNumber.OCClass.numberWithFloat(LCTFontWeight), TNSString.Wrap(kCTFontWeightTrait));
         end;
+
+        if (AFontSlant = TFontSlant.Italic) then
+          LFontTraits.setValue(TNSNumber.OCClass.numberWithUnsignedInt(kCTFontItalicTrait), TNSString.Wrap(kCTFontSymbolicTrait));
+
+        AAttributes.setValue(NSObjectToID(LFontTraits), TNSString.Wrap(kCTFontTraitsAttribute));
+
+      finally
+        LFontTraits.release;
       end;
     end;
-
-    if TFontStyle.fsBold in AFontStyle then begin
-      NewFontRef := CTFontCreateCopyWithSymbolicTraits(LFontRef, 0, Matrix, kCTFontBoldTrait, kCTFontBoldTrait);
-      if NewFontRef <> nil then begin
-        CFRelease(LFontRef);
-        LFontRef := NewFontRef;
-      end;
-    end;
-
-    Result := LFontRef;
-
-  except
-    CFRelease(LFontRef);
-    // don't raise any exception, return simply nil
   end;
 
+begin
+  Result := nil; // To handle a warning bug
+  var LAttributes := TNSMutableDictionary.Create;
+  try
+
+    var LFallbackFontDescriptorRefs: Tarray<CTFontDescriptorRef>;
+    setlength(LFallbackFontDescriptorRefs, 0);
+    try
+
+      Var LMainFontFamilySet: Boolean := False;
+      var LFontFamilies := String(AFontFamily).Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+      for var I := low(LFontFamilies) to high(LFontFamilies) do begin
+        var LFontFamily := ALTrim(LFontFamilies[i]);
+        if LFontFamily = '' then Continue;
+        //--
+        If not LMainFontFamilySet then begin
+          LAttributes.setValue(StringToID(LFontFamily), TNSString.Wrap(kCTFontFamilyNameAttribute));
+          _UpdateFontTraitsAttribute(LAttributes);
+          LMainFontFamilySet := True;
+        end
+        //--
+        else begin
+          var LFallbackAttributes := TNSMutableDictionary.Create;
+          try
+            LFallbackAttributes.setValue(StringToID(LFontFamily), TNSString.Wrap(kCTFontFamilyNameAttribute));
+            _UpdateFontTraitsAttribute(LFallbackAttributes);
+            LFallbackAttributes.setValue(TNSNumber.OCClass.numberWithFloat(AFontSize), TNSString.Wrap(kCTFontSizeAttribute));
+            var LFallbackFontDescriptorRef := CTFontDescriptorCreateWithAttributes(CFDictionaryRef(NSObjectToID(LFallbackAttributes)));
+            if LFallbackFontDescriptorRef = nil then raise Exception.Create('Error creating fallback font descriptor');
+            setlength(LFallbackFontDescriptorRefs, length(LFallbackFontDescriptorRefs) + 1);
+            LFallbackFontDescriptorRefs[high(LFallbackFontDescriptorRefs)] := LFallbackFontDescriptorRef;
+          finally
+            LFallbackAttributes.release;
+          end;
+        end;
+      end;
+
+      if length(LFallbackFontDescriptorRefs) > 0 then begin
+        var LCascadeListArray := TNSArray.Wrap(TNSArray.OCClass.arrayWithObjects(@LFallbackFontDescriptorRefs[0], Length(LFallbackFontDescriptorRefs)));
+        LAttributes.setValue(NSObjectToID(LCascadeListArray), TNSString.Wrap(kCTFontCascadeListAttribute));
+      end;
+
+      var LFontDescriptorRef := CTFontDescriptorCreateWithAttributes(CFDictionaryRef(NSObjectToID(LAttributes)));
+      if LFontDescriptorRef = nil then raise Exception.Create('Error creating font descriptor');
+      Try
+        Result := CTFontCreateWithFontDescriptor(LFontDescriptorRef, AFontSize, nil);
+        if Result = nil then raise Exception.Create('Error creating font');
+      finally
+        CFRelease(LFontDescriptorRef);
+      end;
+
+    finally
+      for var I := Low(LFallbackFontDescriptorRefs) to High(LFallbackFontDescriptorRefs) do
+        CFRelease(LFallbackFontDescriptorRefs[i]);
+    end;
+  finally
+    LAttributes.release;
+  end;
 end;
 {$ENDIF}
 
@@ -627,8 +1964,8 @@ begin
 end;
 {$ENDIF}
 
-{****************}
-{$IF defined(IOS)}
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
 function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
 var S: NSString;
     LString: String;
@@ -641,8 +1978,8 @@ begin
 end;
 {$ENDIF}
 
-{****************}
-{$IF defined(IOS)}
+{************************************}
+{$IF defined(IOS) or defined(ALMacOS)}
 function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 var LStringArray: NSArray;
     LString: String;
@@ -689,7 +2026,64 @@ end;
 
 {$ENDIF}
 
+{$IFDEF ALDPK}
+function ALDPKGetResourceFilename(const AResourceName: String): String;
+begin
+  Result := '';
+  if TFile.Exists(getActiveProject.fileName) then begin
+    var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
+    //<RcItem Include="resources\account_100x100.png">
+    //    <ResourceType>RCDATA</ResourceType>
+    //    <ResourceId>account_100x100</ResourceId>
+    //</RcItem>
+    Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+AResourceName+'</ResourceId>', LDProjSrc);
+    While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
+    if (P1 > 0) then begin
+      var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
+      if P2 > P1 then begin
+        Result := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
+        if not TFile.Exists(Result) then Result := '';
+      end;
+    end;
+  end;
+  if Result = '' then begin
+    Result := extractFilePath(getActiveProject.fileName) + 'Resources\' + AResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
+    if not TFile.Exists(Result) then begin
+      if TFile.Exists(Result + '.png') then Result := Result + '.png'
+      else if TFile.Exists(Result + '.jpg') then Result := Result + '.jpg'
+      else Result := '';
+    end;
+  end;
+end;
+{$ENDIF}
+
+{**************************}
+procedure ALInitScreenScale;
+begin
+  if ALScreenScale = 0 then begin
+    var LScreenService: IFMXScreenService;
+    if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenService) then
+      ALScreenScale := LScreenService.GetScreenScale
+    else
+      ALScreenScale := 1;
+    {$IF defined(debug)}
+    ALLog('Screen Scale', ALFloatToStrW(ALScreenScale, ALDefaultFormatSettingsW));
+    {$ENDIF}
+  end;
+end;
+
+{********************************}
+function ALGetScreenScale: Single;
+begin
+  result := ALScreenScale;
+  if Result = 0 then begin
+    ALInitScreenScale;
+    result := ALScreenScale;
+  end;
+end;
+
 initialization
+  ALScreenScale := 0;
   ALCustomConvertFontFamilyProc := nil;
   {$IFDEF ANDROID}
   ALViewStackCount := 0;

@@ -9,6 +9,7 @@ interface
 {$ENDIF}
 
 uses
+  system.Messaging,
   System.TypInfo,
   System.Types,
   System.Classes,
@@ -68,6 +69,8 @@ type
     function GetView: UIView; overload;
     function GetClipView: UIView;
     function GetZOrderManager: TiOSZOrderManager;
+    procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+    procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
   protected
     procedure InitView; virtual;
     function GetViewFrame: NSRect;
@@ -88,7 +91,7 @@ type
     //procedure PMDoEnter(var AMessage: TDispatchMessage); message PM_DO_ENTER;
     //procedure PMResetFocus(var AMessage: TDispatchMessage); message PM_RESET_FOCUS;
     //procedure PMGetRecommendSize(var AMessage: TDispatchMessageWithValue<TSizeF>); message PM_GET_RECOMMEND_SIZE;
-    procedure SetClipChildren(const Value: Boolean); //procedure PMSetClipChildren(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_CLIP_CHILDREN;
+    //procedure PMSetClipChildren(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_CLIP_CHILDREN;
     procedure AncestorVisibleChanged; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     //procedure PMAncestorPresentationLoaded(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESTOR_PRESENTATION_LOADED;
     //procedure PMAncestorPresentationUnloading(var AMessage: TDispatchMessageWithValue<TFmxObject>); message PM_ANCESTOR_PRESENTATION_UNLOADING;
@@ -134,24 +137,28 @@ type
 
 implementation
 
-uses System.UITypes,
-     System.SysUtils,
-     Macapi.Helpers,
-     Macapi.ObjCRuntime,
-     FMX.Platform.iOS,
-     Alcinoe.Common;
+uses
+  System.UITypes,
+  System.SysUtils,
+  Macapi.Helpers,
+  Macapi.ObjCRuntime,
+  FMX.Platform.iOS,
+  Alcinoe.Common;
 
 {****************************************************}
 function TALIosNativeView.GetAncestorClipRect: TRectF;
-var ControlTmp: TControl;
-    ClipRect: TRectF;
-    AbsoluteOffset: TPointF;
+var
+  ControlTmp: TControl;
+  ClipRect: TRectF;
+  AbsoluteOffset: TPointF;
 begin
   Result := TRectF.Create(0, 0, FSize.width, FSize.height);
   ControlTmp := Control.ParentControl;
   AbsoluteOffset := Control.Position.Point;
-  while (ControlTmp <> nil) do begin
-    if ControlTmp.ClipChildren then begin
+  while (ControlTmp <> nil) do
+  begin
+    if ControlTmp.ClipChildren then
+    begin
       ClipRect := TRectF.Create(ControlTmp.ClipRect.TopLeft - AbsoluteOffset, ControlTmp.ClipRect.Width, ControlTmp.ClipRect.Height);
       Result := TRectF.Intersect(Result, ClipRect);
     end;
@@ -169,13 +176,16 @@ end;
 {************************************************************}
 function TALIosNativeView.GetZOrderManager: TiOSZOrderManager;
 begin
-  if HasZOrderManager then Result := WindowHandleToPlatform(Form.Handle).ZOrderManager
-  else Result := nil;
+  if HasZOrderManager then
+    Result := WindowHandleToPlatform(Form.Handle).ZOrderManager
+  else
+    Result := nil;
 end;
 
 {****************************************************************************}
 function TALIosNativeView.GetFormView(const AForm: TCommonCustomForm): UIView;
-var FormHandle: TiOSWindowHandle;
+var
+  FormHandle: TiOSWindowHandle;
 begin
   FormHandle := WindowHandleToPlatform(AForm.Handle);
   Result := FormHandle.View;
@@ -192,14 +202,32 @@ begin
   ClipView.setClipsToBounds(True);
   ClipView.addSubview(View);
   FVisible := True;
+  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
 end;
 
 {**********************************}
 procedure TALIosNativeView.InitView;
-var V: Pointer;
+var
+  V: Pointer;
 begin
   V := UIView(Super).initWithFrame(GetViewFrame);
-  if GetObjectID <> V then UpdateObjectID(V);
+  if GetObjectID <> V then
+    UpdateObjectID(V);
+end;
+
+{****************************************************************************************************}
+procedure TALIosNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
+    ZOrderManager.AddOrSetLink(Control, ClipView, View);
+end;
+
+{******************************************************************************************************}
+procedure TALIosNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
+    ZOrderManager.RemoveLink(Control);
 end;
 
 {************************************************************}
@@ -212,20 +240,26 @@ end;
 {**********************************}
 destructor TALIosNativeView.Destroy;
 begin
-  if HasZOrderManager then ZOrderManager.RemoveLink(Control);
+  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
+  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
+  if HasZOrderManager then
+    ZOrderManager.RemoveLink(Control);
   ALFreeAndNil(FClipView);
   inherited;
 end;
 
 {********************************************************************************}
 function TALIosNativeView.FindParentView([Weak] out AParentView: UIView): Boolean;
-var OutView: UIView;
+var
+  OutView: UIView;
 begin
-  if HasZOrderManager then begin
+  if HasZOrderManager then
+  begin
     Result := ZOrderManager.FindParentView(Control, OutView);
     AParentView := OutView;
   end
-  else begin
+  else
+  begin
     Result := False;
     AParentView := nil;
   end;
@@ -251,7 +285,8 @@ end;
 
 {*********************************************}
 function TALIosNativeView.GetViewFrame: NSRect;
-var AbsoluteRect: TRectF;
+var
+  AbsoluteRect: TRectF;
 begin
   AbsoluteRect := Control.AbsoluteRect;
   AbsoluteRect.TopLeft := LocalToParentView(TPointF.Zero);
@@ -281,7 +316,8 @@ procedure TALIosNativeView.RefreshNativeParent;
 begin
   FParentView := nil;
   FindParentView(FParentView);
-  if HasZOrderManager then ZOrderManager.UpdateOrder(Control);
+  if HasZOrderManager then
+    ZOrderManager.UpdateOrder(Control);
   UpdateFrame;
 end;
 
@@ -293,10 +329,11 @@ end;
 
 {*************************************}
 procedure TALIosNativeView.UpdateFrame;
-var LocalClipRect: TRectF;
-    AbsoluteClipRect: TRectF;
-    ViewRect: TRectF;
-    NeedClip: Boolean;
+var
+  LocalClipRect: TRectF;
+  AbsoluteClipRect: TRectF;
+  ViewRect: TRectF;
+  NeedClip: Boolean;
 begin
   LocalClipRect := AncestorClipRect;
   AbsoluteClipRect := TRectF.Create(LocalToParentView(LocalClipRect.TopLeft), LocalClipRect.Width, LocalClipRect.Height);
@@ -362,7 +399,8 @@ end;
 
 {**************************************************************************}
 function TALIosNativeView.PointInObjectLocal(X: Single; Y: Single): Boolean;
-var HitTestPoint: TPointF;
+var
+  HitTestPoint: TPointF;
 begin
   HitTestPoint := TPointF.Create(x,y);
   Result := pointInside(CGPointMake(HitTestPoint.X, HitTestPoint.Y), nil);
@@ -373,12 +411,16 @@ procedure TALIosNativeView.RootChanged(const aRoot: IRoot);
 begin
   // Changing root for native control means changing ZOrderManager, because one form owns ZOrderManager.
   // So we need to remove itself from old one and add to new one.
-  if HasZOrderManager then ZOrderManager.RemoveLink(Control);
+  if HasZOrderManager then
+    ZOrderManager.RemoveLink(Control);
 
-  if aRoot is TCommonCustomForm then FForm := TCommonCustomForm(aRoot)
-  else FForm := nil;
+  if aRoot is TCommonCustomForm then
+    FForm := TCommonCustomForm(aRoot)
+  else
+    FForm := nil;
 
-  if HasZOrderManager then ZOrderManager.AddOrSetLink(Control, ClipView, View);
+  if HasZOrderManager then
+    ZOrderManager.AddOrSetLink(Control, ClipView, View);
   RefreshNativeParent;
 end;
 
@@ -386,12 +428,6 @@ end;
 procedure TALIosNativeView.SetAlpha(const Value: Single);
 begin
   View.setAlpha(Value);
-end;
-
-{***************************************************************}
-procedure TALIosNativeView.SetClipChildren(const Value: Boolean);
-begin
-  View.setClipsToBounds(Value);
 end;
 
 {******************************************************************}
@@ -439,8 +475,10 @@ end;
 {*******************************************************************************}
 function TALIosClipView.pointInside(point: CGPoint; withEvent: UIEvent): Boolean;
 begin
-  if ContentView <> nil then Result := ContentView.pointInside(point, withEvent)
-  else Result := UIView(Super).pointInside(point, withEvent);
+  if ContentView <> nil then
+    Result := ContentView.pointInside(point, withEvent)
+  else
+    Result := UIView(Super).pointInside(point, withEvent);
 end;
 
 end.

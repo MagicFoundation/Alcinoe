@@ -9,6 +9,7 @@ interface
 {$ENDIF}
 
 uses
+  system.Messaging,
   System.Classes,
   System.Types,
   Androidapi.JNI.GraphicsContentViewText,
@@ -35,6 +36,8 @@ type
     FVisible: Boolean;
     FFocusChangedListener: TALAndroidFocusChangedListener;
     function GetZOrderManager: TAndroidZOrderManager;
+    procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+    procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
   protected
     procedure SetSize(const ASize: TSizeF); virtual;
     procedure UpdateVisible;
@@ -51,7 +54,7 @@ type
     //procedure PMDoExit(var AMessage: TDispatchMessage); message PM_DO_EXIT;
     //procedure PMDoEnter(var AMessage: TDispatchMessage); message PM_DO_ENTER;
     //procedure PMResetFocus(var AMessage: TDispatchMessage); message PM_RESET_FOCUS;
-    procedure SetClipChildren(const Value: Boolean); // procedure PMSetClipChildren(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_CLIP_CHILDREN;
+    //procedure PMSetClipChildren(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_CLIP_CHILDREN;
     procedure AncestorVisibleChanged; // procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     //procedure PMAncestorPresentationLoaded(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESTOR_PRESENTATION_LOADED;
     //procedure PMAncestorPresentationUnloading(var AMessage: TDispatchMessageWithValue<TFmxObject>); message PM_ANCESTOR_PRESENTATION_UNLOADING;
@@ -118,6 +121,20 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
+{********************************************************************************************************}
+procedure TALAndroidNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
+    ZOrderManager.AddOrSetLink(Control, Layout, nil);
+end;
+
+{**********************************************************************************************************}
+procedure TALAndroidNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
+    ZOrderManager.RemoveLink(Control);
+end;
+
 {****************************************************************}
 constructor TALAndroidNativeView.Create(const AControl: TControl);
 begin
@@ -140,7 +157,8 @@ end;
 
 {**************************************}
 constructor TALAndroidNativeView.Create;
-var LayoutParams: JRelativeLayout_LayoutParams;
+var
+  LayoutParams: JRelativeLayout_LayoutParams;
 begin
   inherited;
   FLayout := CreateLayout;
@@ -157,13 +175,19 @@ begin
   InitView;
 
   FVisible := True;
+
+  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
 end;
 
 {**************************************}
 destructor TALAndroidNativeView.Destroy;
 begin
-  if HasZOrderManager then ZOrderManager.RemoveLink(Control);
-  View.setOnFocusChangeListener(nil); // << https://quality.embarcadero.com/browse/RSP-24666
+  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
+  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
+  if HasZOrderManager then
+    ZOrderManager.RemoveLink(Control);
+  View.setOnFocusChangeListener(nil);
   ALFreeAndNil(FFocusChangedListener);
   inherited;
 end;
@@ -177,8 +201,10 @@ end;
 {********************************************************************}
 function TALAndroidNativeView.GetZOrderManager: TAndroidZOrderManager;
 begin
-  if Form <> nil then Result := WindowHandleToPlatform(Form.Handle).ZOrderManager
-  else Result := nil;
+  if Form <> nil then
+    Result := WindowHandleToPlatform(Form.Handle).ZOrderManager
+  else
+    Result := nil;
 end;
 
 {******************************************************}
@@ -207,7 +233,8 @@ end;
 
 {******************************************************************************}
 function TALAndroidNativeView.PointInObjectLocal(X: Single; Y: Single): Boolean;
-var HitTestPoint: TPointF;
+var
+  HitTestPoint: TPointF;
 begin
   HitTestPoint := TPointF.Create(x,y);
   Result := Control.LocalRect.Contains(HitTestPoint);
@@ -218,12 +245,16 @@ procedure TALAndroidNativeView.RootChanged(const aRoot: IRoot);
 begin
   // Changing root for native control means changing ZOrderManager, because one form owns ZOrderManager.
   // So we need to remove itself from old one and add to new one.
-  if HasZOrderManager then ZOrderManager.RemoveLink(Control);
+  if HasZOrderManager then
+    ZOrderManager.RemoveLink(Control);
 
-  if aRoot is TCommonCustomForm then FForm := TCommonCustomForm(aRoot)
-  else FForm := nil;
+  if aRoot is TCommonCustomForm then
+    FForm := TCommonCustomForm(aRoot)
+  else
+    FForm := nil;
 
-  if HasZOrderManager then ZOrderManager.AddOrSetLink(Control, Layout, nil);
+  if HasZOrderManager then
+    ZOrderManager.AddOrSetLink(Control, Layout, nil);
   RefreshNativeParent;
 end;
 
@@ -237,14 +268,6 @@ end;
 procedure TALAndroidNativeView.SetAlpha(const Value: Single);
 begin
   FView.setAlpha(Value);
-end;
-
-{*******************************************************************}
-procedure TALAndroidNativeView.SetClipChildren(const Value: Boolean);
-begin
-  FLayout.setClipToPadding(Value);
-  FLayout.setClipToOutline(Value);
-  FLayout.setClipChildren(Value);
 end;
 
 {**************************************************************}
@@ -284,19 +307,22 @@ end;
 procedure TALAndroidNativeView.UpdateFrame;
 begin
   if ZOrderManager <> nil then
-    // UpdateBounds instead of UpdateOrderAndBounds because else everytime
-    // we will move the edit we will loose the focus and this is problematic
-    // if we for exemple move the edit from the bottom to the top to let some
-    // place to show the virtual keyboard
+    // Using UpdateBounds instead of UpdateOrderAndBounds to avoid losing focus
+    // every time the edit control is moved. This is particularly problematic
+    // when, for example, moving the edit from the bottom to the top to
+    // accommodate the virtual keyboard display.
     ZOrderManager.UpdateBounds(Control);
 end;
 
 {*******************************************}
 procedure TALAndroidNativeView.UpdateVisible;
 begin
-  if not Visible or not Control.ParentedVisible then Layout.setVisibility(TJView.JavaClass.GONE)
-  else if ZOrderManager = nil then Layout.setVisibility(TJView.JavaClass.VISIBLE)
-  else ZOrderManager.UpdateOrderAndBounds(Control);
+  if not Visible or not Control.ParentedVisible then
+    Layout.setVisibility(TJView.JavaClass.GONE)
+  else if ZOrderManager = nil then
+    Layout.setVisibility(TJView.JavaClass.VISIBLE)
+  else
+    ZOrderManager.UpdateOrderAndBounds(Control);
 end;
 
 {*******************************************************************************}
@@ -325,8 +351,10 @@ begin
   // Since view can get focus without us, we synchronize native focus and fmx focus. For example, when user makes a tap
   // on Input control, control request focus itself and we can get the situation with two focused controls native and
   // styled Edit.
-  if hasFocus and not self.View.Control.IsFocused then self.View.Control.SetFocus
-  else if not hasFocus and self.View.Control.IsFocused then self.View.Control.ResetFocus;
+  if hasFocus and not self.View.Control.IsFocused then
+    self.View.Control.SetFocus
+  else if not hasFocus and self.View.Control.IsFocused then
+    self.View.Control.ResetFocus;
 
 end;
 

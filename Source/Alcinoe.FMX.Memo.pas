@@ -148,7 +148,6 @@ type
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
     procedure ParentChanged; override;
-    procedure ClipChildrenChanged; override;
     procedure DoAbsoluteChanged; override;
     procedure DoRootChanged; override;
     procedure Resize; override;
@@ -167,7 +166,6 @@ type
     function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
-    function PointInObjectLocal(X: Single; Y: Single): Boolean; override;
     property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
@@ -316,8 +314,6 @@ type
     function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
-    Procedure setSelection(const aStart: integer; const aStop: Integer); overload;
-    Procedure setSelection(const aindex: integer); overload;
     function getLineHeight: Single; // << it's include the line spacing
     function getLineCount: Integer;
     property ContainFocus: Boolean read GetContainFocus;
@@ -332,7 +328,7 @@ type
     property Cursor default crIBeam;
     property CanFocus default True;
     //property CanParentFocus;
-    property DisableFocusEffect;
+    //property DisableFocusEffect;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType default TALAutoCapitalizationType.acNone;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
@@ -584,7 +580,7 @@ begin
   fTextPromptVisible := True;
   fLineSpacingMultiplier := 1;
   fLineSpacingExtra := 0;
-  FTextSettings := TALMemoTextSettings.Create(Self);
+  FTextSettings := TALMemoTextSettings.Create;
   FTextSettings.OnChanged := OnFontChanged;
   FTextView := TalIosTextView.create(self);
   SetReturnKeyType(tReturnKeyType.Default);
@@ -893,7 +889,7 @@ begin
 
       LTextRange := NSMakeRange(0, LStr.Length);
 
-      LFontRef := ALGetCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Style);
+      LFontRef := ALCreateCTFontRef(fTextSettings.Font.Family, fTextSettings.Font.Size, fTextSettings.Font.Weight, fTextSettings.Font.Slant);
       if LFontRef <> nil then begin
         try
           LTextAttr.addAttribute(TNSString.Wrap(kCTFontAttributeName), LFontRef, LTextRange);
@@ -906,7 +902,7 @@ begin
         if (fTextPromptColor = TalphaColorRec.Null) then LUIColor := AlphaColorToUIColor(TalphaColorRec.Lightgray)
         else LUIColor := AlphaColorToUIColor(fTextPromptColor);
       end
-      else LUIColor := AlphaColorToUIColor(fTextSettings.FontColor);
+      else LUIColor := AlphaColorToUIColor(fTextSettings.font.Color);
       LTextAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LUIColor), LTextRange);
       //NOTE: if i try to release the aUIColor i have an exception
       //      so it's seam something acquire it
@@ -916,7 +912,7 @@ begin
         LParagraphStyle.init;
         LParagraphStyle.setlineHeightMultiple(fLineSpacingMultiplier);
         LParagraphStyle.setLineSpacing(fLineSpacingExtra);
-        LParagraphStyle.setAlignment(TextAlignToUITextAlignment(fTextSettings.HorzAlign));
+        LParagraphStyle.setAlignment(ALTextHorzAlignToUITextAlignment(fTextSettings.HorzAlign));
         LTextAttr.addAttribute(NSParagraphStyleAttributeName, NSObjectToID(LParagraphStyle), LTextRange);
       finally
         LParagraphStyle.release;
@@ -1017,20 +1013,13 @@ end;
 procedure TALIosMemo.Resize;
 begin
   inherited;
-  FTextView.size := Size.size;
+  FTextView.UpdateFrame;
   if compareValue(FTextView.View.contentSize.height, Size.size.cy, Tepsilon.Position) <= 0 then begin
     var LContentOffset: NSPoint;
     LContentOffset.x := 0;
     LContentOffset.y := 0;
     FTextView.View.setContentOffset(LContentOffset, false{animated}); // << Scroll to top to avoid wrong contentOffset" artefact when line count changes
   end;
-end;
-
-{***************************************}
-procedure TALIosMemo.ClipChildrenChanged;
-begin
-  inherited;
-  FTextView.SetClipChildren(ClipChildren);
 end;
 
 {*************************************}
@@ -1091,27 +1080,24 @@ end;
 procedure TALIosMemo.AncestorVisibleChanged(const Visible: Boolean);
 begin
   inherited;
-  if FTextView <> nil then FTextView.AncestorVisibleChanged;  // << this proc is called during the ondestroy also when FTextView is already destroyed
+  // This proc is called during the ondestroy also when FEditView is already destroyed
+  if FTextView <> nil then FTextView.AncestorVisibleChanged;
 end;
 
 {*****************************************}
 procedure TALIosMemo.AncestorParentChanged;
 begin
   inherited;
-  if FTextView <> nil then FTextView.RefreshNativeParent;  // << this proc is called during the ondestroy also when FTextView is already destroyed
+  // This proc is called during the ondestroy also when FEditView is already destroyed
+  if FTextView <> nil then FTextView.UpdateFrame;
 end;
 
 {*********************************}
 procedure TALIosMemo.ParentChanged;
 begin
   inherited;
-  if FTextView <> nil then FTextView.RefreshNativeParent; // << this proc is called during the ondestroy also when FTextView is already destroyed
-end;
-
-{********************************************************************}
-function TALIosMemo.PointInObjectLocal(X: Single; Y: Single): Boolean;
-begin
-  result := FTextView.PointInObjectLocal(X, Y);
+  // This proc is called during the ondestroy also when FEditView is already destroyed
+  if FTextView <> nil then FTextView.UpdateFrame;
 end;
 
 {***************************}
@@ -1884,29 +1870,6 @@ begin
   if FMemoControl = nil then CreateMemoControl;
   {$IF defined(android) or defined(ios)}
   FMemoControl.RemoveNativeView;
-  {$ENDIF}
-end;
-
-{**************************************************************************}
-Procedure TALMemo.setSelection(const aStart: integer; const aStop: Integer);
-begin
-  if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-  FMemoControl.SelStart := aStart;
-  FMemoControl.SelLength := aStop - aStart;
-  {$ELSEIF defined(android)}
-  FMemoControl.setSelection(aStart, aStop);
-  {$ENDIF}
-end;
-
-{****************************************************}
-Procedure TALMemo.setSelection(const aindex: integer);
-begin
-  if FMemoControl = nil then CreateMemoControl;
-  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-  FMemoControl.SelStart := aindex;
-  {$ELSEIF defined(android)}
-  FMemoControl.setSelection(aindex);
   {$ENDIF}
 end;
 

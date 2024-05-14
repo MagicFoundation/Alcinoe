@@ -123,7 +123,7 @@ please follow these steps:
 
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
----------------------------------------------------
+===================================================
                                  
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" alt="video player for FireMonkey" width="540" style="width:540px;"/>
 
@@ -155,7 +155,7 @@ Learn more at [{alcinoe}/Tools/AndroidMerger](https://github.com/MagicFoundation
 
 
 DeployMan/DeployProjNormalizer/DProjNormalizer
----------
+==============================================
                                  
 DeployMan, DeployProjNormalizer, and DProjNormalizer are essential tools 
 for managing Delphi app deployments. DeployMan greatly simplifies the 
@@ -171,7 +171,7 @@ across commits, simplifying the task of comparing differences
   
 
 Opengl video player for FireMonkey
-----------------------------------
+==================================
 
 ALVideoPlayer renders video to a texture, which is 
 important for integrating the video into a Delphi form and 
@@ -197,7 +197,7 @@ with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/Magi
   
 
 WebRTC Delphi wrapper
----------------------
+=====================
 
 WebRTC (Web Real-Time Communications) is a technology which 
 enables Web applications and sites to capture and optionally 
@@ -219,7 +219,7 @@ interactive and immersive experience! Learn more at
   
 
 Firemonkey native iOS/Android/MacOs/Windows TEdit and TMemo
------------------------------------------------------------
+===========================================================
 
 TALEdit and TALMemo are native controls, so they are 
 created and managed by the platform API with all the 
@@ -239,7 +239,7 @@ Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation
 
 
 Fast/double-buffered FireMonkey controls with native draw
----------------------------------------------------------
+=========================================================
 
 * Rectangle
 * Circle
@@ -315,7 +315,7 @@ at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tr
 
 
 Improved FireMonkey controls
-----------------------------
+============================
 
 * ScrollBox
 * TabControl
@@ -329,7 +329,7 @@ Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation
   
 
 Confetti Falling Animation
---------------------------
+==========================
 
 ALConfetti is a vanilla Delphi library for creating a configurable, 
 high-performance confetti falling animation. Learn more at 
@@ -339,7 +339,7 @@ high-performance confetti falling animation. Learn more at
 
 
 Interpolated Animation
-----------------------
+======================
 
 The TALAnimation component is a refined iteration of Delphi's foundational
 TAnimation object, meticulously tailored for mobile platforms. By forgoing the
@@ -417,7 +417,7 @@ Learn more at
   
 
 Firebase cloud messaging
-------------------------
+========================
 
 Delphi implementation of the latest version of Firebase 
 cloud messaging (FCM) with HTTP V1 protocol that will 
@@ -427,7 +427,7 @@ Android and iOS. Learn more at
 
 
 GeoPositioning for Android/iOS
-------------------------------
+==============================
 
 The TALGeoPositionSensor component is a Delphi component that grants access to
 location services on iOS and Android devices. It enables the retrieval of the
@@ -446,7 +446,7 @@ having to worry about low-level implementation details. Learn more at
 
 
 Google OAuth 2.0 Access Token
------------------------------
+=============================
 
 Google APIs use the OAuth 2.0 protocol for authentication 
 and authorization. You can use the function 
@@ -456,7 +456,7 @@ Access Token. Learn more at
   
 
 Android/iOS VKontakte/Facebook SDK login
-----------------------------------------
+========================================
 
 The VKontakte/Facebook SDK for Android enables users to 
 sign into your app using VKontakte/Facebook Login. Once 
@@ -467,7 +467,7 @@ VKontakte/Facebook on their behalf. Learn more at
 
 
 Photo Editor Filters for Android/iOS
-------------------------------------
+====================================
 
 With TALColorAdjustEffect, you can apply gorgeous photo 
 filters that enhance your images with just one tap. Make 
@@ -482,7 +482,7 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 
 
 Streamlining Object Initialization with TALInit
------------------------------------------------
+===============================================
 
 In the constant evolution of software development, we often find ourselves
 seeking ways to reduce boilerplate code and enhance the maintainability of our
@@ -563,7 +563,7 @@ Learn more at [{alcinoe}/Alcinoe/tree/master/Demos/ALRTTI](https://github.com/Ma
 
 
 Json Parser
------------
+===========
 
 TALJSONDocument is a Delphi parser/writer for JSON/BSON 
 data formats. It supports both DOM and SAX parsers. (Note 
@@ -608,7 +608,7 @@ Learn more at [{alcinoe}/Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFou
   
 
 ImageMagick wrapper for Delphi
-------------------------------
+==============================
 
 Use ImageMagick® to create, edit, compose, or convert bitmap 
 images. It can read and write images in a variety of formats 
@@ -662,7 +662,7 @@ Learn more at [{alcinoe}/Source/Alcinoe.ImageMagick.pas](https://github.com/Magi
 
 
 MongoDb client
---------------
+==============
 
 This is a Delphi driver (with connection pooling) for 
 accessing a MongoDB server. Connection pooling is a cache 
@@ -679,7 +679,7 @@ connection to the database. Learn more at
 
 
 WebSocket client
-----------------
+================
 
 The WebSocket client for Delphi is implemented on top of 
 WinHTTP. WebSocket is a communication protocol that enables 
@@ -691,7 +691,7 @@ poll the server for a reply. Learn more at
 
 
 Fast TStringList
-----------------
+================
 
 TALStringList works the same as Delphi's TStringList, 
 except that it allows you to search for a name=value 
@@ -709,7 +709,7 @@ with the demo located at
 
 
 PHP runner
-----------
+==========
 
 ALPHPRunnerEngine is a simple yet useful component that 
 allows you to easily use PHP (any version) as a scripting 
@@ -722,7 +722,7 @@ communicate with the PHP engine. Learn more at
 
 
 Memcached Client
-----------------
+================
 
 What is Memcached? Free & open source, high-performance,
 distributed memory object caching system, generic in
@@ -732,7 +732,7 @@ applications by alleviating database load. Learn more at
 
 
 GSM component
--------------
+=============
 
 The TAlGSMComm component allows you to implement SMS text 
 messaging using the text-mode interface defined in the GSM 
@@ -741,7 +741,7 @@ Technical Specification 07.05. Learn more at
 
 
 SQLite3 Client
---------------
+==============
 
 Query the SQLite3 database and get the results in XML format
 or in JSON/BSON format. Learn more at 
@@ -749,7 +749,7 @@ or in JSON/BSON format. Learn more at
 
 
 And much more
--------------
+=============
 
 * CGI runner 
 * Http Client (WinInet/WinHTTP)
@@ -762,7 +762,7 @@ And much more
 
 
 DELPHI D2009+ (UNICODE)
------------------------
+=======================
 
 No mistake, Unicode was necessary for a product like Delphi. 
 However, the way Embarcadero decided to implement it is 

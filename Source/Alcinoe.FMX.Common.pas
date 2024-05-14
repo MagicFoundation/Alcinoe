@@ -15,16 +15,23 @@ uses
   Macapi.Foundation,
   Macapi.CoreGraphics,
   Macapi.CoreText,
+  Alcinoe.FMX.NativeView.Mac,
   {$ENDIF}
   {$IF defined(ios)}
   iOSapi.CocoaTypes,
   iOSapi.Foundation,
   iOSapi.CoreGraphics,
   iOSapi.CoreText,
+  IOSApi.UIKit,
+  Alcinoe.FMX.NativeView.iOS,
   {$ENDIF}
   {$IF defined(ANDROID)}
   Androidapi.JNI.JavaTypes,
   Alcinoe.AndroidApi.Common,
+  Alcinoe.FMX.NativeView.Android,
+  {$ENDIF}
+  {$IF defined(MSWINDOWS)}
+  Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
   Fmx.types,
   FMX.TextLayout,
@@ -37,7 +44,7 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALDoubleBufferedControl = interface
-    ['{5BD426B8-2EE7-4225-920D-887721617504}']
+    ['{26A0A593-D483-4AE2-881B-6CB930B5E863}']
     procedure MakeBufDrawable;
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
@@ -45,7 +52,23 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALAutosizeControl = interface
-    ['{901BE104-058B-41A9-A4A9-CA313FCC79A0}']
+    ['{464CDB70-9F76-4334-8774-5DD98605D6C1}']
+    function GetAutosize: boolean;
+    procedure SetAutosize(const AValue: Boolean);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  IALNativeControl = interface
+    ['{EB2063C4-CA1F-4415-97C3-4C161907F244}']
+    {$IF defined(android)}
+    function GetNativeView: TALAndroidNativeView;
+    {$ELSEIF defined(IOS)}
+    function GetNativeView: TALIosNativeView;
+    {$ELSEIF defined(ALMacOS)}
+    function GetNativeView: TALMacNativeView;
+    {$ELSEIF defined(MSWindows)}
+    function GetNativeView: TALWinNativeView;
+    {$ENDIF}
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -314,6 +337,65 @@ type
     property IsHtml;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritBrush = class(TBrush)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor); virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; virtual;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritStrokeBrush = class(TStrokeBrush)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor); virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; virtual;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritBaseTextSettings = class(TALBaseTextSettings)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritShadow = class(TALShadow)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~}
+  TALFontMetrics = record
+    Ascent: Single; // The recommended distance above the baseline for singled spaced text.
+    Descent: Single; // The recommended distance below the baseline for singled spaced text.
+    Leading: Single; // The recommended additional space to add between lines of text.
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~}
   TALFontManager = class
   public
@@ -330,6 +412,14 @@ var
 
 {*********************************************************************}
 function  ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
+function  ALExtractPrimaryFontFamily(const AFontFamilies: String): String;
+function  ALGetFontMetrics(
+            const AFontFamily: String;
+            const AFontSize: single;
+            const AFontWeight: TFontWeight;
+            const AFontSlant: TFontSlant;
+            const AFontColor: TalphaColor;
+            const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
 function  ALTranslate(const AText: string): string;
 Procedure ALEnableDoubleBuffering(const AControl: TControl);
 procedure ALAutoSize(const AControl: TControl);
@@ -340,7 +430,7 @@ function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: sing
 function  ALAlignToPixelRound(const Point: TPointF; const Scale: single): TpointF; overload;
 function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 
-{$IF defined(IOS) or defined(ALMacOS)}
+{$IF defined(ALAppleOS)}
 type
   PAlphaColorCGFloat = ^TAlphaColorCGFloat;
   TAlphaColorCGFloat = record
@@ -351,8 +441,16 @@ type
     class function Create(const Color: TAlphaColorF): TAlphaColorCGFloat; overload; static; inline;
   end;
 
-function  ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
-function  ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
+function ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
+function ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
+{$ENDIF}
+
+{$IF defined(IOS)}
+function ALTextHorzAlignToUITextAlignment(const ATextHorzAlign: TALTextHorzAlign): UITextAlignment;
+{$ENDIF}
+
+{$IF defined(ALMacOS)}
+function ALTextHorzAlignToNSTextAlignment(const ATextHorzAlign: TALTextHorzAlign): NSTextAlignment;
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -364,7 +462,7 @@ function ALStringsToJArrayList(const AStrings: TArray<String>): JArrayList;
 function ALJSetToStrings(const ASet: JSet): TArray<String>;
 {$ENDIF}
 
-{$IF defined(IOS) or defined(ALMacOS)}
+{$IF defined(ALAppleOS)}
 function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
 function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 {$ENDIF}
@@ -558,6 +656,7 @@ implementation
 uses
   system.SysUtils,
   System.Math,
+  System.SyncObjs,
   Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
   FMX.Skia,
@@ -572,16 +671,24 @@ uses
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
+  Macapi.AppKit,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
-  iOSapi.UIKit,
+  {$ENDIF}
+  {$IF defined(MSWINDOWS)}
+  Winapi.Windows,
+  FMX.Helpers.Win,
   {$ENDIF}
   {$IFDEF ALDPK}
   System.IOutils,
+  System.Hash,
   ToolsAPI,
+  {$ENDIF}
+  {$IF not defined(ALDPK)}
+  Alcinoe.Cipher,
   {$ENDIF}
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
@@ -1512,6 +1619,171 @@ begin
   end;
 end;
 
+{***************************************************************************************************}
+constructor TALInheritBrush.Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultKind, ADefaultColor);
+  FInherit := True;
+end;
+
+{**********************************************************}
+procedure TALInheritBrush.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    if Assigned(OnChanged) then
+      OnChanged(Self);
+  end;
+end;
+
+{****************************************************}
+procedure TALInheritBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALInheritBrush then
+    Inherit := TALInheritBrush(Source).Inherit
+  else
+    Inherit := False;
+  inherited Assign(Source);
+end;
+
+{******************************}
+procedure TALInheritBrush.Reset;
+begin
+  Inherit := True;
+  Color := DefaultColor;
+  Kind := DefaultKind;
+end;
+
+{*************************************}
+constructor TALInheritStrokeBrush.Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultKind, ADefaultColor);
+  FInherit := True;
+end;
+
+{**************************************************************}
+procedure TALInheritStrokeBrush.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    if Assigned(OnChanged) then
+      OnChanged(Self);
+  end;
+end;
+
+{********************************************************}
+procedure TALInheritStrokeBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALInheritStrokeBrush then
+    Inherit := TALInheritStrokeBrush(Source).Inherit
+  else
+    Inherit := False;
+  inherited Assign(Source);
+end;
+
+{*********************************************}
+procedure TALInheritStrokeBrush.Reset;
+begin
+  Inherit := True;
+  Color := DefaultColor;
+  Kind := DefaultKind;
+end;
+
+{*************************************}
+constructor TALInheritBaseTextSettings.Create;
+begin
+  inherited create;
+  FInherit := True;
+  // Font size = 0 mean inherit the font size
+  Font.DefaultSize := 0;
+  Font.Size := Font.DefaultSize;
+  // Font family = '' mean inherit the font family
+  Font.DefaultFamily := '';
+  Font.Family := Font.DefaultFamily;
+  // Font Color = Null mean inherit the font Color
+  Font.DefaultColor := TAlphaColors.Null;
+  Font.Color := Font.DefaultColor;
+end;
+
+{**************************************************************}
+procedure TALInheritBaseTextSettings.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    Change;
+  end;
+end;
+
+{********************************************************}
+procedure TALInheritBaseTextSettings.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALInheritBaseTextSettings then
+      Inherit := TALInheritBaseTextSettings(Source).Inherit
+    else
+      Inherit := False;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{*********************************************}
+procedure TALInheritBaseTextSettings.Reset;
+begin
+  BeginUpdate;
+  Try
+    Inherit := True;
+    inherited reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************************}
+constructor TALInheritShadow.Create;
+begin
+  inherited create;
+  FInherit := True;
+end;
+
+{**************************************************************}
+procedure TALInheritShadow.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    Change;
+  end;
+end;
+
+{********************************************************}
+procedure TALInheritShadow.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALInheritShadow then
+      Inherit := TALInheritShadow(Source).Inherit
+    else
+      Inherit := False;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{*********************************************}
+procedure TALInheritShadow.Reset;
+begin
+  BeginUpdate;
+  Try
+    Inherit := True;
+    inherited reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {***************************************************************************************}
 class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName: string);
 begin
@@ -1590,7 +1862,7 @@ begin
     //   sans-serif-condensed
     //   sans-serif-smallcaps
     result := LFontFamily;
-    {$ELSEif defined(IOS) or defined(ALMacOS)}
+    {$ELSEif defined(ALAppleOS)}
     // https://developer.apple.com/fonts/system-fonts/
     if ALSametextW(LFontFamily, 'sans-serif') then result := 'Helvetica Neue'
     else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Helvetica Neue Thin'
@@ -1609,6 +1881,186 @@ begin
     result := LFontFamily;
     {$endif}
   end;
+end;
+
+{***********************************************************************}
+function ALExtractPrimaryFontFamily(const AFontFamilies: String): String;
+begin
+  Result := '';
+  var LFontFamilies := AFontFamilies.Split([',', #13, #10], TStringSplitOptions.ExcludeEmpty);
+  for var I := low(LFontFamilies) to high(LFontFamilies) do begin
+    Result := ALTrim(LFontFamilies[I]);
+    if Result <> '' then break;
+  end;
+end;
+
+{**}
+type
+  // packed because of https://stackoverflow.com/questions/61731462/is-this-declaration-good-tdictionarytpairint32-int64-bool
+  TALFontMetricsKey = packed record
+    FontFamily: {$IF not defined(ALDPK)}TALSHA1Digest{$ELSE}int64{$ENDIF};
+    FontSize: single;
+    FontWeight: TFontWeight;
+    FontSlant: TFontSlant;
+    FontColor: TalphaColor;
+    DecorationKinds: TALTextDecorationKinds;
+  end;
+
+{*}
+var
+  ALFontMetricsCache: TDictionary<TALFontMetricsKey, TALFontMetrics>;
+  ALFontMetricsCacheLock: TLightweightMREW;
+
+{************************}
+function ALGetFontMetrics(
+           const AFontFamily: String;
+           const AFontSize: single;
+           const AFontWeight: TFontWeight;
+           const AFontSlant: TFontSlant;
+           const AFontColor: TalphaColor;
+           const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
+begin
+
+  var LFontMetricsKey: TALFontMetricsKey;
+  {$IF not defined(ALDPK)}
+  ALStringHashSHA1(LFontMetricsKey.FontFamily, AFontFamily, TEncoding.Utf8);
+  {$ELSE}
+  LFontMetricsKey.FontFamily := THashFNV1a64.GetHashValue(AFontFamily);
+  {$ENDIF}
+  LFontMetricsKey.FontSize:= AFontSize;
+  LFontMetricsKey.FontWeight:= AFontWeight;
+  LFontMetricsKey.FontSlant:= AFontSlant;
+  LFontMetricsKey.FontColor:= AFontColor;
+  LFontMetricsKey.DecorationKinds:= ADecorationKinds;
+  ALFontMetricsCacheLock.beginRead;
+  Try
+    if ALFontMetricsCache.TryGetValue(LFontMetricsKey, Result) then exit;
+  finally
+    ALFontMetricsCacheLock.endRead;
+  end;
+
+  {$IF defined(ANDROID)}
+  var LPaint := TJPaint.JavaClass.init;
+  LPaint.setAntiAlias(true);
+  LPaint.setSubpixelText(true);
+  LPaint.setFilterBitmap(True);
+  LPaint.setDither(true);
+
+  var LFontFamily := ALExtractPrimaryFontFamily(AFontFamily);
+  var LFontStyles: TFontStyles := [];
+  if AFontWeight in [TFontWeight.Bold,
+                     TFontWeight.UltraBold,
+                     TFontWeight.Black,
+                     TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
+  if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
+  var LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
+  if TOSVersion.Check(28, 0) then begin
+    var LfontWeightInt: Integer;
+    case AFontWeight of
+      TFontWeight.Thin: LfontWeightInt := 100; //	Thin;
+      TFontWeight.UltraLight: LfontWeightInt := 200; //	Extra Light
+      TFontWeight.Light: LfontWeightInt := 300; //	Light
+      TFontWeight.SemiLight: LfontWeightInt := 350;
+      TFontWeight.Regular: LfontWeightInt := 400; //	Normal
+      TFontWeight.Medium: LfontWeightInt := 500; //	Medium
+      TFontWeight.Semibold: LfontWeightInt := 600; //	Semi Bold
+      TFontWeight.Bold: LfontWeightInt := 700; //	Bold
+      TFontWeight.UltraBold: LfontWeightInt := 800; //	Extra Bold
+      TFontWeight.Black: LfontWeightInt := 900; //	Black
+      TFontWeight.UltraBlack: LfontWeightInt := 1000;
+      else raise Exception.Create('Error B088F38F-341E-44E4-A844-16A51E35E8A1');
+    end;
+    LTypeface := TJTypeface.JavaClass.create(
+                   LTypeface, {family}
+                   LfontWeightInt, {weight}
+                   AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique]{italic});
+  end;
+  LPaint.setTypeface(LTypeface);
+  LPaint.setTextSize(AFontSize);
+  LPaint.setColor(integer(AFontColor));
+  LPaint.setUnderlineText(TALTextDecorationKind.Underline in ADecorationKinds);
+  LPaint.setStrikeThruText(TALTextDecorationKind.LineThrough in ADecorationKinds);
+
+  var LFontMetrics := LPaint.getFontMetrics;
+  Result.Ascent := LFontMetrics.Ascent;
+  Result.Descent := LFontMetrics.Descent;
+  Result.Leading := LFontMetrics.Leading;
+
+  LPaint := nil;
+  {$ENDIF}
+
+  {$IF defined(ALAppleOS)}
+
+  var Lfont := ALCreateCTFontRef(AFontFamily, AFontSize, AFontWeight, AFontSlant);
+  try
+    Result.Ascent := -CTFontGetAscent(Lfont);
+    Result.Descent := CTFontGetDescent(Lfont);
+    Result.Leading := CTFontGetLeading(Lfont);
+    {$IF defined(DEBUG)}
+    //ALLog(
+    //  'ALGetFontMetrics',
+    //  'FontFamily: '+ AFontFamily + ' | '+
+    //  'FontSize: '+ ALFloatToStrW(AFontSize, ALDefaultFormatSettingsW) + ' | '+
+    //  'CTFontGetAscent: ' + ALFloatToStrW(CTFontGetAscent(Lfont), ALDefaultFormatSettingsW) + ' | '+
+    //  'CTFontGetDescent: ' + ALFloatToStrW(CTFontGetDescent(Lfont), ALDefaultFormatSettingsW) + ' | '+
+    //  'CTFontGetLeading: ' + ALFloatToStrW(CTFontGetLeading(Lfont), ALDefaultFormatSettingsW) + ' | '+
+    //  'CTFontGetBoundingBox.height: ' + ALFloatToStrW(CTFontGetBoundingBox(Lfont).size.height, ALDefaultFormatSettingsW));
+    {$ENDIF}
+  finally
+    CFRelease(LFont);
+  end;
+
+  {$ENDIF}
+
+  {$IF defined(MSWINDOWS)}
+
+  // Since the Windows API only works with integers, I multiply the font size by 100
+  // and later divide the result by 100 to achieve better precision.
+
+  var LFontFamily := ALExtractPrimaryFontFamily(AFontFamily);
+  var LFont := CreateFont(
+                 -Round(AFontSize*100), // nHeight: Integer;
+                 0, // nWidth: Integer;
+                 0, // nEscapement: Integer;
+                 0, // nOrientaion: Integer;
+                 FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
+                 Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
+                 cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
+                 cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
+                 DEFAULT_CHARSET, // fdwCharSet: DWORD
+                 OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
+                 CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
+                 DEFAULT_QUALITY, // fdwQuality: DWORD
+                 DEFAULT_PITCH or FF_DONTCARE, // fdwPitchAndFamily: DWORD
+                 PChar(LFontFamily)); // lpszFace: LPCWSTR
+  if LFont = 0 then raiseLastOsError;
+  try
+    var LDC := CreateCompatibleDC(0);
+    if LDC = 0 then raiseLastOsError;
+    try
+      if SelectObject(LDC, LFont) = 0 then raiseLastOsError;
+      var LMetrics: TTextMetric;
+      if not GetTextMetrics(LDC, LMetrics) then raiseLastOsError;
+      Result.Ascent := -LMetrics.tmAscent/100;
+      Result.Descent := LMetrics.tmDescent/100;
+      Result.Leading := LMetrics.tmExternalLeading/100;
+    finally
+      if not DeleteDC(LDC) then
+        raiseLastOsError
+    end;
+  finally
+    if not DeleteObject(LFont) then raiseLastOsError;
+  end;
+
+  {$ENDIF}
+
+  ALFontMetricsCacheLock.beginWrite;
+  Try
+    ALFontMetricsCache.TryAdd(LFontMetricsKey, Result);
+  finally
+    ALFontMetricsCacheLock.endWrite;
+  end;
+
 end;
 
 {*************************************************}
@@ -1663,7 +2115,8 @@ begin
       TAlignLayout.MostTop,
       TAlignLayout.Bottom,
       TAlignLayout.MostBottom: begin
-        if Supports(LChildControl, IALAutosizeControl) then
+        var LAutosizeControl: IALAutosizeControl;
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
           LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
         else
           LSize.Width := Max(LSize.Width, AControl.Width);
@@ -1676,7 +2129,8 @@ begin
       TAlignLayout.Right,
       TAlignLayout.MostRight: Begin
         LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-        if Supports(LChildControl, IALAutosizeControl)  then
+        var LAutosizeControl: IALAutosizeControl;
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
           LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
         else
           LSize.height := Max(LSize.Height, AControl.Height);
@@ -1689,7 +2143,8 @@ begin
       TAlignLayout.Fit,
       TAlignLayout.FitLeft,
       TAlignLayout.FitRight: Begin
-        if Supports(LChildControl, IALAutosizeControl)  then begin
+        var LAutosizeControl: IALAutosizeControl;
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then begin
           LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
           LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
         end
@@ -1702,7 +2157,8 @@ begin
       //--
       TAlignLayout.Horizontal,
       TAlignLayout.VertCenter: Begin
-        if Supports(LChildControl, IALAutosizeControl)  then
+        var LAutosizeControl: IALAutosizeControl;
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
           LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
         else
           LSize.Width := Max(LSize.Width, AControl.Width);
@@ -1711,7 +2167,8 @@ begin
       //--
       TAlignLayout.Vertical,
       TAlignLayout.HorzCenter: Begin
-        if Supports(LChildControl, IALAutosizeControl)  then
+        var LAutosizeControl: IALAutosizeControl;
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
           LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
         else
           LSize.height := Max(LSize.Height, AControl.Height);
@@ -1769,8 +2226,8 @@ begin
   Result.Bottom := Result.Top + (Round(Rect.Height * Scale) / Scale); // keep ratio vertically
 end;
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 class function TAlphaColorCGFloat.Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat;
 begin
   Result.R := R;
@@ -1780,8 +2237,8 @@ begin
 end;
 {$ENDIF}
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 class function TAlphaColorCGFloat.Create(const Color: TAlphaColor): TAlphaColorCGFloat;
 begin
   Result.R := TAlphaColorRec(Color).R / 255;
@@ -1791,8 +2248,8 @@ begin
 end;
 {$ENDIF}
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 class function TAlphaColorCGFloat.Create(const Color: TAlphaColorf): TAlphaColorCGFloat;
 begin
   Result.R := Color.R;
@@ -1802,8 +2259,8 @@ begin
 end;
 {$ENDIF}
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 function ALLowerLeftCGRect(const aUpperLeftOrigin: TPointF; const aWidth, aHeight: single; const aGridHeight: Single): CGRect;
 begin
   Result.origin.x := aUpperLeftOrigin.x;
@@ -1813,8 +2270,8 @@ begin
 end;
 {$ENDIF}
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 function  ALCreateCTFontRef(const AFontFamily: String; const AFontSize: single; const AFontWeight: TFontWeight; const AFontSlant: TFontSlant): CTFontRef;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -1915,6 +2372,34 @@ begin
 end;
 {$ENDIF}
 
+{****************}
+{$IF defined(IOS)}
+function ALTextHorzAlignToUITextAlignment(const ATextHorzAlign: TALTextHorzAlign): UITextAlignment;
+begin
+  case ATextHorzAlign of
+    TALTextHorzAlign.Center:   Result := UITextAlignmentCenter;
+    TALTextHorzAlign.Leading:  Result := UITextAlignmentLeft;
+    TALTextHorzAlign.Trailing: Result := UITextAlignmentRight;
+    TALTextHorzAlign.Justify:  Result := UITextAlignmentLeft;
+    else Raise Exception.Create('Error 1F3C2FAF-354E-4584-A269-DEFD7E626A4A');
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ALMacOS)}
+function ALTextHorzAlignToNSTextAlignment(const ATextHorzAlign: TALTextHorzAlign): NSTextAlignment;
+begin
+  case ATextHorzAlign of
+    TALTextHorzAlign.Center:   Result := NSCenterTextAlignment;
+    TALTextHorzAlign.Leading:  Result := NSLeftTextAlignment;
+    TALTextHorzAlign.Trailing: Result := NSRightTextAlignment;
+    TALTextHorzAlign.Justify:  Result := NSJustifiedTextAlignment;
+    else Raise Exception.Create('Error 8E1D2DC2-33BA-4A53-9CE4-977748C1CAE0');
+  end;
+end;
+{$ENDIF}
+
 {********************}
 {$IF defined(ANDROID)}
 function ALfontStyleToAndroidStyle(const afontStyle: TfontStyles): integer;
@@ -1964,8 +2449,8 @@ begin
 end;
 {$ENDIF}
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
 var S: NSString;
     LString: String;
@@ -1978,8 +2463,8 @@ begin
 end;
 {$ENDIF}
 
-{************************************}
-{$IF defined(IOS) or defined(ALMacOS)}
+{**********************}
+{$IF defined(ALAppleOS)}
 function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
 var LStringArray: NSArray;
     LString: String;
@@ -2089,5 +2574,10 @@ initialization
   ALViewStackCount := 0;
   _RenderScript := nil;
   {$ENDIF}
+  ALFontMetricsCache := TDictionary<TALFontMetricsKey, TALFontMetrics>.Create;
+  //_FontMetricsCacheLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+
+finalization
+  AlFreeAndNil(ALFontMetricsCache);
 
 end.

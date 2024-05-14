@@ -17,6 +17,7 @@ uses
   FMX.layouts,
   FMX.Types,
   FMX.Controls,
+  ALcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.ScrollEngine;
 
@@ -24,12 +25,11 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALLayout = class(TLayout)
-  private
-    FAutoSize: Boolean;
-    procedure SetAutoSize(const Value: Boolean);
+  TALLayout = class(TLayout, IALAutosizeControl)
   protected
-    function isAutosizedControl(const AControl: Tcontrol): boolean; virtual;
+    FAutoSize: Boolean;
+    function GetAutoSize: Boolean; virtual;
+    procedure SetAutoSize(const Value: Boolean); virtual;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
   public
@@ -37,7 +37,7 @@ type
   published
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
-    property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
+    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
   end;
 
   {*************************}
@@ -399,7 +399,6 @@ uses
   FMX.utils,
   FMX.Ani,
   Alcinoe.StringUtils,
-  Alcinoe.FMX.Common,
   Alcinoe.FMX.Objects,
   Alcinoe.Common;
 
@@ -408,14 +407,6 @@ constructor TALLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FAutoSize := False;
-end;
-
-{***********************************************************************}
-function TALLayout.isAutosizedControl(const AControl: Tcontrol): boolean;
-begin
-  if AControl is TALLayout then result := TALLayout(Acontrol).AutoSize
-  else if AControl is TALText then result := TALText(Acontrol).AutoSize
-  else result := False;
 end;
 
 {****************************}
@@ -430,83 +421,14 @@ procedure TALLayout.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (FAutoSize) then begin // if FAutoSize is false nothing to adjust
+     (FAutoSize) then // if FAutoSize is false nothing to adjust
+    ALAutoSize(Self);
+end;
 
-    var LSize := TSizeF.Create(0,0);
-    for var Lcontrol in Controls do begin
-      case Lcontrol.Align of
-
-        //--
-        TAlignLayout.None,
-        TAlignLayout.Center:;
-
-        //--
-        TAlignLayout.Top,
-        TAlignLayout.MostTop,
-        TAlignLayout.Bottom,
-        TAlignLayout.MostBottom: begin
-          if isAutosizedControl(LControl) then
-            LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right)
-          else
-            LSize.Width := Max(LSize.Width, Width);
-          LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom);
-        end;
-
-        //--
-        TAlignLayout.Left,
-        TAlignLayout.MostLeft,
-        TAlignLayout.Right,
-        TAlignLayout.MostRight: Begin
-          LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right);
-          if isAutosizedControl(LControl) then
-            LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom)
-          else
-            LSize.height := Max(LSize.Height, Height);
-        End;
-
-        //--
-        TAlignLayout.Client,
-        TAlignLayout.Contents,
-        TAlignLayout.Scale,
-        TAlignLayout.Fit,
-        TAlignLayout.FitLeft,
-        TAlignLayout.FitRight: Begin
-          if isAutosizedControl(LControl) then begin
-            LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right);
-            LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom);
-          end
-          else begin
-            LSize.Width := Max(LSize.Width, Width);
-            LSize.height := Max(LSize.Height, Height);
-          end;
-        End;
-
-        //--
-        TAlignLayout.Horizontal,
-        TAlignLayout.VertCenter: Begin
-          if isAutosizedControl(LControl) then
-            LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right)
-          else
-            LSize.Width := Max(LSize.Width, Width);
-        End;
-
-        //--
-        TAlignLayout.Vertical,
-        TAlignLayout.HorzCenter: Begin
-          if isAutosizedControl(LControl) then
-            LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom)
-          else
-            LSize.height := Max(LSize.Height, Height);
-        End;
-
-      end;
-    end;
-
-    if LSize.Width = 0 then LSize.Width := Width;
-    if LSize.Height = 0 then LSize.Height := Height;
-    SetBounds(Position.X, Position.Y, LSize.Width, LSize.Height);
-
-  end;
+{**************************************}
+function TALLayout.GetAutoSize: Boolean;
+begin
+  result := FAutoSize;
 end;
 
 {****************************************************}
@@ -1022,7 +944,14 @@ Type
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+  if not aObject.AutoCapture then begin
+    {$IF defined(MSWindows)}
+    // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
+    // This action deactivates some functionalities in the native control, such as the right-click menu.
+    if not Supports(aObject, IALNativeControl) then
+    {$ENDIF}
+      _TALControlAccessProtected(aObject).capture;
+  end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
@@ -1043,7 +972,14 @@ end;
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+  if not aObject.AutoCapture then begin
+    {$IF defined(MSWindows)}
+    // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
+    // This action deactivates some functionalities in the native control, such as the right-click menu.
+    if not Supports(aObject, IALNativeControl) then
+    {$ENDIF}
+      _TALControlAccessProtected(aObject).releasecapture;
+  end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;

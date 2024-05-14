@@ -202,8 +202,8 @@ uses
 
 {$IFDEF DEBUG}
 var
-  TotalMemoryUsedByTextures: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF};        // << https://quality.embarcadero.com/browse/RSP-23154
-  LastTotalMemoryUsedByTexturesLog: {$IF defined(IOS32)}int32{$ELSE}int64{$ENDIF}; // << https://quality.embarcadero.com/browse/RSP-23154
+  TotalMemoryUsedByTextures: int64;
+  LastTotalMemoryUsedByTexturesLog: int64;
 {$ENDIF}
 
 {****************************}
@@ -350,23 +350,8 @@ begin
     UpdateTexture(TBitmapSurface(Source).Bits, TBitmapSurface(Source).Pitch);
   end
 
-  else if Source is TTexture then begin
-    if Handle <> 0 then TContextManager.DefaultContextClass.FinalizeTexture(Self);
-    TALTextureAccessPrivate(self).FWidth := TTexture(Source).width;
-    TALTextureAccessPrivate(self).FHeight := TTexture(Source).height;
-    TALTextureAccessPrivate(self).FPixelFormat := TTexture(Source).PixelFormat;
-    TALTextureAccessPrivate(self).FHandle := TTexture(Source).Handle;
-    TALTextureAccessPrivate(self).FStyle := TTexture(Source).Style + [TTextureStyle.Volatile];
-    TALTextureAccessPrivate(self).FMagFilter := TTexture(Source).MagFilter;
-    TALTextureAccessPrivate(self).FMinFilter := TTexture(Source).MinFilter;
-    TALTextureAccessPrivate(self).FTextureScale := TTexture(Source).TextureScale;
-    //FRequireInitializeAfterLost: Boolean;
-    //FBits: Pointer;
-    //FContextLostId: Integer;
-    //FContextResetId: Integer;
-  end
-
-  else inherited ;
+  else
+    inherited Assign(Source);
 
   {$IFDEF DEBUG}
   {$WARNINGS OFF}

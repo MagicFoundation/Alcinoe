@@ -337,7 +337,9 @@ high-performance confetti falling animation. Learn more at
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 
-
+</br>
+</br>
+</br>
 Interpolated Animation
 ======================
 
@@ -362,7 +364,8 @@ patterns, moving beyond the traditional ease-in or ease-out sequences.
 Learn more at 
 [{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
   
-
+</br>
+</br>
 SpringForce Animation
 =====================
 
@@ -384,7 +387,7 @@ Learn more at
 
 <br clear="left"/>
 
-
+</br>
 Scrolling Engine
 ================
 

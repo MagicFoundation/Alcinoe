@@ -55,7 +55,11 @@ us to patch the original Delphi source files:
 * [Need JNotificationClass.AUDIO_ATTRIBUTES_DEFAULT and JNotificationChannel.setSound](https://quality.embarcadero.com/browse/RSP-39511)
 * [iOS/OSX: Declaration for CLRegion.initCircularRegionWithCenter is incorrect](https://quality.embarcadero.com/browse/RSP-15717)
 * [Missing Declaration of maximumFramesPerSecond Function in UIScreen Interface](https://quality.embarcadero.com/browse/RSP-43458)
-    
+* [Resolve Circular Reference in JBitmapClass by Refactoring JHardwareBuffer Declaration](https://quality.embarcadero.com/browse/RSP-44100)    
+* [Add Missing drawBitmap functions to JRecordingCanvas Interface](https://quality.embarcadero.com/browse/RSP-44102)
+* [Miss kCIFormatRGBA8 and kCIFormatBGRA8 in iOSapi.CoreImage.pas](https://quality.embarcadero.com/browse/RSP-44130)
+* [Miss UITraitCollection.displayGamut in iOSapi.UIKit.pas](https://quality.embarcadero.com/browse/RSP-44208)
+
 
 Install Alcinoe
 ---------------

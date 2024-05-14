@@ -385,29 +385,36 @@ Learn more at
 Scrolling Engine
 ----------------
 
-TALOverScroller and TALVelocityTracker are essential components of the
-TALScrollEngine, playing crucial roles in refining user interface interactions.
-While TALOverScroller is designed to animate and manage actions like scrolling
-and flinging, offering a decelerating animation as users scroll past a view's
-edge to indicate the boundary, TALVelocityTracker measures the velocity of
-touch events, helping to determine the speed and direction of user gestures.
-Together within the TALScrollEngine, they elevate the overall user experience
-by offering smooth animations and intuitive touch feedback.
+<p align="left">
+  
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="scrollingengine" />
 
-Building a scrolling engine is a complex endeavor, requiring expertise in
-various domains, including physics. Rather than starting from scratch and
-potentially reinventing the wheel, we looked towards proven solutions. To this
-end, we utilized the robust and well-tested code from Android's VelocityTracker
-and OverScroller. By translating their Java and C++ codes into Delphi, we've
-ensured that the resultant TALScrollEngine not only meets but exceeds the
-standard for scrolling dynamics. Leveraging the reliability and efficiency of
-Android's scrolling mechanisms, the TALScrollEngine offers Delphi developers a
-top-notch scrolling experience, rooted in established and trusted technologies.
+  <span style="display: inline-block; vertical-align: top; margin-left: 20px;">
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="scrollingengine" />
+    TALOverScroller and TALVelocityTracker are essential components of the
+    TALScrollEngine, playing crucial roles in refining user interface interactions.
+    While TALOverScroller is designed to animate and manage actions like scrolling
+    and flinging, offering a decelerating animation as users scroll past a view's
+    edge to indicate the boundary, TALVelocityTracker measures the velocity of
+    touch events, helping to determine the speed and direction of user gestures.
+    Together within the TALScrollEngine, they elevate the overall user experience
+    by offering smooth animations and intuitive touch feedback.
 
-Learn more at 
-[{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+    Building a scrolling engine is a complex endeavor, requiring expertise in
+    various domains, including physics. Rather than starting from scratch and
+    potentially reinventing the wheel, we looked towards proven solutions. To this
+    end, we utilized the robust and well-tested code from Android's VelocityTracker
+    and OverScroller. By translating their Java and C++ codes into Delphi, we've
+    ensured that the resultant TALScrollEngine not only meets but exceeds the
+    standard for scrolling dynamics. Leveraging the reliability and efficiency of
+    Android's scrolling mechanisms, the TALScrollEngine offers Delphi developers a
+    top-notch scrolling experience, rooted in established and trusted technologies.
+
+    Learn more at 
+    [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+
+  </span>
+</p>
   
 
 Firebase cloud messaging

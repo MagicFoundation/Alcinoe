@@ -182,7 +182,7 @@
     <DCC_S>false</DCC_S>
     <DCC_F>false</DCC_F>
     <DCC_K>false</DCC_K>
-    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;..\..\..\Embarcadero\Athens\rtl\ios;..\..\..\Embarcadero\Athens\rtl\osx;..\..\..\Embarcadero\Athens\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;..\..\..\Embarcadero\Athens\rtl\ios;..\..\..\Embarcadero\Athens\rtl\osx;..\..\..\Embarcadero\Athens\rtl\android;..\..\..\Embarcadero\Athens\rtl\common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>

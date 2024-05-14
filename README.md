@@ -364,10 +364,11 @@ Learn more at
   
 
 SpringForce Animation
----------------------
+=====================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="springforce" align="right" width="320" style="width:320px;" />
-
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />
+  
 Inspired by Android's SpringForce, the TALSpringForceAnimation Component brings
 the intrigue of physics-based animations to the Delphi platform. This component
 captures the real-world dynamism of objects influenced by spring mechanics. The
@@ -381,13 +382,13 @@ specific nuances of different applications.
 Learn more at 
 [{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
 
-<br clear="right"/>
+<br clear="left"/>
 
 
 Scrolling Engine
-----------------
+================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" width="222" height="480" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="left" width="222" height="480" />
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="480" />
   
 TALOverScroller and TALVelocityTracker are essential components of the
@@ -413,6 +414,7 @@ Learn more at
 [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 <br clear="left"/>
+  
 
 Firebase cloud messaging
 ------------------------

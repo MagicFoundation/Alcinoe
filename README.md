@@ -154,32 +154,21 @@ AndroidMerger will:
 Learn more at [{alcinoe}/Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
 
 
-DeployMan
+DeployMan/DeployProjNormalizer/DProjNormalizer
 ---------
                                  
-Simplify the deployment of files and folders for iOS and 
-Android apps written in Delphi. It is especially useful 
-if you need to deploy a lot of files, such as 3rd party SDKs. 
-Learn more at [{alcinoe}/Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan)
+DeployMan, DeployProjNormalizer, and DProjNormalizer are essential tools 
+for managing Delphi app deployments. DeployMan greatly simplifies the 
+deployment of files and folders for iOS and Android apps, ideal for 
+handling extensive files like 3rd party SDKs (learn more at [{alcinoe}/Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan)). 
+DeployProjNormalizer allows you to create a new deployproj file from 
+scratch using the dproj as a reference and normalizes it by ordering 
+the nodes, facilitating the comparison of different revisions with diff 
+tools (learn more at [{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)). 
+Lastly, DProjNormalizer orders the nodes in a DProj file to maintain consistency 
+across commits, simplifying the task of comparing differences 
+(learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer). 
   
-
-DeployProjNormalizer
---------------------
-
-Create a new deployproj file from scratch using the dproj 
-as a reference, and then normalize it by ordering the nodes 
-in such a way that you can compare different revisions with 
-diff comparison tools. Learn more at 
-[{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)
-
-
-DProjNormalizer
----------------
-
-Order the nodes in a DProj file to ensure consistency 
-across commits, making it easier to compare differences. 
-Learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer)
-
 
 Opengl video player for FireMonkey
 ----------------------------------
@@ -244,7 +233,7 @@ size across all platforms. Predefined themes can be applied
 directly within the IDE by right-clicking on the control 
 and selecting from a list of predefined styles.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material-design-form-input-text-fields.webp?raw=true" width="457" style="width:457px;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material-design-form-input-text-fields.webp?raw=true" style="max-width: 100%;"/>
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 

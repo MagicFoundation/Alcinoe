@@ -366,6 +366,8 @@ Learn more at
 SpringForce Animation
 ---------------------
 
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="springforce" align="right" width="320" style="width:320px;" />
+
 Inspired by Android's SpringForce, the TALSpringForceAnimation Component brings
 the intrigue of physics-based animations to the Delphi platform. This component
 captures the real-world dynamism of objects influenced by spring mechanics. The
@@ -375,18 +377,18 @@ Developers have the added advantage of being able to adjust various physical
 properties of the spring, such as its stiffness and damping ratio. This ensures
 that a broad spectrum of animation behaviors can be realized, catering to the
 specific nuances of different applications.
-  
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="springforce" width="320" style="width:320px;" />
 
 Learn more at 
 [{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
-  
+
+<br clear="right"/>
+
 
 Scrolling Engine
 ----------------
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" width="222" height="480" style="padding-right: 8px;" />
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="480" style="padding-right: 8px;" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" width="222" height="480" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="480" />
   
 TALOverScroller and TALVelocityTracker are essential components of the
 TALScrollEngine, playing crucial roles in refining user interface interactions.

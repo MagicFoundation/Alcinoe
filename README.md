@@ -229,22 +229,22 @@ interactive and immersive experience! Learn more at
 [{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
   
 
-Firemonkey native iOS/Android TEdit and TMemo
----------------------------------------------
+Firemonkey native iOS/Android/MacOs/Windows TEdit and TMemo
+-----------------------------------------------------------
 
-The idea is to combine FireMonkey controls with native 
-platform controls when the functionality of a specific 
-control becomes difficult to implement solely with 
-FireMonkey (such as web browser, edit, memo, date picker, 
-etc.).
+TALEdit and TALMemo are native controls, so they are 
+created and managed by the platform API with all the 
+functionalities offered by the platform. You can fully 
+customize their styles (<b>fill, border, shadow, font</b>) 
+across various states such as <b>Enabled, Hovered, 
+Focused, Disabled, Error</b>, and they support prompt text, 
+label text, and supporting text. They also have a 
+useful <b>autosize</b> property to perfectly fit their font 
+size across all platforms. Predefined themes can be applied
+directly within the IDE by right-clicking on the control 
+and selecting from a list of predefined styles.
 
-<p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-20.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-21.png?raw=true" alt="Drawing" width="240" style="width:240px;"/>
-</p>
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-22.png?raw=true" alt="Drawing" width="457" style="width:457px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material-design-form-input-text-fields.webp?raw=true" width="457" style="width:457px;"/>
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 

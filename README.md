@@ -385,7 +385,7 @@ Learn more at
 Scrolling Engine
 ----------------
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" style="max-width: 100%;">
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" width="222" height="480" />
 
 TALOverScroller and TALVelocityTracker are essential components of the
 TALScrollEngine, playing crucial roles in refining user interface interactions.
@@ -409,8 +409,7 @@ top-notch scrolling experience, rooted in established and trusted technologies.
 Learn more at 
 [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
----
-
+<br clear="left"/>
 
 Firebase cloud messaging
 ------------------------

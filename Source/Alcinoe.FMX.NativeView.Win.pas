@@ -17,13 +17,8 @@ uses
   FMX.Types,
   FMX.Forms,
   FMX.Controls,
-  FMX.Controls.Presentation,
   FMX.Controls.Win,
-  FMX.Controls.Model,
-  FMX.Graphics,
-  FMX.Presentation.Messages,
-  FMX.Zorder.Win,
-  FMX.Helpers.Win;
+  FMX.Zorder.Win;
 
 type
 
@@ -41,10 +36,9 @@ type
     FDefWndProc: Pointer;
     FHandle: HWND;
     FObjectInstance: Pointer;
-    procedure SetParentWindow(const Value: HWND);
-    function GetParentWindow: HWND;
     procedure WndProc(var Message: TMessage);
     function GetHandle: HWND;
+    function GetFormHandle(const AForm: TCommonCustomForm): HWND;
   protected
     class property ContainerHandle: HWnd read GetContainerHandle;
     const NullHWnd = 0;
@@ -58,41 +52,25 @@ type
     procedure RecreateWnd;
     function HandleAllocated: Boolean; inline;
     property Handle: HWND read GetHandle;
-    property ParentWindow: HWND read GetParentWindow write SetParentWindow;
   private
-    [Weak] FControl: TControl;
-    [Weak] FForm: TCommonCustomForm;
-    FSize: TSizeF; // FControlSize: TSizeF;
-    function GetZOrderManager: TWinZOrderManager;
+    FControl: TControl;
+    FForm: TCommonCustomForm;
+    FVisible: Boolean;
     procedure BeforeDestroyMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
     procedure AfterCreateMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
   protected
-    procedure SetSize(const ASize: TSizeF); virtual;
     function ExtractPoint(var Message: TWMMouse): TPointF; virtual;
-  protected
-    { Messages from PresentationProxy }
-    //procedure PMGetNativeObject(var AMessage: TDispatchMessageWithValue<IInterface>); message PM_GET_NATIVE_OBJECT;
-    procedure RootChanged(const aRoot: IRoot); //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
-    //procedure PMAncestorPresentationLoaded(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESTOR_PRESENTATION_LOADED;
-    //procedure PMAncestorPresentationUnloading(var AMessage: TDispatchMessageWithValue<TControl>); message PM_ANCESTOR_PRESENTATION_UNLOADING;
-    //procedure PMUnload(var AMessage: TDispatchMessage); message PM_UNLOAD;
-    //procedure PMRefreshParent(var AMessage: TDispatchMessage); message PM_REFRESH_PARENT;
-    procedure ChangeOrder; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
-    //procedure PMAbsoluteChanged(var AMessage: TDispatchMessage); message PM_ABSOLUTE_CHANGED;
-    //procedure PMSetSize(var AMessage: TDispatchMessageWithValue<TSizeF>); message PM_SET_SIZE;
-    //procedure PMGetSize(var AMessage: TDispatchMessageWithValue<TSizeF>); message PM_GET_SIZE;
-    procedure SetVisible(const Value: Boolean); //procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
-    //procedure PMGetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_GET_VISIBLE;
-    procedure AncestorVisibleChanged; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
-    procedure SetAbsoluteEnabled(const value: Boolean); //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
-    //procedure PMGetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_GET_ABSOLUTE_ENABLED;
-    //procedure PMDoExit(var AMessage: TDispatchMessage); message PM_DO_EXIT;
-    //procedure PMDoEnter(var AMessage: TDispatchMessage); message PM_DO_ENTER;
-    //procedure PMResetFocus(var AMessage: TDispatchMessage); message PM_RESET_FOCUS;
-    function PointInObjectLocal(X: Single; Y: Single): Boolean;
+  public
+    procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
+    procedure SetVisible(const Value: Boolean); virtual; //procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
+    procedure SetAlpha(const Value: Single); virtual;
+    procedure AncestorVisibleChanged; virtual; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
+    procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
+    procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
   protected
     procedure WMSetFocus(var Message: TWMSetFocus); message WM_SETFOCUS;
     procedure WMKillFocus(var Message: TWMKillFocus); message WM_KILLFOCUS;
+    procedure WMMouseWheel(var Message: TWMMouseWheel); message WM_MOUSEWHEEL;
     procedure WMKeyDown(var Message: TWMKeyDown); message WM_KEYDOWN;
     procedure WMKeyUp(var Message: TWMKeyUp); message WM_KEYUP;
     procedure WMLButtonDown(var Message: TWMLButtonDown); message WM_LBUTTONDOWN;
@@ -103,22 +81,17 @@ type
     procedure WMLButtonDblClick(var Message: TWMLButtonDblClk); message WM_LBUTTONDBLCLK;
     procedure WMRButtonDblClick(var Message: TWMRButtonDblClk); message WM_RBUTTONDBLCLK;
     procedure WMMButtonDblClick(var Message: TWMMButtonDblClk); message WM_MBUTTONDBLCLK;
-  protected
-    procedure UpdateFrame;
-    procedure RefreshNativeParent; virtual;
   public
     constructor Create; overload; virtual;
     constructor Create(const AControl: TControl); overload; virtual;
     destructor Destroy; override;
-    function HasZOrderManager: Boolean;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
-    property Form: TCommonCustomForm read FForm;
-    property ZOrderManager: TWinZOrderManager read GetZOrderManager;
+    procedure UpdateFrame;
     procedure Invalidate;
-  public
+    property Form: TCommonCustomForm read FForm;
     property Control: TControl read FControl;
-    property Size: TSizeF read FSize write SetSize;
+    property Visible: Boolean read FVisible;
   end;
   TALWinNativeViewClass = class of TALWinNativeView;
 
@@ -128,33 +101,7 @@ uses
   System.SysUtils,
   System.UITypes,
   FMX.Platform.Win,
-  FMX.Consts;
-
-{**********************************}
-constructor TALWinNativeView.Create;
-begin
-  inherited;
-  FObjectInstance := MakeObjectInstance(WndProc);
-  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyMessageListener);
-  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateMessageListener);
-end;
-
-{**********************************}
-destructor TALWinNativeView.Destroy;
-begin
-  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyMessageListener);
-  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateMessageListener);
-  DestroyHandle;
-  FreeObjectInstance(FObjectInstance);
-  inherited Destroy;
-end;
-
-
-
-
-
-
-
+  FMX.Helpers.Win;
 
 {***********************************************************************************************}
 function InitWndProc(HWindow: HWND; Msg: UINT; WParam: WParam; LParam: LParam): LRESULT; stdcall;
@@ -196,22 +143,150 @@ begin
 end;
 
 {*****************************************************}
-procedure TALWinNativeView.DefaultHandler(var Message);
+class procedure TALWinNativeView.CreateContainerHandle;
+const
+  FMContainerClass = 'ALFMContainer';
+var
+  WindowClass: TWndClass;
 begin
-  if (FHandle <> NullHWnd) and (TMessage(Message).Msg < PM_BASE) then
-    TMessage(Message).Result := CallWindowProc(FDefWndProc, FHandle, TMessage(Message).Msg, TMessage(Message).WParam,
-      TMessage(Message).LParam)
-  else
-    inherited DefaultHandler(Message);
+  if FContainerHandle = NullHWnd then
+  begin
+    FillChar(WindowClass, SizeOf(WindowClass), 0);
+    WindowClass.lpszClassName := FMContainerClass;
+    WindowClass.lpfnWndProc := @DefWindowProc;
+    WindowClass.hInstance := HInstance;
+    if Winapi.Windows.RegisterClass(WindowClass) = 0 then
+      RaiseLastOSError;
+
+    FContainerHandle := CreateWindowEx(WS_EX_TOOLWINDOW, WindowClass.lpszClassName, nil, WS_POPUP or WS_CAPTION or
+      WS_CLIPSIBLINGS or WS_SYSMENU or WS_MINIMIZEBOX, GetSystemMetrics(SM_CXSCREEN) div 2,
+      GetSystemMetrics(SM_CYSCREEN) div 2, 0, 0, 0, 0, HInstance, nil);
+  end;
 end;
 
-{********************************************************}
-procedure TALWinNativeView.WndProc(var Message: TMessage);
+{******************************************************}
+class procedure TALWinNativeView.DestroyContainerHandle;
 begin
+  if FContainerHandle <> NullHWnd then
+  begin
+    DestroyWindow(FContainerHandle);
+    FContainerHandle := 0;
+  end;
+end;
+
+{*******************************************************}
+class function TALWinNativeView.GetContainerHandle: HWnd;
+begin
+  if FContainerHandle = NullHWnd then
+    CreateContainerHandle;
+  Result := FContainerHandle;
+end;
+
+{**********************************}
+constructor TALWinNativeView.Create;
+begin
+  inherited;
+  FObjectInstance := MakeObjectInstance(WndProc);
+  FVisible := True;
+  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyMessageListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateMessageListener);
+end;
+
+{************************************************************}
+constructor TALWinNativeView.Create(const AControl: TControl);
+begin
+  FControl := AControl;
+  Create;
+  RootChanged(Control.Root);
+end;
+
+{**********************************}
+destructor TALWinNativeView.Destroy;
+begin
+  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyMessageListener);
+  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateMessageListener);
+  DestroyHandle;
+  FreeObjectInstance(FObjectInstance);
+  inherited Destroy;
+end;
+
+{**********************************************************************************************************************}
+procedure TALWinNativeView.AfterCreateMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+begin
+  // This event is called only when the window's handle is recreated.
+  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
+    RootChanged(Form);
+end;
+
+{************************************************************************************************************************}
+procedure TALWinNativeView.BeforeDestroyMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+begin
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
+    RootChanged(nil);
+end;
+
+{**************************************}
+procedure TALWinNativeView.CreateHandle;
+var
+  Params: TCreateParams;
+  ClassRegistered: Boolean;
+  TempClass: TWndClass;
+begin
+  if FHandle = NullHWnd then
+  begin
+    CreateParams(Params);
+    with Params do
+    begin
+      if (WndParent = NullHWnd) and (Style and WS_CHILD <> 0) then
+        WndParent := ContainerHandle
+      else
+        if GetWindowLong(WndParent, GWL_EXSTYLE) or WS_EX_LAYERED <> 0 then
+          WndParent := ContainerHandle;
+
+      FDefWndProc := WindowClass.lpfnWndProc;
+      ClassRegistered := GetClassInfo(WindowClass.hInstance, WinClassName, TempClass);
+      if not ClassRegistered or (TempClass.lpfnWndProc <> @InitWndProc) then
+      begin
+        if ClassRegistered then
+          Winapi.Windows.UnregisterClass(WinClassName, WindowClass.hInstance);
+        WindowClass.lpfnWndProc := @InitWndProc;
+        WindowClass.lpszClassName := WinClassName;
+        if Winapi.Windows.RegisterClass(WindowClass) = 0 then
+          RaiseLastOSError;
+      end;
+      FCreationControl := Self;
+      FHandle := CreateWindowEx(ExStyle, WinClassName, Caption, Style, X, Y, Width, Height, WndParent, 0,
+        WindowClass.hInstance, Param);
+    end;
+    if FHandle = NullHWnd then
+      RaiseLastOSError;
+    if (GetWindowLong(FHandle, GWL_STYLE) and WS_CHILD <> 0) and (GetWindowLong(FHandle, GWL_ID) = 0) then
+      SetWindowLong(FHandle, GWL_ID, FHandle);
+  end;
+end;
+
+{***************************************}
+procedure TALWinNativeView.DestroyHandle;
+begin
+  RootChanged(nil);
+  if FHandle <> NullHWnd then
   try
-    Dispatch(Message);
-  except
-    Application.HandleException(Self);
+    if not Winapi.Windows.DestroyWindow(FHandle) then
+      RaiseLastOSError;
+  finally
+    FHandle := NullHWnd;
+    FDefWndProc := nil;
+  end;
+end;
+
+{*************************************}
+procedure TALWinNativeView.RecreateWnd;
+begin
+  // to-do recreate all children
+  if FHandle <> NullHWnd then
+  begin
+    DestroyHandle;
+    CreateHandle;
   end;
 end;
 
@@ -232,7 +307,7 @@ begin
   Params.Width := 0;
   Params.Height := 0;
 
-  Params.WndParent := ParentWindow;
+  Params.WndParent := NullHWnd{ParentWindow};
   Params.WindowClass.Style := CS_VREDRAW + CS_HREDRAW + CS_DBLCLKS;
   Params.WindowClass.hCursor := LoadCursor(0, IDC_ARROW);
   Params.WindowClass.hbrBackground := 0;
@@ -276,129 +351,10 @@ begin
     end;
 end;
 
-{**************************************}
-procedure TALWinNativeView.CreateHandle;
-var
-  Params: TCreateParams;
-  ClassRegistered: Boolean;
-  TempClass: TWndClass;
-begin
-  if FHandle = NullHWnd then
-  begin
-    CreateParams(Params);
-    with Params do
-    begin
-      if (WndParent = NullHWnd) and (Style and WS_CHILD <> 0) then
-        WndParent := ContainerHandle
-      else
-        if GetWindowLong(WndParent, GWL_EXSTYLE) or WS_EX_LAYERED <> 0 then
-          WndParent := ContainerHandle;
-
-      FDefWndProc := WindowClass.lpfnWndProc;
-      ClassRegistered := GetClassInfo(WindowClass.hInstance, WinClassName, TempClass);
-      if not ClassRegistered or (TempClass.lpfnWndProc <> @InitWndProc) then
-      begin
-        if ClassRegistered then
-          Winapi.Windows.UnregisterClass(WinClassName, WindowClass.hInstance);
-        WindowClass.lpfnWndProc := @InitWndProc;
-        WindowClass.lpszClassName := WinClassName;
-        if Winapi.Windows.RegisterClass(WindowClass) = 0 then
-          RaiseLastOSError;
-      end;
-      FCreationControl := Self;
-      FHandle := CreateWindowEx(ExStyle, WinClassName, Caption, Style, X, Y, Width, Height, WndParent, 0,
-        WindowClass.hInstance, Param);
-    end;
-    if FHandle = NullHWnd then
-      RaiseLastOSError;
-    if (GetWindowLong(FHandle, GWL_STYLE) and WS_CHILD <> 0) and (GetWindowLong(FHandle, GWL_ID) = 0) then
-      SetWindowLong(FHandle, GWL_ID, FHandle);
-  end;
-
-  if HasZOrderManager then
-    ZOrderManager.AddOrSetLink(Control, Handle, NullHWnd);
-end;
-
-{***************************************}
-procedure TALWinNativeView.DestroyHandle;
-begin
-  if HasZOrderManager then
-    ZOrderManager.RemoveLink(Control);
-
-  if FHandle <> NullHWnd then
-  try
-    if not Winapi.Windows.DestroyWindow(FHandle) then
-      RaiseLastOSError;
-  finally
-    FHandle := NullHWnd;
-    FDefWndProc := nil;
-  end;
-end;
-
-{*************************************}
-procedure TALWinNativeView.RecreateWnd;
-begin
-  // to-do recreate all children
-  if FHandle <> NullHWnd then
-  begin
-    DestroyHandle;
-    CreateHandle;
-  end;
-end;
-
-{*****************************************************}
-class procedure TALWinNativeView.CreateContainerHandle;
-const
-  FMContainerClass = 'ALFMContainer';
-var
-  WindowClass: TWndClass;
-begin
-  if FContainerHandle = NullHWnd then
-  begin
-    FillChar(WindowClass, SizeOf(WindowClass), 0);
-    WindowClass.lpszClassName := FMContainerClass;
-    WindowClass.lpfnWndProc := @DefWindowProc;
-    WindowClass.hInstance := HInstance;
-    if Winapi.Windows.RegisterClass(WindowClass) = 0 then
-      RaiseLastOSError;
-
-    FContainerHandle := CreateWindowEx(WS_EX_TOOLWINDOW, WindowClass.lpszClassName, nil, WS_POPUP or WS_CAPTION or
-      WS_CLIPSIBLINGS or WS_SYSMENU or WS_MINIMIZEBOX, GetSystemMetrics(SM_CXSCREEN) div 2,
-      GetSystemMetrics(SM_CYSCREEN) div 2, 0, 0, 0, 0, HInstance, nil);
-  end;
-end;
-
-{******************************************************}
-class procedure TALWinNativeView.DestroyContainerHandle;
-begin
-  if FContainerHandle <> NullHWnd then
-  begin
-    DestroyWindow(FContainerHandle);
-    FContainerHandle := 0;
-  end;
-end;
-
-{************************************************************}
-procedure TALWinNativeView.SetParentWindow(const Value: HWND);
-begin
-  if HandleAllocated and (Value <> NullHWnd) then
-    Winapi.Windows.SetParent(FHandle, Value)
-  else
-    Winapi.Windows.SetParent(ContainerHandle, Value);
-end;
-
 {*************************************************}
 function TALWinNativeView.HandleAllocated: Boolean;
 begin
   Result := FHandle <> NullHWnd;
-end;
-
-{*******************************************************}
-class function TALWinNativeView.GetContainerHandle: HWnd;
-begin
-  if FContainerHandle = NullHWnd then
-    CreateContainerHandle;
-  Result := FContainerHandle;
 end;
 
 {****************************************}
@@ -409,132 +365,137 @@ begin
   Result := FHandle;
 end;
 
-{**********************************************}
-function TALWinNativeView.GetParentWindow: HWND;
+{****************************************************************************}
+function TALWinNativeView.GetFormHandle(const AForm: TCommonCustomForm): HWND;
 begin
-  if HandleAllocated then
-    Result := Winapi.Windows.GetParent(FHandle)
+  var LFormHandle: TWinWindowHandle := WindowHandleToPlatform(AForm.Handle);
+  Result := LFormHandle.Wnd;
+end;
+
+{*****************************************************}
+procedure TALWinNativeView.DefaultHandler(var Message);
+begin
+  if (FHandle <> NullHWnd) then
+    TMessage(Message).Result := CallWindowProc(FDefWndProc, FHandle, TMessage(Message).Msg, TMessage(Message).WParam,
+      TMessage(Message).LParam)
   else
-    Exit(NullHWnd);
-
-  if Result = ContainerHandle then
-    Result := NullHWnd;
+    inherited DefaultHandler(Message);
 end;
 
-{**********************************************************************************************************************}
-procedure TALWinNativeView.AfterCreateMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
+{********************************************************}
+procedure TALWinNativeView.WndProc(var Message: TMessage);
 begin
-  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
-    ZOrderManager.AddOrSetLink(Control, Handle, NullHWnd);
-end;
-
-{************************************************************************************************************************}
-procedure TALWinNativeView.BeforeDestroyMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
-begin
-  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
-    ZOrderManager.RemoveLink(Control);
-end;
-
-{************************************************************}
-constructor TALWinNativeView.Create(const AControl: TControl);
-begin
-  FControl := AControl;
-  Create;
-end;
-
-{************************************************************}
-function TALWinNativeView.GetZOrderManager: TWinZOrderManager;
-begin
-  if HasZOrderManager then
-    Result := WindowHandleToPlatform(Form.Handle).ZOrderManager
-  else
-    Result := nil;
-end;
-
-{**************************************************}
-function TALWinNativeView.HasZOrderManager: Boolean;
-begin
-  Result := (Form <> nil) and (Form.Handle <> nil);
+  try
+    Dispatch(Message);
+  except
+    Application.HandleException(Self);
+  end;
 end;
 
 {*************************************}
 procedure TALWinNativeView.UpdateFrame;
 begin
-  if HasZOrderManager then
-    // Using UpdateBounds instead of UpdateOrderAndBounds to avoid losing focus
-    // every time the edit control is moved.
-    ZOrderManager.UpdateBounds(Control);
-end;
-
-{*********************************************}
-procedure TALWinNativeView.RefreshNativeParent;
-begin
-  if HasZOrderManager then
-    ZOrderManager.UpdateOrderAndBounds(Control);
-end;
-
-{************************************************}
-procedure TALWinNativeView.AncestorVisibleChanged;
-begin
-  var LVisible := Control.Visible and Control.ParentedVisible;
-  SetVisible(LVisible);
-  if LVisible and HasZOrderManager then
-    ZOrderManager.UpdateOrderAndBounds(Control);
+  // We cannot use ZOrderManager.UpdateBounds(Control) because it updates not
+  // only the bounds but also the visibility! Code below is taken from
+  // TWinZOrderManager.UpdateBounds
+  if FForm = nil then exit;
+  var LBounds := Control.AbsoluteRect;
+  var LScreenScale: Single := FForm.Handle.Scale;
+  var LWinBounds := TRectF.Create(
+                      LBounds.Left * LScreenScale,
+                      LBounds.Top * LScreenScale,
+                      LBounds.Right * LScreenScale,
+                      LBounds.Bottom * LScreenScale).Round;
+  SetWindowPos(Handle, 0, LWinBounds.Left, LWinBounds.Top, LWinBounds.Width, LWinBounds.Height, SWP_NOZORDER or SWP_NOACTIVATE);
 end;
 
 {*************************************}
 procedure TALWinNativeView.ChangeOrder;
 begin
-  if HasZOrderManager then
-    ZOrderManager.UpdateOrder(Control);
+  //if HasZOrderManager then
+  //  ZOrderManager.UpdateOrder(Control);
 end;
 
-{**************************************************************************}
-function TALWinNativeView.PointInObjectLocal(X: Single; Y: Single): Boolean;
-var HitTestPoint: TPointF;
+{************************************************}
+procedure TALWinNativeView.AncestorVisibleChanged;
 begin
-  HitTestPoint := TPointF.Create(x,y);
-  Result := Control.LocalRect.Contains(HitTestPoint);
-end;
-
-{*********************************************************}
-procedure TALWinNativeView.RootChanged(const aRoot: IRoot);
-begin
-  // Changing root for native control means changing ZOrderManager, because one form owns ZOrderManager.
-  // So we need to remove itself from old one and add to new one.
-  if HasZOrderManager then
-    ZOrderManager.RemoveLink(Control);
-
-  if aRoot is TCommonCustomForm then FForm := TCommonCustomForm(aRoot)
-  else FForm := nil;
-
-  if HasZOrderManager then
-  begin
-    ZOrderManager.AddOrSetLink(Control, Handle, NullHWnd);
-    ZOrderManager.UpdateOrderAndBounds(Control);
-  end;
-end;
-
-{******************************************************************}
-procedure TALWinNativeView.SetAbsoluteEnabled(const value: Boolean);
-begin
-  EnableWindow(Handle, Value);
-end;
-
-{******************************************************}
-procedure TALWinNativeView.SetSize(const ASize: TSizeF);
-begin
-  FSize := ASize;
-  UpdateFrame;
+  SetVisible(Visible);
 end;
 
 {**********************************************************}
 procedure TALWinNativeView.SetVisible(const Value: Boolean);
 begin
-  if Value then
-    ShowWindow(Handle, SW_SHOW)
+  FVisible := Value;
+  if not Visible or not Control.ParentedVisible then
+    ShowWindow(Handle, SW_HIDE)
   else
-    ShowWindow(Handle, SW_HIDE);
+    ShowWindow(Handle, SW_SHOW);
+end;
+
+{*******************************************************}
+procedure TALWinNativeView.SetAlpha(const Value: Single);
+begin
+  // Not supported under Windows
+end;
+
+{*********************************************************}
+procedure TALWinNativeView.RootChanged(const aRoot: IRoot);
+begin
+  SetParent(Handle, 0);
+  if aRoot is TCommonCustomForm then begin
+    FForm := TCommonCustomForm(aRoot);
+    SetParent(Handle, GetFormHandle(Form));
+    UpdateFrame;
+  end
+  else FForm := nil;
+end;
+
+{**********************************************************}
+procedure TALWinNativeView.SetEnabled(const value: Boolean);
+begin
+  EnableWindow(Handle, Value);
+end;
+
+{**********************************}
+procedure TALWinNativeView.SetFocus;
+begin
+  Winapi.Windows.SetFocus(Handle);
+end;
+
+{************************************}
+procedure TALWinNativeView.ResetFocus;
+begin
+  if (Form <> nil) and Form.IsHandleAllocated then
+    WinApi.Windows.SetFocus(FormToHWND(Form))
+  else
+    SendMessage(Handle, WM_KILLFOCUS, 0, 0);
+end;
+
+{**************************************************************}
+procedure TALWinNativeView.WMSetFocus(var Message: TWMSetFocus);
+begin
+  inherited;
+  Control.SetFocus;
+end;
+
+{****************************************************************}
+procedure TALWinNativeView.WMKillFocus(var Message: TWMKillFocus);
+begin
+  inherited;
+  Control.ResetFocus;
+end;
+
+{******************************************************************}
+procedure TALWinNativeView.WMMouseWheel(var Message: TWMMouseWheel);
+begin
+  var LHandled: Boolean := False;
+  try
+    if Form <> nil then
+      Form.Mousewheel(KeysToShiftState(Message.Keys), Message.WheelDelta, LHandled);
+  finally
+    If not LHandled then
+      inherited;
+  end;
 end;
 
 {************************************************************}
@@ -575,29 +536,6 @@ begin
   end
   else
     inherited;
-end;
-
-{****************************************************************}
-procedure TALWinNativeView.WMKillFocus(var Message: TWMKillFocus);
-begin
-  inherited;
-  Control.ResetFocus;
-end;
-
-{*********************************************************************}
-function TALWinNativeView.ExtractPoint(var Message: TWMMouse): TPointF;
-var
-  Point: TPoint;
-begin
-  Point := TPoint.Create(Message.XPos, Message.YPos); // px
-  ClientToScreen(Handle, Point); // px
-  if Form = nil then
-    Result := Point
-  else
-  begin
-    ScreenToClient(WindowHandleToPlatform(Form.Handle).Wnd, Point); // px
-    Result := TPointF.Create(Point.X / Form.Handle.Scale, Point.Y / Form.Handle.Scale); // dp
-  end;
 end;
 
 {********************************************************************}
@@ -729,26 +667,20 @@ begin
   end;
 end;
 
-{**************************************************************}
-procedure TALWinNativeView.WMSetFocus(var Message: TWMSetFocus);
+{*********************************************************************}
+function TALWinNativeView.ExtractPoint(var Message: TWMMouse): TPointF;
+var
+  Point: TPoint;
 begin
-  inherited;
-  Control.SetFocus;
-end;
-
-{************************************}
-procedure TALWinNativeView.ResetFocus;
-begin
-  if (Form <> nil) and Form.IsHandleAllocated then
-    WinApi.Windows.SetFocus(FormToHWND(Form))
+  Point := TPoint.Create(Message.XPos, Message.YPos); // px
+  ClientToScreen(Handle, Point); // px
+  if Form = nil then
+    Result := Point
   else
-    SendMessage(Handle, WM_KILLFOCUS, 0, 0);
-end;
-
-{**********************************}
-procedure TALWinNativeView.SetFocus;
-begin
-  Winapi.Windows.SetFocus(Handle);
+  begin
+    ScreenToClient(GetFormHandle(Form), Point); // px
+    Result := TPointF.Create(Point.X / Form.Handle.Scale, Point.Y / Form.Handle.Scale); // dp
+  end;
 end;
 
 {************************************}
@@ -757,5 +689,10 @@ begin
   Winapi.Windows.InvalidateRect(Handle, NiL, TRUE); // Invalidate the entire client area
   UpdateWindow(Handle); // Force an immediate repaint
 end;
+
+initialization
+{$IFDEF WIN64}
+  UserLibrary := 0;
+{$ENDIF}
 
 end.

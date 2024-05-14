@@ -121,7 +121,6 @@ please follow these steps:
    
    ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
 <br/>
-<br/>
   
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
@@ -353,7 +352,6 @@ high-performance confetti falling animation. Learn more at
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 <br/>
-<br/>
   
   
 Interpolated Animation
@@ -509,7 +507,6 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
   &nbsp;&nbsp;&nbsp;
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
 </p>
-<br/>
 <br/>
   
 

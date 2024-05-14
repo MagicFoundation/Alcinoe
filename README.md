@@ -385,12 +385,9 @@ Learn more at
 Scrolling Engine
 ----------------
 
-<div style="display: flex; align-items: flex-start;">
-  <div style="flex: 0 0 auto;">
-    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="Description of image" style="max-width: 100%;">
-  </div>
-  <div style="flex: 1; padding-left: 20px; text-align: left;">
-
+<div style="overflow: hidden;">
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" style="margin-right: 20px;">
+  <p>
     TALOverScroller and TALVelocityTracker are essential components of the
     TALScrollEngine, playing crucial roles in refining user interface interactions.
     While TALOverScroller is designed to animate and manage actions like scrolling
@@ -412,8 +409,7 @@ Scrolling Engine
 
     Learn more at 
     [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-
-  </div>
+  </p>
 </div>
 
 Firebase cloud messaging

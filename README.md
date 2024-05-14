@@ -120,7 +120,9 @@ please follow these steps:
    'Contribute,' and then choose 'Open a pull request.'  
    
    ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
-
+<br/>
+<br/>
+  
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
@@ -152,7 +154,9 @@ AndroidMerger will:
 * Generate the Delphi native bridge file from the Java libraries.
 
 Learn more at [{alcinoe}/Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
-
+<br/>
+<br/>
+  
 
 DeployMan/DeployProjNormalizer/DProjNormalizer
 ==============================================
@@ -168,6 +172,8 @@ tools (learn more at [{alcinoe}/Tools/DeployProjNormalizer](https://github.com/M
 Lastly, DProjNormalizer orders the nodes in a DProj file to maintain consistency 
 across commits, simplifying the task of comparing differences 
 (learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer). 
+<br/>
+<br/>
   
 
 Opengl video player for FireMonkey
@@ -194,7 +200,9 @@ AVPlayer with support for HLS, similar to ExoPlayer.
 
 Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
 with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
-  
+<br/>
+<br/>
+
 
 WebRTC Delphi wrapper
 =====================
@@ -216,7 +224,9 @@ With the TALWebRTC component, you can easily incorporate video
 and audio chat into your applications, giving your users a more 
 interactive and immersive experience! Learn more at 
 [{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
-  
+<br/>
+<br/>
+
 
 Firemonkey native iOS/Android/MacOs/Windows TEdit and TMemo
 ===========================================================
@@ -236,7 +246,9 @@ and selecting from a list of predefined styles.
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material-design-form-input-text-fields.webp?raw=true" style="max-width: 100%;"/>
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-
+<br/>
+<br/>
+  
 
 Fast/double-buffered FireMonkey controls with native draw
 =========================================================
@@ -312,7 +324,9 @@ on the form.quality setting.
   
 You can start exploring this feature with the demo located 
 at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-
+<br/>
+<br/>
+  
 
 Improved FireMonkey controls
 ============================
@@ -326,7 +340,9 @@ Improved FireMonkey controls
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/tabcontrol.gif?raw=true" alt="tabcontrol" width="360" style="width:360px;"/>
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-  
+<br/>
+<br/>
+    
 
 Confetti Falling Animation
 ==========================
@@ -336,7 +352,6 @@ high-performance confetti falling animation. Learn more at
 [{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
-<br/>
 <br/>
 <br/>
   
@@ -420,6 +435,7 @@ Learn more at
 [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 <br clear="left"/>
+<br/>
   
 
 Firebase cloud messaging
@@ -430,6 +446,8 @@ cloud messaging (FCM) with HTTP V1 protocol that will
 permit you to send alert notifications with images in 
 Android and iOS. Learn more at 
 [{alcinoe}\Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)
+<br/>
+<br/>
 
 
 GeoPositioning for Android/iOS
@@ -449,7 +467,9 @@ TALGeoPositionSensor component provides a comprehensive solution for developers
 seeking to integrate location-based functionality into their apps without
 having to worry about low-level implementation details. Learn more at 
 [{alcinoe}\Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
-
+<br/>
+<br/>
+  
 
 Google OAuth 2.0 Access Token
 =============================
@@ -459,6 +479,8 @@ and authorization. You can use the function
 ALGenerateGoogleOAuth2AccessToken to generate an OAuth 2.0 
 Access Token. Learn more at 
 [{alcinoe}/Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
+<br/>
+<br/>
   
 
 Android/iOS VKontakte/Facebook SDK login
@@ -470,7 +492,9 @@ logged in, users can grant permissions to your app,
 allowing you to retrieve information or perform actions on 
 VKontakte/Facebook on their behalf. Learn more at 
 [{alcinoe}\Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
-
+<br/>
+<br/>
+  
 
 Photo Editor Filters for Android/iOS
 ====================================
@@ -485,7 +509,9 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
   &nbsp;&nbsp;&nbsp;
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
 </p>
-
+<br/>
+<br/>
+  
 
 Streamlining Object Initialization with TALInit
 ===============================================
@@ -566,7 +592,9 @@ of initializing fields. This means developers can enjoy the convenience
 without having to worry about any hidden costs in execution time.
 
 Learn more at [{alcinoe}/Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
-
+<br/>
+<br/>
+  
 
 Json Parser
 ===========
@@ -611,6 +639,8 @@ To access the document nodes :
 ```
 
 Learn more at [{alcinoe}/Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)
+<br/>
+<br/>
   
 
 ImageMagick wrapper for Delphi
@@ -665,7 +695,9 @@ Example :
 ```
 
 Learn more at [{alcinoe}/Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
-
+<br/>
+<br/>
+  
 
 MongoDb client
 ==============
@@ -682,7 +714,9 @@ made and added to the pool. Connection pooling also reduces
 the amount of time a user must wait to establish a 
 connection to the database. Learn more at 
 [{alcinoe}/Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
-
+<br/>
+<br/>
+  
 
 WebSocket client
 ================
@@ -694,7 +728,9 @@ browser and a server. This allows you to send messages to a
 server and receive event-driven responses without having to 
 poll the server for a reply. Learn more at 
 [{alcinoe}\Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
-
+<br/>
+<br/>
+  
 
 Fast TStringList
 ================
@@ -712,6 +748,8 @@ TALStringList is not a Unicode TStringList, but a 100%
 Ansi StringList. You can start exploring this feature 
 with the demo located at 
 [{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
+<br/>
+<br/>
 
 
 PHP runner
@@ -725,7 +763,9 @@ without the need for a web server. The component uses
 the CGI/FastCGI interface (php-cgi.exe) of PHP to 
 communicate with the PHP engine. Learn more at 
 [{alcinoe}\Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
-
+<br/>
+<br/>
+  
 
 Memcached Client
 ================
@@ -735,7 +775,9 @@ distributed memory object caching system, generic in
 nature, but intended for use in speeding up dynamic web
 applications by alleviating database load. Learn more at 
 [{alcinoe}/Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
-
+<br/>
+<br/>
+  
 
 GSM component
 =============
@@ -744,7 +786,9 @@ The TAlGSMComm component allows you to implement SMS text
 messaging using the text-mode interface defined in the GSM 
 Technical Specification 07.05. Learn more at 
 [{alcinoe}/Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
-
+<br/>
+<br/>
+  
 
 SQLite3 Client
 ==============
@@ -752,7 +796,9 @@ SQLite3 Client
 Query the SQLite3 database and get the results in XML format
 or in JSON/BSON format. Learn more at 
 [{alcinoe}/Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
-
+<br/>
+<br/>
+  
 
 And much more
 =============
@@ -765,6 +811,8 @@ And much more
 * SMTP Client
 * Xml Parser 
 * etc ...
+<br/>
+<br/>
 
 
 DELPHI D2009+ (UNICODE)

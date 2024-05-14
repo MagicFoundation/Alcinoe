@@ -386,7 +386,7 @@ Scrolling Engine
 ----------------
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" width="222" height="480" />
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" align="left" width="222" height="480" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="20" height="480" />
   
 TALOverScroller and TALVelocityTracker are essential components of the
 TALScrollEngine, playing crucial roles in refining user interface interactions.

@@ -32,6 +32,9 @@ type
     procedure SetAutoSize(const Value: Boolean); virtual;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
+    { IALAutosizeControl }
+    function HasUnconstrainedAutosizeX: Boolean; virtual;
+    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
   published
@@ -429,6 +432,18 @@ end;
 function TALLayout.GetAutoSize: Boolean;
 begin
   result := FAutoSize;
+end;
+
+{***************************************}
+function TALLayout.HasUnconstrainedAutosizeX: Boolean;
+begin
+  result := GetAutoSize;
+end;
+
+{***************************************}
+function TALLayout.HasUnconstrainedAutosizeY: Boolean;
+begin
+  result := GetAutoSize;
 end;
 
 {****************************************************}

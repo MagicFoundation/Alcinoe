@@ -320,18 +320,20 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALMemo = class(TALBaseEdit)
+  TALMemo = class(TALBaseEdit, IALAutosizeControl)
   private
+    FAutosizeLineCount: Single;
     function GetTextSettings: TALMemoTextSettings;
     procedure SetTextSettings(const Value: TALMemoTextSettings);
   protected
-    FAutosizeLineCount: Single;
-    procedure SetAutoSize(const Value: Boolean); override;
     procedure SetAutosizeLineCount(const Value: Single); virtual;
     function IsAutosizeLineCountStored: Boolean;
     function CreateTextSettings: TALEditTextSettings; override;
     function CreateEditControl: TALBaseEditControl; override;
     procedure AdjustSize; override;
+    { IALAutosizeControl }
+    function HasUnconstrainedAutosizeX: Boolean; virtual;
+    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     function getLineCount: Integer;
@@ -1423,7 +1425,6 @@ begin
   TextSettings.DefaultVertAlign := TALTextVertAlign.Leading;
   TextSettings.VertAlign := TextSettings.DefaultVertAlign;
   TextSettings.OnChanged := LTextSettingsChanged;
-  FAutosize := False;
   FAutosizeLineCount := 0;
 end;
 
@@ -1477,15 +1478,7 @@ begin
         if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
       end;
 
-      if (AutoSize) and // if AutoSize is false nothing to adjust
-         (not (Align in [TAlignLayout.Client,
-                         TAlignLayout.Contents,
-                         TAlignLayout.Left,
-                         TAlignLayout.Right,
-                         TAlignLayout.MostLeft,
-                         TAlignLayout.MostRight,
-                         TAlignLayout.Vertical,
-                         TAlignLayout.HorzCenter])) then begin // If aligned vertically nothing to adjust
+      if HasUnconstrainedAutosizeY then begin
 
         var LAdjustement: Single := ((GetLineHeight / 100) * 25);
 
@@ -1541,25 +1534,30 @@ begin
 end;
 
 {**************************************************}
-procedure TALMemo.SetAutoSize(const Value: Boolean);
+function TALMemo.HasUnconstrainedAutosizeX: Boolean;
 begin
-  if FAutoSize <> Value then
-  begin
-    if Value then FAutoSizeLineCount := Max(3, FAutoSizeLineCount)
-    else FAutoSizeLineCount := 0;
-    inherited SetAutoSize(Value);
-    AdjustSize;
-    repaint;
-  end;
+  result := False;
+end;
+
+{**************************************************}
+function TALMemo.HasUnconstrainedAutosizeY: Boolean;
+begin
+  result := (CompareValue(FAutoSizeLineCount, 0, TEpsilon.Scale) > 0) and
+            (not (Align in [TAlignLayout.Client,
+                            TAlignLayout.Contents,
+                            TAlignLayout.Left,
+                            TAlignLayout.Right,
+                            TAlignLayout.MostLeft,
+                            TAlignLayout.MostRight,
+                            TAlignLayout.Vertical,
+                            TAlignLayout.HorzCenter]));
 end;
 
 {**********************************************************}
 procedure TALMemo.SetAutosizeLineCount(const Value: Single);
 begin
-  if not SameValue(FAutoSizeLineCount, Value, TEpsilon.Scale) then
-  begin
+  if not SameValue(FAutoSizeLineCount, Value, TEpsilon.Scale) then begin
     FAutoSizeLineCount := Max(0, Value);
-    FAutoSize := CompareValue(FAutoSizeLineCount, 0, TEpsilon.scale) > 0;
     AdjustSize;
     repaint;
   end;

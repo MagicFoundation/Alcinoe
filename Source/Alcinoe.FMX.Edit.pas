@@ -864,7 +864,7 @@ type
     procedure SetSides(const Value: TSides); override;
     procedure FillChanged(Sender: TObject); override;
     procedure DoResized; override;
-    procedure AdjustSize; override;
+    procedure AdjustSize; virtual; abstract;
     procedure Paint; override;
     Procedure CreateBufPromptTextDrawable(
                 var ABufDrawable: TALDrawable;
@@ -966,12 +966,21 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALEdit = class(TALBaseEdit)
+  TALEdit = class(TALBaseEdit, IALAutosizeControl)
+  private
+    FAutoSize: Boolean;
+  protected
+    function GetAutoSize: Boolean; virtual;
+    procedure SetAutoSize(const Value: Boolean); virtual;
+    procedure AdjustSize; override;
+    { IALAutosizeControl }
+    function HasUnconstrainedAutosizeX: Boolean; virtual;
+    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
   published
     property Password;
-    property AutoSize default True;
+    property AutoSize: Boolean read GetAutoSize write SetAutoSize default True;
   end;
 
 procedure ALApplyThemeToEdit(const AEdit: TALBaseEdit; const ATheme: String);
@@ -1014,6 +1023,7 @@ uses
   {$IF defined(ALSkiaCanvas)}
   System.Skia.API,
   {$endif}
+  Alcinoe.FMX.Memo,
   Alcinoe.FMX.BreakText,
   Alcinoe.Common;
 
@@ -1038,7 +1048,8 @@ begin
     //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
     else if ATheme = 'Material3.Light.Filled' then begin
       //--Enabled (default)--
-      AutoSize := True;
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
+      else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
       padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
       Corners := [TCorner.TopLeft, Tcorner.TopRight];
       Sides := [TSide.Bottom];
@@ -1195,7 +1206,8 @@ begin
     //https://m3.material.io/components/text-fields/specs#e4964192-72ad-414f-85b4-4b4357abb83c
     else if ATheme = 'Material3.Light.Outlined' then begin
       //--Enabled (default)--
-      AutoSize := True;
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
+      else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
       padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
       Corners := AllCorners;
       Sides := AllSides;
@@ -1346,7 +1358,8 @@ begin
     //https://llama.meta.com/llama-downloads
     else if ATheme = 'Facebook.Outlined' then begin
       //--Enabled (default)--
-      AutoSize := True;
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
+      else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
       padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
       Corners := AllCorners;
       Sides := AllSides;
@@ -1461,7 +1474,8 @@ begin
     //https://m3.material.io/components/text-fields/specs#f967d3f6-0139-43f7-8336-510022684fd1
     else if ATheme = 'Material3.Dark.Filled' then begin
       //--Enabled (default)--
-      AutoSize := True;
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
+      else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
       padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
       Corners := [TCorner.TopLeft, Tcorner.TopRight];
       Sides := [TSide.Bottom];
@@ -1618,7 +1632,8 @@ begin
     //https://m3.material.io/components/text-fields/specs#e4964192-72ad-414f-85b4-4b4357abb83c
     else if ATheme = 'Material3.Dark.Outlined' then begin
       //--Enabled (default)--
-      AutoSize := True;
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
+      else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
       padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
       Corners := AllCorners;
       Sides := AllSides;
@@ -5405,97 +5420,6 @@ begin
   AdjustSize;
 end;
 
-{***************************}
-procedure TALBaseEdit.AdjustSize;
-begin
-  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
-     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
-    try
-      Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TALEditLabelTextLayout.Inline);
-      if LInlinedLabelText then MakeBufLabelTextDrawable;
-
-      var LStrokeSize := TRectF.Empty;
-      if Stroke.Kind <> TbrushKind.None then begin
-        if (TSide.Top in Sides) then    LStrokeSize.Top :=    max(Stroke.Thickness - Padding.top,    0);
-        if (TSide.bottom in Sides) then LStrokeSize.bottom := max(Stroke.Thickness - Padding.bottom, 0);
-        if (TSide.right in Sides) then  LStrokeSize.right :=  max(Stroke.Thickness - Padding.right,  0);
-        if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
-      end;
-
-      if (AutoSize) and // if AutoSize is false nothing to adjust
-         (not (Align in [TAlignLayout.Client,
-                         TAlignLayout.Contents,
-                         TAlignLayout.Left,
-                         TAlignLayout.Right,
-                         TAlignLayout.MostLeft,
-                         TAlignLayout.MostRight,
-                         TAlignLayout.Vertical,
-                         TAlignLayout.HorzCenter])) then begin // If aligned vertically nothing to adjust
-
-        If LInlinedLabelText then begin
-          SetBounds(
-            Position.X,
-            Position.Y,
-            Width,
-            GetLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
-        end
-        else begin
-          SetBounds(
-            Position.X,
-            Position.Y,
-            Width,
-            GetLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
-        end;
-
-      end;
-
-      var LMarginRect := TRectF.Empty;
-
-      {$IF defined(MSWINDOWS) or defined(ALMacOS)}
-      // In Windows and MacOS, there is no way to align text vertically,
-      // so we must center the EditControl.
-      If not LInlinedLabelText then begin
-        Var LAvailableHeight := Height - LStrokeSize.Top - LStrokeSize.bottom - Padding.top - Padding.Bottom;
-        var LEditControlHeight := GetLineHeight;
-        {$IF defined(ALMacOS)}
-        // For an obscure reason, when FocusRingType is set to NSFocusRingTypeNone and the font size
-        // is not 16, focusing on the EditField causes it to shift up by 2 pixels.
-        LEditControlHeight := LEditControlHeight + 2;
-        {$ENDIF}
-
-        LMarginRect.top := (LAvailableHeight - LEditControlHeight) / 2;
-        LMarginRect.bottom := (LAvailableHeight - LEditControlHeight) / 2;
-      end;
-      {$ENDIF}
-
-      if LInlinedLabelText then begin
-        Var LAvailableHeight := Height - LStrokeSize.Top - LStrokeSize.bottom - Padding.top - Padding.Bottom;
-        var LEditControlHeight := GetLineHeight;
-        {$IF defined(ALMacOS)}
-        // For an obscure reason, when FocusRingType is set to NSFocusRingTypeNone and the font size
-        // is not 16, focusing on the EditField causes it to shift up by 2 pixels.
-        LEditControlHeight := LEditControlHeight + 2;
-        {$ENDIF}
-
-        LMarginRect.top := (LAvailableHeight - LEditControlHeight - BufLabelTextDrawableRect.Height - LabelTextSettings.Margins.Top - LabelTextSettings.Margins.bottom) / 2;
-        LMarginRect.top := LMarginRect.top + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom;
-        LMarginRect.bottom := (LAvailableHeight - LEditControlHeight - BufLabelTextDrawableRect.Height - LabelTextSettings.Margins.Top - LabelTextSettings.Margins.bottom) / 2;
-      end;
-
-      LMarginRect.left :=   Max(LMarginRect.left   + LStrokeSize.left,   0);
-      LMarginRect.Top :=    Max(LMarginRect.Top    + LStrokeSize.Top,    0);
-      LMarginRect.Right :=  Max(LMarginRect.Right  + LStrokeSize.Right,  0);
-      LMarginRect.Bottom := Max(LMarginRect.Bottom + LStrokeSize.Bottom, 0);
-
-      EditControl.Margins.Rect := LMarginRect;
-
-    finally
-      TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
-    end;
-  end;
-end;
-
 {********************************************}
 Procedure TALBaseEdit.CreateBufPromptTextDrawable(
             var ABufDrawable: TALDrawable;
@@ -6899,6 +6823,126 @@ constructor TALEdit.Create(AOwner: TComponent);
 begin
   inherited;
   FAutoSize := True;
+end;
+
+{*****************************************}
+function TALEdit.GetAutoSize: Boolean;
+begin
+  result := FAutoSize;
+end;
+
+{*****************************************}
+function TALEdit.HasUnconstrainedAutosizeX: Boolean;
+begin
+  result := False;
+end;
+
+{*****************************************}
+function TALEdit.HasUnconstrainedAutosizeY: Boolean;
+begin
+  result := (GetAutoSize) and
+            (not (Align in [TAlignLayout.Client,
+                            TAlignLayout.Contents,
+                            TAlignLayout.Left,
+                            TAlignLayout.Right,
+                            TAlignLayout.MostLeft,
+                            TAlignLayout.MostRight,
+                            TAlignLayout.Vertical,
+                            TAlignLayout.HorzCenter]))
+end;
+
+{****************************************************}
+procedure TALEdit.SetAutoSize(const Value: Boolean);
+begin
+  if FAutoSize <> Value then
+  begin
+    FAutoSize := Value;
+    AdjustSize;
+    repaint;
+  end;
+end;
+
+{***************************}
+procedure TALEdit.AdjustSize;
+begin
+  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
+     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
+     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
+    try
+      Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TALEditLabelTextLayout.Inline);
+      if LInlinedLabelText then MakeBufLabelTextDrawable;
+
+      var LStrokeSize := TRectF.Empty;
+      if Stroke.Kind <> TbrushKind.None then begin
+        if (TSide.Top in Sides) then    LStrokeSize.Top :=    max(Stroke.Thickness - Padding.top,    0);
+        if (TSide.bottom in Sides) then LStrokeSize.bottom := max(Stroke.Thickness - Padding.bottom, 0);
+        if (TSide.right in Sides) then  LStrokeSize.right :=  max(Stroke.Thickness - Padding.right,  0);
+        if (TSide.left in Sides) then   LStrokeSize.left :=   max(Stroke.Thickness - Padding.left,   0);
+      end;
+
+      if HasUnconstrainedAutosizeY then begin
+
+        If LInlinedLabelText then begin
+          SetBounds(
+            Position.X,
+            Position.Y,
+            Width,
+            GetLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
+        end
+        else begin
+          SetBounds(
+            Position.X,
+            Position.Y,
+            Width,
+            GetLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
+        end;
+
+      end;
+
+      var LMarginRect := TRectF.Empty;
+
+      {$IF defined(MSWINDOWS) or defined(ALMacOS)}
+      // In Windows and MacOS, there is no way to align text vertically,
+      // so we must center the EditControl.
+      If not LInlinedLabelText then begin
+        Var LAvailableHeight := Height - LStrokeSize.Top - LStrokeSize.bottom - Padding.top - Padding.Bottom;
+        var LEditControlHeight := GetLineHeight;
+        {$IF defined(ALMacOS)}
+        // For an obscure reason, when FocusRingType is set to NSFocusRingTypeNone and the font size
+        // is not 16, focusing on the EditField causes it to shift up by 2 pixels.
+        LEditControlHeight := LEditControlHeight + 2;
+        {$ENDIF}
+
+        LMarginRect.top := (LAvailableHeight - LEditControlHeight) / 2;
+        LMarginRect.bottom := (LAvailableHeight - LEditControlHeight) / 2;
+      end;
+      {$ENDIF}
+
+      if LInlinedLabelText then begin
+        Var LAvailableHeight := Height - LStrokeSize.Top - LStrokeSize.bottom - Padding.top - Padding.Bottom;
+        var LEditControlHeight := GetLineHeight;
+        {$IF defined(ALMacOS)}
+        // For an obscure reason, when FocusRingType is set to NSFocusRingTypeNone and the font size
+        // is not 16, focusing on the EditField causes it to shift up by 2 pixels.
+        LEditControlHeight := LEditControlHeight + 2;
+        {$ENDIF}
+
+        LMarginRect.top := (LAvailableHeight - LEditControlHeight - BufLabelTextDrawableRect.Height - LabelTextSettings.Margins.Top - LabelTextSettings.Margins.bottom) / 2;
+        LMarginRect.top := LMarginRect.top + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom;
+        LMarginRect.bottom := (LAvailableHeight - LEditControlHeight - BufLabelTextDrawableRect.Height - LabelTextSettings.Margins.Top - LabelTextSettings.Margins.bottom) / 2;
+      end;
+
+      LMarginRect.left :=   Max(LMarginRect.left   + LStrokeSize.left,   0);
+      LMarginRect.Top :=    Max(LMarginRect.Top    + LStrokeSize.Top,    0);
+      LMarginRect.Right :=  Max(LMarginRect.Right  + LStrokeSize.Right,  0);
+      LMarginRect.Bottom := Max(LMarginRect.Bottom + LStrokeSize.Bottom, 0);
+
+      EditControl.Margins.Rect := LMarginRect;
+
+    finally
+      TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
+    end;
+  end;
 end;
 
 {*****************}

@@ -46,15 +46,13 @@ type
   IALDoubleBufferedControl = interface
     ['{26A0A593-D483-4AE2-881B-6CB930B5E863}']
     procedure MakeBufDrawable;
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALAutosizeControl = interface
     ['{464CDB70-9F76-4334-8774-5DD98605D6C1}']
-    function GetAutosize: boolean;
-    procedure SetAutosize(const AValue: Boolean);
+    function HasUnconstrainedAutosizeX: boolean;
+    function HasUnconstrainedAutosizeY: boolean;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -421,7 +419,7 @@ function  ALGetFontMetrics(
             const AFontColor: TalphaColor;
             const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
 function  ALTranslate(const AText: string): string;
-Procedure ALEnableDoubleBuffering(const AControl: TControl);
+Procedure ALMakeBufDrawables(const AControl: TControl);
 procedure ALAutoSize(const AControl: TControl);
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single; overload;
@@ -2076,20 +2074,18 @@ begin
 end;
 
 {**********************************************************}
-Procedure ALEnableDoubleBuffering(const AControl: TControl);
+Procedure ALMakeBufDrawables(const AControl: TControl);
 begin
   // This ensures the style is retained when the control exits the visible area.
   // Otherwise, the style will be released and reapplied shortly after.
   AControl.DisableDisappear := true;
 
   var LDoubleBufferedControl: IALDoubleBufferedControl;
-  if Supports(AControl, IALDoubleBufferedControl, LDoubleBufferedControl) then begin
-    LDoubleBufferedControl.SetDoubleBuffered(True);
+  if Supports(AControl, IALDoubleBufferedControl, LDoubleBufferedControl) then
     LDoubleBufferedControl.MakeBufDrawable;
-  end;
 
   for var LChild in aControl.Controls do
-    ALEnableDoubleBuffering(LChild);
+    ALMakeBufDrawables(LChild);
 end;
 
 {*********************************************}
@@ -2116,7 +2112,7 @@ begin
       TAlignLayout.Bottom,
       TAlignLayout.MostBottom: begin
         var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeX then
           LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
         else
           LSize.Width := Max(LSize.Width, AControl.Width);
@@ -2130,7 +2126,7 @@ begin
       TAlignLayout.MostRight: Begin
         LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
         var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeY then
           LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
         else
           LSize.height := Max(LSize.Height, AControl.Height);
@@ -2144,9 +2140,11 @@ begin
       TAlignLayout.FitLeft,
       TAlignLayout.FitRight: Begin
         var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then begin
-          LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-          LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) then begin
+          if LAutosizeControl.HasUnconstrainedAutosizeX then LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
+          else LSize.Width := Max(LSize.Width, AControl.Width);
+          if LAutosizeControl.HasUnconstrainedAutosizeY then LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
+          else LSize.height := Max(LSize.Height, AControl.Height);
         end
         else begin
           LSize.Width := Max(LSize.Width, AControl.Width);
@@ -2158,7 +2156,7 @@ begin
       TAlignLayout.Horizontal,
       TAlignLayout.VertCenter: Begin
         var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeX then
           LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
         else
           LSize.Width := Max(LSize.Width, AControl.Width);
@@ -2168,7 +2166,7 @@ begin
       TAlignLayout.Vertical,
       TAlignLayout.HorzCenter: Begin
         var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.GetAutosize then
+        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeY then
           LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
         else
           LSize.height := Max(LSize.Height, AControl.Height);

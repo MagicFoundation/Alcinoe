@@ -554,14 +554,17 @@ type
 
   {*******************************************}
   TALEditLabelTextLayout = (Floating, &Inline);
+  TALEditLabelTextAnimation = (Translation, Opacity);
 
   {***************************************************}
   TALEditLabelTextSettings = class(TALBaseTextSettings)
   private
     FMargins: TBounds;
     FLayout: TALEditLabelTextLayout;
+    FAnimation: TALEditLabelTextAnimation;
     procedure SetMargins(const Value: TBounds);
     procedure SetLayout(const Value: TALEditLabelTextLayout);
+    procedure SetAnimation(const Value: TALEditLabelTextAnimation);
     procedure MarginsChanged(Sender: TObject);
   public
     constructor Create; override;
@@ -576,6 +579,7 @@ type
     property IsHtml;
     property Margins: TBounds read FMargins write SetMargins;
     property Layout: TALEditLabelTextLayout read FLayout write SetLayout default TALEditLabelTextLayout.Floating;
+    property Animation: TALEditLabelTextAnimation read FAnimation write SetAnimation default TALEditLabelTextAnimation.Translation;
   end;
 
   {************************************************}
@@ -3927,6 +3931,7 @@ begin
   FMargins := TBounds.Create(TRectF.Create(0,0,0,-7));
   FMargins.OnChange := MarginsChanged;
   FLayout := TALEditLabelTextLayout.Floating;
+  FAnimation := TALEditLabelTextAnimation.Translation;
 end;
 
 {******************************************}
@@ -3947,6 +3952,15 @@ procedure TALEditLabelTextSettings.SetLayout(const Value: TALEditLabelTextLayout
 begin
   if FLayout <> Value then begin
     FLayout := Value;
+    Change;
+  end;
+end;
+
+{**************************************************************************************}
+procedure TALEditLabelTextSettings.SetAnimation(const Value: TALEditLabelTextAnimation);
+begin
+  if FAnimation <> Value then begin
+    FAnimation := Value;
     Change;
   end;
 end;
@@ -4696,7 +4710,7 @@ begin
      (HasTranslationLabelTextAnimation) then begin
     FlabelTextAnimation.StopAtCurrent;
     FlabelTextAnimation.Inverse := False;
-    FlabelTextAnimation.Duration := 0.10;
+    FlabelTextAnimation.Duration := 0.15;
     FLabelTextAnimation.Start;
   end;
   //--
@@ -5016,6 +5030,7 @@ end;
 function TALBaseEdit.HasOpacityLabelTextAnimation: Boolean;
 begin
   result := (LabelTextSettings.Layout = TALEditLabelTextLayout.Floating) and
+            (LabelTextSettings.Animation = TALEditLabelTextAnimation.Opacity) and
             (LabelText <> '') and
             ((prompttext = '') or (prompttext = labeltext));
 end;
@@ -5023,7 +5038,9 @@ end;
 {*********************************************************}
 function TALBaseEdit.HasTranslationLabelTextAnimation: Boolean;
 begin
-  result := (LabelTextSettings.Layout = TALEditLabelTextLayout.Inline) and
+  result := ((LabelTextSettings.Layout = TALEditLabelTextLayout.Inline) or
+             ((LabelTextSettings.Layout = TALEditLabelTextLayout.Floating) and
+              (LabelTextSettings.Animation = TALEditLabelTextAnimation.Translation))) and
             (LabelText <> '') and
             ((PromptText = '') or (PromptText = LabelText));
 end;
@@ -6667,20 +6684,45 @@ begin
         raise Exception.Create('Error EC344A62-E381-4126-A0EB-12BFC91E3664');
     end;
     if GetIsTextEmpty and (HasTranslationLabelTextAnimation) then begin
-      case TextSettings.VertAlign of
-        TALTextVertAlign.Center: LPos.y := LLabelTextDrawableRect.Top + ((EditControl.Height + LLabelTextDrawableRect.Height + LabelTextSettings.Margins.Bottom - LPromptTextDrawableRect.Height) / 2);
-        TALTextVertAlign.Leading: LPos.y := EditControl.Position.y;
-        TALTextVertAlign.Trailing: LPos.y := EditControl.Position.y + EditControl.Height - LPromptTextDrawableRect.Height;
-        Else
-          Raise Exception.Create('Error 28B2F8BC-B4C5-4F22-8E21-681AA1CA3C23')
-      end;
+      if LabelTextSettings.Layout = TALEditLabelTextLayout.Inline then begin
+        case TextSettings.VertAlign of
+          TALTextVertAlign.Center: LPos.y := LLabelTextDrawableRect.Top + ((EditControl.Height + LLabelTextDrawableRect.Height + LabelTextSettings.Margins.Bottom - LPromptTextDrawableRect.Height) / 2);
+          TALTextVertAlign.Leading: LPos.y := EditControl.Position.y;
+          TALTextVertAlign.Trailing: LPos.y := EditControl.Position.y + EditControl.Height - LPromptTextDrawableRect.Height;
+          Else
+            Raise Exception.Create('Error 28B2F8BC-B4C5-4F22-8E21-681AA1CA3C23')
+        end;
+      end
+      else if LabelTextSettings.Layout = TALEditLabelTextLayout.floating then begin
+        case TextSettings.VertAlign of
+          TALTextVertAlign.Center: LPos.y := EditControl.Position.y + ((EditControl.Height - LPromptTextDrawableRect.Height) / 2);
+          TALTextVertAlign.Leading: LPos.y := EditControl.Position.y;
+          TALTextVertAlign.Trailing: LPos.y := EditControl.Position.y + EditControl.Height - LPromptTextDrawableRect.Height;
+          Else
+            Raise Exception.Create('Error 28B2F8BC-B4C5-4F22-8E21-681AA1CA3C23')
+        end;
+      end
+      else
+        raise Exception.Create('Error 42442487-01E1-4810-A030-FC4904834EC2');
       LPromptTextDrawableRect.SetLocation(LPos.X, LPos.y);
       if (FLabelTextAnimation.Running) then begin
         LPromptTextDrawableRect.SetLocation(
-          LPromptTextDrawableRect.Left - ((LPromptTextDrawableRect.Left - EditControl.Left - LabelTextSettings.Margins.Left) * FLabelTextAnimation.CurrentValue),
+          LPromptTextDrawableRect.Left - ((LPromptTextDrawableRect.Left - LLabelTextDrawableRect.Left) * FLabelTextAnimation.CurrentValue),
           LPromptTextDrawableRect.Top - ((LPromptTextDrawableRect.top - LLabelTextDrawableRect.top) * FLabelTextAnimation.CurrentValue));
         LPromptTextDrawableRect.Width := LPromptTextDrawableRect.width - ((LPromptTextDrawableRect.width - LLabelTextDrawableRect.Width) * FLabelTextAnimation.CurrentValue);
         LPromptTextDrawableRect.Height := LPromptTextDrawableRect.Height - ((LPromptTextDrawableRect.Height - LLabelTextDrawableRect.Height) * FLabelTextAnimation.CurrentValue);
+        if (not ALisDrawableNull(LPromptTextDrawable)) and
+           (canvas.Stroke.Kind <> TBrushKind.None) then begin
+          var LRect := LPromptTextDrawableRect;
+          LRect.Inflate(4{DL}, 4{DT}, 4{DR}, 4{DB});
+          LRect.Intersect(LocalRect);
+          if not LRect.IsEmpty then begin
+            LRect := Canvas.AlignToPixel(LRect);
+            Canvas.Fill.Kind := TBrushKind.Solid;
+            Canvas.Fill.Color := EditControl.FillColor;
+            Canvas.FillRect(LRect, 1);
+          end;
+        end;
         ALDrawDrawable(
           Canvas, // const ACanvas: Tcanvas;
           LPromptTextDrawable, // const ADrawable: TALDrawable;

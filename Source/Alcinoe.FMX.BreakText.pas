@@ -222,35 +222,6 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
-{*****************************}
-{$IF not defined(ALSkiaEngine)}
-Type
-
-  TALFontMetrics = record
-    Ascent: Single; // The recommended distance above the baseline for singled spaced text.
-    Descent: Single; // The recommended distance below the baseline for singled spaced text.
-  end;
-
-  // packed because of https://stackoverflow.com/questions/61731462/is-this-declaration-good-tdictionarytpairint32-int64-bool
-  TALFontMetricsKey = packed record
-    FontFamily: TALSHA1Digest;
-    FontSize: single;
-    FontWeight: TFontWeight;
-    FontSlant: TFontSlant;
-    FontStretch: TFontStretch;
-    FontColor: TalphaColor;
-    DecorationKinds: TALTextDecorationKinds;
-    DecorationStyle: TALTextDecorationStyle;
-    DecorationThicknessMultiplier: Single;
-    DecorationColor: TAlphaColor;
-    LetterSpacing: Single;
-  end;
-
-var
-  ALFontMetricsCache: TDictionary<TALFontMetricsKey, TALFontMetrics>;
-  ALFontMetricsCacheLock: TLightweightMREW;
-{$ENDIF}
-
 {**************************************************}
 class function TALTextElement.Empty: TALTextElement;
 begin
@@ -1118,6 +1089,7 @@ function ALCreateMultiLineTextDrawable(
         TFontWeight.UltraBold: LfontWeightInt := 800; //	Extra Bold
         TFontWeight.Black: LfontWeightInt := 900; //	Black
         TFontWeight.UltraBlack: LfontWeightInt := 1000;
+        else raise Exception.Create('Error B088F38F-341E-44E4-A844-16A51E35E8A1');
       end;
       LTypeface := TJTypeface.JavaClass.create(
                      LTypeface, {family}
@@ -1263,131 +1235,21 @@ function ALCreateMultiLineTextDrawable(
              const AFontSize: single;
              const AFontWeight: TFontWeight;
              const AFontSlant: TFontSlant;
-             const AFontStretch: TFontStretch;
              const AFontColor: TalphaColor;
-             const ADecorationKinds: TALTextDecorationKinds;
-             const ADecorationStyle: TALTextDecorationStyle;
-             const ADecorationThicknessMultiplier: Single;
-             const ADecorationColor: TAlphaColor;
-             const ALetterSpacing: Single): TALFontMetrics;
+             const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
   begin
-
-    var LFontMetricsKey: TALFontMetricsKey;
-    ALStringHashSHA1(LFontMetricsKey.FontFamily, AFontFamily, TEncoding.Utf8);
-    LFontMetricsKey.FontSize:= AFontSize;
-    LFontMetricsKey.FontWeight:= AFontWeight;
-    LFontMetricsKey.FontSlant:= AFontSlant;
-    LFontMetricsKey.FontStretch:= AFontStretch;
-    LFontMetricsKey.FontColor:= AFontColor;
-    LFontMetricsKey.DecorationKinds:= ADecorationKinds;
-    LFontMetricsKey.DecorationStyle:= ADecorationStyle;
-    LFontMetricsKey.DecorationThicknessMultiplier:= ADecorationThicknessMultiplier;
-    LFontMetricsKey.DecorationColor:= ADecorationColor;
-    LFontMetricsKey.LetterSpacing:= ALetterSpacing;
-    ALFontMetricsCacheLock.beginRead;
-    Try
-      if ALFontMetricsCache.TryGetValue(LFontMetricsKey, Result) then exit;
-    finally
-      ALFontMetricsCacheLock.endRead;
+    Result := ALGetFontMetrics(
+                AFontFamily, // const AFontFamily: String;
+                AFontSize, // const AFontSize: single;
+                AFontWeight, // const AFontWeight: TFontWeight;
+                AFontSlant, // const AFontSlant: TFontSlant;
+                AFontColor, // const AFontColor: TalphaColor;
+                ADecorationKinds); // const ADecorationKinds: TALTextDecorationKinds);
+    if Result.Leading > 0 then begin
+      Result.Ascent := Result.Ascent - (Result.Leading/2);
+      Result.Descent := Result.Descent + (Result.Leading/2);
+      Result.leading := 0;
     end;
-
-    {$IF defined(ANDROID)}
-
-    _UpdatePaint(
-      AFontFamily,
-      AFontSize,
-      AFontWeight,
-      AFontSlant,
-      AFontStretch,
-      AFontColor,
-      ADecorationKinds,
-      ADecorationStyle,
-      ADecorationThicknessMultiplier,
-      ADecorationColor,
-      ALetterSpacing);
-
-    var LFontMetrics := _Paint.getFontMetrics;
-    Result.Ascent := LFontMetrics.Ascent;
-    Result.Descent := LFontMetrics.Descent;
-    if LFontMetrics.Leading > 0 then begin
-      Result.Ascent := Result.Ascent - (LFontMetrics.Leading/2);
-      Result.Descent := Result.Descent + (LFontMetrics.Leading/2);
-    end;
-
-    {$ENDIF}
-
-    {$IF defined(ALAppleOS)}
-
-    var Lfont := ALCreateCTFontRef(AFontFamily, AFontSize, AFontWeight, AFontSlant);
-    try
-      Result.Ascent := -CTFontGetAscent(Lfont);
-      Result.Descent := CTFontGetDescent(Lfont);
-      var LLeading := CTFontGetLeading(Lfont);
-      if LLeading > 0 then begin
-        Result.Ascent := Result.Ascent - (LLeading/2);
-        Result.Descent := Result.Descent + (LLeading/2);
-      end;
-      {$IF defined(DEBUG)}
-      //ALLog(
-      //  'ALCreateMultiLineTextDrawable._GetFontMetrics',
-      //  'FontFamily: '+ AFontFamily + ' | '+
-      //  'FontSize: '+ ALFloatToStrW(AFontSize, ALDefaultFormatSettingsW) + ' | '+
-      //  'CTFontGetAscent: ' + ALFloatToStrW(CTFontGetAscent(Lfont), ALDefaultFormatSettingsW) + ' | '+
-      //  'CTFontGetDescent: ' + ALFloatToStrW(CTFontGetDescent(Lfont), ALDefaultFormatSettingsW) + ' | '+
-      //  'CTFontGetLeading: ' + ALFloatToStrW(CTFontGetLeading(Lfont), ALDefaultFormatSettingsW) + ' | '+
-      //  'CTFontGetBoundingBox.height: ' + ALFloatToStrW(CTFontGetBoundingBox(Lfont).size.height, ALDefaultFormatSettingsW));
-      {$ENDIF}
-    finally
-      CFRelease(LFont);
-    end;
-
-    {$ENDIF}
-
-    {$IF defined(MSWINDOWS)}
-
-    // Since the Windows API only works with integers, I multiply the font size by 100
-    // and later divide the result by 100 to achieve better precision.
-
-    var LFontFamily := _getFontFamily(AFontFamily);
-    var LFont := CreateFont(
-                   -Round(AFontSize*100), // nHeight: Integer;
-                   0, // nWidth: Integer;
-                   0, // nEscapement: Integer;
-                   0, // nOrientaion: Integer;
-                   FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
-                   Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
-                   cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
-                   cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
-                   DEFAULT_CHARSET, // fdwCharSet: DWORD
-                   OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
-                   CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
-                   DEFAULT_QUALITY, // fdwQuality: DWORD
-                   DEFAULT_PITCH or FF_DONTCARE, // fdwPitchAndFamily: DWORD
-                   PChar(LFontFamily)); // lpszFace: LPCWSTR
-    if LFont = 0 then raiseLastOsError;
-    try
-      if SelectObject(_MeasureBitmap.DC, LFont) = 0 then raiseLastOsError;
-      var LMetrics: TTextMetric;
-      if not GetTextMetrics(_MeasureBitmap.DC, LMetrics) then raiseLastOsError;
-      Result.Ascent := -LMetrics.tmAscent/100;
-      Result.Descent := LMetrics.tmDescent/100;
-      if LMetrics.tmExternalLeading > 0 then begin
-        Result.Ascent := Result.Ascent - (LMetrics.tmExternalLeading/200);
-        Result.Descent := Result.Descent + (LMetrics.tmExternalLeading/200);
-      end;
-    finally
-      if not DeleteObject(LFont) then raiseLastOsError;
-    end;
-
-    {$ENDIF}
-
-    ALFontMetricsCacheLock.beginWrite;
-    Try
-      ALFontMetricsCache.TryAdd(LFontMetricsKey, Result);
-    finally
-      ALFontMetricsCacheLock.endWrite;
-    end;
-
   end;
   {$ENDIF}
   {$ENDREGION}
@@ -2402,6 +2264,13 @@ begin
                 Else raise Exception.Create('Error 6DBA0B08-4F9E-4D89-9998-6B054D527F1F');
               end;
 
+              // init LSk4dParagraphOffsetX
+              Var LSk4dParagraphOffsetX: Single;
+              If (AOptions.hTextAlign = TALTextHorzAlign.Center) then LSk4dParagraphOffsetX := (LOriginalRectWidth - ARect.Width) / 2
+              else if ((AOptions.Direction = TALTextDirection.RightToLeft) and (AOptions.hTextAlign = TALTextHorzAlign.Leading)) or
+                      ((AOptions.Direction <> TALTextDirection.RightToLeft) and (AOptions.hTextAlign = TALTextHorzAlign.Trailing)) then LSk4dParagraphOffsetX := (LOriginalRectWidth - ARect.Width)
+              else LSk4dParagraphOffsetX := 0;
+
               // Update AElements
               var Ltextboxes: TArray<sk_textbox_t>;
               for var I := 0 to LRangeIndexes.Count - 1 do begin
@@ -2414,9 +2283,9 @@ begin
                     var Ltextbox := Ltextboxes[K];
                     AElements[J+K].Id := LRangeIndexes[I].SpanID;
                     AElements[J+K].rect := TRectF.Create(
-                                             (LParagraphRect.Left + Ltextbox.rect.Left) / AOptions.Scale,
+                                             (LParagraphRect.Left + Ltextbox.rect.Left - LSk4dParagraphOffsetX) / AOptions.Scale,
                                              (LParagraphRect.Top + Ltextbox.rect.Top) / AOptions.Scale,
-                                             (LParagraphRect.Left + Ltextbox.rect.Right) / AOptions.Scale,
+                                             (LParagraphRect.Left + Ltextbox.rect.Right - LSk4dParagraphOffsetX) / AOptions.Scale,
                                              (LParagraphRect.Top + Ltextbox.rect.Bottom) / AOptions.Scale);
                   end;
                 end;
@@ -2535,15 +2404,10 @@ begin
                   end;
 
                   // Paint the paragraph
-                  Var LOffsetX: Single;
-                  If (AOptions.hTextAlign = TALTextHorzAlign.Center) then LOffsetX := (LOriginalRectWidth - ARect.Width) / 2
-                  else if ((AOptions.Direction = TALTextDirection.RightToLeft) and (AOptions.hTextAlign = TALTextHorzAlign.Leading)) or
-                          ((AOptions.Direction <> TALTextDirection.RightToLeft) and (AOptions.hTextAlign = TALTextHorzAlign.Trailing)) then LOffsetX := (LOriginalRectWidth - ARect.Width)
-                  else LOffsetX := 0;
                   sk4d_paragraph_paint(
                     LParagraph, // self: sk_paragraph_t;
                     LCanvas, // canvas: sk_canvas_t;
-                    LParagraphRect.left - LOffsetX, // x: float;
+                    LParagraphRect.left - LSk4dParagraphOffsetX, // x: float;
                     LParagraphRect.top); // y: float
 
                   // retrieve the rect of all placeholders
@@ -2558,9 +2422,9 @@ begin
                     Var LImgSrc := LPlaceHolders[i];
                     If LImgSrc <> '' then begin
                       Var LDstRect := TRectF.Create(
-                                        LTextBoxes[i].rect.left,
+                                        LTextBoxes[i].rect.left - LSk4dParagraphOffsetX,
                                         LTextBoxes[i].rect.Top,
-                                        LTextBoxes[i].rect.Right,
+                                        LTextBoxes[i].rect.Right - LSk4dParagraphOffsetX,
                                         LTextBoxes[i].rect.Bottom);
                       LDstRect.Offset(LParagraphRect.TopLeft);
                       var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
@@ -3238,13 +3102,8 @@ begin
                                   LFontSize, // const AFontSize: single;
                                   LFontWeight, // const AFontWeight: TFontWeight;
                                   LFontSlant, // const AFontSlant: TFontSlant;
-                                  LFontStretch, // const AFontStretch: TFontStretch;
                                   LFontColor, // const AFontColor: TalphaColor;
-                                  LDecorationKind, // const ADecorationKinds: TALTextDecorationKinds;
-                                  LDecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
-                                  LDecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
-                                  LDecorationColor, // const ADecorationColor: TAlphaColor;
-                                  LLetterSpacing); // const ALetterSpacing: Single;
+                                  LDecorationKind); // const ADecorationKinds: TALTextDecorationKinds;
 
             // Handle ALineHeightMultiplier
             var LDrawTextOffsetY: Single;
@@ -3471,13 +3330,8 @@ begin
                                     LFontSize, // const AFontSize: single;
                                     LFontWeight, // const AFontWeight: TFontWeight;
                                     LFontSlant, // const AFontSlant: TFontSlant;
-                                    LFontStretch, // const AFontStretch: TFontStretch;
                                     LFontColor, // const AFontColor: TalphaColor;
-                                    LDecorationKind, // const ADecorationKinds: TALTextDecorationKinds;
-                                    LDecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
-                                    LDecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
-                                    LDecorationColor, // const ADecorationColor: TAlphaColor;
-                                    LLetterSpacing); // const ALetterSpacing: Single;
+                                    LDecorationKind); // const ADecorationKinds: TALTextDecorationKinds;
               //--
               var LExtendedTextElement: TExtendedTextElement;
               LExtendedTextElement.Id := '';
@@ -4105,16 +3959,5 @@ begin
     end;
   Setlength(Result, I);
 end;
-
-initialization
-  {$IF not defined(ALSkiaEngine)}
-  ALFontMetricsCache := TDictionary<TALFontMetricsKey, TALFontMetrics>.Create;
-  //_FontMetricsCacheLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
-  {$ENDIF}
-
-finalization
-  {$IF not defined(ALSkiaEngine)}
-  AlFreeAndNil(ALFontMetricsCache);
-  {$ENDIF}
 
 end.

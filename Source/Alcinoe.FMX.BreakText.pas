@@ -215,6 +215,7 @@ uses
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
   Winapi.Windows,
+  FMX.TextLayout,
   FMX.Helpers.Win,
   FMX.Utils,
   {$ENDIF}
@@ -478,32 +479,58 @@ function ALCreateMultiLineTextDrawable(
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'TWinBitmap'}
-  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
-  Type
-    TWinBitmap = record
-      BitmapInfo: TBitmapInfo;
-      DC: HDC;
-      Bitmap: HBITMAP;
-      Bits: PAlphaColorRecArray;
-      Width, Height: Integer;
-    end;
-  {$ENDIF}
+  {$REGION '_IsWhiteSpace'}
+  function _IsWhiteSpace(const AChar: Char): Boolean; inline;
+  begin
+    // SPACE, TAB, LF, LINE-TAB, FF, CR, NEL
+    Result := (AChar.IsWhiteSpace) and (AChar <> #$00A0{No-break Space});
+  end;
+  {$ENDREGION}
+
+  {$REGION '_IsHyphen'}
+  function _IsHyphen(const AChar: Char): Boolean; inline;
+  begin
+    Result := AChar.IsInArray(['-'{Hyphen-Minus}, #$00AD{Soft Hyphen}]);
+  end;
   {$ENDREGION}
 
   {$REGION '_findLastBreakPosition'}
   // Returns zero-based index or, if you prefer, the number of characters
   // If ANumberOfChars <= 0 returns ANumberOfChars
-  function _findLastBreakPosition(const AText: String; Const ANumberOfChars: Integer): integer;
+  function _findLastBreakPosition(
+             const AText: String;
+             Const ANumberOfChars: Integer;
+             const AHardBreak: Boolean = False;
+             const ASkipEndOfTextPunctuation: Boolean = False): integer;
   begin
     if ANumberOfChars <= 0 then exit(ANumberOfChars);
     Var Ln := AText.Length;
+    // Break on Hyphen or WhiteSpace
     Result := Min(ANumberOfChars, Ln);
     While Result > 0 do begin
-      if (AText.Chars[Result-1] = '-') or
-         ((Result < Ln) and (AText.Chars[Result].IsWhiteSpace) and (not AText.Chars[Result-1].IsWhiteSpace)) then break
-      else dec(Result);
+      if (_IsHyphen(AText.Chars[Result-1])) or
+         ((Result < Ln) and
+          (_IsWhiteSpace(AText.Chars[Result])) and
+          (not _IsWhiteSpace(AText.Chars[Result-1]))) then
+        break
+      else
+        dec(Result);
     end;
+    // Break on \ or /
+    If (AHardBreak) and (Result <= 0) then begin
+      Result := Min(ANumberOfChars, Ln);
+      While Result > 0 do begin
+        if (Result < Ln) and (CharInSet(AText.Chars[Result-1], ['\','/'])) then break
+        else dec(Result);
+      end;
+    end;
+    // Skip end of text punctuation
+    While (ASkipEndOfTextPunctuation) and
+          (Result > 0) and
+          ((AText.Chars[Result-1].IsPunctuation) or // ., ; : ? ! - – — ' " ( ) [ ] { } < > / \ … ‘ ’ “ ” * & @ # % _ | ~ ^ + = « » ¡ ¿
+           (AText.Chars[Result-1].IsWhiteSpace) or // SPACE, TAB,LF,LINE-TAB,FF,CR, No-break Space, NEL
+           (AText.Chars[Result-1].IsSeparator)) do // Space / No-Break Space
+      Dec(Result);
   end;
   {$ENDREGION}
 
@@ -968,47 +995,6 @@ function ALCreateMultiLineTextDrawable(
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION '_MeasureBitmap'}
-  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
-  var
-    _MeasureBitmap: TWinBitmap;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_CreateMeasureBitmap'}
-  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
-  procedure _CreateMeasureBitmap;
-  begin
-    _MeasureBitmap.Width := 1;
-    _MeasureBitmap.Height := 1;
-    _MeasureBitmap.DC := CreateCompatibleDC(0);
-    if _MeasureBitmap.DC = 0 then raiseLastOsError;
-    ZeroMemory(@(_MeasureBitmap.BitmapInfo.bmiHeader), SizeOf(TBitmapInfoHeader));
-    _MeasureBitmap.BitmapInfo.bmiHeader.biSize := SizeOf(TBitmapInfoHeader);
-    _MeasureBitmap.BitmapInfo.bmiHeader.biWidth := 1;
-    _MeasureBitmap.BitmapInfo.bmiHeader.biHeight := -1;
-    _MeasureBitmap.BitmapInfo.bmiHeader.biPlanes := 1;
-    _MeasureBitmap.BitmapInfo.bmiHeader.biCompression := BI_RGB;
-    _MeasureBitmap.BitmapInfo.bmiHeader.biBitCount := 32;
-    _MeasureBitmap.Bitmap := CreateDIBSection(_MeasureBitmap.DC, _MeasureBitmap.BitmapInfo, DIB_RGB_COLORS, Pointer(_MeasureBitmap.Bits), 0, 0);
-    if _MeasureBitmap.Bitmap = 0 then raiseLastOsError;
-    if SetMapMode(_MeasureBitmap.DC, MM_TEXT) = 0 then raiseLastOsError;
-    if SelectObject(_MeasureBitmap.DC, _MeasureBitmap.Bitmap) = 0 then raiseLastOsError;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_FreeMeasureBitmap'}
-  {$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
-  procedure _FreeMeasureBitmap;
-  begin
-    _MeasureBitmap.Bits := nil;
-    if not DeleteObject(_MeasureBitmap.Bitmap) then raiseLastOsError;
-    if not DeleteDC(_MeasureBitmap.DC) then raiseLastOsError;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
   {$REGION '_Paint'}
   {$IF not defined(ALSkiaEngine) and defined(ANDROID)}
   var
@@ -1271,6 +1257,7 @@ function ALCreateMultiLineTextDrawable(
              const ALetterSpacing: Single;
              const ADirection: TALTextDirection;
              const AMaxWidth: Single;
+             const AHardBreak: Boolean;
              out AMeasuredWidth: Single;
              out AMeasuredHeight: Single): integer;
   begin
@@ -1333,12 +1320,19 @@ function ALCreateMultiLineTextDrawable(
       else begin
 
         // Calculate the correct position where the text should break
-        var LBreakPosition := _findLastBreakPosition(AText, Result);
+        var LBreakPosition := _findLastBreakPosition(AText, Result, AHardBreak);
 
         // No good position found
         if LBreakPosition = 0 then begin
-          AMeasuredWidth := 0;
-          AMeasuredHeight := 0;
+          if AHardBreak then begin
+            AMeasuredWidth := LMeasuredWidth[0];
+            AMeasuredHeight := 0;
+          end
+          else begin
+            Result := 0;
+            AMeasuredWidth := 0;
+            AMeasuredHeight := 0;
+          end;
         end
 
         // Result already fell within a good position
@@ -1397,13 +1391,8 @@ function ALCreateMultiLineTextDrawable(
                           AFontSize, // const AFontSize: single;
                           AFontWeight, // const AFontWeight: TFontWeight;
                           AFontSlant, // const AFontSlant: TFontSlant;
-                          AFontStretch, // const AFontStretch: TFontStretch;
                           AFontColor, // const AFontColor: TalphaColor;
-                          ADecorationKinds, // const ADecorationKinds: TALTextDecorationKinds;
-                          ADecorationStyle, // const ADecorationStyle: TALTextDecorationStyle;
-                          ADecorationThicknessMultiplier, // const ADecorationThicknessMultiplier: Single;
-                          ADecorationColor, // const ADecorationColor: TAlphaColor;
-                          ALetterSpacing); // const ALetterSpacing: Single)
+                          ADecorationKinds); // const ADecorationKinds: TALTextDecorationKinds;
         var LfitRange: CFRange;
         var LSize := CTFramesetterSuggestFrameSizeWithConstraints(
                        LFrameSetter, //framesetter: CTFramesetterRef;
@@ -1420,8 +1409,8 @@ function ALCreateMultiLineTextDrawable(
         {$ENDIF}
 
         // https://stackoverflow.com/questions/78144915/ctframesettercreateframe-and-kctparagraphstylespecifierfirstlineheadindent
-        if Result < AText.Length then begin
-          var LBreakPosition := _findLastBreakPosition(AText, Result);
+        if (Result < AText.Length) and (not AHardBreak) then begin
+          var LBreakPosition := _findLastBreakPosition(AText, Result, AHardBreak);
           if LBreakPosition <= 0 then begin
             Result := 0;
             AMeasuredWidth := 0;
@@ -1487,46 +1476,147 @@ function ALCreateMultiLineTextDrawable(
 
     {$IF defined(MSWINDOWS)}
 
+    // Initially, I wanted to use the Windows API function GetTextExtentPoint32 to retrieve
+    // text dimensions. However, this function does not return accurate results for fonts
+    // with different weights. For example, when using the 'Segoe UI' font with a medium weight,
+    // it returns dimensions as if the font were set to regular weight, which is incorrect.
+    //
+    //{$REGION 'TWinBitmap'}
+    //{$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+    //Type
+    //  TWinBitmap = record
+    //    BitmapInfo: TBitmapInfo;
+    //    DC: HDC;
+    //    Bitmap: HBITMAP;
+    //    Bits: PAlphaColorRecArray;
+    //    Width, Height: Integer;
+    //  end;
+    //{$ENDIF}
+    //{$ENDREGION}
+    //
+    //{$REGION '_MeasureBitmap'}
+    //{$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+    //var
+    //  _MeasureBitmap: TWinBitmap;
+    //{$ENDIF}
+    //{$ENDREGION}
+    //
+    //{$REGION '_CreateMeasureBitmap'}
+    //{$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+    //procedure _CreateMeasureBitmap;
+    //begin
+    //  _MeasureBitmap.Width := 1;
+    //  _MeasureBitmap.Height := 1;
+    //  _MeasureBitmap.DC := CreateCompatibleDC(0);
+    //  if _MeasureBitmap.DC = 0 then raiseLastOsError;
+    //  ZeroMemory(@(_MeasureBitmap.BitmapInfo.bmiHeader), SizeOf(TBitmapInfoHeader));
+    //  _MeasureBitmap.BitmapInfo.bmiHeader.biSize := SizeOf(TBitmapInfoHeader);
+    //  _MeasureBitmap.BitmapInfo.bmiHeader.biWidth := 1;
+    //  _MeasureBitmap.BitmapInfo.bmiHeader.biHeight := -1;
+    //  _MeasureBitmap.BitmapInfo.bmiHeader.biPlanes := 1;
+    //  _MeasureBitmap.BitmapInfo.bmiHeader.biCompression := BI_RGB;
+    //  _MeasureBitmap.BitmapInfo.bmiHeader.biBitCount := 32;
+    //  _MeasureBitmap.Bitmap := CreateDIBSection(_MeasureBitmap.DC, _MeasureBitmap.BitmapInfo, DIB_RGB_COLORS, Pointer(_MeasureBitmap.Bits), 0, 0);
+    //  if _MeasureBitmap.Bitmap = 0 then raiseLastOsError;
+    //  if SetMapMode(_MeasureBitmap.DC, MM_TEXT) = 0 then raiseLastOsError;
+    //  if SelectObject(_MeasureBitmap.DC, _MeasureBitmap.Bitmap) = 0 then raiseLastOsError;
+    //end;
+    //{$ENDIF}
+    //{$ENDREGION}
+    //
+    //{$REGION '_FreeMeasureBitmap'}
+    //{$IF not defined(ALSkiaEngine) and defined(MSWINDOWS)}
+    //procedure _FreeMeasureBitmap;
+    //begin
+    //  _MeasureBitmap.Bits := nil;
+    //  if not DeleteObject(_MeasureBitmap.Bitmap) then raiseLastOsError;
+    //  if not DeleteDC(_MeasureBitmap.DC) then raiseLastOsError;
+    //end;
+    //{$ENDIF}
+    //{$ENDREGION}
+    //
+    //{$IF defined(MSWINDOWS)}
+    //_CreateMeasureBitmap;
+    //{$ENDIF}
+    //
+    //{$IF defined(MSWINDOWS)}
+    //_FreeMeasureBitmap;
+    //{$ENDIF}
+    //
     // Since the Windows API only works with integers, I multiply the font size by 100
     // and later divide the result by 100 to achieve better precision.
+    //
+    //var LFontFamily := _getFontFamily(AFontFamily);
+    //var LFont := CreateFont(
+    //               -Round(AFontSize*100), // nHeight: Integer;
+    //               0, // nWidth: Integer;
+    //               0, // nEscapement: Integer;
+    //               0, // nOrientaion: Integer;
+    //               FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
+    //               Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
+    //               cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
+    //               cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
+    //               DEFAULT_CHARSET, // fdwCharSet: DWORD
+    //               OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
+    //               CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
+    //               DEFAULT_QUALITY, // fdwQuality: DWORD
+    //               DEFAULT_PITCH or FF_DONTCARE, // fdwPitchAndFamily: DWORD
+    //               PChar(LFontFamily)); // lpszFace: LPCWSTR
+    //if LFont = 0 then raiseLastOsError;
+    //try
+    //  if SelectObject(_MeasureBitmap.DC, LFont) = 0 then raiseLastOsError;
+    //  var LText: String := Atext;
+    //  Result := LText.Length;
+    //  While Result > 0 do begin
+    //    var LSize: TSize;
+    //    if not GetTextExtentPoint32(_MeasureBitmap.DC, LText, LText.Length, LSize) then raiseLastOsError;
+    //    If CompareValue(LSize.Width, AMaxWidth*100, Tepsilon.Position) <= 0 then begin
+    //      AMeasuredWidth := LSize.Width/100;
+    //      AMeasuredHeight := LSize.Height/100;
+    //      exit;
+    //    end;
+    //    Result := _findLastBreakPosition(LText, Result-1, AHardBreak);
+    //    If Result > 0 then
+    //      LText := LText.Remove(Result);
+    //  end;
+    //  AMeasuredWidth := 0;
+    //  AMeasuredHeight := 0;
+    //finally
+    //  if not DeleteObject(LFont) then raiseLastOsError;
+    //end;
 
-    var LFontFamily := _getFontFamily(AFontFamily);
-    var LFont := CreateFont(
-                   -Round(AFontSize*100), // nHeight: Integer;
-                   0, // nWidth: Integer;
-                   0, // nEscapement: Integer;
-                   0, // nOrientaion: Integer;
-                   FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
-                   Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
-                   cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
-                   cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
-                   DEFAULT_CHARSET, // fdwCharSet: DWORD
-                   OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
-                   CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
-                   DEFAULT_QUALITY, // fdwQuality: DWORD
-                   DEFAULT_PITCH or FF_DONTCARE, // fdwPitchAndFamily: DWORD
-                   PChar(LFontFamily)); // lpszFace: LPCWSTR
-    if LFont = 0 then raiseLastOsError;
+    var LLayout := TTextLayoutManager.DefaultTextLayout.Create;
     try
-      if SelectObject(_MeasureBitmap.DC, LFont) = 0 then raiseLastOsError;
       var LText: String := Atext;
       Result := LText.Length;
       While Result > 0 do begin
-        var LSize: TSize;
-        if not GetTextExtentPoint32(_MeasureBitmap.DC, LText, LText.Length, LSize) then raiseLastOsError;
-        If CompareValue(LSize.Width, AMaxWidth*100, Tepsilon.Position) <= 0 then begin
-          AMeasuredWidth := LSize.Width/100;
-          AMeasuredHeight := LSize.Height/100;
-          exit;
+        LLayout.BeginUpdate;
+        LLayout.Font.Family := _getFontFamily(AFontFamily);
+        LLayout.Font.StyleExt := _getFontStyleExt(AFontWeight, AFontSlant, AFontStretch, ADecorationKinds);
+        LLayout.Font.Size := aFontSize;
+        LLayout.MaxSize := Tpointf.Create(65535, 65535);
+        LLayout.Trimming := TTextTrimming.Character;
+        LLayout.VerticalAlign := TTextAlign.Leading;
+        LLayout.HorizontalAlign := TTextAlign.Leading;
+        LLayout.WordWrap := false;
+        LLayout.Text := Ltext;
+        LLayout.EndUpdate;
+        AMeasuredWidth := LLayout.TextWidth;
+        AMeasuredHeight := LLayout.TextHeight;
+        If CompareValue(AMeasuredWidth, AMaxWidth, Tepsilon.Position) <= 0 then exit;
+        var LPrevResult: Integer := Result;
+        Result := _findLastBreakPosition(LText, Result-1, AHardBreak);
+        If Result > 0 then LText := LText.Remove(Result)
+        else if AHardBreak then begin
+          Result := LPrevResult - 1;
+          if LText[Result].IsHighSurrogate then dec(result);
+          If Result > 0 then LText := LText.Remove(Result);
         end;
-        Result := _findLastBreakPosition(LText, Result-1);
-        If Result > 0 then
-          LText := LText.Remove(Result);
       end;
       AMeasuredWidth := 0;
       AMeasuredHeight := 0;
     finally
-      if not DeleteObject(LFont) then raiseLastOsError;
+      ALFreeAndNil(LLayout);
     end;
 
     {$ENDIF}
@@ -2222,7 +2312,11 @@ begin
                   // the management of LPrevInsertEllipsisAt is crucial.
                   LInsertEllipsisAt := LMetrics[i].end_excluding_whitespaces;
                   if LInsertEllipsisAt >= LPrevInsertEllipsisAt then
-                    LInsertEllipsisAt := _findLastBreakPosition(LTextForRange, LPrevInsertEllipsisAt-1);
+                    LInsertEllipsisAt := _findLastBreakPosition(
+                                           LTextForRange, // const AText: String;
+                                           LPrevInsertEllipsisAt-1, // Const ANumberOfChars: Integer;
+                                           false, // const AHardBreak: Boolean = False;
+                                           true); // const ASkipEndOfTextPunctuation: Boolean = False)
                   // _findLastBreakPosition return -1 when LPrevInsertEllipsisAt = 0
                   if LInsertEllipsisAt < 0 then begin
                     ARect.Width := 0;
@@ -2542,9 +2636,6 @@ begin
     {$IF defined(ANDROID)}
     _Paint := TJPaint.JavaClass.init;
     {$ENDIF}
-    {$IF defined(MSWINDOWS)}
-    _CreateMeasureBitmap;
-    {$ENDIF}
     try
 
       {$IF defined(ANDROID)}
@@ -2636,8 +2727,8 @@ begin
                 (LExtendedTextElements[LExtendedTextElements.Count-1].IsEllipsis) do
             LExtendedTextElements.Delete(LExtendedTextElements.Count-1);
 
-          // Init LPartialEllipsis
-          var LPartialEllipsis := (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1);
+          // Init LInteractiveEllipsis
+          var LInteractiveEllipsis := (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1);
 
           // Internal Loop
           While True do begin
@@ -2652,7 +2743,7 @@ begin
               LAddEllipsis := 2;
 
               // Handle special case where ellispis is like "… more[+]"
-              if LPartialEllipsis then begin
+              if LInteractiveEllipsis then begin
                 While true do begin
                   if LExtendedTextElements.Count > 0 then begin
                     Var LExtendedTextElement := LExtendedTextElements[LExtendedTextElements.Count-1];
@@ -2663,7 +2754,10 @@ begin
                     else begin
                       LExtendedTextElements.Delete(LExtendedTextElements.Count-1);
                       LCurrText := ALTrimRight(LExtendedTextElement.Text);
-                      While (LCurrText <> '') and (LCurrText.Chars[LCurrText.Length-1] = '-') do
+                      While (LCurrText <> '') and
+                            ((LCurrText.Chars[LCurrText.Length-1].IsPunctuation) or // ., ; : ? ! - – — ' " ( ) [ ] { } < > / \ … ‘ ’ “ ” * & @ # % _ | ~ ^ + = « » ¡ ¿
+                             (LCurrText.Chars[LCurrText.Length-1].IsWhiteSpace) or // SPACE, TAB,LF,LINE-TAB,FF,CR, No-break Space, NEL
+                             (LCurrText.Chars[LCurrText.Length-1].IsSeparator)) do // Space / No-Break Space
                         LCurrText := ALTrimRight(LCurrText.Remove(LCurrText.Length-1));
                       if LCurrText = '' then continue;
                       LCurrText := LCurrText + '… ';
@@ -2708,7 +2802,7 @@ begin
 
             // If LAddEllipsis = 2, it means we must add the ellipsis element.
             else if LAddEllipsis = 2 then begin
-              if LPartialEllipsis then
+              if LInteractiveEllipsis then
                 LCurrText := ALCopyStr(AOptions.EllipsisText, 3, maxint)
               else
                 LCurrText := AOptions.EllipsisText;
@@ -2793,23 +2887,25 @@ begin
                 // The element is a Text
                 else begin
                   LCurrText := ALTrimRight(LExtendedTextElement.Text);
-                  // Special case LPartialEllipsis = true and LCurrText = '…'
+                  // Special case LInteractiveEllipsis = true and LCurrText = '…'
                   // Remove this element and redo the loop to trunk the previous
                   // element instead of this one
-                  if LPartialEllipsis and (LCurrText = '…') then
+                  if LInteractiveEllipsis and (LCurrText = '…') then
                     continue; // => Go to => While LAddEllipsis = Maxint do begin
                   var LNumberOfChars: Integer;
-                  if LPartialEllipsis then LNumberOfChars := LCurrText.Length - 2 // skip the '…'
+                  if LInteractiveEllipsis then LNumberOfChars := LCurrText.Length - 2 // skip the '…'
                   else LNumberOfChars := LCurrText.Length - 1;
-                  var LBreakPos := _findLastBreakPosition(LCurrText, LNumberOfChars);
-                  While (LBreakPos > 0) and (LCurrText.Chars[LBreakPos-1] = '-') do
-                    Dec(LBreakPos);
+                  var LBreakPos := _findLastBreakPosition(
+                                     LCurrText, // const AText: String;
+                                     LNumberOfChars, // Const ANumberOfChars: Integer;
+                                     (LExtendedTextElements.Count > 0) and (LExtendedTextElements[LExtendedTextElements.Count-1].IsBreakLine), // const AHardBreak: Boolean = False;
+                                     true); // const ASkipEndOfTextPunctuation: Boolean = False
                   if LBreakPos <= 0 then begin
                     LAddEllipsis := 1;
                     continue; // => Go to => else if LAddEllipsis = 1 then
                   end;
                   LCurrText := LCurrText.Remove(LBreakPos);
-                  if LPartialEllipsis then
+                  if LInteractiveEllipsis then
                     LCurrText := LCurrText + '… ';
                   // On the next loop add the ellipsis
                   LAddEllipsis := 2;
@@ -3147,6 +3243,7 @@ begin
                                     LLetterSpacing, // const ALetterSpacing: Single;
                                     AOptions.Direction, // const ADirection: TALTextDirection
                                     ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight - LCurrLineWidth, // const AMaxWidth: Single;
+                                    samevalue(LCurrLineWidth, 0, TEpsilon.Position), // const AHardBreak: Boolean;
                                     LMeasuredWidth, // out AMeasuredWidth: Single): integer;
                                     LMeasuredHeight) // out AMeasuredHeight: Single): integer;
               else begin
@@ -3219,13 +3316,12 @@ begin
                 var LOldLineHeight := -LFontMetrics.Ascent + LFontMetrics.Descent;
                 LExtendedTextElement.Ascent := (LFontMetrics.Ascent / LOldLineHeight) * LMeasuredHeight;
                 LExtendedTextElement.Descent := (LFontMetrics.Descent / LOldLineHeight) * LMeasuredHeight;
-                LExtendedTextElement.DrawTextOffsetY := LDrawTextOffsetY + (-1 * LExtendedTextElement.Ascent) - (-1 * LFontMetrics.Ascent);
               end
               else begin
                 LExtendedTextElement.Ascent := LFontMetrics.Ascent;
                 LExtendedTextElement.Descent := LFontMetrics.Descent;
-                LExtendedTextElement.DrawTextOffsetY := LDrawTextOffsetY;
               end;
+              LExtendedTextElement.DrawTextOffsetY := LDrawTextOffsetY;
               LExtendedTextElement.Rect := TrectF.Create(TpointF.Create(LCurrLineWidth, 0), LMeasuredWidth, -LExtendedTextElement.Ascent + LExtendedTextElement.Descent);
               LCurrLineWidth := LCurrLineWidth + LMeasuredWidth;
               LCurrLineHeight := Max(LCurrLineHeight, -LExtendedTextElement.Ascent + LExtendedTextElement.Descent);
@@ -3289,7 +3385,7 @@ begin
               end;
 
               // Remove white space between lines
-              While (LNumberOfChars < LCurrText.Length) and (LCurrText.Chars[LNumberOfChars].IsWhiteSpace) do
+              While (LNumberOfChars < LCurrText.Length) and (_IsWhiteSpace(LCurrText.Chars[LNumberOfChars])) do
                 inc(LNumberOfChars, 1);
 
               // Update LCurrText
@@ -3867,9 +3963,6 @@ begin
       ALFreeAndNil(LExtendedTextElements);
       {$IF defined(ANDROID)}
       _Paint := nil;
-      {$ENDIF}
-      {$IF defined(MSWINDOWS)}
-      _FreeMeasureBitmap;
       {$ENDIF}
     end;
 

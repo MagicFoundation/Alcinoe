@@ -17,6 +17,7 @@ uses
   FMX.layouts,
   FMX.Types,
   FMX.Controls,
+  Alcinoe.FMX.Controls,
   ALcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.ScrollEngine;
@@ -25,22 +26,71 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALLayout = class(TLayout, IALAutosizeControl)
+  TALLayout = class(TALControl, IALAutosizeControl)
   protected
     FAutoSize: Boolean;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
+    procedure Paint; override;
     { IALAutosizeControl }
     function HasUnconstrainedAutosizeX: Boolean; virtual;
     function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property Align;
+    property Anchors;
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
     property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    property ClipChildren;
+    property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Locked;
+    property Height;
+    property Hint;
+    property HitTest default False;
+    property Padding;
+    property Opacity;
+    property Margins;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
+    property ParentShowHint;
+    property ShowHint;
+    property TabOrder;
+    property TabStop;
+    { Events }
+    property OnPainting;
+    property OnPaint;
+    property OnResize;
+    property OnResized;
+    { Drag and Drop events }
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    { Mouse events }
+    property OnClick;
+    property OnDblClick;
+    property OnMouseDown;
+    property OnMouseMove;
+    property OnMouseUp;
+    property OnMouseWheel;
+    property OnMouseEnter;
+    property OnMouseLeave;
   end;
 
   {*************************}
@@ -55,7 +105,7 @@ type
   //   * InternalSizeChanged => FParentControl.Realign;
   // These notifications are crucial to trigger the realignment of the
   // scrollbox.
-  TALScrollBoxContent = class(TContent)
+  TALScrollBoxContent = class(TALContent)
   private
     FScrollBox: TALCustomScrollBox;
   protected
@@ -109,8 +159,8 @@ type
   TALScrollBoxPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
   TALScrollBoxBarInit = procedure(const sender: TObject; const aScrollBar: TALScrollBoxBar) of object;
 
-  {**********************************}
-  TALCustomScrollBox = class(TControl)
+  {**********************************************************}
+  TALCustomScrollBox = class(TALControl, IALScrollableControl)
   private
     FScrollEngine: TALScrollBoxScrollEngine;
     FContent: TALScrollBoxContent;
@@ -142,6 +192,8 @@ type
     procedure internalMouseMove(Shift: TShiftState; X, Y: Single);
     procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure internalMouseLeave;
+    { IALScrollableControl }
+    function GetScrollEngine: TALScrollEngine;
   protected
     procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
@@ -168,7 +220,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property ScrollEngine: TALScrollBoxScrollEngine read FScrollEngine;
+    property ScrollEngine: TALScrollEngine read GetScrollEngine;
     procedure Sort(Compare: TFmxObjectSortCompare); override;
     procedure ScrollBy(const Dx, Dy: Single);
     function GetTabList: ITabList; override;
@@ -410,6 +462,16 @@ constructor TALLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FAutoSize := False;
+  CanParentFocus := True;
+  HitTest := False;
+end;
+
+{************************}
+procedure TALLayout.Paint;
+begin
+  inherited;
+  if (csDesigning in ComponentState) and not Locked then
+    DrawDesignBorder;
 end;
 
 {****************************}
@@ -820,6 +882,12 @@ begin
   Result.AutoShowing := HasTouchScreen;
 end;
 
+{***********************************************************}
+function TALCustomScrollBox.GetScrollEngine: TALScrollEngine;
+begin
+  result := FScrollEngine;
+end;
+
 {***********************************************************************}
 procedure TALCustomScrollBox.setScrollCapturedByMe(const Value: boolean);
 begin
@@ -953,7 +1021,7 @@ end;
 
 {**}
 Type
-  _TALControlAccessProtected = class(Tcontrol);
+  _TControlAccessProtected = class(Tcontrol);
 
 {*************}
 {$IFNDEF ALDPK}
@@ -965,7 +1033,7 @@ begin
     // This action deactivates some functionalities in the native control, such as the right-click menu.
     if not Supports(aObject, IALNativeControl) then
     {$ENDIF}
-      _TALControlAccessProtected(aObject).capture;
+      _TControlAccessProtected(aObject).capture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
@@ -993,7 +1061,7 @@ begin
     // This action deactivates some functionalities in the native control, such as the right-click menu.
     if not Supports(aObject, IALNativeControl) then
     {$ENDIF}
-      _TALControlAccessProtected(aObject).releasecapture;
+      _TControlAccessProtected(aObject).releasecapture;
   end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);

@@ -17,6 +17,7 @@ uses
   FMX.Controls,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.Controls,
   Alcinoe.FMX.ScrollEngine;
 
 type
@@ -37,8 +38,8 @@ type
                               const aVelocity: Single;
                               const aAnimation: TALFloatPropertyAnimation) of object;
 
-  {**************************}
-  TALTabItem = class(TControl)
+  {****************************}
+  TALTabItem = class(TALControl)
   private
     FTabControl: TALTabControl;
     FIsSelected: Boolean;
@@ -95,7 +96,7 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALTabControl = class(TControl, IItemsContainer)
+  TALTabControl = class(TALControl, IItemsContainer)
   public type
     TFindKind = (Next, Back, First, Last, Current);
   private
@@ -824,13 +825,13 @@ end;
 
 {**}
 Type
-  _TALControlAccessProtected = class(Tcontrol);
+  _TControlAccessProtected = class(Tcontrol);
 
 {*************}
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+  if not aObject.AutoCapture then _TControlAccessProtected(aObject).capture;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
@@ -851,7 +852,7 @@ end;
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+  if not aObject.AutoCapture then _TControlAccessProtected(aObject).releasecapture;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;

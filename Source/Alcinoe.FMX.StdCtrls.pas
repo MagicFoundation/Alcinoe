@@ -149,8 +149,6 @@ type
     fTrackMouseDownPos: TPointF;
     FPressed: Boolean;
     fScrollCapturedByMe: boolean;
-    fScrollCapturedByOther: boolean;
-    procedure setScrollCapturedByMe(const Value: boolean);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     function PointToValue(X, Y: Single): Double;
   public
@@ -1151,7 +1149,6 @@ begin
   fMouseDownPos := TpointF.Zero;
   fTrackMouseDownPos := TpointF.Zero;
   fScrollCapturedByMe := False;
-  fScrollCapturedByOther := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
@@ -1196,24 +1193,9 @@ begin
     Result := inherited ;
 end;
 
-{******************************************************************}
-procedure TALTrackThumb.setScrollCapturedByMe(const Value: boolean);
-begin
-  if Value <> fScrollCapturedByMe  then begin
-    {$IFDEF DEBUG}
-    //ALLog('TALTrackThumb.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
-    {$ENDIF}
-    fScrollCapturedByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value), True);
-  end;
-end;
-
 {*********************************************************************************************}
 procedure TALTrackThumb.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
@@ -1227,20 +1209,17 @@ begin
       FPressed := False;
       if (not FValueRange.Tracking) then FValueRange.Tracking := True;
     end;
-    fScrollCapturedByOther := True;
-  end
-  else fScrollCapturedByOther := False;
+  end;
 end;
 
 {****************************************************************************************}
 procedure TALTrackThumb.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  if (not fScrollCapturedByOther) and (Button = TMouseButton.mbLeft) and Enabled then begin
+  if (Button = TMouseButton.mbLeft) and Enabled then begin
     BringToFront;
     repaint;
     FPressed := True;
-    setScrollCapturedByMe(False);
     fMouseDownPos := PointF(X, Y);
     fTrackMouseDownPos := FTrack.AbsoluteToLocal(LocalToAbsolute(fMouseDownPos));
     FTrack.SetFocus;
@@ -1258,7 +1237,7 @@ begin
 
     if (not fScrollCapturedByMe) then begin
       var LTrackMousePos := FTrack.AbsoluteToLocal(LocalToAbsolute(TpointF.Create(X,Y)));
-       If (((Ftrack.Orientation = TOrientation.Horizontal) and
+      If (((Ftrack.Orientation = TOrientation.Horizontal) and
            (abs(FTrackMouseDownPos.x - LTrackMousePos.x) > abs(FTrackMouseDownPos.y - LTrackMousePos.y)) and
            (abs(FTrackMouseDownPos.x - LTrackMousePos.x) > TALScrollEngine.DefaultTouchSlop)) or
           ((Ftrack.Orientation = TOrientation.Vertical) and
@@ -1266,7 +1245,8 @@ begin
            (abs(FTrackMouseDownPos.y - LTrackMousePos.y) > TALScrollEngine.DefaultTouchSlop))) then begin
         fMouseDownPos := PointF(X, Y);
         fTrackMouseDownPos := LTrackMousePos;
-        setScrollCapturedByMe(True);
+        fScrollCapturedByMe := true;
+        TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(true), True);
       end;
     end;
 
@@ -1290,7 +1270,7 @@ begin
   inherited;
   if FPressed then begin
 
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
 
     FPressed := False;
     try
@@ -1312,7 +1292,7 @@ begin
   inherited;
   if FPressed then begin
 
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
 
     FPressed := False;
     try
@@ -3500,6 +3480,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
 
@@ -3566,6 +3548,8 @@ begin
       StateStyles.Disabled.Stroke.Color := ALSetColorOpacity($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
 
@@ -3625,6 +3609,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
 
@@ -3692,6 +3678,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.Shadow.inherit := False;
@@ -3758,6 +3746,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
 
@@ -3823,6 +3813,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
 
@@ -3889,6 +3881,8 @@ begin
       StateStyles.Disabled.Stroke.Color := ALSetColorOpacity($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
 
@@ -3948,6 +3942,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
 
@@ -4015,6 +4011,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.Shadow.inherit := False;
@@ -4081,6 +4079,8 @@ begin
       StateStyles.Disabled.Stroke.Reset;
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
 

@@ -178,11 +178,9 @@ type
     fOnAniStop: TnotifyEvent;
     fMouseDownPos: TpointF;
     fScrollCapturedByMe: boolean;
-    fScrollCapturedByOther: boolean;
     fMaxContentWidth: Single;
     fMaxContentHeight: single;
     fAnchoredContentOffset: TPointF;
-    procedure setScrollCapturedByMe(const Value: boolean);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetShowScrollBars(const Value: Boolean);
     procedure SetAutoHide(const Value: Boolean);
@@ -697,7 +695,6 @@ begin
   //-----
   fMouseDownPos := TpointF.zero;
   fScrollCapturedByMe := False;
-  fScrollCapturedByOther := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
@@ -888,24 +885,9 @@ begin
   result := FScrollEngine;
 end;
 
-{***********************************************************************}
-procedure TALCustomScrollBox.setScrollCapturedByMe(const Value: boolean);
-begin
-  if Value <> fScrollCapturedByMe  then begin
-    {$IFDEF DEBUG}
-    //ALLog('TALCustomScrollBox.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
-    {$ENDIF}
-    fScrollCapturedByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value));
-  end;
-end;
-
 {**************************************************************************************************}
 procedure TALCustomScrollBox.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
@@ -919,9 +901,7 @@ begin
       fScrollEngine.Down := false;
       FMouseEvents := False;
     end;
-    fScrollCapturedByOther := True;
-  end
-  else fScrollCapturedByOther := False;
+  end;
 end;
 
 {*****************************************************************************************************}
@@ -933,9 +913,8 @@ begin
   //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
-  FMouseEvents := true;
-  if (not fScrollCapturedByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+  if (Button = TMouseButton.mbLeft) then begin
+    FMouseEvents := true;
     fMouseDownPos := TpointF.Create(X,Y);
     ScrollEngine.MouseDown(X, Y);
   end;
@@ -957,7 +936,10 @@ begin
          (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop)) or
         ((ttVertical in fScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.y - y) > abs(fMouseDownPos.x - x)) and
-         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then setScrollCapturedByMe(True);
+         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then begin
+      fScrollCapturedByMe := True;
+      TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(True));
+    end;
     ScrollEngine.MouseMove(X, Y);
   end;
 end;
@@ -972,7 +954,7 @@ begin
   //  TalLogType.verbose);
   {$ENDIF}
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseUp(X, Y);
     FMouseEvents := False;
   end;
@@ -985,7 +967,7 @@ begin
   //ALLog('TALCustomScrollBox.internalMouseLeave', TalLogType.verbose);
   {$ENDIF}
   if FMouseEvents then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseLeave;
     FMouseEvents := False;
   end;

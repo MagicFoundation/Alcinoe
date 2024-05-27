@@ -117,8 +117,6 @@ type
     fOnAniProcess: TnotifyEvent;
     fMouseDownPos: TPointF;
     fScrollCapturedByMe: boolean;
-    fScrollCapturedByOther: boolean;
-    procedure setScrollCapturedByMe(const Value: boolean);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetTabIndex(const Value: Integer);
     function GetActiveTab: TALTabItem;
@@ -471,7 +469,6 @@ begin
   SetAcceptsControls(True);
   fMouseDownPos := TpointF.Zero;
   fScrollCapturedByMe := False;
-  fScrollCapturedByOther := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //-----
   FScrollEngine := TALTabControlScrollEngine.Create(Self);
@@ -690,24 +687,9 @@ begin
     FOnChange(Self);
 end;
 
-{******************************************************************}
-procedure TALTabControl.setScrollCapturedByMe(const Value: boolean);
-begin
-  if Value <> fScrollCapturedByMe  then begin
-    {$IFDEF DEBUG}
-    //ALLog('TALTabControl.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
-    {$ENDIF}
-    fScrollCapturedByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value));
-  end;
-end;
-
 {*********************************************************************************************}
 procedure TALTabControl.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
@@ -720,12 +702,11 @@ begin
     if fScrollEngine.down then begin
       fScrollEngine.Down := false; // instead of down := false to reposition the tabitem
       FMouseEvents := False;
-      // If i try with fScrollEngine.launchanimation i have a flickr because the anim stop and restart at a different speed
+      // If I try with fScrollEngine.launchanimation I have a flickr because the
+      // anim stop and restart at a different speed
       if not FAniTransition.Running then RealignTabs;
     end;
-    fScrollCapturedByOther := True;
-  end
-  else fScrollCapturedByOther := False;
+  end;
 end;
 
 {************************************************************************************************}
@@ -737,10 +718,9 @@ begin
   //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
-  FMouseEvents := true;
   if not AnimationEnabled then exit;
-  if (not fScrollCapturedByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+  if (Button = TMouseButton.mbLeft) then begin
+    FMouseEvents := true;
     fMouseDownPos := TPointF.Create(X,Y);
     ScrollEngine.MouseDown(X, Y);
   end;
@@ -759,7 +739,10 @@ begin
   if FMouseEvents then begin
     if (not fScrollCapturedByMe) and
        (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
-       (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then setScrollCapturedByMe(True);
+       (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then begin
+      fScrollCapturedByMe := True;
+      TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(true));
+    end;
     ScrollEngine.MouseMove(X, Y);
   end;
 end;
@@ -775,7 +758,7 @@ begin
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseUp(X, Y);
     FMouseEvents := False;
   end;
@@ -789,7 +772,7 @@ begin
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseLeave;
     FMouseEvents := False;
   end;

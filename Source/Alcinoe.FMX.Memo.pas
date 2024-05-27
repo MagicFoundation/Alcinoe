@@ -5,6 +5,7 @@ interface
 {$I Alcinoe.inc}
 
 uses
+  System.Types,
   system.Classes,
   System.UITypes,
   {$IF defined(android)}
@@ -49,7 +50,7 @@ type
   {**************************************************}
   TALAndroidMemoControl = class(TALAndroidEditControl)
   public
-    function getLineCount: integer;
+    function getLineCount: integer; override;
   end;
 
 {$endif}
@@ -65,6 +66,10 @@ type
   {****************************************}
   IALIosMemoTextView = interface(UITextView)
     ['{EEF3FCE4-9755-48D7-B896-2C662EFDE9FC}']
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
     function canBecomeFirstResponder: Boolean; cdecl;
     function becomeFirstResponder: Boolean; cdecl;
   end;
@@ -74,6 +79,7 @@ type
   private
     FMemoControl: TALIosMemoControl;
     function GetView: UITextView;
+    function ExtractFirstTouchPoint(touches: NSSet): TPointF;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
@@ -81,6 +87,10 @@ type
   public
     constructor Create; overload; override;
     constructor Create(const AControl: TControl); overload; override;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
     function canBecomeFirstResponder: Boolean; cdecl;
     function becomeFirstResponder: Boolean; cdecl;
     property View: UITextView read GetView;
@@ -144,7 +154,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function getLineCount: integer;
+    function getLineCount: integer; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALIosMemoTextView read GetNativeView;
   end;
@@ -283,7 +293,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    function getLineCount: integer;
+    function getLineCount: integer; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALMacMemoScrollView read GetNativeView;
   end;
@@ -309,7 +319,7 @@ type
     Function CreateNativeView: TALWinNativeView; override;
     function GetNativeView: TALWinMemoView; reintroduce; virtual;
   public
-    function getLineCount: integer;
+    function getLineCount: integer; override;
     property NativeView: TALWinMemoView read GetNativeView;
   end;
 
@@ -336,7 +346,6 @@ type
     function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
-    function getLineCount: Integer;
   published
     property AutoSizeLineCount: Single read FAutosizeLineCount write SetAutosizeLineCount Stored IsAutosizeLineCountStored;
     property TextSettings: TALMemoTextSettings read GetTextSettings write SetTextSettings;
@@ -348,7 +357,6 @@ implementation
 
 uses
   System.SysUtils,
-  System.Types,
   System.Math,
   System.Math.Vectors,
   FMX.Utils,
@@ -419,10 +427,75 @@ begin
   View.setSelectable(value);
 end;
 
+{**************************************************************************}
+function TALIosMemoTextView.ExtractFirstTouchPoint(touches: NSSet): TPointF;
+begin
+  var LPointer := touches.anyObject;
+  if LPointer=nil then
+    raise Exception.Create('Error EB35596D-FDFB-43A6-AF16-02C3927F68C5');
+  var LLocalTouch := TUITouch.Wrap(LPointer);
+  if Form=nil then
+    raise Exception.Create('Error C7EE1922-BDBD-4710-A691-4F5DD6777C33');
+  var LTouchPoint := LLocalTouch.locationInView(GetFormView(Form));
+  Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
+end;
+
+{*****************************************************************************}
+procedure TALIosMemoTextView.touchesBegan(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
+    Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
+    Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALIosMemoTextView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    Form.MouseLeave;
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALIosMemoTextView.touchesEnded(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    Form.MouseLeave;
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALIosMemoTextView.touchesMoved(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (FMemoControl.getLineCount < FMemoControl.Height / FMemoControl.getLineHeight) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+  end;
+end;
+
 {********************************************************}
 function TALIosMemoTextView.canBecomeFirstResponder: Boolean;
 begin
-  Result := UITextView(Super).canBecomeFirstResponder and TALMemo(fMemoControl.Owner).canFocus;
+  Result := UITextView(Super).canBecomeFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
 
 {*****************************************************}
@@ -431,9 +504,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  if (not TControl(FMemoControl.Owner).IsFocused) then
+    TControl(FMemoControl.Owner).SetFocus;
   Result := UITextView(Super).becomeFirstResponder;
-  if Result and (not TALEdit(FMemoControl.Owner).IsFocused) then
-    TALEdit(FMemoControl.Owner).SetFocus;
 end;
 
 {*****************************************************}
@@ -479,7 +552,7 @@ end;
 {***************************************************************************}
 procedure TALIosMemoTextViewDelegate.textViewDidEndEditing(textView: UITextView);
 begin
-  TALMemo(FMemoControl.Owner).ResetFocus;
+  TControl(FMemoControl.Owner).ResetFocus;
 end;
 
 {****************************************************************************************}
@@ -902,7 +975,7 @@ end;
 {*****************************************************}
 function TALMacMemoScrollView.acceptsFirstResponder: Boolean;
 begin
-  Result := NSScrollView(Super).acceptsFirstResponder and TALMemo(fMemoControl.Owner).canFocus;
+  Result := NSScrollView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
 
 {*****************************************************}
@@ -911,9 +984,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacMemoScrollView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  if (not TControl(FMemoControl.Owner).IsFocused) then
+    TControl(FMemoControl.Owner).SetFocus;
   Result := NSScrollView(Super).becomeFirstResponder;
-  if Result and (not TALEdit(FMemoControl.Owner).IsFocused) then
-    TALEdit(FMemoControl.Owner).SetFocus;
 end;
 
 {*****************************************************}
@@ -950,7 +1023,7 @@ end;
 {**********************************************}
 function TALMacMemoTextView.acceptsFirstResponder: Boolean;
 begin
-  Result := NSTextView(Super).acceptsFirstResponder and TALMemo(fMemoControl.Owner).canFocus;
+  Result := NSTextView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
 
 {**********************************************}
@@ -959,9 +1032,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  if (not TControl(FMemoControl.Owner).IsFocused) then
+    TControl(FMemoControl.Owner).SetFocus;
   Result := NSTextView(Super).becomeFirstResponder;
-  if Result and (not TALEdit(FMemoControl.Owner).IsFocused) then
-    TALEdit(FMemoControl.Owner).SetFocus;
 end;
 
 {*******************************************************************************}
@@ -990,7 +1063,7 @@ end;
 {*******************************************************************************}
 procedure TALMacMemoTextViewDelegate.textDidEndEditing(notification: NSNotification);
 begin
-  TALMemo(FMemoControl.Owner).ResetFocus;
+  TControl(FMemoControl.Owner).ResetFocus;
 end;
 
 {**********************************************************************************}
@@ -1377,8 +1450,8 @@ end;
 {****************************************************************}
 procedure TALWinMemoView.WMMouseWheel(var Message: TWMMouseWheel);
 begin
-  if (not TALMemo(EditControl.Owner).IsFocused) or
-     (TALWinMemoControl(EditControl).getLineCount < EditControl.Height / EditControl.getLineHeight)  then inherited
+  if (not TControl(EditControl.Owner).IsFocused) or
+     (EditControl.getLineCount < EditControl.Height / EditControl.getLineHeight)  then inherited
   else begin
     if (Message.WheelDelta > 0) then
       SendMessage(Handle, EM_LINESCROLL, 0, -1)
@@ -1418,13 +1491,25 @@ end;
 
 {*********************************************}
 constructor TALMemo.Create(AOwner: TComponent);
+
+  procedure _UpdateTextSettings(const ATextSettings: TALBaseTextSettings);
+  begin
+    var LTextSettingsChanged: TNotifyEvent := ATextSettings.OnChanged;
+    ATextSettings.OnChanged := nil;
+    ATextSettings.DefaultVertAlign := TALTextVertAlign.Leading;
+    ATextSettings.VertAlign := ATextSettings.DefaultVertAlign;
+    ATextSettings.OnChanged := LTextSettingsChanged;
+  end;
+
 begin
   inherited;
-  var LTextSettingsChanged: TNotifyEvent := TextSettings.OnChanged;
-  TextSettings.OnChanged := nil;
-  TextSettings.DefaultVertAlign := TALTextVertAlign.Leading;
-  TextSettings.VertAlign := TextSettings.DefaultVertAlign;
-  TextSettings.OnChanged := LTextSettingsChanged;
+  _UpdateTextSettings(TextSettings);
+  _UpdateTextSettings(StateStyles.Disabled.TextSettings);
+  _UpdateTextSettings(StateStyles.Hovered.TextSettings);
+  _UpdateTextSettings(StateStyles.Focused.TextSettings);
+  _UpdateTextSettings(StateStyles.Error.TextSettings);
+  _UpdateTextSettings(StateStyles.ErrorHovered.TextSettings);
+  _UpdateTextSettings(StateStyles.ErrorFocused.TextSettings);
   FAutosizeLineCount := 0;
 end;
 
@@ -1515,22 +1600,6 @@ begin
       TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
     end;
   end;
-end;
-
-{*************************************}
-function TALMemo.getLineCount: Integer;
-begin
-  {$IF defined(android)}
-  result := TALAndroidMemoControl(EditControl).getLineCount;
-  {$ELSEIF defined(ios)}
-  result := TALIosMemoControl(EditControl).getLineCount;
-  {$ELSEIF defined(ALMacOS)}
-  result := TALMacMemoControl(EditControl).getLineCount;
-  {$ELSEIF defined(MSWindows)}
-  result := TALWinMemoControl(EditControl).getLineCount;
-  {$ELSE}
-    Not implemented
-  {$ENDIF}
 end;
 
 {**************************************************}

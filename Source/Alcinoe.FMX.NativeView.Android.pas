@@ -195,7 +195,6 @@ begin
   // because it updates not only the bounds but also the visibility! Code below is taken from
   // TAndroidZOrderManager.UpdateBounds
   if FForm = nil then exit;
-  var LParam: JRelativeLayout_LayoutParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
   var LBounds := Control.AbsoluteRect;
   var LScreenScale: Single := FForm.Handle.Scale;
   var R := TRectF.Create(
@@ -203,17 +202,16 @@ begin
               LBounds.Top * LScreenScale,
               LBounds.Right * LScreenScale,
               LBounds.Bottom * LScreenScale).Round;
-  LParam.width := R.Width;
-  LParam.height := R.Height;
-  LParam.leftMargin := R.Left;
-  LParam.topMargin := R.Top;
-  if not Layout.isInLayout then
-    Layout.requestLayout
-  else
-    TThread.ForceQueue(nil, procedure
-    begin
-      Layout.requestLayout;
-    end);
+  If (R.Width <> Layout.getWidth) or (R.Height <> Layout.getHeight) then begin
+    var LParam: JRelativeLayout_LayoutParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
+    LParam.width := R.Width;
+    LParam.height := R.Height;
+    Layout.setLayoutParams(LParam);
+  end;
+  if Layout.getLeft <> R.Left then
+    Layout.setX(R.Left);
+  if Layout.getTop <> R.Top then
+    Layout.setY(R.Top);
 end;
 
 {*****************************************}

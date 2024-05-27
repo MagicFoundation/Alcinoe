@@ -41,6 +41,7 @@ uses
   FMX.types,
   Fmx.controls,
   fmx.Graphics,
+  Alcinoe.FMX.Controls,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Objects,
@@ -62,8 +63,8 @@ Type
     acSentences, // Specifies automatic capitalization of the first letter of each sentence.
     acAllCharacters); // Specifies automatic capitalization of all characters, such as for entry of two-character state abbreviations for the United States.
 
-  {**********************************}
-  TALBaseEditControl = class(TControl)
+  {************************************}
+  TALBaseEditControl = class(TALControl)
   strict private
     fOnChangeTracking: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
@@ -126,6 +127,7 @@ Type
     destructor Destroy; override;
     procedure RecalcOpacity; override;
     procedure RecalcEnabled; override;
+    function getLineCount: integer; virtual;
     function getLineHeight: Single; virtual; abstract; // It includes the line spacing
     function HasNativeView: boolean; virtual;
     Procedure AddNativeView; virtual;
@@ -198,6 +200,15 @@ type
         function onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean; cdecl;
       end;
 
+      {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+      TALTouchListener = class(TJavaLocal, JView_OnTouchListener)
+      private
+        FEditText: TALAndroidEditText;
+      public
+        constructor Create(const aEditText: TALAndroidEditText);
+        function onTouch(v: JView; event: JMotionEvent): Boolean; cdecl;
+      end;
+
   private
     fIsMultiline: boolean;
     fDefStyleAttr: String;
@@ -205,6 +216,7 @@ type
     FTextWatcher: TALTextWatcher;
     FEditorActionListener: TALEditorActionListener;
     FKeyPreImeListener: TALKeyPreImeListener;
+    FTouchListener: TALTouchListener;
     FEditControl: TALAndroidEditControl;
     function GetView: JALEditText;
   protected
@@ -285,6 +297,10 @@ type
   {******************************************}
   IALIosEditTextField = interface(UITextField)
     ['{E4E67240-F15A-444F-8CE1-A3A830C023E8}']
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure ControlEventEditingChanged; cdecl;
     function canBecomeFirstResponder: Boolean; cdecl;
     function becomeFirstResponder: Boolean; cdecl;
@@ -295,6 +311,7 @@ type
   private
     FEditControl: TALIosEditControl;
     function GetView: UITextField;
+    function ExtractFirstTouchPoint(touches: NSSet): TPointF;
   protected
     function GetObjectiveCClass: PTypeInfo; override;
   public
@@ -303,6 +320,10 @@ type
     constructor Create; overload; override;
     constructor Create(const AControl: TControl); overload; override;
     destructor Destroy; override;
+    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
+    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
     procedure ControlEventEditingChanged; cdecl;
     function canBecomeFirstResponder: Boolean; cdecl;
     function becomeFirstResponder: Boolean; cdecl;
@@ -569,6 +590,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
+    procedure Reset; override;
   published
     property Font;
     property Trimming;
@@ -596,6 +618,7 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
+    procedure Reset; override;
   published
     property Font;
     property Trimming;
@@ -906,6 +929,7 @@ type
     function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
+    function getLineCount: integer;
     function getLineHeight: Single; // It includes the line spacing
     procedure MakeBufDrawable; override;
     procedure MakeBufPromptTextDrawable; virtual;
@@ -1038,13 +1062,92 @@ begin
 
     {$REGION 'Default'}
     if ATheme = 'Default' then begin
+      //--Enabled (default)--
+      if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
+      else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
+      padding.Rect := padding.DefaultValue;
+      Corners := AllCorners;
+      Sides := AllSides;
+      XRadius := 0;
+      YRadius := 0;
+      TintColor := TalphaColors.null;
+      Fill.Kind := fill.DefaultKind;
+      Fill.Color := fill.DefaultColor;
+      Stroke.Kind := Stroke.DefaultKind;
+      Stroke.Color := Stroke.DefaultColor;
+      Stroke.Thickness := 1;
+      var LPrevIsHtml := TextSettings.IsHtml;
+      TextSettings.Reset;
+      TextSettings.IsHtml := LPrevIsHtml;
+      LPrevIsHtml := LabelTextSettings.IsHtml;
+      LabelTextSettings.Reset;
+      LabelTextSettings.IsHtml := LPrevIsHtml;
+      LPrevIsHtml := SupportingTextSettings.IsHtml;
+      SupportingTextSettings.Reset;
+      SupportingTextSettings.IsHtml := LPrevIsHtml;
+      Shadow.Reset;
+      PromptTextcolor := TAlphaColors.null;
 
-    end
-    {$ENDREGION}
+      //--Disabled--
+      StateStyles.Disabled.TintColor := TAlphaColors.Null;
+      StateStyles.Disabled.Opacity := TControl.DefaultDisabledOpacity;
+      StateStyles.Disabled.Fill.Reset;
+      StateStyles.Disabled.Stroke.Reset;
+      StateStyles.Disabled.TextSettings.Reset;
+      StateStyles.Disabled.LabelTextSettings.Reset;
+      StateStyles.Disabled.SupportingTextSettings.Reset;
+      StateStyles.Disabled.Shadow.Reset;
+      StateStyles.Disabled.PromptTextcolor := TAlphaColors.Null;
 
-    {$REGION 'Windows'}
-    else if ATheme = 'Windows' then begin
+      //--Hovered--
+      StateStyles.Hovered.TintColor := TAlphaColors.Null;
+      StateStyles.Hovered.Fill.Reset;
+      StateStyles.Hovered.Stroke.Reset;
+      StateStyles.Hovered.TextSettings.Reset;
+      StateStyles.Hovered.LabelTextSettings.Reset;
+      StateStyles.Hovered.SupportingTextSettings.Reset;
+      StateStyles.Hovered.Shadow.Reset;
+      StateStyles.Hovered.PromptTextcolor := TAlphaColors.Null;
 
+      //--Focused--
+      StateStyles.Focused.TintColor := TAlphaColors.Null;
+      StateStyles.Focused.Fill.Reset;
+      StateStyles.Focused.Stroke.Reset;
+      StateStyles.Focused.TextSettings.Reset;
+      StateStyles.Focused.LabelTextSettings.Reset;
+      StateStyles.Focused.SupportingTextSettings.Reset;
+      StateStyles.Focused.Shadow.Reset;
+      StateStyles.Focused.PromptTextcolor := TAlphaColors.Null;
+
+      //--Error--
+      StateStyles.Error.TintColor := TAlphaColors.Null;
+      StateStyles.Error.Fill.Reset;
+      StateStyles.Error.Stroke.Reset;
+      StateStyles.Error.TextSettings.Reset;
+      StateStyles.Error.LabelTextSettings.Reset;
+      StateStyles.Error.SupportingTextSettings.Reset;
+      StateStyles.Error.Shadow.Reset;
+      StateStyles.Error.PromptTextcolor := TAlphaColors.Null;
+
+      //--ErrorHovered--
+      StateStyles.ErrorHovered.TintColor := TAlphaColors.Null;
+      StateStyles.ErrorHovered.Fill.Reset;
+      StateStyles.ErrorHovered.Stroke.Reset;
+      StateStyles.ErrorHovered.TextSettings.Reset;
+      StateStyles.ErrorHovered.LabelTextSettings.Reset;
+      StateStyles.ErrorHovered.SupportingTextSettings.Reset;
+      StateStyles.ErrorHovered.Shadow.Reset;
+      StateStyles.ErrorHovered.PromptTextcolor := TAlphaColors.Null;
+
+      //--ErrorFocused--
+      StateStyles.ErrorFocused.TintColor := TAlphaColors.Null;
+      StateStyles.ErrorFocused.Fill.reset;
+      StateStyles.ErrorFocused.Stroke.Reset;
+      StateStyles.ErrorFocused.TextSettings.Reset;
+      StateStyles.ErrorFocused.LabelTextSettings.Reset;
+      StateStyles.ErrorFocused.SupportingTextSettings.Reset;
+      StateStyles.ErrorFocused.Shadow.Reset;
+      StateStyles.ErrorFocused.PromptTextcolor := TAlphaColors.Null;
     end
     {$ENDREGION}
 
@@ -1059,6 +1162,8 @@ begin
       Sides := [TSide.Bottom];
       XRadius := 4;
       YRadius := 4;
+      DefStyleAttr := 'Material3LightFilledEditTextStyle';
+      DefStyleRes := '';
       TintColor := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
       Fill.Kind := TBrushKind.Solid;
       Fill.Color := $FFE6E0E9; // md.sys.color.surface-container-highest / md.ref.palette.neutral90
@@ -1098,12 +1203,18 @@ begin
       StateStyles.Disabled.Stroke.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.Size := 0;
+      StateStyles.Disabled.LabelTextSettings.Font.Family := '';
       StateStyles.Disabled.LabelTextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Disabled.SupportingTextSettings.Font.Family := '';
       StateStyles.Disabled.SupportingTextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.PromptTextcolor := StateStyles.Disabled.LabelTextSettings.Font.Color;
@@ -1118,12 +1229,18 @@ begin
       StateStyles.Hovered.Stroke.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Hovered.TextSettings.Assign(TextSettings);
       StateStyles.Hovered.TextSettings.Inherit := False;
+      StateStyles.Hovered.TextSettings.Font.Size := 0;
+      StateStyles.Hovered.TextSettings.Font.Family := '';
       StateStyles.Hovered.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
+      StateStyles.Hovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.Hovered.LabelTextSettings.Font.Family := '';
       StateStyles.Hovered.LabelTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       StateStyles.Hovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Hovered.SupportingTextSettings.Inherit := False;
+      StateStyles.Hovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Hovered.SupportingTextSettings.Font.Family := '';
       StateStyles.Hovered.SupportingTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       StateStyles.Hovered.Shadow.Reset;
       StateStyles.Hovered.PromptTextcolor := StateStyles.Hovered.LabelTextSettings.Font.Color;
@@ -1137,12 +1254,18 @@ begin
       StateStyles.Focused.Stroke.Thickness := 3;
       StateStyles.Focused.TextSettings.Assign(TextSettings);
       StateStyles.Focused.TextSettings.Inherit := False;
+      StateStyles.Focused.TextSettings.Font.Size := 0;
+      StateStyles.Focused.TextSettings.Font.Family := '';
       StateStyles.Focused.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
+      StateStyles.Focused.LabelTextSettings.Font.Size := 0;
+      StateStyles.Focused.LabelTextSettings.Font.Family := '';
       StateStyles.Focused.LabelTextSettings.Font.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
       StateStyles.Focused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Focused.SupportingTextSettings.Inherit := False;
+      StateStyles.Focused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Focused.SupportingTextSettings.Font.Family := '';
       StateStyles.Focused.SupportingTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       StateStyles.Focused.Shadow.Reset;
       StateStyles.Focused.PromptTextcolor := StateStyles.Focused.LabelTextSettings.Font.Color;
@@ -1155,12 +1278,18 @@ begin
       StateStyles.Error.Stroke.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.Error.TextSettings.Assign(TextSettings);
       StateStyles.Error.TextSettings.Inherit := False;
+      StateStyles.Error.TextSettings.Font.Size := 0;
+      StateStyles.Error.TextSettings.Font.Family := '';
       StateStyles.Error.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Error.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Error.LabelTextSettings.Inherit := False;
+      StateStyles.Error.LabelTextSettings.Font.Size := 0;
+      StateStyles.Error.LabelTextSettings.Font.Family := '';
       StateStyles.Error.LabelTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.Error.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Error.SupportingTextSettings.Inherit := False;
+      StateStyles.Error.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Error.SupportingTextSettings.Font.Family := '';
       StateStyles.Error.SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.Error.Shadow.Reset;
       StateStyles.Error.PromptTextcolor := StateStyles.Error.LabelTextSettings.Font.Color;
@@ -1175,12 +1304,18 @@ begin
       StateStyles.ErrorHovered.Stroke.Color := $FF410E0B; // md.sys.color.on-error-container / md.ref.palette.error10
       StateStyles.ErrorHovered.TextSettings.Assign(TextSettings);
       StateStyles.ErrorHovered.TextSettings.Inherit := False;
+      StateStyles.ErrorHovered.TextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.TextSettings.Font.Family := '';
       StateStyles.ErrorHovered.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.ErrorHovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorHovered.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.LabelTextSettings.Font.Color := $FF410E0B; // md.sys.color.on-error-container / md.ref.palette.error10
       StateStyles.ErrorHovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorHovered.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.ErrorHovered.Shadow.Reset;
       StateStyles.ErrorHovered.PromptTextcolor := StateStyles.ErrorHovered.LabelTextSettings.Font.Color;
@@ -1194,12 +1329,18 @@ begin
       StateStyles.ErrorFocused.Stroke.Thickness := 3;
       StateStyles.ErrorFocused.TextSettings.Assign(TextSettings);
       StateStyles.ErrorFocused.TextSettings.Inherit := False;
+      StateStyles.ErrorFocused.TextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.TextSettings.Font.Family := '';
       StateStyles.ErrorFocused.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.ErrorFocused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorFocused.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.LabelTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.ErrorFocused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorFocused.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.ErrorFocused.Shadow.Reset;
       StateStyles.ErrorFocused.PromptTextcolor := StateStyles.ErrorFocused.LabelTextSettings.Font.Color;
@@ -1212,11 +1353,13 @@ begin
       //--Enabled (default)--
       if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
       else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
-      padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
+      padding.Rect := TRectF.Create(16{Left}, 16{Top}, 16{Right}, 16{Bottom});
       Corners := AllCorners;
       Sides := AllSides;
       XRadius := 4;
       YRadius := 4;
+      DefStyleAttr := 'Material3LightOutlinedEditTextStyle';
+      DefStyleRes := '';
       TintColor := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
       Fill.Kind := TBrushKind.solid;
       Fill.Color := $FFFFFFFF;
@@ -1254,12 +1397,18 @@ begin
       StateStyles.Disabled.Stroke.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.Size := 0;
+      StateStyles.Disabled.LabelTextSettings.Font.Family := '';
       StateStyles.Disabled.LabelTextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Disabled.SupportingTextSettings.Font.Family := '';
       StateStyles.Disabled.SupportingTextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.PromptTextcolor := StateStyles.Disabled.LabelTextSettings.Font.Color;
@@ -1272,12 +1421,18 @@ begin
       StateStyles.Hovered.Stroke.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Hovered.TextSettings.Assign(TextSettings);
       StateStyles.Hovered.TextSettings.Inherit := False;
+      StateStyles.Hovered.TextSettings.Font.Size := 0;
+      StateStyles.Hovered.TextSettings.Font.Family := '';
       StateStyles.Hovered.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
+      StateStyles.Hovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.Hovered.LabelTextSettings.Font.Family := '';
       StateStyles.Hovered.LabelTextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Hovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Hovered.SupportingTextSettings.Inherit := False;
+      StateStyles.Hovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Hovered.SupportingTextSettings.Font.Family := '';
       StateStyles.Hovered.SupportingTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       StateStyles.Hovered.Shadow.Reset;
       StateStyles.Hovered.PromptTextcolor := StateStyles.Hovered.LabelTextSettings.Font.Color;
@@ -1291,12 +1446,18 @@ begin
       StateStyles.Focused.Stroke.Thickness := 3;
       StateStyles.Focused.TextSettings.Assign(TextSettings);
       StateStyles.Focused.TextSettings.Inherit := False;
+      StateStyles.Focused.TextSettings.Font.Size := 0;
+      StateStyles.Focused.TextSettings.Font.Family := '';
       StateStyles.Focused.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
+      StateStyles.Focused.LabelTextSettings.Font.Size := 0;
+      StateStyles.Focused.LabelTextSettings.Font.Family := '';
       StateStyles.Focused.LabelTextSettings.Font.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
       StateStyles.Focused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Focused.SupportingTextSettings.Inherit := False;
+      StateStyles.Focused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Focused.SupportingTextSettings.Font.Family := '';
       StateStyles.Focused.SupportingTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       StateStyles.Focused.Shadow.Reset;
       StateStyles.Focused.PromptTextcolor := StateStyles.Focused.LabelTextSettings.Font.Color;
@@ -1309,12 +1470,18 @@ begin
       StateStyles.Error.Stroke.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.Error.TextSettings.Assign(TextSettings);
       StateStyles.Error.TextSettings.Inherit := False;
+      StateStyles.Error.TextSettings.Font.Size := 0;
+      StateStyles.Error.TextSettings.Font.Family := '';
       StateStyles.Error.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.Error.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Error.LabelTextSettings.Inherit := False;
+      StateStyles.Error.LabelTextSettings.Font.Size := 0;
+      StateStyles.Error.LabelTextSettings.Font.Family := '';
       StateStyles.Error.LabelTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.Error.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Error.SupportingTextSettings.Inherit := False;
+      StateStyles.Error.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Error.SupportingTextSettings.Font.Family := '';
       StateStyles.Error.SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.Error.Shadow.Reset;
       StateStyles.Error.PromptTextcolor := StateStyles.Error.LabelTextSettings.Font.Color;
@@ -1327,12 +1494,18 @@ begin
       StateStyles.ErrorHovered.Stroke.Color := $FF410E0B; // md.sys.color.on-error-container / md.ref.palette.error10
       StateStyles.ErrorHovered.TextSettings.Assign(TextSettings);
       StateStyles.ErrorHovered.TextSettings.Inherit := False;
+      StateStyles.ErrorHovered.TextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.TextSettings.Font.Family := '';
       StateStyles.ErrorHovered.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.ErrorHovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorHovered.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.LabelTextSettings.Font.Color := $FF410E0B; // md.sys.color.on-error-container / md.ref.palette.error10
       StateStyles.ErrorHovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorHovered.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.ErrorHovered.Shadow.Reset;
       StateStyles.ErrorHovered.PromptTextcolor := StateStyles.ErrorHovered.LabelTextSettings.Font.Color;
@@ -1346,12 +1519,18 @@ begin
       StateStyles.ErrorFocused.Stroke.Thickness := 3;
       StateStyles.ErrorFocused.TextSettings.Assign(TextSettings);
       StateStyles.ErrorFocused.TextSettings.Inherit := False;
+      StateStyles.ErrorFocused.TextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.TextSettings.Font.Family := '';
       StateStyles.ErrorFocused.TextSettings.Font.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
       StateStyles.ErrorFocused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorFocused.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.LabelTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.ErrorFocused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorFocused.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       StateStyles.ErrorFocused.Shadow.Reset;
       StateStyles.ErrorFocused.PromptTextcolor := StateStyles.ErrorFocused.LabelTextSettings.Font.Color;
@@ -1369,6 +1548,8 @@ begin
       Sides := AllSides;
       XRadius := 8;
       YRadius := 8;
+      DefStyleAttr := '';
+      DefStyleRes := '';
       TintColor := $FF1c2b33;
       Fill.Kind := TBrushKind.solid;
       Fill.Color := $FFFFFFFF;
@@ -1406,12 +1587,18 @@ begin
       StateStyles.Disabled.Stroke.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1c2b33, 0.12);
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1c2b33, 0.38);
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.Size := 0;
+      StateStyles.Disabled.LabelTextSettings.Font.Family := '';
       StateStyles.Disabled.LabelTextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1c2b33, 0.38);
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Disabled.SupportingTextSettings.Font.Family := '';
       StateStyles.Disabled.SupportingTextSettings.Font.Color := ALBlendColorWithOpacity($FFFFFFFF, $FF1c2b33, 0.38);
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.PromptTextcolor := StateStyles.Disabled.LabelTextSettings.Font.Color;
@@ -1448,6 +1635,8 @@ begin
       StateStyles.Error.LabelTextSettings.reset;
       StateStyles.Error.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Error.SupportingTextSettings.Inherit := False;
+      StateStyles.Error.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Error.SupportingTextSettings.Font.Family := '';
       StateStyles.Error.SupportingTextSettings.Font.Color := $FFc80a28;
       StateStyles.Error.Shadow.Reset;
       StateStyles.Error.PromptTextcolor := TAlphaColors.Null;
@@ -1485,6 +1674,8 @@ begin
       Sides := [TSide.Bottom];
       XRadius := 4;
       YRadius := 4;
+      DefStyleAttr := 'Material3DarkFilledEditTextStyle';
+      DefStyleRes := '';
       TintColor := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
       Fill.Kind := TBrushKind.Solid;
       Fill.Color := $FF36343B; // md.sys.color.surface-container-highest / md.ref.palette.neutral22
@@ -1524,12 +1715,18 @@ begin
       StateStyles.Disabled.Stroke.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.Size := 0;
+      StateStyles.Disabled.LabelTextSettings.Font.Family := '';
       StateStyles.Disabled.LabelTextSettings.Font.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Disabled.SupportingTextSettings.Font.Family := '';
       StateStyles.Disabled.SupportingTextSettings.Font.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.PromptTextcolor := StateStyles.Disabled.LabelTextSettings.Font.Color;
@@ -1544,12 +1741,18 @@ begin
       StateStyles.Hovered.Stroke.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Hovered.TextSettings.Assign(TextSettings);
       StateStyles.Hovered.TextSettings.Inherit := False;
+      StateStyles.Hovered.TextSettings.Font.Size := 0;
+      StateStyles.Hovered.TextSettings.Font.Family := '';
       StateStyles.Hovered.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
+      StateStyles.Hovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.Hovered.LabelTextSettings.Font.Family := '';
       StateStyles.Hovered.LabelTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       StateStyles.Hovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Hovered.SupportingTextSettings.Inherit := False;
+      StateStyles.Hovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Hovered.SupportingTextSettings.Font.Family := '';
       StateStyles.Hovered.SupportingTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       StateStyles.Hovered.Shadow.Reset;
       StateStyles.Hovered.PromptTextcolor := StateStyles.Hovered.LabelTextSettings.Font.Color;
@@ -1563,12 +1766,18 @@ begin
       StateStyles.Focused.Stroke.Thickness := 3;
       StateStyles.Focused.TextSettings.Assign(TextSettings);
       StateStyles.Focused.TextSettings.Inherit := False;
+      StateStyles.Focused.TextSettings.Font.Size := 0;
+      StateStyles.Focused.TextSettings.Font.Family := '';
       StateStyles.Focused.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
+      StateStyles.Focused.LabelTextSettings.Font.Size := 0;
+      StateStyles.Focused.LabelTextSettings.Font.Family := '';
       StateStyles.Focused.LabelTextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
       StateStyles.Focused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Focused.SupportingTextSettings.Inherit := False;
+      StateStyles.Focused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Focused.SupportingTextSettings.Font.Family := '';
       StateStyles.Focused.SupportingTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       StateStyles.Focused.Shadow.Reset;
       StateStyles.Focused.PromptTextcolor := StateStyles.Focused.LabelTextSettings.Font.Color;
@@ -1581,12 +1790,18 @@ begin
       StateStyles.Error.Stroke.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.Error.TextSettings.Assign(TextSettings);
       StateStyles.Error.TextSettings.Inherit := False;
+      StateStyles.Error.TextSettings.Font.Size := 0;
+      StateStyles.Error.TextSettings.Font.Family := '';
       StateStyles.Error.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Error.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Error.LabelTextSettings.Inherit := False;
+      StateStyles.Error.LabelTextSettings.Font.Size := 0;
+      StateStyles.Error.LabelTextSettings.Font.Family := '';
       StateStyles.Error.LabelTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.Error.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Error.SupportingTextSettings.Inherit := False;
+      StateStyles.Error.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Error.SupportingTextSettings.Font.Family := '';
       StateStyles.Error.SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.Error.Shadow.Reset;
       StateStyles.Error.PromptTextcolor := StateStyles.Error.LabelTextSettings.Font.Color;
@@ -1601,12 +1816,18 @@ begin
       StateStyles.ErrorHovered.Stroke.Color := $FFF9DEDC; // md.sys.color.on-error-container / md.ref.palette.error90
       StateStyles.ErrorHovered.TextSettings.Assign(TextSettings);
       StateStyles.ErrorHovered.TextSettings.Inherit := False;
+      StateStyles.ErrorHovered.TextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.TextSettings.Font.Family := '';
       StateStyles.ErrorHovered.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.ErrorHovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorHovered.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.LabelTextSettings.Font.Color := $FFF9DEDC; // md.sys.color.on-error-container / md.ref.palette.error90
       StateStyles.ErrorHovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorHovered.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.ErrorHovered.Shadow.Reset;
       StateStyles.ErrorHovered.PromptTextcolor := StateStyles.ErrorHovered.LabelTextSettings.Font.Color;
@@ -1620,12 +1841,18 @@ begin
       StateStyles.ErrorFocused.Stroke.Thickness := 3;
       StateStyles.ErrorFocused.TextSettings.Assign(TextSettings);
       StateStyles.ErrorFocused.TextSettings.Inherit := False;
+      StateStyles.ErrorFocused.TextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.TextSettings.Font.Family := '';
       StateStyles.ErrorFocused.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.ErrorFocused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorFocused.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.LabelTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.ErrorFocused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorFocused.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.ErrorFocused.Shadow.Reset;
       StateStyles.ErrorFocused.PromptTextcolor := StateStyles.ErrorFocused.LabelTextSettings.Font.Color;
@@ -1638,11 +1865,13 @@ begin
       //--Enabled (default)--
       if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
       else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
-      padding.Rect := TRectF.Create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
+      padding.Rect := TRectF.Create(16{Left}, 16{Top}, 16{Right}, 16{Bottom});
       Corners := AllCorners;
       Sides := AllSides;
       XRadius := 4;
       YRadius := 4;
+      DefStyleAttr := 'Material3DarkOutlinedEditTextStyle';
+      DefStyleRes := '';
       TintColor := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
       Fill.Kind := TBrushKind.solid;
       Fill.Color := $FF000000;
@@ -1680,12 +1909,18 @@ begin
       StateStyles.Disabled.Stroke.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.TextSettings.Assign(TextSettings);
       StateStyles.Disabled.TextSettings.Inherit := False;
+      StateStyles.Disabled.TextSettings.Font.Size := 0;
+      StateStyles.Disabled.TextSettings.Font.Family := '';
       StateStyles.Disabled.TextSettings.Font.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Disabled.LabelTextSettings.Inherit := False;
+      StateStyles.Disabled.LabelTextSettings.Font.Size := 0;
+      StateStyles.Disabled.LabelTextSettings.Font.Family := '';
       StateStyles.Disabled.LabelTextSettings.Font.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Disabled.SupportingTextSettings.Inherit := False;
+      StateStyles.Disabled.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Disabled.SupportingTextSettings.Font.Family := '';
       StateStyles.Disabled.SupportingTextSettings.Font.Color := ALBlendColorWithOpacity($FF000000, $FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Disabled.Shadow.Reset;
       StateStyles.Disabled.PromptTextcolor := StateStyles.Disabled.LabelTextSettings.Font.Color;
@@ -1698,12 +1933,18 @@ begin
       StateStyles.Hovered.Stroke.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Hovered.TextSettings.Assign(TextSettings);
       StateStyles.Hovered.TextSettings.Inherit := False;
+      StateStyles.Hovered.TextSettings.Font.Size := 0;
+      StateStyles.Hovered.TextSettings.Font.Family := '';
       StateStyles.Hovered.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Hovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Hovered.LabelTextSettings.Inherit := False;
+      StateStyles.Hovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.Hovered.LabelTextSettings.Font.Family := '';
       StateStyles.Hovered.LabelTextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Hovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Hovered.SupportingTextSettings.Inherit := False;
+      StateStyles.Hovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Hovered.SupportingTextSettings.Font.Family := '';
       StateStyles.Hovered.SupportingTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       StateStyles.Hovered.Shadow.Reset;
       StateStyles.Hovered.PromptTextcolor := StateStyles.Hovered.LabelTextSettings.Font.Color;
@@ -1717,12 +1958,18 @@ begin
       StateStyles.Focused.Stroke.Thickness := 3;
       StateStyles.Focused.TextSettings.Assign(TextSettings);
       StateStyles.Focused.TextSettings.Inherit := False;
+      StateStyles.Focused.TextSettings.Font.Size := 0;
+      StateStyles.Focused.TextSettings.Font.Family := '';
       StateStyles.Focused.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Focused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Focused.LabelTextSettings.Inherit := False;
+      StateStyles.Focused.LabelTextSettings.Font.Size := 0;
+      StateStyles.Focused.LabelTextSettings.Font.Family := '';
       StateStyles.Focused.LabelTextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
       StateStyles.Focused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Focused.SupportingTextSettings.Inherit := False;
+      StateStyles.Focused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Focused.SupportingTextSettings.Font.Family := '';
       StateStyles.Focused.SupportingTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       StateStyles.Focused.Shadow.Reset;
       StateStyles.Focused.PromptTextcolor := StateStyles.Focused.LabelTextSettings.Font.Color;
@@ -1735,12 +1982,18 @@ begin
       StateStyles.Error.Stroke.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.Error.TextSettings.Assign(TextSettings);
       StateStyles.Error.TextSettings.Inherit := False;
+      StateStyles.Error.TextSettings.Font.Size := 0;
+      StateStyles.Error.TextSettings.Font.Family := '';
       StateStyles.Error.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.Error.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.Error.LabelTextSettings.Inherit := False;
+      StateStyles.Error.LabelTextSettings.Font.Size := 0;
+      StateStyles.Error.LabelTextSettings.Font.Family := '';
       StateStyles.Error.LabelTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.Error.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.Error.SupportingTextSettings.Inherit := False;
+      StateStyles.Error.SupportingTextSettings.Font.Size := 0;
+      StateStyles.Error.SupportingTextSettings.Font.Family := '';
       StateStyles.Error.SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.Error.Shadow.Reset;
       StateStyles.Error.PromptTextcolor := StateStyles.Error.LabelTextSettings.Font.Color;
@@ -1753,12 +2006,18 @@ begin
       StateStyles.ErrorHovered.Stroke.Color := $FFF9DEDC; // md.sys.color.on-error-container / md.ref.palette.error90
       StateStyles.ErrorHovered.TextSettings.Assign(TextSettings);
       StateStyles.ErrorHovered.TextSettings.Inherit := False;
+      StateStyles.ErrorHovered.TextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.TextSettings.Font.Family := '';
       StateStyles.ErrorHovered.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.ErrorHovered.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorHovered.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.LabelTextSettings.Font.Color := $FFF9DEDC; // md.sys.color.on-error-container / md.ref.palette.error90
       StateStyles.ErrorHovered.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorHovered.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorHovered.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorHovered.SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.ErrorHovered.Shadow.Reset;
       StateStyles.ErrorHovered.PromptTextcolor := StateStyles.ErrorHovered.LabelTextSettings.Font.Color;
@@ -1772,12 +2031,18 @@ begin
       StateStyles.ErrorFocused.Stroke.Thickness := 3;
       StateStyles.ErrorFocused.TextSettings.Assign(TextSettings);
       StateStyles.ErrorFocused.TextSettings.Inherit := False;
+      StateStyles.ErrorFocused.TextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.TextSettings.Font.Family := '';
       StateStyles.ErrorFocused.TextSettings.Font.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
       StateStyles.ErrorFocused.LabelTextSettings.Assign(LabelTextSettings);
       StateStyles.ErrorFocused.LabelTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.LabelTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.LabelTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.ErrorFocused.SupportingTextSettings.Assign(SupportingTextSettings);
       StateStyles.ErrorFocused.SupportingTextSettings.Inherit := False;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Size := 0;
+      StateStyles.ErrorFocused.SupportingTextSettings.Font.Family := '';
       StateStyles.ErrorFocused.SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       StateStyles.ErrorFocused.Shadow.Reset;
       StateStyles.ErrorFocused.PromptTextcolor := StateStyles.ErrorFocused.LabelTextSettings.Font.Color;
@@ -1995,6 +2260,12 @@ begin
   {$ENDIF}
 end;
 
+{************************************************}
+function TALBaseEditControl.getLineCount: integer;
+begin
+  Result := 1;
+end;
+
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 
@@ -2031,6 +2302,53 @@ begin
 
   end
   else result := false;
+end;
+
+{******************************************************************************************}
+constructor TALAndroidEditText.TALTouchListener.Create(const aEditText: TALAndroidEditText);
+begin
+  inherited Create;
+  FEditText := aEditText;
+end;
+
+{*************************************}
+{$IFNDEF ALCompilerVersionSupported120}
+  {$MESSAGE WARN 'Check if FMX.Presentation.Android.TAndroidNativeView.ProcessTouch was not updated and adjust the IFDEF'}
+{$ENDIF}
+function TALAndroidEditText.TALTouchListener.onTouch(v: JView; event: JMotionEvent): Boolean;
+begin
+  if (FEditText.Form <> nil) and
+     (not FeditText.view.hasFocus) and
+     ((not FeditText.fIsMultiline) or
+      (FeditText.FEditControl.getLineCount < FeditText.FeditControl.Height / FeditText.FeditControl.getLineHeight)) then begin
+    var LTouchPoint := TPointF.Create(event.getRawX / ALGetScreenScale, event.getRawY / ALGetScreenScale);
+    LTouchPoint := FEditText.Form.ScreenToClient(LTouchPoint);
+    var LEventAction := event.getAction;
+    if LEventAction = TJMotionEvent.JavaClass.ACTION_DOWN then begin
+      FEditText.Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
+      FEditText.Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
+      FEditText.Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    end
+    else if LEventAction = TJMotionEvent.JavaClass.ACTION_MOVE then begin
+      FEditText.Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y)
+    end
+    else if LEventAction = TJMotionEvent.JavaClass.ACTION_CANCEL then begin
+      FEditText.Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y, False);
+      FEditText.Form.MouseLeave;
+    end
+    else if LEventAction = TJMotionEvent.JavaClass.ACTION_UP then
+    begin
+      FEditText.Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+      FEditText.Form.MouseLeave;
+    end;
+    Result := True;
+  end
+  else begin
+    // In Android, within a single-line EditText, it's possible for the text line to shift slightly vertically
+    // (as if the text is taller than the line height). To prevent this minor scrolling, we consume the touch event.
+    if (not FeditText.fIsMultiline) and (FeditText.view.hasFocus) and (event.getAction() = TJMotionEvent.JavaClass.ACTION_MOVE) then result := true
+    else result := false;
+  end
 end;
 
 {****************************************************************************************}
@@ -2120,6 +2438,7 @@ begin
   FTextWatcher := TALTextWatcher.Create(self);
   FEditorActionListener := TALEditorActionListener.Create(self, aIsMultiline);
   FKeyPreImeListener := TALKeyPreImeListener.Create(self);
+  FTouchListener := TALTouchListener.Create(self);
   fEditControl := TALAndroidEditControl(AControl);
   inherited create(AControl);  // This will call InitView
 end;
@@ -2132,10 +2451,12 @@ begin
   View.RemoveTextChangedListener(FTextWatcher);
   View.setOnEditorActionListener(nil);
   View.SetKeyPreImeListener(nil);
+  View.SetOnTouchListener(nil);
 
   alfreeandNil(FTextWatcher);
   alfreeandNil(fEditorActionListener);
   alfreeandNil(FKeyPreImeListener);
+  alfreeandNil(FTouchListener);
 
   inherited;
 
@@ -2209,6 +2530,7 @@ begin
   View.addTextChangedListener(fTextWatcher);
   View.setOnEditorActionListener(fEditorActionListener);
   View.SetKeyPreImeListener(fKeyPreImeListener);
+  View.SetOnTouchListener(fTouchListener);
 end;
 
 {***********************************************}
@@ -2653,10 +2975,71 @@ begin
   View.SetEnabled(value);
 end;
 
+{***************************************************************************}
+function TALIosEditTextField.ExtractFirstTouchPoint(touches: NSSet): TPointF;
+begin
+  var LPointer := touches.anyObject;
+  if LPointer=nil then
+    raise Exception.Create('Error 46450539-F150-45FC-BA01-0397F2A98B0C');
+  var LLocalTouch := TUITouch.Wrap(LPointer);
+  if Form=nil then
+    raise Exception.Create('Error 5F61EC6E-0C13-46CD-A0C0-8417AA32B62A');
+  var LTouchPoint := LLocalTouch.locationInView(GetFormView(Form));
+  Result := TPointF.Create(LTouchPoint.X, LTouchPoint.Y);
+end;
+
+{*****************************************************************************}
+procedure TALIosEditTextField.touchesBegan(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseMove([ssTouch], LTouchPoint.X, LTouchPoint.Y);
+    Form.MouseMove([], LTouchPoint.X, LTouchPoint.Y); // Require for correct IsMouseOver handle
+    Form.MouseDown(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALIosEditTextField.touchesCancelled(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    Form.MouseLeave;
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALIosEditTextField.touchesEnded(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseUp(TMouseButton.mbLeft, [ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+    Form.MouseLeave;
+  end;
+end;
+
+{*****************************************************************************}
+procedure TALIosEditTextField.touchesMoved(touches: NSSet; withEvent: UIEvent);
+begin
+  if (Form <> nil) and
+     (not view.isFirstResponder) and
+     (touches.count > 0) then begin
+    var LTouchPoint := ExtractFirstTouchPoint(touches);
+    Form.MouseMove([ssLeft, ssTouch], LTouchPoint.x, LTouchPoint.y);
+  end;
+end;
+
 {********************************************************}
 function TALIosEditTextField.canBecomeFirstResponder: Boolean;
 begin
-  Result := UITextField(Super).canBecomeFirstResponder and TALEdit(fEditControl.Owner).canFocus;
+  Result := UITextField(Super).canBecomeFirstResponder and TControl(fEditControl.Owner).canFocus;
 end;
 
 {*****************************************************}
@@ -2665,9 +3048,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  if (not TControl(fEditControl.Owner).IsFocused) then
+    TControl(fEditControl.Owner).SetFocus;
   Result := UITextField(Super).becomeFirstResponder;
-  if Result and (not TALEdit(fEditControl.Owner).IsFocused) then
-    TALEdit(fEditControl.Owner).SetFocus;
 end;
 
 {***************************************************}
@@ -2726,7 +3109,7 @@ end;
 {*******************************************************************************}
 procedure TALIosEditTextFieldDelegate.textFieldDidEndEditing(textField: UITextField);
 begin
-  TALEdit(FEditControl.Owner).ResetFocus;
+  TControl(FEditControl.Owner).ResetFocus;
 end;
 
 {********************************************************************************************}
@@ -3102,7 +3485,7 @@ end;
 {******************************************************}
 function TALMacEditTextField.acceptsFirstResponder: Boolean;
 begin
-  Result := NSTextField(Super).acceptsFirstResponder and TALEdit(fEditControl.Owner).canFocus;
+  Result := NSTextField(Super).acceptsFirstResponder and TControl(fEditControl.Owner).canFocus;
 end;
 
 {*****************************************************}
@@ -3111,9 +3494,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  if (not TControl(fEditControl.Owner).IsFocused) then
+    TControl(fEditControl.Owner).SetFocus;
   Result := NSTextField(Super).becomeFirstResponder;
-  if Result and (not TALEdit(fEditControl.Owner).IsFocused) then
-    TALEdit(fEditControl.Owner).SetFocus;
 end;
 
 {*****************************************************}
@@ -3145,7 +3528,7 @@ end;
 {******************************************************************************}
 procedure TALMacEditTextFieldDelegate.controlTextDidEndEditing(obj: NSNotification);
 begin
-  TALEdit(FEditControl.Owner).ResetFocus;
+  TControl(FEditControl.Owner).ResetFocus;
 end;
 
 {**************************************************************************}
@@ -3928,7 +4311,7 @@ end;
 constructor TALEditLabelTextSettings.Create;
 begin
   inherited create;
-  FMargins := TBounds.Create(TRectF.Create(0,0,0,-7));
+  FMargins := TBounds.Create(TRectF.Create(0,0,0,-8));
   FMargins.OnChange := MarginsChanged;
   FLayout := TALEditLabelTextLayout.Floating;
   FAnimation := TALEditLabelTextAnimation.Translation;
@@ -3939,6 +4322,20 @@ destructor TALEditLabelTextSettings.Destroy;
 begin
   ALFreeAndNil(FMargins);
   Inherited Destroy;
+end;
+
+{***************************************}
+procedure TALEditLabelTextSettings.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    FMargins.Rect := FMargins.DefaultValue;
+    FLayout := TALEditLabelTextLayout.Floating;
+    FAnimation := TALEditLabelTextAnimation.Translation;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {******************************************************************}
@@ -3975,7 +4372,7 @@ end;
 constructor TALEditSupportingTextSettings.Create;
 begin
   inherited create;
-  FMargins := TBounds.Create(TRectF.Create(0,4,0,4));
+  FMargins := TBounds.Create(TRectF.Create(0,4,0,0));
   FMargins.OnChange := MarginsChanged;
   FLayout := TALEditSupportingTextLayout.Floating;
 end;
@@ -3985,6 +4382,20 @@ destructor TALEditSupportingTextSettings.Destroy;
 begin
   ALFreeAndNil(FMargins);
   Inherited Destroy;
+end;
+
+{********************************************}
+procedure TALEditSupportingTextSettings.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    FMargins.Rect := FMargins.DefaultValue;
+    FMargins.OnChange := MarginsChanged;
+    FLayout := TALEditSupportingTextLayout.Floating;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {***********************************************************************}
@@ -4408,6 +4819,7 @@ begin
   fBufSupportingTextErrorHoveredDrawable := ALNullDrawable;
   fBufSupportingTextErrorFocusedDrawable := ALNullDrawable;
   //--
+  FocusOnMouseUp := True;
   Cursor := crIBeam;
   CanFocus := True;
   var LFillChanged: TNotifyEvent := fill.OnChanged;
@@ -4567,6 +4979,7 @@ begin
   TextSettingsChanged(TextSettings);
   //--
   //AdjustSize; => Already called in TextSettingsChanged
+  //UpdateEditControlStyle => Already called in TextSettingsChanged
   //--
   UpdateEditControlPromptText;
   UpdateNativeViewVisibility;
@@ -4835,6 +5248,8 @@ procedure TALBaseEdit.UpdateEditControlStyle;
 
 begin
 
+  if (csLoading in ComponentState) then exit;
+
   {$REGION 'FillColor'}
   if Not Enabled then begin
     if not StateStyles.Disabled.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Disabled.Fill)
@@ -5048,7 +5463,7 @@ end;
 {************************************************************}
 procedure TALBaseEdit.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited MouseMove(Shift, X, Y);
+  inherited;
   SetHovered(True);
 end;
 
@@ -6356,6 +6771,17 @@ end;
 {*********************************}
 procedure TALBaseEdit.clearBufDrawable;
 begin
+  {$IFDEF debug}
+  if (not (csDestroying in ComponentState)) and
+     (ALIsDrawableNull(BufDrawable)) and // warn will be raise in inherited
+     ((not ALIsDrawableNull(fBufDisabledDrawable)) or
+      (not ALIsDrawableNull(fBufHoveredDrawable)) or
+      (not ALIsDrawableNull(fBufFocusedDrawable)) or
+      (not ALIsDrawableNull(fBufErrorDrawable)) or
+      (not ALIsDrawableNull(fBufErrorHoveredDrawable)) or
+      (not ALIsDrawableNull(fBufErrorFocusedDrawable))) then
+    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+  {$endif}
   inherited clearBufDrawable;
   //--
   ALFreeAndNilDrawable(fBufDisabledDrawable);
@@ -6852,6 +7278,12 @@ begin
   FNativeViewRemoved := True;
   ResetFocus;
   EditControl.RemoveNativeView;
+end;
+
+{*****************************************}
+function TALBaseEdit.getLineCount: integer;
+begin
+  Result := EditControl.getLineCount;
 end;
 
 {*****************************************}

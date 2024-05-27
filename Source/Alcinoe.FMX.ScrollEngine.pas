@@ -545,6 +545,7 @@ type
     procedure SetDown(const Value: Boolean);
     procedure SetAutoShowing(const Value: Boolean);
     function GetCurrentVelocity: TPointF;
+    function GetIsVelocityLow: Boolean;
     procedure SetMinScrollLimit(const Value: TalPointD);
     procedure SetMaxScrollLimit(const Value: TalPointD);
     procedure SetViewportPosition(const Value: TALPointD; const EnforceLimits: Boolean; const SynchOverScroller: Boolean); overload;
@@ -605,6 +606,7 @@ type
     property Opacity: Single read FOpacity;
     // In virtual pixels per second.
     property CurrentVelocity: TPointF read GetCurrentVelocity;
+    property IsVelocityLow: Boolean read GetIsVelocityLow;
     property ViewportPosition: TALPointD read FViewportPosition write SetViewportPosition;
     property MinScrollLimit: TALPointD read FMinScrollLimit write SetMinScrollLimit;
     property MaxScrollLimit: TALPointD read FMaxScrollLimit write SetMaxScrollLimit;
@@ -2649,6 +2651,15 @@ end;
 function TALScrollEngine.GetCurrentVelocity: TPointF;
 begin
   result := Foverscroller.getCurrVelocity / ALScreenScale;
+end;
+
+{*************************************************}
+function TALScrollEngine.GetIsVelocityLow: Boolean;
+begin
+  var LCurrentVelocity := GetCurrentVelocity;
+  // virtual pixels per second
+  result := (abs(LCurrentVelocity.X) < 10) and
+            (abs(LCurrentVelocity.Y) < 10);
 end;
 
 {***********************************}

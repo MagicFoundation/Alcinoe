@@ -22,15 +22,6 @@ uses
 
 type
 
-  {***************************}
-  IALUIView = interface(UIView)
-    ['{617EB128-774A-4E65-A50E-57FFA7CB0D6E}']
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
-  end;
-
   {********************************}
   TALIosNativeView = class(TOCLocal)
   private
@@ -51,11 +42,6 @@ type
     procedure AncestorVisibleChanged; virtual; //procedure PMAncesstorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
     procedure RootChanged(const aRoot: IRoot); virtual; //procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
     procedure ChangeOrder; virtual; //procedure PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
-  public
-    procedure touchesBegan(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesCancelled(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesMoved(touches: NSSet; withEvent: UIEvent); cdecl;
-    procedure touchesEnded(touches: NSSet; withEvent: UIEvent); cdecl;
   protected
     function GetView<T: UIView>: T; overload;
   public
@@ -133,7 +119,7 @@ end;
 {******************************************************}
 function TALIosNativeView.GetObjectiveCClass: PTypeInfo;
 begin
-  Result := TypeInfo(IALUIView);
+  Result := TypeInfo(UIView);
 end;
 
 {****************************************************************************}
@@ -192,30 +178,6 @@ begin
     UpdateFrame;
   end
   else FForm := nil;
-end;
-
-{**************************************************************************}
-procedure TALIosNativeView.touchesBegan(touches: NSSet; withEvent: UIEvent);
-begin
-  UIView(Super).touchesBegan(touches, withEvent);
-end;
-
-{******************************************************************************}
-procedure TALIosNativeView.touchesCancelled(touches: NSSet; withEvent: UIEvent);
-begin
-  UIView(Super).touchesCancelled(touches, withEvent);
-end;
-
-{**************************************************************************}
-procedure TALIosNativeView.touchesEnded(touches: NSSet; withEvent: UIEvent);
-begin
-  UIView(Super).touchesEnded(touches, withEvent);
-end;
-
-{**************************************************************************}
-procedure TALIosNativeView.touchesMoved(touches: NSSet; withEvent: UIEvent);
-begin
-  UIView(Super).touchesMoved(touches, withEvent);
 end;
 
 {**********************************************************}

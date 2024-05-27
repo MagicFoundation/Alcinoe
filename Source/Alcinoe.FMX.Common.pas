@@ -38,13 +38,22 @@ uses
   FMX.graphics,
   FMX.Filter,
   FMX.Effects,
-  FMX.controls;
+  FMX.controls,
+  Alcinoe.FMX.ScrollEngine;
 
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  IALScrollableControl = interface
+    ['{6750E04D-8DB6-4F27-898A-B20AD55CAAF4}']
+    function GetScrollEngine: TALScrollEngine;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALDoubleBufferedControl = interface
     ['{26A0A593-D483-4AE2-881B-6CB930B5E863}']
+    function GetDoubleBuffered: boolean;
+    procedure SetDoubleBuffered(const AValue: Boolean);
     procedure MakeBufDrawable;
   end;
 
@@ -2081,8 +2090,10 @@ begin
   AControl.DisableDisappear := true;
 
   var LDoubleBufferedControl: IALDoubleBufferedControl;
-  if Supports(AControl, IALDoubleBufferedControl, LDoubleBufferedControl) then
+  if Supports(AControl, IALDoubleBufferedControl, LDoubleBufferedControl) then begin
+    LDoubleBufferedControl.SetDoubleBuffered(true);
     LDoubleBufferedControl.MakeBufDrawable;
+  end;
 
   for var LChild in aControl.Controls do
     ALMakeBufDrawables(LChild);

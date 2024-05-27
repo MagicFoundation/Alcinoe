@@ -175,8 +175,6 @@ procedure TALEditEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   AItem.AddItem('Default'{ACaption},                  0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
   //--
-  AItem.AddItem('Windows'{ACaption},                  0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
   AItem.AddItem('Material3.Light.Filled'{ACaption},   0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
   AItem.AddItem('Material3.Light.Outlined'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
   //--

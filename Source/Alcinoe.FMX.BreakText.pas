@@ -2528,7 +2528,7 @@ begin
                       if LFileName <> '' then
                         LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
                       else
-                        LImg := ALNullDrawable;
+                        LImg := 0;
                       {$ELSE}
                       var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
                       {$ENDIF}

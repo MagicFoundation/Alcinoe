@@ -372,7 +372,7 @@ type
     property StartValue: Single read GetStartValue write SetStartValue stored True nodefault;
     property StartFromCurrent: Boolean read FStartFromCurrent write FStartFromCurrent default False;
     property StopValue: Single read GetStopValue write setStopValue stored True nodefault;
-    property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored;
+    property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored nodefault;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -445,7 +445,7 @@ type
     property StartValue: TAlphaColor read GetStartValue write SetStartValue stored True nodefault;
     property StartFromCurrent: Boolean read FStartFromCurrent write FStartFromCurrent default False;
     property StopValue: TAlphaColor read GetStopValue write setStopValue stored True nodefault;
-    property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored;
+    property Overshoot: Single read getOvershoot write setOvershoot Stored OvershootStored nodefault;
   end;
 
 //function ALInterpolateLinear(AElapsedTime, AStartOfRange, ARangeSpan, ADuration: Single): Single; => function FMX.Ani.InterpolateLinear(t, B, C, D: Single): Single;
@@ -673,10 +673,10 @@ type
     property StartValue: Single read GetStartValue write SetStartValue stored True nodefault;
     property StartFromCurrent: Boolean read FStartFromCurrent write FStartFromCurrent default False;
     property StopValue: Single read GetStopValue write setStopValue stored True nodefault;
-    property Stiffness: Single read getStiffness write setStiffness stored StiffnessStored;
-    property DampingRatio: Single read getDampingRatio write setDampingRatio stored DampingRatioStored;
-    property ValueThreshold: Single read getValueThreshold write setValueThreshold stored ValueThresholdStored;
-    property InitialVelocity: Single read GetInitialVelocity write SetInitialVelocity stored InitialVelocityStored;
+    property Stiffness: Single read getStiffness write setStiffness stored StiffnessStored nodefault;
+    property DampingRatio: Single read getDampingRatio write setDampingRatio stored DampingRatioStored nodefault;
+    property ValueThreshold: Single read getValueThreshold write setValueThreshold stored ValueThresholdStored nodefault;
+    property InitialVelocity: Single read GetInitialVelocity write SetInitialVelocity stored InitialVelocityStored nodefault;
   end;
 
 procedure Register;
@@ -1597,7 +1597,7 @@ end;
 {**********************************************************}
 function TALFloatPropertyAnimation.OvershootStored: Boolean;
 begin
-  result := fFloatAnimation.Overshoot <> 0;
+  result := not sameValue(fFloatAnimation.Overshoot, 0);
 end;
 
 {********************************************************************************}
@@ -1869,7 +1869,7 @@ end;
 {**********************************************************}
 function TALColorPropertyAnimation.OvershootStored: Boolean;
 begin
-  result := fColorAnimation.Overshoot <> 0;
+  result := not sameValue(fColorAnimation.Overshoot, 0);
 end;
 
 {********************************************************************************}
@@ -2637,7 +2637,7 @@ end;
 {**********************************************************************}
 function TALSpringForcePropertyAnimation.InitialVelocityStored: Boolean;
 begin
-  result := FSpringForceAnimation.InitialVelocity <> 0.0;
+  result := not SameValue(FSpringForceAnimation.InitialVelocity, 0.0);
 end;
 
 {**********************************************}

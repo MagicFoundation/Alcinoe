@@ -9,7 +9,7 @@ uses
   system.sysutils,
   system.types,
   system.uitypes,
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
   System.Skia.API,
   {$ENDIF}
   {$IF defined(ios)}
@@ -17,30 +17,39 @@ uses
   iOSapi.CocoaTypes,
   iOSapi.UIKit,
   fmx.surfaces,
-  fmx.types3D,
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
+  Macapi.CoreGraphics,
+  Macapi.CocoaTypes,
+  Macapi.AppKit,
+  fmx.surfaces,
   {$ENDIF}
   {$IF defined(ANDROID)}
   Androidapi.JNI.GraphicsContentViewText,
   fmx.surfaces,
-  fmx.types3D,
   {$ENDIF}
   FMX.types,
+  fmx.types3D,
   FMX.graphics,
   Alcinoe.FMX.Common,
   Alcinoe.Common;
 
 Type
+  TALSurface =  {$IF defined(ALSkiaEngine)}sk_surface_t{$ELSEIF defined(ANDROID)}Jbitmap{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tbitmap{$ENDIF};
+  TALCanvas =   {$IF defined(ALSkiaEngine)}sk_canvas_t{$ELSEIF defined(ANDROID)}Jcanvas{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tcanvas{$ENDIF};
   TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
 
 const
   ALNullDrawable = {$IF defined(ALSkiaCanvas)}0{$ELSE}Nil{$ENDIF};
 
-function  IsDrawableNull(const aDrawable: TALDrawable): Boolean; inline;
+function  ALIsDrawableNull(const aDrawable: TALDrawable): Boolean; inline;
 procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable); inline;
-function  GetDrawableWidth(const aDrawable: TALDrawable): integer; inline;
-function  GetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
+function  ALGetDrawableWidth(const aDrawable: TALDrawable): integer; inline;
+function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
+function  ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean; inline;
+procedure ALCanvasEndScene(const aCanvas: TALCanvas); inline;
 
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 // ALGlobalSkColorSpace represents the color space of the form's surface
 var ALGlobalSkColorSpace: sk_colorspace_t;
 var ALGlobalSkColorSpaceInitialized: Boolean;
@@ -52,14 +61,23 @@ var ALGlobalSkPaint: sk_paint_t;
 function ALGetGlobalSkPaint(const AOpacity: Single): sk_paint_t;
 
 function ALSkCheckHandle(const AHandle: sk_handle_t): sk_handle_t; inline;
+procedure ALSkCheckCanvas(const ACanvas: TCanvas); inline;
 function ALSkStreamAdapterGetLengthProc(context: Pointer): size_t; cdecl;
 function ALSkStreamAdapterGetPositionProc(context: Pointer): size_t; cdecl;
 function ALSkStreamAdapterReadProc(context: Pointer; buffer: Pointer; size: size_t): size_t; cdecl;
 function ALSkStreamAdapterSeekProc(context: Pointer; position: size_t): _bool; cdecl;
 
-function ALGetSkImageinfo(const W, H: int32_t; const AColorType: sk_colortype_t = {$IFDEF BIGENDIAN}sk_colortype_t.RGBA8888_SK_COLORTYPE{$ELSE}sk_colortype_t.BGRA8888_SK_COLORTYPE{$ENDIF}): sk_imageinfo_t;
+var
+  ALGlobalUseRasterSkSurface: Boolean;
+  ALGlobalUseRasterSkImage: Boolean;
+
+function ALGetSkImageinfo(const W, H: int32_t; const AColorType: sk_colortype_t = sk_colortype_t.BGRA8888_SK_COLORTYPE): sk_imageinfo_t;
 function ALCreateSkSurface(Const W, H: integer): sk_surface_t;
-function ALCreateSkImageFromSurface(Const ASurface: sk_surface_t): sk_image_t;
+function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
+function ALCreateSkImageFromSkSurface(Const ASurface: sk_surface_t): sk_image_t;
+function ALCreateTextureFromSkSurface(Const ASurface: sk_surface_t): TTexture;
+function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 {$ENDIF}
@@ -71,12 +89,22 @@ var ALGlobalJColorSpaceInitialized: Boolean;
 function ALGetGlobalJColorSpace: JColorSpace;
 {$ENDIF}
 
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
+
+Type
+  ALOSImage = {$IF defined(IOS)}UIImage{$ELSE}NSImage{$ENDIF};
+  TALOSImage = {$IF defined(IOS)}TUIImage{$ELSE}TNSImage{$ENDIF};
+
 // ALGlobalCGColorSpace represents the color space used in all drawing operations
 var ALGlobalCGColorSpace: CGColorSpaceRef;
 function ALGetGlobalCGColorSpace: CGColorSpaceRef;
 
 function ALCreateCGContextRef(const W, H: integer; const AData: Pointer = nil; const ABytesPerRow: Integer = -1): CGContextRef;
+function ALOSImageGetCgImage(const AImage: ALOSImage): cgImageRef; inline;
+function ALOSImageGetWidth(const AImage: ALOSImage): Integer; inline;
+function ALOSImageGetHeight(const AImage: ALOSImage): Integer; inline;
+procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
+
 {$ENDIF}
 
 type
@@ -90,10 +118,6 @@ type
                             TRANSVERSE,
                             UNDEFINED);
 
-var
-  ALScreenScale: Single;
-function ALGetScreenScale: Single;
-
 function ALGetImageSize(const aStream: TStream): TSize;
 function AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo;
 function AlGetImageSignature(const aStream: TStream; const aSignatureLength: integer = 12): Tbytes; overload;
@@ -101,30 +125,38 @@ function AlGetImageSignature(const aFileName: string; const aSignatureLength: in
 function AlDetectImageExtension(const aStream: TStream): String; overload;
 function AlDetectImageExtension(const aFileName: string): String; overload;
 function ALPrepareColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
-function ALAlphaBlendColors(const aBackToFrontColors: array of TAlphaColor): TAlphaColor;
+function ALBlendColorWithOpacity(const ABaseColor, AOverlayColor: TAlphaColor; const AOverlayOpacity: Single): TAlphaColor;
+function ALSetColorOpacity(const AColor: TAlphaColor; const AOpacity: Single): TAlphaColor;
 function ALConvertRadiusToSigma(const ARadius: Single): Single;
 function ALConvertSigmaToRadius(const ASigma: Single): Single;
+function ALGetShadowWidth(const AShadowBlur: Single): Single;
+procedure ALGetLinearGradientCoordinates(const ASize: TSizeF; const AAngle: Single; out AStartPoint: TPointF; out AEndPoint: TPointF; const ACssAngleConvention: Boolean = True);
 
 {$IF defined(ANDROID)}
 function ALJBitmaptoTexture(const aBitmap: Jbitmap): TTexture;
 {$ENDIF}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALCGContextRefToTexture(const aCGContextRef: CGContextRef): TTexture;
+function ALCGContextRefToBitmap(const aCGContextRef: CGContextRef): TBitmap;
 {$ENDIF}
 {$IFDEF ALGpuCanvas}
 function ALBitmapSurfacetoTexture(const aBitmapSurface: TbitmapSurface): TTexture;
-function ALTransformBitmaptoTexture(var aBitmap: Tbitmap): TTexture;
+function ALBitmapToTexture(var aBitmap: Tbitmap): TTexture;
 {$ENDIF}
+function ALSurfaceToDrawable(var ASurface: TALSurface): TALDrawable;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// THE CODE BELOW (INTERFACE + IMPLEMENTATION) IS AUTOGENERATED FROM        ///
+/// THE CODE BELOW (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
 /// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
 ////////////////////////////////////////////////////////////////////////////////
 
 {$REGION ' Load and FitInto'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or lower than w or h
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
+function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+function ALLoadFromResourceAndFitIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+function ALLoadFromFileAndFitIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 function ALLoadFromResourceAndFitIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
@@ -138,8 +170,8 @@ function ALLoadFromResourceAndFitIntoToJBitmap(const AResName: String; const W, 
 function ALLoadFromFileAndFitIntoToJBitmap(const AFileName: String; const W, H: single): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoToCGContextRef(const AImage: UIImage; const W, H: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 function ALLoadFromStreamAndFitIntoToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 function ALLoadFromResourceAndFitIntoToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 function ALLoadFromFileAndFitIntoToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
@@ -161,8 +193,11 @@ function ALLoadFromFileAndFitIntoToDrawable(const AFileName: String; const W, H:
 
 {$REGION ' Load and FitInto and Crop'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropToSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropToSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropToSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropToSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropToSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -176,8 +211,8 @@ function ALLoadFromResourceAndFitIntoAndCropToJBitmap(const AResName: String; co
 function ALLoadFromFileAndFitIntoAndCropToJBitmap(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(const AImage: UIImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(const AImage: ALOSImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropToCGContextRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropToCGContextRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropToCGContextRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -199,8 +234,11 @@ function ALLoadFromFileAndFitIntoAndCropToDrawable(const AFileName: String; cons
 
 {$REGION ' Load and FitInto and Crop to RoundRect'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as round rect
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropToRoundRectSkSurface(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkImage(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -214,8 +252,8 @@ function ALLoadFromResourceAndFitIntoAndCropToRoundRectJBitmap(const AResName: S
 function ALLoadFromFileAndFitIntoAndCropToRoundRectJBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropToRoundRectCGContextRef(const AImage: UIImage; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectCGContextRef(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropToRoundRectCGContextRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -237,8 +275,11 @@ function ALLoadFromFileAndFitIntoAndCropToRoundRectDrawable(const AFileName: Str
 
 {$REGION ' Load and FitInto and Crop to Circle'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropToCircleSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -252,8 +293,8 @@ function ALLoadFromResourceAndFitIntoAndCropToCircleJBitmap(const AResName: Stri
 function ALLoadFromFileAndFitIntoAndCropToCircleJBitmap(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropToCircleCGContextRef(const AImage: UIImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropToCircleCGContextRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropToCircleCGContextRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropToCircleCGContextRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -275,8 +316,11 @@ function ALLoadFromFileAndFitIntoAndCropToCircleDrawable(const AFileName: String
 
 {$REGION ' Load and FitInto and Crop and Blur'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -290,8 +334,8 @@ function ALLoadFromResourceAndFitIntoAndCropAndBlurToJBitmap(const AResName: Str
 function ALLoadFromFileAndFitIntoAndCropAndBlurToJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndBlurToCGContextRef(const AImage: UIImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndBlurToCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -313,8 +357,11 @@ function ALLoadFromFileAndFitIntoAndCropAndBlurToDrawable(const AFileName: Strin
 
 {$REGION ' Load and FitInto and Crop and Blur to Circle'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -328,8 +375,8 @@ function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleJBitmap(const AResNam
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndBlurToCircleCGContextRef(const AImage: UIImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndBlurToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -351,8 +398,11 @@ function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleDrawable(const AFileName:
 
 {$REGION ' Load and FitInto and Crop and Mask'}
 // https://i.stack.imgur.com/CcESX.png - transparent pixel in the mask are removed from the resulting image
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropAndMaskToSkSurface(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkImage(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -366,8 +416,8 @@ function ALLoadFromResourceAndFitIntoAndCropAndMaskToJBitmap(const AResName: Str
 function ALLoadFromFileAndFitIntoAndCropAndMaskToJBitmap(const AFileName: String; const AMask: JBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndMaskToCGContextRef(const AImage: UIImage; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndMaskToCGContextRef(const AImage: ALOSImage; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToCGContextRef(const AStream: TStream; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToCGContextRef(const AResName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropAndMaskToCGContextRef(const AFileName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -382,15 +432,18 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskToBitmap(const AStream: TStream
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToBitmap(const AResName: String; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 function ALLoadFromFileAndFitIntoAndCropAndMaskToBitmap(const AFileName: String; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 //--
-function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop and Mask and Blur'}
 // https://i.stack.imgur.com/CcESX.png - transparent pixel in the mask are removed from the resulting image
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkImage(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
@@ -404,8 +457,8 @@ function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToJBitmap(const AResNa
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToJBitmap(const AFileName: String; const AMask: JBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AImage: UIImage; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AImage: ALOSImage; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AStream: TStream; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AResName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AFileName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
@@ -420,15 +473,18 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToBitmap(const AStream: 
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToBitmap(const AResName: String; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToBitmap(const AFileName: String; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 //--
-function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto'}
 // If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndPlaceIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
+function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+function ALLoadFromResourceAndPlaceIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+function ALLoadFromFileAndPlaceIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 //--
 function ALLoadFromStreamAndPlaceIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 function ALLoadFromResourceAndPlaceIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
@@ -442,8 +498,8 @@ function ALLoadFromResourceAndPlaceIntoToJBitmap(const AResName: String; const W
 function ALLoadFromFileAndPlaceIntoToJBitmap(const AFileName: String; const W, H: single): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndPlaceIntoToCGContextRef(const AImage: UIImage; const W, H: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 function ALLoadFromStreamAndPlaceIntoToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 function ALLoadFromResourceAndPlaceIntoToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 function ALLoadFromFileAndPlaceIntoToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
@@ -465,8 +521,11 @@ function ALLoadFromFileAndPlaceIntoToDrawable(const AFileName: String; const W, 
 
 {$REGION ' Load and PlaceInto and Blur'}
 // If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
+function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
+function ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+function ALLoadFromFileAndPlaceIntoAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
 //--
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_image_t;
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
@@ -480,8 +539,8 @@ function ALLoadFromResourceAndPlaceIntoAndBlurToJBitmap(const AResName: String; 
 function ALLoadFromFileAndPlaceIntoAndBlurToJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndPlaceIntoAndBlurToCGContextRef(const AImage: UIImage; const W, H: single; const ABlurRadius: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoAndBlurToCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single): CGContextRef;
 function ALLoadFromStreamAndPlaceIntoAndBlurToCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGContextRef;
 function ALLoadFromResourceAndPlaceIntoAndBlurToCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
 function ALLoadFromFileAndPlaceIntoAndBlurToCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
@@ -503,8 +562,11 @@ function ALLoadFromFileAndPlaceIntoAndBlurToDrawable(const AFileName: String; co
 
 {$REGION ' Load and Stretch'}
 // Resize the src image to make that width = w and height = h
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndStretchToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
+function ALLoadFromStreamAndStretchToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+function ALLoadFromResourceAndStretchToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+function ALLoadFromFileAndStretchToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 //--
 function ALLoadFromStreamAndStretchToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 function ALLoadFromResourceAndStretchToSkImage(const AResName: String; const W, H: single): sk_image_t;
@@ -518,8 +580,8 @@ function ALLoadFromResourceAndStretchToJBitmap(const AResName: String; const W, 
 function ALLoadFromFileAndStretchToJBitmap(const AFileName: String; const W, H: single): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndStretchToCGContextRef(const AImage: UIImage; const W, H: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndStretchToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 function ALLoadFromStreamAndStretchToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 function ALLoadFromResourceAndStretchToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 function ALLoadFromFileAndStretchToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
@@ -539,10 +601,54 @@ function ALLoadFromResourceAndStretchToDrawable(const AResName: String; const W,
 function ALLoadFromFileAndStretchToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 {$ENDREGION}
 
+{$REGION ' Load and Wrap'}
+// Wrap the image inside w and h
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+//--
+function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+{$ENDIF}
+
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+//--
+function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+{$ENDIF}
+
+function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+//--
+function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+{$ENDREGION}
+
 {$REGION ' Load and NormalizeOrientation'}
 // Normalize the orientation
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndNormalizeOrientationToSkSurface(const AImage: sk_image_t; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
+function ALLoadFromStreamAndNormalizeOrientationToSkSurface(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
+function ALLoadFromResourceAndNormalizeOrientationToSkSurface(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
+function ALLoadFromFileAndNormalizeOrientationToSkSurface(const AFileName: String): sk_surface_t;
 //--
 function ALLoadFromStreamAndNormalizeOrientationToSkImage(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 function ALLoadFromResourceAndNormalizeOrientationToSkImage(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
@@ -556,8 +662,8 @@ function ALLoadFromResourceAndNormalizeOrientationToJBitmap(const AResName: Stri
 function ALLoadFromFileAndNormalizeOrientationToJBitmap(const AFileName: String): JBitmap;
 {$ENDIF}
 
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndNormalizeOrientationToCGContextRef(const AImage: UIImage; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndNormalizeOrientationToCGContextRef(const AImage: ALOSImage; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 function ALLoadFromStreamAndNormalizeOrientationToCGContextRef(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 function ALLoadFromResourceAndNormalizeOrientationToCGContextRef(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 function ALLoadFromFileAndNormalizeOrientationToCGContextRef(const AFileName: String): CGContextRef;
@@ -576,37 +682,27 @@ function ALLoadFromResourceAndNormalizeOrientationToDrawable(const AResName: Str
 function ALLoadFromFileAndNormalizeOrientationToDrawable(const AFileName: String): TALDrawable;
 {$ENDREGION}
 
-{$IF defined(IOS)}
-type
-  PAlphaColorCGFloat = ^TAlphaColorCGFloat;
-  TAlphaColorCGFloat = record
-  public
-    R, G, B, A: CGFloat;
-    class function Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat; overload; static; inline;
-    class function Create(const Color: TAlphaColor): TAlphaColorCGFloat; overload; static; inline;
-    class function Create(const Color: TAlphaColorF): TAlphaColorCGFloat; overload; static; inline;
-  end;
-
-procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
-{$ENDIF}
+////////////////////////////////////////////////////////////////////////////////
+/// THE CODE ABOVE (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
+/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
+////////////////////////////////////////////////////////////////////////////////
 
 {************************}
 procedure ALDrawRectangle(
-            {$IF defined(ALSkiaCanvas)}
-            const ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
             const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
             const AStrokeColor: TalphaColor;
             const AStrokeThickness: Single;
-            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
             const AShadowBlur: Single;
             const AShadowOffsetX: Single;
             const AShadowOffsetY: Single;
@@ -615,19 +711,32 @@ procedure ALDrawRectangle(
             const AXRadius: Single;
             const AYRadius: Single); overload;
 procedure ALDrawRectangle(
-            {$IF defined(ALSkiaCanvas)}
-            const ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
-            const AFill: TBrush;
-            const AStroke: TStrokeBrush;
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientAngle: Single;
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single;
+            const ASides: TSides;
+            const ACorners: TCorners;
+            const AXRadius: Single;
+            const AYRadius: Single); overload;
+procedure ALDrawRectangle(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
             const AShadow: TALShadow; // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the rectangle)
             const ASides: TSides;
             const ACorners: TCorners;
@@ -636,18 +745,17 @@ procedure ALDrawRectangle(
 
 {*********************}
 procedure ALDrawCircle(
-            {$IF defined(ALSkiaCanvas)}
-            const ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
             const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
             const AStrokeColor: TalphaColor;
             const AStrokeThickness: Single;
             const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
@@ -655,48 +763,45 @@ procedure ALDrawCircle(
             const AShadowOffsetX: Single;
             const AShadowOffsetY: Single); overload;
 procedure ALDrawCircle(
-            {$IF defined(ALSkiaCanvas)}
-            Var ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
-            const AFill: TBrush;
-            const AStroke: TStrokeBrush;
-            const AShadow: TALShadow); overload; // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the circle)
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientAngle: Single;
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single); overload;
+procedure ALDrawCircle(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow); overload; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
 
 {************************}
 Procedure ALCreateSurface(
-            {$IF defined(ALSkiaCanvas)}
-            out ASurface: sk_surface_t;
-            out ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            out ABitmap: Jbitmap;
-            out ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            out AContext: CGContextRef;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            out ABitmap: Tbitmap;
-            {$ENDIF}
-            const w: integer;
-            const h: integer);
+            out ASurface: TALSurface;
+            out ACanvas: TALCanvas;
+            const AScale: Single;
+            const w: Single;
+            const h: Single); overload;
+Procedure ALCreateSurface(
+            out ASurface: TALSurface;
+            out ACanvas: TALCanvas;
+            const w: Integer;
+            const h: Integer); overload;
 procedure ALFreeSurface(
-            {$IF defined(ALSkiaCanvas)}
-            Var ASurface: sk_surface_t;
-            Var ACanvas: sk_canvas_t
-            {$ELSEIF defined(ANDROID)}
-            Var ABitmap: Jbitmap;
-            var ACanvas: Jcanvas
-            {$ELSEIF defined(IOS)}
-            Var AContext: CGContextRef
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            Var ABitmap: Tbitmap
-            {$ENDIF});
+            Var ASurface: TALSurface;
+            Var ACanvas: TALCanvas);
 
 {***********************}
 procedure ALDrawDrawable(
@@ -708,6 +813,11 @@ procedure ALDrawDrawable(
             const ACanvas: Tcanvas;
             const ADrawable: TALDrawable;
             const ASrcRect: TrectF; // IN REAL PIXEL !
+            const ADstRect: TrectF; // IN Virtual pixels !
+            const AOpacity: Single); overload;
+procedure ALDrawDrawable(
+            const ACanvas: Tcanvas;
+            const ADrawable: TALDrawable;
             const ADstRect: TrectF; // IN Virtual pixels !
             const AOpacity: Single); overload;
 
@@ -756,7 +866,7 @@ implementation
 uses
   system.math,
   System.Math.Vectors,
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
   System.Skia,
   FMX.Skia,
   fmx.Skia.Canvas,
@@ -772,22 +882,29 @@ uses
   Androidapi.JNI.Media,
   Androidapi.Bitmap,
   Alcinoe.AndroidApi.Common,
-  Alcinoe.FMX.Types3D,
   {$ENDIF}
   {$IF defined(IOS)}
+  Fmx.Utils,
   iOSapi.Foundation,
   iOSapi.CoreImage,
   iOSapi.Helpers,
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
-  Alcinoe.iOSApi.ImageIO,
-  Alcinoe.FMX.Types3D,
+  Macapi.ImageIO,
+  {$ENDIF}
+  {$IF defined(ALMacOS)}
+  Fmx.Utils,
+  Macapi.Foundation,
+  Macapi.QuartzCore,
+  Macapi.ObjectiveC,
+  Macapi.CoreFoundation,
+  Macapi.Helpers,
+  Macapi.ImageIO,
   {$ENDIF}
   FMX.Effects,
-  Fmx.Platform,
   System.UIConsts,
-  Alcinoe.StringUtils;
+  Alcinoe.FMX.Types3D;
 
 {********************}
 {$IF defined(ANDROID)}
@@ -804,7 +921,7 @@ end;
 {$ENDIF}
 
 {****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALCGContextRefToTexture(const aCGContextRef: CGContextRef): TTexture;
 begin
   result := TALTexture.Create;
@@ -814,6 +931,26 @@ begin
     result.UpdateTexture(CGBitmapContextGetData(aCGContextRef), CGBitmapContextGetBytesPerRow(aCGContextRef));
   except
     ALFreeAndNil(result);
+    raise;
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALAppleOS)}
+function ALCGContextRefToBitmap(const aCGContextRef: CGContextRef): TBitmap;
+begin
+  Result := TBitmap.Create(CGBitmapContextGetWidth(aCGContextRef), CGBitmapContextGetHeight(aCGContextRef));
+  try
+    var LBitmapData: TBitmapData;
+    if Result.Map(TMapAccess.Write, LBitmapData) then
+    try
+      ALMove(CGBitmapContextGetData(aCGContextRef)^, LBitmapData.Data^, CGBitmapContextGetBytesPerRow(aCGContextRef) * cardinal(Result.Height));
+    finally
+      Result.Unmap(LBitmapData);
+    end;
+  except
+    FreeAndNil(Result);
     raise;
   end;
 end;
@@ -835,7 +972,7 @@ end;
 
 {******************}
 {$IFDEF ALGpuCanvas}
-function ALTransformBitmaptoTexture(var aBitmap: Tbitmap): TTexture;
+function ALBitmapToTexture(var aBitmap: Tbitmap): TTexture;
 begin
 
   //If TCustomCanvasGpu then simply move the textureID to the result
@@ -880,8 +1017,39 @@ begin
 end;
 {$ENDIF}
 
+{******************************************************************}
+function ALSurfaceToDrawable(var ASurface: TALSurface): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALCreateSkImageFromSkSurface(ASurface);
+    {$ELSEIF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromSkSurface(ASurface);
+    {$ELSE}
+    result := ALCreateBitmapFromSkSurface(ASurface);
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  result := ALJBitmaptoTexture(ASurface);
+  {$ELSEIF defined(ALAppleOS)}
+    {$IF defined(ALGpuCanvas)}
+    result := ALCGContextReftoTexture(ASurface);
+    {$ELSE}
+    result := ALCGContextReftoBitmap(ASurface);
+    {$ENDIF}
+  {$ELSE}
+  Result := ASurface;
+  ASurface := nil;
+  {$ENDIF}
+end;
+
+
+////////////////////////////////////////////////////////////////////////////////
+/// THE CODE BELOW (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
+/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
+////////////////////////////////////////////////////////////////////////////////
+
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -893,7 +1061,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoToSkSurface(LImage, W, H);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoToSkSurface(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoToSkSurface(LImage, W, H);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -908,7 +1126,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoToSkSurface(LImage, W, H);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -922,7 +1140,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -935,14 +1153,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoToSkSurface(LImage, W, H);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -1021,19 +1239,19 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoToCGContextRef(const AImage: UIImage; const W, H: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 begin
-  var LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage));
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
   var LDestRect := LSrcRect.
                      FitInto(
                        TrectF.Create(0, 0, W, H));
-  result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(AImage, LDestRect.Width, LDestRect.Height);
+  result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, LDestRect.Width, LDestRect.Height);
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -1057,10 +1275,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoToCGContextRef(LImage, W, H);
+        result := ALLoadFromOSImageAndFitIntoToCGContextRef(LImage, W, H);
       finally
         LImage.release;
       end;
@@ -1074,7 +1292,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1087,13 +1305,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoToCGContextRef(LImage, W, H);
+    result := ALLoadFromOSImageAndFitIntoToCGContextRef(LImage, W, H);
   finally
     LImage.release;
   end;
@@ -1101,7 +1319,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoToCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoToCGContextRef(AStream, W, H);
@@ -1121,7 +1339,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoToCGImageRef(const AResName: String; const W, H: single): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1134,7 +1352,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoToCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoToCGContextRef(AFileName, W, H);
@@ -1199,8 +1417,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndFitIntoToDrawable(const AStream: TStream; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoToSkImage(AStream, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoToSkImage(AStream, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoToSkSurface(AStream, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoToSkSurface(AStream, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoToJBitmap(AStream, W, H);
   try
@@ -1209,10 +1443,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoToCGContextRef(AStream, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -1224,8 +1462,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndFitIntoToDrawable(const AResName: String; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoToSkImage(AResName, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoToSkImage(AResName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoToSkSurface(AResName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoToSkSurface(AResName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoToJBitmap(AResName, W, H);
   try
@@ -1234,10 +1488,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoToCGContextRef(AResName, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -1249,8 +1507,24 @@ end;
 {*****************}
 function ALLoadFromFileAndFitIntoToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoToSkImage(AFileName, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoToSkImage(AFileName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoToSkSurface(AFileName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoToSkSurface(AFileName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoToJBitmap(AFileName, W, H);
   try
@@ -1259,10 +1533,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoToCGContextRef(AFileName, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -1272,7 +1550,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropToSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -1304,7 +1582,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(LImage, W, H, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropToSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropToSkSurface(LStream, W, H, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropToSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(LImage, W, H, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropToSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -1319,7 +1647,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(LImage, W, H, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -1333,7 +1661,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropToSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1346,14 +1674,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropToSkImage(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(LImage, W, H, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -1434,32 +1762,29 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(const AImage: UIImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(const AImage: ALOSImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
   var LRatio: single;
-  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
+  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
   //-----
   Result := ALCreateCGContextRef(LDestRect.Width, LDestRect.Height);
-  CGContextSetInterpolationQuality(Result, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-  CGContextSetShouldAntialias(Result, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(Result, True); // Sets whether or not to allow anti-aliasing for a graphics context.
   CGContextDrawImage(
     Result, // c: The graphics context in which to draw the image.
     ALLowerLeftCGRect(
       TpointF.Create(
         0-(LSrcRect.Left*LRatio),
         0-(LSrcRect.top*LRatio)),
-      LDestRect.width + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(AImage.cgImage)-LSrcRect.right)*LRatio),
-      LDestRect.height + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(AImage.cgImage)-LSrcRect.bottom)*LRatio),
+      LDestRect.width + (LSrcRect.Left*LRatio) + ((ALOSImageGetWidth(AImage)-LSrcRect.right)*LRatio),
+      LDestRect.height + (LSrcRect.top*LRatio)  + ((ALOSImageGetHeight(AImage)-LSrcRect.bottom)*LRatio),
       LDestRect.height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-    AImage.CGImage); // image The image to draw.
+    ALOSImageGetCgImage(AImage)); // image The image to draw.
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCGContextRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -1483,10 +1808,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -1500,7 +1825,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCGContextRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1513,13 +1838,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCGContextRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -1527,7 +1852,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCGImageRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropToCGContextRef(AStream, W, H, XCropCenter, YCropCenter);
@@ -1547,7 +1872,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCGImageRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1560,7 +1885,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCGImageRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropToCGContextRef(AFileName, W, H, XCropCenter, YCropCenter);
@@ -1642,8 +1967,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndFitIntoAndCropToDrawable(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropToSkImage(AStream, W, H, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropToSkImage(AStream, W, H, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropToSkSurface(AStream, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropToSkSurface(AStream, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropToJBitmap(AStream, W, H, XCropCenter, YCropCenter);
   try
@@ -1652,10 +1993,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropToCGContextRef(AStream, W, H, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -1667,8 +2012,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndFitIntoAndCropToDrawable(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropToSkImage(AResName, W, H, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropToSkImage(AResName, W, H, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropToSkSurface(AResName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropToSkSurface(AResName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropToJBitmap(AResName, W, H, XCropCenter, YCropCenter);
   try
@@ -1677,10 +2038,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropToCGContextRef(AResName, W, H, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -1692,8 +2057,24 @@ end;
 {*****************}
 function ALLoadFromFileAndFitIntoAndCropToDrawable(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropToSkImage(AFileName, W, H, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropToSkImage(AFileName, W, H, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropToSkSurface(AFileName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropToSkSurface(AFileName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropToJBitmap(AFileName, W, H, XCropCenter, YCropCenter);
   try
@@ -1702,10 +2083,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropToCGContextRef(AFileName, W, H, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -1715,7 +2100,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -1766,7 +2151,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(LStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropToRoundRectSkSurface(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -1781,7 +2216,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -1795,7 +2230,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkImage(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1808,14 +2243,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectSkImage(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -1855,6 +2290,7 @@ begin
   var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
   LPaint.setXfermode(LPorterDuffXfermode);
   LCanvas.drawBitmap(ABitmap, LJSrcRect, LJDestRect, LPaint);
+  LPaint.setXfermode(nil);
   LPorterDuffXfermode := nil;
 
   LPaint := nil;
@@ -1921,8 +2357,8 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropToRoundRectCGContextRef(const AImage: UIImage; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 
 var
   LGridHeight: Integer;
@@ -1960,12 +2396,9 @@ var
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
   var LRatio: single;
-  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
+  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
   //-----
   Result := ALCreateCGContextRef(LDestRect.Width, LDestRect.Height);
-  CGContextSetInterpolationQuality(Result, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-  CGContextSetShouldAntialias(Result, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(Result, True); // Sets whether or not to allow anti-aliasing for a graphics context.
   CGContextBeginPath(Result);  // Creates a new empty path in a graphics context.
 
   LGridHeight := LDestRect.Height;
@@ -2005,15 +2438,15 @@ begin
       TpointF.Create(
         0-(LSrcRect.Left*LRatio),
         0-(LSrcRect.top*LRatio)),
-      LDestRect.width + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(AImage.cgImage)-LSrcRect.right)*LRatio),
-      LDestRect.height + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(AImage.cgImage)-LSrcRect.bottom)*LRatio),
+      LDestRect.width + (LSrcRect.Left*LRatio) + ((ALOSImageGetWidth(AImage)-LSrcRect.right)*LRatio),
+      LDestRect.height + (LSrcRect.top*LRatio)  + ((ALOSImageGetHeight(AImage)-LSrcRect.bottom)*LRatio),
       LDestRect.height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-    AImage.CGImage); // image The image to draw.
+    ALOSImageGetCgImage(AImage)); // image The image to draw.
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -2037,10 +2470,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropToRoundRectCGContextRef(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropToRoundRectCGContextRef(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -2054,7 +2487,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectCGContextRef(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2067,13 +2500,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectCGContextRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropToRoundRectCGContextRef(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropToRoundRectCGContextRef(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -2081,7 +2514,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectCGImageRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropToRoundRectCGContextRef(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
@@ -2101,7 +2534,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectCGImageRef(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2114,7 +2547,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectCGImageRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropToRoundRectCGContextRef(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
@@ -2147,7 +2580,7 @@ begin
       try
         Result.Canvas.Fill.Bitmap.Bitmap.Assign(LBitmap);
         Result.Canvas.Fill.bitmap.WrapMode := TWrapMode.TileStretch;
-        Result.Canvas.Fill.Kind := TbrushKind.Bitmap;
+        Result.Canvas.Fill.Kind := TBrushKind.Bitmap;
         Result.Canvas.FillRect(
           TRectF.Create(0,0, Result.Width,Result.Height),
           XRadius,
@@ -2204,8 +2637,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectDrawable(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropToRoundRectJBitmap(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   try
@@ -2214,10 +2663,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropToRoundRectCGContextRef(AStream, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -2229,8 +2682,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectDrawable(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropToRoundRectSkImage(AResName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropToRoundRectSkImage(AResName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(AResName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(AResName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropToRoundRectJBitmap(AResName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   try
@@ -2239,10 +2708,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropToRoundRectCGContextRef(AResName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -2254,8 +2727,24 @@ end;
 {*****************}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectDrawable(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropToRoundRectSkImage(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropToRoundRectSkImage(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropToRoundRectSkSurface(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropToRoundRectSkSurface(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropToRoundRectJBitmap(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   try
@@ -2264,10 +2753,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropToRoundRectCGContextRef(AFileName, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -2277,7 +2770,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -2326,7 +2819,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(LImage, W, H, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(LStream, W, H, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropToCircleSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(LImage, W, H, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -2341,7 +2884,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(LImage, W, H, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -2355,7 +2898,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2368,14 +2911,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropToCircleSkImage(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(LImage, W, H, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -2408,6 +2951,7 @@ begin
   var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
   LPaint.setXfermode(LPorterDuffXfermode);
   LCanvas.drawBitmap(ABitmap, LJSrcRect, LJDestRect, LPaint);
+  LPaint.setXfermode(nil);
   LPorterDuffXfermode := nil;
 
   LPaint := nil;
@@ -2474,17 +3018,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropToCircleCGContextRef(const AImage: UIImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
   var LRatio: single;
-  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
+  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
   //-----
   Result := ALCreateCGContextRef(LDestRect.Width, LDestRect.Height);
-  CGContextSetInterpolationQuality(Result, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-  CGContextSetShouldAntialias(Result, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(Result, True); // Sets whether or not to allow anti-aliasing for a graphics context.
   CGContextBeginPath(Result);  // Creates a new empty path in a graphics context.
   CGContextAddEllipseInRect(
     Result,
@@ -2505,15 +3046,15 @@ begin
       TpointF.Create(
         0-(LSrcRect.Left*LRatio),
         0-(LSrcRect.top*LRatio)),
-      LDestRect.width + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(AImage.cgImage)-LSrcRect.right)*LRatio),
-      LDestRect.height + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(AImage.cgImage)-LSrcRect.bottom)*LRatio),
+      LDestRect.width + (LSrcRect.Left*LRatio) + ((ALOSImageGetWidth(AImage)-LSrcRect.right)*LRatio),
+      LDestRect.height + (LSrcRect.top*LRatio)  + ((ALOSImageGetHeight(AImage)-LSrcRect.bottom)*LRatio),
       LDestRect.height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-    AImage.CGImage); // image The image to draw.
+    ALOSImageGetCgImage(AImage)); // image The image to draw.
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleCGContextRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -2537,10 +3078,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropToCircleCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropToCircleCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -2554,7 +3095,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleCGContextRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2567,13 +3108,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCircleCGContextRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropToCircleCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropToCircleCGContextRef(LImage, W, H, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -2581,7 +3122,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleCGImageRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropToCircleCGContextRef(AStream, W, H, XCropCenter, YCropCenter);
@@ -2601,7 +3142,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleCGImageRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2614,7 +3155,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCircleCGImageRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropToCircleCGContextRef(AFileName, W, H, XCropCenter, YCropCenter);
@@ -2647,7 +3188,7 @@ begin
       try
         Result.Canvas.Fill.Bitmap.Bitmap.Assign(LBitmap);
         Result.Canvas.Fill.bitmap.WrapMode := TWrapMode.TileStretch;
-        Result.Canvas.Fill.Kind := TbrushKind.Bitmap;
+        Result.Canvas.Fill.Kind := TBrushKind.Bitmap;
         Result.Canvas.FillEllipse(TRectF.Create(0,0, Result.Width, Result.Height), 1 {AOpacity});
       finally
         Result.Canvas.EndScene;
@@ -2699,8 +3240,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndFitIntoAndCropToCircleDrawable(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(AStream, W, H, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(AStream, W, H, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(AStream, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(AStream, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropToCircleJBitmap(AStream, W, H, XCropCenter, YCropCenter);
   try
@@ -2709,10 +3266,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropToCircleCGContextRef(AStream, W, H, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -2724,8 +3285,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndFitIntoAndCropToCircleDrawable(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropToCircleSkImage(AResName, W, H, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropToCircleSkImage(AResName, W, H, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(AResName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(AResName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropToCircleJBitmap(AResName, W, H, XCropCenter, YCropCenter);
   try
@@ -2734,10 +3311,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropToCircleCGContextRef(AResName, W, H, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -2749,8 +3330,24 @@ end;
 {*****************}
 function ALLoadFromFileAndFitIntoAndCropToCircleDrawable(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropToCircleSkImage(AFileName, W, H, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropToCircleSkImage(AFileName, W, H, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropToCircleSkSurface(AFileName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropToCircleSkSurface(AFileName, W, H, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropToCircleJBitmap(AFileName, W, H, XCropCenter, YCropCenter);
   try
@@ -2759,10 +3356,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropToCircleCGContextRef(AFileName, W, H, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -2772,7 +3373,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -2819,7 +3420,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(LStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -2834,7 +3485,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -2848,7 +3499,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2861,14 +3512,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -3040,10 +3691,10 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndBlurToCGContextRef(const AImage: UIImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndBlurToCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  Result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(AImage, W, H, XCropCenter, YCropCenter);
+  Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, W, H, XCropCenter, YCropCenter);
   try
     var LDestRect := Trect.Create(0, 0, CGBitmapContextGetWidth(Result), CGBitmapContextGetHeight(Result));
     var LData := TNSData.Wrap(
@@ -3111,7 +3762,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -3135,10 +3786,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropAndBlurToCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -3152,7 +3803,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3165,13 +3816,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropAndBlurToCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -3179,7 +3830,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropAndBlurToCGContextRef(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -3199,7 +3850,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3212,7 +3863,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropAndBlurToCGContextRef(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -3307,8 +3958,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropAndBlurToJBitmap(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -3317,10 +3984,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropAndBlurToCGContextRef(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -3332,8 +4003,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToDrawable(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropAndBlurToSkImage(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropAndBlurToSkImage(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropAndBlurToJBitmap(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -3342,10 +4029,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropAndBlurToCGContextRef(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -3357,8 +4048,24 @@ end;
 {*****************}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropAndBlurToSkImage(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropAndBlurToSkImage(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndBlurToSkSurface(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndBlurToSkSurface(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropAndBlurToJBitmap(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -3367,10 +4074,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropAndBlurToCGContextRef(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -3380,7 +4091,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -3444,7 +4155,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(LStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -3459,7 +4220,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -3473,7 +4234,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3486,14 +4247,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -3527,6 +4288,7 @@ begin
     var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
     LPaint.setXfermode(LPorterDuffXfermode);
     LCanvas.drawBitmap(LBitmap, LJRect, LJRect, LPaint);
+    LPaint.setXfermode(nil);
     LPorterDuffXfermode := nil;
 
     LPaint := nil;
@@ -3597,10 +4359,10 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndBlurToCircleCGContextRef(const AImage: UIImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndBlurToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  Result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(AImage, W, H, XCropCenter, YCropCenter);
+  Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, W, H, XCropCenter, YCropCenter);
   try
     var LDestRect := Trect.Create(0, 0, CGBitmapContextGetWidth(Result), CGBitmapContextGetHeight(Result));
     var LData := TNSData.Wrap(
@@ -3690,7 +4452,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -3714,10 +4476,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropAndBlurToCircleCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToCircleCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -3731,7 +4493,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3744,13 +4506,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropAndBlurToCircleCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToCircleCGContextRef(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -3758,7 +4520,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGContextRef(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -3778,7 +4540,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3791,7 +4553,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGContextRef(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -3824,7 +4586,7 @@ begin
       try
         Result.Canvas.Fill.Bitmap.Bitmap.Assign(LBitmap);
         Result.Canvas.Fill.bitmap.WrapMode := TWrapMode.TileStretch;
-        Result.Canvas.Fill.Kind := TbrushKind.Bitmap;
+        Result.Canvas.Fill.Kind := TBrushKind.Bitmap;
         Result.Canvas.FillEllipse(TRectF.Create(0,0, Result.Width, Result.Height), 1 {AOpacity});
       finally
         Result.Canvas.EndScene;
@@ -3876,8 +4638,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleJBitmap(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -3886,10 +4664,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGContextRef(AStream, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -3901,8 +4683,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleDrawable(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkImage(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkImage(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleJBitmap(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -3911,10 +4709,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleCGContextRef(AResName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -3926,8 +4728,24 @@ end;
 {*****************}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkImage(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkImage(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkSurface(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkSurface(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleJBitmap(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -3936,10 +4754,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGContextRef(AFileName, W, H, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -3949,7 +4771,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, sk4d_image_get_width(AMask), sk4d_image_get_Height(AMask)).Round;
@@ -3999,7 +4821,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(LImage, AMask, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(LStream, AMask, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropAndMaskToSkSurface(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(LImage, AMask, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -4014,7 +4886,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(LImage, AMask, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -4028,7 +4900,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkImage(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4041,14 +4913,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToSkImage(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(LImage, AMask, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -4081,6 +4953,7 @@ begin
   var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
   LPaint.setXfermode(LPorterDuffXfermode);
   LCanvas.drawBitmap(ABitmap, LJSrcRect, LJDestRect, LPaint);
+  LPaint.setXfermode(nil);
   LPorterDuffXfermode := nil;
 
   LPaint := nil;
@@ -4147,17 +5020,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndMaskToCGContextRef(const AImage: UIImage; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndMaskToCGContextRef(const AImage: ALOSImage; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LDestRect := Trect.Create(0, 0, CGImageGetWidth(aMask), CGImageGetHeight(aMask));
   var LRatio: single;
-  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
+  var LSrcRect := ALRectFitInto(LDestRect, TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage)), TpointF.create(XCropCenter, YCropCenter), LRatio);
   //-----
   Result := ALCreateCGContextRef(LDestRect.Width, LDestRect.Height);
-  CGContextSetInterpolationQuality(Result, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-  CGContextSetShouldAntialias(Result, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(Result, True); // Sets whether or not to allow anti-aliasing for a graphics context.
   CGContextClipToMask(
     Result,
     ALLowerLeftCGRect(
@@ -4172,15 +5042,15 @@ begin
       TpointF.Create(
         0-(LSrcRect.Left*LRatio),
         0-(LSrcRect.top*LRatio)),
-      LDestRect.width + (LSrcRect.Left*LRatio) + ((CGImageGetWidth(AImage.cgImage)-LSrcRect.right)*LRatio),
-      LDestRect.height + (LSrcRect.top*LRatio)  + ((CGImageGetHeight(AImage.cgImage)-LSrcRect.bottom)*LRatio),
+      LDestRect.width + (LSrcRect.Left*LRatio) + ((ALOSImageGetWidth(AImage)-LSrcRect.right)*LRatio),
+      LDestRect.height + (LSrcRect.top*LRatio)  + ((ALOSImageGetHeight(AImage)-LSrcRect.bottom)*LRatio),
       LDestRect.height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-    AImage.CGImage); // image The image to draw.
+    ALOSImageGetCgImage(AImage)); // image The image to draw.
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToCGContextRef(const AStream: TStream; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -4204,10 +5074,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropAndMaskToCGContextRef(LImage, AMask, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropAndMaskToCGContextRef(LImage, AMask, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -4221,7 +5091,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToCGContextRef(const AResName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4234,13 +5104,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToCGContextRef(const AFileName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropAndMaskToCGContextRef(LImage, AMask, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropAndMaskToCGContextRef(LImage, AMask, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -4248,7 +5118,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToCGImageRef(const AStream: TStream; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropAndMaskToCGContextRef(AStream, AMask, XCropCenter, YCropCenter);
@@ -4268,7 +5138,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToCGImageRef(const AResName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4281,7 +5151,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToCGImageRef(const AFileName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropAndMaskToCGContextRef(AFileName, AMask, XCropCenter, YCropCenter);
@@ -4383,10 +5253,26 @@ begin
 end;
 
 {*****************}
-function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(AStream, AMask, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(AStream, AMask, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(AStream, AMask, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(AStream, AMask, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropAndMaskToJBitmap(AStream, AMask, XCropCenter, YCropCenter);
   try
@@ -4395,10 +5281,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropAndMaskToCGContextRef(AStream, AMask, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -4408,10 +5298,26 @@ begin
 end;
 
 {*****************}
-function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropAndMaskToSkImage(AResName, AMask, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropAndMaskToSkImage(AResName, AMask, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(AResName, AMask, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(AResName, AMask, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropAndMaskToJBitmap(AResName, AMask, XCropCenter, YCropCenter);
   try
@@ -4420,10 +5326,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropAndMaskToCGContextRef(AResName, AMask, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -4433,10 +5343,26 @@ begin
 end;
 
 {*****************}
-function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropAndMaskToSkImage(AFileName, AMask, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropAndMaskToSkImage(AFileName, AMask, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndMaskToSkSurface(AFileName, AMask, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndMaskToSkSurface(AFileName, AMask, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropAndMaskToJBitmap(AFileName, AMask, XCropCenter, YCropCenter);
   try
@@ -4445,10 +5371,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropAndMaskToCGContextRef(AFileName, AMask, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -4458,7 +5388,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, sk4d_image_get_width(AMask), sk4d_image_get_Height(AMask)).Round;
@@ -4522,7 +5452,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(LStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -4537,7 +5517,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -4551,7 +5531,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkImage(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4564,14 +5544,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkImage(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -4604,6 +5584,7 @@ begin
     var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
     LPaint.setXfermode(LPorterDuffXfermode);
     LCanvas.drawBitmap(LBitmap, LJRect, LJRect, LPaint);
+    LPaint.setXfermode(nil);
     LPorterDuffXfermode := nil;
 
     LPaint := nil;
@@ -4673,10 +5654,10 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AImage: UIImage; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AImage: ALOSImage; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  Result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(AImage, CGImageGetWidth(aMask), CGImageGetHeight(aMask), XCropCenter, YCropCenter);
+  Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, CGImageGetWidth(aMask), CGImageGetHeight(aMask), XCropCenter, YCropCenter);
   try
     var LDestRect := Trect.Create(0, 0, CGBitmapContextGetWidth(Result), CGBitmapContextGetHeight(Result));
     var LData := TNSData.Wrap(
@@ -4761,7 +5742,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AStream: TStream; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -4785,10 +5766,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
+        result := ALLoadFromOSImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -4802,7 +5783,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AResName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4815,13 +5796,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AFileName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    result := ALLoadFromOSImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -4829,7 +5810,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGImageRef(const AStream: TStream; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGContextRef(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
@@ -4849,7 +5830,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToCGImageRef(const AResName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4862,7 +5843,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGImageRef(const AFileName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGContextRef(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
@@ -4964,10 +5945,26 @@ begin
 end;
 
 {*****************}
-function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToJBitmap(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -4976,10 +5973,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGContextRef(AStream, AMask, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -4989,10 +5990,26 @@ begin
 end;
 
 {*****************}
-function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkImage(AResName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkImage(AResName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(AResName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(AResName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToJBitmap(AResName, AMask, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -5001,10 +6018,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToCGContextRef(AResName, AMask, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5014,10 +6035,26 @@ begin
 end;
 
 {*****************}
-function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(IOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkImage(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkImage(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkSurface(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkSurface(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToJBitmap(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
   try
@@ -5026,10 +6063,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGContextRef(AFileName, AMask, ABlurRadius, XCropCenter, YCropCenter);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5039,7 +6080,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndPlaceIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -5049,7 +6090,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndPlaceIntoToSkSurface(LImage, W, H);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndPlaceIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToSkSurface(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndPlaceIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndPlaceIntoToSkSurface(LImage, W, H);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndPlaceIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -5064,7 +6155,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoToSkSurface(LImage, W, H);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -5078,7 +6169,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndPlaceIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5091,14 +6182,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndPlaceIntoToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndPlaceIntoToSkSurface(LImage, W, H);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -5175,17 +6266,17 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndPlaceIntoToCGContextRef(const AImage: UIImage; const W, H: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 begin
-  var LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage));
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
   var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
-  Result := ALLoadFromUIImageAndFitIntoAndCropToCGContextRef(AImage, LDestRect.Width, LDestRect.Height);
+  Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, LDestRect.Width, LDestRect.Height);
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -5209,10 +6300,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndPlaceIntoToCGContextRef(LImage, W, H);
+        result := ALLoadFromOSImageAndPlaceIntoToCGContextRef(LImage, W, H);
       finally
         LImage.release;
       end;
@@ -5226,7 +6317,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5239,13 +6330,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndPlaceIntoToCGContextRef(LImage, W, H);
+    result := ALLoadFromOSImageAndPlaceIntoToCGContextRef(LImage, W, H);
   finally
     LImage.release;
   end;
@@ -5253,7 +6344,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoToCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndPlaceIntoToCGContextRef(AStream, W, H);
@@ -5273,7 +6364,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoToCGImageRef(const AResName: String; const W, H: single): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5286,7 +6377,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoToCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndPlaceIntoToCGContextRef(AFileName, W, H);
@@ -5349,8 +6440,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndPlaceIntoToDrawable(const AStream: TStream; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndPlaceIntoToSkImage(AStream, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndPlaceIntoToSkImage(AStream, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndPlaceIntoToSkSurface(AStream, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndPlaceIntoToSkSurface(AStream, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndPlaceIntoToJBitmap(AStream, W, H);
   try
@@ -5359,10 +6466,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndPlaceIntoToCGContextRef(AStream, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5374,8 +6485,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndPlaceIntoToDrawable(const AResName: String; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndPlaceIntoToSkImage(AResName, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndPlaceIntoToSkImage(AResName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndPlaceIntoToSkSurface(AResName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndPlaceIntoToSkSurface(AResName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndPlaceIntoToJBitmap(AResName, W, H);
   try
@@ -5384,10 +6511,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndPlaceIntoToCGContextRef(AResName, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5399,8 +6530,24 @@ end;
 {*****************}
 function ALLoadFromFileAndPlaceIntoToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndPlaceIntoToSkImage(AFileName, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndPlaceIntoToSkImage(AFileName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndPlaceIntoToSkSurface(AFileName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndPlaceIntoToSkSurface(AFileName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndPlaceIntoToJBitmap(AFileName, W, H);
   try
@@ -5409,10 +6556,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndPlaceIntoToCGContextRef(AFileName, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5422,7 +6573,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -5432,7 +6583,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndPlaceIntoAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -5447,7 +6648,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -5461,7 +6662,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5474,14 +6675,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndPlaceIntoAndBlurToSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -5558,17 +6759,17 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndPlaceIntoAndBlurToCGContextRef(const AImage: UIImage; const W, H: single; const ABlurRadius: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoAndBlurToCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
-  var LSrcRect := TrectF.Create(0, 0, CGImageGetWidth(AImage.cgImage), CGImageGetHeight(AImage.cgImage));
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
   var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
-  Result := ALLoadFromUIImageAndFitIntoAndCropAndBlurToCGContextRef(AImage, LDestRect.Width, LDestRect.Height, ABlurRadius);
+  Result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToCGContextRef(AImage, LDestRect.Width, LDestRect.Height, ABlurRadius);
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -5592,10 +6793,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndPlaceIntoAndBlurToCGContextRef(LImage, W, H, ABlurRadius);
+        result := ALLoadFromOSImageAndPlaceIntoAndBlurToCGContextRef(LImage, W, H, ABlurRadius);
       finally
         LImage.release;
       end;
@@ -5609,7 +6810,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5622,13 +6823,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoAndBlurToCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndPlaceIntoAndBlurToCGContextRef(LImage, W, H, ABlurRadius);
+    result := ALLoadFromOSImageAndPlaceIntoAndBlurToCGContextRef(LImage, W, H, ABlurRadius);
   finally
     LImage.release;
   end;
@@ -5636,7 +6837,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndPlaceIntoAndBlurToCGContextRef(AStream, W, H, ABlurRadius);
@@ -5656,7 +6857,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5669,7 +6870,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoAndBlurToCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndPlaceIntoAndBlurToCGContextRef(AFileName, W, H, ABlurRadius);
@@ -5732,8 +6933,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndPlaceIntoAndBlurToDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(AStream, W, H, ABlurRadius);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(AStream, W, H, ABlurRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(AStream, W, H, ABlurRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(AStream, W, H, ABlurRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndPlaceIntoAndBlurToJBitmap(AStream, W, H, ABlurRadius);
   try
@@ -5742,10 +6959,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndPlaceIntoAndBlurToCGContextRef(AStream, W, H, ABlurRadius);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5757,8 +6978,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndPlaceIntoAndBlurToDrawable(const AResName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndPlaceIntoAndBlurToSkImage(AResName, W, H, ABlurRadius);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndPlaceIntoAndBlurToSkImage(AResName, W, H, ABlurRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(AResName, W, H, ABlurRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(AResName, W, H, ABlurRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndPlaceIntoAndBlurToJBitmap(AResName, W, H, ABlurRadius);
   try
@@ -5767,10 +7004,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndPlaceIntoAndBlurToCGContextRef(AResName, W, H, ABlurRadius);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5782,8 +7023,24 @@ end;
 {*****************}
 function ALLoadFromFileAndPlaceIntoAndBlurToDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndPlaceIntoAndBlurToSkImage(AFileName, W, H, ABlurRadius);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndPlaceIntoAndBlurToSkImage(AFileName, W, H, ABlurRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndPlaceIntoAndBlurToSkSurface(AFileName, W, H, ABlurRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndPlaceIntoAndBlurToSkSurface(AFileName, W, H, ABlurRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndPlaceIntoAndBlurToJBitmap(AFileName, W, H, ABlurRadius);
   try
@@ -5792,10 +7049,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndPlaceIntoAndBlurToCGContextRef(AFileName, W, H, ABlurRadius);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -5805,7 +7066,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndStretchToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -5837,7 +7098,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndStretchToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndStretchToSkSurface(LImage, W, H);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndStretchToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndStretchToSkSurface(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndStretchToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndStretchToSkSurface(LImage, W, H);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndStretchToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -5852,7 +7163,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndStretchToSkSurface(LImage, W, H);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -5866,7 +7177,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndStretchToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5879,14 +7190,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndStretchToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndStretchToSkSurface(LImage, W, H);
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -5967,15 +7278,12 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndStretchToCGContextRef(const AImage: UIImage; const W, H: single): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndStretchToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
   //-----
   Result := ALCreateCGContextRef(LDestRect.Width, LDestRect.Height);
-  CGContextSetInterpolationQuality(Result, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-  CGContextSetShouldAntialias(Result, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(Result, True); // Sets whether or not to allow anti-aliasing for a graphics context.
   CGContextDrawImage(
     Result, // c: The graphics context in which to draw the image.
     ALLowerLeftCGRect(
@@ -5983,12 +7291,12 @@ begin
       LDestRect.width,
       LDestRect.Height,
       LDestRect.height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-    AImage.CGImage); // image The image to draw.
+    ALOSImageGetCgImage(AImage)); // image The image to draw.
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndStretchToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -6012,10 +7320,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndStretchToCGContextRef(LImage, W, H);
+        result := ALLoadFromOSImageAndStretchToCGContextRef(LImage, W, H);
       finally
         LImage.release;
       end;
@@ -6029,7 +7337,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndStretchToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6042,13 +7350,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndStretchToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndStretchToCGContextRef(LImage, W, H);
+    result := ALLoadFromOSImageAndStretchToCGContextRef(LImage, W, H);
   finally
     LImage.release;
   end;
@@ -6056,7 +7364,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndStretchToCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndStretchToCGContextRef(AStream, W, H);
@@ -6076,7 +7384,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndStretchToCGImageRef(const AResName: String; const W, H: single): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6089,7 +7397,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndStretchToCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndStretchToCGContextRef(AFileName, W, H);
@@ -6171,8 +7479,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndStretchToDrawable(const AStream: TStream; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndStretchToSkImage(AStream, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndStretchToSkImage(AStream, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndStretchToSkSurface(AStream, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndStretchToSkSurface(AStream, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndStretchToJBitmap(AStream, W, H);
   try
@@ -6181,10 +7505,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndStretchToCGContextRef(AStream, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -6196,8 +7524,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndStretchToDrawable(const AResName: String; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndStretchToSkImage(AResName, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndStretchToSkImage(AResName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndStretchToSkSurface(AResName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndStretchToSkSurface(AResName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndStretchToJBitmap(AResName, W, H);
   try
@@ -6206,10 +7550,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndStretchToCGContextRef(AResName, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -6221,8 +7569,24 @@ end;
 {*****************}
 function ALLoadFromFileAndStretchToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndStretchToSkImage(AFileName, W, H);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndStretchToSkImage(AFileName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndStretchToSkSurface(AFileName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndStretchToSkSurface(AFileName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndStretchToJBitmap(AFileName, W, H);
   try
@@ -6231,10 +7595,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndStretchToCGContextRef(AFileName, W, H);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -6243,8 +7611,517 @@ begin
   {$ENDIF}
 end;
 
+{*************************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+begin
+  case AWrapMode of
+    TALImageWrapMode.Fit: Result := ALLoadFromSkImageAndFitIntoToSkSurface(AImage, W, H);
+    TALImageWrapMode.Stretch: Result := ALLoadFromSkImageAndStretchToSkSurface(AImage, W, H);
+    TALImageWrapMode.Place: Result := ALLoadFromSkImageAndPlaceIntoToSkSurface(AImage, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(AImage, W, H);
+    else Raise exception.Create('Error 4CE56031-47CC-4532-ABC2-49C939A186A6')
+  end;
+end;
+{$ENDIF}
+
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToSkSurface(LStream, AWrapMode, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+      try
+        Result := ALCreateSkImageFromSkSurface(LSurface);
+      finally
+        sk4d_refcnt_unref(LSurface);
+      end;
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToSkImage(LStream, AWrapMode, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+    try
+      Result := ALCreateSkImageFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+begin
+  case AWrapMode of
+    TALImageWrapMode.Fit: Result := ALLoadFromJBitmapAndFitIntoToJBitmap(ABitmap, W, H);
+    TALImageWrapMode.Stretch: Result := ALLoadFromJBitmapAndStretchToJBitmap(ABitmap, W, H);
+    TALImageWrapMode.Place: Result := ALLoadFromJBitmapAndPlaceIntoToJBitmap(ABitmap, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(ABitmap, W, H);
+    else Raise exception.Create('Error AB4C9111-6649-45D7-8116-70758938CD47')
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ANDROID)}
+function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+begin
+  var LLength := AStream.Size-AStream.Position;
+  var LArray := TJavaArray<Byte>.Create(LLength);
+  try
+    AStream.ReadBuffer(LArray.Data^, LLength);
+    var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
+    try
+      Result := ALLoadFromJBitmapAndWrapToJBitmap(LBitmap, AWrapMode, W, H);
+    finally
+      if not LBitmap.equals(Result) then LBitmap.recycle;
+      LBitmap := nil;
+    end;
+    LOptions := nil;
+  finally
+    ALfreeandNil(LArray);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ANDROID)}
+function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToJBitmap(LStream, AWrapMode, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ANDROID)}
+function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+begin
+  var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+  if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+  var LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+  if LBitmap = nil then raise Exception.create('Failed to load bitmap from file');
+  try
+    Result := ALLoadFromJBitmapAndWrapToJBitmap(LBitmap, AWrapMode, W, H);
+  finally
+    if not LBitmap.equals(Result) then LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  LOptions := nil;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+begin
+  case AWrapMode of
+    TALImageWrapMode.Fit: Result := ALLoadFromOSImageAndFitIntoToCGContextRef(AImage, W, H);
+    TALImageWrapMode.Stretch: Result := ALLoadFromOSImageAndStretchToCGContextRef(AImage, W, H);
+    TALImageWrapMode.Place: Result := ALLoadFromOSImageAndPlaceIntoToCGContextRef(AImage, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, W, H);
+    else Raise exception.Create('Error 71B29EF2-207C-479A-B891-42075C545EA8')
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+begin
+  var LBuffer: Pointer := nil;
+  var LLength: Int64 := 0;
+  var LMemoryStream: TCustomMemoryStream := nil;
+  if (AStream is TCustomMemoryStream) and (AStream.Position = 0) then begin
+    LBuffer := TCustomMemoryStream(AStream).Memory;
+    LLength := AStream.Size;
+    AStream.Position := AStream.Size;
+  end
+  else LMemoryStream := TMemoryStream.Create;
+  try
+    if LMemoryStream <> nil then begin
+      LMemoryStream.CopyFrom(AStream, AStream.Size - AStream.Position);
+      LBuffer := LMemoryStream.Memory;
+      LLength := LMemoryStream.Size;
+    end;
+    var LData := TNSData.Wrap(
+                   TNSData.alloc.initWithBytesNoCopy(
+                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    try
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
+      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      try
+        result := ALLoadFromOSImageAndWrapToCGContextRef(LImage, AWrapMode, W, H);
+      finally
+        LImage.release;
+      end;
+    finally
+      LData.release;
+    end;
+  finally
+    ALFreeAndNil(LMemoryStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToCGContextRef(LStream, AWrapMode, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+begin
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
+  if LImage = nil then raise Exception.create('Failed to load image from file');
+  try
+    result := ALLoadFromOSImageAndWrapToCGContextRef(LImage, AWrapMode, W, H);
+  finally
+    LImage.release;
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToCGImageRef(LStream, AWrapMode, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+begin
+  case AWrapMode of
+    TALImageWrapMode.Fit: Result := ALLoadFromBitmapAndFitIntoToBitmap(ABitmap, W, H);
+    TALImageWrapMode.Stretch: Result := ALLoadFromBitmapAndStretchToBitmap(ABitmap, W, H);
+    TALImageWrapMode.Place: Result := ALLoadFromBitmapAndPlaceIntoToBitmap(ABitmap, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, W, H);
+    else Raise exception.Create('Error 68B96273-FB54-47B5-BD9B-A2DD75BEE07F')
+  end;
+end;
+
+{*****************}
+function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromStream(aStream);
+  try
+    result := ALLoadFromBitmapAndWrapToBitmap(LBitmap, AWrapMode, W, H);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{*****************}
+function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToBitmap(LStream, AWrapMode, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{*****************}
+function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromFile(AFileName);
+  try
+    result := ALLoadFromBitmapAndWrapToBitmap(LBitmap, AWrapMode, W, H);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{*****************}
+function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndWrapToSkImage(AStream, AWrapMode, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndWrapToSkSurface(AStream, AWrapMode, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndWrapToSkSurface(AStream, AWrapMode, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromStreamAndWrapToJBitmap(AStream, AWrapMode, W, H);
+  try
+    result := ALJBitmapToTexture(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromStreamAndWrapToBitmap(AStream, AWrapMode, W, H);
+  {$ENDIF}
+end;
+
+{*****************}
+function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndWrapToSkImage(AResName, AWrapMode, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndWrapToSkSurface(AResName, AWrapMode, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndWrapToSkSurface(AResName, AWrapMode, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromResourceAndWrapToJBitmap(AResName, AWrapMode, W, H);
+  try
+    result := ALJBitmapToTexture(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromResourceAndWrapToCGContextRef(AResName, AWrapMode, W, H);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromResourceAndWrapToBitmap(AResName, AWrapMode, W, H);
+  {$ENDIF}
+end;
+
+{*****************}
+function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndWrapToSkImage(AFileName, AWrapMode, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndWrapToSkSurface(AFileName, AWrapMode, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndWrapToSkSurface(AFileName, AWrapMode, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromFileAndWrapToJBitmap(AFileName, AWrapMode, W, H);
+  try
+    result := ALJBitmapToTexture(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromFileAndWrapToBitmap(AFileName, AWrapMode, W, H);
+  {$ENDIF}
+end;
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromSkImageAndNormalizeOrientationToSkSurface(const AImage: sk_image_t; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
   //No need to care about AExifOrientationInfo with skimage
@@ -6277,7 +8154,57 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromStreamAndNormalizeOrientationToSkSurface(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndNormalizeOrientationToSkSurface(LImage, AExifOrientationInfo);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromResourceAndNormalizeOrientationToSkSurface(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndNormalizeOrientationToSkSurface(LStream, AExifOrientationInfo);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
+function ALLoadFromFileAndNormalizeOrientationToSkSurface(const AFileName: String): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndNormalizeOrientationToSkSurface(LImage, AlGetExifOrientationInfo(aFileName));
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{*****************}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromStreamAndNormalizeOrientationToSkImage(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -6292,7 +8219,7 @@ begin
     try
       var LSurface := ALLoadFromSkImageAndNormalizeOrientationToSkSurface(LImage, AExifOrientationInfo);
       try
-        Result := ALCreateSkImageFromSurface(LSurface);
+        Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
         sk4d_refcnt_unref(LSurface);
       end;
@@ -6306,7 +8233,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromResourceAndNormalizeOrientationToSkImage(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6319,14 +8246,14 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALLoadFromFileAndNormalizeOrientationToSkImage(const AFileName: String): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
     var LSurface := ALLoadFromSkImageAndNormalizeOrientationToSkSurface(LImage, AlGetExifOrientationInfo(aFileName));
     try
-      Result := ALCreateSkImageFromSurface(LSurface);
+      Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
@@ -6425,20 +8352,20 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
-function ALLoadFromUIImageAndNormalizeOrientationToCGContextRef(const AImage: UIImage; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndNormalizeOrientationToCGContextRef(const AImage: ALOSImage; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 begin
   var w, h: integer;
   if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270,{UIImageOrientationLeft}
                               TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
                               TalExifOrientationInfo.ROTATE_90, {UIImageOrientationRight}
                               TalExifOrientationInfo.TRANSVERSE {UIImageOrientationRightMirrored}] then begin
-    w := CGImageGetHeight(AImage.cgImage);
-    h := CGImageGetWidth(AImage.cgImage);
+    w := ALOSImageGetHeight(AImage);
+    h := ALOSImageGetWidth(AImage);
   end
   else begin
-    w := CGImageGetWidth(AImage.cgImage);
-    h := CGImageGetHeight(AImage.cgImage);
+    w := ALOSImageGetWidth(AImage);
+    h := ALOSImageGetHeight(AImage);
   end;
   var LMatrix := CGAffineTransformIdentity;
   case aExifOrientationInfo of
@@ -6514,9 +8441,6 @@ begin
   end;
 
   Result := ALCreateCGContextRef(W, H);
-  CGContextSetInterpolationQuality(Result, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context.
-  CGContextSetShouldAntialias(Result, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(Result, True); // Sets whether or not to allow anti-aliasing for a graphics context.
   CGContextConcatCTM(Result, LMatrix);
   if aExifOrientationInfo in [TalExifOrientationInfo.ROTATE_270, {UIImageOrientationLeft}
                               TalExifOrientationInfo.TRANSPOSE, {UIImageOrientationLeftMirrored}
@@ -6525,17 +8449,17 @@ begin
     CGContextDrawImage(
       Result, // c: The graphics context in which to draw the image.
       CGRectMake(0, 0, h, w), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-      AImage.CGImage) // image The image to draw.
+      ALOSImageGetCgImage(AImage)) // image The image to draw.
   else
     CGContextDrawImage(
       Result, // c: The graphics context in which to draw the image.
       CGRectMake(0, 0, w, h), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-      AImage.CGImage); // image The image to draw.
+      ALOSImageGetCgImage(AImage)); // image The image to draw.
 end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndNormalizeOrientationToCGContextRef(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
@@ -6559,10 +8483,10 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromUIImageAndNormalizeOrientationToCGContextRef(LImage, AExifOrientationInfo);
+        result := ALLoadFromOSImageAndNormalizeOrientationToCGContextRef(LImage, AExifOrientationInfo);
       finally
         LImage.release;
       end;
@@ -6576,7 +8500,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndNormalizeOrientationToCGContextRef(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6589,13 +8513,13 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndNormalizeOrientationToCGContextRef(const AFileName: String): CGContextRef;
 begin
-  var LImage := TUIImage.Wrap(TUIImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename))); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromUIImageAndNormalizeOrientationToCGContextRef(LImage, AlGetExifOrientationInfo(aFileName));
+    result := ALLoadFromOSImageAndNormalizeOrientationToCGContextRef(LImage, AlGetExifOrientationInfo(aFileName));
   finally
     LImage.release;
   end;
@@ -6603,7 +8527,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndNormalizeOrientationToCGImageRef(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): CGImageRef;
 begin
   var LContextRef := ALLoadFromStreamAndNormalizeOrientationToCGContextRef(AStream, AExifOrientationInfo);
@@ -6623,7 +8547,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndNormalizeOrientationToCGImageRef(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6636,7 +8560,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALLoadFromFileAndNormalizeOrientationToCGImageRef(const AFileName: String): CGImageRef;
 begin
   var LContextRef := ALLoadFromFileAndNormalizeOrientationToCGContextRef(AFileName);
@@ -6719,8 +8643,24 @@ end;
 {*****************}
 function ALLoadFromStreamAndNormalizeOrientationToDrawable(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromStreamAndNormalizeOrientationToSkImage(AStream, AExifOrientationInfo);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndNormalizeOrientationToSkImage(AStream, AExifOrientationInfo);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndNormalizeOrientationToSkSurface(AStream, AExifOrientationInfo);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndNormalizeOrientationToSkSurface(AStream, AExifOrientationInfo);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromStreamAndNormalizeOrientationToJBitmap(AStream, AExifOrientationInfo);
   try
@@ -6729,10 +8669,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromStreamAndNormalizeOrientationToCGContextRef(AStream, AExifOrientationInfo);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -6744,8 +8688,24 @@ end;
 {*****************}
 function ALLoadFromResourceAndNormalizeOrientationToDrawable(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromResourceAndNormalizeOrientationToSkImage(AResName, AExifOrientationInfo);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndNormalizeOrientationToSkImage(AResName, AExifOrientationInfo);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndNormalizeOrientationToSkSurface(AResName, AExifOrientationInfo);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndNormalizeOrientationToSkSurface(AResName, AExifOrientationInfo);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromResourceAndNormalizeOrientationToJBitmap(AResName, AExifOrientationInfo);
   try
@@ -6754,10 +8714,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromResourceAndNormalizeOrientationToCGContextRef(AResName, AExifOrientationInfo);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -6769,8 +8733,24 @@ end;
 {*****************}
 function ALLoadFromFileAndNormalizeOrientationToDrawable(const AFileName: String): TALDrawable;
 begin
-  {$IF defined(ALSkiaCanvas)}
-  Result := ALLoadFromFileAndNormalizeOrientationToSkImage(AFileName);
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndNormalizeOrientationToSkImage(AFileName);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndNormalizeOrientationToSkSurface(AFileName);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndNormalizeOrientationToSkSurface(AFileName);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   var LBitmap := ALLoadFromFileAndNormalizeOrientationToJBitmap(AFileName);
   try
@@ -6779,10 +8759,14 @@ begin
     LBitmap.recycle;
     LBitmap := nil;
   end;
-  {$ELSEIF defined(IOS)}
+  {$ELSEIF defined(ALAppleOS)}
   var LCGContextRef := ALLoadFromFileAndNormalizeOrientationToCGContextRef(AFileName);
   try
+    {$IF defined(ALGPUCanvas)}
     result := ALCGContextRefToTexture(LCGContextRef);
+    {$ELSE}
+    result := ALCGContextRefToBitmap(LCGContextRef);
+    {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
@@ -6791,22 +8775,11 @@ begin
   {$ENDIF}
 end;
 
-{********************************}
-function ALGetScreenScale: Single;
-begin
-  result := ALScreenScale;
-  if Result = 0 then begin
-    var LScreenService: IFMXScreenService;
-    if TPlatformServices.Current.SupportsPlatformService(IFMXScreenService, LScreenService) then
-      ALScreenScale := LScreenService.GetScreenScale
-    else
-      ALScreenScale := 1;
-    result := ALScreenScale;
-    {$IF defined(debug)}
-    ALLog('Screen Scale', ALFloatToStrW(Result, ALDefaultFormatSettingsW));
-    {$ENDIF}
-  end;
-end;
+////////////////////////////////////////////////////////////////////////////////
+/// THE CODE ABOVE (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
+/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
+////////////////////////////////////////////////////////////////////////////////
+
 
 {*****************************************************}
 function ALGetImageSize(const aStream: TStream): TSize;
@@ -6835,8 +8808,8 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'IOS'}
-  {$IF defined(IOS)}
+  {$REGION 'APPLEOS'}
+  {$IF defined(ALAppleOS)}
   var LBuffer: Pointer := nil;
   var LLength: Int64 := 0;
   var LMemoryStream: TCustomMemoryStream := nil;
@@ -6858,12 +8831,12 @@ begin
                      LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
                      False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
     try
-      var LImage := TUIImage.Wrap(TUIImage.alloc.initWithData(LData)); // Return Value: An initialized UIImage object, or nil if the method could not initialize the image from the specified data.
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
         Result := TSize.Create(
-                    CGImageGetWidth(LImage.cgImage),
-                    CGImageGetHeight(LImage.cgImage));
+                    ALOSImageGetWidth(LImage),
+                    ALOSImageGetHeight(LImage));
       finally
         LImage.release;
       end;
@@ -6876,8 +8849,8 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
+  {$REGION 'MSWINDOWS'}
+  {$IF defined(MSWINDOWS)}
   var LBitmap := Tbitmap.CreateFromStream(aStream);
   try
     Result := TSize.Create(LBitmap.Width, LBitmap.height);
@@ -6910,20 +8883,22 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'IOS'}
-  {$IF defined(IOS)}
+  {$REGION 'APPLEOS'}
+  {$IF defined(ALAppleOS)}
   result := TalExifOrientationInfo.UNDEFINED;
   var LPath := CFStringCreateWithCString(nil{alloc}, MarshaledAString(UTF8Encode(AFileName)){cStr}, kCFStringEncodingUTF8{encoding});
+  if LPath = nil then raise Exception.Create('Failed to create CFString from file name');
   try
     var LUrl := CFURLCreateWithFileSystemPath(nil{allocator}, LPath{filePath}, kCFURLPOSIXPathStyle{pathStyle}, False{isDirectory});
+    if LUrl = nil then raise Exception.Create('Failed to create CFURL from file path');
     try
       var LImgSourceRef := CGImageSourceCreateWithURL(LUrl{url}, nil{options});
-      if LImgSourceRef <> nil then
+      if LImgSourceRef = nil then raise Exception.Create('Failed to create CGImageSource from URL');
       try
         var LDictionaryRef := CGImageSourceCopyPropertiesAtIndex(LImgSourceRef{isrc}, 0{index}, nil{options});
-        if LDictionaryRef <> nil then
+        if LDictionaryRef = nil then raise Exception.Create('Failed to retrieve image properties');
         try
-          var LOrientation := TNSNumber.Wrap(CFDictionaryGetValue(LDictionaryRef, NSStringToID(kCGImagePropertyOrientation)));
+          var LOrientation := TNSNumber.Wrap(CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation));
           if LOrientation <> nil then begin
 
             //typedef CF_ENUM(uint32_t, CGImagePropertyOrientation) {
@@ -6980,8 +8955,8 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF defined(MSWINDOWS) or defined(ALMacOS)}
+  {$REGION 'MSWINDOWS'}
+  {$IF defined(MSWINDOWS)}
   result := TalExifOrientationInfo.NORMAL; // << todo - https://stackoverflow.com/questions/18622152/read-exif-gps-info-using-delphi
   {$ENDIF}
   {$ENDREGION}
@@ -7104,20 +9079,22 @@ begin
     Result := SrcColor;
 end;
 
-{***************************************************************************************}
-function ALAlphaBlendColors(const aBackToFrontColors: array of TAlphaColor): TAlphaColor;
+{*************************************************************************************************************************}
+function ALBlendColorWithOpacity(const ABaseColor, AOverlayColor: TAlphaColor; const AOverlayOpacity: Single): TAlphaColor;
 begin
-  if length(aBackToFrontColors) = 0 then exit(TalphaColorRec.Null);
-  var LMixed := TalphaColorF.Create(aBackToFrontColors[Low(aBackToFrontColors)]);
-  for var I := Low(aBackToFrontColors) + 1 to High(aBackToFrontColors) do begin
-    var LBelow := LMixed;
-    var LAbove := TalphaColorF.Create(aBackToFrontColors[I]);
-    LMixed.a := (1-LAbove.a)*LBelow.a + LAbove.a;
-    LMixed.r := ((1-LAbove.a)*LBelow.a*LBelow.r + LAbove.a*LAbove.r) / LMixed.a;
-    LMixed.g := ((1-LAbove.a)*LBelow.a*LBelow.g + LAbove.a*LAbove.g) / LMixed.a;
-    LMixed.b := ((1-LAbove.a)*LBelow.a*LBelow.b + LAbove.a*LAbove.b) / LMixed.a;
-  end;
-  result := LMixed.ToAlphaColor;
+  TAlphaColorRec(Result).R := Round((TAlphaColorRec(AOverlayColor).R * AOverlayOpacity) + (TAlphaColorRec(ABaseColor).R * (1 - AOverlayOpacity)));
+  TAlphaColorRec(Result).G := Round((TAlphaColorRec(AOverlayColor).G * AOverlayOpacity) + (TAlphaColorRec(ABaseColor).G * (1 - AOverlayOpacity)));
+  TAlphaColorRec(Result).B := Round((TAlphaColorRec(AOverlayColor).B * AOverlayOpacity) + (TAlphaColorRec(ABaseColor).B * (1 - AOverlayOpacity)));
+  TAlphaColorRec(Result).A := Round((TAlphaColorRec(AOverlayColor).A * AOverlayOpacity) + (TAlphaColorRec(ABaseColor).A * (1 - AOverlayOpacity)));
+end;
+
+{*****************************************************************************************}
+function ALSetColorOpacity(const AColor: TAlphaColor; const AOpacity: Single): TAlphaColor;
+begin
+  TAlphaColorRec(Result).R := TAlphaColorRec(AColor).R;
+  TAlphaColorRec(Result).G := TAlphaColorRec(AColor).G;
+  TAlphaColorRec(Result).B := TAlphaColorRec(AColor).B;
+  TAlphaColorRec(Result).A := Round(Max(Min(AOpacity, 1), 0) * 255);
 end;
 
 {*************************************************************}
@@ -7136,141 +9113,58 @@ begin
   else Result := 0;
 end;
 
-{****************}
-{$IF defined(IOS)}
-class function TAlphaColorCGFloat.Create(const R, G, B: CGFloat; const A: CGFloat = 1): TAlphaColorCGFloat;
+{***********************************************************}
+function ALGetShadowWidth(const AShadowBlur: Single): Single;
 begin
-  Result.R := R;
-  Result.G := G;
-  Result.B := B;
-  Result.A := A;
+  // To be on the safe side
+  Result := AShadowBlur * 2;
 end;
 
-{*************************************************************************************}
-class function TAlphaColorCGFloat.Create(const Color: TAlphaColor): TAlphaColorCGFloat;
+{*************************************************************************************************************************************************************************}
+procedure ALGetLinearGradientCoordinates(const ASize: TSizeF; const AAngle: Single; out AStartPoint: TPointF; out AEndPoint: TPointF; const ACssAngleConvention: Boolean = True);
 begin
-  Result.R := TAlphaColorRec(Color).R / 255;
-  Result.G := TAlphaColorRec(Color).G / 255;
-  Result.B := TAlphaColorRec(Color).B / 255;
-  Result.A := TAlphaColorRec(Color).A / 255;
+
+  // handle edge cases like: -1235, ...
+  var LNormalizedAngle: Single;
+  if (ACssAngleConvention) then LNormalizedAngle := fmod(fmod((90 - AAngle), 360) + 360, 360)
+  else LNormalizedAngle := fmod(fmod(AAngle, 360) + 360, 360);
+
+  var LAngleInRadians: Single := DegToRad(LNormalizedAngle);
+
+  var LDiagonal: Double := sqrt(Power(ASize.width,2) + Power(ASize.height,2));
+  var LAngleBetweenDiagonalAndWidth: Double := ArcCos(ASize.width / LDiagonal);
+  var LAngleBetweenDiagonalAndGradientLine: Double;
+  if ((LNormalizedAngle > 90) and (LNormalizedAngle < 180)) or
+     ((LNormalizedAngle > 270) and (LNormalizedAngle < 360)) then LAngleBetweenDiagonalAndGradientLine := PI - LAngleInRadians - LAngleBetweenDiagonalAndWidth
+  else LAngleBetweenDiagonalAndGradientLine := LAngleInRadians - LAngleBetweenDiagonalAndWidth;
+
+  var LHalfGradientLine: Double := abs(cos(LAngleBetweenDiagonalAndGradientLine) * LDiagonal) / 2;
+
+  var LHorizontalOffset: Double := LHalfGradientLine * cos(LAngleInRadians);
+  var LVerticalOffset: Double := LHalfGradientLine * sin(LAngleInRadians);
+
+  AStartPoint := TPointF.create((ASize.Width / 2) - LHorizontalOffset, (ASize.Height / 2) + LVerticalOffset);
+  AEndPoint := TPointF.create((ASize.Width / 2) + LHorizontalOffset, (ASize.Height / 2) - LVerticalOffset);
+
 end;
 
-{**************************************************************************************}
-class function TAlphaColorCGFloat.Create(const Color: TAlphaColorf): TAlphaColorCGFloat;
-begin
-  Result.R := Color.R;
-  Result.G := Color.G;
-  Result.B := Color.B;
-  Result.A := Color.A;
-end;
-{$ENDIF}
-
-{****************}
-{$IF defined(IOS)}
-
-
-//static void ALGradientEvaluateCallback(void *info, const float *in, float *out)
-//{
-//  /*
-//  The domain of this function is 0 - 1. For an input value of 0
-//  this function returns the color to paint at the start point
-//  of the shading. For an input value of 1 this function returns
-//  the color to paint at the end point of the shading. This
-//  is a 1 in, 4 out function where the output values correspond
-//  to an r,g,b,a color.
-//
-//  This function evaluates to produce a blend from startColor to endColor.
-//  Note that the returned results are clipped to the range
-//  by Quartz so this function doesn't worry about values
-//  that are outside the range 0-1.
-//  */
-//
-//  MyStartEndColor *startEndColorP = (MyStartEndColor * )info;
-//  float *startColor = startEndColorP->startColor;
-//  float *endColor = startEndColorP->endColor;
-//  float input = in[0];
-//  // Weight the starting and ending color components depending
-//  // on what position in the blend the input value specifies.
-//  out[0] = (startColor[0]*(1-input) + endColor[0]*input);
-//  out[1] = (startColor[1]*(1-input) + endColor[1]*input);
-//  out[2] = (startColor[2]*(1-input) + endColor[2]*input);
-//  // The alpha component is always 1, the shading is always opaque.
-//  out[3] = 1;
-//}
-procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
-begin
-  if info <> nil then
-    outData^ := TAlphaColorCGFloat.Create(TGradient(info).InterpolateColor(inData^));
-end;
-{$ENDIF}
-
-{*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
-  {$MESSAGE WARN 'Check if FMX.Objects.GetDrawingShapeRectAndSetThickness still have the same implementation and adjust the IFDEF'}
-{$ENDIF}
-//duplicate of the private delphi function GetDrawingShapeRectAndSetThickness in FMX.Objects
-function ALGetDrawingShapeRectAndSetThickness(
-           const Rect: TrectF;
-           const Fill: TBrush;
-           const Stroke: TStrokeBrush;
-           const Fit: Boolean;
-           var FillShape, DrawShape: Boolean;
-           var StrokeThicknessRestoreValue: Single): TRectF;
-const
-  MinRectAreaSize = 0.01;
-begin
-  FillShape := (Fill <> nil) and (Fill.Kind <> TBrushKind.None);
-  DrawShape := (Stroke <> nil) and (Stroke.Kind <> TBrushKind.None);
-
-  if Fit then
-    Result := TRectF.Create(0, 0, 1, 1).FitInto(Rect)
-  else
-    Result := Rect;
-
-  if DrawShape then
-  begin
-    if Result.Width < Stroke.Thickness then
-    begin
-      StrokeThicknessRestoreValue := Stroke.Thickness;
-      FillShape := False;
-      Stroke.Thickness := Min(Result.Width, Result.Height);
-      Result.Left := (Result.Right + Result.Left) * 0.5;
-      Result.Right := Result.Left + MinRectAreaSize;
-    end
-    else
-      Result.Inflate(-Stroke.Thickness * 0.5, 0);
-
-    if Result.Height < Stroke.Thickness then
-    begin
-      if StrokeThicknessRestoreValue < 0.0 then
-        StrokeThicknessRestoreValue := Stroke.Thickness;
-      FillShape := False;
-      Stroke.Thickness := Min(Result.Width, Result.Height);
-      Result.Top := (Result.Bottom + Result.Top) * 0.5;
-      Result.Bottom := Result.Top + MinRectAreaSize;
-    end
-    else
-      Result.Inflate(0, -Stroke.Thickness * 0.5);
-  end;
-end;
 
 {************************}
 procedure ALDrawRectangle(
-            {$IF defined(ALSkiaCanvas)}
-            const ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
             const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
             const AStrokeColor: TalphaColor;
             const AStrokeThickness: Single;
-            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
             const AShadowBlur: Single;
             const AShadowOffsetX: Single;
             const AShadowOffsetY: Single;
@@ -7279,9 +9173,21 @@ procedure ALDrawRectangle(
             const AXRadius: Single;
             const AYRadius: Single);
 
-  {$REGION '_drawRect (SKIA)'}
-  {$IF defined(ALSkiaCanvas)}
-  procedure _drawRect(
+var
+  LScaledStrokeThickness: Single;
+  LScaledXRadius: Single;
+  LScaledYRadius: Single;
+  LStrokeColor: TalphaColor;
+  {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
+  LShadowColor: TalphaColor;
+  LScaledShadowBlur: Single;
+  LScaledShadowOffsetX: Single;
+  LScaledShadowOffsetY: Single;
+  {$ENDIF}
+
+  {$REGION '_DrawRect (SKIA)'}
+  {$IF defined(ALSkiaEngine)}
+  procedure _DrawRect(
               const aCanvas: sk_canvas_t;
               const aPaint: sk_Paint_t;
               const aRect: TrectF;
@@ -7321,30 +9227,40 @@ procedure ALDrawRectangle(
 
   begin
 
+    // Init LRect
+    var LRect := aRect;
+
     // use drawRoundRect
-    if ((compareValue(AXRadius, 0, TEpsilon.position) > 0) and
-        (compareValue(AYRadius, 0, TEpsilon.position) > 0)) and
+    if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
+        (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
        (ACorners<>[]) and
        (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
 
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
       var LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
       try
         var LRadii: array[0..4] of TPointF;
-        if TCorner.TopLeft in ACorners then LRadii[0] := TPointF.Create(AXRadius, AYRadius)
+        if TCorner.TopLeft in ACorners then LRadii[0] := TPointF.Create(LScaledXRadius, LScaledYRadius)
         else LRadii[0] := TPointF.Create(0, 0);
 
-        if TCorner.TopRight in ACorners then LRadii[1] := TPointF.Create(AXRadius, AYRadius)
+        if TCorner.TopRight in ACorners then LRadii[1] := TPointF.Create(LScaledXRadius, LScaledYRadius)
         else LRadii[1] := TPointF.Create(0, 0);
 
-        if TCorner.BottomRight in ACorners then LRadii[2] := TPointF.Create(AXRadius, AYRadius)
+        if TCorner.BottomRight in ACorners then LRadii[2] := TPointF.Create(LScaledXRadius, LScaledYRadius)
         else LRadii[2] := TPointF.Create(0, 0);
 
-        if TCorner.BottomLeft in ACorners then LRadii[3] := TPointF.Create(AXRadius, AYRadius)
+        if TCorner.BottomLeft in ACorners then LRadii[3] := TPointF.Create(LScaledXRadius, LScaledYRadius)
         else LRadii[3] := TPointF.Create(0, 0);
 
         sk4d_rrect_set_rect2(
           LRRect, // self: sk_rrect_t;
-          @ARect, // const rect: psk_rect_t;
+          @LRect, // const rect: psk_rect_t;
           @LRadii); // const radii: psk_vector_t
         sk4d_canvas_draw_rrect(ACanvas, LRRect, APaint);
       finally
@@ -7354,12 +9270,19 @@ procedure ALDrawRectangle(
     end
 
     // use drawRect
-    else if ((compareValue(AXRadius, 0, TEpsilon.position) = 0) or
-             (compareValue(AYRadius, 0, TEpsilon.position) = 0) or
+    else if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
+             (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
              (ACorners=[])) and
             (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
 
-      sk4d_canvas_draw_Rect(ACanvas, @ARect, APaint);
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
+      sk4d_canvas_draw_Rect(ACanvas, @LRect, APaint);
 
     end
 
@@ -7368,48 +9291,73 @@ procedure ALDrawRectangle(
 
       var LPathBuilder := ALSkCheckHandle(sk4d_pathbuilder_create);
       try
-        var LXRadius: single := AXRadius;
-        var LYradius: single := AYRadius;
-        if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
-        if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
-        //----
+        var LHalfStrokeThickness: Single := 0;
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          if (aDrawOnlyBorder) or
+             ((LShadowcolor = TalphaColorRec.Null) and
+              (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+              (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right])) then begin
+            LHalfStrokeThickness := LScaledStrokeThickness / 2;
+            LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
+          end
+          else if (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) and
+                  (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+                  (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+            LHalfStrokeThickness := 1;
+            LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
+          end;
+        end;
+        //--
+        var LXRadius: single := LScaledXRadius;
+        var LYradius: single := LScaledYRadius;
+        if (LXRadius > LRect.width / 2) then LXRadius := LRect.width / 2;
+        if (LYradius > LRect.height / 2) then LYradius := LRect.height / 2;
+        //--
         var LCorners: TCorners;
         if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
            (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := ACorners
         else LCorners := [];
-        //----
-        var LWidthMinusCorners: single := (aRect.width - (2 * LXRadius));
-        var LHeightMinusCorners: single := (aRect.height - (2 * LYradius));
-        //----
-        var LHalfStrokeWidth: Single;
-        if (AStrokeColor <> TalphaColorRec.Null) then LHalfStrokeWidth := (AStrokeThickness) / 2
-        else LHalfStrokeWidth := 0;
+        //--
+        If aDrawOnlyBorder then begin
+          If (TCorner.TopRight in LCorners)    and (not (TSide.Top in ASides))    and (not (Tside.Right in ASides)) then LCorners := LCorners - [TCorner.TopRight];
+          If (TCorner.TopLeft in LCorners)     and (not (TSide.Top in ASides))    and (not (Tside.Left in ASides))  then LCorners := LCorners - [TCorner.TopLeft];
+          If (TCorner.BottomRight in LCorners) and (not (TSide.Bottom in ASides)) and (not (Tside.Right in ASides)) then LCorners := LCorners - [TCorner.BottomRight];
+          If (TCorner.BottomLeft in LCorners)  and (not (TSide.Bottom in ASides)) and (not (Tside.Left in ASides))  then LCorners := LCorners - [TCorner.BottomLeft];
+        end;
+        //--
+        var LWidthMinusCorners: single := (LRect.width - (2 * LXRadius));
+        var LHeightMinusCorners: single := (LRect.height - (2 * LYradius));
 
 
         //----- TopRight
         if (TCorner.TopRight in LCorners) then begin
-          _MoveTo(LPathBuilder, aRect.right, aRect.top + LYradius);
+          _MoveTo(LPathBuilder, LRect.right, LRect.top + LYradius);
           _RQuadTo(LPathBuilder, 0, -LYradius, -LXRadius, -LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, -LHalfStrokeWidth);
         end
         else begin
-          if not aDrawOnlyBorder then _MoveTo(LPathBuilder, aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
-          else _MoveTo(LPathBuilder, aRect.right, aRect.top + LYradius);
+          _MoveTo(LPathBuilder, LRect.right, LRect.top + LYradius);
           //----
           if (not aDrawOnlyBorder) or
              (TSide.right in ASides) then begin
-             _RLineTo(LPathBuilder, 0, -LYradius -LHalfStrokeWidth);
-             if aDrawOnlyBorder then _RMoveTo(LPathBuilder, 0, LHalfStrokeWidth);
+            _RLineTo(LPathBuilder, 0, -LYradius);
+            if (aDrawOnlyBorder) and
+               (TSide.right in ASides) and
+               (not (TSide.top in ASides)) then begin
+              _RLineTo(LPathBuilder, 0, -LHalfStrokeThickness);
+              _RMoveTo(LPathBuilder, 0, LHalfStrokeThickness);
+            end;
           end
           else _RMoveTo(LPathBuilder, 0, -LYradius); // aDrawOnlyBorder AND not TSide.right
           //----
           if (not aDrawOnlyBorder) or
              (TSide.top in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, -LXRadius -LHalfStrokeWidth,0)
-            else begin
-              _RMoveTo(LPathBuilder, +LHalfStrokeWidth,0);
-              _RLineTo(LPathBuilder, -LXRadius -LHalfStrokeWidth,0);
+            if (aDrawOnlyBorder) and
+               (TSide.top in ASides) and
+               (not (TSide.right in ASides)) then begin
+              _RMoveTo(LPathBuilder, LHalfStrokeThickness, 0);
+              _RLineTo(LPathBuilder, -LHalfStrokeThickness, 0);
             end;
+            _RLineTo(LPathBuilder, -LXRadius,0);
           end
           else _RMoveTo(LPathBuilder, -LXRadius,0); // aDrawOnlyBorder AND not TSide.top
         end;
@@ -7420,25 +9368,30 @@ procedure ALDrawRectangle(
 
         //----- TopLeft
         if (TCorner.TopLeft in LCorners) then begin
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, +LHalfStrokeWidth);
           _RQuadTo(LPathBuilder, -LXRadius, 0, -LXRadius, LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, -LHalfStrokeWidth, 0);
         end
         else begin
           if (not aDrawOnlyBorder) or
              (TSide.top in ASides) then begin
-            _RLineTo(LPathBuilder, -LXRadius -LHalfStrokeWidth, 0);
-            if aDrawOnlyBorder then _RMoveTo(LPathBuilder, LHalfStrokeWidth, 0);
+            _RLineTo(LPathBuilder, -LXRadius, 0);
+            if (aDrawOnlyBorder) and
+               (TSide.top in ASides) and
+               (not (TSide.left in ASides)) then begin
+              _RLineTo(LPathBuilder, -LHalfStrokeThickness, 0);
+              _RMoveTo(LPathBuilder, LHalfStrokeThickness, 0);
+            end;
           end
           else _RMoveTo(LPathBuilder, -LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
           //----
           if (not aDrawOnlyBorder) or
              (TSide.left in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0,LYradius +LHalfStrokeWidth)
-            else begin
-              _RMoveTo(LPathBuilder, 0,-LHalfStrokeWidth);
-              _RLineTo(LPathBuilder, 0,+LYradius +LHalfStrokeWidth);
+            if (aDrawOnlyBorder) and
+               (TSide.left in ASides) and
+               (not (TSide.top in ASides)) then begin
+              _RMoveTo(LPathBuilder, 0, -LHalfStrokeThickness);
+              _RLineTo(LPathBuilder, 0, LHalfStrokeThickness);
             end;
+            _RLineTo(LPathBuilder, 0,LYradius);
           end
           else _RMoveTo(LPathBuilder, 0,LYradius); // aDrawOnlyBorder AND not TSide.left
         end;
@@ -7449,25 +9402,30 @@ procedure ALDrawRectangle(
 
         //----- BottomLeft
         if (TCorner.BottomLeft in LCorners) then begin
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, LHalfStrokeWidth, 0);
           _RQuadTo(LPathBuilder, 0, LYradius, LXRadius, LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, LHalfStrokeWidth);
         end
         else begin
           if (not aDrawOnlyBorder) or
              (TSide.left in ASides) then begin
-            _RLineTo(LPathBuilder, 0, LYradius +LHalfStrokeWidth);
-            if aDrawOnlyBorder then _RMoveTo(LPathBuilder, 0, -LHalfStrokeWidth);
+            _RLineTo(LPathBuilder, 0, LYradius);
+            if (aDrawOnlyBorder) and
+               (TSide.left in ASides) and
+               (not (TSide.bottom in ASides)) then begin
+              _RLineTo(LPathBuilder, 0, LHalfStrokeThickness);
+              _RMoveTo(LPathBuilder, 0, -LHalfStrokeThickness);
+            end;
           end
           else _RMoveTo(LPathBuilder, 0, LYradius); // aDrawOnlyBorder AND not TSide.left
           //----
           if (not aDrawOnlyBorder) or
              (TSide.bottom in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, LXRadius +LHalfStrokeWidth,0)
-            else begin
-              _RMoveTo(LPathBuilder, -LHalfStrokeWidth,0);
-              _RLineTo(LPathBuilder, +LXRadius +LHalfStrokeWidth,0);
+            if (aDrawOnlyBorder) and
+               (TSide.bottom in ASides) and
+               (not (TSide.left in ASides)) then begin
+              _RMoveTo(LPathBuilder, -LHalfStrokeThickness, 0);
+              _RLineTo(LPathBuilder, LHalfStrokeThickness, 0);
             end;
+            _RLineTo(LPathBuilder, LXRadius,0);
           end
           else _RMoveTo(LPathBuilder, LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
         end;
@@ -7478,25 +9436,30 @@ procedure ALDrawRectangle(
 
         //----- BottomRight
         if (TCorner.BottomRight in LCorners) then begin
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, -LHalfStrokeWidth);
           _RQuadTo(LPathBuilder, LXRadius, 0, LXRadius, -LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, LHalfStrokeWidth, 0);
         end
         else begin
           if (not aDrawOnlyBorder) or
              (TSide.bottom in ASides) then begin
-            _RLineTo(LPathBuilder, LXRadius +LHalfStrokeWidth,0);
-            if aDrawOnlyBorder then _RMoveTo(LPathBuilder, -LHalfStrokeWidth, 0);
+            _RLineTo(LPathBuilder, LXRadius,0);
+            if (aDrawOnlyBorder) and
+               (TSide.bottom in ASides) and
+               (not (TSide.right in ASides)) then begin
+              _RLineTo(LPathBuilder, LHalfStrokeThickness, 0);
+              _RMoveTo(LPathBuilder, -LHalfStrokeThickness, 0);
+            end;
           end
           else _RMoveTo(LPathBuilder, LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
           //----
           if (not aDrawOnlyBorder) or
              (TSide.right in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, -LYradius -LHalfStrokeWidth)
-            else begin
-              _RMoveTo(LPathBuilder, 0,+LHalfStrokeWidth);
-              _RLineTo(LPathBuilder, 0,-LYradius -LHalfStrokeWidth);
+            if (aDrawOnlyBorder) and
+               (TSide.right in ASides) and
+               (not (TSide.bottom in ASides)) then begin
+              _RMoveTo(LPathBuilder, 0, LHalfStrokeThickness);
+              _RLineTo(LPathBuilder, 0, -LHalfStrokeThickness);
             end;
+            _RLineTo(LPathBuilder, 0,-LYradius);
           end
           else _RMoveTo(LPathBuilder, 0, -LYradius); // aDrawOnlyBorder AND not TSide.right
         end;
@@ -7504,9 +9467,11 @@ procedure ALDrawRectangle(
         if (not aDrawOnlyBorder) or
            (TSide.right in ASides) then _RLineTo(LPathBuilder, 0, -LHeightMinusCorners)
         else _RMoveTo(LPathBuilder, 0, -LHeightMinusCorners);
+        //-----
+        if (TSide.right in ASides) and
+           (TSide.top in ASides) then sk4d_pathbuilder_close(LPathBuilder);
 
 
-        //draw the path
         var LPath := sk4d_pathbuilder_detach(LPathBuilder);
         try
           sk4d_canvas_draw_Path(ACanvas, LPath, APaint);
@@ -7524,41 +9489,64 @@ procedure ALDrawRectangle(
   {$ENDREGION}
 
   {$REGION '_DrawRect (ANDROID)'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
   procedure _DrawRect(
               const aCanvas: Jcanvas;
               const aPaint: JPaint;
               const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean);
+              const aDrawOnlyBorder: Boolean;
+              const aForceDrawPath: Boolean;
+              const aClipPath: Boolean);
   begin
 
+    // Init LRect
+    var LRect := aRect;
+
     // use drawRoundRect
-    if ((compareValue(AXRadius, 0, TEpsilon.position) > 0) and
-        (compareValue(AYRadius, 0, TEpsilon.position) > 0)) and
+    if (not aForceDrawPath) and
+       (not aClipPath) and
+       ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
+        (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
        (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
        (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
 
-      var LJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
+      var LJRect := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
       aCanvas.drawRoundRect(
         LJRect{rect},
-        AXRadius {rx},
-        AYRadius {ry},
+        LScaledXRadius {rx},
+        LScaledYRadius {ry},
         apaint);
       LJRect := nil;
 
     end
 
     // use drawRect
-    else if ((compareValue(AXRadius, 0, TEpsilon.position) = 0) or
-             (compareValue(AYRadius, 0, TEpsilon.position) = 0) or
+    else if (not aForceDrawPath) and
+            (not aClipPath) and
+            ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
+             (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
              (ACorners=[])) and
             (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
 
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
       aCanvas.drawRect(
-        aRect.left{left},
-        aRect.top{top},
-        aRect.right{right},
-        aRect.bottom{bottom},
+        LRect.left{left},
+        LRect.top{top},
+        LRect.right{right},
+        LRect.bottom{bottom},
         apaint);
 
     end
@@ -7567,49 +9555,74 @@ procedure ALDrawRectangle(
     else begin
 
       var LPath := TJPath.Create;
-      //----
-      var LXRadius: single := AXRadius;
-      var LYradius: single := AYRadius;
-      if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
-      if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
-      //----
+      //--
+      var LHalfStrokeThickness: Single := 0;
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder) or
+           ((LShadowcolor = TalphaColorRec.Null) and
+            (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right])) then begin
+          LHalfStrokeThickness := LScaledStrokeThickness / 2;
+          LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
+        end
+        else if (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) and
+                (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+                (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+          LHalfStrokeThickness := 1;
+          LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
+        end;
+      end;
+      //--
+      var LXRadius: single := LScaledXRadius;
+      var LYradius: single := LScaledYRadius;
+      if (LXRadius > LRect.width / 2) then LXRadius := LRect.width / 2;
+      if (LYradius > LRect.height / 2) then LYradius := LRect.height / 2;
+      //--
       var LCorners: TCorners;
       if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
          (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := ACorners
       else LCorners := [];
-      //----
-      var LWidthMinusCorners: single := (aRect.width - (2 * LXRadius));
-      var LHeightMinusCorners: single := (aRect.height - (2 * LYradius));
-      //----
-      var LHalfStrokeWidth: Single;
-      if (AStrokeColor <> TalphaColorRec.Null) then LHalfStrokeWidth := (AStrokeThickness) / 2
-      else LHalfStrokeWidth := 0;
+      //--
+      If aDrawOnlyBorder then begin
+        If (TCorner.TopRight in LCorners)    and (not (TSide.Top in ASides))    and (not (Tside.Right in ASides)) then LCorners := LCorners - [TCorner.TopRight];
+        If (TCorner.TopLeft in LCorners)     and (not (TSide.Top in ASides))    and (not (Tside.Left in ASides))  then LCorners := LCorners - [TCorner.TopLeft];
+        If (TCorner.BottomRight in LCorners) and (not (TSide.Bottom in ASides)) and (not (Tside.Right in ASides)) then LCorners := LCorners - [TCorner.BottomRight];
+        If (TCorner.BottomLeft in LCorners)  and (not (TSide.Bottom in ASides)) and (not (Tside.Left in ASides))  then LCorners := LCorners - [TCorner.BottomLeft];
+      end;
+      //--
+      var LWidthMinusCorners: single := (LRect.width - (2 * LXRadius));
+      var LHeightMinusCorners: single := (LRect.height - (2 * LYradius));
 
 
       //----- TopRight
       if (TCorner.TopRight in LCorners) then begin
-        LPath.moveTo(aRect.right, aRect.top + LYradius);
+        LPath.moveTo(LRect.right, LRect.top + LYradius);
         LPath.rQuadTo(0, -LYradius, -LXRadius, -LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(0, -LHalfStrokeWidth);
       end
       else begin
-        if not aDrawOnlyBorder then LPath.moveTo(aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
-        else LPath.moveTo(aRect.right, aRect.top + LYradius);
+        LPath.moveTo(LRect.right, LRect.top + LYradius);
         //----
         if (not aDrawOnlyBorder) or
            (TSide.right in ASides) then begin
-           LPath.rLineTo(0, -LYradius -LHalfStrokeWidth);
-           if aDrawOnlyBorder then LPath.rMoveTo(0, LHalfStrokeWidth);
+          LPath.rLineTo(0, -LYradius);
+          if (aDrawOnlyBorder) and
+             (TSide.right in ASides) and
+             (not (TSide.top in ASides)) then begin
+            LPath.rLineTo(0, -LHalfStrokeThickness);
+            LPath.rMoveTo(0, LHalfStrokeThickness);
+          end;
         end
         else LPath.rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
         //----
         if (not aDrawOnlyBorder) or
            (TSide.top in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(-LXRadius -LHalfStrokeWidth,0)
-          else begin
-            LPath.rMoveTo(+LHalfStrokeWidth,0);
-            LPath.rLineTo(-LXRadius -LHalfStrokeWidth,0);
+          if (aDrawOnlyBorder) and
+             (TSide.top in ASides) and
+             (not (TSide.right in ASides)) then begin
+            LPath.rMoveTo(LHalfStrokeThickness, 0);
+            LPath.rLineTo(-LHalfStrokeThickness, 0);
           end;
+          LPath.rLineTo(-LXRadius,0);
         end
         else LPath.rMoveTo(-LXRadius,0); // aDrawOnlyBorder AND not TSide.top
       end;
@@ -7620,25 +9633,30 @@ procedure ALDrawRectangle(
 
       //----- TopLeft
       if (TCorner.TopLeft in LCorners) then begin
-        if not aDrawOnlyBorder then LPath.rlineTo(0, +LHalfStrokeWidth);
         LPath.rQuadTo(-LXRadius, 0, -LXRadius, LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(-LHalfStrokeWidth, 0);
       end
       else begin
         if (not aDrawOnlyBorder) or
            (TSide.top in ASides) then begin
-          LPath.rLineTo(-LXRadius -LHalfStrokeWidth, 0);
-          if aDrawOnlyBorder then LPath.rMoveTo(LHalfStrokeWidth, 0);
+          LPath.rLineTo(-LXRadius, 0);
+          if (aDrawOnlyBorder) and
+             (TSide.top in ASides) and
+             (not (TSide.left in ASides)) then begin
+            LPath.rLineTo(-LHalfStrokeThickness, 0);
+            LPath.rMoveTo(LHalfStrokeThickness, 0);
+          end;
         end
         else LPath.rMoveTo(-LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
         //----
         if (not aDrawOnlyBorder) or
            (TSide.left in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(0,LYradius +LHalfStrokeWidth)
-          else begin
-            LPath.rMoveTo(0,-LHalfStrokeWidth);
-            LPath.rLineTo(0,+LYradius +LHalfStrokeWidth);
+          if (aDrawOnlyBorder) and
+             (TSide.left in ASides) and
+             (not (TSide.top in ASides)) then begin
+            LPath.rMoveTo(0, -LHalfStrokeThickness);
+            LPath.rLineTo(0, LHalfStrokeThickness);
           end;
+          LPath.rLineTo(0,LYradius);
         end
         else LPath.rMoveTo(0,LYradius); // aDrawOnlyBorder AND not TSide.left
       end;
@@ -7649,25 +9667,30 @@ procedure ALDrawRectangle(
 
       //----- BottomLeft
       if (TCorner.BottomLeft in LCorners) then begin
-        if not aDrawOnlyBorder then LPath.rlineTo(LHalfStrokeWidth, 0);
         LPath.rQuadTo(0, LYradius, LXRadius, LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(0, LHalfStrokeWidth);
       end
       else begin
         if (not aDrawOnlyBorder) or
            (TSide.left in ASides) then begin
-          LPath.rLineTo(0, LYradius +LHalfStrokeWidth);
-          if aDrawOnlyBorder then LPath.rMoveTo(0, -LHalfStrokeWidth);
+          LPath.rLineTo(0, LYradius);
+          if (aDrawOnlyBorder) and
+             (TSide.left in ASides) and
+             (not (TSide.bottom in ASides)) then begin
+            LPath.rLineTo(0, LHalfStrokeThickness);
+            LPath.rMoveTo(0, -LHalfStrokeThickness);
+          end;
         end
         else LPath.rMoveTo(0, LYradius); // aDrawOnlyBorder AND not TSide.left
         //----
         if (not aDrawOnlyBorder) or
            (TSide.bottom in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(LXRadius +LHalfStrokeWidth,0)
-          else begin
-            LPath.rMoveTo(-LHalfStrokeWidth,0);
-            LPath.rLineTo(+LXRadius +LHalfStrokeWidth,0);
+          if (aDrawOnlyBorder) and
+             (TSide.bottom in ASides) and
+             (not (TSide.left in ASides)) then begin
+            LPath.rMoveTo(-LHalfStrokeThickness, 0);
+            LPath.rLineTo(LHalfStrokeThickness, 0);
           end;
+          LPath.rLineTo(LXRadius,0);
         end
         else LPath.rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
       end;
@@ -7678,25 +9701,30 @@ procedure ALDrawRectangle(
 
       //----- BottomRight
       if (TCorner.BottomRight in LCorners) then begin
-        if not aDrawOnlyBorder then LPath.rlineTo(0, -LHalfStrokeWidth);
         LPath.rQuadTo(LXRadius, 0, LXRadius, -LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(LHalfStrokeWidth, 0);
       end
       else begin
         if (not aDrawOnlyBorder) or
            (TSide.bottom in ASides) then begin
-          LPath.rLineTo(LXRadius +LHalfStrokeWidth,0);
-          if aDrawOnlyBorder then LPath.rMoveTo(-LHalfStrokeWidth, 0);
+          LPath.rLineTo(LXRadius,0);
+          if (aDrawOnlyBorder) and
+             (TSide.bottom in ASides) and
+             (not (TSide.right in ASides)) then begin
+            LPath.rLineTo(LHalfStrokeThickness, 0);
+            LPath.rMoveTo(-LHalfStrokeThickness, 0);
+          end;
         end
         else LPath.rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
         //----
         if (not aDrawOnlyBorder) or
            (TSide.right in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(0, -LYradius -LHalfStrokeWidth)
-          else begin
-            LPath.rMoveTo(0,+LHalfStrokeWidth);
-            LPath.rLineTo(0,-LYradius -LHalfStrokeWidth);
+          if (aDrawOnlyBorder) and
+             (TSide.right in ASides) and
+             (not (TSide.bottom in ASides)) then begin
+            LPath.rMoveTo(0, LHalfStrokeThickness);
+            LPath.rLineTo(0, -LHalfStrokeThickness);
           end;
+          LPath.rLineTo(0,-LYradius);
         end
         else LPath.rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
       end;
@@ -7704,9 +9732,16 @@ procedure ALDrawRectangle(
       if (not aDrawOnlyBorder) or
          (TSide.right in ASides) then LPath.rLineTo(0, -LHeightMinusCorners)
       else LPath.rMoveTo(0, -LHeightMinusCorners);
+      //-----
+      if (TSide.right in ASides) and
+         (TSide.top in ASides) then LPath.close;
 
 
-      aCanvas.drawPath(LPath,aPaint);
+      if aPaint <> nil then aCanvas.drawPath(LPath,aPaint);
+      if aClipPath then begin
+        aCanvas.save;
+        aCanvas.clipPath(LPath);
+      end;
       LPath := nil;
 
     end;
@@ -7714,11 +9749,14 @@ procedure ALDrawRectangle(
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION '_DrawRect (IOS)'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION '_DrawRect (APPLEOS)'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
   procedure _DrawRect(
+              const aCanvas: CGContextRef;
+              const aGridHeight: Integer;
               const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean);
+              Const aDrawOnlyBorder: Boolean;
+              const aClipPath: Boolean);
 
   var
     LCurPoint: TpointF;
@@ -7726,7 +9764,7 @@ procedure ALDrawRectangle(
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _moveTo(const x: Single; const y: Single);
     begin
-      CGContextMoveToPoint(aContext, X, aGridHeight - Y);
+      CGContextMoveToPoint(ACanvas, X, AGridHeight - Y);
       LCurPoint.X := x;
       LCurPoint.Y := Y;
     end;
@@ -7735,11 +9773,11 @@ procedure ALDrawRectangle(
     procedure _rQuadTo(const dx1: Single; const dy1: Single; const dx2: Single; const dy2: Single);
     begin
       CGContextAddQuadCurveToPoint(
-        aContext,
+        ACanvas,
         LCurPoint.X + dx1{cpx},
-        aGridHeight - (LCurPoint.Y + dy1){cpy},
+        AGridHeight - (LCurPoint.Y + dy1){cpy},
         LCurPoint.X + dx2{x},
-        aGridHeight - (LCurPoint.Y + dy2){y});
+        AGridHeight - (LCurPoint.Y + dy2){y});
       LCurPoint.X := LCurPoint.X + dx2;
       LCurPoint.Y := LCurPoint.Y + dy2;
     end;
@@ -7747,7 +9785,7 @@ procedure ALDrawRectangle(
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rLineTo(const dx: Single; const dy: Single);
     begin
-      CGContextAddLineToPoint(aContext, LCurPoint.X + dx{x}, aGridHeight - (LCurPoint.Y + dy{y}));
+      CGContextAddLineToPoint(ACanvas, LCurPoint.X + dx{x}, AGridHeight - (LCurPoint.Y + dy{y}));
       LCurPoint.X := LCurPoint.X + dx;
       LCurPoint.Y := LCurPoint.Y + dy;
     end;
@@ -7755,77 +9793,118 @@ procedure ALDrawRectangle(
     {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
     procedure _rMoveTo(const dx: Single; const dy: Single);
     begin
-      CGContextMoveToPoint(aContext, LCurPoint.X + dx{x}, aGridHeight - (LCurPoint.Y + dy{y}));
+      CGContextMoveToPoint(ACanvas, LCurPoint.X + dx{x}, AGridHeight - (LCurPoint.Y + dy{y}));
       LCurPoint.X := LCurPoint.X + dx;
       LCurPoint.Y := LCurPoint.Y + dy;
     end;
 
   begin
 
-    // Creates a new empty path in a graphics context.
-    CGContextBeginPath(aContext);
+    // Init LRect
+    var LRect := aRect;
 
     // use drawRect
-    if ((compareValue(AXRadius, 0, TEpsilon.position) = 0) or
-        (compareValue(AYRadius, 0, TEpsilon.position) = 0) or
+    if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
+        (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
         (ACorners=[])) and
        (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
-     //-----
-     CGContextAddRect(
-       aContext,
-       ALLowerLeftCGRect(
-         aRect.TopLeft,
-         aRect.Width,
-         aRect.Height,
-         aGridHeight));
-     //-----
+
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
+      if aClipPath then CGContextSaveGState(ACanvas);
+      CGContextBeginPath(ACanvas);
+      CGContextAddRect(
+        ACanvas,
+        ALLowerLeftCGRect(
+          LRect.TopLeft,
+          LRect.Width,
+          LRect.Height,
+          AGridHeight));
+      CGContextClosePath(ACanvas);
+      if aClipPath then CGContextClip(ACanvas)
+      else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
+      else CGContextStrokePath(ACanvas);
+
     end
 
     // use drawPath
     else begin
 
-      var LXRadius: single := AXRadius;
-      var LYradius: single := AYRadius;
-      if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
-      if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
-      //----
+      if aClipPath then CGContextSaveGState(ACanvas);
+      CGContextBeginPath(ACanvas);
+      //--
+      var LHalfStrokeThickness: Single := 0;
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder) or
+           ((LShadowcolor = TalphaColorRec.Null) and
+            (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right])) then begin
+          LHalfStrokeThickness := LScaledStrokeThickness / 2;
+          LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
+        end
+        else if (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) and
+                (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
+                (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+          LHalfStrokeThickness := 1;
+          LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
+        end;
+      end;
+      //--
+      var LXRadius: single := LScaledXRadius;
+      var LYradius: single := LScaledYRadius;
+      if (LXRadius > LRect.width / 2) then LXRadius := LRect.width / 2;
+      if (LYradius > LRect.height / 2) then LYradius := LRect.height / 2;
+      //--
       var LCorners: TCorners;
       if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
          (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := ACorners
       else LCorners := [];
-      //----
-      var LWidthMinusCorners: single := (aRect.width - (2 * LXRadius));
-      var LHeightMinusCorners: single := (aRect.height - (2 * LYradius));
-      //----
-      var LHalfStrokeWidth: Single;
-      if (AStrokeColor <> TalphaColorRec.Null) then LHalfStrokeWidth := (AStrokeThickness) / 2
-      else LHalfStrokeWidth := 0;
+      //--
+      If aDrawOnlyBorder then begin
+        If (TCorner.TopRight in LCorners)    and (not (TSide.Top in ASides))    and (not (Tside.Right in ASides)) then LCorners := LCorners - [TCorner.TopRight];
+        If (TCorner.TopLeft in LCorners)     and (not (TSide.Top in ASides))    and (not (Tside.Left in ASides))  then LCorners := LCorners - [TCorner.TopLeft];
+        If (TCorner.BottomRight in LCorners) and (not (TSide.Bottom in ASides)) and (not (Tside.Right in ASides)) then LCorners := LCorners - [TCorner.BottomRight];
+        If (TCorner.BottomLeft in LCorners)  and (not (TSide.Bottom in ASides)) and (not (Tside.Left in ASides))  then LCorners := LCorners - [TCorner.BottomLeft];
+      end;
+      //--
+      var LWidthMinusCorners: single := (LRect.width - (2 * LXRadius));
+      var LHeightMinusCorners: single := (LRect.height - (2 * LYradius));
 
 
       //----- TopRight
       if (TCorner.TopRight in LCorners) then begin
-        _moveTo(aRect.right, aRect.top + LYradius);
+        _moveTo(LRect.right, LRect.top + LYradius);
         _rQuadTo(0, -LYradius, -LXRadius, -LYradius);
-        if not aDrawOnlyBorder then _rlineTo(0, -LHalfStrokeWidth);
       end
       else begin
-        if not aDrawOnlyBorder then _moveTo(aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
-        else _moveTo(aRect.right, aRect.top + LYradius);
+        _moveTo(LRect.right, LRect.top + LYradius);
         //----
         if (not aDrawOnlyBorder) or
            (TSide.right in ASides) then begin
-           _rLineTo(0, -LYradius -LHalfStrokeWidth);
-           if aDrawOnlyBorder then _rMoveTo(0, LHalfStrokeWidth);
+          _rLineTo(0, -LYradius);
+          if (aDrawOnlyBorder) and
+             (TSide.right in ASides) and
+             (not (TSide.top in ASides)) then begin
+            _rLineTo(0, -LHalfStrokeThickness);
+            _rMoveTo(0, LHalfStrokeThickness);
+          end;
         end
         else _rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
         //----
         if (not aDrawOnlyBorder) or
            (TSide.top in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(-LXRadius -LHalfStrokeWidth,0)
-          else begin
-            _rMoveTo(+LHalfStrokeWidth,0);
-            _rLineTo(-LXRadius -LHalfStrokeWidth,0);
+          if (aDrawOnlyBorder) and
+             (TSide.top in ASides) and
+             (not (TSide.right in ASides)) then begin
+            _rMoveTo(LHalfStrokeThickness, 0);
+            _rLineTo(-LHalfStrokeThickness, 0);
           end;
+          _rLineTo(-LXRadius,0);
         end
         else _rMoveTo(-LXRadius,0); // aDrawOnlyBorder AND not TSide.top
       end;
@@ -7836,25 +9915,30 @@ procedure ALDrawRectangle(
 
       //----- TopLeft
       if (TCorner.TopLeft in LCorners) then begin
-        if not aDrawOnlyBorder then _rlineTo(0, +LHalfStrokeWidth);
         _rQuadTo(-LXRadius, 0, -LXRadius, LYradius);
-        if not aDrawOnlyBorder then _rlineTo(-LHalfStrokeWidth, 0);
       end
       else begin
         if (not aDrawOnlyBorder) or
            (TSide.top in ASides) then begin
-          _rLineTo(-LXRadius -LHalfStrokeWidth, 0);
-          if aDrawOnlyBorder then _rMoveTo(LHalfStrokeWidth, 0);
+          _rLineTo(-LXRadius, 0);
+          if (aDrawOnlyBorder) and
+             (TSide.top in ASides) and
+             (not (TSide.left in ASides)) then begin
+            _rLineTo(-LHalfStrokeThickness, 0);
+            _rMoveTo(LHalfStrokeThickness, 0);
+          end;
         end
         else _rMoveTo(-LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
         //----
         if (not aDrawOnlyBorder) or
            (TSide.left in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(0,LYradius +LHalfStrokeWidth)
-          else begin
-            _rMoveTo(0,-LHalfStrokeWidth);
-            _rLineTo(0,+LYradius +LHalfStrokeWidth);
+          if (aDrawOnlyBorder) and
+             (TSide.left in ASides) and
+             (not (TSide.top in ASides)) then begin
+            _rMoveTo(0, -LHalfStrokeThickness);
+            _rLineTo(0, LHalfStrokeThickness);
           end;
+          _rLineTo(0,LYradius);
         end
         else _rMoveTo(0,LYradius); // aDrawOnlyBorder AND not TSide.left
       end;
@@ -7865,25 +9949,30 @@ procedure ALDrawRectangle(
 
       //----- BottomLeft
       if (TCorner.BottomLeft in LCorners) then begin
-        if not aDrawOnlyBorder then _rlineTo(LHalfStrokeWidth, 0);
         _rQuadTo(0, LYradius, LXRadius, LYradius);
-        if not aDrawOnlyBorder then _rlineTo(0, LHalfStrokeWidth);
       end
       else begin
         if (not aDrawOnlyBorder) or
            (TSide.left in ASides) then begin
-          _rLineTo(0, LYradius +LHalfStrokeWidth);
-          if aDrawOnlyBorder then _rMoveTo(0, -LHalfStrokeWidth);
+          _rLineTo(0, LYradius);
+          if (aDrawOnlyBorder) and
+             (TSide.left in ASides) and
+             (not (TSide.bottom in ASides)) then begin
+            _rLineTo(0, LHalfStrokeThickness);
+            _rMoveTo(0, -LHalfStrokeThickness);
+          end;
         end
         else _rMoveTo(0, LYradius); // aDrawOnlyBorder AND not TSide.left
         //----
         if (not aDrawOnlyBorder) or
            (TSide.bottom in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(LXRadius +LHalfStrokeWidth,0)
-          else begin
-            _rMoveTo(-LHalfStrokeWidth,0);
-            _rLineTo(+LXRadius +LHalfStrokeWidth,0);
+          if (aDrawOnlyBorder) and
+             (TSide.bottom in ASides) and
+             (not (TSide.left in ASides)) then begin
+            _rMoveTo(-LHalfStrokeThickness, 0);
+            _rLineTo(LHalfStrokeThickness, 0);
           end;
+          _rLineTo(LXRadius,0);
         end
         else _rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
       end;
@@ -7894,25 +9983,30 @@ procedure ALDrawRectangle(
 
       //----- BottomRight
       if (TCorner.BottomRight in LCorners) then begin
-        if not aDrawOnlyBorder then _rlineTo(0, -LHalfStrokeWidth);
         _rQuadTo(LXRadius, 0, LXRadius, -LYradius);
-        if not aDrawOnlyBorder then _rlineTo(LHalfStrokeWidth, 0);
       end
       else begin
         if (not aDrawOnlyBorder) or
            (TSide.bottom in ASides) then begin
-          _rLineTo(LXRadius +LHalfStrokeWidth,0);
-          if aDrawOnlyBorder then _rMoveTo(-LHalfStrokeWidth, 0);
+          _rLineTo(LXRadius,0);
+          if (aDrawOnlyBorder) and
+             (TSide.bottom in ASides) and
+             (not (TSide.right in ASides)) then begin
+            _rLineTo(LHalfStrokeThickness, 0);
+            _rMoveTo(-LHalfStrokeThickness, 0);
+          end;
         end
         else _rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
         //----
         if (not aDrawOnlyBorder) or
            (TSide.right in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(0, -LYradius -LHalfStrokeWidth)
-          else begin
-            _rMoveTo(0,+LHalfStrokeWidth);
-            _rLineTo(0,-LYradius -LHalfStrokeWidth);
+          if (aDrawOnlyBorder) and
+             (TSide.right in ASides) and
+             (not (TSide.bottom in ASides)) then begin
+            _rMoveTo(0, LHalfStrokeThickness);
+            _rLineTo(0, -LHalfStrokeThickness);
           end;
+          _rLineTo(0,-LYradius);
         end
         else _rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
       end;
@@ -7920,28 +10014,181 @@ procedure ALDrawRectangle(
       if (not aDrawOnlyBorder) or
          (TSide.right in ASides) then _rLineTo(0, -LHeightMinusCorners)
       else _rMoveTo(0, -LHeightMinusCorners);
+      //-----
+      if (TSide.right in ASides) and
+         (TSide.top in ASides) then CGContextClosePath(ACanvas);
+
+
+      if aClipPath then CGContextClip(ACanvas)
+      else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
+      else CGContextStrokePath(ACanvas);
 
     end;
-
   end;
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION '_GetShapeRect (MSWINDOWS / ALMacOS)'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
-  function _GetShapeRect: TRectF;
+  {$REGION '_SetShadow (SKIA)'}
+  {$IF defined(ALSkiaEngine)}
+  procedure _SetShadow(const aPaint: sk_Paint_t);
   begin
-    Result := ADstRect;
-    if AStrokeColor <> TalphaColorRec.Null then
-      InflateRect(Result, -(AStrokeThickness / 2), -(AStrokeThickness / 2));
+    //In skia we can use this to convert from the (legacy) idea of specify
+    //the blur "radius" to the standard notion of specifying its sigma.
+    //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
+    //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
+    //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
+    //  }
+    //But it's not very good, I think that a better value is just Shadow.blur / 2
+    if (LShadowColor <> TalphaColorRec.Null) then begin
+      var LImagefilter := ALSkCheckHandle(
+                            sk4d_imagefilter_make_drop_shadow(
+                              LScaledShadowOffsetX, // dx,
+                              LScaledShadowOffsetY, // dy,
+                              LScaledShadowBlur / 2, // sigma_x,
+                              LScaledShadowBlur / 2, // sigma_y: float;
+                              LShadowColor, // color: sk_color_t;
+                              0, // input: sk_imagefilter_t;
+                              nil)); // const crop_rect: psk_rect_t)
+      try
+        // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
+        sk4d_paint_set_image_filter(aPaint, LImagefilter);
+      finally
+        sk4d_refcnt_unref(LImagefilter);
+      end;
+    end;
   end;
   {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_SetShadow (ANDROID)'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+  procedure _SetShadow(const aPaint: JPaint);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then
+      APaint.setShadowLayer(
+        LScaledShadowBlur{radius},
+        LScaledShadowOffsetX{dx},
+        LScaledShadowOffsetY{dy},
+        integer(LShadowColor){shadowColor});
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_SetShadow (APPLEOS)'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  procedure _SetShadow(const aCanvas: CGContextRef);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then begin
+      var LShadowColorF := TAlphaColorCGFloat.Create(LShadowColor);
+      var LShadowColorCG := CGColorCreate(ALGetGlobalCGColorSpace, @LShadowColorF);
+      try
+        CGContextSetShadowWithColor(
+          ACanvas,
+          CGSizeMake(LScaledShadowOffsetX, -LScaledShadowOffsetY), // offset
+          LScaledShadowBlur, // blur
+          LShadowColorCG); // color
+      finally
+        CGColorRelease(LShadowColorCG);
+      end;
+    end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_ClearShadow (SKIA)'}
+  {$IF defined(ALSkiaEngine)}
+  procedure _ClearShadow(const aPaint: sk_Paint_t);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then
+      sk4d_paint_set_image_filter(aPaint, 0);
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_ClearShadow (ANDROID)'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+  procedure _ClearShadow(const aPaint: JPaint);
+  begin
+      if LShadowColor <> TalphaColorRec.Null then
+        APaint.clearShadowLayer;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_ClearShadow (APPLEOS)'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  procedure _ClearShadow(const aCanvas: CGContextRef);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then
+      CGContextSetShadowWithColor(
+        ACanvas,
+        CGSizeMake(0, 0), // offset
+        0, // blur
+        nil); // color
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_FillGradientIsTransparent'}
+  function _FillGradientIsTransparent: boolean;
+  begin
+    if length(AFillGradientColors) = 0 then exit(true);
+    Result := False;
+    for var I := Low(AFillGradientColors) to High(AFillGradientColors) do begin
+      Result := TAlphaColorRec(AFillGradientColors[i]).A < 255;
+      if Result then exit;
+    end;
+  end;
   {$ENDREGION}
 
 begin
 
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  var LGridHeight := CGBitmapContextGetHeight(ACanvas);
+  {$ENDIF}
+  var LRect := ADstRect;
+  LRect.Top := LRect.Top * AScale;
+  LRect.right := LRect.right * AScale;
+  LRect.left := LRect.left * AScale;
+  LRect.bottom := LRect.bottom * AScale;
+  LScaledStrokeThickness := AStrokeThickness * AScale;
+  LScaledXRadius := AXRadius * AScale;
+  LScaledYRadius := AYRadius * AScale;
+  var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
+  if LScaledXRadius < 0 then LScaledXRadius := (LRect.Width/100)*abs(LScaledXRadius);
+  if LScaledYRadius < 0 then LScaledYRadius := (LRect.Height/100)*abs(LScaledYRadius);
+  LScaledXRadius := min(LScaledXRadius, LMaxRadius);
+  LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+  {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
+  LScaledShadowBlur := AShadowBlur * AScale;
+  LScaledShadowOffsetX := AShadowOffsetX * AScale;
+  LScaledShadowOffsetY := AShadowOffsetY * AScale;
+  LShadowColor := AShadowColor;
+  if CompareValue(LScaledShadowBlur, 0, TEpsilon.position) <= 0 then
+    LShadowColor := TAlphaColors.Null;
+  {$ENDIF}
+  LStrokeColor := AStrokeColor;
+  if CompareValue(LScaledStrokeThickness, 0, TEpsilon.position) <= 0 then
+    LStrokeColor := TAlphaColors.Null;
+  if length(AFillGradientColors) = 1 then
+    raise Exception.Create('Invalid gradient: A gradient requires at least two colors');
+  var LFillGradientOffsets := AFillGradientOffsets;
+  if (length(LFillGradientOffsets) = 0) and (length(AFillGradientColors) > 0) then begin
+    setlength(LFillGradientOffsets, length(AFillGradientColors));
+    for Var I := 0 to length(AFillGradientColors) - 1 do
+      LFillGradientOffsets[i] := I * (1 / (length(AFillGradientColors) - 1));
+  end
+  else if (length(LFillGradientOffsets) <> length(AFillGradientColors)) then
+    raise Exception.Create('Invalid gradient: The number of gradient offsets does not match the number of gradient colors');
+  var LScaledFillGradientStartPoint := AFillGradientStartPoint;
+  LScaledFillGradientStartPoint.X := LScaledFillGradientStartPoint.X * AScale;
+  LScaledFillGradientStartPoint.Y := LScaledFillGradientStartPoint.Y * AScale;
+  var LScaledFillGradientEndPoint := AFillGradientEndPoint;
+  LScaledFillGradientEndPoint.X := LScaledFillGradientEndPoint.X * AScale;
+  LScaledFillGradientEndPoint.Y := LScaledFillGradientEndPoint.Y * AScale;
+
   {$REGION 'SKIA'}
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
 
   // Create LPaint
   var LPaint := ALSkCheckHandle(sk4d_paint_create);
@@ -7949,71 +10196,196 @@ begin
 
     // Requests, but does not require, that edge pixels draw opaque or with partial transparency.
     sk4d_paint_set_antialias(LPaint, true);
-    // Sets whether the geometry is filled, stroked, or filled and stroked.
+    // Requests, but does not require, to distribute color error.
     sk4d_paint_set_dither(LPaint, true);
 
-    // Init LRect
-    var LRect: TRectf;
-    if AStrokeColor <> TalphaColorRec.Null then begin
-      LRect := TrectF.Create(
-                 ADstRect.Left + (AStrokeThickness / 2),
-                 ADstRect.Top + (AStrokeThickness / 2),
-                 ADstRect.right - (AStrokeThickness / 2),
-                 ADstRect.bottom - (AStrokeThickness / 2));
-    end
-    else LRect := ADstRect;
-
-    // Fill the circle
-    if AFillColor <> TalphaColorRec.Null then begin
+    // Fill the rectangle
+    if (AFillColor <> TalphaColorRec.Null) or
+       (length(AFillGradientColors) > 0) or
+       (AFillResourceName <> '') or
+       (LShadowColor <> TalphaColorRec.Null) then begin
 
       // FILL_SK_PAINTSTYLE
       sk4d_paint_set_style(LPaint, sk_paintstyle_t.FILL_SK_PAINTSTYLE);
 
-      //In skia we can use this to convert from the (legacy) idea of specify
-      //the blur "radius" to the standard notion of specifying its sigma.
-      //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
-      //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
-      //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
-      //  }
-      //But it's not very good, I think that a better value is just Shadow.blur / 2
-      if (AShadowColor <> TalphaColorRec.Null) then begin
-        var Limagefilter := ALSkCheckHandle(
-                              sk4d_imagefilter_make_drop_shadow(
-                                AShadowOffsetX, // dx,
-                                AShadowOffsetY, // dy,
-                                AShadowblur / 2, // sigma_x,
-                                AShadowblur / 2, // sigma_y: float;
-                                AShadowColor, // color: sk_color_t;
-                                0, // input: sk_imagefilter_t;
-                                nil)); // const crop_rect: psk_rect_t)
+      //Fill with bitmap
+      //if AFill.Kind = TALBrushKind.Bitmap then begin
+      //  if AFill.Bitmap.Bitmap.HandleAllocated then begin
+      //    var LBitmapData: TBitmapData;
+      //    if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then begin
+      //      try
+      //        var LImage: sk_image_t;
+      //        var LImageInfo := ALGetSkImageinfo(LBitmapData.Width, LBitmapData.Height, sk_colortype_t(SkFmxColorType[LBitmapData.PixelFormat]));
+      //        var LPixmap := ALSkCheckHandle(
+      //                         sk4d_pixmap_create(
+      //                           @LImageInfo, // const image_info: psk_imageinfo_t;
+      //                           LBitmapData.Data, // const pixels: Pointer;
+      //                           LBitmapData.Pitch)); // row_bytes: size_t
+      //        try
+      //          LImage := ALSkCheckHandle(
+      //                      sk4d_image_make_from_raster(
+      //                        LPixmap, // const pixmap: sk_pixmap_t;
+      //                        nil, // proc: sk_image_raster_release_proc;
+      //                        nil));// proc_context: Pointer
+      //          try
+      //            ...
+      //          finally
+      //            sk4d_refcnt_unref(LImage);
+      //          end;
+      //        finally
+      //          sk4d_refcnt_unref(LPixmap);
+      //        end;
+      //      finally
+      //        AFill.Bitmap.Bitmap.Unmap(LBitmapData);
+      //      end
+      //    end;
+      //  end;
+      //end
+
+      // Init LDrawnWithSolidColor
+      var LDrawnWithSolidColor := False;
+
+      // Fill with transparent solid color and shadow
+      if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
+         (TAlphaColorRec(AFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
+         (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
+         ((AFillResourceName = '') or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
+          (AFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
+          (length(AFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
+          (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
+
+        // First pass draw the shadow
+        var LFillColor := AFillColor;
+        TAlphaColorRec(LFillColor).A := 255;
+        sk4d_paint_set_color(LPaint, LFillColor);
+        _SetShadow(LPaint);
+        _DrawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+        _ClearShadow(LPaint);
+
+        // Second pass fill the rect
+        var LBlender := ALSkCheckHandle(
+                          sk4d_blender_make_mode(
+                            sk_blendmode_t.SRC_SK_BLENDMODE));
         try
-          // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
-          sk4d_paint_set_image_filter(LPaint, Limagefilter);
+          sk4d_paint_set_blender(LPaint, LBlender);
+          sk4d_paint_set_color(LPaint, AFillColor);
+          _DrawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+          sk4d_paint_set_blender(LPaint, 0);
         finally
-          sk4d_refcnt_unref(Limagefilter);
+          sk4d_refcnt_unref(LBlender)
         end;
-      end;
+        LDrawnWithSolidColor := True;
+
+      end
 
       // Fill with solid color
-      sk4d_paint_set_color(LPaint, AFillColor);
-      _drawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+      else if (AFillColor <> TalphaColors.Null) then begin
+        sk4d_paint_set_color(LPaint, AFillColor);
+        _SetShadow(LPaint);
+        _DrawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+        _ClearShadow(LPaint);
+        LDrawnWithSolidColor := True;
+      end;
 
-      //remove the shadow filter
-      sk4d_paint_set_image_filter(LPaint, 0);
+      // Fill with gradient
+      if length(AFillGradientColors) > 0 then begin
+        case AFillGradientStyle of
+          TGradientStyle.Linear: begin
+            var LPoints: array[0..1] of sk_point_t;
+            LPoints[0].x := LScaledFillGradientStartPoint.X;
+            LPoints[0].y := LScaledFillGradientStartPoint.Y;
+            LPoints[1].x := LScaledFillGradientEndPoint.X;
+            LPoints[1].y := LScaledFillGradientEndPoint.Y;
+            var LShader := ALSkCheckHandle(
+                             sk4d_shader_make_gradient_linear(
+                               @LPoints[0], // const points: psk_point_t;
+                               @AFillGradientColors[0], // const colors: psk_color_t;
+                               @LFillGradientOffsets[0], // const positions: pfloat;
+                               Length(AFillGradientColors), // count: int32_t;
+                               sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
+                               nil)); // const local_matrix: psk_matrix_t
+            try
+              // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
+              sk4d_paint_set_shader(LPaint, LShader);
+            finally
+              sk4d_refcnt_unref(LShader);
+            end;
+          end;
+          TGradientStyle.Radial: begin
+            var LShader := ALSkCheckHandle(
+                             sk4d_shader_make_gradient_radial(
+                               @LScaledFillGradientStartPoint, // const center: psk_point_t;
+                               LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint), // radius: float;
+                               @AFillGradientColors[0], // const colors: psk_color_t;
+                               @LFillGradientOffsets[0], // const positions: pfloat;
+                               Length(AFillGradientColors), // count: int32_t;
+                               sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
+                               nil));// const local_matrix: psk_matrix_t
+            try
+              // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
+              sk4d_paint_set_shader(LPaint, LShader);
+            finally
+              sk4d_refcnt_unref(LShader);
+            end;
+          end;
+          else
+            raise Exception.Create('Error EADEA97C-5440-46F0-A44A-47BCF4CFAC2F');
+        end;
+        if not LDrawnWithSolidColor then _SetShadow(LPaint);
+        _DrawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+        if not LDrawnWithSolidColor then _ClearShadow(LPaint);
+        sk4d_paint_set_shader(LPaint, 0);
+        LDrawnWithSolidColor := True;
+      end;
+
+      // Fill with image
+      if AFillResourceName <> '' then begin
+        var LImage: sk_image_t;
+        var LFileName := ALGetResourceFilename(AFillResourceName);
+        if LFileName <> '' then LImage := ALLoadFromFileAndWrapToSkImage(LFileName, AFillWrapMode, LRect.Width, LRect.Height)
+        else LImage := {$IFDEF ALDPK}0{$ELSE}ALLoadFromResourceAndWrapToSkImage(AFillResourceName, AFillWrapMode, LRect.Width, LRect.Height){$ENDIF};
+        {$IFDEF ALDPK}If LImage <> 0 then{$ENDIF}
+          try
+
+            var LDestRect := TrectF.Create(0,0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)).CenterAt(LRect);
+            var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
+            var Lshader: sk_shader_t;
+            var LMatrix := TMatrix.CreateTranslation(LRect.Left + LDestRect.Left - LRect.Left, LRect.Top + LDestRect.Top - LRect.Top);
+            Lshader := ALSkCheckHandle(
+                         sk4d_image_make_shader(
+                           LImage, // const self: sk_image_t;
+                           sk_tilemode_t.DECAL_SK_TILEMODE, // tile_mode_x,
+                           sk_tilemode_t.DECAL_SK_TILEMODE,// tile_mode_y: sk_tilemode_t;
+                           @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+                           @LMatrix)); // const local_matrix: psk_matrix_t)
+            try
+              // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
+              sk4d_paint_set_shader(LPaint, LShader);
+            finally
+              sk4d_refcnt_unref(LShader);
+            end;
+
+            // Specify an opaque color to ensure the image is drawn without the
+            // transparency effect of the current color.
+            sk4d_paint_set_color(LPaint, $FFFFFFFF);
+            if not LDrawnWithSolidColor then _SetShadow(LPaint);
+            _DrawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+            if not LDrawnWithSolidColor then _ClearShadow(LPaint);
+            sk4d_paint_set_shader(LPaint, 0);
+
+          finally
+            sk4d_refcnt_unref(LImage);
+          end;
+      end;
 
     end;
 
-    // Stroke the circle
-    if AStrokeColor <> TalphaColorRec.Null then begin
-
-      // Init LPaint
+    // Stroke the rectangle
+    if LStrokeColor <> TalphaColorRec.Null then begin
       sk4d_paint_set_style(LPaint, sk_paintstyle_t.STROKE_SK_PAINTSTYLE);
-      sk4d_paint_set_stroke_width(LPaint, AStrokeThickness);
-
-      // Stroke with solid color
-      sk4d_paint_set_color(LPaint, AStrokeColor);
-      _drawRect(ACanvas, LPaint, LRect, true{aDrawOnlyBorder});
-
+      sk4d_paint_set_stroke_width(LPaint, LScaledStrokeThickness);
+      sk4d_paint_set_color(LPaint, LStrokeColor);
+      _DrawRect(ACanvas, LPaint, LRect, true{aDrawOnlyBorder});
     end;
 
   finally
@@ -8024,7 +10396,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
 
   //create the canvas and the paint
   var LPaint := TJPaint.JavaClass.init;
@@ -8032,42 +10404,240 @@ begin
   LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
   LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
 
-  //init LRect
-  var LRect: TrectF;
-  if AStrokeColor <> TalphaColorRec.Null then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStrokeThickness / 2),
-               ADstRect.Top + (AStrokeThickness / 2),
-               ADstRect.right - (AStrokeThickness / 2),
-               ADstRect.bottom - (AStrokeThickness / 2));
-  end
-  else LRect := ADstRect;
-
-  //fill the rectangle
-  if AFillColor <> TalphaColorRec.Null then begin
+  // Fill the rectangle
+  if (AFillColor <> TalphaColorRec.Null) or
+     (length(AFillGradientColors) > 0) or
+     (AFillResourceName <> '') or
+     (LShadowColor <> TalphaColorRec.Null) then begin
 
     //init LPaint
     LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LRect + StrokeThickness :( this result&ing in border if the fill is for exemple black and border white
 
-    //fill with solid color
-    LPaint.setColor(integer(AFillColor));
-    if (AShadowColor <> TalphaColorRec.Null) then LPaint.setShadowLayer(AShadowBlur{radius}, AShadowOffsetX{dx}, AShadowOffsetY{dy}, integer(AShadowColor){shadowColor});
-    _drawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder});
-    if (AShadowColor <> TalphaColorRec.Null) then LPaint.clearShadowLayer;
+    //fill with bitmap
+    //if AFill.Kind = TALBrushKind.Bitmap then begin
+    //  if not AFill.Bitmap.Bitmap.IsEmpty then begin
+    //    if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
+    //      //--
+    //      var LTmpBitmap := TJBitmap.JavaClass.createBitmap(AFill.Bitmap.Bitmap.Width, AFill.Bitmap.Bitmap.height, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+    //      //--
+    //      var LPixelBuffer: Pointer;
+    //      var LBitmapInfo: AndroidBitmapInfo;
+    //      FillChar(LBitmapInfo, SizeOf(LBitmapInfo), 0);
+    //      if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LBitmapInfo) = 0) and
+    //         (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LPixelBuffer) = 0) then
+    //      try
+    //        var LBitmapData: TBitmapData;
+    //        if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
+    //        try
+    //          ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
+    //        finally
+    //          AFill.Bitmap.Bitmap.Unmap(LBitmapData);
+    //        end;
+    //      finally
+    //        AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID);
+    //      end;
+    //      //--
+    //      ...
+    //      //--
+    //      LTmpBitmap.recycle;
+    //      LTmpBitmap := nil;
+    //      //--
+    //    end;
+    //  end;
+    //end
+
+    // Init LDrawnWithSolidColor
+    var LDrawnWithSolidColor := False;
+
+    // Fill with transparent solid color and shadow
+    if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
+       (TAlphaColorRec(AFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
+       (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
+       ((AFillResourceName = '') or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
+        (AFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
+        (length(AFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
+        (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
+
+      // First pass draw the shadow
+      var LFillColor := AFillColor;
+      TAlphaColorRec(LFillColor).A := 255;
+      LPaint.setColor(integer(LFillColor));
+      _SetShadow(LPaint);
+      _DrawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, false{aClipPath});
+      _ClearShadow(LPaint);
+
+      // Second pass fill the rect
+      var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC);
+      LPaint.setXfermode(LPorterDuffXfermode);
+      LPaint.setColor(integer(AFillColor));
+      _DrawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, (AFillResourceName <> '') and (length(AFillGradientColors) = 0){aClipPath});
+      LPaint.setXfermode(nil);
+      LPorterDuffXfermode := nil;
+      LDrawnWithSolidColor := True;
+
+    end
+
+    // Fill with solid color
+    else if (AFillColor <> TalphaColors.Null) then begin
+      LPaint.setColor(integer(AFillColor));
+      _SetShadow(LPaint);
+      _DrawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, (AFillResourceName <> '') and (length(AFillGradientColors) = 0){aClipPath});
+      _ClearShadow(LPaint);
+      LDrawnWithSolidColor := True;
+    end;
+
+    //fill with gradient
+    if length(AFillGradientColors) > 0 then begin
+
+      // First pass draw the shadow if not already drawn
+      // We must do this because else the shadow will be drawn with
+      // the color of the gradient :(
+      if not LDrawnWithSolidColor then begin
+        var LFillColor := AFillColor;
+        TAlphaColorRec(LFillColor).A := 255;
+        LPaint.setColor(integer(LFillColor));
+        _SetShadow(LPaint);
+        _DrawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, false{aClipPath});
+        _ClearShadow(LPaint);
+      end;
+
+      // Second pass fill the rect
+      var LJColors := TJavaArray<Integer>.Create(length(AFillGradientColors));
+      var LJOffsets := TJavaArray<Single>.Create(length(LFillGradientOffsets));
+      Try
+        for var i := low(AFillGradientColors) to high(AFillGradientColors) do begin
+          LJColors[i] := integer(AFillGradientColors[i]);
+          LJOffsets[i] := LFillGradientOffsets[i];
+        end;
+        var LShader: JShader;
+        case AFillGradientStyle of
+          TGradientStyle.Linear: begin
+            LShader := TJLinearGradient.JavaClass.init(
+                         LScaledFillGradientStartPoint.X{x0},
+                         LScaledFillGradientStartPoint.Y{y0},
+                         LScaledFillGradientEndPoint.X{x1},
+                         LScaledFillGradientEndPoint.Y{y1},
+                         LJColors{colors},
+                         LJOffsets{positions},
+                         TJShader_TileMode.JavaClass.CLAMP{tile});
+          end;
+          TGradientStyle.Radial: begin
+            LShader := TJRadialGradient.JavaClass.init(
+                         LScaledFillGradientStartPoint.X{x},
+                         LScaledFillGradientStartPoint.Y{y},
+                         LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint){radius},
+                         LJColors{colors},
+                         LJOffsets{positions},
+                         TJShader_TileMode.JavaClass.CLAMP{tile});
+          end;
+          else
+            raise Exception.Create('Error EAB4DED3-CF02-495B-9CB8-8F82479D2839');
+        end;
+        LPaint.setShader(LShader);
+        _DrawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, AFillResourceName <> ''{aClipPath});
+        LPaint.setShader(nil);
+        LShader := nil;
+        LDrawnWithSolidColor := True;
+      finally
+        ALfreeandNil(LJColors);
+        ALfreeandNil(LJOffsets);
+      end;
+    end;
+
+    // Fill with image
+    if AFillResourceName <> '' then begin
+      var LBitmap: JBitmap;
+      var LFileName := ALGetResourceFilename(AFillResourceName);
+      if LFileName <> '' then LBitmap := ALLoadFromFileAndWrapToJBitmap(LFileName, AFillWrapMode, LRect.Width, LRect.Height)
+      else LBitmap := {$IFDEF ALDPK}nil{$ELSE}ALLoadFromResourceAndWrapToJBitmap(AFillResourceName, AFillWrapMode, LRect.Width, LRect.Height){$ENDIF};
+      {$IFDEF ALDPK}If LBitmap <> nil then{$ENDIF}
+        try
+
+          // On android the bitmap is drawed with the opacity of the paint color
+          // so set the color to black to make the bitmap fully opaque
+          LPaint.setColor(integer(TAlphaColors.Black));
+
+          // The shadow is made directly on the bitmap
+          if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
+
+            // Their is corners so remove them from the LBitmap
+            if (compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) or
+               (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0) then begin
+              // Draw the shape of the rect in LDestBitmap
+              var LDestRect := TRectF.Create(0,0,LRect.Width,LRect.height);
+              var LDestBitmap := TJBitmap.JavaClass.createBitmap(Round(LDestRect.Width), round(LDestRect.Height), TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+              var LDestCanvas := TJCanvas.JavaClass.init(LDestBitmap);
+              _DrawRect(LDestCanvas, LPaint, LDestRect, false{aDrawOnlyBorder}, False{aForceDrawPath}, False{aClipPath});
+              // Copy LBitmap in LSrcBitmap and extend LSrcBitmap to the size of LDestBitmap
+              var LSrcBitmap := TJBitmap.JavaClass.createBitmap(LDestBitmap.getWidth, LDestBitmap.getHeight, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+              var LSrcCanvas := TJCanvas.JavaClass.init(LSrcBitmap);
+              LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(TRectF.Create(0,0,LDestBitmap.getWidth,LDestBitmap.getHeight));
+              var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+              var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
+              LSrcCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
+              // draw the LSrcBitmap onto the LDestBitmap with SRC_IN
+              LJDestRectf := TJRectf.JavaClass.init(0, 0, LSrcBitmap.getWidth, LSrcBitmap.getheight);
+              LJSrcRect := TJRect.JavaClass.init(0, 0, LSrcBitmap.getWidth, LSrcBitmap.getheight);
+              var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
+              LPaint.setXfermode(LPorterDuffXfermode);
+              LDestCanvas.drawBitmap(LSrcBitmap, LJSrcRect, LJDestRectf, LPaint);
+              LPaint.setXfermode(nil);
+              LPorterDuffXfermode := nil;
+              // swap LDestBitmap with LBitmap
+              LJSrcRect := nil;
+              LJDestRectf := nil;
+              LSrcCanvas := nil;
+              LDestCanvas := nil;
+              if not LBitmap.equals(LDestBitmap) then LBitmap.recycle;
+              if not LSrcBitmap.equals(LDestBitmap) then LSrcBitmap.recycle;
+              LBitmap := LDestBitmap;
+              LSrcBitmap := nil;
+              LDestBitmap := nil;
+            end;
+
+            var LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(LRect);
+            LDestRect.Offset(LScaledShadowOffsetX, LScaledShadowOffsetY);
+            var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
+            //--
+            var LBlurMaskFilter := TJBlurMaskFilter.JavaClass.init(AShadowblur*2.5, TJBlurMaskFilter_Blur.JavaClass.NORMAL);
+            LPaint.setColor(integer(LShadowColor));
+            LPaint.setMaskFilter(LBlurMaskFilter);
+            aCanvas.drawBitmap(LBitmap.extractAlpha, LJSrcRect, LJDestRectf, LPaint);
+            LPaint.setMaskFilter(nil);
+            LDestRect.Offset(-LScaledShadowOffsetX, -LScaledShadowOffsetY);
+            LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            LPaint.setColor(integer(TAlphaColors.Black));
+            aCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
+
+          end
+
+          // The shadow is made on the rectangle shape
+          else begin
+            If not LDrawnWithSolidColor then _DrawRect(aCanvas, nil{APaint}, LRect, false{aDrawOnlyBorder}, true{aForceDrawPath}, true{aClipPath});
+            var LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(LRect);
+            var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
+            aCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
+            aCanvas.restore;
+            LJSrcRect := nil;
+            LJDestRectf := nil;
+          end;
+
+        finally
+          LBitmap.recycle;
+          LBitmap := nil;
+        end;
+    end;
 
   end;
 
   //stroke the rectangle
-  if AStrokeColor <> TalphaColorRec.Null then begin
-
-    //init LPaint
+  if LStrokeColor <> TalphaColorRec.Null then begin
     LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-    LPaint.setStrokeWidth(AStrokeThickness);
-
-    //stroke with solid color
-    LPaint.setColor(integer(AStrokeColor));
-    _drawRect(aCanvas, LPaint, LRect, true{aDrawOnlyBorder});
-
+    LPaint.setStrokeWidth(LScaledStrokeThickness);
+    LPaint.setColor(integer(LStrokeColor));
+    _DrawRect(aCanvas, LPaint, LRect, true{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, False{aClipPath});
   end;
 
   //free the paint and the canvas
@@ -8076,77 +10646,250 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'IOS'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'APPLEOS'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  //set the paint default properties
-  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
-  //-----
-  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
+  // Fill the rectangle
+  if (AFillColor <> TalphaColorRec.Null) or
+     (length(AFillGradientColors) > 0) or
+     (AFillResourceName <> '') or
+     (LShadowColor <> TalphaColorRec.Null) then begin
 
-  //init LRect
-  var LRect: TrectF;
-  if AStrokeColor <> TalphaColorRec.Null then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStrokeThickness / 2),
-               ADstRect.Top + (AStrokeThickness / 2),
-               ADstRect.right - (AStrokeThickness / 2),
-               ADstRect.bottom - (AStrokeThickness / 2));
-  end
-  else LRect := ADstRect;
+    //fill with bitmap
+    //if AFill.Kind = TALBrushKind.Bitmap then begin
+    //  if not AFill.Bitmap.Bitmap.IsEmpty then begin
+    //    if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
+    //      var LBitmapData: TBitmapData;
+    //      if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
+    //      try
+    //        var LTmpContext := ALCreateCGContextRef(LBitmapData.Width, LBitmapData.Height, LBitmapData.Data, LBitmapData.Pitch);
+    //        try
+    //          var LImageRef := CGBitmapContextCreateImage(LTmpContext);
+    //          if LImageRef = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+    //          try
+    //            var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithCGImage(LImageRef{$IF defined(ALMacOS)}, CGSizeMake(LBitmapData.width, LBitmapData.height){$ENDIF}));
+    //            if LImage = nil then raise Exception.create('Failed to initialize UIImage/NSImage from CGImageRef');
+    //            try
+    //              ...
+    //            finally
+    //              LImage.release;
+    //            end;
+    //          finally
+    //            CGImageRelease(LImageRef);
+    //          end;
+    //        finally
+    //          CGContextRelease(LTmpContext);
+    //        end;
+    //      finally
+    //        AFill.Bitmap.Bitmap.Unmap(LBitmapData);
+    //      end;
+    //    end;
+    //  end;
+    //end
 
-  //fill the rectangle
-  if AFillColor <> TalphaColorRec.Null then begin
+    // Init LDrawnWithSolidColor
+    var LDrawnWithSolidColor := False;
 
-    //fill with solid color
-    var LAlphaColor := TAlphaColorCGFloat.Create(AFillColor);
-    CGContextSetRGBFillColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-    _DrawRect(LRect, false{aDrawOnlyBorder});
-    //-----
-    if (AShadowColor <> TalphaColorRec.Null) then begin
-      LAlphaColor := TAlphaColorCGFloat.Create(AShadowColor);
-      var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
+    // Fill with transparent solid color and shadow
+    if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
+       (TAlphaColorRec(AFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
+       (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
+       ((AFillResourceName = '') or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
+        (AFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
+        (length(AFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
+        (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
+
+      // First pass draw the shadow
+      var LFillColorF := TAlphaColorCGFloat.Create(AFillColor);
+      CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
+      _SetShadow(aCanvas);
+      _DrawRect(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+      _ClearShadow(aCanvas);
+
+      // Second pass fill the rect
+      CGContextSetBlendMode(ACanvas, kCGBlendModeCopy);
+      CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, LFillColorF.A);
+      _DrawRect(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+      CGContextSetBlendMode(ACanvas, kCGBlendModeNormal);
+      LDrawnWithSolidColor := True;
+
+    end
+
+    // Fill with solid color
+    else if (AFillColor <> TalphaColors.Null) then begin
+      var LFillColorF := TAlphaColorCGFloat.Create(AFillColor);
+      CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, LFillColorF.A);
+      _SetShadow(aCanvas);
+      _DrawRect(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+      _ClearShadow(aCanvas);
+      LDrawnWithSolidColor := True;
+    end;
+
+    //fill with gradient
+    if length(AFillGradientColors) > 0 then begin
+
+      // First pass draw the shadow if not already drawn
+      // We must do this because else the shadow will not be drawn
+      if not LDrawnWithSolidColor then begin
+        var LFillColorF := TAlphaColorCGFloat.Create(AFillColor);
+        CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
+        _SetShadow(aCanvas);
+        _DrawRect(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+        _ClearShadow(aCanvas);
+      end;
+
+      // Second pass fill the rect
+      var LGradient := TALGradient.create;
       try
-        CGContextSetShadowWithColor(
-          aContext,
-          CGSizeMake(AShadowOffsetX, AShadowOffsetY), // offset
-          AShadowBlur, // blur
-          LColor); // color
+        LGradient.Colors := AFillGradientColors;
+        LGradient.Offsets := LFillGradientOffsets;
+        var LDefaultInputRange: array[0..1] of CGFloat;
+        LDefaultInputRange[0] := 0;
+        LDefaultInputRange[1] := 1;
+        var LCallback: CGFunctionCallbacks;
+        LCallback.version := 0;
+        LCallback.evaluate := @ALGradientEvaluateCallback;
+        LCallback.releaseInfo := nil;
+        var LFunc := CGFunctionCreate(
+                       LGradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
+                       1, // domainDimension - The number of inputs.
+                       @LDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                       4, // rangeDimension - The number of outputs.
+                       nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
+                       @LCallback); // callbacks - A pointer to a callback function table.
+        try
+          var LShading: CGShadingRef;
+          case AFillGradientStyle of
+            TGradientStyle.Linear: begin
+              LShading := CGShadingCreateAxial(
+                            ALGetGlobalCGColorSpace, // colorspace
+                            CGPointMake(
+                              LScaledFillGradientStartPoint.X,
+                              LGridHeight - LScaledFillGradientStartPoint.y), // start - The starting point of the axis, in the shading's target coordinate space.
+                            CGPointMake(
+                              LScaledFillGradientEndPoint.x,
+                              LGridHeight - LScaledFillGradientEndPoint.y), // end - The ending point of the axis, in the shading's target coordinate space.
+                            LFunc, // function
+                            True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
+                            True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
+            end;
+            TGradientStyle.Radial: begin
+              LShading := CGShadingCreateRadial(
+                            ALGetGlobalCGColorSpace, // colorspace
+                            CGPoint.Create(TPointF.Create(LScaledFillGradientStartPoint.X, LGridHeight - LScaledFillGradientStartPoint.Y)), // start - The center of the starting circle, in the shading's target coordinate space.
+                            0, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
+                            CGPoint.Create(TPointF.Create(LScaledFillGradientStartPoint.X, LGridHeight - LScaledFillGradientStartPoint.Y)), // end - The center of the ending circle, in the shading's target coordinate space.
+                            LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint), // endRadius - The radius of the ending circle, in the shading's target coordinate space.
+                            LFunc, // function
+                            True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                            True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+            end;
+            else
+              raise Exception.Create('Error 23128453-626D-49A6-AD49-D6CA8AC35ACF');
+          end;
+          try
+            _DrawRect(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, true{aClipPath});
+            CGContextDrawShading(ACanvas, LShading);
+            CGContextRestoreGState(ACanvas);
+            LDrawnWithSolidColor := True;
+          finally
+            CGShadingRelease(LShading);
+          end;
+        finally
+          CGFunctionRelease(LFunc);
+        end;
       finally
-        CGColorRelease(LColor);
+        ALFreeAndNil(LGradient);
       end;
     end;
-    //-----
-    CGContextFillPath(aContext);
-    //-----
-    if (AShadowColor <> TalphaColorRec.Null) then begin
-      CGContextSetShadowWithColor(
-        aContext,
-        CGSizeMake(0, 0), // offset
-        0, // blur
-        nil); // color
+
+    // Fill with image
+    if AFillResourceName <> '' then begin
+      var LImage: CGImageRef;
+      var LFileName := ALGetResourceFilename(AFillResourceName);
+      if LFileName <> '' then LImage := ALLoadFromFileAndWrapToCGImageRef(LFileName, AFillWrapMode, LRect.Width, LRect.Height)
+      else LImage := {$IFDEF ALDPK}nil{$ELSE}ALLoadFromResourceAndWrapToCGImageRef(AFillResourceName, AFillWrapMode, LRect.Width, LRect.Height){$ENDIF};
+      {$IFDEF ALDPK}If LImage <> nil then{$ENDIF}
+        try
+
+          // The shadow is made directly on the bitmap
+          if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
+
+            // Their is corners so remove them from the LBitmap
+            if (compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) or
+               (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0) then begin
+              var LTmpRect := TRectF.Create(0,0,LRect.Width,LRect.height).Round;
+              var LTmpCGContextRef := ALCreateCGContextRef(LTmpRect.Width, LTmpRect.Height);
+              try
+                _DrawRect(LTmpCGContextRef, LTmpRect.Height, LTmpRect, false{aDrawOnlyBorder}, true{aClipPath});
+                var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LTmpRect);
+                CGContextDrawImage(
+                  LTmpCGContextRef, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    LDestRect.TopLeft,
+                    LDestRect.Width,
+                    LDestRect.Height,
+                    LTmpRect.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LImage); // image The image to draw.
+                CGContextRestoreGState(LTmpCGContextRef);
+                var LTmpImage := CGBitmapContextCreateImage(LTmpCGContextRef);
+                if LTmpImage = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+                CGImageRelease(LImage);
+                LImage := LTmpImage;
+              finally
+                CGContextRelease(LTmpCGContextRef);
+              end;
+            end;
+
+            _SetShadow(aCanvas);
+            var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LRect);
+            CGContextDrawImage(
+              ACanvas, // c: The graphics context in which to draw the image.
+              ALLowerLeftCGRect(
+                LDestRect.TopLeft,
+                LDestRect.Width,
+                LDestRect.Height,
+                LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+              LImage); // image The image to draw.
+             _ClearShadow(aCanvas);
+
+          end
+
+          // The shadow is made on the rectangle shape
+          else begin
+            _DrawRect(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, true{aClipPath});
+            var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LRect);
+            CGContextDrawImage(
+              ACanvas, // c: The graphics context in which to draw the image.
+              ALLowerLeftCGRect(
+                LDestRect.TopLeft,
+                LDestRect.Width,
+                LDestRect.Height,
+                LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+              LImage); // image The image to draw.
+            CGContextRestoreGState(ACanvas);
+          end;
+
+        finally
+          CGImageRelease(LImage);
+        end;
     end;
 
   end;
 
   //stroke the rectangle
-  if AStrokeColor <> TalphaColorRec.Null then begin
-
-    //stroke with solid color
-    var LAlphaColor := TAlphaColorCGFloat.Create(AStrokeColor);
-    CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-    CGContextSetLineWidth(aContext, AStrokeThickness);
-    _DrawRect(LRect, True{aDrawOnlyBorder});
-    CGContextStrokePath(aContext);
-
+  if LStrokeColor <> TalphaColorRec.Null then begin
+    CGContextSetLineWidth(ACanvas, LScaledStrokeThickness);
+    var LStrokeColorF := TAlphaColorCGFloat.Create(LStrokeColor);
+    CGContextSetRGBStrokeColor(ACanvas, LStrokeColorF.R, LStrokeColorF.G, LStrokeColorF.B, LStrokeColorF.A);
+    _DrawRect(aCanvas, LGridHeight, LRect, True{aDrawOnlyBorder}, false);
   end;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'MSWINDOWS'}
+  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
   var LFillKindRestoreValue: TBrushKind := ACanvas.Fill.Kind;
   var LFillColorRestoreValue: TAlphacolor := ACanvas.Fill.color;
@@ -8158,77 +10901,21 @@ begin
     ACanvas.Fill.Color := AFillColor;
   end
   else ACanvas.Fill.Kind := TBrushKind.None;
-  If AStrokeColor <> TalphaColorRec.Null then begin
+  If LStrokeColor <> TalphaColorRec.Null then begin
     ACanvas.Stroke.Kind := TBrushKind.Solid;
-    ACanvas.Stroke.Color := AStrokeColor;
-    ACanvas.Stroke.Thickness := AStrokeThickness;
+    ACanvas.Stroke.Color := LStrokeColor;
+    ACanvas.Stroke.Thickness := LScaledStrokeThickness;
   end
   else ACanvas.Stroke.Kind := TBrushKind.None;
   try
 
-    var LFillShape, LDrawShape: Boolean;
-    var LShapeRect := ALGetDrawingShapeRectAndSetThickness(ADstRect, ACanvas.Fill, ACanvas.Stroke, False, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
+    if LStrokeColor <> TalphaColorRec.Null then
+      LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
 
-    if ASides <> AllSides then
-    begin
-      var LOff: Single := LShapeRect.Left;
-      if not(TSide.Top in ASides) then
-        LShapeRect.Top := LShapeRect.Top - LOff;
-      if not(TSide.Left in ASides) then
-        LShapeRect.Left := LShapeRect.Left - LOff;
-      if not(TSide.Bottom in ASides) then
-        LShapeRect.Bottom := LShapeRect.Bottom + LOff;
-      if not(TSide.Right in ASides) then
-        LShapeRect.Right := LShapeRect.Right + LOff;
-      if LFillShape then
-        aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
-      if LDrawShape then
-        aCanvas.DrawRectSides(_GetShapeRect, AXRadius, AYRadius, ACorners,  1{AbsoluteOpacity}, ASides, ACanvas.Stroke, TCornerType.Round{CornerType});
-    end
-    else
-    begin
-      if LFillShape then
-        aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
-      if LDrawShape then
-        aCanvas.DrawRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Stroke, TCornerType.Round{CornerType});
-    end;
-
-    if (AShadowColor <> TalphaColorRec.Null) then begin
-
-      var LShadowEffect := TshadowEffect.Create(nil);
-      try
-        LShadowEffect.ShadowColor := AShadowColor;
-        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
-                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                    // we use the opacity of the color instead
-        LShadowEffect.softness := AShadowBlur / 24; // Specifies the amount of blur applied to the shadow.
-                                                    // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                    // I calculate approximatly that 0.5 = around 12 for blur
-        Acanvas.Flush;
-        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
-      finally
-        ALFreeAndNil(LShadowEffect);
-      end;
-
-      if ASides <> AllSides then
-      begin
-        if LFillShape then
-          aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
-        if LDrawShape then
-          aCanvas.DrawRectSides(_GetShapeRect, AXRadius, AYRadius, ACorners,  1{AbsoluteOpacity}, ASides, ACanvas.Stroke, TCornerType.Round{CornerType});
-      end
-      else
-      begin
-        if LFillShape then
-          aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
-        if LDrawShape then
-          aCanvas.DrawRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Stroke, TCornerType.Round{CornerType});
-      end;
-
-    end;
+    if AFillColor <> TAlphaColorRec.Null then
+      aCanvas.FillRect(LRect, LScaledXRadius, LScaledYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Fill, TCornerType.Round{CornerType});
+    If LStrokeColor <> TalphaColorRec.Null then
+      aCanvas.DrawRect(LRect, LScaledXRadius, LScaledYRadius, ACorners, 1{AbsoluteOpacity}, ACanvas.Stroke, TCornerType.Round{CornerType});
 
   finally
     ACanvas.Fill.Kind := LFillKindRestoreValue;
@@ -8245,1447 +10932,117 @@ end;
 
 {************************}
 procedure ALDrawRectangle(
-            {$IF defined(ALSkiaCanvas)}
-            const ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
-            const AFill: TBrush;
-            const AStroke: TStrokeBrush;
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientAngle: Single;
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single;
+            const ASides: TSides;
+            const ACorners: TCorners;
+            const AXRadius: Single;
+            const AYRadius: Single);
+begin
+  var LFillGradientStartPoint: TPointF;
+  var LFillGradientEndPoint: TPointF;
+  case AFillGradientStyle of
+    TGradientStyle.Linear: begin
+      ALGetLinearGradientCoordinates(
+        ADstRect.Size, // const ASize: TSizeF;
+        AFillGradientAngle, // const AAngle: Single;
+        LFillGradientStartPoint, // out AStartPoint: TPointF;
+        LFillGradientEndPoint); // out AEndPoint: TPointF;
+    end;
+    TGradientStyle.Radial: begin
+      LFillGradientStartPoint := ADstRect.CenterPoint;
+      LFillGradientEndPoint := ADstRect.TopLeft;
+    end
+    else
+      Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
+  end;
+  ALDrawRectangle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    ADstRect, // const ADstRect: TrectF;
+    AFillColor, // const AFillColor: TAlphaColor;
+    AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+    LFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    LFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillResourceName, // const AFillResourceName: String;
+    AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStrokeColor, // const AStrokeColor: TalphaColor;
+    AStrokeThickness, // const AStrokeThickness: Single;
+    AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    AShadowBlur, // const AShadowBlur: Single;
+    AShadowOffsetX, // const AShadowOffsetX: Single;
+    AShadowOffsetY, // const AShadowOffsetY: Single;
+    ASides, // const ASides: TSides;
+    ACorners, // const ACorners: TCorners;
+    AXRadius, // const AXRadius: Single;
+    AYRadius); // const AYRadius: Single)
+end;
+
+{************************}
+procedure ALDrawRectangle(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
             const AShadow: TALShadow; // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the rectangle)
             const ASides: TSides;
             const ACorners: TCorners;
             const AXRadius: Single;
             const AYRadius: Single);
-
-  {$REGION '_drawRect (SKIA)'}
-  {$IF defined(ALSkiaCanvas)}
-  procedure _drawRect(
-              const aCanvas: sk_canvas_t;
-              const aPaint: sk_Paint_t;
-              const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean);
-
-  var
-    LCurPoint: TpointF;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _MoveTo(const APathBuilder: sk_pathbuilder_t; const x: Single; const y: Single);
-    begin
-      LCurPoint := TPointF.Create(x, y);
-      sk4d_pathbuilder_move_to(APathBuilder, @LCurPoint);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _RMoveTo(const APathBuilder: sk_pathbuilder_t; const dx: Single; const dy: Single);
-    begin
-      LCurPoint := LCurPoint + TPointF.Create(dx, dy);
-      sk4d_pathbuilder_move_to(APathBuilder, @LCurPoint);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _RLineTo(const APathBuilder: sk_pathbuilder_t; const dx: Single; const dy: Single);
-    begin
-      LCurPoint := LCurPoint + TPointF.Create(dx, dy);
-      sk4d_pathbuilder_line_to(APathBuilder, @LCurPoint);
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _RQuadTo(const APathBuilder: sk_pathbuilder_t; const dx1: Single; const dy1: Single; const dx2: Single; const dy2: Single);
-    begin
-      var LPoint1 := LCurPoint + TPointF.Create(dx1, dy1);
-      LCurPoint := LCurPoint + TPointF.Create(dx2, dy2);
-      sk4d_pathbuilder_quad_to(APathBuilder, @LPoint1, @LCurPoint);
-    end;
-
-  begin
-
-    // use drawRoundRect
-    if ((compareValue(AXRadius, 0, TEpsilon.position) > 0) and
-        (compareValue(AYRadius, 0, TEpsilon.position) > 0)) and
-       (ACorners<>[]) and
-       (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
-
-      var LRRect :=  ALSkCheckHandle(sk4d_rrect_create);
-      try
-        var LRadii: array[0..4] of TPointF;
-        if TCorner.TopLeft in ACorners then LRadii[0] := TPointF.Create(AXRadius, AYRadius)
-        else LRadii[0] := TPointF.Create(0, 0);
-
-        if TCorner.TopRight in ACorners then LRadii[1] := TPointF.Create(AXRadius, AYRadius)
-        else LRadii[1] := TPointF.Create(0, 0);
-
-        if TCorner.BottomRight in ACorners then LRadii[2] := TPointF.Create(AXRadius, AYRadius)
-        else LRadii[2] := TPointF.Create(0, 0);
-
-        if TCorner.BottomLeft in ACorners then LRadii[3] := TPointF.Create(AXRadius, AYRadius)
-        else LRadii[3] := TPointF.Create(0, 0);
-
-        sk4d_rrect_set_rect2(
-          LRRect, // self: sk_rrect_t;
-          @ARect, // const rect: psk_rect_t;
-          @LRadii); // const radii: psk_vector_t
-        sk4d_canvas_draw_rrect(ACanvas, LRRect, APaint);
-      finally
-        sk4d_rrect_destroy(LRRect);
-      end;
-
-    end
-
-    // use drawRect
-    else if ((compareValue(AXRadius, 0, TEpsilon.position) = 0) or
-             (compareValue(AYRadius, 0, TEpsilon.position) = 0) or
-             (ACorners=[])) and
-            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
-
-      sk4d_canvas_draw_Rect(ACanvas, @ARect, APaint);
-
-    end
-
-    // use drawPath
-    else begin
-
-      var LPathBuilder := ALSkCheckHandle(sk4d_pathbuilder_create);
-      try
-        var LXRadius: single := AXRadius;
-        var LYradius: single := AYRadius;
-        if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
-        if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
-        //----
-        var LCorners: TCorners;
-        if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
-           (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := ACorners
-        else LCorners := [];
-        //----
-        var LWidthMinusCorners: single := (aRect.width - (2 * LXRadius));
-        var LHeightMinusCorners: single := (aRect.height - (2 * LYradius));
-        //----
-        var LHalfStrokeWidth: Single;
-        if (AStroke.Kind <> TBrushKind.None) then LHalfStrokeWidth := (AStroke.Thickness) / 2
-        else LHalfStrokeWidth := 0;
-
-
-        //----- TopRight
-        if (TCorner.TopRight in LCorners) then begin
-          _MoveTo(LPathBuilder, aRect.right, aRect.top + LYradius);
-          _RQuadTo(LPathBuilder, 0, -LYradius, -LXRadius, -LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, -LHalfStrokeWidth);
-        end
-        else begin
-          if not aDrawOnlyBorder then _MoveTo(LPathBuilder, aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
-          else _MoveTo(LPathBuilder, aRect.right, aRect.top + LYradius);
-          //----
-          if (not aDrawOnlyBorder) or
-             (TSide.right in ASides) then begin
-             _RLineTo(LPathBuilder, 0, -LYradius -LHalfStrokeWidth);
-             if aDrawOnlyBorder then _RMoveTo(LPathBuilder, 0, LHalfStrokeWidth);
-          end
-          else _RMoveTo(LPathBuilder, 0, -LYradius); // aDrawOnlyBorder AND not TSide.right
-          //----
-          if (not aDrawOnlyBorder) or
-             (TSide.top in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, -LXRadius -LHalfStrokeWidth,0)
-            else begin
-              _RMoveTo(LPathBuilder, +LHalfStrokeWidth,0);
-              _RLineTo(LPathBuilder, -LXRadius -LHalfStrokeWidth,0);
-            end;
-          end
-          else _RMoveTo(LPathBuilder, -LXRadius,0); // aDrawOnlyBorder AND not TSide.top
-        end;
-        //-----
-        if (not aDrawOnlyBorder) or
-           (TSide.Top in ASides) then _RLineTo(LPathBuilder, -LWidthMinusCorners, 0)
-        else _RMoveTo(LPathBuilder, -LWidthMinusCorners, 0);
-
-        //----- TopLeft
-        if (TCorner.TopLeft in LCorners) then begin
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, +LHalfStrokeWidth);
-          _RQuadTo(LPathBuilder, -LXRadius, 0, -LXRadius, LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, -LHalfStrokeWidth, 0);
-        end
-        else begin
-          if (not aDrawOnlyBorder) or
-             (TSide.top in ASides) then begin
-            _RLineTo(LPathBuilder, -LXRadius -LHalfStrokeWidth, 0);
-            if aDrawOnlyBorder then _RMoveTo(LPathBuilder, LHalfStrokeWidth, 0);
-          end
-          else _RMoveTo(LPathBuilder, -LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
-          //----
-          if (not aDrawOnlyBorder) or
-             (TSide.left in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0,LYradius +LHalfStrokeWidth)
-            else begin
-              _RMoveTo(LPathBuilder, 0,-LHalfStrokeWidth);
-              _RLineTo(LPathBuilder, 0,+LYradius +LHalfStrokeWidth);
-            end;
-          end
-          else _RMoveTo(LPathBuilder, 0,LYradius); // aDrawOnlyBorder AND not TSide.left
-        end;
-        //-----
-        if (not aDrawOnlyBorder) or
-           (TSide.left in ASides) then _RLineTo(LPathBuilder, 0, LHeightMinusCorners)
-        else _RMoveTo(LPathBuilder, 0, LHeightMinusCorners);
-
-        //----- BottomLeft
-        if (TCorner.BottomLeft in LCorners) then begin
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, LHalfStrokeWidth, 0);
-          _RQuadTo(LPathBuilder, 0, LYradius, LXRadius, LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, LHalfStrokeWidth);
-        end
-        else begin
-          if (not aDrawOnlyBorder) or
-             (TSide.left in ASides) then begin
-            _RLineTo(LPathBuilder, 0, LYradius +LHalfStrokeWidth);
-            if aDrawOnlyBorder then _RMoveTo(LPathBuilder, 0, -LHalfStrokeWidth);
-          end
-          else _RMoveTo(LPathBuilder, 0, LYradius); // aDrawOnlyBorder AND not TSide.left
-          //----
-          if (not aDrawOnlyBorder) or
-             (TSide.bottom in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, LXRadius +LHalfStrokeWidth,0)
-            else begin
-              _RMoveTo(LPathBuilder, -LHalfStrokeWidth,0);
-              _RLineTo(LPathBuilder, +LXRadius +LHalfStrokeWidth,0);
-            end;
-          end
-          else _RMoveTo(LPathBuilder, LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
-        end;
-        //-----
-        if (not aDrawOnlyBorder) or
-           (TSide.bottom in ASides) then _RLineTo(LPathBuilder, LWidthMinusCorners, 0)
-        else _RMoveTo(LPathBuilder, LWidthMinusCorners, 0);
-
-        //----- BottomRight
-        if (TCorner.BottomRight in LCorners) then begin
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, -LHalfStrokeWidth);
-          _RQuadTo(LPathBuilder, LXRadius, 0, LXRadius, -LYradius);
-          if not aDrawOnlyBorder then _RLineTo(LPathBuilder, LHalfStrokeWidth, 0);
-        end
-        else begin
-          if (not aDrawOnlyBorder) or
-             (TSide.bottom in ASides) then begin
-            _RLineTo(LPathBuilder, LXRadius +LHalfStrokeWidth,0);
-            if aDrawOnlyBorder then _RMoveTo(LPathBuilder, -LHalfStrokeWidth, 0);
-          end
-          else _RMoveTo(LPathBuilder, LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
-          //----
-          if (not aDrawOnlyBorder) or
-             (TSide.right in ASides) then begin
-            if not aDrawOnlyBorder then _RLineTo(LPathBuilder, 0, -LYradius -LHalfStrokeWidth)
-            else begin
-              _RMoveTo(LPathBuilder, 0,+LHalfStrokeWidth);
-              _RLineTo(LPathBuilder, 0,-LYradius -LHalfStrokeWidth);
-            end;
-          end
-          else _RMoveTo(LPathBuilder, 0, -LYradius); // aDrawOnlyBorder AND not TSide.right
-        end;
-        //-----
-        if (not aDrawOnlyBorder) or
-           (TSide.right in ASides) then _RLineTo(LPathBuilder, 0, -LHeightMinusCorners)
-        else _RMoveTo(LPathBuilder, 0, -LHeightMinusCorners);
-
-
-        //draw the path
-        var LPath := sk4d_pathbuilder_detach(LPathBuilder);
-        try
-          sk4d_canvas_draw_Path(ACanvas, LPath, APaint);
-        finally
-          sk4d_path_destroy(LPath);
-        end;
-
-      finally
-        sk4d_pathbuilder_destroy(LPathBuilder);
-      end;
-
-    end;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_drawRect (ANDROID)'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
-  procedure _drawRect(
-              const aCanvas: Jcanvas;
-              const aPaint: JPaint;
-              const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean);
-  begin
-
-    // use drawRoundRect
-    if ((compareValue(AXRadius, 0, TEpsilon.position) > 0) and
-        (compareValue(AYRadius, 0, TEpsilon.position) > 0)) and
-       (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-       (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
-
-      var LJRect := TJRectf.JavaClass.init(aRect.left, aRect.top, aRect.right, aRect.bottom);
-      aCanvas.drawRoundRect(
-        LJRect{rect},
-        AXRadius {rx},
-        AYRadius {ry},
-        apaint);
-      LJRect := nil;
-
-    end
-
-    // use drawRect
-    else if ((compareValue(AXRadius, 0, TEpsilon.position) = 0) or
-             (compareValue(AYRadius, 0, TEpsilon.position) = 0) or
-             (ACorners=[])) and
-            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
-
-      aCanvas.drawRect(
-        aRect.left{left},
-        aRect.top{top},
-        aRect.right{right},
-        aRect.bottom{bottom},
-        apaint);
-
-    end
-
-    // use drawPath
-    else begin
-
-      var LPath := TJPath.Create;
-      //----
-      var LXRadius: Single := AXRadius;
-      var LYradius: single := AYRadius;
-      if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
-      if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
-      //----
-      var LCorners: TCorners;
-      if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
-         (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := ACorners
-      else LCorners := [];
-      //----
-      var LWidthMinusCorners: Single := (aRect.width - (2 * LXRadius));
-      var LHeightMinusCorners: Single := (aRect.height - (2 * LYradius));
-      //----
-      var LHalfStrokeWidth: Single;
-      if (AStroke.Kind <> TBrushKind.None) then LHalfStrokeWidth := (AStroke.Thickness) / 2
-      else LHalfStrokeWidth := 0;
-
-
-      //----- TopRight
-      if (TCorner.TopRight in LCorners) then begin
-        LPath.moveTo(aRect.right, aRect.top + LYradius);
-        LPath.rQuadTo(0, -LYradius, -LXRadius, -LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(0, -LHalfStrokeWidth);
-      end
-      else begin
-        if not aDrawOnlyBorder then LPath.moveTo(aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
-        else LPath.moveTo(aRect.right, aRect.top + LYradius);
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.right in ASides) then begin
-           LPath.rLineTo(0, -LYradius -LHalfStrokeWidth);
-           if aDrawOnlyBorder then LPath.rMoveTo(0, LHalfStrokeWidth);
-        end
-        else LPath.rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.top in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(-LXRadius -LHalfStrokeWidth,0)
-          else begin
-            LPath.rMoveTo(+LHalfStrokeWidth,0);
-            LPath.rLineTo(-LXRadius -LHalfStrokeWidth,0);
-          end;
-        end
-        else LPath.rMoveTo(-LXRadius,0); // aDrawOnlyBorder AND not TSide.top
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.Top in ASides) then LPath.rLineTo(-LWidthMinusCorners, 0)
-      else LPath.rMoveTo(-LWidthMinusCorners, 0);
-
-      //----- TopLeft
-      if (TCorner.TopLeft in LCorners) then begin
-        if not aDrawOnlyBorder then LPath.rlineTo(0, +LHalfStrokeWidth);
-        LPath.rQuadTo(-LXRadius, 0, -LXRadius, LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(-LHalfStrokeWidth, 0);
-      end
-      else begin
-        if (not aDrawOnlyBorder) or
-           (TSide.top in ASides) then begin
-          LPath.rLineTo(-LXRadius -LHalfStrokeWidth, 0);
-          if aDrawOnlyBorder then LPath.rMoveTo(LHalfStrokeWidth, 0);
-        end
-        else LPath.rMoveTo(-LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.left in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(0,LYradius +LHalfStrokeWidth)
-          else begin
-            LPath.rMoveTo(0,-LHalfStrokeWidth);
-            LPath.rLineTo(0,+LYradius +LHalfStrokeWidth);
-          end;
-        end
-        else LPath.rMoveTo(0,LYradius); // aDrawOnlyBorder AND not TSide.left
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.left in ASides) then LPath.rLineTo(0, LHeightMinusCorners)
-      else LPath.rMoveTo(0, LHeightMinusCorners);
-
-      //----- BottomLeft
-      if (TCorner.BottomLeft in LCorners) then begin
-        if not aDrawOnlyBorder then LPath.rlineTo(LHalfStrokeWidth, 0);
-        LPath.rQuadTo(0, LYradius, LXRadius, LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(0, LHalfStrokeWidth);
-      end
-      else begin
-        if (not aDrawOnlyBorder) or
-           (TSide.left in ASides) then begin
-          LPath.rLineTo(0, LYradius +LHalfStrokeWidth);
-          if aDrawOnlyBorder then LPath.rMoveTo(0, -LHalfStrokeWidth);
-        end
-        else LPath.rMoveTo(0, LYradius); // aDrawOnlyBorder AND not TSide.left
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.bottom in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(LXRadius +LHalfStrokeWidth,0)
-          else begin
-            LPath.rMoveTo(-LHalfStrokeWidth,0);
-            LPath.rLineTo(+LXRadius +LHalfStrokeWidth,0);
-          end;
-        end
-        else LPath.rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.bottom in ASides) then LPath.rLineTo(LWidthMinusCorners, 0)
-      else LPath.rMoveTo(LWidthMinusCorners, 0);
-
-      //----- BottomRight
-      if (TCorner.BottomRight in LCorners) then begin
-        if not aDrawOnlyBorder then LPath.rlineTo(0, -LHalfStrokeWidth);
-        LPath.rQuadTo(LXRadius, 0, LXRadius, -LYradius);
-        if not aDrawOnlyBorder then LPath.rlineTo(LHalfStrokeWidth, 0);
-      end
-      else begin
-        if (not aDrawOnlyBorder) or
-           (TSide.bottom in ASides) then begin
-          LPath.rLineTo(LXRadius +LHalfStrokeWidth,0);
-          if aDrawOnlyBorder then LPath.rMoveTo(-LHalfStrokeWidth, 0);
-        end
-        else LPath.rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.right in ASides) then begin
-          if not aDrawOnlyBorder then LPath.rLineTo(0, -LYradius -LHalfStrokeWidth)
-          else begin
-            LPath.rMoveTo(0,+LHalfStrokeWidth);
-            LPath.rLineTo(0,-LYradius -LHalfStrokeWidth);
-          end;
-        end
-        else LPath.rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.right in ASides) then LPath.rLineTo(0, -LHeightMinusCorners)
-      else LPath.rMoveTo(0, -LHeightMinusCorners);
-
-
-      aCanvas.drawPath(LPath,aPaint);
-      LPath := nil;
-
-    end;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_DrawRect (IOS)'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
-  procedure _DrawRect(
-              const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean);
-
-  var
-    LCurPoint: TpointF;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _moveTo(const x: Single; const y: Single);
-    begin
-      CGContextMoveToPoint(aContext, X, aGridHeight - Y);
-      LCurPoint.X := x;
-      LCurPoint.Y := Y;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _rQuadTo(const dx1: Single; const dy1: Single; const dx2: Single; const dy2: Single);
-    begin
-      CGContextAddQuadCurveToPoint(
-        aContext,
-        LCurPoint.X + dx1{cpx},
-        aGridHeight - (LCurPoint.Y + dy1){cpy},
-        LCurPoint.X + dx2{x},
-        aGridHeight - (LCurPoint.Y + dy2){y});
-      LCurPoint.X := LCurPoint.X + dx2;
-      LCurPoint.Y := LCurPoint.Y + dy2;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _rLineTo(const dx: Single; const dy: Single);
-    begin
-      CGContextAddLineToPoint(aContext, LCurPoint.X + dx{x}, aGridHeight - (LCurPoint.Y + dy{y}));
-      LCurPoint.X := LCurPoint.X + dx;
-      LCurPoint.Y := LCurPoint.Y + dy;
-    end;
-
-    {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-    procedure _rMoveTo(const dx: Single; const dy: Single);
-    begin
-      CGContextMoveToPoint(aContext, LCurPoint.X + dx{x}, aGridHeight - (LCurPoint.Y + dy{y}));
-      LCurPoint.X := LCurPoint.X + dx;
-      LCurPoint.Y := LCurPoint.Y + dy;
-    end;
-
-  begin
-
-    // Creates a new empty path in a graphics context.
-    CGContextBeginPath(aContext);
-
-    // use drawRect
-    if ((compareValue(AXRadius, 0, TEpsilon.position) = 0) or
-        (compareValue(AYRadius, 0, TEpsilon.position) = 0) or
-        (ACorners=[])) and
-       (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
-     //-----
-     CGContextAddRect(
-       aContext,
-       ALLowerLeftCGRect(
-         aRect.TopLeft,
-         aRect.Width,
-         aRect.Height,
-         aGridHeight));
-     //-----
-    end
-
-    // use drawPath
-    else begin
-
-      var LXRadius: single := AXRadius;
-      var LYradius: single := AYRadius;
-      if (LXRadius > aRect.width / 2) then LXRadius := aRect.width / 2;
-      if (LYradius > aRect.height / 2) then LYradius := aRect.height / 2;
-      //----
-      var LCorners: TCorners;
-      if (compareValue(LXRadius, 0, TEpsilon.position) > 0) and
-         (compareValue(LYradius, 0, TEpsilon.position) > 0) then LCorners := ACorners
-      else LCorners := [];
-      //----
-      var LWidthMinusCorners: single := (aRect.width - (2 * LXRadius));
-      var LHeightMinusCorners: single := (aRect.height - (2 * LYradius));
-      //----
-      var LHalfStrokeWidth: Single;
-      if (AStroke.Kind <> TBrushKind.None) then LHalfStrokeWidth := (AStroke.Thickness) / 2
-      else LHalfStrokeWidth := 0;
-
-
-      //----- TopRight
-      if (TCorner.TopRight in LCorners) then begin
-        _moveTo(aRect.right, aRect.top + LYradius);
-        _rQuadTo(0, -LYradius, -LXRadius, -LYradius);
-        if not aDrawOnlyBorder then _rlineTo(0, -LHalfStrokeWidth);
-      end
-      else begin
-        if not aDrawOnlyBorder then _moveTo(aRect.right + LHalfStrokeWidth, aRect.top + LYradius)
-        else _moveTo(aRect.right, aRect.top + LYradius);
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.right in ASides) then begin
-           _rLineTo(0, -LYradius -LHalfStrokeWidth);
-           if aDrawOnlyBorder then _rMoveTo(0, LHalfStrokeWidth);
-        end
-        else _rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.top in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(-LXRadius -LHalfStrokeWidth,0)
-          else begin
-            _rMoveTo(+LHalfStrokeWidth,0);
-            _rLineTo(-LXRadius -LHalfStrokeWidth,0);
-          end;
-        end
-        else _rMoveTo(-LXRadius,0); // aDrawOnlyBorder AND not TSide.top
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.Top in ASides) then _rLineTo(-LWidthMinusCorners, 0)
-      else _rMoveTo(-LWidthMinusCorners, 0);
-
-      //----- TopLeft
-      if (TCorner.TopLeft in LCorners) then begin
-        if not aDrawOnlyBorder then _rlineTo(0, +LHalfStrokeWidth);
-        _rQuadTo(-LXRadius, 0, -LXRadius, LYradius);
-        if not aDrawOnlyBorder then _rlineTo(-LHalfStrokeWidth, 0);
-      end
-      else begin
-        if (not aDrawOnlyBorder) or
-           (TSide.top in ASides) then begin
-          _rLineTo(-LXRadius -LHalfStrokeWidth, 0);
-          if aDrawOnlyBorder then _rMoveTo(LHalfStrokeWidth, 0);
-        end
-        else _rMoveTo(-LXRadius, 0); // aDrawOnlyBorder AND not TSide.top
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.left in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(0,LYradius +LHalfStrokeWidth)
-          else begin
-            _rMoveTo(0,-LHalfStrokeWidth);
-            _rLineTo(0,+LYradius +LHalfStrokeWidth);
-          end;
-        end
-        else _rMoveTo(0,LYradius); // aDrawOnlyBorder AND not TSide.left
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.left in ASides) then _rLineTo(0, LHeightMinusCorners)
-      else _rMoveTo(0, LHeightMinusCorners);
-
-      //----- BottomLeft
-      if (TCorner.BottomLeft in LCorners) then begin
-        if not aDrawOnlyBorder then _rlineTo(LHalfStrokeWidth, 0);
-        _rQuadTo(0, LYradius, LXRadius, LYradius);
-        if not aDrawOnlyBorder then _rlineTo(0, LHalfStrokeWidth);
-      end
-      else begin
-        if (not aDrawOnlyBorder) or
-           (TSide.left in ASides) then begin
-          _rLineTo(0, LYradius +LHalfStrokeWidth);
-          if aDrawOnlyBorder then _rMoveTo(0, -LHalfStrokeWidth);
-        end
-        else _rMoveTo(0, LYradius); // aDrawOnlyBorder AND not TSide.left
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.bottom in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(LXRadius +LHalfStrokeWidth,0)
-          else begin
-            _rMoveTo(-LHalfStrokeWidth,0);
-            _rLineTo(+LXRadius +LHalfStrokeWidth,0);
-          end;
-        end
-        else _rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.bottom in ASides) then _rLineTo(LWidthMinusCorners, 0)
-      else _rMoveTo(LWidthMinusCorners, 0);
-
-      //----- BottomRight
-      if (TCorner.BottomRight in LCorners) then begin
-        if not aDrawOnlyBorder then _rlineTo(0, -LHalfStrokeWidth);
-        _rQuadTo(LXRadius, 0, LXRadius, -LYradius);
-        if not aDrawOnlyBorder then _rlineTo(LHalfStrokeWidth, 0);
-      end
-      else begin
-        if (not aDrawOnlyBorder) or
-           (TSide.bottom in ASides) then begin
-          _rLineTo(LXRadius +LHalfStrokeWidth,0);
-          if aDrawOnlyBorder then _rMoveTo(-LHalfStrokeWidth, 0);
-        end
-        else _rMoveTo(LXRadius,0); // aDrawOnlyBorder AND not TSide.bottom
-        //----
-        if (not aDrawOnlyBorder) or
-           (TSide.right in ASides) then begin
-          if not aDrawOnlyBorder then _rLineTo(0, -LYradius -LHalfStrokeWidth)
-          else begin
-            _rMoveTo(0,+LHalfStrokeWidth);
-            _rLineTo(0,-LYradius -LHalfStrokeWidth);
-          end;
-        end
-        else _rMoveTo(0, -LYradius); // aDrawOnlyBorder AND not TSide.right
-      end;
-      //-----
-      if (not aDrawOnlyBorder) or
-         (TSide.right in ASides) then _rLineTo(0, -LHeightMinusCorners)
-      else _rMoveTo(0, -LHeightMinusCorners);
-
-    end;
-
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_GetShapeRect (MSWINDOWS / MACOS)'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
-  function _GetShapeRect: TRectF;
-  begin
-    Result := ADstRect;
-    if AStroke.Kind <> TBrushKind.None then
-      InflateRect(Result, -(AStroke.Thickness / 2), -(AStroke.Thickness / 2));
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-{$IF defined(IOS)}
-const DefaultInputRange: array[0..1] of CGFloat = (0, 1);
-{$ENDIF}
-
 begin
-
-  {$REGION 'SKIA'}
-  {$IF defined(ALSkiaCanvas)}
-
-  // Create LPaint
-  var LPaint := ALSkCheckHandle(sk4d_paint_create);
-  try
-
-    // Requests, but does not require, that edge pixels draw opaque or with partial transparency.
-    sk4d_paint_set_antialias(LPaint, true);
-    // Sets whether the geometry is filled, stroked, or filled and stroked.
-    sk4d_paint_set_dither(LPaint, true);
-
-    // Init LRect
-    var LRect: TRectf;
-    if AStroke.Kind <> TBrushKind.None then begin
-      LRect := TrectF.Create(
-                 ADstRect.Left + (AStroke.Thickness / 2),
-                 ADstRect.Top + (AStroke.Thickness / 2),
-                 ADstRect.right - (AStroke.Thickness / 2),
-                 ADstRect.bottom - (AStroke.Thickness / 2));
-    end
-    else LRect := ADstRect;
-
-    // Fill the circle
-    if AFill.Kind <> TBrushKind.None then begin
-
-      // FILL_SK_PAINTSTYLE
-      sk4d_paint_set_style(LPaint, sk_paintstyle_t.FILL_SK_PAINTSTYLE);
-
-      //In skia we can use this to convert from the (legacy) idea of specify
-      //the blur "radius" to the standard notion of specifying its sigma.
-      //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
-      //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
-      //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
-      //  }
-      //But it's not very good, I think that a better value is just Shadow.blur / 2
-      if (AShadow <> nil) and
-         (AShadow.enabled) then begin
-        var Limagefilter := ALSkCheckHandle(
-                              sk4d_imagefilter_make_drop_shadow(
-                                AShadow.OffsetX, // dx,
-                                AShadow.OffsetY, // dy,
-                                AShadow.blur / 2, // sigma_x,
-                                AShadow.blur / 2, // sigma_y: float;
-                                AShadow.Color, // color: sk_color_t;
-                                0, // input: sk_imagefilter_t;
-                                nil)); // const crop_rect: psk_rect_t)
-        try
-          // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
-          sk4d_paint_set_image_filter(LPaint, Limagefilter);
-        finally
-          sk4d_refcnt_unref(Limagefilter);
-        end;
-      end;
-
-      // Fill with gradient
-      if AFill.Kind = TBrushKind.Gradient then begin
-        var LColors: TArray<TAlphaColor>;
-        var LPositions: TArray<Single>;
-        SetLength(LColors, AFill.Gradient.Points.Count);
-        SetLength(LPositions, AFill.Gradient.Points.Count);
-        if Length(LColors) < 1 then raise Exception.Create('Invalid gradient');
-        if Length(LPositions) <> Length(LColors) then raise Exception.Create('Invalid gradient');
-        case AFill.Gradient.Style of
-          TGradientStyle.Linear:
-            begin
-              for var I := 0 to AFill.Gradient.Points.Count - 1 do begin
-                LColors[I]    := AFill.Gradient.Points[I].Color;
-                LPositions[I] := AFill.Gradient.Points[I].Offset;
-              end;
-              var LPoints: array[0..1] of sk_point_t;
-              LPoints[0].x := LRect.Left + AFill.Gradient.StartPosition.X * LRect.Width;
-              LPoints[0].y := LRect.Top + AFill.Gradient.StartPosition.Y * LRect.Height;
-              LPoints[1].x := LRect.Left + AFill.Gradient.StopPosition.X * LRect.Width;
-              LPoints[1].y := LRect.Top + AFill.Gradient.StopPosition.Y * LRect.Height;
-              var LShader := ALSkCheckHandle(
-                               sk4d_shader_make_gradient_linear(
-                                 @LPoints[0], // const points: psk_point_t;
-                                 @LColors[0], // const colors: psk_color_t;
-                                 @LPositions[0], // const positions: pfloat;
-                                 Length(LColors), // count: int32_t;
-                                 sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                 nil)); // const local_matrix: psk_matrix_t
-              try
-                // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                sk4d_paint_set_shader(LPaint, LShader);
-              finally
-                sk4d_refcnt_unref(LShader);
-              end;
-              _drawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
-              sk4d_paint_set_shader(LPaint, 0);
-            end;
-          TGradientStyle.Radial:
-            begin
-              for var I := 0 to AFill.Gradient.Points.Count - 1 do begin
-                LColors[AFill.Gradient.Points.Count - 1 - I]    := AFill.Gradient.Points[I].Color;
-                LPositions[AFill.Gradient.Points.Count - 1 - I] := 1 - AFill.Gradient.Points[I].Offset;
-              end;
-              var LCenter  := TPointF.Create(LRect.Width * AFill.Gradient.RadialTransform.RotationCenter.X, LRect.Height * AFill.Gradient.RadialTransform.RotationCenter.Y) + LRect.TopLeft;
-              var LRadiusX: Single := AFill.Gradient.RadialTransform.Scale.X * (LRect.Width  / 2);
-              var LRadiusY: Single := AFill.Gradient.RadialTransform.Scale.Y * (LRect.Height / 2);
-              if not SameValue(LRadiusX, LRadiusY, Epsilon) then
-              begin
-                var LRadius: Single;
-                var LMatrix: TMatrix;
-                if LRadiusX < LRadiusY then begin
-                  LRadius := LRadiusY;
-                  LMatrix := TMatrix.CreateScaling(LRadiusX / LRadiusY, 1) * TMatrix.CreateTranslation(LCenter.X - (LCenter.X * (LRadiusX / LRadiusY)), 0);
-                end
-                else begin
-                  LRadius := LRadiusX;
-                  LMatrix := TMatrix.CreateScaling(1, LRadiusY / LRadiusX) * TMatrix.CreateTranslation(0, LCenter.Y - (LCenter.Y * (LRadiusY / LRadiusX)));
-                end;
-                var LShader := ALSkCheckHandle(
-                                 sk4d_shader_make_gradient_radial(
-                                   @LCenter, // const center: psk_point_t;
-                                   LRadius, // radius: float;
-                                   @LColors[0], // const colors: psk_color_t;
-                                   @LPositions[0], // const positions: pfloat;
-                                   Length(LColors), // count: int32_t;
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                   @LMatrix));// const local_matrix: psk_matrix_t
-                try
-                  // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                  sk4d_paint_set_shader(LPaint, LShader);
-                finally
-                  sk4d_refcnt_unref(LShader);
-                end;
-              end
-              else begin
-                var LShader := ALSkCheckHandle(
-                                 sk4d_shader_make_gradient_radial(
-                                   @LCenter, // const center: psk_point_t;
-                                   LRadiusX, // radius: float;
-                                   @LColors[0], // const colors: psk_color_t;
-                                   @LPositions[0], // const positions: pfloat;
-                                   Length(LColors), // count: int32_t;
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                   nil));// const local_matrix: psk_matrix_t
-                try
-                  // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                  sk4d_paint_set_shader(LPaint, LShader);
-                finally
-                  sk4d_refcnt_unref(LShader);
-                end;
-              end;
-              _drawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
-              sk4d_paint_set_shader(LPaint, 0);
-            end;
-          else
-            raise Exception.Create('Error EAB4DED3-CF02-495B-9CB8-8F82479D2839');
-        end;
-      end
-
-      // Fill with bitmap
-      else if AFill.Kind = TBrushKind.Bitmap then begin
-        if AFill.Bitmap.Bitmap.HandleAllocated then begin
-          var LBitmapData: TBitmapData;
-          var LBitmapMapped := AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData);
-          if LBitmapMapped then begin
-            try
-
-              var LImage: sk_image_t;
-              var LImageInfo := ALGetSkImageinfo(LBitmapData.Width, LBitmapData.Height, sk_colortype_t(SkFmxColorType[LBitmapData.PixelFormat]));
-              var LPixmap := ALSkCheckHandle(
-                               sk4d_pixmap_create(
-                                 @LImageInfo, // const image_info: psk_imageinfo_t;
-                                 LBitmapData.Data, // const pixels: Pointer;
-                                 LBitmapData.Pitch)); // row_bytes: size_t
-              try
-                LImage := ALSkCheckHandle(
-                            sk4d_image_make_from_raster(
-                              LPixmap, // const pixmap: sk_pixmap_t;
-                              nil, // proc: sk_image_raster_release_proc;
-                              nil));// proc_context: Pointer
-                try
-
-                  var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
-
-                  var Lshader: sk_shader_t;
-                  if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
-                    var LMatrix := TMatrix.CreateScaling(LRect.Width / sk4d_image_get_width(LImage), LRect.Height / sk4d_image_get_height(LImage)) * TMatrix.CreateTranslation(LRect.Left, LRect.Top);
-                    Lshader := ALSkCheckHandle(
-                                 sk4d_image_make_shader(
-                                   LImage, // const self: sk_image_t;
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode_x,
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE,// tile_mode_y: sk_tilemode_t;
-                                   @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                                   @LMatrix)); // const local_matrix: psk_matrix_t)
-                    try
-                      // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                      sk4d_paint_set_shader(LPaint, LShader);
-                    finally
-                      sk4d_refcnt_unref(LShader);
-                    end;
-                  end
-                  else begin
-                    var LTileMode: sk_tilemode_t;
-                    if AFill.Bitmap.WrapMode=TWrapMode.Tile then LTileMode := sk_tilemode_t.REPEAT_SK_TILEMODE
-                    else if AFill.Bitmap.WrapMode=TWrapMode.TileOriginal then LTileMode := sk_tilemode_t.CLAMP_SK_TILEMODE
-                    else raise Exception.Create('Error 9BC21F4C-82D4-4206-97BD-FB5F27BF262A');
-                    Lshader := ALSkCheckHandle(
-                                 sk4d_image_make_shader(
-                                   LImage, // const self: sk_image_t;
-                                   LTileMode, // tile_mode_x,
-                                   LTileMode, // tile_mode_y: sk_tilemode_t;
-                                   @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                                   nil)); // const local_matrix: psk_matrix_t)
-                    try
-                      // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                      sk4d_paint_set_shader(LPaint, LShader);
-                    finally
-                      sk4d_refcnt_unref(LShader);
-                    end;
-                  end;
-
-                  _drawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
-                  sk4d_paint_set_shader(LPaint, 0);
-
-                finally
-                  sk4d_refcnt_unref(LImage);
-                end;
-              finally
-                sk4d_refcnt_unref(LPixmap);
-              end;
-
-            finally
-              AFill.Bitmap.Bitmap.Unmap(LBitmapData);
-            end
-          end;
-        end;
-      end
-
-      // Fill with solid color
-      else if AFill.Kind = TBrushKind.Solid then begin
-        sk4d_paint_set_color(LPaint, AFill.Color);
-        _drawRect(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
-      end;
-
-      //remove the shadow filter
-      sk4d_paint_set_image_filter(LPaint, 0);
-
-    end;
-
-    // Stroke the circle
-    if AStroke.Kind <> TBrushKind.None then begin
-
-      // Init LPaint
-      sk4d_paint_set_style(LPaint, sk_paintstyle_t.STROKE_SK_PAINTSTYLE);
-      sk4d_paint_set_stroke_width(LPaint, AStroke.Thickness);
-
-      // Stroke with solid color
-      if AStroke.Kind = TBrushKind.Solid then begin
-        sk4d_paint_set_color(LPaint, AStroke.Color);
-        _drawRect(ACanvas, LPaint, LRect, true{aDrawOnlyBorder});
-      end;
-
-    end;
-
-  finally
-    sk4d_paint_destroy(LPaint);
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
-
-  //create the canvas and the paint
-  var LPaint := TJPaint.JavaClass.init;
-  LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
-  LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
-  LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
-
-  //init LRect
-  var LRect: TrectF;
-  if AStroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStroke.Thickness / 2),
-               ADstRect.Top + (AStroke.Thickness / 2),
-               ADstRect.right - (AStroke.Thickness / 2),
-               ADstRect.bottom - (AStroke.Thickness / 2));
-  end
-  else LRect := ADstRect;
-
-  //fill the rectangle
-  if AFill.Kind <> TBrushKind.None then begin
-
-    //init LPaint
-    LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LRect + Stroke.Thickness :( this result&ing in border if the fill is for exemple black and border white
-
-    //fill with gradient
-    if AFill.Kind = TBrushKind.Gradient then begin
-      if AFill.Gradient.Style = TGradientStyle.Radial then begin
-        var LColors := TJavaArray<Integer>.Create(AFill.Gradient.Points.Count);
-        var LStops := TJavaArray<Single>.Create(AFill.Gradient.Points.Count);
-        for var i := 0 to AFill.Gradient.Points.Count - 1 do begin
-          LColors[AFill.Gradient.Points.Count - 1 - i] := integer(AFill.Gradient.Points[i].Color);
-          LStops[AFill.Gradient.Points.Count - 1 - i] := 1 - AFill.Gradient.Points[i].Offset;
-        end;
-        var LRadialShader := TJRadialGradient.JavaClass.init(
-                               LRect.CenterPoint.x{x},
-                               LRect.CenterPoint.y{y},
-                               LRect.width / 2{radius},
-                               LColors,
-                               LStops,
-                               TJShader_TileMode.JavaClass.CLAMP{tile});
-        LPaint.setShader(LRadialShader);
-        if (AShadow <> nil) and
-           (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-        _drawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder});
-        if (AShadow <> nil) and
-           (AShadow.enabled) then LPaint.clearShadowLayer;
-        LPaint.setShader(nil);
-        LRadialShader := nil;
-        ALfreeandNil(LColors);
-        ALfreeandNil(LStops);
-      end
-      else if AFill.Gradient.Style = TGradientStyle.Linear then begin
-        var LColors := TJavaArray<Integer>.Create(AFill.Gradient.Points.Count);
-        var LStops := TJavaArray<Single>.Create(AFill.Gradient.Points.Count);
-        for var i := 0 to AFill.Gradient.Points.Count - 1 do begin
-          LColors[i] := integer(AFill.Gradient.Points[i].Color);
-          LStops[i] := AFill.Gradient.Points[i].Offset;
-        end;
-        var LLinearShader := TJLinearGradient.JavaClass.init(
-                               LRect.TopLeft.x + (AFill.Gradient.StartPosition.X * LRect.Width){x0},
-                               LRect.TopLeft.y + (AFill.Gradient.StartPosition.Y * LRect.Height){y0},
-                               LRect.BottomRight.x + (AFill.Gradient.StopPosition.X * LRect.Width){x1},
-                               LRect.BottomRight.y + (AFill.Gradient.StopPosition.Y * LRect.Height){y1},
-                               LColors,
-                               LStops,
-                               TJShader_TileMode.JavaClass.CLAMP{tile});
-        LPaint.setShader(LLinearShader);
-        if (AShadow <> nil) and
-           (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-        _drawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder});
-        if (AShadow <> nil) and
-           (AShadow.enabled) then LPaint.clearShadowLayer;
-        LPaint.setShader(nil);
-        LLinearShader := nil;
-        ALfreeandNil(LColors);
-        ALfreeandNil(LStops);
-      end;
-    end
-
-    //fill with bitmap
-    else if AFill.Kind = TBrushKind.Bitmap then begin
-      if not AFill.Bitmap.Bitmap.IsEmpty then begin
-        if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
-          //-----
-          var LTmpBitmap := TJBitmap.JavaClass.createBitmap(AFill.Bitmap.Bitmap.Width, AFill.Bitmap.Bitmap.height, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
-          //-----
-          var LPixelBuffer: Pointer;
-          var LBitmapInfo: AndroidBitmapInfo;
-          FillChar(LBitmapInfo, SizeOf(LBitmapInfo), 0);
-          if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LBitmapInfo) = 0) and
-             (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LPixelBuffer) = 0) then
-          try
-            var LBitmapData: TBitmapData;
-            if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
-            try
-              ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
-            finally
-              AFill.Bitmap.Bitmap.Unmap(LBitmapData);
-            end;
-          finally
-            AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID);
-          end;
-          //-----
-          if (AShadow <> nil) and
-             (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-          _drawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder});
-          if (AShadow <> nil) and
-             (AShadow.enabled) then LPaint.clearShadowLayer;
-          var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
-          var LJDestRectf := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
-          var LJSrcRect := TJRect.JavaClass.init(0, 0, AFill.Bitmap.Bitmap.Width, AFill.Bitmap.Bitmap.height);
-          LPaint.setXfermode(LPorterDuffXfermode);
-          aCanvas.drawBitmap(LTmpBitmap, LJSrcRect, LJDestRectf, LPaint);
-          LPaint.setXfermode(nil);
-          LPorterDuffXfermode := nil;
-          LJSrcRect := nil;
-          LJDestRectf := nil;
-          //-----
-          LTmpBitmap.recycle;
-          LTmpBitmap := nil;
-          //-----
-        end;
-      end;
-    end
-
-    //fill with solid color
-    else if AFill.Kind = TBrushKind.Solid then begin
-      LPaint.setColor(integer(AFill.Color));
-      if (AShadow <> nil) and
-         (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-      _drawRect(aCanvas, LPaint, LRect, false{aDrawOnlyBorder});
-      if (AShadow <> nil) and
-         (AShadow.enabled) then LPaint.clearShadowLayer;
-    end;
-
-  end;
-
-  //stroke the rectangle
-  if AStroke.Kind <> TBrushKind.None then begin
-
-    //init LPaint
-    LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-    LPaint.setStrokeWidth(AStroke.Thickness);
-
-    //stroke with solid color
-    if AStroke.Kind = TBrushKind.Solid then begin
-      LPaint.setColor(integer(AStroke.Color));
-      _drawRect(aCanvas, LPaint, LRect, true{aDrawOnlyBorder});
-    end;
-
-  end;
-
-  //free the paint and the canvas
-  LPaint := nil;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'IOS'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
-
-  //set the paint default properties
-  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
-  //-----
-  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
-
-  //init LRect
-  var LRect: TrectF;
-  if AStroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStroke.Thickness / 2),
-               ADstRect.Top + (AStroke.Thickness / 2),
-               ADstRect.right - (AStroke.Thickness / 2),
-               ADstRect.bottom - (AStroke.Thickness / 2));
-  end
-  else LRect := ADstRect;
-
-  //fill the rectangle
-  if AFill.Kind <> TBrushKind.None then begin
-
-    //fill with gradient
-    if AFill.Kind = TBrushKind.Gradient then begin
-      if AFill.Gradient.Style in [TGradientStyle.Radial,
-                                  TGradientStyle.Linear] then begin
-        CGContextSaveGState(aContext);
-        //-----
-        var LCallback: CGFunctionCallbacks;
-        LCallback.version := 0;
-        LCallback.evaluate := @ALGradientEvaluateCallback;
-        LCallback.releaseInfo:= nil;
-        var LFunc := CGFunctionCreate(
-                       AFill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
-                       1, // domainDimension - The number of inputs.
-                       @DefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
-                       4, // rangeDimension - The number of outputs.
-                       nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
-                       @LCallback); // callbacks - A pointer to a callback function table.
-        try
-          var LShading: CGShadingRef;
-          if AFill.Gradient.Style = TGradientStyle.Radial then begin
-            LShading := CGShadingCreateRadial(
-                          ALGetGlobalCGColorSpace, // colorspace
-                          CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.height / 2))), // start - The center of the starting circle, in the shading's target coordinate space.
-                          LRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
-                          CGPoint.Create(TPointF.Create(LRect.Width / 2, aGridHeight - (LRect.Height / 2))), // end - The center of the ending circle, in the shading's target coordinate space.
-                          0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
-                          LFunc, // function
-                          True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                          True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
-          end
-          else begin
-            LShading := CGShadingCreateAxial(
-                          ALGetGlobalCGColorSpace, // colorspace
-                          CGPointMake(
-                            LRect.Left + (AFill.Gradient.StartPosition.X * LRect.Width),
-                            aGridHeight - LRect.top - (AFill.Gradient.StartPosition.Y * LRect.Height)), // start - The starting point of the axis, in the shading's target coordinate space.
-                          CGPointMake(
-                            LRect.Left + (AFill.Gradient.StopPosition.X * LRect.Width),
-                            aGridHeight - LRect.top - (AFill.Gradient.StopPosition.Y * LRect.Height)), // end - The ending point of the axis, in the shading's target coordinate space.
-                          LFunc, // function
-                          True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
-                          True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
-          end;
-          try
-            _DrawRect(LRect, false{aDrawOnlyBorder});
-            CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
-                                     // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
-                                     // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
-                                     // save the graphics state before you clip and restore the graphics state after you’ve completed
-                                     // any clipped drawing.
-            //-----
-            if (AShadow <> nil) and
-               (AShadow.enabled) then begin
-              var LAlphaColor := TAlphaColorCGFloat.Create(AShadow.Color);
-              var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-              try
-                CGContextSetShadowWithColor(
-                  aContext,
-                  CGSizeMake(AShadow.OffsetX, AShadow.OffsetY), // offset
-                  AShadow.blur, // blur
-                  LColor); // color
-              finally
-                CGColorRelease(LColor);
-              end;
-            end;
-            //-----
-            CGContextDrawShading(aContext, LShading);
-            //-----
-            if (AShadow <> nil) and
-               (AShadow.enabled) then begin
-              CGContextSetShadowWithColor(
-                aContext,
-                CGSizeMake(0, 0), // offset
-                0, // blur
-                nil); // color
-            end;
-            //-----
-          finally
-            CGShadingRelease(LShading);
-          end;
-        finally
-          CGFunctionRelease(LFunc);
-        end;
-        //-----
-        CGContextRestoreGState(aContext);
-      end;
-    end
-
-    //fill with bitmap
-    else if AFill.Kind = TBrushKind.Bitmap then begin
-      if not AFill.Bitmap.Bitmap.IsEmpty then begin
-        if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
-          var LBitmapData: TBitmapData;
-          if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
-          try
-            var LTmpContext := ALCreateCGContextRef(LBitmapData.Width, LBitmapData.Height, LBitmapData.Data, LBitmapData.Pitch);
-            try
-              var LImageRef := CGBitmapContextCreateImage(LTmpContext);
-              if LImageRef = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
-              try
-                var LImage := TUIImage.Wrap(TUIImage.alloc.initWithCGImage(LImageRef));
-                if LImage = nil then raise Exception.create('Failed to initialize UIImage from CGImageRef');
-                try
-                  CGContextSaveGState(aContext);
-                  //-----
-                  _DrawRect(LRect, false{aDrawOnlyBorder});
-                  CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
-                                           // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
-                                           // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
-                                           // save the graphics state before you clip and restore the graphics state after you’ve completed
-                                           // any clipped drawing.
-                  //-----
-                  if (AShadow <> nil) and
-                     (AShadow.enabled) then begin
-                    var LAlphaColor := TAlphaColorCGFloat.Create(AShadow.Color);
-                    var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-                    try
-                      CGContextSetShadowWithColor(
-                        aContext,
-                        CGSizeMake(AShadow.OffsetX, AShadow.OffsetY), // offset
-                        AShadow.blur, // blur
-                        LColor); // color
-                    finally
-                      CGColorRelease(LColor);
-                    end;
-                  end;
-                  //-----
-                  CGContextDrawImage(
-                    aContext, // c: The graphics context in which to draw the image.
-                    ALLowerLeftCGRect(
-                      LRect.TopLeft,
-                      LRect.Width,
-                      LRect.Height,
-                      aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                    LImage.CGImage); // image The image to draw.
-                  //-----
-                  if (AShadow <> nil) and
-                     (AShadow.enabled) then begin
-                    CGContextSetShadowWithColor(
-                      aContext,
-                      CGSizeMake(0, 0), // offset
-                      0, // blur
-                      nil); // color
-                  end;
-                  //-----
-                  CGContextRestoreGState(aContext);
-                finally
-                  LImage.release;
-                end;
-              finally
-                CGImageRelease(LImageRef);
-              end;
-            finally
-              CGContextRelease(LTmpContext);
-            end;
-          finally
-            AFill.Bitmap.Bitmap.Unmap(LBitmapData);
-          end;
-        end;
-      end;
-    end
-
-    //fill with solid color
-    else if AFill.Kind = TBrushKind.Solid then begin
-      var LAlphaColor := TAlphaColorCGFloat.Create(AFill.Color);
-      CGContextSetRGBFillColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-      _DrawRect(LRect, false{aDrawOnlyBorder});
-      //-----
-      if (AShadow <> nil) and
-         (AShadow.enabled) then begin
-        LAlphaColor := TAlphaColorCGFloat.Create(AShadow.Color);
-        var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-        try
-          CGContextSetShadowWithColor(
-            aContext,
-            CGSizeMake(AShadow.OffsetX, AShadow.OffsetY), // offset
-            AShadow.blur, // blur
-            LColor); // color
-        finally
-          CGColorRelease(LColor);
-        end;
-      end;
-      //-----
-      CGContextFillPath(aContext);
-      //-----
-      if (AShadow <> nil) and
-         (AShadow.enabled) then begin
-        CGContextSetShadowWithColor(
-          aContext,
-          CGSizeMake(0, 0), // offset
-          0, // blur
-          nil); // color
-      end;
-    end;
-
-  end;
-
-  //stroke the rectangle
-  if AStroke.Kind <> TBrushKind.None then begin
-
-    //stroke with solid color
-    if AStroke.Kind = TBrushKind.Solid then begin
-      var LAlphaColor := TAlphaColorCGFloat.Create(AStroke.Color);
-      CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-      CGContextSetLineWidth(aContext, AStroke.Thickness);
-      _DrawRect(LRect, True{aDrawOnlyBorder});
-      CGContextStrokePath(aContext);
-    end;
-
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
-
-  var LStrokeThicknessRestoreValue: Single := AStroke.Thickness;
-  try
-
-    var LFillShape, LDrawShape: Boolean;
-    var LShapeRect := ALGetDrawingShapeRectAndSetThickness(ADstRect, AFill, AStroke, False, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
-
-    if ASides <> AllSides then
-    begin
-      var LOff: Single := LShapeRect.Left;
-      if not(TSide.Top in ASides) then
-        LShapeRect.Top := LShapeRect.Top - LOff;
-      if not(TSide.Left in ASides) then
-        LShapeRect.Left := LShapeRect.Left - LOff;
-      if not(TSide.Bottom in ASides) then
-        LShapeRect.Bottom := LShapeRect.Bottom + LOff;
-      if not(TSide.Right in ASides) then
-        LShapeRect.Right := LShapeRect.Right + LOff;
-      if LFillShape then
-        aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, AFill, TCornerType.Round{CornerType});
-      if LDrawShape then
-        aCanvas.DrawRectSides(_GetShapeRect, AXRadius, AYRadius, ACorners,  1{AbsoluteOpacity}, ASides, AStroke, TCornerType.Round{CornerType});
-    end
-    else
-    begin
-      if LFillShape then
-        aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, AFill, TCornerType.Round{CornerType});
-      if LDrawShape then
-        aCanvas.DrawRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, AStroke, TCornerType.Round{CornerType});
-    end;
-
-    if (AShadow <> nil) and
-       (AShadow.Enabled) then begin
-
-      var LShadowEffect := TshadowEffect.Create(nil);
-      try
-        LShadowEffect.ShadowColor := AShadow.Color;
-        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
-                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                    // we use the opacity of the color instead
-        LShadowEffect.softness := AShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
-                                                     // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                     // I calculate approximatly that 0.5 = around 12 for blur
-        Acanvas.Flush;
-        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
-      finally
-        ALFreeAndNil(LShadowEffect);
-      end;
-
-      if ASides <> AllSides then
-      begin
-        if LFillShape then
-          aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, AFill, TCornerType.Round{CornerType});
-        if LDrawShape then
-          aCanvas.DrawRectSides(_GetShapeRect, AXRadius, AYRadius, ACorners,  1{AbsoluteOpacity}, ASides, AStroke, TCornerType.Round{CornerType});
-      end
-      else
-      begin
-        if LFillShape then
-          aCanvas.FillRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, AFill, TCornerType.Round{CornerType});
-        if LDrawShape then
-          aCanvas.DrawRect(LShapeRect, AXRadius, AYRadius, ACorners, 1{AbsoluteOpacity}, AStroke, TCornerType.Round{CornerType});
-      end;
-
-    end;
-
-  finally
-    AStroke.Thickness := LStrokeThicknessRestoreValue;
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
+  ALDrawRectangle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    ADstRect, // const ADstRect: TrectF;
+    AFill.Color, // const AFillColor: TAlphaColor;
+    Afill.Gradient.Style, // const AFillGradientStyle: TGradientStyle;
+    Afill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
+    Afill.Gradient.Offsets, // const AFillGradientOffsets: TArray<Single>;
+    Afill.Gradient.Angle, // const AFillGradientAngle: Single;
+    AFill.ResourceName, // const AFillResourceName: String;
+    AFill.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStroke.Color, // const AStrokeColor: TalphaColor;
+    AStroke.Thickness, // const AStrokeThickness: Single;
+    AShadow.Color, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    AShadow.Blur, // const AShadowBlur: Single;
+    AShadow.OffsetX, // const AShadowOffsetX: Single;
+    AShadow.OffsetY, // const AShadowOffsetY: Single;
+    ASides, // const ASides: TSides;
+    ACorners, // const ACorners: TCorners;
+    AXRadius, // const AXRadius: Single;
+    AYRadius); // const AYRadius: Single)
 end;
 
 {*********************}
 procedure ALDrawCircle(
-            {$IF defined(ALSkiaCanvas)}
-            const ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
             const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
             const AStrokeColor: TalphaColor;
             const AStrokeThickness: Single;
             const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
@@ -9693,14 +11050,286 @@ procedure ALDrawCircle(
             const AShadowOffsetX: Single;
             const AShadowOffsetY: Single);
 
-{$IF defined(IOS)}
-const DefaultInputRange: array[0..1] of CGFloat = (0, 1);
-{$ENDIF}
+var
+  LScaledStrokeThickness: Single;
+  LStrokeColor: TalphaColor;
+  {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
+  LShadowColor: TalphaColor;
+  LScaledShadowBlur: Single;
+  LScaledShadowOffsetX: Single;
+  LScaledShadowOffsetY: Single;
+  {$ENDIF}
+
+  {$REGION '_DrawCircle (SKIA)'}
+  {$IF defined(ALSkiaEngine)}
+  procedure _DrawCircle(
+              const aCanvas: sk_canvas_t;
+              const aPaint: sk_Paint_t;
+              const aRect: TrectF;
+              Const aDrawOnlyBorder: Boolean);
+  begin
+
+    var LRect := aRect;
+    if (LStrokeColor <> TalphaColorRec.Null) then begin
+      if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+        LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+      else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+        LRect.Inflate(-1, -1);
+    end;
+    //--
+    var LCenterPoint := LRect.CenterPoint;
+    sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, aPaint);
+
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_DrawCircle (ANDROID)'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+  procedure _DrawCircle(
+              const aCanvas: Jcanvas;
+              const aPaint: JPaint;
+              const aRect: TrectF;
+              const aDrawOnlyBorder: Boolean;
+              const aForceDrawPath: Boolean;
+              const aClipPath: Boolean);
+  begin
+
+    // Init LRect
+    var LRect := aRect;
+
+    // use drawRoundRect
+    if (not aForceDrawPath) and
+       (not aClipPath) then begin
+
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
+      aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, aPaint);
+
+    end
+
+    // use drawPath
+    else begin
+
+      var LPath := TJPath.Create;
+      //--
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        if (aDrawOnlyBorder) or
+           (LShadowcolor = TalphaColorRec.Null) then begin
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
+        end
+        else if (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then begin
+          LRect.Inflate(-1, -1);
+        end;
+      end;
+      //--
+      LPath.addCircle(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius}, TJPath_Direction.JavaClass.CW{dir});
+      //--
+      if aPaint <> nil then aCanvas.drawPath(LPath,aPaint);
+      if aClipPath then begin
+        aCanvas.save;
+        aCanvas.clipPath(LPath);
+      end;
+      LPath := nil;
+
+    end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_DrawCircle (APPLEOS)'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  procedure _DrawCircle(
+              const aCanvas: CGContextRef;
+              const aGridHeight: Integer;
+              const aRect: TrectF;
+              Const aDrawOnlyBorder: Boolean;
+              const aClipPath: Boolean);
+  begin
+    var LRect := aRect;
+    if (LStrokeColor <> TalphaColorRec.Null) then begin
+      if (aDrawOnlyBorder or (LShadowcolor = TalphaColorRec.Null)) then
+        LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+      else if compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0 then
+        LRect.Inflate(-1, -1);
+    end;
+    //--
+    if aClipPath then CGContextSaveGState(ACanvas);
+    CGContextBeginPath(ACanvas);
+    CGContextAddEllipseInRect(
+      ACanvas,
+      ALLowerLeftCGRect(
+        LRect.TopLeft,
+        LRect.Width,
+        LRect.Height,
+        AGridHeight));
+    CGContextClosePath(ACanvas);
+    if aClipPath then CGContextClip(ACanvas)
+    else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
+    else CGContextStrokePath(ACanvas);
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_SetShadow (SKIA)'}
+  {$IF defined(ALSkiaEngine)}
+  procedure _SetShadow(const aPaint: sk_Paint_t);
+  begin
+    //In skia we can use this to convert from the (legacy) idea of specify
+    //the blur "radius" to the standard notion of specifying its sigma.
+    //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
+    //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
+    //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
+    //  }
+    //But it's not very good, I think that a better value is just Shadow.blur / 2
+    if (LShadowColor <> TalphaColorRec.Null) then begin
+      var LImagefilter := ALSkCheckHandle(
+                            sk4d_imagefilter_make_drop_shadow(
+                              LScaledShadowOffsetX, // dx,
+                              LScaledShadowOffsetY, // dy,
+                              LScaledShadowBlur / 2, // sigma_x,
+                              LScaledShadowBlur / 2, // sigma_y: float;
+                              LShadowColor, // color: sk_color_t;
+                              0, // input: sk_imagefilter_t;
+                              nil)); // const crop_rect: psk_rect_t)
+      try
+        // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
+        sk4d_paint_set_image_filter(aPaint, LImagefilter);
+      finally
+        sk4d_refcnt_unref(LImagefilter);
+      end;
+    end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_SetShadow (ANDROID)'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+  procedure _SetShadow(const aPaint: JPaint);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then
+      APaint.setShadowLayer(
+        LScaledShadowBlur{radius},
+        LScaledShadowOffsetX{dx},
+        LScaledShadowOffsetY{dy},
+        integer(LShadowColor){shadowColor});
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_SetShadow (APPLEOS)'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  procedure _SetShadow(const aCanvas: CGContextRef);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then begin
+      var LShadowColorF := TAlphaColorCGFloat.Create(LShadowColor);
+      var LShadowColorCG := CGColorCreate(ALGetGlobalCGColorSpace, @LShadowColorF);
+      try
+        CGContextSetShadowWithColor(
+          ACanvas,
+          CGSizeMake(LScaledShadowOffsetX, -LScaledShadowOffsetY), // offset
+          LScaledShadowBlur, // blur
+          LShadowColorCG); // color
+      finally
+        CGColorRelease(LShadowColorCG);
+      end;
+    end;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_ClearShadow (SKIA)'}
+  {$IF defined(ALSkiaEngine)}
+  procedure _ClearShadow(const aPaint: sk_Paint_t);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then
+      sk4d_paint_set_image_filter(aPaint, 0);
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_ClearShadow (ANDROID)'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+  procedure _ClearShadow(const aPaint: JPaint);
+  begin
+      if LShadowColor <> TalphaColorRec.Null then
+        APaint.clearShadowLayer;
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_ClearShadow (APPLEOS)'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  procedure _ClearShadow(const aCanvas: CGContextRef);
+  begin
+    if LShadowColor <> TalphaColorRec.Null then
+      CGContextSetShadowWithColor(
+        ACanvas,
+        CGSizeMake(0, 0), // offset
+        0, // blur
+        nil); // color
+  end;
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION '_FillGradientIsTransparent'}
+  function _FillGradientIsTransparent: boolean;
+  begin
+    if length(AFillGradientColors) = 0 then exit(true);
+    Result := False;
+    for var I := Low(AFillGradientColors) to High(AFillGradientColors) do begin
+      Result := TAlphaColorRec(AFillGradientColors[i]).A < 255;
+      if Result then exit;
+    end;
+  end;
+  {$ENDREGION}
 
 begin
 
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+  var LGridHeight := CGBitmapContextGetHeight(ACanvas);
+  {$ENDIF}
+  var LRect := ADstRect;
+  LRect.Top := LRect.Top * AScale;
+  LRect.right := LRect.right * AScale;
+  LRect.left := LRect.left * AScale;
+  LRect.bottom := LRect.bottom * AScale;
+  LScaledStrokeThickness := AStrokeThickness * AScale;
+  {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
+  LScaledShadowBlur := AShadowBlur * AScale;
+  LScaledShadowOffsetX := AShadowOffsetX * AScale;
+  LScaledShadowOffsetY := AShadowOffsetY * AScale;
+  LShadowColor := AShadowColor;
+  if CompareValue(LScaledShadowBlur, 0, TEpsilon.position) <= 0 then
+    LShadowColor := TAlphaColors.Null;
+  {$ENDIF}
+  LStrokeColor := AStrokeColor;
+  if CompareValue(LScaledStrokeThickness, 0, TEpsilon.position) <= 0 then
+    LStrokeColor := TAlphaColors.Null;
+  if length(AFillGradientColors) = 1 then
+    raise Exception.Create('Invalid gradient: A gradient requires at least two colors');
+  var LFillGradientOffsets := AFillGradientOffsets;
+  if (length(LFillGradientOffsets) = 0) and (length(AFillGradientColors) > 0) then begin
+    setlength(LFillGradientOffsets, length(AFillGradientColors));
+    for Var I := 0 to length(AFillGradientColors) - 1 do
+      LFillGradientOffsets[i] := I * (1 / (length(AFillGradientColors) - 1));
+  end
+  else if (length(LFillGradientOffsets) <> length(AFillGradientColors)) then
+    raise Exception.Create('Invalid gradient: The number of gradient offsets does not match the number of gradient colors');
+  var LScaledFillGradientStartPoint := AFillGradientStartPoint;
+  LScaledFillGradientStartPoint.X := LScaledFillGradientStartPoint.X * AScale;
+  LScaledFillGradientStartPoint.Y := LScaledFillGradientStartPoint.Y * AScale;
+  var LScaledFillGradientEndPoint := AFillGradientEndPoint;
+  LScaledFillGradientEndPoint.X := LScaledFillGradientEndPoint.X * AScale;
+  LScaledFillGradientEndPoint.Y := LScaledFillGradientEndPoint.Y * AScale;
+
   {$REGION 'SKIA'}
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
 
   // Create LPaint
   var LPaint := ALSkCheckHandle(sk4d_paint_create);
@@ -9708,71 +11337,162 @@ begin
 
     // Requests, but does not require, that edge pixels draw opaque or with partial transparency.
     sk4d_paint_set_antialias(LPaint, true);
-    // Sets whether the geometry is filled, stroked, or filled and stroked.
+    // Requests, but does not require, to distribute color error.
     sk4d_paint_set_dither(LPaint, true);
 
-    // Init LRect
-    var LRect: TRectf;
-    if AStrokeColor <> TalphaColorRec.Null then begin
-      LRect := TrectF.Create(
-                 ADstRect.Left + (AStrokeThickness / 2),
-                 ADstRect.Top + (AStrokeThickness / 2),
-                 ADstRect.right - (AStrokeThickness / 2),
-                 ADstRect.bottom - (AStrokeThickness / 2));
-    end
-    else LRect := ADstRect;
-
     // Fill the circle
-    if AFillColor <> TalphaColorRec.Null then begin
+    if (AFillColor <> TalphaColorRec.Null) or
+       (length(AFillGradientColors) > 0) or
+       (AFillResourceName <> '') or
+       (LShadowColor <> TalphaColorRec.Null) then begin
 
       // FILL_SK_PAINTSTYLE
       sk4d_paint_set_style(LPaint, sk_paintstyle_t.FILL_SK_PAINTSTYLE);
 
-      //In skia we can use this to convert from the (legacy) idea of specify
-      //the blur "radius" to the standard notion of specifying its sigma.
-      //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
-      //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
-      //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
-      //  }
-      //But it's not very good, I think that a better value is just Shadow.blur / 2
-      if AShadowColor <> TalphaColorRec.Null then begin
-        var Limagefilter := ALSkCheckHandle(
-                              sk4d_imagefilter_make_drop_shadow(
-                                AShadowOffsetX, // dx,
-                                AShadowOffsetY, // dy,
-                                AShadowblur / 2, // sigma_x,
-                                AShadowblur / 2, // sigma_y: float;
-                                AShadowColor, // color: sk_color_t;
-                                0, // input: sk_imagefilter_t;
-                                nil)); // const crop_rect: psk_rect_t)
+      // Init LDrawnWithSolidColor
+      var LDrawnWithSolidColor := False;
+
+      // Fill with transparent solid color and shadow
+      if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
+         (TAlphaColorRec(AFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
+         (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
+         ((AFillResourceName = '') or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
+          (AFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
+          (length(AFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
+          (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
+
+        // First pass draw the shadow
+        var LFillColor := AFillColor;
+        TAlphaColorRec(LFillColor).A := 255;
+        sk4d_paint_set_color(LPaint, LFillColor);
+        _SetShadow(LPaint);
+        _DrawCircle(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+        _ClearShadow(LPaint);
+
+        // Second pass fill the rect
+        var LBlender := ALSkCheckHandle(
+                          sk4d_blender_make_mode(
+                            sk_blendmode_t.SRC_SK_BLENDMODE));
         try
-          // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
-          sk4d_paint_set_image_filter(LPaint, Limagefilter);
+          sk4d_paint_set_blender(LPaint, LBlender);
+          sk4d_paint_set_color(LPaint, AFillColor);
+          _DrawCircle(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+          sk4d_paint_set_blender(LPaint, 0);
         finally
-          sk4d_refcnt_unref(Limagefilter);
+          sk4d_refcnt_unref(LBlender)
         end;
-      end;
+        LDrawnWithSolidColor := True;
+
+      end
 
       // Fill with solid color
-      sk4d_paint_set_color(LPaint, AFillColor);
-      var LCenterPoint := LRect.CenterPoint;
-      sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
+      else if (AFillColor <> TalphaColors.Null) then begin
+        sk4d_paint_set_color(LPaint, AFillColor);
+        _SetShadow(LPaint);
+        _DrawCircle(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+        _ClearShadow(LPaint);
+        LDrawnWithSolidColor := True;
+      end;
+
+      // Fill with gradient
+      if length(AFillGradientColors) > 0 then begin
+        case AFillGradientStyle of
+          TGradientStyle.Linear: begin
+            var LPoints: array[0..1] of sk_point_t;
+            LPoints[0].x := LScaledFillGradientStartPoint.X;
+            LPoints[0].y := LScaledFillGradientStartPoint.Y;
+            LPoints[1].x := LScaledFillGradientEndPoint.X;
+            LPoints[1].y := LScaledFillGradientEndPoint.Y;
+            var LShader := ALSkCheckHandle(
+                             sk4d_shader_make_gradient_linear(
+                               @LPoints[0], // const points: psk_point_t;
+                               @AFillGradientColors[0], // const colors: psk_color_t;
+                               @LFillGradientOffsets[0], // const positions: pfloat;
+                               Length(AFillGradientColors), // count: int32_t;
+                               sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
+                               nil)); // const local_matrix: psk_matrix_t
+            try
+              // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
+              sk4d_paint_set_shader(LPaint, LShader);
+            finally
+              sk4d_refcnt_unref(LShader);
+            end;
+          end;
+          TGradientStyle.Radial: begin
+            var LShader := ALSkCheckHandle(
+                             sk4d_shader_make_gradient_radial(
+                               @LScaledFillGradientStartPoint, // const center: psk_point_t;
+                               LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint), // radius: float;
+                               @AFillGradientColors[0], // const colors: psk_color_t;
+                               @LFillGradientOffsets[0], // const positions: pfloat;
+                               Length(AFillGradientColors), // count: int32_t;
+                               sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
+                               nil));// const local_matrix: psk_matrix_t
+            try
+              // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
+              sk4d_paint_set_shader(LPaint, LShader);
+            finally
+              sk4d_refcnt_unref(LShader);
+            end;
+          end;
+          else
+            raise Exception.Create('Error EADEA97C-5440-46F0-A44A-47BCF4CFAC2F');
+        end;
+        if not LDrawnWithSolidColor then _SetShadow(LPaint);
+        _DrawCircle(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+        if not LDrawnWithSolidColor then _ClearShadow(LPaint);
+        sk4d_paint_set_shader(LPaint, 0);
+        LDrawnWithSolidColor := True;
+      end;
+
+      // Fill with image
+      if AFillResourceName <> '' then begin
+        var LImage: sk_image_t;
+        var LFileName := ALGetResourceFilename(AFillResourceName);
+        if LFileName <> '' then LImage := ALLoadFromFileAndWrapToSkImage(LFileName, AFillWrapMode, LRect.Width, LRect.Height)
+        else LImage := {$IFDEF ALDPK}0{$ELSE}ALLoadFromResourceAndWrapToSkImage(AFillResourceName, AFillWrapMode, LRect.Width, LRect.Height){$ENDIF};
+        {$IFDEF ALDPK}If LImage <> 0 then{$ENDIF}
+          try
+
+            var LDestRect := TrectF.Create(0,0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)).CenterAt(LRect);
+            var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
+            var Lshader: sk_shader_t;
+            var LMatrix := TMatrix.CreateTranslation(LRect.Left + LDestRect.Left - LRect.Left, LRect.Top + LDestRect.Top - LRect.Top);
+            Lshader := ALSkCheckHandle(
+                         sk4d_image_make_shader(
+                           LImage, // const self: sk_image_t;
+                           sk_tilemode_t.DECAL_SK_TILEMODE, // tile_mode_x,
+                           sk_tilemode_t.DECAL_SK_TILEMODE,// tile_mode_y: sk_tilemode_t;
+                           @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+                           @LMatrix)); // const local_matrix: psk_matrix_t)
+            try
+              // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
+              sk4d_paint_set_shader(LPaint, LShader);
+            finally
+              sk4d_refcnt_unref(LShader);
+            end;
+
+            // Specify an opaque color to ensure the image is drawn without the
+            // transparency effect of the current color.
+            sk4d_paint_set_color(LPaint, $FFFFFFFF);
+            if not LDrawnWithSolidColor then _SetShadow(LPaint);
+            _DrawCircle(ACanvas, LPaint, LRect, false{aDrawOnlyBorder});
+            if not LDrawnWithSolidColor then _ClearShadow(LPaint);
+            sk4d_paint_set_shader(LPaint, 0);
+
+          finally
+            sk4d_refcnt_unref(LImage);
+          end;
+      end;
 
     end;
 
     // Stroke the circle
-    if AStrokeColor <> TalphaColorRec.Null then begin
-
-      // Init LPaint
+    if LStrokeColor <> TalphaColorRec.Null then begin
       sk4d_paint_set_style(LPaint, sk_paintstyle_t.STROKE_SK_PAINTSTYLE);
-      sk4d_paint_set_stroke_width(LPaint, AStrokeThickness);
-      sk4d_paint_set_image_filter(LPaint, 0);
-
-      // Stroke with solid color
-      sk4d_paint_set_color(LPaint, AStrokeColor);
-      var LCenterPoint := LRect.CenterPoint;
-      sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
-
+      sk4d_paint_set_stroke_width(LPaint, LScaledStrokeThickness);
+      sk4d_paint_set_color(LPaint, LStrokeColor);
+      _DrawCircle(ACanvas, LPaint, LRect, true{aDrawOnlyBorder});
     end;
 
   finally
@@ -9783,7 +11503,7 @@ begin
   {$ENDREGION}
 
   {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
 
   //create the canvas and the paint
   var LPaint := TJPaint.JavaClass.init;
@@ -9791,42 +11511,203 @@ begin
   LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
   LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
 
-  //init LRect
-  var LRect: TRectf;
-  if AStrokeColor <> TalphaColorRec.Null then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStrokeThickness / 2),
-               ADstRect.Top + (AStrokeThickness / 2),
-               ADstRect.right - (AStrokeThickness / 2),
-               ADstRect.bottom - (AStrokeThickness / 2));
-  end
-  else LRect := ADstRect;
-
-  //fill the circle
-  if AFillColor <> TalphaColorRec.Null then begin
+  // Fill the circle
+  if (AFillColor <> TalphaColorRec.Null) or
+     (length(AFillGradientColors) > 0) or
+     (AFillResourceName <> '') or
+     (LShadowColor <> TalphaColorRec.Null) then begin
 
     //init LPaint
     LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LRect + StrokeThickness :( this result&ing in border if the fill is for exemple black and border white
 
-    //fill with solid color
-    LPaint.setColor(integer(AFillColor));
-    if (AShadowColor <> TalphaColorRec.Null) then LPaint.setShadowLayer(AShadowBlur{radius}, AShadowOffsetX{dx}, AShadowOffsetY{dy}, integer(AShadowColor){shadowColor});
-    aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
-    if (AShadowColor <> TalphaColorRec.Null) then LPaint.clearShadowLayer;
+    // Init LDrawnWithSolidColor
+    var LDrawnWithSolidColor := False;
+
+    // Fill with transparent solid color and shadow
+    if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
+       (TAlphaColorRec(AFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
+       (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
+       ((AFillResourceName = '') or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
+        (AFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
+        (length(AFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
+        (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
+
+      // First pass draw the shadow
+      var LFillColor := AFillColor;
+      TAlphaColorRec(LFillColor).A := 255;
+      LPaint.setColor(integer(LFillColor));
+      _SetShadow(LPaint);
+      _DrawCircle(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, false{aClipPath});
+      _ClearShadow(LPaint);
+
+      // Second pass fill the rect
+      var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC);
+      LPaint.setXfermode(LPorterDuffXfermode);
+      LPaint.setColor(integer(AFillColor));
+      _DrawCircle(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, (AFillResourceName <> '') and (length(AFillGradientColors) = 0){aClipPath});
+      LPaint.setXfermode(nil);
+      LPorterDuffXfermode := nil;
+      LDrawnWithSolidColor := True;
+
+    end
+
+    // Fill with solid color
+    else if (AFillColor <> TalphaColors.Null) then begin
+      LPaint.setColor(integer(AFillColor));
+      _SetShadow(LPaint);
+      _DrawCircle(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, (AFillResourceName <> '') and (length(AFillGradientColors) = 0){aClipPath});
+      _ClearShadow(LPaint);
+      LDrawnWithSolidColor := True;
+    end;
+
+    //fill with gradient
+    if length(AFillGradientColors) > 0 then begin
+
+      // First pass draw the shadow if not already drawn
+      // We must do this because else the shadow will be drawn with
+      // the color of the gradient :(
+      if not LDrawnWithSolidColor then begin
+        var LFillColor := AFillColor;
+        TAlphaColorRec(LFillColor).A := 255;
+        LPaint.setColor(integer(LFillColor));
+        _SetShadow(LPaint);
+        _DrawCircle(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, false{aClipPath});
+        _ClearShadow(LPaint);
+      end;
+
+      // Second pass fill the rect
+      var LJColors := TJavaArray<Integer>.Create(length(AFillGradientColors));
+      var LJOffsets := TJavaArray<Single>.Create(length(LFillGradientOffsets));
+      Try
+        for var i := low(AFillGradientColors) to high(AFillGradientColors) do begin
+          LJColors[i] := integer(AFillGradientColors[i]);
+          LJOffsets[i] := LFillGradientOffsets[i];
+        end;
+        var LShader: JShader;
+        case AFillGradientStyle of
+          TGradientStyle.Linear: begin
+            LShader := TJLinearGradient.JavaClass.init(
+                         LScaledFillGradientStartPoint.X{x0},
+                         LScaledFillGradientStartPoint.Y{y0},
+                         LScaledFillGradientEndPoint.X{x1},
+                         LScaledFillGradientEndPoint.Y{y1},
+                         LJColors{colors},
+                         LJOffsets{positions},
+                         TJShader_TileMode.JavaClass.CLAMP{tile});
+          end;
+          TGradientStyle.Radial: begin
+            LShader := TJRadialGradient.JavaClass.init(
+                         LScaledFillGradientStartPoint.X{x},
+                         LScaledFillGradientStartPoint.Y{y},
+                         LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint){radius},
+                         LJColors{colors},
+                         LJOffsets{positions},
+                         TJShader_TileMode.JavaClass.CLAMP{tile});
+          end;
+          else
+            raise Exception.Create('Error EAB4DED3-CF02-495B-9CB8-8F82479D2839');
+        end;
+        LPaint.setShader(LShader);
+        _DrawCircle(aCanvas, LPaint, LRect, false{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, AFillResourceName <> ''{aClipPath});
+        LPaint.setShader(nil);
+        LShader := nil;
+        LDrawnWithSolidColor := True;
+      finally
+        ALfreeandNil(LJColors);
+        ALfreeandNil(LJOffsets);
+      end;
+    end;
+
+    // Fill with image
+    if AFillResourceName <> '' then begin
+      var LBitmap: JBitmap;
+      var LFileName := ALGetResourceFilename(AFillResourceName);
+      if LFileName <> '' then LBitmap := ALLoadFromFileAndWrapToJBitmap(LFileName, AFillWrapMode, LRect.Width, LRect.Height)
+      else LBitmap := {$IFDEF ALDPK}nil{$ELSE}ALLoadFromResourceAndWrapToJBitmap(AFillResourceName, AFillWrapMode, LRect.Width, LRect.Height){$ENDIF};
+      {$IFDEF ALDPK}If LBitmap <> nil then{$ENDIF}
+        try
+
+          // On android the bitmap is drawed with the opacity of the paint color
+          // so set the color to black to make the bitmap fully opaque
+          LPaint.setColor(integer(TAlphaColors.Black));
+
+          // The shadow is made directly on the bitmap
+          if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
+
+            // Draw the shape of the rect in LDestBitmap
+            var LDestRect := TRectF.Create(0,0,LRect.Width,LRect.height);
+            var LDestBitmap := TJBitmap.JavaClass.createBitmap(Round(LDestRect.Width), round(LDestRect.Height), TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+            var LDestCanvas := TJCanvas.JavaClass.init(LDestBitmap);
+            _DrawCircle(LDestCanvas, LPaint, LDestRect, false{aDrawOnlyBorder}, False{aForceDrawPath}, False{aClipPath});
+            // Copy LBitmap in LSrcBitmap and extend LSrcBitmap to the size of LDestBitmap
+            var LSrcBitmap := TJBitmap.JavaClass.createBitmap(LDestBitmap.getWidth, LDestBitmap.getHeight, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+            var LSrcCanvas := TJCanvas.JavaClass.init(LSrcBitmap);
+            LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(TRectF.Create(0,0,LDestBitmap.getWidth,LDestBitmap.getHeight));
+            var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
+            LSrcCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
+            // draw the LSrcBitmap onto the LDestBitmap with SRC_IN
+            LJDestRectf := TJRectf.JavaClass.init(0, 0, LSrcBitmap.getWidth, LSrcBitmap.getheight);
+            LJSrcRect := TJRect.JavaClass.init(0, 0, LSrcBitmap.getWidth, LSrcBitmap.getheight);
+            var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
+            LPaint.setXfermode(LPorterDuffXfermode);
+            LDestCanvas.drawBitmap(LSrcBitmap, LJSrcRect, LJDestRectf, LPaint);
+            LPaint.setXfermode(nil);
+            LPorterDuffXfermode := nil;
+            // swap LDestBitmap with LBitmap
+            LJSrcRect := nil;
+            LJDestRectf := nil;
+            LSrcCanvas := nil;
+            LDestCanvas := nil;
+            if not LBitmap.equals(LDestBitmap) then LBitmap.recycle;
+            if not LSrcBitmap.equals(LDestBitmap) then LSrcBitmap.recycle;
+            LBitmap := LDestBitmap;
+            LSrcBitmap := nil;
+            LDestBitmap := nil;
+
+            LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(LRect);
+            LDestRect.Offset(LScaledShadowOffsetX, LScaledShadowOffsetY);
+            LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
+            //--
+            var LBlurMaskFilter := TJBlurMaskFilter.JavaClass.init(AShadowblur*2.5, TJBlurMaskFilter_Blur.JavaClass.NORMAL);
+            LPaint.setColor(integer(LShadowColor));
+            LPaint.setMaskFilter(LBlurMaskFilter);
+            aCanvas.drawBitmap(LBitmap.extractAlpha, LJSrcRect, LJDestRectf, LPaint);
+            LPaint.setMaskFilter(nil);
+            LDestRect.Offset(-LScaledShadowOffsetX, -LScaledShadowOffsetY);
+            LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            LPaint.setColor(integer(TAlphaColors.Black));
+            aCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
+
+          end
+
+          // The shadow is made on the circle shape
+          else begin
+            If not LDrawnWithSolidColor then _DrawCircle(aCanvas, nil{APaint}, LRect, false{aDrawOnlyBorder}, true{aForceDrawPath}, true{aClipPath});
+            var LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(LRect);
+            var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
+            var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
+            aCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
+            aCanvas.restore;
+            LJSrcRect := nil;
+            LJDestRectf := nil;
+          end;
+
+        finally
+          LBitmap.recycle;
+          LBitmap := nil;
+        end;
+    end;
 
   end;
 
   //stroke the circle
-  if AStrokeColor <> TalphaColorRec.Null then begin
-
-    //init LPaint
+  if LStrokeColor <> TalphaColorRec.Null then begin
     LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-    LPaint.setStrokeWidth(AStrokeThickness);
-
-    //stroke with solid color
-    LPaint.setColor(integer(AStrokeColor));
-    aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
-
+    LPaint.setStrokeWidth(LScaledStrokeThickness);
+    LPaint.setColor(integer(LStrokeColor));
+    _DrawCircle(aCanvas, LPaint, LRect, true{aDrawOnlyBorder}, AFillResourceName <> ''{aForceDrawPath}, False{aClipPath});
   end;
 
   //free the paint and the canvas
@@ -9835,87 +11716,215 @@ begin
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'IOS'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'APPLEOS'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  //set the paint default properties
-  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
-  //-----
-  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
+  // Fill the circle
+  if (AFillColor <> TalphaColorRec.Null) or
+     (length(AFillGradientColors) > 0) or
+     (AFillResourceName <> '') or
+     (LShadowColor <> TalphaColorRec.Null) then begin
 
-  //init LRect
-  var LRect: TRectf;
-  if AStrokeColor <> TalphaColorRec.Null then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStrokeThickness / 2),
-               ADstRect.Top + (AStrokeThickness / 2),
-               ADstRect.right - (AStrokeThickness / 2),
-               ADstRect.bottom - (AStrokeThickness / 2));
-  end
-  else LRect := ADstRect;
+    // Init LDrawnWithSolidColor
+    var LDrawnWithSolidColor := False;
 
-  //fill the circle
-  if AFillColor <> TalphaColorRec.Null then begin
+    // Fill with transparent solid color and shadow
+    if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
+       (TAlphaColorRec(AFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
+       (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
+       ((AFillResourceName = '') or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
+        (AFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
+        (length(AFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
+        (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
 
-    //fill with solid color
-    var LAlphaColor := TAlphaColorCGFloat.Create(AFillColor);
-    CGContextSetRGBFillColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-    //-----
-    if (AShadowColor <> TalphaColorRec.Null) then begin
-      LAlphaColor := TAlphaColorCGFloat.Create(AShadowColor);
-      var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
+      // First pass draw the shadow
+      var LFillColorF := TAlphaColorCGFloat.Create(AFillColor);
+      CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
+      _SetShadow(aCanvas);
+      _DrawCircle(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+      _ClearShadow(aCanvas);
+
+      // Second pass fill the rect
+      CGContextSetBlendMode(ACanvas, kCGBlendModeCopy);
+      CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, LFillColorF.A);
+      _DrawCircle(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+      CGContextSetBlendMode(ACanvas, kCGBlendModeNormal);
+      LDrawnWithSolidColor := True;
+
+    end
+
+    // Fill with solid color
+    else if (AFillColor <> TalphaColors.Null) then begin
+      var LFillColorF := TAlphaColorCGFloat.Create(AFillColor);
+      CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, LFillColorF.A);
+      _SetShadow(aCanvas);
+      _DrawCircle(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+      _ClearShadow(aCanvas);
+      LDrawnWithSolidColor := True;
+    end;
+
+    //fill with gradient
+    if length(AFillGradientColors) > 0 then begin
+
+      // First pass draw the shadow if not already drawn
+      // We must do this because else the shadow will not be drawn
+      if not LDrawnWithSolidColor then begin
+        var LFillColorF := TAlphaColorCGFloat.Create(AFillColor);
+        CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
+        _SetShadow(aCanvas);
+        _DrawCircle(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, false{aClipPath});
+        _ClearShadow(aCanvas);
+      end;
+
+      // Second pass fill the rect
+      var LGradient := TALGradient.create;
       try
-        CGContextSetShadowWithColor(
-          aContext,
-          CGSizeMake(AShadowOffsetX, AShadowOffsetY), // offset
-          AShadowblur, // blur
-          LColor); // color
+        LGradient.Colors := AFillGradientColors;
+        LGradient.Offsets := LFillGradientOffsets;
+        var LDefaultInputRange: array[0..1] of CGFloat;
+        LDefaultInputRange[0] := 0;
+        LDefaultInputRange[1] := 1;
+        var LCallback: CGFunctionCallbacks;
+        LCallback.version := 0;
+        LCallback.evaluate := @ALGradientEvaluateCallback;
+        LCallback.releaseInfo := nil;
+        var LFunc := CGFunctionCreate(
+                       LGradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
+                       1, // domainDimension - The number of inputs.
+                       @LDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
+                       4, // rangeDimension - The number of outputs.
+                       nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
+                       @LCallback); // callbacks - A pointer to a callback function table.
+        try
+          var LShading: CGShadingRef;
+          case AFillGradientStyle of
+            TGradientStyle.Linear: begin
+              LShading := CGShadingCreateAxial(
+                            ALGetGlobalCGColorSpace, // colorspace
+                            CGPointMake(
+                              LScaledFillGradientStartPoint.X,
+                              LGridHeight - LScaledFillGradientStartPoint.y), // start - The starting point of the axis, in the shading's target coordinate space.
+                            CGPointMake(
+                              LScaledFillGradientEndPoint.x,
+                              LGridHeight - LScaledFillGradientEndPoint.y), // end - The ending point of the axis, in the shading's target coordinate space.
+                            LFunc, // function
+                            True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
+                            True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
+            end;
+            TGradientStyle.Radial: begin
+              LShading := CGShadingCreateRadial(
+                            ALGetGlobalCGColorSpace, // colorspace
+                            CGPoint.Create(TPointF.Create(LScaledFillGradientStartPoint.X, LGridHeight - LScaledFillGradientStartPoint.Y)), // start - The center of the starting circle, in the shading's target coordinate space.
+                            0, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
+                            CGPoint.Create(TPointF.Create(LScaledFillGradientStartPoint.X, LGridHeight - LScaledFillGradientStartPoint.Y)), // end - The center of the ending circle, in the shading's target coordinate space.
+                            LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint), // endRadius - The radius of the ending circle, in the shading's target coordinate space.
+                            LFunc, // function
+                            True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
+                            True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
+            end;
+            else
+              raise Exception.Create('Error 23128453-626D-49A6-AD49-D6CA8AC35ACF');
+          end;
+          try
+            _DrawCircle(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, true{aClipPath});
+            CGContextDrawShading(ACanvas, LShading);
+            CGContextRestoreGState(ACanvas);
+            LDrawnWithSolidColor := True;
+          finally
+            CGShadingRelease(LShading);
+          end;
+        finally
+          CGFunctionRelease(LFunc);
+        end;
       finally
-        CGColorRelease(LColor);
+        ALFreeAndNil(LGradient);
       end;
     end;
-    //-----
-    CGContextFillEllipseInRect(
-      aContext,
-      ALLowerLeftCGRect(
-        LRect.TopLeft,
-        LRect.Width,
-        LRect.Height,
-        aGridHeight));
-    //-----
-    if (AShadowColor <> TalphaColorRec.Null) then begin
-      CGContextSetShadowWithColor(
-        aContext,
-        CGSizeMake(0, 0), // offset
-        0, // blur
-        nil); // color
+
+    // Fill with image
+    if AFillResourceName <> '' then begin
+      var LImage: CGImageRef;
+      var LFileName := ALGetResourceFilename(AFillResourceName);
+      if LFileName <> '' then LImage := ALLoadFromFileAndWrapToCGImageRef(LFileName, AFillWrapMode, LRect.Width, LRect.Height)
+      else LImage := {$IFDEF ALDPK}nil{$ELSE}ALLoadFromResourceAndWrapToCGImageRef(AFillResourceName, AFillWrapMode, LRect.Width, LRect.Height){$ENDIF};
+      {$IFDEF ALDPK}If LImage <> nil then{$ENDIF}
+        try
+
+          // The shadow is made directly on the bitmap
+          if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
+
+            // Their is corners so remove them from the LBitmap
+            var LTmpRect := TRectF.Create(0,0,LRect.Width,LRect.height).Round;
+            var LTmpCGContextRef := ALCreateCGContextRef(LTmpRect.Width, LTmpRect.Height);
+            try
+              _DrawCircle(LTmpCGContextRef, LTmpRect.Height, LTmpRect, false{aDrawOnlyBorder}, true{aClipPath});
+              var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LTmpRect);
+              CGContextDrawImage(
+                LTmpCGContextRef, // c: The graphics context in which to draw the image.
+                ALLowerLeftCGRect(
+                  LDestRect.TopLeft,
+                  LDestRect.Width,
+                  LDestRect.Height,
+                  LTmpRect.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                LImage); // image The image to draw.
+              CGContextRestoreGState(LTmpCGContextRef);
+              var LTmpImage := CGBitmapContextCreateImage(LTmpCGContextRef);
+              if LTmpImage = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+              CGImageRelease(LImage);
+              LImage := LTmpImage;
+            finally
+              CGContextRelease(LTmpCGContextRef);
+            end;
+
+            _SetShadow(aCanvas);
+            var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LRect);
+            CGContextDrawImage(
+              ACanvas, // c: The graphics context in which to draw the image.
+              ALLowerLeftCGRect(
+                LDestRect.TopLeft,
+                LDestRect.Width,
+                LDestRect.Height,
+                LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+              LImage); // image The image to draw.
+             _ClearShadow(aCanvas);
+
+          end
+
+          // The shadow is made on the circle shape
+          else begin
+            _DrawCircle(aCanvas, LGridHeight, LRect, false{aDrawOnlyBorder}, true{aClipPath});
+            var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LRect);
+            CGContextDrawImage(
+              ACanvas, // c: The graphics context in which to draw the image.
+              ALLowerLeftCGRect(
+                LDestRect.TopLeft,
+                LDestRect.Width,
+                LDestRect.Height,
+                LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+              LImage); // image The image to draw.
+            CGContextRestoreGState(ACanvas);
+          end;
+
+        finally
+          CGImageRelease(LImage);
+        end;
     end;
 
   end;
 
   //stroke the circle
-  if AStrokeColor <> TalphaColorRec.Null then begin
-
-    //stroke with solid color
-    var LAlphaColor := TAlphaColorCGFloat.Create(AStrokeColor);
-    CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-    CGContextSetLineWidth(aContext, AStrokeThickness);
-    CGContextStrokeEllipseInRect(
-      aContext,
-      ALLowerLeftCGRect(
-        LRect.TopLeft,
-        LRect.Width,
-        LRect.Height,
-        aGridHeight));
-
+  if LStrokeColor <> TalphaColorRec.Null then begin
+    CGContextSetLineWidth(ACanvas, LScaledStrokeThickness);
+    var LStrokeColorF := TAlphaColorCGFloat.Create(LStrokeColor);
+    CGContextSetRGBStrokeColor(ACanvas, LStrokeColorF.R, LStrokeColorF.G, LStrokeColorF.B, LStrokeColorF.A);
+    _DrawCircle(aCanvas, LGridHeight, LRect, True{aDrawOnlyBorder}, false);
   end;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'MSWINDOWS'}
+  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
   var LFillKindRestoreValue: TBrushKind := ACanvas.Fill.Kind;
   var LFillColorRestoreValue: TAlphacolor := ACanvas.Fill.color;
@@ -9927,48 +11936,21 @@ begin
     ACanvas.Fill.Color := AFillColor;
   end
   else ACanvas.Fill.Kind := TBrushKind.None;
-  If AStrokeColor <> TalphaColorRec.Null then begin
+  If LStrokeColor <> TalphaColorRec.Null then begin
     ACanvas.Stroke.Kind := TBrushKind.Solid;
-    ACanvas.Stroke.Color := AStrokeColor;
-    ACanvas.Stroke.Thickness := AStrokeThickness;
+    ACanvas.Stroke.Color := LStrokeColor;
+    ACanvas.Stroke.Thickness := LScaledStrokeThickness;
   end
   else ACanvas.Stroke.Kind := TBrushKind.None;
   try
 
-    var LFillShape, LDrawShape: Boolean;
-    var LShapeRect := ALGetDrawingShapeRectAndSetThickness(ADstRect, ACanvas.Fill, ACanvas.Stroke, True, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
+    if LStrokeColor <> TalphaColorRec.Null then
+      LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
 
-    if LFillShape then
-      aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Fill);
-    if LDrawShape then
-      aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Stroke);
-
-    if (AShadowColor <> TalphaColorRec.Null) then begin
-
-      var LShadowEffect := TshadowEffect.Create(nil);
-      try
-        LShadowEffect.ShadowColor := AShadowColor;
-        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
-                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                    // we use the opacity of the color instead
-        LShadowEffect.softness := AShadowBlur / 24; // Specifies the amount of blur applied to the shadow.
-                                                    // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                    // I calculate approximatly that 0.5 = around 12 for blur
-        Acanvas.Flush;
-        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
-      finally
-        ALFreeAndNil(LShadowEffect);
-      end;
-
-      if LFillShape then
-        aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Fill);
-      if LDrawShape then
-        aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, ACanvas.Stroke);
-
-    end;
+    if AFillColor <> TAlphaColorRec.Null then
+      aCanvas.FillEllipse(LRect, 1{AbsoluteOpacity}, ACanvas.Fill);
+    If LStrokeColor <> TalphaColorRec.Null then
+      aCanvas.DrawEllipse(LRect, 1{AbsoluteOpacity}, ACanvas.Stroke);
 
   finally
     ACanvas.Fill.Kind := LFillKindRestoreValue;
@@ -9985,717 +11967,130 @@ end;
 
 {*********************}
 procedure ALDrawCircle(
-            {$IF defined(ALSkiaCanvas)}
-            Var ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            const ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            const AContext: CGContextRef;
-            const AGridHeight: Single;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            const ACanvas: Tcanvas;
-            {$ENDIF}
+            const ACanvas: TALCanvas;
+            const AScale: Single;
             const ADstRect: TrectF;
-            const AFill: TBrush;
-            const AStroke: TStrokeBrush;
-            const AShadow: TALShadow); // If shadow is not nil, then the Canvas must have enough space to draw the shadow (approximately Shadow.blur on each side of the circle)
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientAngle: Single;
+            const AFillResourceName: String;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single); overload;
+begin
+  var LFillGradientStartPoint: TPointF;
+  var LFillGradientEndPoint: TPointF;
+  case AFillGradientStyle of
+    TGradientStyle.Linear: begin
+      ALGetLinearGradientCoordinates(
+        ADstRect.Size, // const ASize: TSizeF;
+        AFillGradientAngle, // const AAngle: Single;
+        LFillGradientStartPoint, // out AStartPoint: TPointF;
+        LFillGradientEndPoint); // out AEndPoint: TPointF;
+    end;
+    TGradientStyle.Radial: begin
+      LFillGradientStartPoint := ADstRect.CenterPoint;
+      LFillGradientEndPoint := ADstRect.TopLeft;
+    end
+    else
+      Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
+  end;
+  ALDrawCircle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    ADstRect, // const ADstRect: TrectF;
+    AFillColor, // const AFillColor: TAlphaColor;
+    AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+    LFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    LFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillResourceName,// const AFillResourceName: String;
+    AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStrokeColor, // const AStrokeColor: TalphaColor;
+    AStrokeThickness, // const AStrokeThickness: Single;
+    AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+    AShadowBlur, // const AShadowBlur: Single;
+    AShadowOffsetX, // const AShadowOffsetX: Single;
+    AShadowOffsetY); // const AShadowOffsetY: Single);
+end;
 
-{$IF defined(IOS)}
-const DefaultInputRange: array[0..1] of CGFloat = (0, 1);
-{$ENDIF}
+{*********************}
+procedure ALDrawCircle(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow); // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+begin
+  ALDrawCircle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    ADstRect, // const ADstRect: TrectF;
+    AFill.Color, // const AFillColor: TAlphaColor;
+    Afill.Gradient.Style, // const AFillGradientStyle: TGradientStyle;
+    Afill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
+    Afill.Gradient.Offsets, // const AFillGradientOffsets: TArray<Single>;
+    Afill.Gradient.Angle, // const AFillGradientAngle: Single;
+    AFill.ResourceName, // const AFillResourceName: String;
+    AFill.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStroke.Color, // const AStrokeColor: TalphaColor;
+    AStroke.Thickness, // const AStrokeThickness: Single;
+    AShadow.Color, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    AShadow.Blur, // const AShadowBlur: Single;
+    AShadow.OffsetX, // const AShadowOffsetX: Single;
+    AShadow.OffsetY); // const AShadowOffsetY: Single;
+end;
 
+{************************}
+Procedure ALCreateSurface(
+            out ASurface: TALSurface;
+            out ACanvas: TALCanvas;
+            const AScale: Single;
+            const w: Single;
+            const h: Single);
 begin
 
   {$REGION 'SKIA'}
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
 
-  // Create LPaint
-  var LPaint := ALSkCheckHandle(sk4d_paint_create);
-  try
-
-    // Requests, but does not require, that edge pixels draw opaque or with partial transparency.
-    sk4d_paint_set_antialias(LPaint, true);
-    // Sets whether the geometry is filled, stroked, or filled and stroked.
-    sk4d_paint_set_dither(LPaint, true);
-
-    // Init LRect
-    var LRect: TRectf;
-    if AStroke.Kind <> TBrushKind.None then begin
-      LRect := TrectF.Create(
-                 ADstRect.Left + (AStroke.Thickness / 2),
-                 ADstRect.Top + (AStroke.Thickness / 2),
-                 ADstRect.right - (AStroke.Thickness / 2),
-                 ADstRect.bottom - (AStroke.Thickness / 2));
-    end
-    else LRect := ADstRect;
-
-    // Fill the circle
-    if AFill.Kind <> TBrushKind.None then begin
-
-      // FILL_SK_PAINTSTYLE
-      sk4d_paint_set_style(LPaint, sk_paintstyle_t.FILL_SK_PAINTSTYLE);
-
-      //In skia we can use this to convert from the (legacy) idea of specify
-      //the blur "radius" to the standard notion of specifying its sigma.
-      //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
-      //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
-      //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
-      //  }
-      //But it's not very good, I think that a better value is just Shadow.blur / 2
-      if (AShadow <> nil) and
-         (AShadow.enabled) then begin
-        var Limagefilter := ALSkCheckHandle(
-                              sk4d_imagefilter_make_drop_shadow(
-                                AShadow.OffsetX, // dx,
-                                AShadow.OffsetY, // dy,
-                                AShadow.blur / 2, // sigma_x,
-                                AShadow.blur / 2, // sigma_y: float;
-                                AShadow.Color, // color: sk_color_t;
-                                0, // input: sk_imagefilter_t;
-                                nil)); // const crop_rect: psk_rect_t)
-        try
-          // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
-          sk4d_paint_set_image_filter(LPaint, Limagefilter);
-        finally
-          sk4d_refcnt_unref(Limagefilter);
-        end;
-      end;
-
-      // Fill with gradient
-      if AFill.Kind = TBrushKind.Gradient then begin
-        var LColors: TArray<TAlphaColor>;
-        var LPositions: TArray<Single>;
-        SetLength(LColors, AFill.Gradient.Points.Count);
-        SetLength(LPositions, AFill.Gradient.Points.Count);
-        if Length(LColors) < 1 then raise Exception.Create('Invalid gradient');
-        if Length(LPositions) <> Length(LColors) then raise Exception.Create('Invalid gradient');
-        case AFill.Gradient.Style of
-          TGradientStyle.Linear:
-            begin
-              for var I := 0 to AFill.Gradient.Points.Count - 1 do begin
-                LColors[I]    := AFill.Gradient.Points[I].Color;
-                LPositions[I] := AFill.Gradient.Points[I].Offset;
-              end;
-              var LPoints: array[0..1] of sk_point_t;
-              LPoints[0].x := LRect.Left + AFill.Gradient.StartPosition.X * LRect.Width;
-              LPoints[0].y := LRect.Top + AFill.Gradient.StartPosition.Y * LRect.Height;
-              LPoints[1].x := LRect.Left + AFill.Gradient.StopPosition.X * LRect.Width;
-              LPoints[1].y := LRect.Top + AFill.Gradient.StopPosition.Y * LRect.Height;
-              var LShader := ALSkCheckHandle(
-                               sk4d_shader_make_gradient_linear(
-                                 @LPoints[0], // const points: psk_point_t;
-                                 @LColors[0], // const colors: psk_color_t;
-                                 @LPositions[0], // const positions: pfloat;
-                                 Length(LColors), // count: int32_t;
-                                 sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                 nil)); // const local_matrix: psk_matrix_t
-              try
-                // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                sk4d_paint_set_shader(LPaint, LShader);
-              finally
-                sk4d_refcnt_unref(LShader);
-              end;
-              var LCenterPoint := LRect.CenterPoint;
-              sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
-              sk4d_paint_set_shader(LPaint, 0);
-            end;
-          TGradientStyle.Radial:
-            begin
-              for var I := 0 to AFill.Gradient.Points.Count - 1 do begin
-                LColors[AFill.Gradient.Points.Count - 1 - I]    := AFill.Gradient.Points[I].Color;
-                LPositions[AFill.Gradient.Points.Count - 1 - I] := 1 - AFill.Gradient.Points[I].Offset;
-              end;
-              var LCenter  := TPointF.Create(LRect.Width * AFill.Gradient.RadialTransform.RotationCenter.X, LRect.Height * AFill.Gradient.RadialTransform.RotationCenter.Y) + LRect.TopLeft;
-              var LRadiusX: Single := AFill.Gradient.RadialTransform.Scale.X * (LRect.Width  / 2);
-              var LRadiusY: Single := AFill.Gradient.RadialTransform.Scale.Y * (LRect.Height / 2);
-              if not SameValue(LRadiusX, LRadiusY, Epsilon) then
-              begin
-                var LRadius: Single;
-                var LMatrix: TMatrix;
-                if LRadiusX < LRadiusY then begin
-                  LRadius := LRadiusY;
-                  LMatrix := TMatrix.CreateScaling(LRadiusX / LRadiusY, 1) * TMatrix.CreateTranslation(LCenter.X - (LCenter.X * (LRadiusX / LRadiusY)), 0);
-                end
-                else begin
-                  LRadius := LRadiusX;
-                  LMatrix := TMatrix.CreateScaling(1, LRadiusY / LRadiusX) * TMatrix.CreateTranslation(0, LCenter.Y - (LCenter.Y * (LRadiusY / LRadiusX)));
-                end;
-                var LShader := ALSkCheckHandle(
-                                 sk4d_shader_make_gradient_radial(
-                                   @LCenter, // const center: psk_point_t;
-                                   LRadius, // radius: float;
-                                   @LColors[0], // const colors: psk_color_t;
-                                   @LPositions[0], // const positions: pfloat;
-                                   Length(LColors), // count: int32_t;
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                   @LMatrix));// const local_matrix: psk_matrix_t
-                try
-                  // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                  sk4d_paint_set_shader(LPaint, LShader);
-                finally
-                  sk4d_refcnt_unref(LShader);
-                end;
-              end
-              else begin
-                var LShader := ALSkCheckHandle(
-                                 sk4d_shader_make_gradient_radial(
-                                   @LCenter, // const center: psk_point_t;
-                                   LRadiusX, // radius: float;
-                                   @LColors[0], // const colors: psk_color_t;
-                                   @LPositions[0], // const positions: pfloat;
-                                   Length(LColors), // count: int32_t;
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                   nil));// const local_matrix: psk_matrix_t
-                try
-                  // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                  sk4d_paint_set_shader(LPaint, LShader);
-                finally
-                  sk4d_refcnt_unref(LShader);
-                end;
-              end;
-              var LCenterPoint := LRect.CenterPoint;
-              sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
-              sk4d_paint_set_shader(LPaint, 0);
-            end;
-          else
-            raise Exception.Create('Error EAB4DED3-CF02-495B-9CB8-8F82479D2839');
-        end;
-      end
-
-      // Fill with bitmap
-      else if AFill.Kind = TBrushKind.Bitmap then begin
-        if AFill.Bitmap.Bitmap.HandleAllocated then begin
-          var LBitmapData: TBitmapData;
-          var LBitmapMapped := AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData);
-          if LBitmapMapped then begin
-            try
-
-              var LImage: sk_image_t;
-              var LImageInfo := ALGetSkImageinfo(LBitmapData.Width, LBitmapData.Height, sk_colortype_t(SkFmxColorType[LBitmapData.PixelFormat]));
-              var LPixmap := ALSkCheckHandle(
-                               sk4d_pixmap_create(
-                                 @LImageInfo, // const image_info: psk_imageinfo_t;
-                                 LBitmapData.Data, // const pixels: Pointer;
-                                 LBitmapData.Pitch)); // row_bytes: size_t
-              try
-                LImage := ALSkCheckHandle(
-                            sk4d_image_make_from_raster(
-                              LPixmap, // const pixmap: sk_pixmap_t;
-                              nil, // proc: sk_image_raster_release_proc;
-                              nil));// proc_context: Pointer
-                try
-
-                  var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
-
-                  var Lshader: sk_shader_t;
-                  if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
-                    var LMatrix := TMatrix.CreateScaling(LRect.Width / sk4d_image_get_width(LImage), LRect.Height / sk4d_image_get_height(LImage)) * TMatrix.CreateTranslation(LRect.Left, LRect.Top);
-                    Lshader := ALSkCheckHandle(
-                                 sk4d_image_make_shader(
-                                   LImage, // const self: sk_image_t;
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode_x,
-                                   sk_tilemode_t.CLAMP_SK_TILEMODE,// tile_mode_y: sk_tilemode_t;
-                                   @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                                   @LMatrix)); // const local_matrix: psk_matrix_t)
-                    try
-                      // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                      sk4d_paint_set_shader(LPaint, LShader);
-                    finally
-                      sk4d_refcnt_unref(LShader);
-                    end;
-                  end
-                  else begin
-                    var LTileMode: sk_tilemode_t;
-                    if AFill.Bitmap.WrapMode=TWrapMode.Tile then LTileMode := sk_tilemode_t.REPEAT_SK_TILEMODE
-                    else if AFill.Bitmap.WrapMode=TWrapMode.TileOriginal then LTileMode := sk_tilemode_t.CLAMP_SK_TILEMODE
-                    else raise Exception.Create('Error 9BC21F4C-82D4-4206-97BD-FB5F27BF262A');
-                    Lshader := ALSkCheckHandle(
-                                 sk4d_image_make_shader(
-                                   LImage, // const self: sk_image_t;
-                                   LTileMode, // tile_mode_x,
-                                   LTileMode, // tile_mode_y: sk_tilemode_t;
-                                   @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                                   nil)); // const local_matrix: psk_matrix_t)
-                    try
-                      // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                      sk4d_paint_set_shader(LPaint, LShader);
-                    finally
-                      sk4d_refcnt_unref(LShader);
-                    end;
-                  end;
-
-                  var LCenterPoint := LRect.CenterPoint;
-                  sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
-                  sk4d_paint_set_shader(LPaint, 0);
-
-                finally
-                  sk4d_refcnt_unref(LImage);
-                end;
-              finally
-                sk4d_refcnt_unref(LPixmap);
-              end;
-
-            finally
-              AFill.Bitmap.Bitmap.Unmap(LBitmapData);
-            end
-          end;
-        end;
-      end
-
-      // Fill with solid color
-      else if AFill.Kind = TBrushKind.Solid then begin
-        sk4d_paint_set_color(LPaint, AFill.Color);
-        var LCenterPoint := LRect.CenterPoint;
-        sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
-      end;
-
-    end;
-
-    // Stroke the circle
-    if AStroke.Kind <> TBrushKind.None then begin
-
-      // Init LPaint
-      sk4d_paint_set_style(LPaint, sk_paintstyle_t.STROKE_SK_PAINTSTYLE);
-      sk4d_paint_set_stroke_width(LPaint, AStroke.Thickness);
-      sk4d_paint_set_image_filter(LPaint, 0);
-
-      // Stroke with solid color
-      if AStroke.Kind = TBrushKind.Solid then begin
-        sk4d_paint_set_color(LPaint, AStroke.Color);
-        var LCenterPoint := LRect.CenterPoint;
-        sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, LPaint);
-      end;
-
-    end;
-
-  finally
-    sk4d_paint_destroy(LPaint);
-  end;
+  ASurface := ALCreateSkSurface(Round(W * AScale), Round(H * AScale));
+  ACanvas := ALSkCheckHandle(sk4d_surface_get_canvas(aSurface));
 
   {$ENDIF}
   {$ENDREGION}
 
   {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
 
-  //create the canvas and the paint
-  var LPaint := TJPaint.JavaClass.init;
-  LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
-  LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
-  LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
-
-  //init LRect
-  var LRect: TRectf;
-  if AStroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStroke.Thickness / 2),
-               ADstRect.Top + (AStroke.Thickness / 2),
-               ADstRect.right - (AStroke.Thickness / 2),
-               ADstRect.bottom - (AStroke.Thickness / 2));
-  end
-  else LRect := ADstRect;
-
-  //fill the circle
-  if AFill.Kind <> TBrushKind.None then begin
-
-    //init LPaint
-    LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LRect + Stroke.Thickness :( this result&ing in border if the fill is for exemple black and border white
-
-    //fill with gradient
-    if AFill.Kind = TBrushKind.Gradient then begin
-      if AFill.Gradient.Style = TGradientStyle.Radial then begin
-        var LColors := TJavaArray<Integer>.Create(AFill.Gradient.Points.Count);
-        var LStops := TJavaArray<Single>.Create(AFill.Gradient.Points.Count);
-        for var i := 0 to AFill.Gradient.Points.Count - 1 do begin
-          LColors[AFill.Gradient.Points.Count - 1 - i] := integer(AFill.Gradient.Points[i].Color);
-          LStops[AFill.Gradient.Points.Count - 1 - i] := 1 - AFill.Gradient.Points[i].Offset;
-        end;
-        var LShader := TJRadialGradient.JavaClass.init(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius},  LColors, LStops, TJShader_TileMode.JavaClass.CLAMP{tile});
-        LPaint.setShader(LShader);
-        if (AShadow <> nil) and
-           (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-        aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
-        if (AShadow <> nil) and
-           (AShadow.enabled) then LPaint.clearShadowLayer;
-        LPaint.setShader(nil);
-        LShader := nil;
-        alfreeandNil(LColors);
-        alfreeandNil(LStops);
-      end;
-    end
-
-    //fill with bitmap
-    else if AFill.Kind = TBrushKind.Bitmap then begin
-      if not AFill.Bitmap.Bitmap.IsEmpty then begin
-        if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
-          //-----
-          var LTmpBitmap := TJBitmap.JavaClass.createBitmap(AFill.Bitmap.Bitmap.Width, AFill.Bitmap.Bitmap.height, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
-          //-----
-          var LPixelBuffer: Pointer;
-          var LBitmapInfo: AndroidBitmapInfo;
-          FillChar(LBitmapInfo, SizeOf(LBitmapInfo), 0);
-          if (AndroidBitmap_getInfo(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LBitmapInfo) = 0) and
-             (AndroidBitmap_lockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID, @LPixelBuffer) = 0) then
-          try
-            var LBitmapData: TBitmapData;
-            if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
-            try
-              ALMove(LBitmapData.Data^, LPixelBuffer^, LBitmapData.Pitch * LBitmapData.Height);
-            finally
-              AFill.Bitmap.Bitmap.Unmap(LBitmapData);
-            end;
-          finally
-            AndroidBitmap_unlockPixels(TJNIResolver.GetJNIEnv, (LTmpBitmap as ILocalObject).GetObjectID);
-          end;
-          //-----
-          aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
-          var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
-          var LJDestRectf := TJRectf.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
-          var LJSrcRect := TJRect.JavaClass.init(0, 0, AFill.Bitmap.Bitmap.Width, AFill.Bitmap.Bitmap.height);
-          LPaint.setXfermode(LPorterDuffXfermode);
-          if (AShadow <> nil) and
-             (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-          aCanvas.drawBitmap(LTmpBitmap, LJSrcRect, LJDestRectf, LPaint);
-          if (AShadow <> nil) and
-             (AShadow.enabled) then LPaint.clearShadowLayer;
-          LPaint.setXfermode(nil);
-          LPorterDuffXfermode := nil;
-          LJSrcRect := nil;
-          LJDestRectf := nil;
-          //-----
-          LTmpBitmap.recycle;
-          LTmpBitmap := nil;
-          //-----
-        end;
-      end;
-    end
-
-    //fill with solid color
-    else if AFill.Kind = TBrushKind.Solid then begin
-      LPaint.setColor(integer(AFill.Color));
-      if (AShadow <> nil) and
-         (AShadow.enabled) then LPaint.setShadowLayer(AShadow.blur{radius}, AShadow.OffsetX{dx}, AShadow.OffsetY{dy}, integer(AShadow.Color){shadowColor});
-      aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
-      if (AShadow <> nil) and
-         (AShadow.enabled) then LPaint.clearShadowLayer;
-    end;
-
-  end;
-
-  //stroke the circle
-  if AStroke.Kind <> TBrushKind.None then begin
-
-    //init LPaint
-    LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-    LPaint.setStrokeWidth(AStroke.Thickness);
-
-    //stroke with solid color
-    if AStroke.Kind = TBrushKind.Solid then begin
-      LPaint.setColor(integer(AStroke.Color));
-      aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, LPaint);
-    end;
-
-  end;
-
-  //free the paint and the canvas
-  LPaint := nil;
+  ASurface := TJBitmap.JavaClass.createBitmap(Round(W * AScale), Round(H * AScale), TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+  ACanvas := TJCanvas.JavaClass.init(ASurface);
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'IOS'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'APPLEOS'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  //set the paint default properties
-  CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
-  //-----
-  CGContextSetShouldAntialias(aContext, True); // Sets anti-aliasing on or off for a graphics context.
-  CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
-
-  //init LRect
-  var LRect: TRectf;
-  if AStroke.Kind <> TBrushKind.None then begin
-    LRect := TrectF.Create(
-               ADstRect.Left + (AStroke.Thickness / 2),
-               ADstRect.Top + (AStroke.Thickness / 2),
-               ADstRect.right - (AStroke.Thickness / 2),
-               ADstRect.bottom - (AStroke.Thickness / 2));
-  end
-  else LRect := ADstRect;
-
-  //fill the circle
-  if AFill.Kind <> TBrushKind.None then begin
-
-    //fill with gradient
-    if AFill.Kind = TBrushKind.Gradient then begin
-      if AFill.Gradient.Style = TGradientStyle.Radial then begin
-        CGContextSaveGState(aContext);
-        //-----
-        var LCallback: CGFunctionCallbacks;
-        LCallback.version := 0;
-        LCallback.evaluate := @ALGradientEvaluateCallback;
-        LCallback.releaseInfo:= nil;
-        var LFunc := CGFunctionCreate(
-                       AFill.Gradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
-                       1, // domainDimension - The number of inputs.
-                       @DefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
-                       4, // rangeDimension - The number of outputs.
-                       nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
-                       @LCallback); // callbacks - A pointer to a callback function table.
-        try
-          var LShading := CGShadingCreateRadial(
-                            ALGetGlobalCGColorSpace, // colorspace
-                            CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.height / 2)), // start - The center of the starting circle, in the shading's target coordinate space.
-                            LRect.Width / 2, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
-                            CGPoint.Create(TPointF.Create(LRect.Width / 2, LRect.Height / 2)), // end - The center of the ending circle, in the shading's target coordinate space.
-                            0, // endRadius - The radius of the ending circle, in the shading's target coordinate space.
-                            LFunc, // function
-                            True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                            True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
-          try
-            CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
-            CGContextAddEllipseInRect(
-              aContext,
-              ALLowerLeftCGRect(
-                LRect.TopLeft,
-                LRect.Width,
-                LRect.Height,
-                aGridHeight));
-            CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
-            CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
-                                     // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
-                                     // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
-                                     // save the graphics state before you clip and restore the graphics state after you’ve completed
-                                     // any clipped drawing.
-            //-----
-            if (AShadow <> nil) and
-               (AShadow.enabled) then begin
-              var LAlphaColor := TAlphaColorCGFloat.Create(AShadow.Color);
-              var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-              try
-                CGContextSetShadowWithColor(
-                  aContext,
-                  CGSizeMake(AShadow.OffsetX, AShadow.OffsetY), // offset
-                  AShadow.blur, // blur
-                  LColor); // color
-              finally
-                CGColorRelease(LColor);
-              end;
-            end;
-            //-----
-            CGContextDrawShading(aContext, LShading);
-            //-----
-            if (AShadow <> nil) and
-               (AShadow.enabled) then begin
-              CGContextSetShadowWithColor(
-                aContext,
-                CGSizeMake(0, 0), // offset
-                0, // blur
-                nil); // color
-            end;
-            //-----
-          finally
-            CGShadingRelease(LShading);
-          end;
-        finally
-          CGFunctionRelease(LFunc);
-        end;
-        //-----
-        CGContextRestoreGState(aContext);
-      end;
-    end
-
-    //fill with bitmap
-    else if AFill.Kind = TBrushKind.Bitmap then begin
-      if not AFill.Bitmap.Bitmap.IsEmpty then begin
-        if AFill.Bitmap.WrapMode = TWrapMode.TileStretch then begin
-          var LBitmapData: TBitmapData;
-          if AFill.Bitmap.Bitmap.Map(TMapAccess.Read, LBitmapData) then
-          try
-            var LTmpContext := ALCreateCGContextRef(LBitmapData.Width, LBitmapData.Height, LBitmapData.Data, LBitmapData.Pitch);
-            try
-              var LImageRef := CGBitmapContextCreateImage(LTmpContext);
-              if LImageRef = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
-              try
-                var LImage := TUIImage.Wrap(TUIImage.alloc.initWithCGImage(LImageRef));
-                if LImage = nil then raise Exception.create('Failed to initialize UIImage from CGImageRef');
-                try
-                  CGContextSaveGState(aContext);
-                  //-----
-                  CGContextBeginPath(aContext);  // Creates a new empty path in a graphics context.
-                  CGContextAddEllipseInRect(
-                    aContext,
-                    ALLowerLeftCGRect(
-                      LRect.TopLeft,
-                      LRect.Width,
-                      LRect.Height,
-                      aGridHeight)); // Adds an ellipse that fits inside the specified rectangle.
-                  CGContextClosePath(aContext); // Closes and terminates the current path’s subpath.
-                  CGContextClip(aContext); // Modifies the current clipping path, using the nonzero winding number rule.
-                                           // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
-                                           // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
-                                           // save the graphics state before you clip and restore the graphics state after you’ve completed
-                                           // any clipped drawing.
-                  //-----
-                  if (AShadow <> nil) and
-                     (AShadow.enabled) then begin
-                    var LAlphaColor := TAlphaColorCGFloat.Create(AShadow.Color);
-                    var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-                    try
-                      CGContextSetShadowWithColor(
-                        aContext,
-                        CGSizeMake(AShadow.OffsetX, AShadow.OffsetY), // offset
-                        AShadow.blur, // blur
-                        LColor); // color
-                    finally
-                      CGColorRelease(LColor);
-                    end;
-                  end;
-                  //-----
-                  CGContextDrawImage(
-                    aContext, // c: The graphics context in which to draw the image.
-                    ALLowerLeftCGRect(
-                      LRect.TopLeft,
-                      LRect.Width,
-                      LRect.Height,
-                      aGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                    LImage.CGImage); // image The image to draw.
-                  //-----
-                  if (AShadow <> nil) and
-                     (AShadow.enabled) then begin
-                    CGContextSetShadowWithColor(
-                      aContext,
-                      CGSizeMake(0, 0), // offset
-                      0, // blur
-                      nil); // color
-                  end;
-                  //-----
-                  CGContextRestoreGState(aContext);
-                finally
-                  LImage.release;
-                end;
-              finally
-                CGImageRelease(LImageRef);
-              end;
-            finally
-              CGContextRelease(LTmpContext);
-            end;
-          finally
-            AFill.Bitmap.Bitmap.Unmap(LBitmapData);
-          end;
-        end;
-      end;
-    end
-
-    //fill with solid color
-    else if AFill.Kind = TBrushKind.Solid then begin
-      var LAlphaColor := TAlphaColorCGFloat.Create(AFill.Color);
-      CGContextSetRGBFillColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-      //-----
-      if (AShadow <> nil) and
-         (AShadow.enabled) then begin
-        LAlphaColor := TAlphaColorCGFloat.Create(AShadow.Color);
-        var LColor := CGColorCreate(ALGetGlobalCGColorSpace, @LAlphaColor);
-        try
-          CGContextSetShadowWithColor(
-            aContext,
-            CGSizeMake(AShadow.OffsetX, AShadow.OffsetY), // offset
-            AShadow.blur, // blur
-            LColor); // color
-        finally
-          CGColorRelease(LColor);
-        end;
-      end;
-      //-----
-      CGContextFillEllipseInRect(
-        aContext,
-        ALLowerLeftCGRect(
-          LRect.TopLeft,
-          LRect.Width,
-          LRect.Height,
-          aGridHeight));
-      //-----
-      if (AShadow <> nil) and
-         (AShadow.enabled) then begin
-        CGContextSetShadowWithColor(
-          aContext,
-          CGSizeMake(0, 0), // offset
-          0, // blur
-          nil); // color
-      end;
-      //-----
-    end;
-
-  end;
-
-  //stroke the circle
-  if AStroke.Kind <> TBrushKind.None then begin
-
-    //stroke with solid color
-    if AStroke.Kind = TBrushKind.Solid then begin
-      var LAlphaColor := TAlphaColorCGFloat.Create(AStroke.Color);
-      CGContextSetRGBStrokeColor(aContext, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-      CGContextSetLineWidth(aContext, AStroke.Thickness);
-      CGContextStrokeEllipseInRect(
-        aContext,
-        ALLowerLeftCGRect(
-          LRect.TopLeft,
-          LRect.Width,
-          LRect.Height,
-          aGridHeight));
-    end;
-
-  end;
+  ASurface := ALCreateCGContextRef(Round(W * AScale), Round(H * AScale));
+  ACanvas := ASurface;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'MSWINDOWS'}
+  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  var LStrokeThicknessRestoreValue: Single := AStroke.Thickness;
-  try
-
-    var LFillShape, LDrawShape: Boolean;
-    var LShapeRect := ALGetDrawingShapeRectAndSetThickness(ADstRect, AFill, AStroke, True, LFillShape, LDrawShape, LStrokeThicknessRestoreValue);
-
-    if LFillShape then
-      aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, AFill);
-    if LDrawShape then
-      aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, AStroke);
-
-    if (LFillShape) and
-       (AShadow <> nil) and
-       (AShadow.Enabled) then begin
-
-      var LShadowEffect := TshadowEffect.Create(nil);
-      try
-        LShadowEffect.ShadowColor := AShadow.Color;
-        LShadowEffect.distance := 0; // Specifies the distance between the shadow and the visual object to which TShadowEffect is applied.
-                                     // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Direction := 0;  // Specifies the direction (in degrees) of the shadow.
-                                       // i m too lazy to calculate this from fShadow.offsetX / fShadow.offsetY - if someone want to do it
-        LShadowEffect.Opacity := 1; // Opacity is a System.Single value that takes values in the range from 0 through 1.
-                                    // we use the opacity of the color instead
-        LShadowEffect.softness := AShadow.blur / 24; // Specifies the amount of blur applied to the shadow.
-                                                     // Softness is a System.Single value that takes values in the range from 0 through 9.
-                                                     // I calculate approximatly that 0.5 = around 12 for blur
-        Acanvas.Flush;
-        LShadowEffect.ProcessEffect(ACanvas, Acanvas.Bitmap, 1);
-      finally
-        ALFreeAndNil(LShadowEffect);
-      end;
-
-      if LFillShape then
-        aCanvas.FillEllipse(LShapeRect, 1{AbsoluteOpacity}, AFill);
-      if LDrawShape then
-        aCanvas.DrawEllipse(LShapeRect, 1{AbsoluteOpacity}, AStroke);
-
-    end;
-
-  finally
-    AStroke.Thickness := LStrokeThicknessRestoreValue;
-  end;
+  ASurface := Tbitmap.Create(Round(W * AScale), Round(H * AScale));
+  ASurface.Clear(TAlphaColorRec.Null);
+  ACanvas := ASurface.Canvas;
 
   {$ENDIF}
   {$ENDREGION}
@@ -10704,130 +12099,29 @@ end;
 
 {************************}
 Procedure ALCreateSurface(
-            {$IF defined(ALSkiaCanvas)}
-            out ASurface: sk_surface_t;
-            out ACanvas: sk_canvas_t;
-            {$ELSEIF defined(ANDROID)}
-            out ABitmap: Jbitmap;
-            out ACanvas: Jcanvas;
-            {$ELSEIF defined(IOS)}
-            out AContext: CGContextRef;
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            out ABitmap: Tbitmap;
-            {$ENDIF}
-            const w: integer;
-            const h: integer);
+            out ASurface: TALSurface;
+            out ACanvas: TALCanvas;
+            const w: Integer;
+            const h: Integer);
 begin
-
-  {$REGION 'SKIA'}
-  {$IF defined(ALSkiaCanvas)}
-
-  ASurface := ALCreateSkSurface(w, h);
-  ACanvas := ALSkCheckHandle(sk4d_surface_get_canvas(aSurface));
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
-
-  aBitmap := TJBitmap.JavaClass.createBitmap(W, H, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
-  aCanvas := TJCanvas.JavaClass.init(aBitmap);
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'IOS'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
-
-  //create the context
-  aContext := ALCreateCGContextRef(W, H);
-  try
-
-    //set the paint default properties
-    CGContextSetInterpolationQuality(aContext, kCGInterpolationHigh); // Sets the level of interpolation quality for a graphics context. http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
-    //-----
-    CGContextSetShouldAntialias(aContext, True); // default: ON
-                                                 // Sets anti-aliasing on or off for a graphics context.
-    CGContextSetAllowsAntialiasing(aContext, True); // Sets whether or not to allow anti-aliasing for a graphics context.
-    //-----
-    //CGContextSetShouldSmoothFonts(aContext, True); // There are cases, such as rendering to a bitmap, when font smoothing is not appropriate and should be disabled.
-                                                     // Note that some contexts (such as PostScript contexts) do not support font smoothing.
-                                                     // -----
-                                                     // Enables or disables font smoothing in a graphics context.
-                                                     // When drawing text on a context attached to a color LCD display, Quartz takes advantage of the nature of
-                                                     // LCD monitors to improve the legibility of text. This technique is called Font Smoothing. The pixels
-                                                     // of an LCD monitor are made up of red, green, and blue sub-pixels. If you take these sub-pixels into
-                                                     // account the screen appears to have three times the resolution commonly attributed to it, at least in
-                                                     // one dimension. Font smoothing takes advantage of this increased resolution to improve the rendering of
-                                                     // text. Quartz turns different sub-pixels off and on by changing the color of a pixels along the edge of
-                                                     // letter shapes. Because your eye expects to see a hard line at the edge of the glyphs, the computer tricks
-                                                     // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
-                                                     // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
-                                                     // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
-    //CGContextSetAllowsFontSmoothing(aContext, True); // Sets whether or not to allow font smoothing for a graphics context.
-    //-----
-    CGContextSetShouldSubpixelPositionFonts(aContext, True); // default: ON
-                                                             // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
-                                                             // the position of glyphs are always forced to integral pixel boundaries.
-                                                             // -----
-                                                             // Enables or disables subpixel positioning in a graphics context.
-                                                             // Subpixel positioning concerns whether or not the glyphs in a line of
-                                                             // text will be aligned to pixel boundaries or not. If subpixel positioning is
-                                                             // off then when glyphs are drawn their positions might be shifted slightly to
-                                                             // take pixel boundaries in account. This can improve the visual definition of
-                                                             // the glyphs (making them slightly less "blurry") at the expense of honoring
-                                                             // the font metrics.
-    CGContextSetAllowsFontSubpixelPositioning(aContext, True); // Sets whether or not to allow subpixel positioning for a graphics context
-    //-----
-    CGContextSetShouldSubpixelQuantizeFonts(aContext, True); // default: ON
-                                                             // Enables or disables subpixel quantization in a graphics context.
-                                                             // -----
-                                                             // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
-                                                             // quantization improves the rendering of fonts whose glyphs are at subpixel positions
-                                                             // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
-                                                             // This improvement, requires additional processing so changing this value can affect text
-                                                             // drawing performance.
-    CGContextSetAllowsFontSubpixelQuantization(aContext, True);  // Sets whether or not to allow subpixel quantization for a graphics context
-
-  except
-    CGContextRelease(aContext);
-    raise;
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
-
-  aBitmap := Tbitmap.Create(w, H);
-  aBitmap.Clear(TAlphaColorRec.Null);
-
-  {$ENDIF}
-  {$ENDREGION}
-
+  ALCreateSurface(
+    ASurface, // out ASurface: TALSurface;
+    ACanvas, // out ACanvas: TALCanvas;
+    1, // const AScale: Single;
+    w, // const w: Single;
+    h); // const h: Single
 end;
 
 {**********************}
 procedure ALFreeSurface(
-            {$IF defined(ALSkiaCanvas)}
-            Var ASurface: sk_surface_t;
-            Var ACanvas: sk_canvas_t
-            {$ELSEIF defined(ANDROID)}
-            Var ABitmap: Jbitmap;
-            var ACanvas: Jcanvas
-            {$ELSEIF defined(IOS)}
-            Var AContext: CGContextRef
-            {$ELSEIF defined(MSWINDOWS) or defined(ALMacOS)}
-            Var ABitmap: Tbitmap
-            {$ENDIF});
+            Var ASurface: TALSurface;
+            Var ACanvas: TALCanvas);
 begin
 
   {$REGION 'SKIA'}
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
 
-  ACanvas := 0;
+  ACanvas := 0; // ACanvas is linked inside ASurface
   if aSurface <> 0 then begin
     sk4d_refcnt_unref(aSurface);
     aSurface := 0;
@@ -10837,32 +12131,34 @@ begin
   {$ENDREGION}
 
   {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaCanvas))}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
 
   aCanvas := nil;
-  if aBitmap <> nil then begin
-    aBitmap.recycle;
-    aBitmap := nil;
+  if ASurface <> nil then begin
+    ASurface.recycle;
+    ASurface := nil;
   end;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'IOS'}
-  {$IF (defined(IOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'APPLEOS'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  if aContext <> nil then begin
-    CGContextRelease(aContext);
-    aContext := nil;
+  ACanvas := Nil; // ACanvas = ASurface
+  if ASurface <> nil then begin
+    CGContextRelease(ASurface);
+    ASurface := nil;
   end;
 
   {$ENDIF}
   {$ENDREGION}
 
-  {$REGION 'MSWINDOWS / MACOS'}
-  {$IF (defined(MSWINDOWS) or defined(ALMacOS)) and (not defined(ALSkiaCanvas))}
+  {$REGION 'MSWINDOWS'}
+  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  ALFreeAndNil(aBitmap);
+  ACanvas := nil; // ACanvas is linked inside ASurface
+  ALFreeAndNil(ASurface);
 
   {$ENDIF}
   {$ENDREGION}
@@ -10877,7 +12173,10 @@ procedure ALDrawDrawable(
             const AOpacity: Single);
 begin
 
-  var LSrcRect := TRectF.Create(0, 0, GetDrawableWidth(ADrawable), GetDrawableHeight(ADrawable));
+  if ALIsDrawableNull(ADrawable) then
+    Exit;
+
+  var LSrcRect := TRectF.Create(0, 0, ALGetDrawableWidth(ADrawable), ALGetDrawableHeight(ADrawable));
   var LDstRect := LSrcRect;
   LDstRect.Width := LDstRect.Width / ACanvas.Scale;
   LDstRect.height := LDstRect.height / ACanvas.Scale;
@@ -10885,6 +12184,26 @@ begin
   LDstRect := ACanvas.AlignToPixel(LDstRect);
 
   {$IF DEFINED(ALSkiaCanvas)}
+
+  {$IF DEFINED(ALDPK)}
+
+  var LBufferBitmap := ALCreateBitmapFromSkImage(ADrawable);
+  try
+    ACanvas.DrawBitmap(
+      LBufferBitmap,
+      LSrcRect, {SrcRect}
+      LDstRect, {DestRect}
+      AOpacity, {opacity}
+      true{highSpeed});
+  finally
+    ALFreeAndNil(LBufferBitmap);
+  end;
+
+  {$ELSE}
+
+  {$IF defined(DEBUG)}
+  ALSkCheckCanvas(ACanvas);
+  {$ENDIF}
 
   var LPaint := ALGetGlobalSkPaint(AOpacity);
   var LSamplingoptions := ALGetNearestSkSamplingoptions;
@@ -10896,6 +12215,8 @@ begin
     @LSamplingoptions, // const sampling: psk_samplingoptions_t;
     LPaint, // const paint: sk_paint_t;
     FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+
+  {$ENDIF}
 
   {$ELSEIF DEFINED(ALGpuCanvas)}
 
@@ -10927,9 +12248,32 @@ procedure ALDrawDrawable(
             const AOpacity: Single);
 begin
 
+  if ALIsDrawableNull(ADrawable) then
+    Exit;
+
   var LDstRect := ACanvas.AlignToPixel(ADstRect);
 
   {$IF DEFINED(ALSkiaCanvas)}
+
+  {$IF DEFINED(ALDPK)}
+
+  var LBufferBitmap := ALCreateBitmapFromSkImage(ADrawable);
+  try
+    ACanvas.DrawBitmap(
+      LBufferBitmap,
+      ASrcRect, {SrcRect}
+      LDstRect, {DestRect}
+      AOpacity, {opacity}
+      true{highSpeed});
+  finally
+    ALFreeAndNil(LBufferBitmap);
+  end;
+
+  {$ELSE}
+
+  {$IF defined(DEBUG)}
+  ALSkCheckCanvas(ACanvas);
+  {$ENDIF}
 
   var LPaint := ALGetGlobalSkPaint(AOpacity);
   var LSamplingoptions := ALGetNearestSkSamplingoptions;
@@ -10941,6 +12285,8 @@ begin
     @LSamplingoptions, // const sampling: psk_samplingoptions_t;
     LPaint, // const paint: sk_paint_t;
     FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+
+  {$ENDIF}
 
   {$ELSEIF DEFINED(ALGpuCanvas)}
 
@@ -10963,8 +12309,31 @@ begin
 
 end;
 
-{**************************************************************}
-function  IsDrawableNull(const aDrawable: TALDrawable): Boolean;
+{***********************}
+procedure ALDrawDrawable(
+            const ACanvas: Tcanvas;
+            const ADrawable: TALDrawable;
+            const ADstRect: TrectF; // IN Virtual pixels !
+            const AOpacity: Single);
+begin
+
+  if ALIsDrawableNull(ADrawable) then
+    Exit;
+
+  ALDrawDrawable(
+    ACanvas, // const ACanvas: Tcanvas;
+    ADrawable, // const ADrawable: TALDrawable;
+    Trectf.Create(
+      0, 0,
+      ALGetDrawableWidth(ADrawable),
+      ALGetDrawableHeight(ADrawable)), // const ASrcRect: TrectF; // IN REAL PIXEL !
+    ADstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+    AOpacity); // const AOpacity: Single)
+
+end;
+
+{****************************************************************}
+function  ALIsDrawableNull(const aDrawable: TALDrawable): Boolean;
 begin
   {$IF defined(ALSkiaCanvas)}
   result := aDrawable = 0
@@ -10986,8 +12355,8 @@ begin
   {$ENDIF}
 end;
 
-{****************************************************************}
-function  GetDrawableWidth(const aDrawable: TALDrawable): integer;
+{******************************************************************}
+function  ALGetDrawableWidth(const aDrawable: TALDrawable): integer;
 begin
   {$IF defined(ALSkiaCanvas)}
   result := sk4d_image_get_width(aDrawable);
@@ -10996,8 +12365,8 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************************************}
-function  GetDrawableHeight(const aDrawable: TALDrawable): integer;
+{*******************************************************************}
+function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer;
 begin
   {$IF defined(ALSkiaCanvas)}
   result := sk4d_image_get_height(aDrawable);
@@ -11006,8 +12375,36 @@ begin
   {$ENDIF}
 end;
 
+{*************************************************************}
+function ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean;
+begin
+  {$IF defined(ALSkiaEngine)}
+  Result := true;
+  {$ELSEIF defined(ANDROID)}
+  Result := true;
+  {$ELSEIF defined(ALAppleOS)}
+  Result := true;
+  {$ELSE}
+  Result := ACanvas.BeginScene;
+  {$ENDIF};
+end;
+
+{***************************************************}
+procedure ALCanvasEndScene(const aCanvas: TALCanvas);
+begin
+  {$IF defined(ALSkiaEngine)}
+  // Nothing to do
+  {$ELSEIF defined(ANDROID)}
+  // Nothing to do
+  {$ELSEIF defined(ALAppleOS)}
+  // Nothing to do
+  {$ELSE}
+  ACanvas.EndScene;
+  {$ENDIF};
+end;
+
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALCreateDisplayP3SkColorSpace: sk_colorspace_t;
 begin
   //Taken from SkColorSpace.h
@@ -11050,7 +12447,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALGetGlobalSkColorSpace: sk_colorspace_t;
 begin
   if not ALGlobalSkColorSpaceInitialized then begin
@@ -11099,6 +12496,13 @@ begin
         raise Exception.Create('Unknown UITraitEnvironment.displayGamut');
     end;
 
+    {$ELSEIF defined(ALMacOS)}
+
+    LSkColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+    {$IF defined(debug)}
+    ALLog('GlobalSkColorSpace', 'sRGB');
+    {$ENDIF}
+
     {$ELSE}
 
     LSkColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
@@ -11118,7 +12522,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALGetGlobalSkPaint(const AOpacity: Single): sk_paint_t;
 begin
   {$IF defined(DEBUG)}
@@ -11140,7 +12544,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALSkCheckHandle(const AHandle: sk_handle_t): sk_handle_t;
 begin
   If AHandle = 0 then
@@ -11150,7 +12554,29 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+procedure ALSkCheckCanvas(const ACanvas: TCanvas);
+begin
+  if not (ACanvas is TSkCanvasCustom) then begin
+    if GlobalUseSkia then
+      raise Exception.Create(
+              'Your declaration of GlobalUseSkia has no effect because the ' +
+              'canvas service has already been started. In this case, just ' +
+              'create a unit in the project like "Project.Startup.pas", '    +
+              'place the GlobalUseSkia declaration in the initialization of ' +
+              'this new unit, and declare this new unit before any other '  +
+              'unit of yours in the .dpr, that is, right after FMX.Forms.')
+    else
+      raise Exception.Create(
+              'You must enable Skia for app rendering by setting '+
+              'FMX.Skia.GlobalUseSkia to true in the initialization section '+
+              'of your project.');
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
 function ALSkStreamAdapterGetLengthProc(context: Pointer): size_t;
 begin
   Result := TStream(context).Size;
@@ -11158,7 +12584,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALSkStreamAdapterGetPositionProc(context: Pointer): size_t;
 begin
   Result := TStream(context).Position;
@@ -11166,7 +12592,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALSkStreamAdapterReadProc(context: Pointer; buffer: Pointer; size: size_t): size_t;
 begin
   Result := TStream(context).Read(buffer^, size);
@@ -11174,7 +12600,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALSkStreamAdapterSeekProc(context: Pointer; position: size_t): _bool;
 begin
   TStream(context).Position := position;
@@ -11183,8 +12609,8 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
-function ALGetSkImageinfo(const W, H: int32_t; const AColorType: sk_colortype_t = {$IFDEF BIGENDIAN}sk_colortype_t.RGBA8888_SK_COLORTYPE{$ELSE}sk_colortype_t.BGRA8888_SK_COLORTYPE{$ENDIF}): sk_imageinfo_t;
+{$IF defined(ALSkiaEngine)}
+function ALGetSkImageinfo(const W, H: int32_t; const AColorType: sk_colortype_t = sk_colortype_t.BGRA8888_SK_COLORTYPE): sk_imageinfo_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_imageinfo_t didn''t changed'}
@@ -11202,35 +12628,54 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALCreateSkSurface(Const W, H: integer): sk_surface_t;
 begin
 
-  //their is a bug with openGL that forbid us to use
-  //GPU surface: https://github.com/skia4delphi/skia4delphi/issues/296
+  if (not ALGlobalUseRasterSkSurface) then begin
 
-  {if (TGrCanvas.SharedContext <> nil) then begin
-    var LImageInfo := ALGetSkImageinfo(W, H);
-    var LGrBackEndTexture := ALSkCheckHandle(
-                               gr4d_directcontext_create_texture(
-                                 TGrCanvas.SharedContext.GrDirectContext.Handle, // self: gr_directcontext_t;
-                                 LImageInfo.width, // width,
-                                 LImageInfo.Height, // height: int32_t;
-                                 LImageInfo.color_type, // color_type: sk_colortype_t;
-                                 // color: sk_color_t;
-                                 False, // is_mipmapped,
-                                 True, // is_renderable,
-                                 False)); //is_protected: _bool
+    // https://groups.google.com/g/skia-discuss/c/rq8ucR2OyQ0
+    // * Ganesh is not thread safe. Thus it can only be used on one thread at a
+    //   time and it is the clients responsibility to ensure this happens. This
+    //   includes drawing to GPU surfaces as well as things like creating and
+    //   freeing resources owning GPU objects (e.g. gpu texture backed SkImages/Surfaces).
+    // * You cannot share objects that wrap GPU objects between different
+    //   GrDirectContexts. So an SkSurface made on one GrDirectContext cannot be
+    //   used on a different one*.
+    // * GL does allow you to make share groups which allow you to use GL objects
+    //   between different GL Contexts. In general Skia does not test this so we
+    //   cannot recommend using this system ourselves. Now saying that, we do
+    //   know in the past we've seen driver bugs when trying to play around with
+    //   share groups especially when rendering to the objects on different
+    //   contexts (with appropriate synchronization of course). It does seem like
+    //   things like texture creation and uploads do tend to work with less bugs
+    //   across share groups.
 
-    result := ALSkCheckHandle(
-                sk4d_surface_make_from_texture(
-                  TGrCanvas.SharedContext.GrDirectContext.Handle, // context: gr_directcontext_t;
-                  LGrBackEndTexture, // const texture: gr_backendtexture_t;
-                  gr_surfaceorigin_t.TOP_LEFT_GR_SURFACEORIGIN, // origin: gr_surfaceorigin_t;
-                  1, // sample_count: int32_t;
-                  LImageInfo.color_type, // color_type: sk_colortype_t;
-                  LImageInfo.color_space, // color_space: sk_colorspace_t;
-                  nil)); //const props: psk_surfaceprops_t));
+    Raise exception.Create('GPU Surface is not yet supported');
+
+    //if not TGrCanvas.Initialized then
+    //  Raise exception.Create('The shared context has not been initialized');
+    //var LImageInfo := ALGetSkImageinfo(W, H);
+    //var LGrBackEndTexture := ALSkCheckHandle(
+    //                           gr4d_directcontext_create_texture(
+    //                             TGrCanvas.SharedContext.GrDirectContext.Handle, // self: gr_directcontext_t;
+    //                             LImageInfo.width, // width,
+    //                             LImageInfo.Height, // height: int32_t;
+    //                             LImageInfo.color_type, // color_type: sk_colortype_t;
+    //                             False, // is_mipmapped,
+    //                             True, // is_renderable,
+    //                             False)); //is_protected: _bool
+    //
+    //result := ALSkCheckHandle(
+    //            sk4d_surface_make_from_texture(
+    //              TGrCanvas.SharedContext.GrDirectContext.Handle, // context: gr_directcontext_t;
+    //              LGrBackEndTexture, // const texture: gr_backendtexture_t;
+    //              gr_surfaceorigin_t.TOP_LEFT_GR_SURFACEORIGIN, // origin: gr_surfaceorigin_t;
+    //              1, // sample_count: int32_t;
+    //              LImageInfo.color_type, // color_type: sk_colortype_t;
+    //              LImageInfo.color_space, // color_space: sk_colorspace_t;
+    //              nil)); //const props: psk_surfaceprops_t));
+
   end
   else begin
     var LImageInfo := ALGetSkImageinfo(W, H);
@@ -11240,57 +12685,119 @@ begin
                   LImageInfo.width * SkBytesPerPixel[TSkColorType(LImageInfo.color_type)], // row_bytes: size_t;
                   nil)); // const props: psk_surfaceprops_t
 
-  end;}
-
-  var LImageInfo := ALGetSkImageinfo(W, H);
-  Result := ALSkCheckHandle(
-              sk4d_surface_make_raster(
-                @LImageInfo, // image_info: psk_imageinfo_t;
-                LImageInfo.width * SkBytesPerPixel[TSkColorType(LImageInfo.color_type)], // row_bytes: size_t;
-                nil)); // const props: psk_surfaceprops_t
+  end;
 
 end;
 {$ENDIF}
 
-{$IF defined(ALSkiaCanvas)}
-{$IF defined(debug)}
-var
-  ALSkImageIsTextureBackedLOG: Boolean = false;
-{$ENDIF}
+{*************************}
+{$IF defined(ALSkiaEngine)}
+function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
+begin
+  var LWidth := sk4d_pixmap_get_width(APixmap);
+  var LHeight := sk4d_pixmap_get_Height(APixmap);
+  Result := TBitmap.Create(LWidth, LHeight);
+  Try
+    var LBitmapData: TBitmapData;
+    if Result.Map(TMapAccess.ReadWrite, LBitmapData) then begin
+      try
+        {$IF defined(DEBUG)}
+        var Lcolortype := sk4d_pixmap_get_color_type(APixmap);
+        if Lcolortype <> sk_colortype_t(SkFmxColorType[LBitmapData.PixelFormat]) then
+          Raise Exception.Create('Pixmap and TBitmap color types mismatch');
+        {$ENDIF}
+        var LBytesPerPixel := LBitmapData.BytesPerPixel;
+        var LSourceRowBytes := Integer(sk4d_pixmap_get_row_bytes(APixmap));
+        var LDestRowBytes := LBitmapData.Pitch;
+        var LSourceData := sk4d_pixmap_get_pixels(APixmap);
+        if LSourceRowBytes <> LDestRowBytes then begin
+          for var Y := 0 to LHeight - 1 do
+            ALMove(PByte(LSourceData)[Y * LSourceRowBytes], PByte(LBitmapData.Data)[Y * LDestRowBytes], LWidth * LBytesPerPixel);
+        end
+        else begin
+          ALMove(PByte(LSourceData)[0], PByte(LBitmapData.Data)[0], LWidth * LHeight * LBytesPerPixel);
+        end;
+      finally
+        Result.Unmap(LBitmapData);
+      end
+    end
+    else
+      Raise Exception.create('Failed to map the bitmap for read/write access');
+  except
+    ALFreeAndNil(Result);
+    Raise;
+  end;
+end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
-function ALCreateSkImageFromSurface(Const ASurface: sk_surface_t): sk_image_t;
+{$IF defined(ALSkiaEngine)}
+function ALCreateSkImageFromSkSurface(Const ASurface: sk_surface_t): sk_image_t;
 begin
   Result := ALSkCheckHandle(sk4d_surface_make_image_snapshot(ASurface));
-
-  //their is a bug with openGL that forbid us to use
-  //GPU surface: https://github.com/skia4delphi/skia4delphi/issues/296
-
-  //if (not sk4d_image_is_texture_backed(Result)) and
-  //   (TGrCanvas.Initialized) then begin
-  //  Result := ALSkCheckHandle(
-  //              sk4d_image_make_texture_image(
-  //                Result, // const self: sk_image_t;
-  //                TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
-  //                false)); //is_mipmapped: _bool
-  //end;
-
-  {$IF defined(debug)}
-  if not ALSkImageIsTextureBackedLOG then begin
-    if (not sk4d_image_is_texture_backed(Result)) then
-      allog('Skia', 'Images are not backed by textures.', TalLogType.WARN)
-    else
-      allog('Skia', 'Images are backed by textures.', TalLogType.verbose);
-    ALSkImageIsTextureBackedLOG := True;
+  if (not ALGlobalUseRasterSkImage) and
+     (not sk4d_image_is_texture_backed(Result)) then begin
+    if not TGrCanvas.Initialized then
+      Raise exception.Create('The shared context has not been initialized');
+    Result := ALSkCheckHandle(
+                sk4d_image_make_texture_image(
+                  Result, // const self: sk_image_t;
+                  TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
+                  false)); //is_mipmapped: _bool
   end;
-  {$ENDIF}
 end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
+function ALCreateTextureFromSkSurface(Const ASurface: sk_surface_t): TTexture;
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
+  try
+    result := TALTexture.Create;
+    try
+      result.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+      result.SetSize(sk4d_pixmap_get_Width(LPixmap), sk4d_pixmap_get_Height(LPixmap));
+      result.PixelFormat := SkFmxPixelFormat[TSkColorType(sk4d_pixmap_get_color_type(LPixmap))];
+      result.UpdateTexture(sk4d_pixmap_get_pixels(LPixmap), sk4d_pixmap_get_row_bytes(LPixmap));
+    except
+      ALFreeAndNil(result);
+      raise;
+    end;
+  finally
+    sk4d_pixmap_destroy(LPixmap);
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
+  try
+    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+  finally
+    sk4d_pixmap_destroy(LPixmap);
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
+  try
+    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+  finally
+    sk4d_pixmap_destroy(LPixmap);
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
@@ -11302,13 +12809,13 @@ begin
   // It provides a good balance between blurring and ringing.
   Result.Cubic.b := 1 / 3;
   Result.Cubic.c := 1 / 3;
-  Result.Filter := sk_filtermode_t.NEAREST_SK_FILTERMODE;
-  Result.Mipmap := sk_mipmapmode_t.NONE_SK_MIPMAPMODE;
+  Result.Filter := sk_filtermode_t.LINEAR_SK_FILTERMODE; // Not used unless use_cubic is false
+  Result.Mipmap := sk_mipmapmode_t.LINEAR_SK_MIPMAPMODE; // Use linear mipmap interpolation
 end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaCanvas)}
+{$IF defined(ALSkiaEngine)}
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
@@ -11356,7 +12863,7 @@ end;
 {$ENDIF}
 
 {****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALGetGlobalCGColorSpace: CGColorSpaceRef;
 begin
   if ALGlobalCGColorSpace = nil then begin
@@ -11371,7 +12878,7 @@ end;
 {$ENDIF}
 
 {****************}
-{$IF defined(IOS)}
+{$IF defined(ALAppleOS)}
 function ALCreateCGContextRef(const W, H: integer; const AData: Pointer = nil; const ABytesPerRow: Integer = -1): CGContextRef;
 begin
   var LbitmapInfo: CGBitmapInfo;
@@ -11411,6 +12918,169 @@ begin
                             //             information using the CGBitmapContextCreate function, see “Creating a Bitmap Graphics Context” in the
                             //             Graphics Contexts chapter of Quartz 2D Programming Guide.
   if Result = nil then raise Exception.Create('Failed to create bitmap context');
+  try
+    // Sets the level of interpolation quality for a graphics context.
+    // http://stackoverflow.com/questions/5685884/imagequality-with-cgcontextsetinterpolationquality
+    CGContextSetInterpolationQuality(Result, kCGInterpolationHigh);
+    // Sets anti-aliasing on or off for a graphics context.
+    // default: ON
+    CGContextSetShouldAntialias(Result, True);
+    // Sets whether or not to allow anti-aliasing for a graphics context.
+    CGContextSetAllowsAntialiasing(Result, True);
+    // Enables or disables font smoothing in a graphics context.
+    // When drawing text on a context attached to a color LCD display, Quartz takes advantage of the nature of
+    // LCD monitors to improve the legibility of text. This technique is called Font Smoothing. The pixels
+    // of an LCD monitor are made up of red, green, and blue sub-pixels. If you take these sub-pixels into
+    // account the screen appears to have three times the resolution commonly attributed to it, at least in
+    // one dimension. Font smoothing takes advantage of this increased resolution to improve the rendering of
+    // text. Quartz turns different sub-pixels off and on by changing the color of a pixels along the edge of
+    // letter shapes. Because your eye expects to see a hard line at the edge of the glyphs, the computer tricks
+    // it into ignoring the color in favor of perceiving a smooth edge. One disadvantage of font smoothing is
+    // that it relies on the fixed ordering of the sub-pixels of an LCD display. That makes the technique of
+    // limited use on other types of monitors. Font smoothing is also of limited use on offscreen bitmaps.
+    // CGContextSetShouldSmoothFonts(ASurface, True);
+    // --
+    // Sets whether or not to allow font smoothing for a graphics context.
+    // CGContextSetAllowsFontSmoothing(ASurface, True);
+    // --
+    // Enables or disables subpixel positioning in a graphics context.
+    // Subpixel positioning concerns whether or not the glyphs in a line of
+    // text will be aligned to pixel boundaries or not. If subpixel positioning is
+    // off then when glyphs are drawn their positions might be shifted slightly to
+    // take pixel boundaries in account. This can improve the visual definition of
+    // the glyphs (making them slightly less "blurry") at the expense of honoring
+    // the font metrics.
+    // When enabled, the graphics context may position glyphs on nonintegral pixel boundaries. When disabled,
+    // the position of glyphs are always forced to integral pixel boundaries.
+    // default: ON
+    CGContextSetShouldSubpixelPositionFonts(Result, True);
+    // Sets whether or not to allow subpixel positioning for a graphics context
+    CGContextSetAllowsFontSubpixelPositioning(Result, True);
+    // Enables or disables subpixel quantization in a graphics context.
+    // Subpixel quantization is only enabled if subpixel positioning is enabled. Subpixel
+    // quantization improves the rendering of fonts whose glyphs are at subpixel positions
+    // by more closely examining how the shapes that make up the glyphs cover an individual pixel.
+    // This improvement, requires additional processing so changing this value can affect text
+    // drawing performance.
+    // default: ON
+    CGContextSetShouldSubpixelQuantizeFonts(Result, True);
+    // Sets whether or not to allow subpixel quantization for a graphics context
+    CGContextSetAllowsFontSubpixelQuantization(Result, True);
+  except
+    CGContextRelease(Result);
+    raise;
+  end;
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALAppleOS)}
+function ALOSImageGetCgImage(const AImage: ALOSImage): cgImageRef;
+begin
+  {$IF defined(IOS)}
+  result := AImage.cgImage;
+  {$ELSE}
+  result := AImage.CGImageForProposedRect(nil{proposedDestRect},nil{context},nil{hints});
+  {$ENDIF}
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALAppleOS)}
+function ALOSImageGetWidth(const AImage: ALOSImage): Integer; inline;
+begin
+  {$IF defined(IOS)}
+  result := CGImageGetWidth(AImage.cgImage);
+  {$ELSE}
+  result := CGImageGetWidth(AImage.CGImageForProposedRect(nil{proposedDestRect},nil{context},nil{hints}));
+  {$ENDIF}
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALAppleOS)}
+function ALOSImageGetHeight(const AImage: ALOSImage): Integer; inline;
+begin
+  {$IF defined(IOS)}
+  result := CGImageGetHeight(AImage.cgImage);
+  {$ELSE}
+  result := CGImageGetHeight(AImage.CGImageForProposedRect(nil{proposedDestRect},nil{context},nil{hints}));
+  {$ENDIF}
+end;
+{$ENDIF}
+
+{****************}
+{$IF defined(ALAppleOS)}
+//static void ALGradientEvaluateCallback(void *info, const float *in, float *out)
+//{
+//  /*
+//  The domain of this function is 0 - 1. For an input value of 0
+//  this function returns the color to paint at the start point
+//  of the shading. For an input value of 1 this function returns
+//  the color to paint at the end point of the shading. This
+//  is a 1 in, 4 out function where the output values correspond
+//  to an r,g,b,a color.
+//
+//  This function evaluates to produce a blend from startColor to endColor.
+//  Note that the returned results are clipped to the range
+//  by Quartz so this function doesn't worry about values
+//  that are outside the range 0-1.
+//  */
+//
+//  MyStartEndColor *startEndColorP = (MyStartEndColor * )info;
+//  float *startColor = startEndColorP->startColor;
+//  float *endColor = startEndColorP->endColor;
+//  float input = in[0];
+//  // Weight the starting and ending color components depending
+//  // on what position in the blend the input value specifies.
+//  out[0] = (startColor[0]*(1-input) + endColor[0]*input);
+//  out[1] = (startColor[1]*(1-input) + endColor[1]*input);
+//  out[2] = (startColor[2]*(1-input) + endColor[2]*input);
+//  // The alpha component is always 1, the shading is always opaque.
+//  out[3] = 1;
+//}
+procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: PAlphaColorCGFloat); cdecl;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _InterpolateColor(const AGradient: TALGradient; AOffset: Single): TAlphaColor;
+  begin
+    Result := 0;
+    if length(AGradient.Offsets) > 1 then
+    begin
+      if AOffset < 0 then
+        AOffset := 0;
+      if AOffset > 1 then
+        AOffset := 1;
+      if AOffset < AGradient.Offsets[0] then
+      begin
+        Result := AGradient.Colors[0];
+        Exit;
+      end;
+      if AOffset > AGradient.Offsets[High(AGradient.Offsets)] then
+      begin
+        Result := AGradient.Colors[High(AGradient.Offsets)];
+        Exit;
+      end;
+      for var I := 0 to length(AGradient.Offsets) - 2 do
+      begin
+        if (AOffset < AGradient.Offsets[I]) then
+          Continue;
+        if AOffset > AGradient.Offsets[I + 1] then
+          Continue;
+        if AGradient.Offsets[I + 1] - AGradient.Offsets[I] <= 0 then
+          Result := AGradient.Colors[I]
+        else if (I = length(AGradient.Offsets) - 2) and (AOffset > AGradient.Offsets[High(AGradient.Offsets)]) then // last
+          Result := AGradient.Colors[High(AGradient.Offsets)]
+        else
+          Result := FMX.Utils.InterpolateColor(AGradient.Colors[I], AGradient.Colors[I + 1],
+            (AOffset - AGradient.Offsets[I]) / (AGradient.Offsets[I + 1] - AGradient.Offsets[I]));
+      end;
+    end;
+  end;
+
+begin
+  if info <> nil then
+    outData^ := TAlphaColorCGFloat.Create(_InterpolateColor(TALGradient(info),inData^));
 end;
 {$ENDIF}
 
@@ -11438,10 +13108,10 @@ procedure TALGraphicThreadPool.ExecuteProc(
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
 begin
-  {$IF (not defined(ALSkiaCanvas)) and (not defined(ALGpuCanvas))}
-  //TCanvas do not work from a background thread
-  //under android/ios we use platform API functions
-  //do draw images but under windows/macos we use Tcanvas :(
+  {$IF (not defined(ALSkiaEngine)) and (not defined(ALGpuCanvas))}
+  // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
+  // and with Skia, we use platform API functions to draw images. However,
+  // on other platforms, we resort to using TCanvas. :(
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
@@ -11472,10 +13142,10 @@ procedure TALGraphicThreadPool.ExecuteProc(
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
 begin
-  {$IF (not defined(ALSkiaCanvas)) and (not defined(ALGpuCanvas))}
-  //TCanvas do not work from a background thread
-  //under android/ios we use platform API functions
-  //do draw images but under windows/macos we use Tcanvas :(
+  {$IF (not defined(ALSkiaEngine)) and (not defined(ALGpuCanvas))}
+  // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
+  // and with Skia, we use platform API functions to draw images. However,
+  // on other platforms, we resort to using TCanvas. :(
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
@@ -11499,7 +13169,9 @@ begin
 end;
 
 initialization
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
+  ALGlobalUseRasterSkSurface := True;
+  ALGlobalUseRasterSkImage := True;
   ALGlobalSkColorSpace := 0;
   ALGlobalSkColorSpaceInitialized := False;
   ALGlobalSkPaint := 0;
@@ -11508,16 +13180,15 @@ initialization
   ALGlobalJColorSpace := nil;
   ALGlobalJColorSpaceInitialized := False;
   {$ENDIF}
-  {$IF defined(IOS)}
+  {$IF defined(ALAppleOS)}
   ALGlobalCGColorSpace := nil;
   {$ENDIF}
-  ALScreenScale := 0;
   TALGraphicThreadPool.FInstance := nil;
   TALGraphicThreadPool.CreateInstanceFunc := @TALGraphicThreadPool.CreateInstance;
 
 finalization
   ALFreeAndNil(TALGraphicThreadPool.FInstance);
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
   if ALGlobalSkColorSpace <> 0 then begin
     sk4d_colorspace_unref(ALGlobalSkColorSpace);
     ALGlobalSkColorSpace := 0;
@@ -11530,7 +13201,7 @@ finalization
   {$IF defined(ANDROID)}
   ALGlobalJColorSpace := nil;
   {$ENDIF}
-  {$IF defined(IOS)}
+  {$IF defined(ALAppleOS)}
   if ALGlobalCGColorSpace <> nil then begin
     CGColorSpaceRelease(ALGlobalCGColorSpace);
     ALGlobalCGColorSpace := nil;

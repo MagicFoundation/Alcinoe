@@ -213,8 +213,8 @@ type
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     property HScrollBar: TALScrollBoxBar read fHScrollBar;
     property VScrollBar: TALScrollBoxBar read fVScrollBar;
-    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored;
-    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored;
+    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored nodefault;
+    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored nodefault;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -723,14 +723,19 @@ function TALCustomScrollBox.CalcContentBounds: TRectF;
 begin
   Result := LocalRect;
   if (FContent <> nil) then begin
-    for var I := 0 to FContent.ControlsCount - 1 do
-      if FContent.Controls[I].Visible then begin
+    for var I := 0 to FContent.ControlsCount - 1 do begin
+      var LControl := FContent.Controls[I];
+      if LControl.Visible then begin
         {$IFDEF MSWINDOWS}
-        if (csDesigning in ComponentState) and Supports(FContent.Controls[I], IDesignerControl) then
+        if (csDesigning in ComponentState) and Supports(LControl, IDesignerControl) then
           Continue;
         {$ENDIF}
-        Result.Union(FContent.Controls[I].BoundsRect);
+        var LBoundsRect := LControl.BoundsRect;
+        LBoundsRect.Right := LBoundsRect.Right + LControl.Margins.Right;
+        LBoundsRect.Bottom := LBoundsRect.Bottom + LControl.Margins.Bottom;
+        Result.Union(LBoundsRect);
       end;
+    end;
   end;
   if result.Top < 0 then result.Top := 0;
   if result.left < 0 then result.left := 0;

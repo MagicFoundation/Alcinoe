@@ -1939,7 +1939,8 @@ begin
   const positive: Boolean = start > max;
   const edge: integer = IfThen(positive, max, min);
   const overDistance: integer = start - edge;
-  var keepIncreasing: Boolean := overDistance * velocity >= 0;
+  // The Single cast below is necessary to avoid integer overflow.
+  var keepIncreasing: Boolean := Single(overDistance) * Single(velocity) >= 0;
   if (keepIncreasing) then begin
     // Will result in a bounce or a to_boundary depending on velocity.
     startBounceAfterEdge(start, edge, velocity);

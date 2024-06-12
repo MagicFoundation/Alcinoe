@@ -527,6 +527,10 @@ Procedure ALFreeAndNil(var Obj; const ADelayed: boolean = false); inline;
 Function AlBoolToInt(Value:Boolean):Integer;
 Function AlIntToBool(Value:integer):boolean;
 Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
+function ALTryRGBAHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlphaColor): Boolean;
+function ALRGBAHexToAlphaColor(const aHexValue: String): TAlphaColor;
+function ALTryARGBHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlphaColor): Boolean;
+function ALARGBHexToAlphaColor(const aHexValue: String): TAlphaColor;
 
 {**************************************************************************************************************}
 function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer = 0): Integer; overload; inline;
@@ -664,6 +668,7 @@ uses
   Macapi.Mach,
   {$ENDIF}
   system.DateUtils,
+  System.UIConsts,
   Alcinoe.StringUtils;
 
 {****************************************}
@@ -2608,6 +2613,72 @@ Function ALMediumPos(LTotal, LBorder, LObject : integer):Integer;
 Begin
   result := (LTotal - (LBorder*2) - LObject) div 2 + LBorder;
 End;
+
+{************************************************************************************************}
+function ALTryRGBAHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlphaColor): Boolean;
+begin
+  var R, G, B, A: Integer;
+  case Length(aHexValue) of
+    6: // RRGGBB
+      begin
+        If not ALTryStrToInt('$' + AHexValue.Substring(0, 2), R) or (R < low(Byte)) or (R > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(2, 2), G) or (G < low(Byte)) or (G > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(4, 2), B) or (B < low(Byte)) or (B > high(Byte)) then exit(false);
+        A := high(Byte);
+      end;
+    8: // RRGGBBAA
+      begin
+        If not ALTryStrToInt('$' + AHexValue.Substring(0, 2), R) or (R < low(Byte)) or (R > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(2, 2), G) or (G < low(Byte)) or (G > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(4, 2), B) or (B < low(Byte)) or (B > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(6, 2), A) or (A < low(Byte)) or (A > high(Byte)) then exit(false);
+      end;
+  else
+    exit(False);
+  end;
+  AAlphaColor := MakeColor(R, G, B, A);
+  Result := True;
+end;
+
+{*******************************************************************}
+function ALRGBAHexToAlphaColor(const aHexValue: String): TAlphaColor;
+begin
+  if not ALTryRGBAHexToAlphaColor(aHexValue, Result) then
+    raise Exception.Create('Invalid RGBA hex color format');
+end;
+
+{************************************************************************************************}
+function ALTryARGBHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlphaColor): Boolean;
+begin
+  var R, G, B, A: Integer;
+  case Length(aHexValue) of
+    6: // RRGGBB
+      begin
+        A := high(Byte);
+        If not ALTryStrToInt('$' + AHexValue.Substring(0, 2), R) or (R < low(Byte)) or (R > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(2, 2), G) or (G < low(Byte)) or (G > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(4, 2), B) or (B < low(Byte)) or (B > high(Byte)) then exit(false);
+      end;
+    8: // RRGGBBAA
+      begin
+        If not ALTryStrToInt('$' + AHexValue.Substring(0, 2), A) or (A < low(Byte)) or (A > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(2, 2), R) or (R < low(Byte)) or (R > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(4, 2), G) or (G < low(Byte)) or (G > high(Byte)) then exit(false);
+        If not ALTryStrToInt('$' + AHexValue.Substring(6, 2), B) or (B < low(Byte)) or (B > high(Byte)) then exit(false);
+      end;
+  else
+    exit(False);
+  end;
+  AAlphaColor := MakeColor(R, G, B, A);
+  Result := True;
+end;
+
+{*******************************************************************}
+function ALARGBHexToAlphaColor(const aHexValue: String): TAlphaColor;
+begin
+  if not ALTryARGBHexToAlphaColor(aHexValue, Result) then
+    raise Exception.Create('Invalid ARGB hex color format');
+end;
 
 {************************************************************************************************}
 function ALIfThenA(AValue: Boolean; const ATrue: AnsiString; AFalse: AnsiString = ''): AnsiString;

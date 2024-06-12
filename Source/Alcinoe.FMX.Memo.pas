@@ -347,7 +347,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property AutoSizeLineCount: Single read FAutosizeLineCount write SetAutosizeLineCount Stored IsAutosizeLineCountStored;
+    property AutoSizeLineCount: Single read FAutosizeLineCount write SetAutosizeLineCount Stored IsAutosizeLineCountStored nodefault;
     property TextSettings: TALMemoTextSettings read GetTextSettings write SetTextSettings;
   end;
 
@@ -1556,7 +1556,7 @@ begin
       if LInlinedLabelText then MakeBufLabelTextDrawable;
 
       var LStrokeSize := TRectF.Empty;
-      if Stroke.Kind <> TbrushKind.None then begin
+      if Stroke.HasStroke then begin
         if (TSide.Top in Sides) then    LStrokeSize.Top :=    max(Stroke.Thickness - Padding.top,    0);
         if (TSide.bottom in Sides) then LStrokeSize.bottom := max(Stroke.Thickness - Padding.bottom, 0);
         if (TSide.right in Sides) then  LStrokeSize.right :=  max(Stroke.Thickness - Padding.right,  0);

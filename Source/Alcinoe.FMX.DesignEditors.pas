@@ -134,15 +134,29 @@ type
     procedure SetValue(const AValue: string); override;
   end;
 
+  {*************************************************}
+  TALGradientPropertyEditor = class(TPropertyEditor)
+  protected
+    function GetIsDefault: Boolean; override;
+  public
+    function GetValue: string; override;
+    procedure SetValue(const AValue: string); override;
+  end;
+
+
 procedure Register;
 
 implementation
 
 uses
   System.SysUtils,
+  System.UIConsts,
   Vcl.Menus,
+  FMX.Graphics,
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Memo,
+  Alcinoe.fmx.common,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.TabControl;
@@ -560,6 +574,34 @@ begin
   SetStrValue(AValue);
 end;
 
+{*******************************************************}
+function TALGradientPropertyEditor.GetIsDefault: Boolean;
+begin
+  result := GetValue = '';
+end;
+
+{**************************************************}
+function TALGradientPropertyEditor.GetValue: string;
+begin
+  Result := '';
+  if PropCount > 0 then begin
+    var LObj := TObject(GetOrdValue);
+    if Assigned(LObj) and (LObj is TALGradient) then
+      result := TALGradient(LObj).cssFormat;
+  end;
+end;
+
+{*****************************************************************}
+procedure TALGradientPropertyEditor.SetValue(const AValue: string);
+begin
+  if PropCount > 0 then begin
+    var LObj := TObject(GetOrdValue);
+    if Assigned(LObj) and (LObj is TALGradient) then
+      TALGradient(LObj).cssFormat := AValue;
+  end;
+end;
+
+
 {*****************}
 procedure Register;
 begin
@@ -569,6 +611,7 @@ begin
   RegisterComponentEditor(TALTabControl, TALTabControlEditor);
   RegisterComponentEditor(TALTabItem, TALTabItemEditor);
   RegisterPropertyEditor(TypeInfo(string), TALText, 'Text', TALTextTextPropertyEditor);
+  RegisterPropertyEditor(TypeInfo(TALGradient), TALBrush, 'Gradient', TALGradientPropertyEditor);
 end;
 
 initialization

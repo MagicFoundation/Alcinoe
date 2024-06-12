@@ -43,6 +43,57 @@ uses
 
 type
 
+  {~~~~~~~~~~~~~~~~~~}
+  TALImageWrapMode = (
+    // Display the image with its original dimensions:
+    // * The image is placed in the upper-left corner of the rectangle of the control.
+    // * If the image is larger than the control's rectangle, then only the upper-left part of the image,
+    //   which fits in the rectangle of the control, is shown. The image is not resized.
+    //Original,
+
+    // Best fit the image in the rectangle of the control:
+    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
+    //   (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
+    //   of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
+    //   or the height of the resized image is equal to the height of the rectangle of the control. The whole image
+    //   should be displayed. The image is displayed centered in the rectangle of the control.
+    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+    //   the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+    Fit,
+
+    // Stretch the image to fill the entire rectangle of the control.
+    Stretch,
+
+    // Tile (multiply) the image to cover the entire rectangle of the control:
+    // * If the image is larger than the rectangle of the control, then only the
+    //   upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
+    // * If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
+    //   (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
+    //   the upper-left corner of the rectangle of the control.
+    //Tile,
+
+    // Center the image to the rectangle of the control:
+    // * The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
+    //Center,
+
+    // Fit the image in the rectangle of the control:
+    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
+    //   to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
+    //   resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
+    // * If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
+    Place,
+
+    // Best fit the image in the rectangle of the control:
+    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
+    //   (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
+    //   of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
+    //   AND the height of the resized image is equal to the height of the rectangle of the control.
+    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
+    //   the rectangle of the control. Whole the image should be displayed.
+    FitAndCrop);
+
+type
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALScrollableControl = interface
     ['{6750E04D-8DB6-4F27-898A-B20AD55CAAF4}']
@@ -99,7 +150,6 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALShadow = class(TALPersistentObserver)
   private
-    FEnabled: boolean;
     FBlur: Single;
     FOffsetX: Single;
     FOffsetY: Single;
@@ -108,7 +158,6 @@ type
     FDefaultOffsetX: Single;
     FDefaultOffsetY: Single;
     FDefaultColor: TAlphaColor;
-    procedure SetEnabled(const Value: boolean);
     procedure setblur(const Value: Single);
     procedure setOffsetX(const Value: Single);
     procedure setOffsetY(const Value: Single);
@@ -117,20 +166,39 @@ type
     function IsOffsetXStored: Boolean;
     function IsOffsetYStored: Boolean;
     function IsColorStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadEnabled(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    function HasShadow: boolean;
     property Defaultblur: Single read fDefaultblur write fDefaultblur;
     property DefaultOffsetX: Single read fDefaultOffsetX write fDefaultOffsetX;
     property DefaultOffsetY: Single read fDefaultOffsetY write fDefaultOffsetY;
     property DefaultColor: TAlphaColor read fDefaultColor write fDefaultColor;
   published
-    property enabled: boolean read fEnabled Write SetEnabled default false;
-    property blur: Single read fblur write setblur stored IsblurStored;
-    property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored;
-    property OffsetY: Single read fOffsetY write setOffsetY stored IsOffsetYStored;
+    property blur: Single read fblur write setblur stored IsblurStored nodefault;
+    property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored nodefault;
+    property OffsetY: Single read fOffsetY write setOffsetY stored IsOffsetYStored nodefault;
     property Color: TAlphaColor read fColor write setColor stored IsColorStored;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritShadow = class(TALShadow)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -187,8 +255,8 @@ type
     property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
     property DefaultAutoConvert: Boolean read FDefaultAutoConvert write FDefaultAutoConvert;
   published
-    property Family: TFontName read FFamily write SetFamily stored IsFamilyStored;
-    property Size: Single read FSize write SetSize stored IsSizeStored;
+    property Family: TFontName read FFamily write SetFamily stored IsFamilyStored nodefault;
+    property Size: Single read FSize write SetSize stored IsSizeStored nodefault;
     property Weight: TFontWeight read FWeight write SetWeight stored IsWeightStored;
     property Slant: TFontSlant read FSlant write SetSlant stored IsSlantStored;
     property Stretch: TFontStretch read FStretch write SetStretch stored IsStretchStored;
@@ -226,7 +294,7 @@ type
   published
     property Kinds: TALTextDecorationKinds read FKinds write SetKinds Stored IsKindsStored;
     property Style: TALTextDecorationStyle read FStyle write SetStyle Stored IsStyleStored;
-    property ThicknessMultiplier: Single read FThicknessMultiplier write SetThicknessMultiplier Stored IsThicknessMultiplierStored;
+    property ThicknessMultiplier: Single read FThicknessMultiplier write SetThicknessMultiplier Stored IsThicknessMultiplierStored nodefault;
     property Color: TAlphaColor read FColor write SetColor Stored IsColorStored;
   end;
 
@@ -315,14 +383,14 @@ type
     //--
     property Font: TALFont read FFont write SetFont;
     property Decoration: TALTextDecoration read FDecoration write SetDecoration;
-    property Ellipsis: String read FEllipsis write SetEllipsis stored IsEllipsisStored;
+    property Ellipsis: String read FEllipsis write SetEllipsis stored IsEllipsisStored nodefault;
     property EllipsisSettings: TALEllipsisSettings read FEllipsisSettings write SetEllipsisSettings;
     property Trimming: TALTextTrimming read FTrimming write SetTrimming stored IsTrimmingStored;
     property MaxLines: Integer read FMaxLines write SetMaxLines stored IsMaxLinesStored;
     property HorzAlign: TALTextHorzAlign read FHorzAlign write SetHorzAlign stored IsHorzAlignStored;
     property VertAlign: TALTextVertAlign read FVertAlign write SetVertAlign stored IsVertAlignStored;
-    property LineHeightMultiplier: Single read FLineHeightMultiplier write SetLineHeightMultiplier stored IsLineHeightMultiplierStored;
-    property LetterSpacing: Single read FLetterSpacing write SetLetterSpacing stored IsLetterSpacingStored;
+    property LineHeightMultiplier: Single read FLineHeightMultiplier write SetLineHeightMultiplier stored IsLineHeightMultiplierStored nodefault;
+    property LetterSpacing: Single read FLetterSpacing write SetLetterSpacing stored IsLetterSpacingStored nodefault;
     property IsHtml: Boolean read FIsHtml write SetIsHtml stored IsIsHtmlStored;
   end;
 
@@ -344,32 +412,6 @@ type
     property IsHtml;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALInheritBrush = class(TBrush)
-  private
-    FInherit: Boolean;
-    procedure SetInherit(const AValue: Boolean);
-  public
-    constructor Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor); virtual;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; virtual;
-  published
-    property Inherit: Boolean read FInherit write SetInherit Default True;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALInheritStrokeBrush = class(TStrokeBrush)
-  private
-    FInherit: Boolean;
-    procedure SetInherit(const AValue: Boolean);
-  public
-    constructor Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor); virtual;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; virtual;
-  published
-    property Inherit: Boolean read FInherit write SetInherit Default True;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInheritBaseTextSettings = class(TALBaseTextSettings)
   private
@@ -383,13 +425,137 @@ type
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALInheritShadow = class(TALShadow)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALGradient = class(TALPersistentObserver)
+  private
+    FStyle: TGradientStyle;
+    FColors: TArray<TAlphaColor>;
+    FOffsets: TArray<Single>;
+    FAngle: Single;
+    FDefaultStyle: TGradientStyle;
+    FDefaultAngle: Single;
+    function GetCSSFormat: String;
+    procedure SetStyle(const Value: TGradientStyle);
+    procedure SetColors(const Value: TArray<TAlphaColor>);
+    procedure SetOffsets(const Value: TArray<Single>);
+    procedure SetAngle(const Value: Single);
+    procedure SetCSSFormat(const Value: String);
+    function IsStyleStored: Boolean;
+    function IsAngleStored: Boolean;
+    procedure ReadColors(Reader: TReader);
+    procedure WriteColors(Writer: TWriter);
+    procedure ReadOffsets(Reader: TReader);
+    procedure WriteOffsets(Writer: TWriter);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  public
+    constructor Create; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    property DefaultStyle: TGradientStyle read FDefaultStyle write FDefaultStyle;
+    property DefaultAngle: Single read FDefaultAngle write FDefaultAngle;
+    property Colors: TArray<TAlphaColor> read FColors write SetColors;
+    property Offsets: TArray<Single> read FOffsets write SetOffsets;
+    property CSSFormat: String read GetCSSFormat Write SetCSSFormat;
+  published
+    property Style: TGradientStyle read FStyle write SetStyle stored IsStyleStored;
+    property Angle: Single read FAngle write SetAngle stored IsAngleStored nodefault;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBrushStyle = (Solid, Gradient, Image);
+  TALBrushStyles = set of TALBrushStyle;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBrush = class(TALPersistentObserver)
+  private
+    FColor: TAlphaColor;
+    FGradient: TALGradient;
+    FResourceName: String;
+    FWrapMode: TALImageWrapMode;
+    FDefaultColor: TAlphaColor;
+    FDefaultResourceName: String;
+    FDefaultWrapMode: TALImageWrapMode;
+    procedure SetColor(const Value: TAlphaColor);
+    procedure SetGradient(const Value: TALGradient);
+    procedure SetResourceName(const Value: String);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure GradientChanged(Sender: TObject); virtual;
+    function IsColorStored: Boolean;
+    function IsResourceNameStored: Boolean;
+    function IsWrapModeStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadKind(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
+  public
+    constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    function HasFill: boolean;
+    function Styles: TALBrushStyles;
+    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+    property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
+    property DefaultWrapMode: TALImageWrapMode read FDefaultWrapMode write FDefaultWrapMode;
+  published
+    property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property Gradient: TALGradient read FGradient write SetGradient;
+    property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritBrush = class(TALBrush)
   private
     FInherit: Boolean;
     procedure SetInherit(const AValue: Boolean);
   public
-    constructor Create; override;
+    constructor Create(const ADefaultColor: TAlphaColor); override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALStrokeBrush = class(TALPersistentObserver)
+  private
+    FColor: TAlphaColor;
+    FThickness: Single;
+    FDefaultColor: TAlphaColor;
+    FDefaultThickness: Single;
+    procedure SetColor(const Value: TAlphaColor);
+    procedure SetThickness(const Value: Single);
+    function IsColorStored: Boolean;
+    function IsThicknessStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadKind(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
+  public
+    constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    function HasStroke: boolean;
+    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+    property DefaultThickness: Single read FDefaultThickness write FDefaultThickness;
+  published
+    property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritStrokeBrush = class(TALStrokeBrush)
+  private
+    FInherit: Boolean;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const ADefaultColor: TAlphaColor); override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
   published
@@ -410,12 +576,12 @@ type
   end;
 
 type
-
   TALCustomConvertFontFamilyProc = function(const AFontFamily: TFontName): TFontName;
+  TALCustomGetResourceFilenameProc = function(const AResourceName: String): String;
 
 var
-
   ALCustomConvertFontFamilyProc: TALCustomConvertFontFamilyProc;
+  ALCustomGetResourceFilenameProc: TALCustomGetResourceFilenameProc;
 
 {*********************************************************************}
 function  ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
@@ -427,6 +593,8 @@ function  ALGetFontMetrics(
             const AFontSlant: TFontSlant;
             const AFontColor: TalphaColor;
             const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
+function  ALGetResourceDirectory: String;
+function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
 Procedure ALMakeBufDrawables(const AControl: TControl);
 procedure ALAutoSize(const AControl: TControl);
@@ -472,10 +640,6 @@ function ALJSetToStrings(const ASet: JSet): TArray<String>;
 {$IF defined(ALAppleOS)}
 function ALStringsToNSArray(const AStrings: TArray<String>): NSMutableArray;
 function ALNSSetToStrings(const ANSSet: NSSet): TArray<String>;
-{$ENDIF}
-
-{$IFDEF ALDPK}
-function ALDPKGetResourceFilename(const AResourceName: String): String;
 {$ENDIF}
 
 Type
@@ -664,6 +828,8 @@ uses
   system.SysUtils,
   System.Math,
   System.SyncObjs,
+  System.IOutils,
+  System.UIConsts,
   Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
   FMX.Skia,
@@ -690,16 +856,20 @@ uses
   FMX.Helpers.Win,
   {$ENDIF}
   {$IFDEF ALDPK}
-  System.IOutils,
   System.Hash,
   ToolsAPI,
   {$ENDIF}
   {$IF not defined(ALDPK)}
   Alcinoe.Cipher,
   {$ENDIF}
+  {$IF defined(ALDPK)}
+  DesignEditors,
+  {$ENDIF}
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.Common,
+  Alcinoe.files,
+  Alcinoe.stringList,
   ALcinoe.StringUtils;
 
 {***************************************}
@@ -763,18 +933,34 @@ end;
 constructor TALShadow.Create;
 begin
   inherited Create;
-  FEnabled := False;
-
+  //--
   FDefaultblur := 12;
   FDefaultOffsetX := 0;
   FDefaultOffsetY := 0;
-  FDefaultColor := $96000000;
-
+  FDefaultColor := TAlphaColors.null; // $96000000;
+  //--
   Fblur := FDefaultBlur;
   FOffsetX := FDefaultOffsetX;
   FOffsetY := FDefaultOffsetY;
   FColor := FDefaultColor;
 end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALShadow.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('Enabled', ReadEnabled{ReadData}, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALShadow.ReadEnabled(Reader: TReader);
+begin
+  if not Reader.ReadBoolean then Color := TAlphaColors.Null;
+end;
+{$ENDIF}
 
 {**********************************************}
 procedure TALShadow.Assign(Source: TPersistent);
@@ -782,7 +968,6 @@ begin
   if Source is TALShadow then begin
     BeginUpdate;
     Try
-      Enabled := TALShadow(Source).Enabled;
       Blur    := TALShadow(Source).Blur;
       OffsetX := TALShadow(Source).OffsetX;
       OffsetY := TALShadow(Source).OffsetY;
@@ -801,7 +986,6 @@ begin
   BeginUpdate;
   Try
     inherited Reset;
-    Enabled := False;
     blur := DefaultBlur;
     OffsetX := DefaultOffsetX;
     OffsetY := DefaultOffsetY;
@@ -811,10 +995,17 @@ begin
   end;
 end;
 
+{************************************}
+function TALShadow.HasShadow: boolean;
+begin
+  result := (Color <> TalphaColors.Null) and
+            (CompareValue(fBlur, 0, Tepsilon.vector) > 0);
+end;
+
 {***************************************}
 function TALShadow.IsblurStored: Boolean;
 begin
-  result := not SameValue(fBlur, FDefaultBlur, Tepsilon.Position);
+  result := not SameValue(fBlur, FDefaultBlur, Tepsilon.vector);
 end;
 
 {******************************************}
@@ -835,19 +1026,10 @@ begin
   result := FColor <> FDefaultColor;
 end;
 
-{***************************************************}
-procedure TALShadow.SetEnabled(const Value: boolean);
-begin
-  if fEnabled <> Value then begin
-    fEnabled := Value;
-    Change;
-  end;
-end;
-
 {***********************************************}
 procedure TALShadow.setblur(const Value: Single);
 begin
-  if not SameValue(fBlur, Value, Tepsilon.Position) then begin
+  if not SameValue(fBlur, Value, Tepsilon.vector) then begin
     Fblur := Value;
     Change;
   end;
@@ -877,6 +1059,49 @@ begin
   if FColor <> Value then begin
     FColor := Value;
     Change;
+  end;
+end;
+
+{*************************************}
+constructor TALInheritShadow.Create;
+begin
+  inherited create;
+  FInherit := True;
+end;
+
+{**********************************************************}
+procedure TALInheritShadow.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALInheritShadow.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALInheritShadow then
+      Inherit := TALInheritShadow(Source).Inherit
+    else
+      Inherit := False;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{******************************}
+procedure TALInheritShadow.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Inherit := True;
+  finally
+    EndUpdate;
   end;
 end;
 
@@ -1165,7 +1390,7 @@ end;
 {**************************************************************}
 function TALTextDecoration.IsThicknessMultiplierStored: Boolean;
 begin
-  Result := not SameValue(FThicknessMultiplier, FDefaultThicknessMultiplier, TEpsilon.Vector);
+  Result := not SameValue(FThicknessMultiplier, FDefaultThicknessMultiplier, TEpsilon.Scale);
 end;
 
 {************************************************}
@@ -1195,7 +1420,7 @@ end;
 {***********************************************************************}
 procedure TALTextDecoration.SetThicknessMultiplier(const AValue: Single);
 begin
-  if not SameValue(FThicknessMultiplier, AValue, TEpsilon.Vector) then begin
+  if not SameValue(FThicknessMultiplier, AValue, TEpsilon.Scale) then begin
     FThicknessMultiplier := AValue;
     Change;
   end;
@@ -1308,13 +1533,14 @@ end;
 constructor TALBaseTextSettings.Create;
 begin
   inherited Create;
+  //--
   FFont := TALFont.Create;
   FFont.OnChanged := FontChanged;
   FDecoration := TALTextDecoration.Create;
   FDecoration.OnChanged := DecorationChanged;
   FEllipsisSettings := TALEllipsisSettings.create;
   FEllipsisSettings.OnChanged := EllipsisSettingsChanged;
-
+  //--
   FDefaultEllipsis := '…';
   FDefaultTrimming := TALTextTrimming.Word;
   FDefaultMaxLines := 65535;
@@ -1323,7 +1549,7 @@ begin
   FDefaultLineHeightMultiplier := 0;
   FDefaultLetterSpacing := 0;
   FDefaultIsHtml := False;
-
+  //--
   FEllipsis := FDefaultEllipsis;
   FTrimming := FDefaultTrimming;
   FMaxLines := FDefaultMaxLines;
@@ -1626,76 +1852,6 @@ begin
   end;
 end;
 
-{***************************************************************************************************}
-constructor TALInheritBrush.Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor);
-begin
-  inherited create(ADefaultKind, ADefaultColor);
-  FInherit := True;
-end;
-
-{**********************************************************}
-procedure TALInheritBrush.SetInherit(const AValue: Boolean);
-begin
-  If FInherit <> AValue then begin
-    FInherit := AValue;
-    if Assigned(OnChanged) then
-      OnChanged(Self);
-  end;
-end;
-
-{****************************************************}
-procedure TALInheritBrush.Assign(Source: TPersistent);
-begin
-  if Source is TALInheritBrush then
-    Inherit := TALInheritBrush(Source).Inherit
-  else
-    Inherit := False;
-  inherited Assign(Source);
-end;
-
-{******************************}
-procedure TALInheritBrush.Reset;
-begin
-  Inherit := True;
-  Color := DefaultColor;
-  Kind := DefaultKind;
-end;
-
-{*************************************}
-constructor TALInheritStrokeBrush.Create(const ADefaultKind: TBrushKind; const ADefaultColor: TAlphaColor);
-begin
-  inherited create(ADefaultKind, ADefaultColor);
-  FInherit := True;
-end;
-
-{**************************************************************}
-procedure TALInheritStrokeBrush.SetInherit(const AValue: Boolean);
-begin
-  If FInherit <> AValue then begin
-    FInherit := AValue;
-    if Assigned(OnChanged) then
-      OnChanged(Self);
-  end;
-end;
-
-{********************************************************}
-procedure TALInheritStrokeBrush.Assign(Source: TPersistent);
-begin
-  if Source is TALInheritStrokeBrush then
-    Inherit := TALInheritStrokeBrush(Source).Inherit
-  else
-    Inherit := False;
-  inherited Assign(Source);
-end;
-
-{*********************************************}
-procedure TALInheritStrokeBrush.Reset;
-begin
-  Inherit := True;
-  Color := DefaultColor;
-  Kind := DefaultKind;
-end;
-
 {*************************************}
 constructor TALInheritBaseTextSettings.Create;
 begin
@@ -1712,7 +1868,7 @@ begin
   Font.Color := Font.DefaultColor;
 end;
 
-{**************************************************************}
+{**********************************************************}
 procedure TALInheritBaseTextSettings.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
@@ -1721,7 +1877,7 @@ begin
   end;
 end;
 
-{********************************************************}
+{****************************************************}
 procedure TALInheritBaseTextSettings.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -1736,27 +1892,546 @@ begin
   End;
 end;
 
-{*********************************************}
+{******************************}
 procedure TALInheritBaseTextSettings.Reset;
 begin
   BeginUpdate;
   Try
+    inherited Reset;
     Inherit := True;
-    inherited reset;
   finally
     EndUpdate;
   end;
 end;
 
-{*************************************}
-constructor TALInheritShadow.Create;
+{*****************************}
+constructor TALGradient.Create;
 begin
-  inherited create;
+  inherited Create;
+  //--
+  FDefaultStyle := TGradientStyle.Linear;
+  FDefaultAngle := 180;
+  //--
+  FStyle := FDefaultStyle;
+  FColors := [];
+  FOffsets := [];
+  FAngle := FDefaultAngle;
+end;
+
+{**********************************************}
+procedure TALGradient.Assign(Source: TPersistent);
+begin
+  if Source is TALGradient then begin
+    BeginUpdate;
+    Try
+      Style := TALGradient(Source).Style;
+      Colors := TALGradient(Source).Colors;
+      Offsets := TALGradient(Source).Offsets;
+      Angle := TALGradient(Source).Angle;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{**************************}
+procedure TALGradient.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Style := DefaultStyle;
+    Colors := [];
+    Offsets := [];
+    Angle := DefaultAngle;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{****************************************************}
+procedure TALGradient.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('Colors', ReadColors, WriteColors, Length(FColors) > 0);
+  Filer.DefineProperty('Offsets', ReadOffsets, WriteOffsets, Length(FOffsets) > 0);
+end;
+
+{************************************************}
+procedure TALGradient.ReadColors(Reader: TReader);
+begin
+  SetLength(FColors, 0);
+  Reader.ReadListBegin;
+  try
+    while not Reader.EndOfList do begin
+      SetLength(FColors, length(FColors)+1);
+      FColors[high(FColors)] := Cardinal(Reader.ReadInt64);
+    end;
+  finally
+    Reader.ReadListEnd;
+  end;
+end;
+
+{*************************************************}
+procedure TALGradient.WriteColors(Writer: TWriter);
+begin
+  Writer.WriteListBegin;
+  try
+    for var I := Low(FColors) to High(FColors) do
+      Writer.WriteInteger(FColors[I]);
+  finally
+    Writer.WriteListEnd;
+  end;
+end;
+
+{*************************************************}
+procedure TALGradient.ReadOffsets(Reader: TReader);
+begin
+  SetLength(FOffsets, 0);
+  Reader.ReadListBegin;
+  try
+    while not Reader.EndOfList do begin
+      SetLength(FOffsets, length(FOffsets)+1);
+      FOffsets[high(FOffsets)] := Reader.ReadSingle;
+    end;
+  finally
+    Reader.ReadListEnd;
+  end;
+end;
+
+{*************************************************}
+procedure TALGradient.WriteOffsets(Writer: TWriter);
+begin
+  Writer.WriteListBegin;
+  try
+    for var I := Low(FOffsets) to High(FOffsets) do
+      Writer.WriteSingle(FOffsets[I]);
+  finally
+    Writer.WriteListEnd;
+  end;
+end;
+
+{*****************************************}
+function TALGradient.IsStyleStored: Boolean;
+begin
+  result := FStyle <> FDefaultStyle;
+end;
+
+{******************************************}
+function TALGradient.IsAngleStored: Boolean;
+begin
+  result := Not sameValue(FAngle, FDefaultAngle, TEpsilon.Angle);
+end;
+
+{****************************************}
+function TALGradient.GetCSSFormat: String;
+begin
+  Result := '';
+  If (length(Colors) = 0) then exit;
+  If (length(Colors) = 1) then begin
+    {$IF defined(ALDPK)}
+    Exit;
+    {$ELSE}
+    raise Exception.Create('A gradient requires at least two colors');
+    {$ENDIF}
+  end;
+  if ((length(Offsets) > 0) and
+      (length(Offsets) <> length(Colors))) then begin
+    {$IF defined(ALDPK)}
+    Exit;
+    {$ELSE}
+    raise Exception.Create('The number of gradient offsets does not match the number of gradient colors');
+    {$ENDIF}
+  end;
+  case Style of
+    TGradientStyle.linear: result := ALFormatFloatW('linear-gradient(0.#####deg', Angle, ALDefaultFormatSettingsW);
+    TGradientStyle.radial: Result := 'radial-gradient(circle';
+    else raise Exception.Create('Error 591CBC8C-50A7-4444-A0D6-584EB45AD56A');
+  end;
+  For var I := Low(Colors) to high(Colors) do begin
+    var LAphaColorRec := TAlphaColorRec.Create(Colors[i]);
+    result := result + ', #' + ALInttoHexW(LAphaColorRec.R, 2) + ALInttoHexW(LAphaColorRec.G, 2) + ALInttoHexW(LAphaColorRec.B, 2) + ALInttoHexW(LAphaColorRec.A, 2);
+    if length(Offsets) > 0 then
+      result := result + ALFormatFloatW(' 0.#####%', Offsets[i] * 100, ALDefaultFormatSettingsW);
+  end;
+  result := result + ')';
+end;
+
+{**********************************************************}
+procedure TALGradient.SetStyle(const Value: TGradientStyle);
+begin
+  if fStyle <> Value then begin
+    fStyle := Value;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALGradient.SetColors(const Value: TArray<TAlphaColor>);
+begin
+  if fColors <> Value then begin
+    fColors := Value;
+    Change;
+  end;
+end;
+
+{************************************************************}
+procedure TALGradient.SetOffsets(const Value: TArray<Single>);
+begin
+  if fOffsets <> Value then begin
+    fOffsets := Value;
+    Change;
+  end;
+end;
+
+{**************************************************}
+procedure TALGradient.SetAngle(const Value: Single);
+begin
+  if fAngle <> Value then begin
+    fAngle := Value;
+    Change;
+  end;
+end;
+
+{******************************************************}
+procedure TALGradient.SetCSSFormat(const Value: String);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _RaiseException(const AMsg: String);
+  begin
+    {$IF defined(ALDPK)}
+    raise EDesignPropertyError.Create(AMsg);
+    {$ELSE}
+    raise Exception.Create(AMsg);
+    {$ENDIF}
+  end;
+
+begin
+
+  BeginUpdate;
+  try
+
+    Reset;
+
+    Try
+
+      //linear-gradient(44deg, rgba(198,27,27,1) 0%, rgba(134,113,255,1) 100%);
+      //radial-gradient(circle, rgba(198,27,27,1) 0%, rgba(134,113,255,1) 100%);
+      var LValue := ALTrim(ALLowerCase(Value));
+      LValue := ALStringReplaceW(LValue, #13, ' ', [RfReplaceALL]);
+      LValue := ALStringReplaceW(LValue, #10, ' ', [RfReplaceALL]);
+      LValue := ALStringReplaceW(LValue, #9, ' ', [RfReplaceALL]);
+      while AlposW(' (', LValue) > 0 do LValue := ALStringReplaceW(LValue, ' (', '(', [rfReplaceALL]); // linear-gradient(44deg, rgba(198,27,27,1) 0%, rgba(134,113,255,1) 100%);
+      while AlposW(' ,', LValue) > 0 do LValue := ALStringReplaceW(LValue, ' ,', ',', [rfReplaceALL]); // linear-gradient(44deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%);
+      while AlposW(', ', LValue) > 0 do LValue := ALStringReplaceW(LValue, ', ', ',', [rfReplaceALL]); // linear-gradient(44deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%);
+      While (LValue <> '') and (LValue[length(LValue)] = ';') do begin
+        delete(LValue, length(LValue), 1); //linear-gradient(44deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%)
+        LValue := ALTrim(LValue);
+      end;
+      if (LValue <> '') and (LValue[length(LValue)] = ')') then begin
+        delete(LValue, length(LValue), 1); //linear-gradient(44deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        LValue := ALTrim(LValue);
+      end
+      else
+        _RaiseException('Invalid CSS gradient');
+
+      var P1: integer := 1;
+      // linear-gradient
+      If Alposw('linear-gradient(', LValue, P1) = P1 then begin
+        FStyle := TGradientStyle.linear;
+        P1 := P1 + 16{length('linear-gradient(')}; // 44deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        var P2 := P1;
+        While (P2 <= Length(LValue)) and (CharInSet(LValue[P2], ['0'..'9','.'])) do inc(p2);
+        if P2 = P1 then _RaiseException('CSS gradient format error: angle specification missing');
+        If not ALTryStrToFloat(ALCopyStr(LValue, P1, P2-P1), FAngle, ALDefaultFormatSettingsW) then
+          _RaiseException('CSS gradient format error: invalid angle value');
+        P1 := P2; // deg,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        if AlposW('deg,', LValue, P1) = P1 then
+          P1 := P1 + 4{length('deg,')} // rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        else
+          _RaiseException('CSS gradient format error: "deg," expected after angle value');
+      end
+      // radial-gradient
+      else If Alposw('radial-gradient(', LValue, P1) = P1 then begin
+        FStyle := TGradientStyle.Radial;
+        P1 := P1 + 16{length('radial-gradient(')}; // circle,rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        if AlposW('circle,', LValue, P1) = P1 then
+          P1 := P1 + 7{length('circle,')} // rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        else
+          _RaiseException('CSS gradient support error: only "circle" shape is supported for radial gradients');
+      end
+      else
+        _RaiseException('CSS gradient format error: unrecognized gradient type');
+
+      If P1 > Length(LValue) then
+        _RaiseException('CSS gradient format error: incomplete gradient definition');
+
+      var LWithOffset: integer := -1;
+      While P1 <= Length(LValue) do begin
+
+        var LColor: TAlphacolor;
+
+        // rgb(198,27,27) 0%,rgba(134,113,255,1) 100%
+        if Alposw('rgb(', LValue, P1) = P1 then begin
+          P1 := P1 + 4{length('rgb(')};
+          var P2 := ALPosW(')', LValue, P1);
+          if P2 <= P1 then _RaiseException('CSS gradient format error: Expected closing parenthesis for rgb');
+          var LLst := TALStringListW.create;
+          Try
+            LLst.LineBreak := ',';
+            LLst.Text := ALCopyStr(LValue, P1, P2-P1);
+            If LLst.Count <> 3 then _RaiseException('CSS gradient format error: RGB values count mismatch');
+            var R, G, B: integer;
+            if (not ALTryStrToInt(LLst[0], R)) or (R < low(Byte)) or (R > high(Byte)) then _RaiseException('CSS gradient format error: Invalid red component');
+            if (not ALTryStrToInt(LLst[1], G)) or (G < low(Byte)) or (G > high(Byte)) then _RaiseException('CSS gradient format error: Invalid green component');
+            if (not ALTryStrToInt(LLst[2], B)) or (B < low(Byte)) or (B > high(Byte)) then _RaiseException('CSS gradient format error: Invalid blue component');
+            LColor := MakeColor(R, G, B);
+          finally
+            ALFreeAndNil(LLst);
+          end;
+          P1 := P2 + 1; //  0%,rgba(134,113,255,1) 100%
+        end
+
+        // rgba(198,27,27,1) 0%,rgba(134,113,255,1) 100%
+        else if Alposw('rgba(', LValue, P1) = P1 then begin
+          P1 := P1 + 5{length('rgba(')};
+          var P2 := ALPosW(')', LValue, P1);
+          if P2 <= P1 then _RaiseException('CSS gradient format error: Expected closing parenthesis for rgba');
+          var LLst := TALStringListW.create;
+          Try
+            LLst.LineBreak := ',';
+            LLst.Text := ALCopyStr(LValue, P1, P2-P1);
+            If LLst.Count <> 4 then _RaiseException('CSS gradient format error: RGBA values count mismatch');
+            var R, G, B: integer;
+            var A: Single;
+            if (not ALTryStrToInt(LLst[0], R)) or (R < low(Byte)) or (R > high(Byte)) then _RaiseException('CSS gradient format error: Invalid red component');
+            if (not ALTryStrToInt(LLst[1], G)) or (G < low(Byte)) or (G > high(Byte)) then _RaiseException('CSS gradient format error: Invalid green component');
+            if (not ALTryStrToInt(LLst[2], B)) or (B < low(Byte)) or (B > high(Byte)) then _RaiseException('CSS gradient format error: Invalid blue component');
+            if (not ALTryStrToFloat(LLst[3], A, ALDefaultFormatSettingsW)) or (compareValue(A, 0, Tepsilon.Vector) < 0) or (compareValue(A, 1, Tepsilon.Vector) > 0) then _RaiseException('CSS gradient format error: Invalid alpha component');
+            LColor := MakeColor(R, G, B, byte(round(A * High(Byte))));
+          finally
+            ALFreeAndNil(LLst);
+          end;
+          P1 := P2 + 1; //  0%,rgba(134,113,255,1) 100%
+        end
+
+        // #ff000080 0%,rgba(134,113,255,1) 100%
+        else if Alposw('#', LValue, P1) = P1 then begin
+          P1 := P1 + 1{length('#')};
+          var P2 := P1;
+          While (P2 <= Length(LValue)) and (CharInSet(LValue[P2], ['0'..'9','a'..'f'])) do inc(P2);
+          If not ALTryRGBAHexToAlphaColor(AlcopyStr(LValue, P1, P2-P1), LColor) then _RaiseException('CSS gradient format error: Invalid hexadecimal color');
+          P1 := P2 + 1; //  0%,rgba(134,113,255,1) 100%
+        end
+
+       // Unknown
+        else
+          _RaiseException('CSS gradient format error: Unknown color format');
+
+        var LOffset: Single;
+        While (P1 <= Length(LValue)) and (LValue[P1] = ' ') do inc(p1);
+        var P2 := P1;
+        While (P2 <= Length(LValue)) and (CharInSet(LValue[P2], ['0'..'9','.'])) do inc(p2);
+        if P2 = P1 then begin
+          if LWithOffset = 1 then _RaiseException('CSS gradient format error: Inconsistent color stop definitions');
+          LWithOffset := 0;
+        end
+        else begin
+          if LWithOffset = 0 then _RaiseException('CSS gradient format error: Inconsistent color stop definitions');
+          LWithOffset := 1;
+          If not ALTryStrToFloat(ALCopyStr(LValue, P1, P2-P1), LOffset, ALDefaultFormatSettingsW) then
+            _RaiseException('CSS gradient format error: Invalid offset value');
+          P1 := P2; // %,rgba(134,113,255,1) 100%
+          if AlPosW('%', LValue, P1) = P1 then
+            P1 := P1 + 1{length('%')} // ,rgba(134,113,255,1) 100%
+          else
+            _RaiseException('CSS gradient format error: Missing percentage sign after offset value');
+        end;
+
+        Setlength(Fcolors, length(Fcolors) + 1);
+        Fcolors[high(Fcolors)] := Lcolor;
+        if LWithOffset = 1 then begin
+          Setlength(FOffsets, length(FOffsets) + 1);
+          FOffsets[high(FOffsets)] := LOffset / 100;
+        end;
+
+        if AlPosW(',', LValue, P1) = P1 then
+          P1 := P1 + 1{length(',')}; // rgba(134,113,255,1) 100%
+
+      end;
+
+      Change;
+
+    Except
+      On E: Exception do begin
+        Reset;
+        raise;
+      end;
+    end;
+
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************************************************************************}
+constructor TALBrush.Create(const ADefaultColor: TAlphaColor);
+begin
+  inherited Create;
+  //--
+  FDefaultColor := ADefaultColor;
+  FDefaultResourceName := '';
+  FDefaultWrapMode := TALImageWrapMode.Fit;
+  //--
+  FColor := FDefaultColor;
+  FResourceName := FDefaultResourceName;
+  FWrapMode := FDefaultWrapMode;
+  //--
+  FGradient := TALGradient.Create;
+  FGradient.OnChanged := GradientChanged;
+end;
+
+{**************************}
+destructor TALBrush.Destroy;
+begin
+  ALFreeAndNil(FGradient);
+  inherited;
+end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBrush.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('Kind', ReadKind{ReadData}, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBrush.ReadKind(Reader: TReader);
+begin
+  var LKindStr := Reader.ReadIdent;
+  If ALSameTextW(LKindStr, 'None') then Color := TAlphaColors.Null;
+end;
+{$ENDIF}
+
+{**********************************************}
+procedure TALBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALBrush then begin
+    BeginUpdate;
+    Try
+      Color := TALBrush(Source).Color;
+      Gradient.Assign(TALBrush(Source).Gradient);
+      ResourceName := TALBrush(Source).ResourceName;
+      WrapMode := TALBrush(Source).WrapMode;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{************************}
+procedure TALBrush.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Color := DefaultColor;
+    Gradient.Reset;
+    ResourceName := DefaultResourceName;
+    WrapMode := DefaultWrapMode;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************}
+function TALBrush.HasFill: boolean;
+begin
+  result := Styles <> [];
+end;
+
+{***************************************}
+function TALBrush.Styles: TALBrushStyles;
+begin
+  Result := [];
+  if (Color <> TalphaColors.Null) then result := result + [TALBrushStyle.Solid];
+  if (length(Gradient.Colors) > 0) then result := result + [TALBrushStyle.Gradient];
+  if (ResourceName <> '') then result := result + [TALBrushStyle.Image];
+end;
+
+{***************************************}
+function TALBrush.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor;
+end;
+
+{**********************************************}
+function TALBrush.IsResourceNameStored: Boolean;
+begin
+  result := FResourceName <> FDefaultResourceName;
+end;
+
+{**********************************************}
+function TALBrush.IsWrapModeStored: Boolean;
+begin
+  result := FWrapMode <> FDefaultWrapMode;
+end;
+
+{****************************************************}
+procedure TALBrush.SetColor(const Value: TAlphaColor);
+begin
+  if fColor <> Value then begin
+    fColor := Value;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALBrush.SetGradient(const Value: TAlGradient);
+begin
+  FGradient.Assign(Value);
+end;
+
+{******************************************************}
+procedure TALBrush.SetResourceName(const Value: String);
+begin
+  if fResourceName <> Value then begin
+    fResourceName := Value;
+    Change;
+  end;
+end;
+
+{******************************************************}
+procedure TALBrush.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if fWrapMode <> Value then begin
+    fWrapMode := Value;
+    Change;
+  end;
+end;
+
+{**************************************************}
+procedure TALBrush.GradientChanged(Sender: TObject);
+begin
+  change;
+end;
+
+{***************************************************************************************************}
+constructor TALInheritBrush.Create(const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultColor);
   FInherit := True;
 end;
 
-{**************************************************************}
-procedure TALInheritShadow.SetInherit(const AValue: Boolean);
+{**********************************************************}
+procedure TALInheritBrush.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
     FInherit := AValue;
@@ -1764,13 +2439,13 @@ begin
   end;
 end;
 
-{********************************************************}
-procedure TALInheritShadow.Assign(Source: TPersistent);
+{****************************************************}
+procedure TALInheritBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritShadow then
-      Inherit := TALInheritShadow(Source).Inherit
+    if Source is TALInheritBrush then
+      Inherit := TALInheritBrush(Source).Inherit
     else
       Inherit := False;
     inherited Assign(Source);
@@ -1779,13 +2454,152 @@ begin
   End;
 end;
 
-{*********************************************}
-procedure TALInheritShadow.Reset;
+{******************************}
+procedure TALInheritBrush.Reset;
 begin
   BeginUpdate;
   Try
+    inherited Reset;
     Inherit := True;
-    inherited reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************************************************************************}
+constructor TALStrokeBrush.Create(const ADefaultColor: TAlphaColor);
+begin
+  inherited Create;
+  //--
+  FDefaultColor := ADefaultColor;
+  FDefaultThickness := 1;
+  //--
+  FColor := FDefaultColor;
+  FThickness := FDefaultThickness;
+end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALStrokeBrush.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('Kind', ReadKind{ReadData}, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALStrokeBrush.ReadKind(Reader: TReader);
+begin
+  var LKindStr := Reader.ReadIdent;
+  If ALSameTextW(LKindStr, 'None') then Color := TAlphaColors.Null;
+end;
+{$ENDIF}
+
+{**********************************************}
+procedure TALStrokeBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALStrokeBrush then begin
+    BeginUpdate;
+    Try
+      Color := TALStrokeBrush(Source).Color;
+      Thickness := TALStrokeBrush(Source).Thickness;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    inherited Assign(Source);
+end;
+
+{************************}
+procedure TALStrokeBrush.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Color := DefaultColor;
+    Thickness := DefaultThickness;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{************************}
+function TALStrokeBrush.HasStroke: boolean;
+begin
+  result := (Color <> TalphaColors.Null) and
+            (CompareValue(FThickness, 0, TEpsilon.Vector) > 0);
+end;
+
+{***************************************}
+function TALStrokeBrush.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor;
+end;
+
+{**********************************************}
+function TALStrokeBrush.IsThicknessStored: Boolean;
+begin
+  result := not SameValue(FThickness, FDefaultThickness, TEpsilon.Vector);
+end;
+
+{****************************************************}
+procedure TALStrokeBrush.SetColor(const Value: TAlphaColor);
+begin
+  if fColor <> Value then begin
+    fColor := Value;
+    Change;
+  end;
+end;
+
+{*********************************************************}
+procedure TALStrokeBrush.SetThickness(const Value: Single);
+begin
+  if not SameValue(Value, FThickness, TEpsilon.Vector) then begin
+    fThickness := Value;
+    Change;
+  end;
+end;
+
+{*************************************}
+constructor TALInheritStrokeBrush.Create(const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultColor);
+  FInherit := True;
+end;
+
+{**********************************************************}
+procedure TALInheritStrokeBrush.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALInheritStrokeBrush.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALInheritStrokeBrush then
+      Inherit := TALInheritStrokeBrush(Source).Inherit
+    else
+      Inherit := False;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{******************************}
+procedure TALInheritStrokeBrush.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Inherit := True;
   finally
     EndUpdate;
   end;
@@ -2070,6 +2884,93 @@ begin
 
 end;
 
+{*}
+var
+  ALResourceDirectory: String;
+  ALResourceDirectoryLock: TLightweightMREW;
+
+{**************************************}
+function ALGetResourceDirectory: String;
+begin
+  ALResourceDirectoryLock.beginRead;
+  Try
+    result := ALResourceDirectory;
+  finally
+    ALResourceDirectoryLock.endRead;
+  end;
+
+  if result = '' then begin
+    ALResourceDirectoryLock.beginWrite;
+    Try
+
+      {$IF Defined(ANDROID)}
+      // asset:///resources
+      ALResourceDirectory := 'asset:///resources';
+      {$ELSEIF Defined(IOS)}
+      // /private/var/containers/Bundle/Application/1A22111C-63ED-2255-8899-33554D5FA659/myapp.app/Resources
+      var LBundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
+      ALResourceDirectory := TPath.combine(UTF8ToString(LBundle.resourcePath.UTF8String), 'Resources');
+      {$ELSEIF Defined(ALMacOS)}
+      // /Users/xxx/PAServer/scratch-dir/xxx-VMWare/myapp.app/Contents/Resources
+      var LBundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
+      ALResourceDirectory := UTF8ToString(LBundle.resourcePath.UTF8String);
+      {$ELSEIF Defined(MSWINDOWS)}
+      // c:\Program Files\myapp\Resources
+      ALResourceDirectory := TPath.combine(ALGetModulePathW, 'Resources');
+      {$ELSE}
+      raise Exception.Create('Error 0F41B748-DFAD-48A8-957C-07C175AE5633');
+      {$ENDIF}
+
+      result := ALResourceDirectory;
+
+    finally
+      ALResourceDirectoryLock.endWrite;
+    end;
+  end;
+end;
+
+{******************************************************************}
+function ALGetResourceFilename(const AResourceName: String): String;
+begin
+
+  {$IFDEF ALDPK}
+
+  Result := '';
+  if TFile.Exists(getActiveProject.fileName) then begin
+    var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
+    //<RcItem Include="resources\account_100x100.png">
+    //    <ResourceType>RCDATA</ResourceType>
+    //    <ResourceId>account_100x100</ResourceId>
+    //</RcItem>
+    Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+AResourceName+'</ResourceId>', LDProjSrc);
+    While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
+    if (P1 > 0) then begin
+      var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
+      if P2 > P1 then begin
+        Result := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
+        if not TFile.Exists(Result) then Result := '';
+      end;
+    end;
+  end;
+  if Result = '' then begin
+    Result := extractFilePath(getActiveProject.fileName) + 'Resources\' + AResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
+    if not TFile.Exists(Result) then begin
+      if TFile.Exists(Result + '.png') then Result := Result + '.png'
+      else if TFile.Exists(Result + '.jpg') then Result := Result + '.jpg'
+      else Result := '';
+    end;
+  end;
+
+  {$ELSE}
+
+  if Assigned(ALCustomGetResourceFilenameProc) then Result := ALCustomGetResourceFilenameProc(AResourceName)
+  else If ALposW('.',AResourceName) > 0 then Result := TPath.combine(ALGetResourceDirectory, AResourceName)
+  else result := '';
+
+  {$ENDIF}
+
+end;
+
 {*************************************************}
 function  ALTranslate(const AText: string): string;
 begin
@@ -2115,7 +3016,10 @@ begin
       end;
 
       //--
-      TAlignLayout.Center:;
+      TAlignLayout.Center: begin
+        LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
+        LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
+      end;
 
       //--
       TAlignLayout.Top,
@@ -2520,37 +3424,6 @@ end;
 
 {$ENDIF}
 
-{$IFDEF ALDPK}
-function ALDPKGetResourceFilename(const AResourceName: String): String;
-begin
-  Result := '';
-  if TFile.Exists(getActiveProject.fileName) then begin
-    var LDProjSrc := ALGetStringFromFile(getActiveProject.fileName, TEncoding.utf8);
-    //<RcItem Include="resources\account_100x100.png">
-    //    <ResourceType>RCDATA</ResourceType>
-    //    <ResourceId>account_100x100</ResourceId>
-    //</RcItem>
-    Var P1: Integer := ALposIgnoreCaseW('<ResourceId>'+AResourceName+'</ResourceId>', LDProjSrc);
-    While (P1 > 1) and ((LDProjSrc[P1-1] <> '=') or (LDProjSrc[P1] <> '"')) do dec(P1);
-    if (P1 > 0) then begin
-      var P2: Integer := ALPosW('"', LDProjSrc, P1+1);
-      if P2 > P1 then begin
-        Result := extractFilePath(getActiveProject.fileName) + ALcopyStr(LDProjSrc, P1+1, P2-P1-1);
-        if not TFile.Exists(Result) then Result := '';
-      end;
-    end;
-  end;
-  if Result = '' then begin
-    Result := extractFilePath(getActiveProject.fileName) + 'Resources\' + AResourceName; // by default all the resources files must be located in the sub-folder /Resources/ of the project
-    if not TFile.Exists(Result) then begin
-      if TFile.Exists(Result + '.png') then Result := Result + '.png'
-      else if TFile.Exists(Result + '.jpg') then Result := Result + '.jpg'
-      else Result := '';
-    end;
-  end;
-end;
-{$ENDIF}
-
 {**************************}
 procedure ALInitScreenScale;
 begin
@@ -2579,12 +3452,15 @@ end;
 initialization
   ALScreenScale := 0;
   ALCustomConvertFontFamilyProc := nil;
+  ALCustomGetResourceFilenameProc := nil;
+  ALResourceDirectory := '';
+  //ALResourceDirectoryLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
   {$IFDEF ANDROID}
   ALViewStackCount := 0;
   _RenderScript := nil;
   {$ENDIF}
   ALFontMetricsCache := TDictionary<TALFontMetricsKey, TALFontMetrics>.Create;
-  //_FontMetricsCacheLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  //ALFontMetricsCacheLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
 
 finalization
   AlFreeAndNil(ALFontMetricsCache);

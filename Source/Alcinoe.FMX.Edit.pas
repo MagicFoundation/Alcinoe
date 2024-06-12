@@ -690,7 +690,7 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
   published
-    property Opacity: Single read FOpacity write SetOpacity stored OpacityStored;
+    property Opacity: Single read FOpacity write SetOpacity stored OpacityStored nodefault;
   end;
 
   {***********************************************}
@@ -1021,6 +1021,7 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
+  FMX.Types3D,
   FMX.Utils,
   {$IF defined(android)}
   Androidapi.Helpers,
@@ -1071,9 +1072,7 @@ begin
       XRadius := 0;
       YRadius := 0;
       TintColor := TalphaColors.null;
-      Fill.Kind := fill.DefaultKind;
       Fill.Color := fill.DefaultColor;
-      Stroke.Kind := Stroke.DefaultKind;
       Stroke.Color := Stroke.DefaultColor;
       Stroke.Thickness := 1;
       var LPrevIsHtml := TextSettings.IsHtml;
@@ -1165,9 +1164,7 @@ begin
       DefStyleAttr := 'Material3LightFilledEditTextStyle';
       DefStyleRes := '';
       TintColor := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
-      Fill.Kind := TBrushKind.Solid;
       Fill.Color := $FFE6E0E9; // md.sys.color.surface-container-highest / md.ref.palette.neutral90
-      Stroke.Kind := TBrushKind.Solid;
       Stroke.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       Stroke.Thickness := 1;
       var LPrevIsHtml := TextSettings.IsHtml;
@@ -1361,9 +1358,7 @@ begin
       DefStyleAttr := 'Material3LightOutlinedEditTextStyle';
       DefStyleRes := '';
       TintColor := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
-      Fill.Kind := TBrushKind.solid;
       Fill.Color := $FFFFFFFF;
-      Stroke.Kind := TBrushKind.Solid;
       Stroke.Color := $FF79747E; // md.sys.color.outline / md.ref.palette.neutral-variant50
       Stroke.Thickness := 1;
       var LPrevIsHtml := TextSettings.IsHtml;
@@ -1551,9 +1546,7 @@ begin
       DefStyleAttr := '';
       DefStyleRes := '';
       TintColor := $FF1c2b33;
-      Fill.Kind := TBrushKind.solid;
       Fill.Color := $FFFFFFFF;
-      Stroke.Kind := TBrushKind.Solid;
       Stroke.Color := $FFdee3e9;
       Stroke.Thickness := 1;
       var LPrevIsHtml := TextSettings.IsHtml;
@@ -1677,9 +1670,7 @@ begin
       DefStyleAttr := 'Material3DarkFilledEditTextStyle';
       DefStyleRes := '';
       TintColor := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
-      Fill.Kind := TBrushKind.Solid;
       Fill.Color := $FF36343B; // md.sys.color.surface-container-highest / md.ref.palette.neutral22
-      Stroke.Kind := TBrushKind.Solid;
       Stroke.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       Stroke.Thickness := 1;
       var LPrevIsHtml := TextSettings.IsHtml;
@@ -1873,9 +1864,7 @@ begin
       DefStyleAttr := 'Material3DarkOutlinedEditTextStyle';
       DefStyleRes := '';
       TintColor := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
-      Fill.Kind := TBrushKind.solid;
       Fill.Color := $FF000000;
-      Stroke.Kind := TBrushKind.Solid;
       Stroke.Color := $FF938F99; // md.sys.color.outline / md.ref.palette.neutral-variant60
       Stroke.Thickness := 1;
       var LPrevIsHtml := TextSettings.IsHtml;
@@ -4427,10 +4416,10 @@ begin
   FPromptTextColor := TalphaColors.Null;
   FTintColor := TalphaColors.Null;
   //--
-  FFill := TALInheritBrush.Create(TBrushKind.Solid{ADefaultKind}, $ffffffff{ADefaultColor});
+  FFill := TALInheritBrush.Create($ffffffff{ADefaultColor});
   FFill.OnChanged := FillChanged;
   //--
-  FStroke := TALInheritStrokeBrush.Create(TBrushKind.Solid{ADefaultKind}, $FF7a7a7a{ADefaultColor});
+  FStroke := TALInheritStrokeBrush.Create($FF7a7a7a{ADefaultColor});
   FStroke.OnChanged := StrokeChanged;
   //--
   FTextSettings := TALEditStateStyleTextSettings.Create;
@@ -4829,8 +4818,6 @@ begin
   fill.OnChanged := LFillChanged;
   var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
   stroke.OnChanged := Nil;
-  stroke.DefaultKind := TBrushKind.Solid;
-  stroke.kind := stroke.DefaultKind;
   stroke.DefaultColor := $FF7a7a7a;
   stroke.Color := stroke.DefaultColor;
   stroke.OnChanged := LStrokeChanged;
@@ -5180,13 +5167,6 @@ end;
 {***************************************}
 procedure TALBaseEdit.UpdateEditControlStyle;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _GetFillColor(const aFill: Tbrush): TalphaColor;
-  begin
-    if aFill.Kind = TBrushKind.Solid then Result := aFill.Color
-    else Result := TalphaColors.Null;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _UpdateEdit1ControlTextSettings(
               const AStateStyle: TALEditStateStyle;
@@ -5252,39 +5232,39 @@ begin
 
   {$REGION 'FillColor'}
   if Not Enabled then begin
-    if not StateStyles.Disabled.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Disabled.Fill)
-    else EditControl.FillColor := _GetFillColor(Fill);
+    if not StateStyles.Disabled.Fill.Inherit then EditControl.FillColor := StateStyles.Disabled.Fill.color
+    else EditControl.FillColor := Fill.color;
   end
   //--
   else if FError and IsFocused then begin
-    if not StateStyles.ErrorFocused.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.ErrorFocused.Fill)
-    else if not StateStyles.Error.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Error.Fill)
-    else EditControl.FillColor := _GetFillColor(Fill);
+    if not StateStyles.ErrorFocused.Fill.Inherit then EditControl.FillColor := StateStyles.ErrorFocused.Fill.color
+    else if not StateStyles.Error.Fill.Inherit then EditControl.FillColor := StateStyles.Error.Fill.color
+    else EditControl.FillColor := Fill.color;
   end
   //--
   else if FError and FHovered then begin
-    if not StateStyles.ErrorHovered.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.ErrorHovered.Fill)
-    else if not StateStyles.Error.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Error.Fill)
-    else EditControl.FillColor := _GetFillColor(Fill);
+    if not StateStyles.ErrorHovered.Fill.Inherit then EditControl.FillColor := StateStyles.ErrorHovered.Fill.color
+    else if not StateStyles.Error.Fill.Inherit then EditControl.FillColor := StateStyles.Error.Fill.color
+    else EditControl.FillColor := Fill.color;
   end
   //--
   else if FError then begin
-    if not StateStyles.Error.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Error.Fill)
-    else EditControl.FillColor := _GetFillColor(Fill);
+    if not StateStyles.Error.Fill.Inherit then EditControl.FillColor := StateStyles.Error.Fill.color
+    else EditControl.FillColor := Fill.color;
   end
   //--
   else if IsFocused then begin
-    if not StateStyles.Focused.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Focused.Fill)
-    else EditControl.FillColor := _GetFillColor(Fill);
+    if not StateStyles.Focused.Fill.Inherit then EditControl.FillColor := StateStyles.Focused.Fill.color
+    else EditControl.FillColor := Fill.color;
   end
   //--
   else if FHovered then begin
-    if not StateStyles.Hovered.Fill.Inherit then EditControl.FillColor := _GetFillColor(StateStyles.Hovered.Fill)
-    else EditControl.FillColor := _GetFillColor(Fill);
+    if not StateStyles.Hovered.Fill.Inherit then EditControl.FillColor := StateStyles.Hovered.Fill.color
+    else EditControl.FillColor := Fill.color;
   end
   //--
   else begin
-    EditControl.FillColor := _GetFillColor(Fill);
+    EditControl.FillColor := Fill.color;
   end;
   {$ENDREGION}
 
@@ -6225,12 +6205,12 @@ procedure TALBaseEdit.MakeBufDrawable;
     if AStateStyle.Inherit then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
     //--
-    var LFill: TBrush;
+    var LFill: TALBrush;
     if not AStateStyle.Fill.inherit then LFill := AStateStyle.Fill
     else if (not StateStyles.Error.fill.Inherit) and (AUseErrorStyleInheritance) then LFill := StateStyles.Error.Fill
     else LFill := Fill;
     //--
-    var LStroke: TStrokeBrush;
+    var LStroke: TALStrokeBrush;
     if not AStateStyle.Stroke.inherit then LStroke := AStateStyle.Stroke
     else if (not StateStyles.Error.Stroke.Inherit) and (AUseErrorStyleInheritance) then LStroke := StateStyles.Error.Stroke
     else LStroke := Stroke;
@@ -6243,8 +6223,8 @@ procedure TALBaseEdit.MakeBufDrawable;
     CreateBufDrawable(
       ABufDrawable, // var ABufDrawable: TALDrawable;
       ABufDrawableRect, // var ABufDrawableRect: TRectF;
-      LFill, // const AFill: TBrush;
-      LStroke, // const AStroke: TStrokeBrush;
+      LFill, // const AFill: TALBrush;
+      LStroke, // const AStroke: TALStrokeBrush;
       LShadow); // const AShadow: TALShadow);
   end;
 
@@ -7006,8 +6986,7 @@ begin
      ((Labeltext <> '') and (prompttext <> '') and (prompttext <> labeltext)) or
      (not GetIsTextEmpty) or
      (GetIsTextEmpty and HasOpacityLabelTextAnimation and FLabelTextAnimation.Running) then begin
-    if (not ALisDrawableNull(LLabelTextDrawable)) and
-       (canvas.Stroke.Kind <> TBrushKind.None) then begin
+    if (not ALisDrawableNull(LLabelTextDrawable)) then begin
       var LRect := LLabelTextDrawableRect;
       LRect.Inflate(4{DL}, 4{DT}, 4{DR}, 4{DB});
       LRect.Intersect(LocalRect);
@@ -7137,8 +7116,7 @@ begin
           LPromptTextDrawableRect.Top - ((LPromptTextDrawableRect.top - LLabelTextDrawableRect.top) * FLabelTextAnimation.CurrentValue));
         LPromptTextDrawableRect.Width := LPromptTextDrawableRect.width - ((LPromptTextDrawableRect.width - LLabelTextDrawableRect.Width) * FLabelTextAnimation.CurrentValue);
         LPromptTextDrawableRect.Height := LPromptTextDrawableRect.Height - ((LPromptTextDrawableRect.Height - LLabelTextDrawableRect.Height) * FLabelTextAnimation.CurrentValue);
-        if (not ALisDrawableNull(LPromptTextDrawable)) and
-           (canvas.Stroke.Kind <> TBrushKind.None) then begin
+        if (not ALisDrawableNull(LPromptTextDrawable)) then begin
           var LRect := LPromptTextDrawableRect;
           LRect.Inflate(4{DL}, 4{DT}, 4{DR}, 4{DB});
           LRect.Intersect(LocalRect);
@@ -7347,7 +7325,7 @@ begin
       if LInlinedLabelText then MakeBufLabelTextDrawable;
 
       var LStrokeSize := TRectF.Empty;
-      if Stroke.Kind <> TbrushKind.None then begin
+      if Stroke.HasStroke then begin
         if (TSide.Top in Sides) then    LStrokeSize.Top :=    max(Stroke.Thickness - Padding.top,    0);
         if (TSide.bottom in Sides) then LStrokeSize.bottom := max(Stroke.Thickness - Padding.bottom, 0);
         if (TSide.right in Sides) then  LStrokeSize.right :=  max(Stroke.Thickness - Padding.right,  0);

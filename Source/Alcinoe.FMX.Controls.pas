@@ -106,6 +106,7 @@ uses
 constructor TALControl.Create(AOwner: TComponent);
 begin
   inherited;
+  Size.SetPlatformDefaultWithoutNotification(False);
   FFocusOnMouseUp := False;
   FMouseDownPos := TpointF.zero;
   FMouseDownAtLowVelocity := True;

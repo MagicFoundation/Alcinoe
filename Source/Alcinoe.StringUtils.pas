@@ -281,6 +281,9 @@ function  ALUIntToStrW(Value: UInt64): String; overload; inline;
 function  ALIntToHexA(Value: Integer; Digits: Integer): AnsiString; overload;
 function  ALIntToHexA(Value: Int64; Digits: Integer): AnsiString; overload;
 function  ALIntToHexA(Value: UInt64; Digits: Integer): AnsiString; overload;
+function  ALIntToHexW(Value: Integer; Digits: Integer): String; inline; overload;
+function  ALIntToHexW(Value: Int64; Digits: Integer): String; inline; overload;
+function  ALIntToHexW(Value: UInt64; Digits: Integer): String; inline; overload;
 function  ALTryBinToHex(const aBin: AnsiString; out Value: AnsiString): boolean; overload;
 function  ALTryBinToHex(const aBin; aBinSize : Cardinal; out Value: AnsiString): boolean; overload;
 function  ALTryBinToHex(const aBin: Tbytes; out Value: String): boolean; overload;
@@ -4868,6 +4871,24 @@ end;
 function ALIntToHexA(Value: UInt64; Digits: Integer): AnsiString;
 begin
   Result := _ALIntToHex(Value, digits);
+end;
+
+{*************************************************************}
+function  ALIntToHexW(Value: Integer; Digits: Integer): String;
+begin
+  Result := IntToHex(Value, Digits);
+end;
+
+{***********************************************************}
+function  ALIntToHexW(Value: Int64; Digits: Integer): String;
+begin
+  Result := IntToHex(Value, Digits);
+end;
+
+{************************************************************}
+function  ALIntToHexW(Value: UInt64; Digits: Integer): String;
+begin
+  Result := IntToHex(Value, Digits);
 end;
 
 {******************************************************************}

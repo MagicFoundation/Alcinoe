@@ -37,99 +37,58 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~}
-  TALImageWrapMode = (
-    // Display the image with its original dimensions:
-    // * The image is placed in the upper-left corner of the rectangle of the control.
-    // * If the image is larger than the control's rectangle, then only the upper-left part of the image,
-    //   which fits in the rectangle of the control, is shown. The image is not resized.
-    Original,
-
-    // Best fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    //   (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
-    //   of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
-    //   or the height of the resized image is equal to the height of the rectangle of the control. The whole image
-    //   should be displayed. The image is displayed centered in the rectangle of the control.
-    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    //   the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    Fit,
-
-    // Stretch the image to fill the entire rectangle of the control.
-    Stretch,
-
-    // Tile (multiply) the image to cover the entire rectangle of the control:
-    // * If the image is larger than the rectangle of the control, then only the
-    //   upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
-    // * If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
-    //   (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
-    //   the upper-left corner of the rectangle of the control.
-    Tile,
-
-    // Center the image to the rectangle of the control:
-    // * The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
-    Center,
-
-    // Fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
-    //   to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
-    //   resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    // * If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
-    Place,
-
-    // Best fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    //   (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
-    //   of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
-    //   AND the height of the resized image is equal to the height of the rectangle of the control.
-    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    //   the rectangle of the control. Whole the image should be displayed.
-    FitAndCrop);
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALShape = class(TALControl)
-  private
-    FFill: TBrush;
-    FStroke: TStrokeBrush;
-    procedure SetFill(const Value: TBrush);
-    procedure SetStroke(const Value: TStrokeBrush);
+  strict private
+    FFill: TALBrush;
+    FStroke: TALStrokeBrush;
+    fShadow: TALShadow;
+    procedure SetFill(const Value: TALBrush);
+    procedure SetStroke(const Value: TALStrokeBrush);
+    procedure SetShadow(const Value: TALShadow);
   protected
-    procedure Painting; override;
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
-    function GetShapeRect: TRectF;
-    function DoGetUpdateRect: TRectF; override;
+    procedure ShadowChanged(Sender: TObject); virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property Fill: TBrush read FFill write SetFill;
-    property Stroke: TStrokeBrush read FStroke write SetStroke;
-    property ShapeRect: TRectF read GetShapeRect;
+    property Fill: TALBrush read FFill write SetFill;
+    property Stroke: TALStrokeBrush read FStroke write SetStroke;
+    property Shadow: TALShadow read fshadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  //Under delphi, we have multi-res bitmap for Timage or Tglyph. this mean that we can gave several bitmap for several screen scale.
-  //Exemple with a screen scale of 1 i will gave a bitmap of 100x100, for the screen scale of 1.5 i will gave a bitmap of 150*150, etc..
-  //so taking care that most screen scale are 1, 1.5, 2, 3, and 4 we must provide 4 pictures. In 99.9999 % of the case the developer will
-  //simply do a normal resize of the image (under photoshop or similar app) in the 5 of fewer screen scale (seriously is their any developer
-  //who will gave radically different image between scale 1 and scale n ?)
-  //But the resize algo to resize picture is quite powerful and often negligible. So if we gave only one bitmap (at the most biggest scale, 4)
-  //it's must be good/powerfull and it's will reduce also the size of the app.
-  //also from smartphone to tablet i notice that to keep a good ratio i must increase all the font size, and image by 15%. So using multires
-  //bitmap and if i want to avoid any resize (the purpose of multires bitmap as i understand) i must have 10 bitmaps per image !!
-  //so all of this to say that multi-res bitmap is a fundamentally wrong concept
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // In Delphi, multi-resolution bitmaps for TImage or TGlyph allow us to
+  // provide different bitmap sizes for various screen scales. For example, a
+  // screen scale of 1 might use a 100x100 bitmap, while a scale of 1.5 uses a
+  // 150x150 bitmap, etc. Typically, most screen scales are 1, 1.5, 2, 3, and 4,
+  // requiring up to 4 different images. In most cases (99.9999%), developers
+  // will simply resize these images using a tool like Photoshop to match one
+  // of these five scales. Rarely does anyone create radically different images
+  // for each scale.
+  //
+  // However, the resizing algorithms available are quite effective and the
+  // differences are often negligible. Thus, providing just one high-resolution
+  // bitmap (at the largest scale of 4) could be sufficient and would help
+  // reduce the application's size.
+  //
+  // Moreover, transitioning from smartphones to tablets, I've noticed that
+  // maintaining proper proportions requires increasing the font and image
+  // sizes by 15%. Therefore, to avoid resizing and truly leverage
+  // multi-resolution bitmaps, one might need up to 10 different bitmaps per
+  // image. This leads me to conclude that the concept of multi-resolution
+  // bitmaps is fundamentally flawed.
   [ComponentPlatforms($FFFF)]
   TALImage = class(TALControl, IALDoubleBufferedControl)
   private
     fExifOrientationInfo: TalExifOrientationInfo;
     fRotateAccordingToExifOrientation: Boolean;
-    fFileName: String;
     fResourceName: String;
     FWrapMode: TALImageWrapMode;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
     procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure setFileName(const Value: String);
     procedure setResourceName(const Value: String);
   protected
     function GetDoubleBuffered: boolean;
@@ -163,13 +122,17 @@ type
     property Position;
     property RotationAngle;
     property RotationCenter;
-    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write fRotateAccordingToExifOrientation default false; // << under Android, work only when using filename
+    // under Android, work only when setting a file in ResourceName
+    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write fRotateAccordingToExifOrientation default false;
     property Scale;
     property Size;
     property TouchTargetExpansion;
     property Visible default True;
     property Width;
-    property FileName: String read fFileName write setFileName;
+    // If a file extension (e.g., .xxx) is detected in ResourceName, the image is loaded from the
+    // specified file (With the full path of the file obtained using ALGetResourceFilename).
+    // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
+    // project directory (with the extensions .png or .jpg).
     property ResourceName: String read fResourceName write setResourceName;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
     property ParentShowHint;
@@ -205,8 +168,6 @@ type
     FSides: TSides;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
-    fShadow: TALShadow;
-    procedure SetShadow(const Value: TALShadow);
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
   protected
@@ -218,16 +179,16 @@ type
     procedure SetSides(const Value: TSides); virtual;
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
-    procedure ShadowChanged(Sender: TObject); virtual;
+    procedure ShadowChanged(Sender: TObject); override;
     procedure Paint; override;
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
                 var ABufDrawableRect: TRectF;
-                const AFill: TBrush;
-                const AStroke: TStrokeBrush;
-                const AShadow: TALShadow);
+                const AFill: TALBrush;
+                const AStroke: TALStrokeBrush;
+                const AShadow: TALShadow); virtual;
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -258,7 +219,7 @@ type
     property RotationAngle;
     property RotationCenter;
     property Scale;
-    property Shadow: TALShadow read fshadow write SetShadow;
+    property Shadow;
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property Size;
     property Stroke;
@@ -318,22 +279,20 @@ type
     fDoubleBuffered: boolean;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
-    fShadow: TALShadow;
-    procedure SetShadow(const Value: TALShadow);
   protected
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
-    procedure ShadowChanged(Sender: TObject); virtual;
+    procedure ShadowChanged(Sender: TObject); override;
     procedure Paint; override;
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
                 var ABufDrawableRect: TRectF;
-                const AFill: TBrush;
-                const AStroke: TStrokeBrush;
+                const AFill: TALBrush;
+                const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
     procedure DoResized; override;
   public
@@ -365,7 +324,7 @@ type
     property RotationAngle;
     property RotationCenter;
     property Scale;
-    property Shadow: TALShadow read fshadow write SetShadow;
+    property Shadow;
     property Size;
     property Stroke;
     property Visible default True;
@@ -467,8 +426,8 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBaseText = class(TALControl, IALAutosizeControl, IALDoubleBufferedControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBaseText = class(TALShape, IALAutosizeControl, IALDoubleBufferedControl)
   public
     type
       TElementMouseEvent = procedure(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single; const Element: TALTextElement) of object;
@@ -498,13 +457,7 @@ type
     FXRadius: Single;
     FCorners: TCorners;
     FSides: TSides;
-    FFill: TBrush;
-    FStroke: TStrokeBrush;
-    fShadow: TALShadow;
     FAutoSize: Boolean;
-    procedure SetFill(const Value: TBrush);
-    procedure SetStroke(const Value: TStrokeBrush);
-    procedure SetShadow(const Value: TALShadow);
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
     procedure SetText(const Value: string);
@@ -531,9 +484,9 @@ type
     property BufDrawableRect: TRectF read fBufDrawableRect;
     procedure PaddingChanged; override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
-    procedure FillChanged(Sender: TObject); virtual;
-    procedure StrokeChanged(Sender: TObject); virtual;
-    procedure ShadowChanged(Sender: TObject); virtual;
+    procedure FillChanged(Sender: TObject); override;
+    procedure StrokeChanged(Sender: TObject); override;
+    procedure ShadowChanged(Sender: TObject); override;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
     procedure SetCorners(const Value: TCorners); virtual;
@@ -558,8 +511,8 @@ type
                 const ADecoration: TALTextDecoration;
                 const AEllipsisFont: TALFont;
                 const AEllipsisDecoration: TALTextDecoration;
-                const AFill: TBrush;
-                const AStroke: TStrokeBrush;
+                const AFill: TALBrush;
+                const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
     property Elements: TALTextElements read fBufElements;
     property OnElementClick: TElementNotifyEvent read FOnElementClick write FOnElementClick;
@@ -605,8 +558,8 @@ type
     property Text: string read FText write SetText;
     property Visible default True;
     property Width;
-    property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored;
-    property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored;
+    property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored nodefault;
+    property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored nodefault;
     {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;
@@ -627,9 +580,9 @@ type
     property OnResize;
     property OnResized;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
-    property Fill: TBrush read FFill write SetFill;
-    property Stroke: TStrokeBrush read FStroke write SetStroke;
-    property shadow: TALShadow read fshadow write SetShadow;
+    property Fill;
+    property Stroke;
+    property shadow;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property XRadius: Single read FXRadius write SetXRadius;
@@ -698,57 +651,21 @@ uses
 constructor TALShape.Create(AOwner: TComponent);
 begin
   inherited;
-  Size.SetPlatformDefaultWithoutNotification(False);
-  FFill := TBrush.Create(TBrushKind.Solid, $FFE0E0E0);
+  FFill := TALBrush.Create($FFE0E0E0);
   FFill.OnChanged := FillChanged;
-  FStroke := TStrokeBrush.Create(TBrushKind.Solid, $FF000000);
+  FStroke := TALStrokeBrush.Create($FF000000);
   FStroke.OnChanged := StrokeChanged;
-  SetAcceptsControls(False);
+  fShadow := TALShadow.Create;
+  fShadow.OnChanged := ShadowChanged;
 end;
 
 {**********************************************}
 destructor TALShape.Destroy;
 begin
-  FreeAndNil(FStroke);
-  FreeAndNil(FFill);
+  ALFreeAndNil(FStroke);
+  ALFreeAndNil(FFill);
+  ALFreeAndNil(fShadow);
   inherited;
-end;
-
-{**********************************************}
-function TALShape.GetShapeRect: TRectF;
-begin
-  Result := LocalRect;
-  if FStroke.Kind <> TBrushKind.None then
-    InflateRect(Result, -(FStroke.Thickness / 2), -(FStroke.Thickness / 2));
-end;
-
-{**********************************************}
-function TALShape.DoGetUpdateRect: TRectF;
-var
-  LOffset: Single;
-begin
-  Result := inherited DoGetUpdateRect;
-
-  LOffset := 0;
-  if FStroke <> nil then
-  begin
-    if (FStroke.Dash <> TStrokeDash.Solid) and (FStroke.Cap = TStrokeCap.Flat) then
-      LOffset := (Sqrt(2) - 1) * 0.5 * FStroke.Thickness;
-
-  end;
-
-  { inflate rect - remove antialiasing artefacts }
-  if not Result.IsEmpty then
-    LOffset := LOffset + 1;
-  if LOffset > 0 then
-    Result.Inflate(LOffset, LOffset);
-end;
-
-{**********************************************}
-procedure TALShape.Painting;
-begin
-  inherited;
-  Canvas.Stroke.Assign(FStroke);
 end;
 
 {**********************************************}
@@ -765,16 +682,29 @@ begin
     Repaint;
 end;
 
+{************************************************}
+procedure TALShape.ShadowChanged(Sender: TObject);
+begin
+  if FUpdating = 0 then
+    Repaint;
+end;
+
 {**********************************************}
-procedure TALShape.SetFill(const Value: TBrush);
+procedure TALShape.SetFill(const Value: TALBrush);
 begin
   FFill.Assign(Value);
 end;
 
 {******************************************************}
-procedure TALShape.SetStroke(const Value: TStrokeBrush);
+procedure TALShape.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
+end;
+
+{***************************************************}
+procedure TALShape.SetShadow(const Value: TALShadow);
+begin
+  FShadow.Assign(Value);
 end;
 
 {**********************************************}
@@ -783,7 +713,6 @@ begin
   inherited Create(AOwner);
   fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   fRotateAccordingToExifOrientation := False;
-  fFileName := '';
   fResourceName := '';
   FWrapMode := TALImageWrapMode.Fit;
   fBufDrawable := ALNullDrawable;
@@ -813,7 +742,7 @@ procedure TALImage.MakeBufDrawable;
 begin
 
   if (Size.Size.IsZero) or // Do not create BufDrawable if the size is 0
-     ((fFileName = '') and (fResourceName = '')) // Do not create BufDrawable if  fFileName or fResourceName is empty
+     (fResourceName = '') // Do not create BufDrawable if fResourceName is empty
   then begin
     clearBufDrawable;
     exit;
@@ -821,18 +750,9 @@ begin
 
   if (not ALIsDrawableNull(fBufDrawable)) then exit;
 
-  {$IFDEF ALDPK}
-  var LFileName: String := '';
-  if fresourceName = '' then begin
-    LFileName := fFileName;
-    if not TFile.Exists(LFileName) then LFileName := '';
-  end
-  else LFileName := ALDPKGetResourceFilename(FResourceName);
-  {$ENDIF}
+  var LFileName := ALGetResourceFilename(FResourceName);
 
-  if (fRotateAccordingToExifOrientation) and
-     (fResourceName = '') and
-     (fFileName <> '') then fExifOrientationInfo := AlGetExifOrientationInfo(ffilename)
+  if (fRotateAccordingToExifOrientation) and (LFileName <> '') then fExifOrientationInfo := AlGetExifOrientationInfo(LFilename)
   else fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
 
   if fExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
@@ -846,107 +766,10 @@ begin
                                                                                       // TalExifOrientationInfo.ROTATE_180:;
                                                                                       // TalExifOrientationInfo.UNDEFINED:;
 
-  case FWrapMode of
+  if LFileName <> '' then fBufDrawable := ALLoadFromFileAndWrapToDrawable(LFileName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+  else fBufDrawable := {$IFDEF ALDPK}ALNullDrawable{$ELSE}ALLoadFromResourceAndWrapToDrawable(fResourceName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale){$ENDIF};
 
-    // Display the image with its original dimensions:
-    // * The image is placed in the upper-left corner of the rectangle of the control.
-    // * If the image is larger than the control's rectangle, then only the upper-left part of the image,
-    //   which fits in the rectangle of the control, is shown. The image is not resized.
-    TALImageWrapMode.Original:
-      begin
-        // todo
-      end;
-
-    // Best fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    //   (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
-    //   of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
-    //   or the height of the resized image is equal to the height of the rectangle of the control. The whole image
-    //   should be displayed. The image is displayed centered in the rectangle of the control.
-    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    //   the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    TALImageWrapMode.Fit:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Stretch the image to fill the entire rectangle of the control.
-    TALImageWrapMode.Stretch:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndStretchToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndStretchToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALLoadFromFileAndStretchToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Tile (multiply) the image to cover the entire rectangle of the control:
-    // * If the image is larger than the rectangle of the control, then only the
-    //   upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
-    // * If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
-    //   (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
-    //   the upper-left corner of the rectangle of the control.
-    TALImageWrapMode.Tile:
-      begin
-        // todo
-      end;
-
-    // Center the image to the rectangle of the control:
-    // * The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
-    TALImageWrapMode.Center:
-      begin
-        // todo
-      end;
-
-    // Fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
-    //   to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
-    //   resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    // * If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
-    TALImageWrapMode.Place:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndPlaceIntoToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndPlaceIntoToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALLoadFromFileAndPlaceIntoToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Best fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    //   (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
-    //   of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
-    //   AND the height of the resized image is equal to the height of the rectangle of the control.
-    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    //   the rectangle of the control. Whole the image should be displayed.
-    TALImageWrapMode.FitAndCrop:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoAndCropToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        if fResourceName <> '' then fBufDrawable := ALLoadFromResourceAndFitIntoAndCropToDrawable(fResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALLoadFromFileAndFitIntoAndCropToDrawable(fFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Error
-    else
-      Raise exception.Create('Error 9F61789B-F9A8-45D8-BEF4-8C7DABCCFCE7')
-
-  end;
-
-  if not ALIsDrawableNull(fBufDrawable) then
+  {$IFDEF ALDPK}if not ALIsDrawableNull(fBufDrawable) then{$ENDIF}
     fBufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(fBufDrawable)/ALGetScreenScale, ALGetDrawableHeight(fBufDrawable)/ALGetScreenScale).
                           CenterAt(LocalRect);
 
@@ -1048,16 +871,6 @@ begin
   end;
 end;
 
-{**************************************************}
-procedure TALImage.setFileName(const Value: String);
-begin
-  if FFileName <> Value then begin
-    clearBufDrawable;
-    FFileName := Value;
-    Repaint;
-  end;
-end;
-
 {******************************************************}
 procedure TALImage.setResourceName(const Value: String);
 begin
@@ -1097,15 +910,12 @@ begin
   FCorners := AllCorners;
   FSides := AllSides;
   fBufDrawable := ALNullDrawable;
-  fShadow := TALShadow.Create;
-  fShadow.OnChanged := ShadowChanged;
 end;
 
 {******************************}
 destructor TALBaseRectangle.Destroy;
 begin
   ClearBufDrawable;
-  ALFreeAndNil(fShadow);
   inherited;
 end;
 
@@ -1222,15 +1032,15 @@ end;
 procedure TALBaseRectangle.ShadowChanged(Sender: TObject);
 begin
   clearBufDrawable;
-  Repaint;
+  inherited;
 end;
 
 {***************************************}
 Procedure TALBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             var ABufDrawableRect: TRectF;
-            const AFill: TBrush;
-            const AStroke: TStrokeBrush;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
             const AShadow: TALShadow);
 begin
 
@@ -1238,13 +1048,14 @@ begin
 
   ABufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
   var LRect := TrectF.Create(0, 0, ABufDrawableRect.Width, ABufDrawableRect.height);
-  if AShadow.enabled then begin
+  if AShadow.HasShadow then begin
+    var LShadowWidth := ALGetShadowWidth(AShadow.blur);
     var LShadowRect := ABufDrawableRect;
-    LShadowRect.Inflate(AShadow.blur, AShadow.blur);
+    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
     LShadowRect.Offset(AShadow.OffsetX, AShadow.OffsetY);
     ABufDrawableRect := TRectF.Union(LShadowRect, ABufDrawableRect); // add the extra space needed to draw the shadow
     ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
-    LRect.Offset(Max(0, AShadow.blur - AShadow.OffsetX), Max(0, AShadow.blur - AShadow.OffsetY));
+    LRect.Offset(Max(0, LShadowWidth - AShadow.OffsetX), Max(0, LShadowWidth - AShadow.OffsetY));
   end;
 
   var LSurface: TALSurface;
@@ -1264,8 +1075,8 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
         LRect, // const Rect: TrectF;
-        AFill, // const Fill: TBrush;
-        AStroke, // const Stroke: TStrokeBrush;
+        AFill, // const Fill: TALBrush;
+        AStroke, // const Stroke: TALStrokeBrush;
         AShadow, // const Shadow: TALShadow
         Sides, // const Sides: TSides;
         Corners, // const Corners: TCorners;
@@ -1293,16 +1104,17 @@ begin
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
      //--- Do not create BufDrawable if only fill with solid color
-     (((Stroke.Kind = TBrushKind.None) or
+     (((not Stroke.HasStroke) or
        (sides = []))
       and
       ((SameValue(xRadius, 0, TEpsilon.Vector)) or
        (SameValue(yRadius, 0, TEpsilon.Vector)) or
        (corners=[]))
       and
-      (not fShadow.enabled)
+      (not Shadow.HasShadow)
       and
-      (Fill.Kind in [TBrushKind.None, TBrushKind.Solid]))
+      ((not Fill.HasFill) or
+       (Fill.Styles = [TALBrushStyle.solid])))
   then begin
     clearBufDrawable;
     exit;
@@ -1313,8 +1125,8 @@ begin
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // var ABufDrawableRect: TRectF;
-    Fill, // const AFill: TBrush;
-    Stroke, // const AStroke: TStrokeBrush;
+    Fill, // const AFill: TALBrush;
+    Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
 
 end;
@@ -1333,8 +1145,8 @@ begin
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
       Canvas.AlignToPixel(LRect), // const Rect: TrectF;
-      Fill, // const Fill: TBrush;
-      Stroke, // const Stroke: TStrokeBrush;
+      Fill, // const Fill: TALBrush;
+      Stroke, // const Stroke: TALStrokeBrush;
       Shadow, // const Shadow: TALShadow
       Sides, // const Sides: TSides;
       Corners, // const Corners: TCorners;
@@ -1345,7 +1157,12 @@ begin
     if not doublebuffered then
       raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
     {$ENDIF}
-    Canvas.FillRect(Canvas.AlignToPixel(LocalRect), XRadius, YRadius, FCorners, AbsoluteOpacity, FFill, TCornerType.Round);
+    If Fill.Styles = [TALBrushStyle.Solid] then begin
+      Canvas.Fill.kind := TBrushKind.solid;
+      Canvas.Fill.color := Fill.color;
+      Canvas.FillRect(Canvas.AlignToPixel(LocalRect), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
+    end
+    else if Fill.HasFill then raise Exception.Create('Error 87B5E7C8-55AF-41C7-88D4-B840C7D0F78F');
     {$ENDIF}
     exit;
   end;
@@ -1356,12 +1173,6 @@ begin
     fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
-end;
-
-{*******************************************************}
-procedure TALBaseRectangle.SetShadow(const Value: TALShadow);
-begin
-  FShadow.Assign(Value);
 end;
 
 {**************************************************}
@@ -1422,15 +1233,12 @@ begin
   inherited;
   fDoubleBuffered := true;
   fBufDrawable := ALNullDrawable;
-  fShadow := TalShadow.Create;
-  fShadow.OnChanged := ShadowChanged;
 end;
 
 {***************************}
 destructor TALCircle.Destroy;
 begin
   clearBufDrawable;
-  alFreeAndNil(fShadow);
   inherited;
 end;
 
@@ -1478,15 +1286,15 @@ end;
 procedure TALCircle.ShadowChanged(Sender: TObject);
 begin
   clearBufDrawable;
-  Repaint;
+  inherited;
 end;
 
 {***************************************}
 Procedure TALCircle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             var ABufDrawableRect: TRectF;
-            const AFill: TBrush;
-            const AStroke: TStrokeBrush;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
             const AShadow: TALShadow);
 begin
 
@@ -1494,13 +1302,14 @@ begin
 
   ABufDrawableRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), ALGetScreenScale); // to have the pixel aligned width and height
   var LRect := TrectF.Create(0, 0, ABufDrawableRect.Width, ABufDrawableRect.height);
-  if AShadow.enabled then begin
+  if AShadow.HasShadow then begin
+    var LShadowWidth := ALGetShadowWidth(AShadow.blur);
     var LShadowRect := ABufDrawableRect;
-    LShadowRect.Inflate(AShadow.blur, AShadow.blur);
+    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
     LShadowRect.Offset(AShadow.OffsetX, AShadow.OffsetY);
     ABufDrawableRect := TRectF.Union(LShadowRect, ABufDrawableRect); // add the extra space needed to draw the shadow
     ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
-    LRect.Offset(Max(0, AShadow.blur - AShadow.OffsetX), Max(0, AShadow.blur - AShadow.OffsetY));
+    LRect.Offset(Max(0, LShadowWidth - AShadow.OffsetX), Max(0, LShadowWidth - AShadow.OffsetY));
   end;
 
   var LSurface: TALSurface;
@@ -1520,8 +1329,8 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
         LRect, // const Rect: TrectF;
-        AFill, // const Fill: TBrush;
-        AStroke, // const Stroke: TStrokeBrush;
+        AFill, // const Fill: TALBrush;
+        AStroke, // const Stroke: TALStrokeBrush;
         AShadow); // const Shadow: TALShadow
 
     finally
@@ -1553,8 +1362,8 @@ begin
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // var ABufDrawableRect: TRectF;
-    Fill, // const AFill: TBrush;
-    Stroke, // const AStroke: TStrokeBrush;
+    Fill, // const AFill: TALBrush;
+    Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
 
 end;
@@ -1573,8 +1382,8 @@ begin
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
       Canvas.AlignToPixel(LRect), // const Rect: TrectF;
-      Fill, // const Fill: TBrush;
-      Stroke, // const Stroke: TStrokeBrush;
+      Fill, // const Fill: TALBrush;
+      Stroke, // const Stroke: TALStrokeBrush;
       Shadow); // const Shadow: TALShadow
     {$ELSE}
     {$IF defined(DEBUG)}
@@ -1606,12 +1415,6 @@ procedure TALCircle.DoResized;
 begin
   ClearBufDrawable;
   inherited;
-end;
-
-{****************************************************}
-procedure TALCircle.SetShadow(const Value: TALShadow);
-begin
-  FShadow.Assign(Value);
 end;
 
 {*********************************************}
@@ -1681,8 +1484,7 @@ begin
      //--- Do not create BufDrawable if linetype <> TALLineType.Diagonal
      (not (lineType in [TALLineType.TopLeftToBottomRight, TALLineType.BottomLeftToTopRight])) or
      //--- // Do not create BufDrawable if no stroke
-     (Stroke.Kind = TBrushKind.None) or
-     (SameValue(Stroke.Thickness, 0, TEpsilon.position)) then begin
+     (Not Stroke.HasStroke) then begin
     clearBufDrawable;
     exit;
   end;
@@ -1721,57 +1523,55 @@ begin
         sk4d_paint_set_antialias(LPaint, true);
         sk4d_paint_set_dither(LPaint, true);
 
-        //stroke the circle
-        if Stroke.Kind <> TBrushKind.None then begin
+        //stroke the line
+        if Stroke.HasStroke then begin
 
           //init LPaint
           sk4d_paint_set_stroke_width(LPaint, Stroke.Thickness * ALGetScreenScale);
 
           //stroke with solid color
-          if Stroke.Kind = TBrushKind.Solid then begin
-            sk4d_paint_set_color(LPaint, Stroke.Color);
-            case lineType of
-              TALLineType.TopLeftToBottomRight: begin
-                var Lpoint1 := TPointF.Create(LRect.left, LRect.top);
-                var Lpoint2 := TPointF.Create(LRect.right, LRect.Bottom);
-                sk4d_canvas_draw_line(
-                  LCanvas,
-                  @Lpoint1,
-                  @Lpoint2,
-                  LPaint);
-              end;
-              //--
-              TALLineType.BottomLeftToTopRight: begin
-                var Lpoint1 := TPointF.Create(LRect.left, LRect.Bottom);
-                var Lpoint2 := TPointF.Create(LRect.right, LRect.top);
-                sk4d_canvas_draw_line(
-                  LCanvas,
-                  @Lpoint1,
-                  @Lpoint2,
-                  LPaint);
-              end;
-              //--
-              TALLineType.Top,
-              TALLineType.Bottom: begin
-                var Lpoint1 := TPointF.Create(LRect.left, (LRect.bottom - LRect.top) / 2);
-                var Lpoint2 := TPointF.Create(LRect.right, (LRect.bottom - LRect.top) / 2);
-                sk4d_canvas_draw_line(
-                  LCanvas,
-                  @Lpoint1,
-                  @Lpoint2,
-                  LPaint);
-              end;
-              //--
-              TALLineType.Left,
-              TALLineType.Right: begin
-                var Lpoint1 := TPointF.Create((LRect.right - LRect.left) / 2, LRect.top);
-                var Lpoint2 := TPointF.Create((LRect.right - LRect.left) / 2, LRect.bottom);
-                sk4d_canvas_draw_line(
-                  LCanvas,
-                  @Lpoint1,
-                  @Lpoint2,
-                  LPaint);
-              end;
+          sk4d_paint_set_color(LPaint, Stroke.Color);
+          case lineType of
+            TALLineType.TopLeftToBottomRight: begin
+              var Lpoint1 := TPointF.Create(LRect.left, LRect.top);
+              var Lpoint2 := TPointF.Create(LRect.right, LRect.Bottom);
+              sk4d_canvas_draw_line(
+                LCanvas,
+                @Lpoint1,
+                @Lpoint2,
+                LPaint);
+            end;
+            //--
+            TALLineType.BottomLeftToTopRight: begin
+              var Lpoint1 := TPointF.Create(LRect.left, LRect.Bottom);
+              var Lpoint2 := TPointF.Create(LRect.right, LRect.top);
+              sk4d_canvas_draw_line(
+                LCanvas,
+                @Lpoint1,
+                @Lpoint2,
+                LPaint);
+            end;
+            //--
+            TALLineType.Top,
+            TALLineType.Bottom: begin
+              var Lpoint1 := TPointF.Create(LRect.left, (LRect.bottom - LRect.top) / 2);
+              var Lpoint2 := TPointF.Create(LRect.right, (LRect.bottom - LRect.top) / 2);
+              sk4d_canvas_draw_line(
+                LCanvas,
+                @Lpoint1,
+                @Lpoint2,
+                LPaint);
+            end;
+            //--
+            TALLineType.Left,
+            TALLineType.Right: begin
+              var Lpoint1 := TPointF.Create((LRect.right - LRect.left) / 2, LRect.top);
+              var Lpoint2 := TPointF.Create((LRect.right - LRect.left) / 2, LRect.bottom);
+              sk4d_canvas_draw_line(
+                LCanvas,
+                @Lpoint1,
+                @Lpoint2,
+                LPaint);
             end;
           end;
 
@@ -1810,44 +1610,42 @@ begin
       LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
       LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
 
-      //stroke the circle
-      if Stroke.Kind <> TBrushKind.None then begin
+      //stroke the line
+      if Stroke.HasStroke then begin
 
         //init LPaint
         LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
         LPaint.setStrokeWidth(Stroke.Thickness * ALGetScreenScale);
 
         //stroke with solid color
-        if Stroke.Kind = TBrushKind.Solid then begin
-          LPaint.setColor(integer(Stroke.Color));
-          case lineType of
-            TALLineType.TopLeftToBottomRight: LCanvas.drawLine(
-                                                LRect.left {startX},
-                                                LRect.top {startY},
-                                                LRect.right {stopX},
-                                                LRect.Bottom {stopY},
-                                                LPaint);
-            TALLineType.BottomLeftToTopRight: LCanvas.drawLine(
-                                                LRect.left {startX},
-                                                LRect.Bottom {startY},
-                                                LRect.right {stopX},
-                                                LRect.Top {stopY},
-                                                LPaint);
-            TALLineType.Top,
-            TALLineType.Bottom: LCanvas.drawLine(
-                                  LRect.left {startX},
-                                  (LRect.bottom - LRect.top) / 2 {startY},
-                                  LRect.right {stopX},
-                                  (LRect.bottom - LRect.top) / 2 {stopY},
-                                  LPaint);
-            TALLineType.Left,
-            TALLineType.Right: LCanvas.drawLine(
-                                 (LRect.right - LRect.left) / 2 {startX},
-                                 LRect.top {startY},
-                                 (LRect.right - LRect.left) / 2 {stopX},
-                                 LRect.bottom {stopY},
-                                 LPaint);
-          end;
+        LPaint.setColor(integer(Stroke.Color));
+        case lineType of
+          TALLineType.TopLeftToBottomRight: LCanvas.drawLine(
+                                              LRect.left {startX},
+                                              LRect.top {startY},
+                                              LRect.right {stopX},
+                                              LRect.Bottom {stopY},
+                                              LPaint);
+          TALLineType.BottomLeftToTopRight: LCanvas.drawLine(
+                                              LRect.left {startX},
+                                              LRect.Bottom {startY},
+                                              LRect.right {stopX},
+                                              LRect.Top {stopY},
+                                              LPaint);
+          TALLineType.Top,
+          TALLineType.Bottom: LCanvas.drawLine(
+                                LRect.left {startX},
+                                (LRect.bottom - LRect.top) / 2 {startY},
+                                LRect.right {stopX},
+                                (LRect.bottom - LRect.top) / 2 {stopY},
+                                LPaint);
+          TALLineType.Left,
+          TALLineType.Right: LCanvas.drawLine(
+                               (LRect.right - LRect.left) / 2 {startX},
+                               LRect.top {startY},
+                               (LRect.right - LRect.left) / 2 {stopX},
+                               LRect.bottom {stopY},
+                               LPaint);
         end;
 
       end;
@@ -1880,40 +1678,38 @@ begin
     if ALCanvasBeginScene(LCanvas) then
     try
 
-      //stroke the circle
-      if Stroke.Kind <> TBrushKind.None then begin
+      //stroke the line
+      if Stroke.HasStroke then begin
 
         //stroke with solid color
-        if Stroke.Kind = TBrushKind.Solid then begin
-          var LAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
-          CGContextSetRGBStrokeColor(LCanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-          CGContextSetLineWidth(LCanvas, Stroke.Thickness * ALGetScreenScale);
-          case lineType of
-            TALLineType.TopLeftToBottomRight: begin
-                                                CGContextBeginPath(LCanvas);
-                                                CGContextMoveToPoint(LCanvas, LRect.left, LGridHeight - LRect.top);
-                                                CGContextAddLineToPoint(LCanvas, LRect.right, LGridHeight - LRect.Bottom);
-                                              end;
-            TALLineType.BottomLeftToTopRight: begin
-                                                CGContextBeginPath(LCanvas);
-                                                CGContextMoveToPoint(LCanvas, LRect.left, LGridHeight - LRect.Bottom);
-                                                CGContextAddLineToPoint(LCanvas, LRect.right, LGridHeight - LRect.top);
-                                              end;
-            TALLineType.Top,
-            TALLineType.Bottom: begin
-                                CGContextBeginPath(LCanvas);
-                                CGContextMoveToPoint(LCanvas, LRect.left, LGridHeight - ((LRect.bottom - LRect.top) / 2));
-                                CGContextAddLineToPoint(LCanvas, LRect.right, LGridHeight - ((LRect.bottom - LRect.top) / 2));
-                              end;
-            TALLineType.Left,
-            TALLineType.Right: begin
-                               CGContextBeginPath(LCanvas);
-                               CGContextMoveToPoint(LCanvas, (LRect.right - LRect.left) / 2, LGridHeight - LRect.top);
-                               CGContextAddLineToPoint(LCanvas, (LRect.right - LRect.left) / 2, LGridHeight - LRect.Bottom);
-                             end;
-          end;
-          CGContextStrokePath(LCanvas);
+        var LAlphaColor := TAlphaColorCGFloat.Create(Stroke.Color);
+        CGContextSetRGBStrokeColor(LCanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+        CGContextSetLineWidth(LCanvas, Stroke.Thickness * ALGetScreenScale);
+        case lineType of
+          TALLineType.TopLeftToBottomRight: begin
+                                              CGContextBeginPath(LCanvas);
+                                              CGContextMoveToPoint(LCanvas, LRect.left, LGridHeight - LRect.top);
+                                              CGContextAddLineToPoint(LCanvas, LRect.right, LGridHeight - LRect.Bottom);
+                                            end;
+          TALLineType.BottomLeftToTopRight: begin
+                                              CGContextBeginPath(LCanvas);
+                                              CGContextMoveToPoint(LCanvas, LRect.left, LGridHeight - LRect.Bottom);
+                                              CGContextAddLineToPoint(LCanvas, LRect.right, LGridHeight - LRect.top);
+                                            end;
+          TALLineType.Top,
+          TALLineType.Bottom: begin
+                              CGContextBeginPath(LCanvas);
+                              CGContextMoveToPoint(LCanvas, LRect.left, LGridHeight - ((LRect.bottom - LRect.top) / 2));
+                              CGContextAddLineToPoint(LCanvas, LRect.right, LGridHeight - ((LRect.bottom - LRect.top) / 2));
+                            end;
+          TALLineType.Left,
+          TALLineType.Right: begin
+                             CGContextBeginPath(LCanvas);
+                             CGContextMoveToPoint(LCanvas, (LRect.right - LRect.left) / 2, LGridHeight - LRect.top);
+                             CGContextAddLineToPoint(LCanvas, (LRect.right - LRect.left) / 2, LGridHeight - LRect.Bottom);
+                           end;
         end;
+        CGContextStrokePath(LCanvas);
 
       end;
 
@@ -1937,7 +1733,7 @@ begin
 
   MakeBufDrawable;
 
-  if ALIsDrawableNull(fBufDrawable) then begin
+  if ALIsDrawableNull(fBufDrawable) and Stroke.HasStroke then begin
     var LPt1, LPt2: TPointF;
     case lineType of
       TALLineType.TopLeftToBottomRight: begin
@@ -1967,7 +1763,10 @@ begin
       else
         raise Exception.Create('Error E353EE34-4D44-4487-9C1C-21BC44E36B40');
     end;
-    Canvas.DrawLine(Canvas.AlignToPixel(LPt1), Canvas.AlignToPixel(LPt2), AbsoluteOpacity, FStroke);
+    Canvas.Stroke.Kind := TBrushKind.Solid;
+    Canvas.Stroke.Color := Stroke.Color;
+    Canvas.Stroke.Thickness := Stroke.Thickness;
+    Canvas.DrawLine(Canvas.AlignToPixel(LPt1), Canvas.AlignToPixel(LPt2), AbsoluteOpacity);
     exit;
   end;
 
@@ -2015,12 +1814,16 @@ begin
   //-----
   fBufDrawable := ALNullDrawable;
   //-----
-  FFill := TBrush.Create(TBrushKind.none, $FFE0E0E0);
-  FFill.OnChanged := FillChanged;
-  FStroke := TStrokeBrush.Create(TBrushKind.none, $FF000000);
-  FStroke.OnChanged := StrokeChanged;
-  fShadow := TALShadow.Create;
-  fShadow.OnChanged := ShadowChanged;
+  var LPrevFillOnchanged := Fill.OnChanged;
+  Fill.OnChanged := nil;
+  Fill.DefaultColor := TAlphaColors.Null;
+  Fill.Color := Fill.DefaultColor;
+  Fill.OnChanged := LPrevFillOnchanged;
+  var LPrevStrokeOnchanged := Stroke.OnChanged;
+  Stroke.OnChanged := nil;
+  Stroke.DefaultColor := TAlphaColors.Null;
+  Stroke.Color := Stroke.DefaultColor;
+  Stroke.OnChanged := LPrevStrokeOnchanged;
   FCorners := AllCorners;
   FXRadius := 0;
   FYRadius := 0;
@@ -2043,9 +1846,6 @@ end;
 destructor TALBaseText.Destroy;
 begin
   ClearBufDrawable;
-  ALFreeAndNil(FFill);
-  ALFreeAndNil(FStroke);
-  ALFreeAndNil(fShadow);
   ALFreeAndNil(FTextSettings);
   inherited;
 end;
@@ -2239,39 +2039,21 @@ end;
 procedure TALBaseText.FillChanged(Sender: TObject);
 begin
   clearBufDrawable;
-  Repaint;
+  inherited;
 end;
 
 {***************************************************}
 procedure TALBaseText.StrokeChanged(Sender: TObject);
 begin
   clearBufDrawable;
-  Repaint;
+  inherited;
 end;
 
 {***************************************************}
 procedure TALBaseText.ShadowChanged(Sender: TObject);
 begin
   clearBufDrawable;
-  Repaint;
-end;
-
-{*************************************************}
-procedure TALBaseText.SetFill(const Value: TBrush);
-begin
-  FFill.Assign(Value);
-end;
-
-{*********************************************************}
-procedure TALBaseText.SetStroke(const Value: TStrokeBrush);
-begin
-  FStroke.Assign(Value);
-end;
-
-{******************************************************}
-procedure TALBaseText.SetShadow(const Value: TALShadow);
-begin
-  FShadow.Assign(Value);
+  inherited;
 end;
 
 {********************************************}
@@ -2477,8 +2259,8 @@ Procedure TALBaseText.CreateBufDrawable(
            const ADecoration: TALTextDecoration;
            const AEllipsisFont: TALFont;
            const AEllipsisDecoration: TALTextDecoration;
-           const AFill: TBrush;
-           const AStroke: TStrokeBrush;
+           const AFill: TALBrush;
+           const AStroke: TALStrokeBrush;
            const AShadow: TALShadow);
 begin
 
@@ -2542,17 +2324,19 @@ begin
     LOptions.HTextAlign := TextSettings.HorzAlign;
     LOptions.VTextAlign := TextSettings.VertAlign;
     //--
-    //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null - not used if Fill is provided
-    //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null - not used if Stroke is provided
-    //LOptions.StrokeThickness: Single; // default = 1 - not used if Stroke is provided
-    //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null - not used if Shadow is provided
-    //LOptions.ShadowBlur: Single; // default = 12 - not used if Shadow is provided
-    //LOptions.ShadowOffsetX: Single; // default = 0 - not used if Shadow is provided
-    //LOptions.ShadowOffsetY: Single; // default = 0 - not used if Shadow is provided
-    //--
-    LOptions.Fill.assign(AFill);
-    LOptions.Stroke.assign(AStroke);
-    LOptions.Shadow.assign(AShadow);
+    LOptions.FillColor := Fill.Color;
+    LOptions.FillGradientStyle := Fill.Gradient.Style;
+    LOptions.FillGradientColors := Fill.Gradient.Colors;
+    LOptions.FillGradientOffsets := Fill.Gradient.Offsets;
+    LOptions.FillGradientAngle := Fill.Gradient.Angle;
+    LOptions.FillResourceName := Fill.ResourceName;
+    LOptions.FillWrapMode := Fill.WrapMode;
+    LOptions.StrokeColor := Stroke.Color;
+    LOptions.StrokeThickness := Stroke.Thickness;
+    LOptions.ShadowColor := Shadow.Color;
+    LOptions.ShadowBlur := Shadow.Blur;
+    LOptions.ShadowOffsetX := Shadow.OffsetX;
+    LOptions.ShadowOffsetY := Shadow.OffsetY;
     //--
     LOptions.Sides := Sides;
     LOptions.XRadius := XRadius;
@@ -2596,8 +2380,8 @@ begin
               LCanvas, // const ACanvas: sk_canvas_t;
               ALGetScreenScale, // const AScale: Single;
               ABufDrawableRect, // const Rect: TrectF;
-              Fill, // const Fill: TBrush;
-              Stroke, // const Stroke: TStrokeBrush;
+              Fill, // const Fill: TALBrush;
+              Stroke, // const Stroke: TALStrokeBrush;
               Shadow, // const Shadow: TALShadow
               Sides, // const Sides: TSides;
               Corners, // const Corners: TCorners;
@@ -2636,8 +2420,8 @@ begin
     TextSettings.Decoration, // const ADecoration: TALTextDecoration;
     TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
     TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-    Fill, // const AFill: TBrush;
-    Stroke, // const AStroke: TStrokeBrush;
+    Fill, // const AFill: TALBrush;
+    Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
 
   // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.

@@ -3092,6 +3092,16 @@ begin
   if (FViewportPosition.y < FMinScrollLimit.y) or
      (FViewportPosition.y > FMaxScrollLimit.y) then yDiff := yDiff * FDragResistanceFactor;
 
+  if FDragResistanceFactor = 0 then begin
+         if FViewportPosition.x + xDiff < FMinScrollLimit.x then xDiff := FMinScrollLimit.x - FViewportPosition.x
+    else if FViewportPosition.x + xDiff > FMaxScrollLimit.x then xDiff := FMaxScrollLimit.x - FViewportPosition.x;
+         if FViewportPosition.y + YDiff < FMinScrollLimit.y then yDiff := FMinScrollLimit.y - FViewportPosition.y
+    else if FViewportPosition.y + YDiff > FMaxScrollLimit.y then yDiff := FMaxScrollLimit.y - FViewportPosition.y;
+  end;
+
+  if sameValue(xDiff, 0, Tepsilon.Position) and
+     sameValue(YDiff, 0, Tepsilon.Position) then exit;
+
   SetViewportPosition(
     TALPointD.Create(
       FViewportPosition.x + xDiff,

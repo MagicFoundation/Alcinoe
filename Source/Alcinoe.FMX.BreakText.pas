@@ -24,13 +24,6 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALMultiLineTextOptions = class(Tobject)
-  private
-    FFill: TBrush;  // default = nil
-    FStroke: TStrokeBrush; // default = nil
-    FShadow: TALShadow; // default = nil
-    function GetFill: TBrush;
-    function GetStroke: TStrokeBrush;
-    function GetShadow: TALShadow;
   public
     Scale: Single; // default = 1
     //--
@@ -76,13 +69,20 @@ type
     HTextAlign: TALTextHorzAlign; // default = TALTextHorzAlign.Leading
     VTextAlign: TALTextVertAlign; // default = TALTextVertAlign.Leading
     //--
-    FillColor: TAlphaColor; // default = TAlphaColors.null - not used if Fill is provided
-    StrokeColor: TalphaColor; // default = TAlphaColors.null - not used if Stroke is provided
-    StrokeThickness: Single; // default = 1 - not used if Stroke is provided
-    ShadowColor: TAlphaColor; // default = TAlphaColors.null - not used if Shadow is provided
-    ShadowBlur: Single; // default = 12 - not used if Shadow is provided
-    ShadowOffsetX: Single; // default = 0 - not used if Shadow is provided
-    ShadowOffsetY: Single; // default = 0 - not used if Shadow is provided
+    FillColor: TAlphaColor; // default = TAlphaColors.null
+    FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    FillGradientColors: TArray<TAlphaColor>; // Default = [];
+    FillGradientOffsets: TArray<Single>; // Default = [];
+    FillGradientAngle: Single; // Default = 180;
+    FillResourceName: String; // default = ''
+    FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    FillPaddingRect: TRectF; // default = TRectF.Empty
+    StrokeColor: TalphaColor; // default = TAlphaColors.null
+    StrokeThickness: Single; // default = 1
+    ShadowColor: TAlphaColor; // default = TAlphaColors.null
+    ShadowBlur: Single; // default = 12
+    ShadowOffsetX: Single; // default = 0
+    ShadowOffsetY: Single; // default = 0
     //--
     Sides: TSides; // default = AllSides
     XRadius: Single; // default = 0
@@ -120,14 +120,7 @@ type
     TextIsHtml: boolean; // default = false;
     //--
     constructor Create;
-    destructor Destroy; override;
     //--
-    property Fill: TBrush read GetFill;  // default = nil
-    property Stroke: TStrokeBrush read GetStroke; // default = nil
-    property Shadow: TALShadow read GetShadow; // default = nil
-    function IsFillAssigned: Boolean;
-    function IsStrokeAssigned: Boolean;
-    function IsShadowAssigned: Boolean;
     function GetScaledFontSize: Single; inline;
     function GetScaledEllipsisFontSize: Single; inline;
     function GetScaledLetterSpacing: Single; inline;
@@ -276,16 +269,19 @@ begin
   VTextAlign := TALTextVertAlign.Leading;
   //--
   FillColor := TAlphaColors.Null;
+  FillGradientStyle := TGradientStyle.Linear;
+  FillGradientColors := [];
+  FillGradientOffsets := [];
+  FillGradientAngle := 180;
+  FillResourceName := '';
+  FillWrapMode := TALImageWrapMode.Fit;
+  FillPaddingRect := TRectF.Empty;
   StrokeColor := TalphaColors.Null;
   StrokeThickness := 1;
   ShadowColor := TAlphaColors.Null;
   ShadowBlur := 12;
   ShadowOffsetX := 0;
   ShadowOffsetY := 0;
-  //--
-  FFill := nil;
-  FStroke := nil;
-  FShadow := nil;
   //--
   Sides := AllSides;
   XRadius := 0;
@@ -294,48 +290,6 @@ begin
   Padding := TRectF.Create(0,0,0,0);
   //--
   TextIsHtml := false;
-end;
-
-{***********************************************}
-function TALMultiLineTextOptions.GetFill: TBrush;
-begin
-  if FFill = nil then
-    FFill := TBrush.Create(TbrushKind.None, $FFE0E0E0);
-  result := FFill;
-end;
-
-{*******************************************************}
-function TALMultiLineTextOptions.GetStroke: TStrokeBrush;
-begin
-  if FStroke = nil then
-    FStroke := TStrokeBrush.Create(TbrushKind.None,  $FF000000);
-  result := FStroke;
-end;
-
-{****************************************************}
-function TALMultiLineTextOptions.GetShadow: TALShadow;
-begin
-  if FShadow = nil then
-    FShadow := TALShadow.Create;
-  result := FShadow;
-end;
-
-{*******************************************************}
-function TALMultiLineTextOptions.IsFillAssigned: Boolean;
-begin
-  result := FFill <> nil;
-end;
-
-{*********************************************************}
-function TALMultiLineTextOptions.IsStrokeAssigned: Boolean;
-begin
-  result := FStroke <> nil;
-end;
-
-{*********************************************************}
-function TALMultiLineTextOptions.IsShadowAssigned: Boolean;
-begin
-  result := FShadow <> nil;
 end;
 
 {*********************************************************}
@@ -414,15 +368,6 @@ end;
 function TALMultiLineTextOptions.GetScaledPaddingBottom: Single;
 begin
   Result := Padding.Bottom * Scale;
-end;
-
-{*****************************************}
-destructor TALMultiLineTextOptions.Destroy;
-begin
-  ALFreeAndNil(FFill);
-  ALFreeAndNil(FStroke);
-  ALFreeAndNil(FShadow);
-  inherited destroy;
 end;
 
 {*************************************}
@@ -539,10 +484,11 @@ function ALCreateMultiLineTextDrawable(
   begin
     Result := False;
     if (AColorStr <> '') and (AColorStr[low(AColorStr)] = '#') then begin
-      var LColorStr := AColorStr;
-      LColorStr[low(LColorStr)] := '$';
-      if length(LColorStr) = 7 then insert('ff', LColorStr, 2); // $ffffffff
-      Result := ALTryStrToUInt(LColorStr, AColorInt);
+      var LAlphaColor: TAlphaColor;
+      if ALTryRGBAHexToAlphaColor(AlcopyStr(AColorStr, 2, MaxInt), LAlphaColor) then begin
+        Result := True;
+        AColorInt := Cardinal(LAlphaColor);
+      end;
     end;
   end;
   {$ENDREGION}
@@ -2396,27 +2342,16 @@ begin
 
               // Handle Shadow
               var LRect := ARect;
-              if ((AOptions.IsShadowAssigned) and (AOptions.shadow.Enabled)) or
-                 ((not AOptions.IsShadowAssigned) and (AOptions.ShadowColor <> TalphaColors.Null)) then begin
-                var LShadowBlur: Single;
-                var LShadowOffsetX: Single;
-                var LShadowOffsetY: Single;
-                if AOptions.IsShadowAssigned then begin
-                  LShadowBlur := AOptions.Shadow.blur * AOptions.Scale;
-                  LShadowOffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
-                  LShadowOffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
-                end
-                else begin
-                  LShadowBlur := AOptions.GetScaledShadowblur;
-                  LShadowOffsetX := AOptions.GetScaledShadowOffsetX;
-                  LShadowOffsetY := AOptions.GetScaledShadowOffsetY;
-                end;
+              if (AOptions.ShadowColor <> TalphaColors.Null) then begin
+                var LShadowOffsetX: Single := AOptions.GetScaledShadowOffsetX;
+                var LShadowOffsetY: Single := AOptions.GetScaledShadowOffsetY;
+                var LShadowWidth := ALGetShadowWidth(AOptions.GetScaledShadowblur);
                 var LShadowRect := LRect;
-                LShadowRect.Inflate(LShadowblur, LShadowblur);
+                LShadowRect.Inflate(LShadowWidth, LShadowWidth);
                 LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
                 LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
-                ARect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
-                LParagraphRect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
+                ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+                LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
               end;
 
               // Create the drawing surface
@@ -2433,58 +2368,23 @@ begin
                 try
 
                   // Draw the background
-                  if (AOptions.IsFillAssigned) or
-                     (AOptions.IsStrokeAssigned) or
-                     (AOptions.IsShadowAssigned) then begin
-                    if (AOptions.Fill.Kind <> TbrushKind.None) or
-                       (AOptions.stroke.Kind <> TbrushKind.None) or
-                       (AOptions.shadow.Enabled) then begin
-                      Tmonitor.Enter(AOptions.Stroke);
-                      Tmonitor.Enter(AOptions.Shadow);
-                      var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
-                      var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
-                      var LShadowOnChangedRestoreValue := AOptions.Shadow.OnChanged;
-                      var LShadowBlurRestoreValue: Single := AOptions.Shadow.Blur;
-                      var LShadowOffsetXRestoreValue: Single := AOptions.Shadow.OffsetX;
-                      var LShadowOffsetYRestoreValue: Single := AOptions.Shadow.OffsetY;
-                      try
-                        AOptions.Stroke.OnChanged := nil;
-                        AOptions.Stroke.Thickness := AOptions.Stroke.Thickness * AOptions.Scale;
-                        AOptions.Shadow.OnChanged := nil;
-                        AOptions.Shadow.Blur := AOptions.Shadow.Blur * AOptions.Scale;
-                        AOptions.Shadow.OffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
-                        AOptions.Shadow.OffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
-                        ALDrawRectangle(
-                          LCanvas, // const ACanvas: TALCanvas;
-                          1, // const AScale: Single;
-                          ARect, // const ARect: TrectF;
-                          AOptions.Fill, // const Fill: TBrush;
-                          AOptions.Stroke, // const Stroke: TStrokeBrush;
-                          AOptions.Shadow, // const Shadow: TALShadow
-                          AOptions.Sides, // const Sides: TSides;
-                          AOptions.Corners, // const Corners: TCorners;
-                          AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                          AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-                      finally
-                        AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
-                        AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
-                        Tmonitor.Exit(AOptions.Stroke);
-                        AOptions.Shadow.Blur := LShadowBlurRestoreValue;
-                        AOptions.Shadow.OffsetX := LShadowOffsetXRestoreValue;
-                        AOptions.Shadow.OffsetY := LShadowOffsetYRestoreValue;
-                        AOptions.Shadow.OnChanged := LShadowOnChangedRestoreValue;
-                        Tmonitor.Exit(AOptions.Shadow);
-                      end;
-                    end;
-                  end
-                  else if (AOptions.FillColor <> TalphaColors.Null) or
-                          (AOptions.StrokeColor <> TalphaColors.Null) or
-                          (AOptions.ShadowColor <> TalphaColors.Null) then begin
+                  if (AOptions.FillColor <> TalphaColors.Null) or
+                     (length(AOptions.FillGradientColors) > 0) or
+                     (AOptions.FillResourceName <> '') or
+                     (AOptions.StrokeColor <> TalphaColors.Null) or
+                     (AOptions.ShadowColor <> TalphaColors.Null) then begin
                     ALDrawRectangle(
                       LCanvas, // const ACanvas: TALCanvas;
                       1, // const AScale: Single;
                       ARect, // const ARect: TrectF;
                       AOptions.FillColor, // const AFillColor: TAlphaColor;
+                      AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+                      AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+                      AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+                      AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
+                      AOptions.FillResourceName, // const AFillResourceName: String;
+                      AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+                      AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
                       AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
                       AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
                       AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
@@ -2524,7 +2424,7 @@ begin
                       var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
                       {$IFDEF ALDPK}
                       var LImg: sk_image_t;
-                      var LFileName := ALDPKGetResourceFilename(LImgSrc);
+                      var LFileName := ALGetResourceFilename(LImgSrc);
                       if LFileName <> '' then
                         LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
                       else
@@ -3662,27 +3562,16 @@ begin
 
       // Handle Shadow
       var LRect := ARect;
-      if ((AOptions.IsShadowAssigned) and (AOptions.shadow.Enabled)) or
-         ((not AOptions.IsShadowAssigned) and (AOptions.ShadowColor <> TalphaColors.Null)) then begin
-        var LShadowBlur: Single;
-        var LShadowOffsetX: Single;
-        var LShadowOffsetY: Single;
-        if AOptions.IsShadowAssigned then begin
-          LShadowBlur := AOptions.Shadow.blur * AOptions.Scale;
-          LShadowOffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
-          LShadowOffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
-        end
-        else begin
-          LShadowBlur := AOptions.GetScaledShadowblur;
-          LShadowOffsetX := AOptions.GetScaledShadowOffsetX;
-          LShadowOffsetY := AOptions.GetScaledShadowOffsetY;
-        end;
+      if (AOptions.ShadowColor <> TalphaColors.Null) then begin
+        var LShadowOffsetX: Single := AOptions.GetScaledShadowOffsetX;
+        var LShadowOffsetY: Single := AOptions.GetScaledShadowOffsetY;
+        var LShadowWidth := ALGetShadowWidth(AOptions.GetScaledShadowblur);
         var LShadowRect := LRect;
-        LShadowRect.Inflate(LShadowblur, LShadowblur);
+        LShadowRect.Inflate(LShadowWidth, LShadowWidth);
         LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
         LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
-        ARect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
-        LParagraphRect.Offset(Max(0, LShadowblur - LShadowOffsetX), Max(0, LShadowblur - LShadowOffsetY));
+        ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+        LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
       end;
 
       // Create the drawing surface
@@ -3699,58 +3588,23 @@ begin
         try
 
           // Draw the background
-          if (AOptions.IsFillAssigned) or
-             (AOptions.IsStrokeAssigned) or
-             (AOptions.IsShadowAssigned) then begin
-            if (AOptions.Fill.Kind <> TbrushKind.None) or
-               (AOptions.stroke.Kind <> TbrushKind.None) or
-               (AOptions.shadow.Enabled) then begin
-              Tmonitor.Enter(AOptions.Stroke);
-              Tmonitor.Enter(AOptions.Shadow);
-              var LStrokeOnChangedRestoreValue := AOptions.Stroke.OnChanged;
-              var LStrokeThicknessRestoreValue: Single := AOptions.Stroke.Thickness;
-              var LShadowOnChangedRestoreValue := AOptions.Shadow.OnChanged;
-              var LShadowBlurRestoreValue: Single := AOptions.Shadow.Blur;
-              var LShadowOffsetXRestoreValue: Single := AOptions.Shadow.OffsetX;
-              var LShadowOffsetYRestoreValue: Single := AOptions.Shadow.OffsetY;
-              try
-                AOptions.Stroke.OnChanged := nil;
-                AOptions.Stroke.Thickness := AOptions.Stroke.Thickness * AOptions.Scale;
-                AOptions.Shadow.OnChanged := nil;
-                AOptions.Shadow.Blur := AOptions.Shadow.Blur * AOptions.Scale;
-                AOptions.Shadow.OffsetX := AOptions.Shadow.OffsetX * AOptions.Scale;
-                AOptions.Shadow.OffsetY := AOptions.Shadow.OffsetY * AOptions.Scale;
-                ALDrawRectangle(
-                  LCanvas, // const ACanvas: TALCanvas;
-                  1, // const AScale: Single;
-                  ARect, // const ARect: TrectF;
-                  AOptions.Fill, // const Fill: TBrush;
-                  AOptions.Stroke, // const Stroke: TStrokeBrush;
-                  AOptions.shadow, // const Shadow: TALShadow
-                  AOptions.Sides, // const Sides: TSides;
-                  AOptions.Corners, // const Corners: TCorners;
-                  AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                  AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-              finally
-                AOptions.Stroke.Thickness := LStrokeThicknessRestoreValue;
-                AOptions.Stroke.OnChanged := LStrokeOnChangedRestoreValue;
-                Tmonitor.Exit(AOptions.Stroke);
-                AOptions.Shadow.Blur := LShadowBlurRestoreValue;
-                AOptions.Shadow.OffsetX := LShadowOffsetXRestoreValue;
-                AOptions.Shadow.OffsetY := LShadowOffsetYRestoreValue;
-                AOptions.Shadow.OnChanged := LShadowOnChangedRestoreValue;
-                Tmonitor.Exit(AOptions.Shadow);
-              end;
-            end;
-          end
-          else if (AOptions.FillColor <> TalphaColors.Null) or
-                  (AOptions.StrokeColor <> TalphaColors.Null) or
-                  (AOptions.ShadowColor <> TalphaColors.Null) then begin
+          if (AOptions.FillColor <> TalphaColors.Null) or
+             (length(AOptions.FillGradientColors) > 0) or
+             (AOptions.FillResourceName <> '') or
+             (AOptions.StrokeColor <> TalphaColors.Null) or
+             (AOptions.ShadowColor <> TalphaColors.Null) then begin
             ALDrawRectangle(
               LCanvas, // const ACanvas: TALCanvas;
               1, // const AScale: Single;
               ARect, // const ARect: TrectF;
               AOptions.FillColor, // const AFillColor: TAlphaColor;
+              AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+              AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+              AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+              AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
+              AOptions.FillResourceName, // const AFillResourceName: String;
+              AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+              AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
               AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
               AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
               AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
@@ -3881,7 +3735,7 @@ begin
           {$REGION 'MSWINDOWS'}
           {$IF defined(MSWINDOWS)}
 
-          LCanvas.Fill.Kind := TbrushKind.Solid;
+          LCanvas.Fill.Kind := TBrushKind.Solid;
           for i := 0 to LExtendedTextElements.count - 1 do begin
             var LExtendedTextElement := LExtendedTextElements[i];
             if LExtendedTextElement.imgSrc <> '' then begin

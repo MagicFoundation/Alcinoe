@@ -37,14 +37,17 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALShape = class(TALControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALShape = class(TALControl, IALShapeControl)
   strict private
     FFill: TALBrush;
     FStroke: TALStrokeBrush;
     fShadow: TALShadow;
+    function GetFill: TALBrush;
     procedure SetFill(const Value: TALBrush);
+    function GetStroke: TALStrokeBrush;
     procedure SetStroke(const Value: TALStrokeBrush);
+    function GetShadow: TALShadow;
     procedure SetShadow(const Value: TALShadow);
   protected
     procedure FillChanged(Sender: TObject); virtual;
@@ -53,9 +56,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property Fill: TALBrush read FFill write SetFill;
-    property Stroke: TALStrokeBrush read FStroke write SetStroke;
-    property Shadow: TALShadow read fshadow write SetShadow;
+    property Fill: TALBrush read GetFill write SetFill;
+    property Stroke: TALStrokeBrush read GetStroke write SetStroke;
+    property Shadow: TALShadow read GetShadow write SetShadow;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -103,58 +106,67 @@ type
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
   published
+    //property Action;
     property Align;
     property Anchors;
-    property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled default True;
-    property Locked default False;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
-    property HitTest default True;
-    property Padding;
-    property Opacity;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
-    property RotationAngle;
-    property RotationCenter;
-    // under Android, work only when setting a file in ResourceName
-    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write fRotateAccordingToExifOrientation default false;
-    property Scale;
-    property Size;
-    property TouchTargetExpansion;
-    property Visible default True;
-    property Width;
     // If a file extension (e.g., .xxx) is detected in ResourceName, the image is loaded from the
     // specified file (With the full path of the file obtained using ALGetResourceFilename).
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
     property ResourceName: String read fResourceName write setResourceName;
+    // under Android, work only when setting a file in ResourceName
+    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write fRotateAccordingToExifOrientation default false;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
-    property ParentShowHint;
-    property ShowHint;
-    {Drag and Drop events}
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Mouse events}
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -197,23 +209,29 @@ type
     procedure clearBufDrawable; virtual;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
   published
+    //property Action;
     property Align;
     property Anchors;
-    property ClipChildren default False;
-    property ClipParent default False;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
-    property Cursor default crDefault;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled default True;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
     property Fill;
-    property Locked default False;
     property Height;
-    property Hint;
-    property HitTest default True;
-    property Padding;
-    property Opacity;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -223,30 +241,34 @@ type
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property Size;
     property Stroke;
-    property Visible default True;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
     property XRadius: Single read FXRadius write SetXRadius;
     property YRadius: Single read FYRadius write SetYRadius;
-    property Width;
-    property ParentShowHint;
-    property ShowHint;
-    {Drag and Drop events}
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Mouse events}
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -302,23 +324,29 @@ type
     procedure clearBufDrawable; virtual;
     function PointInObjectLocal(X, Y: Single): Boolean; override;
   published
+    //property Action;
     property Align;
     property Anchors;
-    property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled default True;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
     property Fill;
-    property Locked default False;
     property Height;
-    property Hint;
-    property HitTest default True;
-    property Padding;
-    property Opacity;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -327,26 +355,32 @@ type
     property Shadow;
     property Size;
     property Stroke;
-    property Visible default True;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -361,7 +395,7 @@ type
     FLineType: TALLineType;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
-    procedure SeTALLineType(const Value: TALLineType);
+    procedure SetLineType(const Value: TALLineType);
   protected
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
@@ -377,23 +411,29 @@ type
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
   published
+    //property Action;
     property Align;
     property Anchors;
-    property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled default True;
-    property Locked default False;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
-    property HitTest default True;
-    property LineType: TALLineType read FLineType write SeTALLineType;
-    property Padding;
-    property Opacity;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property LineType: TALLineType read FLineType write SetLineType;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -401,28 +441,32 @@ type
     property Scale;
     property Size;
     property Stroke;
-    property Visible default True;
+    //property TabOrder;
+    //property TabStop;
+    //property TouchTargetExpansion;
+    property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    {Drag and Drop events}
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Mouse events}
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -534,60 +578,72 @@ type
     procedure clearBufDrawable; virtual;
     function TextBroken: Boolean;
   published
+    //property Action;
     property Align;
     property Anchors;
     property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
-    property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled default True;
-    property Locked default False;
+    property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Fill;
     property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest default False;
-    property Padding;
-    property Opacity;
+    property Locked;
     property Margins;
+    property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored nodefault;
+    property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored nodefault;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
     property RotationCenter;
     property Scale;
+    property Shadow;
+    property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property Size;
+    property Stroke;
+    //property TabOrder;
+    //property TabStop;
     property Text: string read FText write SetText;
-    property Visible default True;
+    property TouchTargetExpansion;
+    property Visible;
     property Width;
-    property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored nodefault;
-    property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored nodefault;
-    {Drag and Drop events}
+    property XRadius: Single read FXRadius write SetXRadius;
+    property YRadius: Single read FYRadius write SetYRadius;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Mouse events}
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
-    property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
-    property Fill;
-    property Stroke;
-    property shadow;
-    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
-    property Sides: TSides read FSides write SetSides stored IsSidesStored;
-    property XRadius: Single read FXRadius write SetXRadius;
-    property YRadius: Single read FYRadius write SetYRadius;
-    property TouchTargetExpansion;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -671,22 +727,25 @@ end;
 {**********************************************}
 procedure TALShape.FillChanged(Sender: TObject);
 begin
-  if FUpdating = 0 then
-    Repaint;
+  Repaint;
 end;
 
 {**********************************************}
 procedure TALShape.StrokeChanged(Sender: TObject);
 begin
-  if FUpdating = 0 then
-    Repaint;
+  Repaint;
 end;
 
 {************************************************}
 procedure TALShape.ShadowChanged(Sender: TObject);
 begin
-  if FUpdating = 0 then
-    Repaint;
+  Repaint;
+end;
+
+{**********************************}
+function TALShape.GetFill: TALBrush;
+begin
+  Result := FFill;
 end;
 
 {**********************************************}
@@ -695,10 +754,22 @@ begin
   FFill.Assign(Value);
 end;
 
+{******************************************}
+function TALShape.GetStroke: TALStrokeBrush;
+begin
+  Result := FStroke;
+end;
+
 {******************************************************}
 procedure TALShape.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
+end;
+
+{*************************************}
+function TALShape.GetShadow: TALShadow;
+begin
+  Result := FShadow;
 end;
 
 {***************************************************}
@@ -1785,8 +1856,8 @@ begin
   inherited;
 end;
 
-{****************************************************}
-procedure TALLine.SeTALLineType(const Value: TALLineType);
+{******************************************************}
+procedure TALLine.SetLineType(const Value: TALLineType);
 begin
   if FLineType <> Value then
   begin
@@ -2324,19 +2395,19 @@ begin
     LOptions.HTextAlign := TextSettings.HorzAlign;
     LOptions.VTextAlign := TextSettings.VertAlign;
     //--
-    LOptions.FillColor := Fill.Color;
-    LOptions.FillGradientStyle := Fill.Gradient.Style;
-    LOptions.FillGradientColors := Fill.Gradient.Colors;
-    LOptions.FillGradientOffsets := Fill.Gradient.Offsets;
-    LOptions.FillGradientAngle := Fill.Gradient.Angle;
-    LOptions.FillResourceName := Fill.ResourceName;
-    LOptions.FillWrapMode := Fill.WrapMode;
-    LOptions.StrokeColor := Stroke.Color;
-    LOptions.StrokeThickness := Stroke.Thickness;
-    LOptions.ShadowColor := Shadow.Color;
-    LOptions.ShadowBlur := Shadow.Blur;
-    LOptions.ShadowOffsetX := Shadow.OffsetX;
-    LOptions.ShadowOffsetY := Shadow.OffsetY;
+    LOptions.FillColor := AFill.Color;
+    LOptions.FillGradientStyle := AFill.Gradient.Style;
+    LOptions.FillGradientColors := AFill.Gradient.Colors;
+    LOptions.FillGradientOffsets := AFill.Gradient.Offsets;
+    LOptions.FillGradientAngle := AFill.Gradient.Angle;
+    LOptions.FillResourceName := AFill.ResourceName;
+    LOptions.FillWrapMode := AFill.WrapMode;
+    LOptions.StrokeColor := AStroke.Color;
+    LOptions.StrokeThickness := AStroke.Thickness;
+    LOptions.ShadowColor := AShadow.Color;
+    LOptions.ShadowBlur := AShadow.Blur;
+    LOptions.ShadowOffsetX := AShadow.OffsetX;
+    LOptions.ShadowOffsetY := AShadow.OffsetY;
     //--
     LOptions.Sides := Sides;
     LOptions.XRadius := XRadius;
@@ -2530,7 +2601,25 @@ procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALImage, TALRectangle, TALCircle, TALLine, TALText]);
   {$IFDEF ALDPK}
-  UnlistPublishedProperty(TALRectangle, 'CornerType');
+  UnlistPublishedProperty(TALImage, 'Size');
+  UnlistPublishedProperty(TALImage, 'StyleName');
+  UnlistPublishedProperty(TALImage, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALRectangle, 'Size');
+  UnlistPublishedProperty(TALRectangle, 'StyleName');
+  UnlistPublishedProperty(TALRectangle, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALCircle, 'Size');
+  UnlistPublishedProperty(TALCircle, 'StyleName');
+  UnlistPublishedProperty(TALCircle, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALLine, 'Size');
+  UnlistPublishedProperty(TALLine, 'StyleName');
+  UnlistPublishedProperty(TALLine, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALText, 'Size');
+  UnlistPublishedProperty(TALText, 'StyleName');
+  UnlistPublishedProperty(TALText, 'OnTap');
   {$ENDIF}
 end;
 

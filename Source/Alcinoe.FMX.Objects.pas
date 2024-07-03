@@ -478,6 +478,8 @@ type
       TElementMouseMoveEvent = procedure(Sender: TObject; Shift: TShiftState; X, Y: Single; const Element: TALTextElement) of object;
       TElementNotifyEvent = procedure(Sender: TObject; const Element: TALTextElement) of object;
   private
+    fDoubleBuffered: boolean;
+    FMultiLineTextOptions: TALMultiLineTextOptions;
     FOnElementClick: TElementNotifyEvent;
     FOnElementDblClick: TElementNotifyEvent;
     FOnElementMouseDown: TElementMouseEvent;
@@ -489,9 +491,9 @@ type
     FPressedElement: TALTextElement;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
-    fBufTextBroken: Boolean;
-    fBufAllTextDrawn: Boolean;
-    fBufElements: TALTextElements;
+    fTextBroken: Boolean;
+    fAllTextDrawn: Boolean;
+    fElements: TALTextElements;
     FAutoTranslate: Boolean;
     FText: String;
     FTextSettings: TALBaseTextSettings;
@@ -544,12 +546,20 @@ type
     procedure DoResized; override;
     procedure DoEndUpdate; override;
     procedure AdjustSize; virtual;
-    Procedure CreateBufDrawable(
-                var ABufDrawable: TALDrawable;
-                var ABufDrawableRect: TRectF;
-                var ABufTextBroken: Boolean;
-                var ABufAllTextDrawn: Boolean;
-                var ABufElements: TALTextElements;
+    function GetMultiLineTextOptions(
+               const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+               const AFont: TALFont;
+               const ADecoration: TALTextDecoration;
+               const AEllipsisFont: TALFont;
+               const AEllipsisDecoration: TALTextDecoration;
+               const AFill: TALBrush;
+               const AStroke: TALStrokeBrush;
+               const AShadow: TALShadow): TALMultiLineTextOptions;
+    Procedure DrawMultilineText(
+                const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+                out ATextBroken: Boolean;
+                out AAllTextDrawn: Boolean;
+                out AElements: TALTextElements;
                 const AText: String;
                 const AFont: TALFont;
                 const ADecoration: TALTextDecoration;
@@ -558,7 +568,34 @@ type
                 const AFill: TALBrush;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
-    property Elements: TALTextElements read fBufElements;
+    Procedure MeasureMultilineText(
+                out ARect: TRectF;
+                out ATextBroken: Boolean;
+                out AAllTextDrawn: Boolean;
+                out AElements: TALTextElements;
+                const AText: String;
+                const AFont: TALFont;
+                const ADecoration: TALTextDecoration;
+                const AEllipsisFont: TALFont;
+                const AEllipsisDecoration: TALTextDecoration;
+                const AFill: TALBrush;
+                const AStroke: TALStrokeBrush;
+                const AShadow: TALShadow);
+    Procedure CreateBufDrawable(
+                var ABufDrawable: TALDrawable;
+                out ABufDrawableRect: TRectF;
+                out ATextBroken: Boolean;
+                out AAllTextDrawn: Boolean;
+                out AElements: TALTextElements;
+                const AText: String;
+                const AFont: TALFont;
+                const ADecoration: TALTextDecoration;
+                const AEllipsisFont: TALFont;
+                const AEllipsisDecoration: TALTextDecoration;
+                const AFill: TALBrush;
+                const AStroke: TALStrokeBrush;
+                const AShadow: TALShadow);
+    property Elements: TALTextElements read fElements;
     property OnElementClick: TElementNotifyEvent read FOnElementClick write FOnElementClick;
     property OnElementDblClick: TElementNotifyEvent read FOnElementDblClick write FOnElementDblClick;
     property OnElementMouseDown: TElementMouseEvent read FOnElementMouseDown write FOnElementMouseDown;
@@ -577,6 +614,7 @@ type
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
     function TextBroken: Boolean;
+    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
   published
     //property Action;
     property Align;
@@ -657,6 +695,7 @@ type
   public
     property Elements;
   published
+    property DoubleBuffered;
     property TextSettings: TALTextSettings read GetTextSettings write SetTextSettings;
     property OnElementClick;
     property OnElementDblClick;
@@ -1171,7 +1210,7 @@ procedure TALBaseRectangle.MakeBufDrawable;
 begin
 
   if //--- Do not create BufDrawable if not DoubleBuffered
-     (not DoubleBuffered) or
+     {$IF not DEFINED(ALDPK)}(not DoubleBuffered) or{$ENDIF}
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
      //--- Do not create BufDrawable if only fill with solid color
@@ -1421,7 +1460,7 @@ procedure TALCircle.MakeBufDrawable;
 begin
 
   if //--- Do not create BufDrawable if not DoubleBuffered
-     (not DoubleBuffered) or
+     {$IF not DEFINED(ALDPK)}(not DoubleBuffered) or{$ENDIF}
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) then begin
     clearBufDrawable;
@@ -1549,7 +1588,7 @@ procedure TALLine.MakeBufDrawable;
 begin
 
   if //--- Do not create BufDrawable if not DoubleBuffered
-     (not DoubleBuffered) or
+     {$IF not DEFINED(ALDPK)}(not DoubleBuffered) or{$ENDIF}
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
      //--- Do not create BufDrawable if linetype <> TALLineType.Diagonal
@@ -1867,11 +1906,13 @@ begin
   end;
 end;
 
-
 {*************************************************}
 constructor TALBaseText.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  //-----
+  fDoubleBuffered := true;
+  FMultiLineTextOptions := TALMultiLineTextOptions.Create;
   //-----
   FOnElementClick := nil;
   FOnElementDblClick := nil;
@@ -1884,6 +1925,10 @@ begin
   FPressedElement := TALTextElement.Empty;
   //-----
   fBufDrawable := ALNullDrawable;
+  //-----
+  fTextBroken := False;
+  fAllTextDrawn := False;
+  SetLength(fElements, 0);
   //-----
   var LPrevFillOnchanged := Fill.OnChanged;
   Fill.OnChanged := nil;
@@ -1918,6 +1963,7 @@ destructor TALBaseText.Destroy;
 begin
   ClearBufDrawable;
   ALFreeAndNil(FTextSettings);
+  ALFreeAndNil(FMultiLineTextOptions);
   inherited;
 end;
 
@@ -1982,8 +2028,26 @@ begin
     FIsAdjustingSize := True;
     try
 
-      MakeBufDrawable;
-      var R := FBufDrawableRect;
+      var R: TrectF;
+      If {$IF not DEFINED(ALDPK)}DoubleBuffered{$ELSE}True{$ENDIF} then begin
+        MakeBufDrawable;
+        R := FBufDrawableRect;
+      end
+      else begin
+        MeasureMultilineText(
+          R, // out ARect: TRectF;
+          FTextBroken, // out ATextBroken: Boolean;
+          FAllTextDrawn, // out AAllTextDrawn: Boolean;
+          FElements, // out AElements: TALTextElements;
+          Text, // const AText: String;
+          TextSettings.Font, // const AFont: TALFont;
+          TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+          TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+          TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+          Fill, // const AFill: TALBrush;
+          Stroke, // const AStroke: TALStrokeBrush;
+          Shadow); // const AShadow: TALShadow);
+      end;
 
       if not HasUnconstrainedAutosizeX then begin
         r.Left := 0;
@@ -2005,13 +2069,11 @@ end;
 {************************************************************************}
 function TALBaseText.GetElementAtPos(const APos: TPointF): TALTextElement;
 begin
-  if (not ALIsDrawableNull(fBufDrawable)) then begin
-    for var I := Low(fBufElements) to High(fBufElements) do
-      if fBufElements[i].Rect.Contains(APos) then begin
-        Result := fBufElements[i];
-        Exit;
-      end;
-  end;
+  for var I := Low(fElements) to High(fElements) do
+    if fElements[i].Rect.Contains(APos) then begin
+      Result := fElements[i];
+      Exit;
+    end;
   Result.Id := '';
   Result.Rect := TrectF.Empty;
 end;
@@ -2219,6 +2281,30 @@ begin
 
   MakeBufDrawable;
 
+  if ALIsDrawableNull(fBufDrawable) then begin
+    {$IF DEFINED(ALSkiaCanvas)}
+    DrawMultilineText(
+      nil, // const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+      FTextBroken, // out ATextBroken: Boolean;
+      FAllTextDrawn, // out AAllTextDrawn: Boolean;
+      FElements, // out AElements: TALTextElements;
+      Text, // const AText: String;
+      TextSettings.Font, // const AFont: TALFont;
+      TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+      TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+      TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+      Fill, // const AFill: TALBrush;
+      Stroke, // const AStroke: TALStrokeBrush;
+      Shadow); // const AShadow: TALShadow);
+    {$ELSE}
+    {$IF defined(DEBUG)}
+    if not doublebuffered then
+      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
+    {$ENDIF}
+    {$ENDIF}
+    exit;
+  end;
+
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
     fBufDrawable, // const ADrawable: TALDrawable;
@@ -2233,13 +2319,16 @@ end;
 {***********************************************}
 function TALBaseText.GetDoubleBuffered: boolean;
 begin
-  result := True;
+  result := fDoubleBuffered;
 end;
 
 {**************************************************************}
 procedure TALBaseText.SetDoubleBuffered(const AValue: Boolean);
 begin
-  // Not yet supported
+  if AValue <> fDoubleBuffered then begin
+    fDoubleBuffered := AValue;
+    if not fDoubleBuffered then clearBufDrawable;
+  end;
 end;
 
 {********************************************************}
@@ -2315,16 +2404,189 @@ begin
     ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
-  setlength(fBufElements, 0);
+end;
+
+{*******************************************}
+function TALBaseText.GetMultiLineTextOptions(
+           const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+           const AFont: TALFont;
+           const ADecoration: TALTextDecoration;
+           const AEllipsisFont: TALFont;
+           const AEllipsisDecoration: TALTextDecoration;
+           const AFill: TALBrush;
+           const AStroke: TALStrokeBrush;
+           const AShadow: TALShadow): TALMultiLineTextOptions;
+begin
+  Result := FMultiLineTextOptions;
+  Result.Scale := ALGetScreenScale;
+  //--
+  Result.FontFamily := Afont.Family;
+  Result.FontSize := Afont.Size;
+  Result.FontWeight := Afont.Weight;
+  Result.FontSlant := Afont.Slant;
+  Result.FontStretch := Afont.Stretch;
+  Result.FontColor := AFont.Color;
+  //--
+  Result.DecorationKinds := ADecoration.Kinds;
+  Result.DecorationStyle := ADecoration.Style;
+  Result.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
+  Result.DecorationColor := ADecoration.Color;
+  //--
+  Result.EllipsisText := TextSettings.Ellipsis;
+  Result.EllipsisInheritSettings := TextSettings.EllipsisSettings.inherit;
+  //--
+  Result.EllipsisFontFamily := AEllipsisfont.Family;
+  Result.EllipsisFontSize := AEllipsisfont.Size;
+  Result.EllipsisFontWeight := AEllipsisfont.Weight;
+  Result.EllipsisFontSlant := AEllipsisfont.Slant;
+  Result.EllipsisFontStretch := AEllipsisfont.Stretch;
+  Result.EllipsisFontColor := AEllipsisFont.Color;
+  //--
+  Result.EllipsisDecorationKinds := AEllipsisDecoration.Kinds;
+  Result.EllipsisDecorationStyle := AEllipsisDecoration.Style;
+  Result.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
+  Result.EllipsisDecorationColor := AEllipsisDecoration.Color;
+  //--
+  Result.AutoSize := False;
+  Result.AutoSizeX := False;
+  Result.AutoSizeY := False;
+  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then Result.AutoSize := True
+  else if HasUnconstrainedAutosizeX then Result.AutoSizeX := True
+  else if HasUnconstrainedAutosizeY then Result.AutoSizeY := True;
+  //--
+  Result.MaxLines := TextSettings.MaxLines;
+  Result.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
+  Result.LetterSpacing := TextSettings.LetterSpacing;
+  Result.Trimming := TextSettings.Trimming;
+  Result.FailIfTextBroken := false;
+  //--
+  if TFillTextFlag.RightToLeft in FillTextFlags then Result.Direction := TALTextDirection.RightToLeft
+  else Result.Direction := TALTextDirection.LeftToRight;
+  Result.HTextAlign := TextSettings.HorzAlign;
+  Result.VTextAlign := TextSettings.VertAlign;
+  //--
+  Result.FillColor := AFill.Color;
+  Result.FillGradientStyle := AFill.Gradient.Style;
+  Result.FillGradientColors := AFill.Gradient.Colors;
+  Result.FillGradientOffsets := AFill.Gradient.Offsets;
+  Result.FillGradientAngle := AFill.Gradient.Angle;
+  Result.FillResourceName := AFill.ResourceName;
+  Result.FillWrapMode := AFill.WrapMode;
+  Result.StrokeColor := AStroke.Color;
+  Result.StrokeThickness := AStroke.Thickness;
+  Result.ShadowColor := AShadow.Color;
+  Result.ShadowBlur := AShadow.Blur;
+  Result.ShadowOffsetX := AShadow.OffsetX;
+  Result.ShadowOffsetY := AShadow.OffsetY;
+  //--
+  Result.Sides := Sides;
+  Result.XRadius := XRadius;
+  Result.YRadius := YRadius;
+  Result.Corners := Corners;
+  Result.Padding := padding.Rect;
+  //--
+  Result.TextIsHtml := TextSettings.IsHtml;
+  //--
+  Result.OnAdjustRect := AOnAdjustRect;
+end;
+
+{**************************************}
+Procedure TALBaseText.DrawMultilineText(
+            const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+            out ATextBroken: Boolean;
+            out AAllTextDrawn: Boolean;
+            out AElements: TALTextElements;
+            const AText: String;
+            const AFont: TALFont;
+            const ADecoration: TALTextDecoration;
+            const AEllipsisFont: TALFont;
+            const AEllipsisDecoration: TALTextDecoration;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow);
+begin
+  {$IF DEFINED(ALSkiaCanvas)}
+  var LMaxSize: TSizeF;
+  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+  else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
+  else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+  else LMaxSize := TSizeF.Create(width, height);
+
+  var LRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+
+  var LSurface: TALSurface := ALNullSurface;
+  var LCanvas: TALCanvas := TSkCanvasCustom(Canvas).Canvas.Handle;
+  ALDrawMultiLineText(
+    LSurface,
+    LCanvas,
+    AText,
+    LRect,
+    ATextBroken,
+    AAllTextDrawn,
+    AElements,
+    GetMultiLineTextOptions(
+      AOnAdjustRect,
+      AFont,
+      ADecoration,
+      AEllipsisFont,
+      AEllipsisDecoration,
+      AFill,
+      AStroke,
+      AShadow));
+  {$ELSE}
+  {$IF defined(DEBUG)}
+  raise Exception.Create('DrawMultilineText work only when SKIA is enabled.');
+  {$ENDIF}
+  {$ENDIF}
+end;
+
+{*****************************************}
+Procedure TALBaseText.MeasureMultilineText(
+            out ARect: TRectF;
+            out ATextBroken: Boolean;
+            out AAllTextDrawn: Boolean;
+            out AElements: TALTextElements;
+            const AText: String;
+            const AFont: TALFont;
+            const ADecoration: TALTextDecoration;
+            const AEllipsisFont: TALFont;
+            const AEllipsisDecoration: TALTextDecoration;
+            const AFill: TALBrush;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow);
+begin
+  var LMaxSize: TSizeF;
+  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+  else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
+  else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+  else LMaxSize := TSizeF.Create(width, height);
+
+  ARect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+
+  ALMeasureMultiLineText(
+    AText,
+    ARect,
+    ATextBroken,
+    AAllTextDrawn,
+    AElements,
+    GetMultiLineTextOptions(
+      nil{AOnAdjustRect},
+      AFont,
+      ADecoration,
+      AEllipsisFont,
+      AEllipsisDecoration,
+      AFill,
+      AStroke,
+      AShadow));
 end;
 
 {**************************************}
 Procedure TALBaseText.CreateBufDrawable(
            var ABufDrawable: TALDrawable;
-           var ABufDrawableRect: TRectF;
-           var ABufTextBroken: Boolean;
-           var ABufAllTextDrawn: Boolean;
-           var ABufElements: TALTextElements;
+           out ABufDrawableRect: TRectF;
+           out ATextBroken: Boolean;
+           out AAllTextDrawn: Boolean;
+           out AElements: TALTextElements;
            const AText: String;
            const AFont: TALFont;
            const ADecoration: TALTextDecoration;
@@ -2345,131 +2607,63 @@ begin
 
   ABufDrawableRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
 
-  var LOptions := TALMultiLineTextOptions.Create;
-  Try
+  //build ABufDrawable
+  ABufDrawable := ALCreateMultiLineTextDrawable(
+                    AText,
+                    ABufDrawableRect,
+                    ATextBroken,
+                    AAllTextDrawn,
+                    AElements,
+                    GetMultiLineTextOptions(
+                      nil{AOnAdjustRect},
+                      AFont,
+                      ADecoration,
+                      AEllipsisFont,
+                      AEllipsisDecoration,
+                      AFill,
+                      AStroke,
+                      AShadow));
 
-    LOptions.Scale := ALGetScreenScale;
-    //--
-    LOptions.FontFamily := Afont.Family;
-    LOptions.FontSize := Afont.Size;
-    LOptions.FontWeight := Afont.Weight;
-    LOptions.FontSlant := Afont.Slant;
-    LOptions.FontStretch := Afont.Stretch;
-    LOptions.FontColor := AFont.Color;
-    //--
-    LOptions.DecorationKinds := ADecoration.Kinds;
-    LOptions.DecorationStyle := ADecoration.Style;
-    LOptions.DecorationThicknessMultiplier := ADecoration.ThicknessMultiplier;
-    LOptions.DecorationColor := ADecoration.Color;
-    //--
-    LOptions.EllipsisText := TextSettings.Ellipsis;
-    LOptions.EllipsisInheritSettings := TextSettings.EllipsisSettings.inherit;
-    //--
-    LOptions.EllipsisFontFamily := AEllipsisfont.Family;
-    LOptions.EllipsisFontSize := AEllipsisfont.Size;
-    LOptions.EllipsisFontWeight := AEllipsisfont.Weight;
-    LOptions.EllipsisFontSlant := AEllipsisfont.Slant;
-    LOptions.EllipsisFontStretch := AEllipsisfont.Stretch;
-    LOptions.EllipsisFontColor := AEllipsisFont.Color;
-    //--
-    LOptions.EllipsisDecorationKinds := AEllipsisDecoration.Kinds;
-    LOptions.EllipsisDecorationStyle := AEllipsisDecoration.Style;
-    LOptions.EllipsisDecorationThicknessMultiplier := AEllipsisDecoration.ThicknessMultiplier;
-    LOptions.EllipsisDecorationColor := AEllipsisDecoration.Color;
-    //--
-    LOptions.AutoSize := False;
-    LOptions.AutoSizeX := False;
-    LOptions.AutoSizeY := False;
-    if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LOptions.AutoSize := True
-    else if HasUnconstrainedAutosizeX then LOptions.AutoSizeX := True
-    else if HasUnconstrainedAutosizeY then LOptions.AutoSizeY := True;
-    //--
-    LOptions.MaxLines := TextSettings.MaxLines;
-    LOptions.LineHeightMultiplier := TextSettings.LineHeightMultiplier;
-    LOptions.LetterSpacing := TextSettings.LetterSpacing;
-    LOptions.Trimming := TextSettings.Trimming;
-    //LOptions.FailIfTextBroken: boolean; // default = false
-    //--
-    if TFillTextFlag.RightToLeft in FillTextFlags then LOptions.Direction := TALTextDirection.RightToLeft
-    else LOptions.Direction := TALTextDirection.LeftToRight;
-    LOptions.HTextAlign := TextSettings.HorzAlign;
-    LOptions.VTextAlign := TextSettings.VertAlign;
-    //--
-    LOptions.FillColor := AFill.Color;
-    LOptions.FillGradientStyle := AFill.Gradient.Style;
-    LOptions.FillGradientColors := AFill.Gradient.Colors;
-    LOptions.FillGradientOffsets := AFill.Gradient.Offsets;
-    LOptions.FillGradientAngle := AFill.Gradient.Angle;
-    LOptions.FillResourceName := AFill.ResourceName;
-    LOptions.FillWrapMode := AFill.WrapMode;
-    LOptions.StrokeColor := AStroke.Color;
-    LOptions.StrokeThickness := AStroke.Thickness;
-    LOptions.ShadowColor := AShadow.Color;
-    LOptions.ShadowBlur := AShadow.Blur;
-    LOptions.ShadowOffsetX := AShadow.OffsetX;
-    LOptions.ShadowOffsetY := AShadow.OffsetY;
-    //--
-    LOptions.Sides := Sides;
-    LOptions.XRadius := XRadius;
-    LOptions.YRadius := YRadius;
-    LOptions.Corners := Corners;
-    LOptions.Padding := padding.Rect;
-    //--
-    LOptions.TextIsHtml := TextSettings.IsHtml;
-
-    //build ABufDrawable
-    ABufDrawable := ALCreateMultiLineTextDrawable(
-                      AText,
-                      ABufDrawableRect,
-                      ABufTextBroken,
-                      ABufAllTextDrawn,
-                      ABufElements,
-                      LOptions);
-
-    //Special case where it's impossible to draw at least one char.
-    //To avoid to call again ALDrawMultiLineText on each paint
-    //return a "blank" drawable. Also to avoid to have a control
-    //with a "zero" size, do not do any autoresize
-    if (ALIsDrawableNull(ABufDrawable)) then begin
-      if (not LocalRect.IsEmpty) then begin
-        ABufDrawableRect := LocalRect;
-        ABufDrawableRect.Width := Min(MaxWidth, ABufDrawableRect.Width);
-        ABufDrawableRect.Height := Min(MaxHeight, ABufDrawableRect.Height);
-        ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale);
-        var LSurface: TALSurface;
-        var LCanvas: TALCanvas;
-        ALCreateSurface(
-          LSurface, // out ASurface: sk_surface_t;
-          LCanvas, // out ACanvas: sk_canvas_t;
-          ALGetScreenScale, // const AScale: Single;
-          ABufDrawableRect.Width, // const w: integer;
-          ABufDrawableRect.height);// const h: integer)
+  //Special case where it's impossible to draw at least one char.
+  //To avoid to call again ALDrawMultiLineText on each paint
+  //return a "blank" drawable. Also to avoid to have a control
+  //with a "zero" size, do not do any autoresize
+  if (ALIsDrawableNull(ABufDrawable)) then begin
+    if (not LocalRect.IsEmpty) then begin
+      ABufDrawableRect := LocalRect;
+      ABufDrawableRect.Width := Min(MaxWidth, ABufDrawableRect.Width);
+      ABufDrawableRect.Height := Min(MaxHeight, ABufDrawableRect.Height);
+      ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale);
+      var LSurface: TALSurface;
+      var LCanvas: TALCanvas;
+      ALCreateSurface(
+        LSurface, // out ASurface: sk_surface_t;
+        LCanvas, // out ACanvas: sk_canvas_t;
+        ALGetScreenScale, // const AScale: Single;
+        ABufDrawableRect.Width, // const w: integer;
+        ABufDrawableRect.height);// const h: integer)
+      try
+        if ALCanvasBeginScene(LCanvas) then
         try
-          if ALCanvasBeginScene(LCanvas) then
-          try
-            ALDrawRectangle(
-              LCanvas, // const ACanvas: sk_canvas_t;
-              ALGetScreenScale, // const AScale: Single;
-              ABufDrawableRect, // const Rect: TrectF;
-              Fill, // const Fill: TALBrush;
-              Stroke, // const Stroke: TALStrokeBrush;
-              Shadow, // const Shadow: TALShadow
-              Sides, // const Sides: TSides;
-              Corners, // const Corners: TCorners;
-              XRadius, // const XRadius: Single = 0;
-              YRadius); // const YRadius: Single = 0);
-          finally
-            ALCanvasEndScene(LCanvas)
-          end;
-          ABufDrawable := ALSurfaceToDrawable(LSurface);
+          ALDrawRectangle(
+            LCanvas, // const ACanvas: sk_canvas_t;
+            ALGetScreenScale, // const AScale: Single;
+            ABufDrawableRect, // const Rect: TrectF;
+            Fill, // const Fill: TALBrush;
+            Stroke, // const Stroke: TALStrokeBrush;
+            Shadow, // const Shadow: TALShadow
+            Sides, // const Sides: TSides;
+            Corners, // const Corners: TCorners;
+            XRadius, // const XRadius: Single = 0;
+            YRadius); // const YRadius: Single = 0);
         finally
-          ALFreeSurface(LSurface, LCanvas);
+          ALCanvasEndScene(LCanvas)
         end;
+        ABufDrawable := ALSurfaceToDrawable(LSurface);
+      finally
+        ALFreeSurface(LSurface, LCanvas);
       end;
     end;
-
-  finally
-    ALFreeAndNil(LOptions);
   end;
 
 end;
@@ -2478,14 +2672,20 @@ end;
 procedure TALBaseText.MakeBufDrawable;
 begin
 
+  //--- Do not create BufDrawable if not DoubleBuffered
+  if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
+    clearBufDrawable;
+    exit;
+  end;
+
   if (not ALIsDrawableNull(FBufDrawable)) then exit;
 
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
-    FBufDrawableRect, // var ABufDrawableRect: TRectF;
-    FBufTextBroken, // var ABufTextBroken: Boolean;
-    FBufAllTextDrawn, // var ABufAllTextDrawn: Boolean;
-    FBufElements, // var ABufElements: TALTextElements;
+    FBufDrawableRect, // out ABufDrawableRect: TRectF;
+    FTextBroken, // out ATextBroken: Boolean;
+    FAllTextDrawn, // out AAllTextDrawn: Boolean;
+    FElements, // out AElements: TALTextElements;
     Text, // const AText: String;
     TextSettings.Font, // const AFont: TALFont;
     TextSettings.Decoration, // const ADecoration: TALTextDecoration;
@@ -2505,7 +2705,7 @@ end;
 {***************************************}
 function TALBaseText.TextBroken: Boolean;
 begin
-  result := (not ALIsDrawableNull(fBufDrawable)) and (fBufTextBroken);
+  result := fTextBroken;
 end;
 
 {*****************************************************}

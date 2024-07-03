@@ -19,10 +19,12 @@ type
   {$ENDIF}
   TALControl = class(TControl)
   private
+    FFocusOnMouseDown: Boolean;
     FFocusOnMouseUp: Boolean;
     FMouseDownPos: TpointF;
     FMouseDownAtLowVelocity: Boolean;
   protected
+    property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -47,51 +49,59 @@ type
     constructor Create(AOwner: TComponent); override;
     function GetTabListClass: TTabListClass; override;
   published
+    //property Action;
     property Align;
+    //property Anchors;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
+    //property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
     property Enabled;
-    property Locked default False;
     property Height;
-    property HitTest default True;
-    property Padding;
-    property Opacity;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
     property RotationCenter;
     property Scale;
+    property Size;
+    //property TabOrder;
+    //property TabStop;
+    //property TouchTargetExpansion;
     property Visible;
     property Width;
-    property Size;
-    {Drag and Drop events}
+    property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Keyboard events}
-    property OnKeyDown;
-    property OnKeyUp;
-    {Mouse events}
-    property OnCanFocus;
-    property OnClick;
-    property OnDblClick;
     property OnEnter;
     property OnExit;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -107,6 +117,7 @@ constructor TALControl.Create(AOwner: TComponent);
 begin
   inherited;
   Size.SetPlatformDefaultWithoutNotification(False);
+  FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownPos := TpointF.zero;
   FMouseDownAtLowVelocity := True;
@@ -131,7 +142,7 @@ begin
     else LParent := LParent.Parent;
   end;
   //--
-  if (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin
+  if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin
     Var LOldIsfocused := FIsfocused;
     FIsfocused := True;
     Try

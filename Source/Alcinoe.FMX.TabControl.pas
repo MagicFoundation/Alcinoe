@@ -61,36 +61,61 @@ type
     property TabControl: TALTabControl read FTabControl;
     property ViewPortOffset: single read fViewPortOffset;
   published
+    //property Action;
+    //property Align;
+    //property Anchors;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren;
-    property ClipParent;
+    //property ClipParent;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
-    property Enabled default True;
+    property Enabled;
+    //property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest default false;
+    property &Index stored False;
     property IsSelected: Boolean read FIsSelected write SetIsSelected;
-    property Index stored False;
-    property Padding;
+    //property Locked;
+    //property Margins;
     property Opacity;
+    property Padding;
     property PopupMenu;
-    property Visible default True;
-    property ParentShowHint;
+    //property Position;
+    //property RotationAngle;
+    //property RotationCenter;
+    //property Scale;
+    //property Size;
+    //property TabOrder;
+    //property TabStop;
+    //property TouchTargetExpansion;
+    property Visible;
+    //property Width;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -183,51 +208,69 @@ type
     property ScrollEngine: TALScrollEngine read FScrollEngine;
     property AniTransition: TALFloatPropertyAnimation read FAniTransition;
   published
+    //property Action;
+    property ActiveTab: TALTabItem read GetActiveTab write SetActiveTab stored False;
     property Align;
     property Anchors;
-    property ActiveTab: TALTabItem read GetActiveTab write SetActiveTab stored False;
     property AnimationEnabled: boolean read getAnimationEnabled write setAnimationEnabled default true;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
-    property Enabled default True;
-    property Locked;
+    property Enabled;
     property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
-    property Opacity;
+    property Locked;
     property Margins;
+    property Opacity;
+    //property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
     property RotationCenter;
     property Scale;
     property Size;
+    //property TabOrder;
+    //property TabStop;
     property TabIndex: Integer read FTabIndex write SetTabIndex default -1;
-    property Visible default True;
+    //property TouchTargetExpansion;
+    property Visible;
     property Width;
+    property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
+    property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
+    property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
+    property OnAniProcess: TnotifyEvent read fOnAniProcess write fOnAniProcess;
+    //property OnCanFocus;
     property OnChange: TNotifyEvent read FOnChange write FOnChange; // Fired immediately after the selected tab changes.
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
-    property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
-    property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
-    property OnAniProcess: TnotifyEvent read fOnAniProcess write fOnAniProcess;
   end;
 
 procedure Register;
@@ -238,6 +281,9 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
+  {$IFDEF ALDPK}
+  DesignIntf,
+  {$ENDIF}
   FMX.Utils,
   FMX.Consts,
   Alcinoe.StringUtils,
@@ -252,8 +298,6 @@ begin
   FIsSelected := false;
   fViewPortOffset := 0;
   Locked := True;
-  Enabled := True;
-  Visible := True;
   HitTest := False;
   // this because some tab can contain control without z-order like TALEdit and
   // when the tab (all the tab) is first created, it's created at a visible pos to be later realigned
@@ -459,8 +503,6 @@ begin
   FTabCount := 0;
   FMouseEvents := False;
   FOnChange := nil;
-  Visible := true;
-  Enabled := true;
   ClipChildren := true;
   FTabIndex := -1;
   FchildreenChanging := False;
@@ -1252,6 +1294,11 @@ end;
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALTabControl]);
+  {$IFDEF ALDPK}
+  UnlistPublishedProperty(TALTabControl, 'Size');
+  UnlistPublishedProperty(TALTabControl, 'StyleName');
+  UnlistPublishedProperty(TALTabControl, 'OnTap');
+  {$ENDIF}
 end;
 
 initialization

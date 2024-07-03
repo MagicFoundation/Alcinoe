@@ -582,6 +582,7 @@ function ALUTCNow: TDateTime;
 function ALUnixMsToDateTime(const aValue: Int64): TDateTime;
 function ALDateTimeToUnixMs(const aValue: TDateTime): Int64;
 Function ALInc(var x: integer; Count: integer): Integer;
+procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
 var ALMove: procedure (const Source; var Dest; Count: NativeInt);
 {$IFDEF MSWINDOWS}
 type
@@ -649,6 +650,7 @@ implementation
 uses
   system.math,
   system.Rtti,
+  System.RTLConsts,
   {$IF defined(MSWindows)}
   Winapi.MMSystem,
   {$ENDIF}
@@ -3033,6 +3035,18 @@ Function ALInc(var x: integer; Count: integer): Integer;
 begin
   inc(X, count);
   result := X;
+end;
+
+{********************************************************************}
+procedure ALAssignError(Const ASource: TObject; const ADest: Tobject);
+begin
+  var LSourceName: string;
+  if ASource <> nil then LSourceName := ASource.ClassName
+  else LSourceName := 'nil';
+  var LDestName: string;
+  if ADest <> nil then LDestName := ADest.ClassName
+  else LDestName := 'nil';
+  raise EConvertError.CreateResFmt(@SAssignError, [LSourceName, LDestName]);
 end;
 
 {******************************************************}

@@ -22,8 +22,13 @@ type
   end;
   TALTextElements = array of TALTextElement;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALMultiLineTextAdjustRectProc = reference to procedure(var ARect: TrectF);
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALMultiLineTextOptions = class(Tobject)
+  private
+    FOnAdjustRect: TALMultiLineTextAdjustRectProc;
   public
     Scale: Single; // default = 1
     //--
@@ -119,6 +124,8 @@ type
     // Ex: <span style="font-size:14px;font-style:italic">
     TextIsHtml: boolean; // default = false;
     //--
+    property OnAdjustRect: TALMultiLineTextAdjustRectProc read FOnAdjustRect write FOnAdjustRect; // default = nil
+    //--
     constructor Create;
     //--
     function GetScaledFontSize: Single; inline;
@@ -136,6 +143,90 @@ type
     function GetScaledPaddingBottom: Single; inline;
   End;
 
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False); overload;
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False); inline; overload;
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False); inline; overload;
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False); inline; overload;
+
+
+procedure ALMeasureMultiLineText(
+            const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
+            const AOptions: TALMultiLineTextOptions); inline; overload;
+procedure ALMeasureMultiLineText(
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            const AOptions: TALMultiLineTextOptions); inline; overload;
+procedure ALMeasureMultiLineText(
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            const AOptions: TALMultiLineTextOptions); inline; overload;
+procedure ALMeasureMultiLineText(
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            const AOptions: TALMultiLineTextOptions); inline; overload;
+
+
 function ALCreateMultiLineTextDrawable(
            const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
@@ -145,7 +236,7 @@ function ALCreateMultiLineTextDrawable(
            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
-           const AOptions: TALMultiLineTextOptions): TALDrawable; overload;
+           const AOptions: TALMultiLineTextOptions): TALDrawable; inline; overload;
 function ALCreateMultiLineTextDrawable(
            const AText: String;
            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
@@ -226,6 +317,8 @@ end;
 {*****************************************}
 constructor TALMultiLineTextOptions.Create;
 begin
+  FOnAdjustRect := nil;
+  //--
   Scale := 1;
   //--
   FontFamily := '';
@@ -370,17 +463,20 @@ begin
   Result := Padding.Bottom * Scale;
 end;
 
-{*************************************}
-function ALCreateMultiLineTextDrawable(
-           const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
-           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
-                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
-                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
-                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
-           out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
-           out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
-           out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
-           const AOptions: TALMultiLineTextOptions): TALDrawable;
+{****************************}
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False);
 
   {$REGION 'TRangeIndex'}
   {$IF defined(ALSkiaEngine)}
@@ -2195,7 +2291,7 @@ begin
               if length(LMetrics) = 0 then begin
                 ARect.Width := 0;
                 ARect.Height := 0;
-                exit(ALNullDrawable);
+                exit;
               end;
               sk4d_paragraph_get_line_metrics(Lparagraph, @LMetrics[0]);
 
@@ -2213,7 +2309,7 @@ begin
               if AOptions.FailIfTextBroken and ATextBroken then begin
                 ARect.Width := 0;
                 ARect.Height := 0;
-                exit(ALNullDrawable);
+                exit;
               end;
 
               // Update ARect
@@ -2233,7 +2329,7 @@ begin
                   if I = 0 then begin
                     ARect.Width := 0;
                     ARect.Height := 0;
-                    exit(ALNullDrawable);
+                    exit;
                   end;
                   // Although it's impossible to have LMaxLines = I, I prefer to crash rather
                   // than enter an infinite loop.
@@ -2267,7 +2363,7 @@ begin
                   if LInsertEllipsisAt < 0 then begin
                     ARect.Width := 0;
                     ARect.Height := 0;
-                    exit(ALNullDrawable);
+                    exit;
                   end;
                   LPrevInsertEllipsisAt := LInsertEllipsisAt;
                   LReLayout := True;
@@ -2337,7 +2433,7 @@ begin
                  (Round(ARect.Height) = 0)then begin
                 ARect.Width := 0;
                 ARect.Height := 0;
-                exit(ALNullDrawable);
+                exit;
               end;
 
               // Handle Shadow
@@ -2350,118 +2446,120 @@ begin
                 LShadowRect.Inflate(LShadowWidth, LShadowWidth);
                 LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
                 LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
-                ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
-                LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+                if ALIsCanvasNull(ACanvas) then begin
+                  ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+                  LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+                end;
               end;
 
+              // Adjust the rect
+              if Assigned(AOptions.OnAdjustRect) then begin
+                var LPrevRect := ARect;
+                AOptions.OnAdjustRect(ARect);
+                LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
+              end;
+
+              // Exit if AOnlyMeasure
+              if AOnlyMeasure then exit;
+
               // Create the drawing surface
-              var LSurface: TALSurface;
-              var LCanvas: TALCanvas;
-              ALCreateSurface(
-                LSurface, // out ASurface: TALSurface;
-                LCanvas, // out ACanvas: TALCanvas;
-                round(LRect.Width), // const w: integer;
-                round(LRect.Height));// const h: integer)
+              if ALIsCanvasNull(ACanvas) then begin
+                if not ALIsSurfaceNull(ASurface) then
+                  raise Exception.Create('ASurface must also be null when ACanvas is null');
+                ALCreateSurface(
+                  ASurface, // out ASurface: TALSurface;
+                  ACanvas, // out ACanvas: TALCanvas;
+                  round(LRect.Width), // const w: integer;
+                  round(LRect.Height));// const h: integer)
+              end;
+              if ALCanvasBeginScene(ACanvas) then
               try
 
-                if ALCanvasBeginScene(LCanvas) then
-                try
+                // Draw the background
+                if (AOptions.FillColor <> TalphaColors.Null) or
+                   (length(AOptions.FillGradientColors) > 0) or
+                   (AOptions.FillResourceName <> '') or
+                   (AOptions.StrokeColor <> TalphaColors.Null) or
+                   (AOptions.ShadowColor <> TalphaColors.Null) then begin
+                  ALDrawRectangle(
+                    ACanvas, // const ACanvas: TALCanvas;
+                    1, // const AScale: Single;
+                    ARect, // const ARect: TrectF;
+                    AOptions.FillColor, // const AFillColor: TAlphaColor;
+                    AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+                    AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+                    AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+                    AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
+                    AOptions.FillResourceName, // const AFillResourceName: String;
+                    AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+                    AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
+                    AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
+                    AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
+                    AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+                    AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
+                    AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
+                    AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
+                    AOptions.Sides, // const Sides: TSides;
+                    AOptions.Corners, // const Corners: TCorners;
+                    AOptions.GetScaledXRadius, // const XRadius: Single = 0;
+                    AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+                end;
 
-                  // Draw the background
-                  if (AOptions.FillColor <> TalphaColors.Null) or
-                     (length(AOptions.FillGradientColors) > 0) or
-                     (AOptions.FillResourceName <> '') or
-                     (AOptions.StrokeColor <> TalphaColors.Null) or
-                     (AOptions.ShadowColor <> TalphaColors.Null) then begin
-                    ALDrawRectangle(
-                      LCanvas, // const ACanvas: TALCanvas;
-                      1, // const AScale: Single;
-                      ARect, // const ARect: TrectF;
-                      AOptions.FillColor, // const AFillColor: TAlphaColor;
-                      AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-                      AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                      AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-                      AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-                      AOptions.FillResourceName, // const AFillResourceName: String;
-                      AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-                      AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
-                      AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-                      AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-                      AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-                      AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
-                      AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
-                      AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
-                      AOptions.Sides, // const Sides: TSides;
-                      AOptions.Corners, // const Corners: TCorners;
-                      AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                      AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-                  end;
+                // Paint the paragraph
+                sk4d_paragraph_paint(
+                  LParagraph, // self: sk_paragraph_t;
+                  ACanvas, // canvas: sk_canvas_t;
+                  LParagraphRect.left - LSk4dParagraphOffsetX, // x: float;
+                  LParagraphRect.top); // y: float
 
-                  // Paint the paragraph
-                  sk4d_paragraph_paint(
-                    LParagraph, // self: sk_paragraph_t;
-                    LCanvas, // canvas: sk_canvas_t;
-                    LParagraphRect.left - LSk4dParagraphOffsetX, // x: float;
-                    LParagraphRect.top); // y: float
+                // retrieve the rect of all placeholders
+                SetLength(LTextBoxes, sk4d_paragraph_get_rects_for_placeholders(LParagraph, nil));
+                if length(LTextBoxes) > 0 then
+                  sk4d_paragraph_get_rects_for_placeholders(LParagraph, @LTextBoxes[0]);
 
-                  // retrieve the rect of all placeholders
-                  SetLength(LTextBoxes, sk4d_paragraph_get_rects_for_placeholders(LParagraph, nil));
-                  if length(LTextBoxes) > 0 then
-                    sk4d_paragraph_get_rects_for_placeholders(LParagraph, @LTextBoxes[0]);
-
-                  // Paint all images
-                  if Length(LTextBoxes) > LPlaceHolders.Count then
-                    raise Exception.Create('Error 155FE121-9CA2-46F8-A51C-0CB72EADC7EC');
-                  For var i := low(LTextBoxes) to high(LTextBoxes) do begin
-                    Var LImgSrc := LPlaceHolders[i];
-                    If LImgSrc <> '' then begin
-                      Var LDstRect := TRectF.Create(
-                                        LTextBoxes[i].rect.left - LSk4dParagraphOffsetX,
-                                        LTextBoxes[i].rect.Top,
-                                        LTextBoxes[i].rect.Right - LSk4dParagraphOffsetX,
-                                        LTextBoxes[i].rect.Bottom);
-                      LDstRect.Offset(LParagraphRect.TopLeft);
-                      var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-                      {$IFDEF ALDPK}
-                      var LImg: sk_image_t;
-                      var LFileName := ALGetResourceFilename(LImgSrc);
-                      if LFileName <> '' then
-                        LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
-                      else
-                        LImg := 0;
-                      {$ELSE}
-                      var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
-                      {$ENDIF}
-                      If LImg <> 0 then begin
-                        try
-                          var LSamplingoptions := ALGetNearestSkSamplingoptions;
-                          sk4d_canvas_draw_image_rect(
-                            LCanvas, // self: sk_canvas_t;
-                            LImg, // const image: sk_image_t;
-                            @LSrcRect, // const src: psk_rect_t;
-                            @LDstRect,  // const dest: psk_rect_t;
-                            @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                            LPaint, // const paint: sk_paint_t;
-                            FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
-                        finally
-                          sk4d_refcnt_unref(LImg);
-                        end;
+                // Paint all images
+                if Length(LTextBoxes) > LPlaceHolders.Count then
+                  raise Exception.Create('Error 155FE121-9CA2-46F8-A51C-0CB72EADC7EC');
+                For var i := low(LTextBoxes) to high(LTextBoxes) do begin
+                  Var LImgSrc := LPlaceHolders[i];
+                  If LImgSrc <> '' then begin
+                    Var LDstRect := TRectF.Create(
+                                      LTextBoxes[i].rect.left - LSk4dParagraphOffsetX,
+                                      LTextBoxes[i].rect.Top,
+                                      LTextBoxes[i].rect.Right - LSk4dParagraphOffsetX,
+                                      LTextBoxes[i].rect.Bottom);
+                    LDstRect.Offset(LParagraphRect.TopLeft);
+                    var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+                    {$IFDEF ALDPK}
+                    var LImg: sk_image_t;
+                    var LFileName := ALGetResourceFilename(LImgSrc);
+                    if LFileName <> '' then
+                      LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
+                    else
+                      LImg := 0;
+                    {$ELSE}
+                    var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
+                    {$ENDIF}
+                    If LImg <> 0 then begin
+                      try
+                        var LSamplingoptions := ALGetNearestSkSamplingoptions;
+                        sk4d_canvas_draw_image_rect(
+                          ACanvas, // self: sk_canvas_t;
+                          LImg, // const image: sk_image_t;
+                          @LSrcRect, // const src: psk_rect_t;
+                          @LDstRect,  // const dest: psk_rect_t;
+                          @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+                          LPaint, // const paint: sk_paint_t;
+                          FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+                      finally
+                        sk4d_refcnt_unref(LImg);
                       end;
                     end;
                   end;
-
-                finally
-                  ALCanvasEndScene(LCanvas);
                 end;
 
-                // Create the result
-                result := ALSurfaceToDrawable(LSurface);
-
-                // break the loop
-                Break;
-
               finally
-                ALFreeSurface(LSurface, LCanvas);
+                ALCanvasEndScene(ACanvas);
               end;
 
             finally
@@ -2475,6 +2573,9 @@ begin
         finally
           sk4d_paragraphstyle_destroy(LParagraphstyle);
         end;
+
+        // break the loop
+        Break;
 
       end;
 
@@ -2771,7 +2872,7 @@ begin
                 if LExtendedTextElements.Count = 0 then begin
                   ARect.Width := 0;
                   ARect.Height := 0;
-                  exit(ALNullDrawable);
+                  exit;
                 end;
 
                 // Get the previous element
@@ -3168,7 +3269,7 @@ begin
                 if AOptions.FailIfTextBroken then begin
                   ARect.Width := 0;
                   ARect.Height := 0;
-                  exit(ALNullDrawable);
+                  exit;
                 end;
                 //--
                 var LExtendedTextElement: TExtendedTextElement;
@@ -3254,7 +3355,7 @@ begin
                 if AOptions.FailIfTextBroken then begin
                   ARect.Width := 0;
                   ARect.Height := 0;
-                  exit(ALNullDrawable);
+                  exit;
                 end;
                 //--
                 //var LExtendedTextElement: TExtendedTextElement;
@@ -3318,7 +3419,7 @@ begin
               if AOptions.FailIfTextBroken then begin
                 ARect.Width := 0;
                 ARect.Height := 0;
-                exit(ALNullDrawable);
+                exit;
               end;
               //--
               var LFontMetrics := _GetFontMetrics(
@@ -3557,7 +3658,7 @@ begin
          (Round(ARect.Height) = 0) then begin
         ARect.Width := 0;
         ARect.Height := 0;
-        exit(ALNullDrawable);
+        exit;
       end;
 
       // Handle Shadow
@@ -3570,233 +3671,238 @@ begin
         LShadowRect.Inflate(LShadowWidth, LShadowWidth);
         LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
         LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
-        ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
-        LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+        if ALIsCanvasNull(ACanvas) then begin
+          ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+          LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
+        end;
       end;
 
+      // Adjust the rect
+      if Assigned(AOptions.OnAdjustRect) then begin
+        var LPrevRect := ARect;
+        AOptions.OnAdjustRect(ARect);
+        LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
+      end;
+
+      // Exit if AOnlyMeasure
+      if AOnlyMeasure then exit;
+
       // Create the drawing surface
-      var LSurface: TALSurface;
-      var LCanvas: TALCanvas;
-      ALCreateSurface(
-        LSurface, // out ASurface: TALSurface;
-        LCanvas, // out ACanvas: TALCanvas;
-        round(LRect.Width), // const w: integer;
-        round(LRect.Height));// const h: integer)
+      if ALIsCanvasNull(ACanvas) then begin
+        if not ALIsSurfaceNull(ASurface) then
+          raise Exception.Create('ASurface must also be null when ACanvas is null');
+        ALCreateSurface(
+          ASurface, // out ASurface: TALSurface;
+          ACanvas, // out ACanvas: TALCanvas;
+          round(LRect.Width), // const w: integer;
+          round(LRect.Height));// const h: integer)
+      end;
+      if ALCanvasBeginScene(ACanvas) then
       try
 
-        if ALCanvasBeginScene(LCanvas) then
-        try
-
-          // Draw the background
-          if (AOptions.FillColor <> TalphaColors.Null) or
-             (length(AOptions.FillGradientColors) > 0) or
-             (AOptions.FillResourceName <> '') or
-             (AOptions.StrokeColor <> TalphaColors.Null) or
-             (AOptions.ShadowColor <> TalphaColors.Null) then begin
-            ALDrawRectangle(
-              LCanvas, // const ACanvas: TALCanvas;
-              1, // const AScale: Single;
-              ARect, // const ARect: TrectF;
-              AOptions.FillColor, // const AFillColor: TAlphaColor;
-              AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-              AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-              AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-              AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-              AOptions.FillResourceName, // const AFillResourceName: String;
-              AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-              AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
-              AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-              AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-              AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-              AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
-              AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
-              AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
-              AOptions.Sides, // const Sides: TSides;
-              AOptions.Corners, // const Corners: TCorners;
-              AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-              AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-          end;
-
-          {$REGION 'ANDROID'}
-          {$IF defined(ANDROID)}
-
-          for i := 0 to LExtendedTextElements.count - 1 do begin
-            var LExtendedTextElement := LExtendedTextElements[i];
-            if LExtendedTextElement.imgSrc <> '' then begin
-              Var LDstRect := LExtendedTextElement.Rect;
-              LDstRect.Offset(LParagraphRect.TopLeft);
-              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
-              try
-                LCanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
-              finally
-                LImg.recycle;
-                LImg := nil;
-              end;
-            end
-            else begin
-              Var LDstRect := LExtendedTextElement.Rect;
-              LDstRect.Offset(LParagraphRect.TopLeft);
-              _UpdatePaint(
-                LExtendedTextElement.FontFamily,
-                LExtendedTextElement.FontSize,
-                LExtendedTextElement.FontWeight,
-                LExtendedTextElement.FontSlant,
-                LExtendedTextElement.FontStretch,
-                LExtendedTextElement.FontColor,
-                LExtendedTextElement.DecorationKinds,
-                LExtendedTextElement.DecorationStyle,
-                LExtendedTextElement.DecorationThicknessMultiplier,
-                LExtendedTextElement.DecorationColor,
-                LExtendedTextElement.LetterSpacing);
-              LCanvas.drawText(
-                StringToJString(LExtendedTextElement.text){text},
-                LDstRect.left {x},
-                LDstRect.Top + (-1 * LExtendedTextElement.Ascent){y},
-                _Paint {paint});
-            end;
-          end;
-
-          {$ENDIF}
-          {$ENDREGION}
-
-          {$REGION 'IOS/MACOS'}
-          {$IF defined(ALAppleOS)}
-
-          var LGridHeight := CGBitmapContextGetHeight(LCanvas);
-          for i := 0 to LExtendedTextElements.count - 1 do begin
-            var LExtendedTextElement := LExtendedTextElements[i];
-            if LExtendedTextElement.imgSrc <> '' then begin
-              Var LDstRect := LExtendedTextElement.Rect;
-              LDstRect.Offset(LParagraphRect.TopLeft);
-              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
-              try
-                CGContextDrawImage(
-                  LCanvas, // c: The graphics context in which to draw the image.
-                  ALLowerLeftCGRect(
-                    TPointF.Create(LDstRect.left, LDstRect.top),
-                    LDstRect.Width,
-                    LDstRect.Height,
-                    LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                  LImg); // image The image to draw.
-              finally
-                CGImageRelease(LImg);
-              end;
-            end
-            else begin
-              Var LDstRect := LExtendedTextElement.Rect;
-              LDstRect.Offset(LParagraphRect.TopLeft);
-              If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
-                var LAlphaColor := TAlphaColorCGFloat.Create(LExtendedTextElement.BackgroundColor);
-                CGContextSetRGBFillColor(LCanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-                CGContextFillRect(
-                  LCanvas,
-                  ALLowerLeftCGRect(
-                    LDstRect.TopLeft,
-                    LDstRect.Width,
-                    LDstRect.Height,
-                    LGridHeight));
-              end;
-              var LAttributedString := _CreateAttributedString(
-                                         LExtendedTextElement.Text, //const AText: String;
-                                         LExtendedTextElement.FontFamily, //const AFontFamily: String;
-                                         LExtendedTextElement.FontSize, //const AFontSize: single;
-                                         LExtendedTextElement.FontWeight, //const AFontWeight: TFontWeight;
-                                         LExtendedTextElement.FontSlant, //const AFontSlant: TFontSlant;
-                                         LExtendedTextElement.FontStretch, //const AFontStretch: TFontStretch;
-                                         LExtendedTextElement.FontColor, //const AFontColor: TalphaColor;
-                                         LExtendedTextElement.DecorationKinds, //const ADecorationKinds: TALTextDecorationKinds;
-                                         LExtendedTextElement.DecorationStyle, //const ADecorationStyle: TALTextDecorationStyle;
-                                         LExtendedTextElement.DecorationThicknessMultiplier, //const ADecorationThicknessMultiplier: Single;
-                                         LExtendedTextElement.DecorationColor, //const ADecorationColor: TAlphaColor;
-                                         LExtendedTextElement.LetterSpacing, //const ALetterSpacing: Single
-                                         AOptions.Direction); // const ADirection: TALTextDirection
-              try
-                var LLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LAttributedString));
-                try
-                  CGContextSetTextPosition(
-                    LCanvas,
-                    LDstRect.left {x},
-                    LGridHeight - (LDstRect.Top + (-1 * LExtendedTextElement.Ascent)));{y}
-                  CTLineDraw(LLine, LCanvas); // Draws a complete line.
-                finally
-                  CFRelease(LLine);
-                end;
-              finally
-                CFRelease(LAttributedString);
-              end;
-            end;
-          end;
-
-          {$ENDIF}
-          {$ENDREGION}
-
-          {$REGION 'MSWINDOWS'}
-          {$IF defined(MSWINDOWS)}
-
-          LCanvas.Fill.Kind := TBrushKind.Solid;
-          for i := 0 to LExtendedTextElements.count - 1 do begin
-            var LExtendedTextElement := LExtendedTextElements[i];
-            if LExtendedTextElement.imgSrc <> '' then begin
-              Var LDstRect := LExtendedTextElement.Rect;
-              LDstRect.Offset(LParagraphRect.TopLeft);
-              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
-              try
-                LCanvas.drawBitmap(
-                  LImg,
-                  LSrcRect,
-                  LDstRect,
-                  1{AOpacity},
-                  false{HighSpeed});
-              finally
-                ALFreeAndNil(LImg);
-              end;
-            end
-            else begin
-              Var LDstRect := LExtendedTextElement.Rect;
-              LDstRect.Offset(LParagraphRect.TopLeft);
-              LCanvas.Font.Family := _getFontFamily(LExtendedTextElement.FontFamily);
-              LCanvas.Font.Size := LExtendedTextElement.FontSize;
-              LCanvas.Font.StyleExt := _getFontStyleExt(LExtendedTextElement.FontWeight, LExtendedTextElement.FontSlant, LExtendedTextElement.FontStretch, LExtendedTextElement.DecorationKinds);
-              If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
-                LCanvas.Fill.Color := LExtendedTextElement.BackgroundColor;
-                LCanvas.FillRect(
-                  LDstRect,
-                  1{AOpacity});
-              end;
-              LCanvas.Fill.Color := LExtendedTextElement.FontColor;
-              var LFlags: TFillTextFlags;
-              if AOptions.Direction = TALTextDirection.RightToLeft then
-                LFlags := [TFillTextFlag.RightToLeft]
-              else
-                LFlags := [];
-              LDstRect.Offset(0, LExtendedTextElement.DrawTextOffsetY);
-              // It appears that FillText includes the default font leading,
-              // which is not included in LDstRect.
-              LCanvas.FillText(
-                LDstRect, // const ARect: TRectF;
-                LExtendedTextElement.Text, // const AText: string;
-                False, // const WordWrap: Boolean;
-                1, // const AOpacity: Single;
-                LFlags, // const Flags: TFillTextFlags;
-                TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
-            end;
-          end;
-
-          {$ENDIF}
-          {$ENDREGION}
-
-        finally
-          ALCanvasEndScene(LCanvas);
+        // Draw the background
+        if (AOptions.FillColor <> TalphaColors.Null) or
+           (length(AOptions.FillGradientColors) > 0) or
+           (AOptions.FillResourceName <> '') or
+           (AOptions.StrokeColor <> TalphaColors.Null) or
+           (AOptions.ShadowColor <> TalphaColors.Null) then begin
+          ALDrawRectangle(
+            ACanvas, // const ACanvas: TALCanvas;
+            1, // const AScale: Single;
+            ARect, // const ARect: TrectF;
+            AOptions.FillColor, // const AFillColor: TAlphaColor;
+            AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+            AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+            AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+            AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
+            AOptions.FillResourceName, // const AFillResourceName: String;
+            AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+            AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
+            AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
+            AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
+            AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+            AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
+            AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
+            AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
+            AOptions.Sides, // const Sides: TSides;
+            AOptions.Corners, // const Corners: TCorners;
+            AOptions.GetScaledXRadius, // const XRadius: Single = 0;
+            AOptions.GetScaledYRadius); // const YRadius: Single = 0);
         end;
 
-        // Create the result
-        result := ALSurfaceToDrawable(LSurface);
+        {$REGION 'ANDROID'}
+        {$IF defined(ANDROID)}
+
+        for i := 0 to LExtendedTextElements.count - 1 do begin
+          var LExtendedTextElement := LExtendedTextElements[i];
+          if LExtendedTextElement.imgSrc <> '' then begin
+            Var LDstRect := LExtendedTextElement.Rect;
+            LDstRect.Offset(LParagraphRect.TopLeft);
+            var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+            var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+            try
+              LCanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
+            finally
+              LImg.recycle;
+              LImg := nil;
+            end;
+          end
+          else begin
+            Var LDstRect := LExtendedTextElement.Rect;
+            LDstRect.Offset(LParagraphRect.TopLeft);
+            _UpdatePaint(
+              LExtendedTextElement.FontFamily,
+              LExtendedTextElement.FontSize,
+              LExtendedTextElement.FontWeight,
+              LExtendedTextElement.FontSlant,
+              LExtendedTextElement.FontStretch,
+              LExtendedTextElement.FontColor,
+              LExtendedTextElement.DecorationKinds,
+              LExtendedTextElement.DecorationStyle,
+              LExtendedTextElement.DecorationThicknessMultiplier,
+              LExtendedTextElement.DecorationColor,
+              LExtendedTextElement.LetterSpacing);
+            LCanvas.drawText(
+              StringToJString(LExtendedTextElement.text){text},
+              LDstRect.left {x},
+              LDstRect.Top + (-1 * LExtendedTextElement.Ascent){y},
+              _Paint {paint});
+          end;
+        end;
+
+        {$ENDIF}
+        {$ENDREGION}
+
+        {$REGION 'IOS/MACOS'}
+        {$IF defined(ALAppleOS)}
+
+        var LGridHeight := CGBitmapContextGetHeight(LCanvas);
+        for i := 0 to LExtendedTextElements.count - 1 do begin
+          var LExtendedTextElement := LExtendedTextElements[i];
+          if LExtendedTextElement.imgSrc <> '' then begin
+            Var LDstRect := LExtendedTextElement.Rect;
+            LDstRect.Offset(LParagraphRect.TopLeft);
+            var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+            var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+            try
+              CGContextDrawImage(
+                LCanvas, // c: The graphics context in which to draw the image.
+                ALLowerLeftCGRect(
+                  TPointF.Create(LDstRect.left, LDstRect.top),
+                  LDstRect.Width,
+                  LDstRect.Height,
+                  LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                LImg); // image The image to draw.
+            finally
+              CGImageRelease(LImg);
+            end;
+          end
+          else begin
+            Var LDstRect := LExtendedTextElement.Rect;
+            LDstRect.Offset(LParagraphRect.TopLeft);
+            If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
+              var LAlphaColor := TAlphaColorCGFloat.Create(LExtendedTextElement.BackgroundColor);
+              CGContextSetRGBFillColor(LCanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+              CGContextFillRect(
+                LCanvas,
+                ALLowerLeftCGRect(
+                  LDstRect.TopLeft,
+                  LDstRect.Width,
+                  LDstRect.Height,
+                  LGridHeight));
+            end;
+            var LAttributedString := _CreateAttributedString(
+                                       LExtendedTextElement.Text, //const AText: String;
+                                       LExtendedTextElement.FontFamily, //const AFontFamily: String;
+                                       LExtendedTextElement.FontSize, //const AFontSize: single;
+                                       LExtendedTextElement.FontWeight, //const AFontWeight: TFontWeight;
+                                       LExtendedTextElement.FontSlant, //const AFontSlant: TFontSlant;
+                                       LExtendedTextElement.FontStretch, //const AFontStretch: TFontStretch;
+                                       LExtendedTextElement.FontColor, //const AFontColor: TalphaColor;
+                                       LExtendedTextElement.DecorationKinds, //const ADecorationKinds: TALTextDecorationKinds;
+                                       LExtendedTextElement.DecorationStyle, //const ADecorationStyle: TALTextDecorationStyle;
+                                       LExtendedTextElement.DecorationThicknessMultiplier, //const ADecorationThicknessMultiplier: Single;
+                                       LExtendedTextElement.DecorationColor, //const ADecorationColor: TAlphaColor;
+                                       LExtendedTextElement.LetterSpacing, //const ALetterSpacing: Single
+                                       AOptions.Direction); // const ADirection: TALTextDirection
+            try
+              var LLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LAttributedString));
+              try
+                CGContextSetTextPosition(
+                  LCanvas,
+                  LDstRect.left {x},
+                  LGridHeight - (LDstRect.Top + (-1 * LExtendedTextElement.Ascent)));{y}
+                CTLineDraw(LLine, LCanvas); // Draws a complete line.
+              finally
+                CFRelease(LLine);
+              end;
+            finally
+              CFRelease(LAttributedString);
+            end;
+          end;
+        end;
+
+        {$ENDIF}
+        {$ENDREGION}
+
+        {$REGION 'MSWINDOWS'}
+        {$IF defined(MSWINDOWS)}
+
+        ACanvas.Fill.Kind := TBrushKind.Solid;
+        for i := 0 to LExtendedTextElements.count - 1 do begin
+          var LExtendedTextElement := LExtendedTextElements[i];
+          if LExtendedTextElement.imgSrc <> '' then begin
+            Var LDstRect := LExtendedTextElement.Rect;
+            LDstRect.Offset(LParagraphRect.TopLeft);
+            var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+            var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+            try
+              ACanvas.drawBitmap(
+                LImg,
+                LSrcRect,
+                LDstRect,
+                1{AOpacity},
+                false{HighSpeed});
+            finally
+              ALFreeAndNil(LImg);
+            end;
+          end
+          else begin
+            Var LDstRect := LExtendedTextElement.Rect;
+            LDstRect.Offset(LParagraphRect.TopLeft);
+            ACanvas.Font.Family := _getFontFamily(LExtendedTextElement.FontFamily);
+            ACanvas.Font.Size := LExtendedTextElement.FontSize;
+            ACanvas.Font.StyleExt := _getFontStyleExt(LExtendedTextElement.FontWeight, LExtendedTextElement.FontSlant, LExtendedTextElement.FontStretch, LExtendedTextElement.DecorationKinds);
+            If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
+              ACanvas.Fill.Color := LExtendedTextElement.BackgroundColor;
+              ACanvas.FillRect(
+                LDstRect,
+                1{AOpacity});
+            end;
+            ACanvas.Fill.Color := LExtendedTextElement.FontColor;
+            var LFlags: TFillTextFlags;
+            if AOptions.Direction = TALTextDirection.RightToLeft then
+              LFlags := [TFillTextFlag.RightToLeft]
+            else
+              LFlags := [];
+            LDstRect.Offset(0, LExtendedTextElement.DrawTextOffsetY);
+            // It appears that FillText includes the default font leading,
+            // which is not included in LDstRect.
+            ACanvas.FillText(
+              LDstRect, // const ARect: TRectF;
+              LExtendedTextElement.Text, // const AText: string;
+              False, // const WordWrap: Boolean;
+              1, // const AOpacity: Single;
+              LFlags, // const Flags: TFillTextFlags;
+              TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
+          end;
+        end;
+
+        {$ENDIF}
+        {$ENDREGION}
 
       finally
-        ALFreeSurface(LSurface, LCanvas);
+        ALCanvasEndScene(ACanvas);
       end;
 
     finally
@@ -3829,6 +3935,209 @@ begin
     ARect.left := ARect.left / AOptions.Scale;
     ARect.bottom := ARect.bottom / AOptions.Scale;
   end;
+end;
+
+{*************************************}
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False);
+begin
+  var LElements: TALTextElements;
+  ALDrawMultiLineText(
+    ASurface,
+    ACanvas,
+    AText,
+    ARect,
+    ATextBroken,
+    AAllTextDrawn,
+    LElements,
+    AOptions,
+    AOnlyMeasure);
+end;
+
+{*************************************}
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False);
+begin
+  var LElements: TALTextElements;
+  var LAllTextDrawn: boolean;
+  ALDrawMultiLineText(
+    ASurface,
+    ACanvas,
+    AText,
+    ARect,
+    ATextBroken,
+    LAllTextDrawn,
+    LElements,
+    AOptions,
+    AOnlyMeasure);
+end;
+
+{*************************************}
+procedure ALDrawMultiLineText(
+            var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
+            var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            const AOptions: TALMultiLineTextOptions;
+            const AOnlyMeasure: Boolean = False);
+begin
+  var LElements: TALTextElements;
+  var LTextBroken: boolean;
+  var LAllTextDrawn: boolean;
+  ALDrawMultiLineText(
+    ASurface,
+    ACanvas,
+    AText,
+    ARect,
+    LTextBroken,
+    LAllTextDrawn,
+    LElements,
+    AOptions,
+    AOnlyMeasure);
+end;
+
+{*************************************}
+procedure ALMeasureMultiLineText(
+            const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
+            const AOptions: TALMultiLineTextOptions);
+begin
+  var LSurface: TALSurface := ALNullSurface;
+  var LCanvas: TALCanvas := ALNullCanvas;
+  ALDrawMultiLineText(
+    LSurface,
+    LCanvas,
+    AText,
+    ARect,
+    ATextBroken,
+    AAllTextDrawn,
+    AElements,
+    AOptions,
+    true{AOnlyMeasure});
+end;
+
+{*************************************}
+procedure ALMeasureMultiLineText(
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+            const AOptions: TALMultiLineTextOptions);
+begin
+  var LElements: TALTextElements;
+  ALMeasureMultiLineText(
+    AText,
+    ARect,
+    ATextBroken,
+    AAllTextDrawn,
+    LElements,
+    AOptions);
+end;
+
+{*************************************}
+procedure ALMeasureMultiLineText(
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+            const AOptions: TALMultiLineTextOptions);
+begin
+  var LElements: TALTextElements;
+  var LAllTextDrawn: boolean;
+  ALMeasureMultiLineText(
+    AText,
+    ARect,
+    ATextBroken,
+    LAllTextDrawn,
+    LElements,
+    AOptions);
+end;
+
+{*************************************}
+procedure ALMeasureMultiLineText(
+            const AText: String;
+            var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                               // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                               // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                               // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+            const AOptions: TALMultiLineTextOptions);
+begin
+  var LElements: TALTextElements;
+  var LTextBroken: boolean;
+  var LAllTextDrawn: boolean;
+  ALMeasureMultiLineText(
+    AText,
+    ARect,
+    LTextBroken,
+    LAllTextDrawn,
+    LElements,
+    AOptions);
+end;
+
+{*************************************}
+function ALCreateMultiLineTextDrawable(
+           const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
+           var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
+                              // Out: Updated to the calculated rectangle that snugly contains the text, also in real pixels.
+                              // Note: The shadow effect is not considered within the constraint boundaries and is also not included in the calculated rectangle's dimensions.
+                              // However, the calculated rectangle is offset by the shadow's dx and dy values, if a shadow is applied, to adjust for the visual shift caused by the shadow.
+           out ATextBroken: boolean; // out => Returns true if the text has been broken into several lines.
+           out AAllTextDrawn: boolean; // out => Returns true if all the text was drawn.
+           out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
+           const AOptions: TALMultiLineTextOptions): TALDrawable;
+begin
+  var LSurface: TALSurface := ALNullSurface;
+  var LCanvas: TALCanvas := ALNullCanvas;
+  ALDrawMultiLineText(
+    LSurface,
+    LCanvas,
+    AText,
+    ARect,
+    ATextBroken,
+    AAllTextDrawn,
+    AElements,
+    AOptions);
+  if not ALIsSurfaceNull(LSurface) then begin
+    try
+      result := ALSurfaceToDrawable(LSurface);
+    finally
+      ALFreeSurface(LSurface, LCanvas);
+    end;
+  end
+  else result := ALNullDrawable;
 end;
 
 {*************************************}

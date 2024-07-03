@@ -377,6 +377,9 @@ uses
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.Windows,
   {$endif}
+  {$IFDEF ALDPK}
+  DesignIntf,
+  {$ENDIF}
   Alcinoe.FMX.Graphics,
   Alcinoe.Common;
 
@@ -1507,9 +1510,6 @@ begin
   _UpdateTextSettings(StateStyles.Disabled.TextSettings);
   _UpdateTextSettings(StateStyles.Hovered.TextSettings);
   _UpdateTextSettings(StateStyles.Focused.TextSettings);
-  _UpdateTextSettings(StateStyles.Error.TextSettings);
-  _UpdateTextSettings(StateStyles.ErrorHovered.TextSettings);
-  _UpdateTextSettings(StateStyles.ErrorFocused.TextSettings);
   FAutosizeLineCount := 0;
 end;
 
@@ -1642,6 +1642,11 @@ end;
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALMemo]);
+  {$IFDEF ALDPK}
+  UnlistPublishedProperty(TALMemo, 'Size');
+  UnlistPublishedProperty(TALMemo, 'StyleName');
+  UnlistPublishedProperty(TALMemo, 'OnTap');
+  {$ENDIF}
 end;
 
 initialization

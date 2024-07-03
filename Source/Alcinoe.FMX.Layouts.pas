@@ -40,57 +40,63 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    //property Action;
     property Align;
     property Anchors;
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
     property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren;
-    property ClipParent;
+    //property ClipParent;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
-    property Locked;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest default False;
-    property Padding;
-    property Opacity;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
     property RotationCenter;
     property Scale;
     property Size;
+    property TabOrder;
+    property TabStop;
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    property TabOrder;
-    property TabStop;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
   end;
 
   {*************************}
@@ -242,17 +248,24 @@ type
   published
     property HScrollBar;
     property VScrollBar;
+    //property Action;
     property Align;
     property Anchors;
     property AutoHide;
-    property ClipParent;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
     property DragMode;
-    property Enabled;
     property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
     property Locked;
     property Margins;
@@ -270,33 +283,32 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    property OnAniStart;
+    property OnAniStop;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
-    { ScrollBox events }
-    property OnViewportPositionChange;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnScrollBarInit;
-    property OnAniStart;
-    property OnAniStop;
+    property OnViewportPositionChange;
   end;
 
   {*************************}
@@ -308,22 +320,29 @@ type
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
     function CreateScrollEngine: TALScrollBoxScrollEngine; override;
   published
-    property MaxContentWidth;
     property VScrollBar;
+    //property Action;
     property Align;
     property Anchors;
     property AutoHide;
-    property ClipParent;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
     property DragMode;
-    property Enabled;
     property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
     property Locked;
     property Margins;
+    property MaxContentWidth;
     property Opacity;
     property Padding;
     property PopupMenu;
@@ -338,33 +357,32 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    property OnAniStart;
+    property OnAniStop;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
-    { ScrollBox events }
-    property OnViewportPositionChange;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnScrollBarInit;
-    property OnAniStart;
-    property OnAniStop;
+    property OnViewportPositionChange;
   end;
 
   {*************************}
@@ -376,22 +394,29 @@ type
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
     function CreateScrollEngine: TALScrollBoxScrollEngine; override;
   published
-    property MaxContentHeight;
     property HScrollBar;
+    //property Action;
     property Align;
     property Anchors;
     property AutoHide;
-    property ClipParent;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
     property DragMode;
-    property Enabled;
     property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
     property Locked;
     property Margins;
+    property MaxContentHeight;
     property Opacity;
     property Padding;
     property PopupMenu;
@@ -406,33 +431,32 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    property OnAniStart;
+    property OnAniStop;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
-    { ScrollBox events }
-    property OnViewportPositionChange;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnScrollBarInit;
-    property OnAniStart;
-    property OnAniStop;
+    property OnViewportPositionChange;
   end;
 
 procedure Register;
@@ -1222,8 +1246,26 @@ procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
   {$IFDEF ALDPK}
-  UnlistPublishedProperty(TALScrollBoxBar, 'Locked');
+  UnlistPublishedProperty(TALLayout, 'Size');
+  UnlistPublishedProperty(TALLayout, 'StyleName');
+  UnlistPublishedProperty(TALLayout, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALScrollBox, 'Size');
+  UnlistPublishedProperty(TALScrollBox, 'StyleName');
+  UnlistPublishedProperty(TALScrollBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALVertScrollBox, 'Size');
+  UnlistPublishedProperty(TALVertScrollBox, 'StyleName');
+  UnlistPublishedProperty(TALVertScrollBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALHorzScrollBox, 'Size');
+  UnlistPublishedProperty(TALHorzScrollBox, 'StyleName');
+  UnlistPublishedProperty(TALHorzScrollBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALScrollBoxBar, 'Size');
   UnlistPublishedProperty(TALScrollBoxBar, 'StyleName');
+  UnlistPublishedProperty(TALScrollBoxBar, 'OnTap');
+  UnlistPublishedProperty(TALScrollBoxBar, 'Locked');
   UnlistPublishedProperty(TALScrollBoxBar, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
   UnlistPublishedProperty(TALScrollBoxBar, 'Align');
   UnlistPublishedProperty(TALScrollBoxBar, 'Position');

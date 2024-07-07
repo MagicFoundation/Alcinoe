@@ -3220,6 +3220,7 @@ begin
   Result.FillGradientAngle := AFill.Gradient.Angle;
   Result.FillResourceName := AFill.ResourceName;
   Result.FillWrapMode := AFill.WrapMode;
+  Result.FillPaddingRect := AFill.Padding.Rect;
   Result.StrokeColor := AStroke.Color;
   Result.StrokeThickness := AStroke.Thickness;
   Result.ShadowColor := AShadow.Color;

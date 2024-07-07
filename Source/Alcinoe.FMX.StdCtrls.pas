@@ -995,6 +995,7 @@ type
   TALButton = class(TALBaseText)
   public
     type
+      // -----------------------
       // TStateStyleTextSettings
       TStateStyleTextSettings = class(TALInheritBaseTextSettings)
       published

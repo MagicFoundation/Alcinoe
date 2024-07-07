@@ -35,14 +35,6 @@ uses
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Common;
 
-Type
-
-  {**********************************************}
-  TALMemoTextSettings = class(TALEditTextSettings)
-  published
-    property LineHeightMultiplier;
-  end;
-
 {$REGION ' ANDROID'}
 {$IF defined(android)}
 type
@@ -331,14 +323,22 @@ type
   {*************************}
   [ComponentPlatforms($FFFF)]
   TALMemo = class(TALBaseEdit, IALAutosizeControl)
+  public
+    type
+      // -------------
+      // TTextSettings
+      TMemoTextSettings = class(TTextSettings)
+      published
+        property LineHeightMultiplier;
+      end;
   private
     FAutosizeLineCount: Single;
-    function GetTextSettings: TALMemoTextSettings;
-    procedure SetTextSettings(const Value: TALMemoTextSettings);
+    function GetTextSettings: TMemoTextSettings;
+    procedure SetTextSettings(const Value: TMemoTextSettings);
   protected
     procedure SetAutosizeLineCount(const Value: Single); virtual;
     function IsAutosizeLineCountStored: Boolean;
-    function CreateTextSettings: TALEditTextSettings; override;
+    function CreateTextSettings: TALBaseEdit.TTextSettings; override;
     function CreateEditControl: TALBaseEditControl; override;
     procedure AdjustSize; override;
     { IALAutosizeControl }
@@ -348,7 +348,7 @@ type
     constructor Create(AOwner: TComponent); override;
   published
     property AutoSizeLineCount: Single read FAutosizeLineCount write SetAutosizeLineCount Stored IsAutosizeLineCountStored nodefault;
-    property TextSettings: TALMemoTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TMemoTextSettings read GetTextSettings write SetTextSettings;
   end;
 
 procedure Register;
@@ -1514,9 +1514,9 @@ begin
 end;
 
 {*******************************************************}
-function TALMemo.CreateTextSettings: TALEditTextSettings;
+function TALMemo.CreateTextSettings: TALBaseEdit.TTextSettings;
 begin
-  result := TALMemoTextSettings.Create;
+  result := TMemoTextSettings.Create;
 end;
 
 {*****************************************************}
@@ -1534,13 +1534,13 @@ begin
 end;
 
 {****************************************************}
-function TALMemo.GetTextSettings: TALMemoTextSettings;
+function TALMemo.GetTextSettings: TMemoTextSettings;
 begin
-  result := TALMemoTextSettings(inherited TextSettings);
+  result := TMemoTextSettings(inherited TextSettings);
 end;
 
 {******************************************************************}
-procedure TALMemo.SetTextSettings(const Value: TALMemoTextSettings);
+procedure TALMemo.SetTextSettings(const Value: TMemoTextSettings);
 begin
   inherited TextSettings := Value;
 end;
@@ -1552,7 +1552,7 @@ begin
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
-      Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TALEditLabelTextLayout.Inline);
+      Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
       if LInlinedLabelText then MakeBufLabelTextDrawable;
 
       var LStrokeSize := TRectF.Empty;

@@ -2533,8 +2533,13 @@ begin
                     {$IFDEF ALDPK}
                     var LImg: sk_image_t;
                     var LFileName := ALGetResourceFilename(LImgSrc);
-                    if LFileName <> '' then
-                      LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
+                    if LFileName <> '' then begin
+                      try
+                        LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
+                      except
+                        LImg := 0;
+                      end
+                    end
                     else
                       LImg := 0;
                     {$ELSE}

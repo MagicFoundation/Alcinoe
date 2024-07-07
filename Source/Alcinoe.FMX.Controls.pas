@@ -8,6 +8,7 @@ uses
   System.UITypes,
   system.Types,
   System.Classes,
+  FMX.Forms,
   FMX.Controls,
   FMX.Types;
 
@@ -19,6 +20,7 @@ type
   {$ENDIF}
   TALControl = class(TControl)
   private
+    FForm: TCommonCustomForm;
     FFocusOnMouseDown: Boolean;
     FFocusOnMouseUp: Boolean;
     FMouseDownPos: TpointF;
@@ -29,8 +31,12 @@ type
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    function GetParentedVisible: Boolean; override;
+    procedure DoRootChanged; override;
   public
     constructor Create(AOwner: TComponent); override;
+    function IsVisibleWithinFormBounds: Boolean;
+    property Form: TCommonCustomForm read FForm;
   end;
 
   {**************************************}
@@ -117,10 +123,20 @@ constructor TALControl.Create(AOwner: TComponent);
 begin
   inherited;
   Size.SetPlatformDefaultWithoutNotification(False);
+  FForm := nil;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
   FMouseDownPos := TpointF.zero;
   FMouseDownAtLowVelocity := True;
+end;
+
+{*****************************************************}
+function TALControl.IsVisibleWithinFormBounds: Boolean;
+begin
+  Result := GetParentedVisible;
+  if not result then exit;
+  if FForm <> nil then
+    Result := FForm.ClientRect.IntersectsWith(LocalToAbsolute(LocalRect));
 end;
 
 {*************************************************************************************}
@@ -175,6 +191,32 @@ begin
      (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) or
      (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop) then exit;
   inherited;
+end;
+
+{*************************************}
+// Optimized GetParentedVisible to work
+// exclusively with ParentControl.
+function TALControl.GetParentedVisible: Boolean;
+begin
+  {$IF defined(ALDPK)}
+  result := Inherited GetParentedVisible;
+  {$ELSE}
+  var P: TControl := Self;
+  Result := False;
+  while P <> nil do begin
+    if not p.Visible then Exit;
+    P := P.ParentControl;
+  end;
+  Result := (FForm = nil) or (FForm.visible);
+  {$ENDIF}
+end;
+
+{*********************************}
+procedure TALControl.DoRootChanged;
+begin
+  inherited;
+  if Root is TCommonCustomForm then FForm := TCommonCustomForm(Root)
+  else FForm := Nil;
 end;
 
 {**}

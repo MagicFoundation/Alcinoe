@@ -26,10 +26,14 @@ uses
   FMX.TextLayout.GPU,
   FMX.types3D,
   {$ENDIF}
+  {$IF defined(ALSkiaEngine)}
+  System.Skia.API,
+  {$ENDIF}
   FMX.controls,
   FMX.types,
   FMX.graphics,
   FMX.objects,
+  Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.BreakText,
@@ -152,6 +156,163 @@ type
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
+    //property OnEnter;
+    //property OnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
+  TALAnimatedImage = class(TALControl)
+  Public
+    type
+      TAnimation = class(TALPersistentObserver)
+      private
+        fOwner: TALAnimatedImage;
+        FFloatAnimation: TALFloatAnimation;
+        FSpeed: Single;
+        FDuration: Single;
+        function GetAutoReverse: Boolean;
+        function GetEnabled: Boolean; virtual;
+        function GetDelay: Single;
+        function GetDuration: Single;
+        function GetInverse: Boolean;
+        function GetLoop: Boolean;
+        function GetCurrentTime: Single;
+        function GetPause: Boolean;
+        function GetRunning: Boolean;
+        function GetStartProgress: Single;
+        function GetStopProgress: Single;
+        function GetCurrentProgress: Single;
+        function GetSpeed: Single;
+        procedure SetEnabled(const Value: Boolean); virtual;
+        procedure SetAutoReverse(const Value: Boolean);
+        procedure SetDelay(const Value: Single);
+        procedure SetInverse(const Value: Boolean);
+        procedure SetLoop(const Value: Boolean);
+        procedure SetPause(const Value: Boolean);
+        procedure SetStartProgress(const Value: Single);
+        procedure SetStopProgress(const Value: Single);
+        procedure SetSpeed(const Value: Single);
+        function IsStopProgressStored: Boolean;
+        function IsSpeedStored: Boolean;
+        procedure UpdateFloatAnimationDuration;
+        procedure repaint;
+      protected
+        procedure SetDuration(const Value: Single);
+        procedure doFirstFrame(Sender: TObject);
+        procedure doProcess(Sender: TObject);
+        procedure doFinish(Sender: TObject);
+      public
+        constructor Create(AOwner: TALAnimatedImage); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Start; virtual;
+        procedure Stop; virtual;
+        procedure StopAtCurrent; virtual;
+        property Running: Boolean read getRunning;
+        property Pause: Boolean read getPause write setPause;
+        property CurrentProgress: Single read GetCurrentProgress;
+        property CurrentTime: Single read GetCurrentTime;
+      published
+        property AutoReverse: Boolean read getAutoReverse write setAutoReverse default False;
+        property Delay: Single read getDelay write setDelay;
+        property Duration: Single read getDuration;
+        property Enabled: Boolean read getEnabled write SetEnabled default False;
+        property Inverse: Boolean read getInverse write setInverse default False;
+        property Loop: Boolean read getLoop write setLoop default True;
+        property Speed: Single read GetSpeed write setSpeed stored IsSpeedStored nodefault;
+        property StartProgress: Single read GetStartProgress write SetStartProgress;
+        property StopProgress: Single read GetStopProgress write setStopProgress stored IsStopProgressStored nodefault;
+      end;
+  private
+    fAnimation: TAnimation;
+    {$IF defined(ALSkiaEngine)}
+      fSkottieAnimation: sk_skottieanimation_t;
+      fAnimcodecplayer: sk_animcodecplayer_t;
+      FRenderRect: TRectF;
+      {$IF not defined(ALSkiaCanvas)}
+      FBufSurface: TALSurface;
+      FBufCanvas: TALCanvas;
+      {$ENDIF}
+    {$ENDIF}
+    fResourceName: String;
+    FWrapMode: TALImageWrapMode;
+    FOnAnimationFirstFrame: TNotifyEvent;
+    FOnAnimationProcess: TNotifyEvent;
+    FOnAnimationFinish: TNotifyEvent;
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure setResourceName(const Value: String);
+    procedure SetAnimation(const Value: TAnimation);
+  protected
+    procedure Paint; override;
+    procedure DoResized; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure CreateCodec; virtual;
+    procedure ReleaseCodec; virtual;
+  published
+    //property Action;
+    property Align;
+    property Anchors;
+    property Animation: TAnimation read fAnimation write SetAnimation;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
+    property Margins;
+    property Opacity;
+    property Padding;
+    property PopupMenu;
+    property Position;
+    // If a file extension (e.g., .xxx) is detected in ResourceName, the image is loaded from the
+    // specified file (With the full path of the file obtained using ALGetResourceFilename).
+    // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
+    // project directory (with the extensions .png or .jpg).
+    property ResourceName: String read fResourceName write setResourceName;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
+    //property OnCanFocus;
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    property OnAnimationFirstFrame: TNotifyEvent read FOnAnimationFirstFrame write FOnAnimationFirstFrame;
+    property OnAnimationProcess: TNotifyEvent read FOnAnimationProcess write FOnAnimationProcess;
+    property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -717,9 +878,9 @@ uses
   system.SysUtils,
   system.Math,
   system.Math.Vectors,
-  fmx.platform,
+  FMX.platform,
   {$IF defined(ALSkiaEngine)}
-  System.Skia.API,
+  FMX.Skia,
   FMX.Skia.Canvas,
   {$ENDIF}
   {$IF defined(ANDROID)}
@@ -851,8 +1012,10 @@ end;
 procedure TALImage.MakeBufDrawable;
 begin
 
-  if (Size.Size.IsZero) or // Do not create BufDrawable if the size is 0
-     (fResourceName = '') // Do not create BufDrawable if fResourceName is empty
+  if //--- Do not create BufDrawable if the size is 0
+     (Size.Size.IsZero) or
+     //--- Do not create BufDrawable if fResourceName is empty
+     (fResourceName = '')
   then begin
     clearBufDrawable;
     exit;
@@ -876,8 +1039,16 @@ begin
                                                                                       // TalExifOrientationInfo.ROTATE_180:;
                                                                                       // TalExifOrientationInfo.UNDEFINED:;
 
-  if LFileName <> '' then fBufDrawable := ALLoadFromFileAndWrapToDrawable(LFileName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-  else fBufDrawable := {$IFDEF ALDPK}ALNullDrawable{$ELSE}ALLoadFromResourceAndWrapToDrawable(fResourceName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale){$ENDIF};
+  {$IFDEF ALDPK}
+  try
+  {$ENDIF}
+    if LFileName <> '' then fBufDrawable := ALLoadFromFileAndWrapToDrawable(LFileName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
+    else fBufDrawable := {$IFDEF ALDPK}ALNullDrawable{$ELSE}ALLoadFromResourceAndWrapToDrawable(fResourceName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale){$ENDIF};
+  {$IFDEF ALDPK}
+  except
+    fBufDrawable := ALNullDrawable;
+  end;
+  {$ENDIF}
 
   {$IFDEF ALDPK}if not ALIsDrawableNull(fBufDrawable) then{$ENDIF}
     fBufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(fBufDrawable)/ALGetScreenScale, ALGetDrawableHeight(fBufDrawable)/ALGetScreenScale).
@@ -1008,6 +1179,583 @@ end;
 procedure TALImage.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not yet supported
+end;
+
+{****************************************************}
+constructor TALAnimatedImage.TAnimation.Create(AOwner: TALAnimatedImage);
+begin
+  inherited create;
+  fOwner := AOwner;
+  fFloatAnimation := TALFloatAnimation.Create;
+  fFloatAnimation.Loop := True;
+  fFloatAnimation.StopValue := 1.0;
+  fFloatAnimation.Duration := MaxSingle;
+  fFloatAnimation.OnFirstFrame := DoFirstFrame;
+  fFloatAnimation.OnProcess := DoProcess;
+  fFloatAnimation.OnFinish := DoFinish;
+  FSpeed := 1.0;
+  FDuration := 0.0;
+end;
+
+{****************************************************}
+destructor TALAnimatedImage.TAnimation.Destroy;
+begin
+  ALFreeAndNil(fFloatAnimation);
+  inherited;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.UpdateFloatAnimationDuration;
+begin
+  if not SameValue(FSpeed, 0.0, Single.Epsilon) then
+    FFloatAnimation.Duration := (FDuration / FSpeed) * abs(FFloatAnimation.StopValue - FFloatAnimation.StartValue)
+  else
+    FFloatAnimation.Duration := maxSingle;
+end;
+
+{********************************************}
+procedure TALAnimatedImage.TAnimation.repaint;
+begin
+  if Fowner.IsVisibleWithinFormBounds then
+    Fowner.Repaint;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetAutoReverse: Boolean;
+begin
+  Result := FFloatAnimation.AutoReverse;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetDelay: Single;
+begin
+  Result := FFloatAnimation.Delay;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetDuration: Single;
+begin
+  Result := FDuration;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetInverse: Boolean;
+begin
+  Result := FFloatAnimation.Inverse;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetLoop: Boolean;
+begin
+  Result := FFloatAnimation.Loop;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetCurrentTime: Single;
+begin
+  if not Enabled then begin
+    if Inverse then Result := StopProgress * Duration
+    else Result := StartProgress * Duration;
+  end
+  else
+    Result := CurrentProgress * Duration
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetPause: Boolean;
+begin
+  Result := FFloatAnimation.Pause;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetRunning: Boolean;
+begin
+  Result := FFloatAnimation.Running;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetStartProgress: Single;
+begin
+  Result := FFloatAnimation.StartValue;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetStopProgress: Single;
+begin
+  Result := FFloatAnimation.StopValue;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetCurrentProgress: Single;
+begin
+  Result := FFloatAnimation.CurrentValue;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.GetSpeed: Single;
+begin
+  Result := FSpeed;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetAutoReverse(const Value: Boolean);
+begin
+  FFloatAnimation.AutoReverse := Value;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetDelay(const Value: Single);
+begin
+  FFloatAnimation.Delay := Value;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetDuration(const Value: Single);
+begin
+  FDuration := Value;
+  UpdateFloatAnimationDuration;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetInverse(const Value: Boolean);
+begin
+  FFloatAnimation.Inverse := Value;
+  Repaint;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetLoop(const Value: Boolean);
+begin
+  FFloatAnimation.Loop := Value;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetPause(const Value: Boolean);
+begin
+  FFloatAnimation.Pause := Value;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetStartProgress(const Value: Single);
+begin
+  FFloatAnimation.StartValue := Min(Max(Value, 0), 1);
+  UpdateFloatAnimationDuration;
+  Repaint;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetStopProgress(const Value: Single);
+begin
+  FFloatAnimation.StopValue := Min(Max(Value, 0), 1);
+  UpdateFloatAnimationDuration;
+  Repaint;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetSpeed(const Value: Single);
+begin
+  if not SameValue(FSpeed, Value, Single.Epsilon) then begin
+    FSpeed := Value;
+    UpdateFloatAnimationDuration;
+  end;
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.IsStopProgressStored: Boolean;
+begin
+  Result := Not SameValue(FFloatAnimation.StopValue, 1.0, Single.Epsilon);
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.IsSpeedStored: Boolean;
+begin
+  Result := Not SameValue(FSpeed, 1.0, Single.Epsilon);
+end;
+
+{****************************************************}
+function TALAnimatedImage.TAnimation.getEnabled: Boolean;
+begin
+  Result := FFloatAnimation.Enabled;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
+begin
+  FFloatAnimation.Enabled := Value;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.doFirstFrame(Sender: TObject);
+begin
+  if assigned(FOwner.FOnAnimationFirstFrame) then
+    FOwner.FOnAnimationFirstFrame(FOwner);
+  Repaint;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.doProcess(Sender: TObject);
+begin
+  if assigned(FOwner.FOnAnimationProcess) then
+    FOwner.FOnAnimationProcess(FOwner);
+  Repaint;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.doFinish(Sender: TObject);
+begin
+  if assigned(FOwner.FOnAnimationFinish) then
+    FOwner.FOnAnimationFinish(FOwner);
+  Repaint;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.Start;
+begin
+  FFloatAnimation.Start;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.Stop;
+begin
+  FFloatAnimation.Stop;
+end;
+
+{****************************************************}
+procedure TALAnimatedImage.TAnimation.StopAtCurrent;
+begin
+  FFloatAnimation.StopAtCurrent;
+end;
+
+{**********************************************}
+constructor TALAnimatedImage.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  fAnimation := TAnimation.create(Self);
+  {$IF defined(ALSkiaEngine)}
+    fSkottieAnimation := 0;
+    fAnimcodecplayer := 0;
+    //FRenderRect := TrectF.Empty;
+    {$IF not defined(ALSkiaCanvas)}
+    FBufSurface := ALNullSurface;
+    FBufCanvas := ALNullCanvas;
+    {$ENDIF}
+  {$ENDIF}
+  fResourceName := '';
+  FWrapMode := TALImageWrapMode.Fit;
+  FOnAnimationFirstFrame := nil;
+  FOnAnimationProcess := nil;
+  FOnAnimationFinish := nil;
+  SetAcceptsControls(False);
+end;
+
+{**************************}
+destructor TALAnimatedImage.Destroy;
+begin
+  ReleaseCodec;
+  AlFreeAndNil(FAnimation);
+  inherited;
+end;
+
+{*************************************}
+procedure TALAnimatedImage.CreateCodec;
+begin
+  {$IF defined(ALSkiaEngine)}
+
+  if //--- Do not create Codec if the size is 0
+     (Size.Size.IsZero) or
+     //--- Do not create Codec if fResourceName is empty
+     (fResourceName = '')
+  then begin
+    ReleaseCodec;
+    exit;
+  end;
+
+  if (fSkottieAnimation <> 0) or (fAnimcodecplayer <> 0) then exit;
+
+  var LFileName := ALGetResourceFilename(FResourceName);
+
+  if LFileName <> '' then begin
+    fSkottieAnimation := sk4d_skottieanimation_make_from_file(MarshaledAString(UTF8String(LFileName)), TSkDefaultProviders.TypefaceFont.Handle)
+  end
+  else begin
+    {$IFDEF ALDPK}
+    fSkottieAnimation := 0
+    {$ELSE}
+    var LResourceStream := TResourceStream.Create(HInstance, fResourceName, RT_RCDATA);
+    try
+      var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
+      try
+        var LStreamadapterProcs: sk_streamadapter_procs_t;
+        LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+        LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+        LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+        LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+        sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+        fSkottieAnimation := sk4d_skottieanimation_make_from_stream(
+                               LSkStream, // stream: sk_stream_t
+                               0{TSkDefaultProviders.Resource.Handle}, // resource_provider: sk_resourceprovider_t;
+                               TSkDefaultProviders.TypefaceFont.Handle);  // font_provider: sk_fontmgr_t
+      finally
+        sk4d_streamadapter_destroy(LSKStream);
+      end;
+    finally
+      ALfreeandNil(LResourceStream);
+    end;
+    {$ENDIF}
+  end;
+
+  if fSkottieAnimation = 0 then begin
+    if LFileName <> '' then begin
+      fAnimCodecPlayer := sk4d_animcodecplayer_make_from_file(MarshaledAString(UTF8String(LFileName)))
+    end
+    else begin
+      {$IFDEF ALDPK}
+      fAnimCodecPlayer := 0
+      {$ELSE}
+      var LResourceStream := TResourceStream.Create(HInstance, fResourceName, RT_RCDATA);
+      try
+        var LSkStream := ALSkCheckHandle(sk4d_streamadapter_create(LResourceStream));
+        try
+          var LStreamadapterProcs: sk_streamadapter_procs_t;
+          LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+          LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+          LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+          LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+          sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+          fAnimCodecPlayer := sk4d_animcodecplayer_make_from_stream(LSkStream);
+        finally
+          sk4d_streamadapter_destroy(LSKStream);
+        end;
+      finally
+        ALfreeandNil(LResourceStream);
+      end;
+      {$ENDIF}
+    end;
+  end;
+
+  if (fSkottieAnimation = 0) and (fAnimCodecPlayer = 0) then
+    {$IF not defined(ALDPK)}
+    Raise Exception.CreateFmt('Failed to create the animation codec for resource "%s". Please ensure the resource exists and is in a valid format', [fResourceName]);
+    {$ELSE}
+    Exit;
+    {$ENDIF}
+
+  var LSize: TSizeF;
+  if fSkottieAnimation <> 0 then begin
+    var LSizeT: sk_size_t;
+    sk4d_skottieanimation_get_size(fSkottieAnimation, LSizeT);
+    LSize.Width := LSizeT.width;
+    LSize.Height := LSizeT.height;
+  end
+  else begin
+    var LIsizeT: sk_isize_t;
+    sk4d_animcodecplayer_get_dimensions(fAnimCodecPlayer, LIsizeT);
+    LSize.Width := LIsizeT.width;
+    LSize.Height := LIsizeT.height;
+  end;
+  if SameValue(LSize.width, 0, Tepsilon.Position) or
+     SameValue(LSize.Height, 0, Tepsilon.Position) then begin
+    {$IF not defined(ALDPK)}
+    Raise Exception.CreateFmt('The animation "%s" has invalid dimensions (width or height is zero)', [fResourceName]);
+    {$ELSE}
+    ReleaseCodec;
+    Exit;
+    {$ENDIF}
+  end;
+  FRenderRect := TRectF.Create(0,0,LSize.width, LSize.height);
+
+  case FWrapMode of
+    TALImageWrapMode.Fit: FRenderRect := FRenderRect.FitInto(LocalRect);
+    TALImageWrapMode.Stretch: FRenderRect := LocalRect;
+    TALImageWrapMode.Place: FRenderRect := FRenderRect.PlaceInto(LocalRect);
+    TALImageWrapMode.FitAndCrop: FRenderRect := FRenderRect.FitInto(LocalRect);
+    else
+      Raise Exception.Create('Error 822CE359-8404-40CE-91B9-1CFC3DBA259F')
+  end;
+
+  {$IF not defined(ALSkiaCanvas)}
+  if (fSkottieAnimation <> 0) then
+    ALCreateSurface(
+      FBufSurface, // out ASurface: TALSurface;
+      FbufCanvas, // out ACanvas: TALCanvas;
+      round(FRenderRect.width), // const w: Integer;
+      round(FRenderRect.height)); // const h: Integer);
+  {$ENDIF}
+
+  var LDuration: Single;
+  if fSkottieAnimation <> 0 then
+    LDuration := Single(sk4d_skottieanimation_get_duration(fSkottieAnimation))
+  else
+    LDuration := Single(sk4d_animcodecplayer_get_duration(fAnimCodecPlayer) / 1000);
+  FAnimation.SetDuration(LDuration);
+
+  {$ENDIF}
+end;
+
+{**************************************}
+procedure TALAnimatedImage.ReleaseCodec;
+begin
+  {$IF defined(ALSkiaEngine)}
+    if fSkottieAnimation <> 0 then begin
+      sk4d_skottieanimation_unref(fSkottieAnimation);
+      fSkottieAnimation := 0;
+    end;
+    if fAnimCodecPlayer <> 0 then begin
+      sk4d_animcodecplayer_destroy(fAnimCodecPlayer);
+      fAnimCodecPlayer := 0;
+    end;
+    FAnimation.SetDuration(0.0);
+    {$IF (not defined(ALSkiaCanvas))}
+    ALFreeSurface(FBufSurface, FBufCanvas);
+    {$ENDIF}
+  {$ENDIF}
+end;
+
+{**********************************}
+procedure TALAnimatedImage.DoResized;
+begin
+  releaseCodec;
+  inherited;
+end;
+
+{***********************}
+procedure TALAnimatedImage.Paint;
+begin
+
+  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
+  begin
+    var R := LocalRect;
+    InflateRect(R, -0.5, -0.5);
+    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
+  end;
+
+  CreateCodec;
+
+  {$IF defined(ALSkiaEngine)}
+  if fSkottieAnimation <> 0 then begin
+    sk4d_skottieanimation_seek_frame_time(fSkottieAnimation, fAnimation.CurrentTime);
+    {$IF defined(ALSkiaCanvas)}
+    var LNeedSaveLayer := not SameValue(AbsoluteOpacity, 1, TEpsilon.Position);
+    if LNeedSaveLayer then
+      sk4d_canvas_save_layer_alpha(TSkCanvasCustom(Canvas).Canvas.Handle, nil, Round(AbsoluteOpacity * 255));
+    try
+      sk4d_skottieanimation_render(
+        fSkottieAnimation, // const self: sk_skottieanimation_t;
+        TSkCanvasCustom(Canvas).Canvas.Handle, // canvas: sk_canvas_t;
+        @FRenderRect, // const dest: psk_rect_t;
+        0); // render_flags: uint32_t); cdecl;
+    finally
+      if LNeedSaveLayer then
+        sk4d_canvas_restore(TSkCanvasCustom(Canvas).Canvas.Handle);
+    end;
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LRect := FRenderRect;
+    LRect.Offset(-LRect.Left,-LRect.Top);
+    sk4d_canvas_clear(FBufCanvas, TAlphaColors.Null);
+    sk4d_skottieanimation_render(
+      fSkottieAnimation, // const self: sk_skottieanimation_t;
+      FBufCanvas, // canvas: sk_canvas_t;
+      @LRect, // const dest: psk_rect_t;
+      0); // render_flags: uint32_t); cdecl;
+    var LBufferTexture := ALCreateTextureFromSkSurface(FBufSurface);
+    try
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        LBufferTexture, // const ADrawable: TALDrawable;
+        FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
+        AbsoluteOpacity); // const AOpacity: Single)
+    finally
+      ALFreeAndNil(LBufferTexture);
+    end;
+    {$ELSE}
+    var LRect := FRenderRect;
+    LRect.Offset(-LRect.Left,-LRect.Top);
+    sk4d_canvas_clear(FBufCanvas, TAlphaColors.Null);
+    sk4d_skottieanimation_render(
+      fSkottieAnimation, // const self: sk_skottieanimation_t;
+      FBufCanvas, // canvas: sk_canvas_t;
+      @LRect, // const dest: psk_rect_t;
+      0); // render_flags: uint32_t); cdecl;
+    var LBufferBitmap := ALCreateBitmapFromSkSurface(FBufSurface);
+    try
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        LBufferBitmap, // const ADrawable: TALDrawable;
+        FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
+        AbsoluteOpacity); // const AOpacity: Single)
+    finally
+      ALFreeAndNil(LBufferBitmap);
+    end;
+    {$ENDIF}
+  end
+  else if fAnimcodecplayer <> 0 then Begin
+    sk4d_animcodecplayer_seek(fAnimcodecplayer, round(fAnimation.CurrentTime * 1000));
+    {$IF defined(ALSkiaCanvas)}
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      sk4d_animcodecplayer_get_frame(fAnimcodecplayer), // const ADrawable: TALDrawable;
+      FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LBufferTexture := ALCreateTextureFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer));
+    try
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        LBufferTexture, // const ADrawable: TALDrawable;
+        FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+        AbsoluteOpacity); // const AOpacity: Single)
+    finally
+      ALFreeAndNil(LBufferTexture);
+    end;
+    {$ELSE}
+    var LBufferBitmap := ALCreateBitmapFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer));
+    try
+      ALDrawDrawable(
+        Canvas, // const ACanvas: Tcanvas;
+        LBufferBitmap, // const ADrawable: TALDrawable;
+        FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+        AbsoluteOpacity); // const AOpacity: Single)
+    finally
+      ALFreeAndNil(LBufferBitmap);
+    end;
+    {$ENDIF}
+  end;
+  {$ELSE}
+  Raise Exception.create('''
+    The Skia Engine is required to use AnimatedImage.
+    First, enable Skia for the project. Then, if you prefer not to
+    use a Skia canvas for the main form, go to the project options
+    and replace the "SKIA" definition with "ALSkiaEngine." Additionally,
+    add the line "GlobalUseSkia := False" to the DPR file.
+  ''');
+  {$ENDIF}
+
+end;
+
+{********************************************************************}
+procedure TALAnimatedImage.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if FWrapMode <> Value then begin
+    releaseCodec;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{******************************************************}
+procedure TALAnimatedImage.setResourceName(const Value: String);
+begin
+  if FResourceName <> Value then begin
+    releaseCodec;
+    FResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{***************************************************************}
+procedure TALAnimatedImage.SetAnimation(const Value: TAnimation);
+begin
+  FAnimation.Assign(Value);
 end;
 
 {**************************************************}
@@ -2799,11 +3547,15 @@ end;
 {*****************}
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALImage, TALRectangle, TALCircle, TALLine, TALText]);
+  RegisterComponents('Alcinoe', [TALImage, TALAnimatedImage, TALRectangle, TALCircle, TALLine, TALText]);
   {$IFDEF ALDPK}
   UnlistPublishedProperty(TALImage, 'Size');
   UnlistPublishedProperty(TALImage, 'StyleName');
   UnlistPublishedProperty(TALImage, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALAnimatedImage, 'Size');
+  UnlistPublishedProperty(TALAnimatedImage, 'StyleName');
+  UnlistPublishedProperty(TALAnimatedImage, 'OnTap');
   //--
   UnlistPublishedProperty(TALRectangle, 'Size');
   UnlistPublishedProperty(TALRectangle, 'StyleName');

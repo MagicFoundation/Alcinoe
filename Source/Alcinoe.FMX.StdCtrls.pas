@@ -71,58 +71,63 @@ type
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
   published
+    //property Action;
     property Align;
     property Anchors;
-    property Cursor default crDefault;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
     property Enabled stored EnabledStored default DefaultEnabled;
-    property Locked default False;
     property Height;
-    property Hint;
-    property HitTest default True;
-    property Padding;
-    property Opacity;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
+    property ResourceName: String read fResourceName write setResourceName stored ResourceNameStored nodefault;
+    property FrameCount: Integer read FFrameCount write FFrameCount default 20;
+    property RowCount: Integer read FRowCount write FRowCount default 4;
+    property Interval: integer read finterval write finterval default 50;
     property RotationAngle;
     property RotationCenter;
     property Scale;
     property Size;
+    //property TabOrder;
+    //property TabStop;
     property TouchTargetExpansion;
-    property Visible default True;
+    property Visible;
     property Width;
-    property FrameCount: Integer read FFrameCount write FFrameCount default 20;
-    property RowCount: Integer read FRowCount write FRowCount default 4;
-    property interval: integer read finterval write finterval default 50;
-    property ResourceName: String read fResourceName write setResourceName stored ResourceNameStored;
-    property ParentShowHint;
-    property ShowHint;
-    {Drag and Drop events}
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Keyboard events}
-    property OnKeyDown;
-    property OnKeyUp;
-    {Mouse events}
-    property OnCanFocus;
-    property OnEnter;
-    property OnExit;
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -130,13 +135,14 @@ type
   TALCustomTrack = class;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  (* todo move it inside TALCustomTrack *)
   TALTrackThumbGlyph = class(TALImage)
   public
     constructor Create(AOwner: TComponent); override;
   published
     property Align default TalignLayout.Client;
-    property Locked default True;
     property HitTest default false;
+    property Locked default True;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -161,12 +167,12 @@ type
     function GetDefaultTouchTargetExpansion: TRectF; override;
     property Pressed: Boolean read FPressed;
   published
-    property TouchTargetExpansion;
+    property Cursor default crHandPoint;
+    property Glyph: TALTrackThumbGlyph read FGlyph;
     property Locked default True;
     property Position stored false;
     property Size stored false;
-    property Glyph: TALTrackThumbGlyph read FGlyph;
-    property Cursor default crHandPoint;
+    property TouchTargetExpansion;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -174,8 +180,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property Locked default True;
     property HitTest default false;
+    property Locked default True;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -183,9 +189,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
+    property HitTest default false;
     property Locked default True;
     property Position stored false;
-    property HitTest default false;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -253,7 +259,7 @@ type
     property ViewportSize: Double read GetViewportSize write SetViewportSize stored ViewportSizeStored nodefault;
     property Orientation: TOrientation read FOrientation write SetOrientation;
     property Tracking: Boolean read FTracking write FTracking default True;
-    property ThumbSize: Single read fThumbSize write SetThumbSize Stored ThumbSizeStored; // << 0 mean the thumb will have the height of the track in horizontal or width of the track in vertical
+    property ThumbSize: Single read fThumbSize write SetThumbSize Stored ThumbSizeStored nodefault; // 0 mean the thumb will have the height of the track in horizontal or width of the track in vertical
     property BackGround: TALTrackBackground read FBackGround;
     property Highlight: TALTrackHighlight read FHighlight;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
@@ -269,32 +275,33 @@ type
     constructor Create(AOwner: TComponent); override;
     property ValueRange;
   published
-    property ThumbSize;
-    property Thumb;
-    property BackGround;
-    property Highlight;
+    //property Action;
     property Align;
     property Anchors;
+    property BackGround;
     property CanFocus default True;
-    property CanParentFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren;
-    property ClipParent;
+    //property ClipParent;
     property Cursor;
-    property DisableFocusEffect;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
     property Frequency;
-    property Locked;
     property Height;
-    property Hint;
+    property Highlight;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
-    property Padding;
+    property Locked;
+    property Margins;
     property Min;
     property Max;
-    property Orientation;
     property Opacity;
-    property Margins;
+    property Orientation;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -303,42 +310,36 @@ type
     property Size;
     property TabOrder;
     property TabStop;
+    property Thumb;
+    property ThumbSize; (* todo: delete *)
     property TouchTargetExpansion;
     property Tracking;
     property Value;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    {events}
+    property OnCanFocus;
     property OnChange;
     property OnTracking;
-    {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Keyboard events}
-    property OnKeyDown;
-    property OnKeyUp;
-    {Mouse events}
-    property OnCanFocus;
-    property OnClick;
-    property OnDblClick;
-    //-----
     property OnEnter;
     property OnExit;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
-    //-----
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -351,28 +352,31 @@ type
     constructor Create(AOwner: TComponent); override;
     property ValueRange;
   published
-    property Thumb;
-    property BackGround;
+    //property Action;
     property Align;
     property Anchors;
+    property BackGround;
     property CanFocus default False;
-    property CanParentFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren;
-    property ClipParent;
+    //property ClipParent;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
-    property Locked;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
-    property Padding;
+    property Locked;
+    property Margins;
     property Min;
     property Max;
-    property Orientation;
     property Opacity;
-    property Margins;
+    property Orientation;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -381,41 +385,34 @@ type
     property Size;
     property TabOrder;
     property TabStop;
+    property Thumb;
     property TouchTargetExpansion;
     property Value;
+    property ViewportSize;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    property ViewportSize;
-    {events}
+    property OnCanFocus;
     property OnChange;
-    {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Keyboard events}
-    property OnKeyDown;
-    property OnKeyUp;
-    {Mouse events}
-    property OnCanFocus;
-    property OnClick;
-    property OnDblClick;
-    //-----
     property OnEnter;
     property OnExit;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
-    //-----
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -442,35 +439,38 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
   published
-    property ThumbSize;
-    property MinThumb: TALTrackThumb read FThumb;
-    property MaxThumb: TALTrackThumb read FMaxThumb;
-    property BackGround;
-    property Highlight;
+    //property Action;
     property Align;
     property Anchors;
+    property BackGround;
     property CanFocus default True;
-    property CanParentFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren;
-    property ClipParent;
+    //property ClipParent;
     property Cursor;
-    property DisableFocusEffect;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
     property Frequency;
-    property Locked;
     property Height;
-    property Hint;
+    property Highlight;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
-    property Padding;
+    property Locked;
+    property Margins;
     property Min;
     property Max;
     property MinValue: Double read GetValue write SetValue stored ValueStored nodefault;
     property MaxValue: Double read GetMaxValue write SetMaxValue stored MaxValueStored nodefault;
-    property Orientation;
+    property MinThumb: TALTrackThumb read FThumb;
+    property MaxThumb: TALTrackThumb read FMaxThumb;
+    property ThumbSize;  (* todo delete *)
     property Opacity;
-    property Margins;
+    property Orientation;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -484,141 +484,360 @@ type
     property Value;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    {events}
+    property OnCanFocus;
     property OnChange;
     property OnTracking;
-    {Drag and Drop events}
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    {Keyboard events}
-    property OnKeyDown;
-    property OnKeyUp;
-    {Mouse events}
-    property OnCanFocus;
-    property OnClick;
-    property OnDblClick;
-    //-----
     property OnEnter;
     property OnExit;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
-    //-----
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~}
+  TALCheckBox = Class;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  (* todo move it inside TALCheckBox *)
+  TALCheckMarkBrush = class(TALPersistentObserver)
+  private
+    FColor: TAlphaColor;
+    FResourceName: String;
+    FWrapMode: TALImageWrapMode;
+    FThickness: Single;
+    FPadding: TBounds;
+    FDefaultColor: TAlphaColor;
+    FDefaultResourceName: String;
+    FDefaultWrapMode: TALImageWrapMode;
+    FDefaultThickness: Single;
+    procedure SetColor(const Value: TAlphaColor);
+    procedure SetResourceName(const Value: String);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure SetThickness(const Value: Single);
+    procedure SetPadding(const Value: TBounds);
+    procedure PaddingChanged(Sender: TObject); virtual;
+    function IsColorStored: Boolean;
+    function IsResourceNameStored: Boolean;
+    function IsWrapModeStored: Boolean;
+    function IsThicknessStored: Boolean;
+  public
+    constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    function HasCheckMark: boolean;
+    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+    property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
+    property DefaultWrapMode: TALImageWrapMode read FDefaultWrapMode write FDefaultWrapMode;
+    property DefaultThickness: Single read FDefaultThickness write FDefaultThickness;
+  published
+    property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+    property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
+    property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
+    property Padding: TBounds read FPadding write SetPadding;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritCheckMarkBrush = class(TALCheckMarkBrush)
+  private
+    FParent: TALCheckMarkBrush;
+    FInherit: Boolean;
+    fSuperseded: Integer;
+    FPriorSupersedeColor: TAlphaColor;
+    FPriorSupersedeResourceName: String;
+    FPriorSupersedeWrapMode: TALImageWrapMode;
+    FPriorSupersedeThickness: Single;
+    FPriorSupersedePaddingRect: TRectF;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const AParent: TALCheckMarkBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    procedure Supersede;
+    procedure Reinstate;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxBaseStateStyle = class(TALBaseStateStyle)
+  private
+    FCheckMark: TALInheritCheckMarkBrush;
+    procedure SetCheckMark(const AValue: TALInheritCheckMarkBrush);
+    procedure CheckMarkChanged(ASender: TObject);
+  protected
+    function GetInherit: Boolean; override;
+    procedure DoSupersede; override;
+    procedure DoReinstate; override;
+  public
+    constructor Create(const AParent: TObject); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    Property Inherit: Boolean read GetInherit;
+  published
+    property CheckMark: TALInheritCheckMarkBrush read FCheckMark write SetCheckMark;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxDefaultStateStyle = class(TALCheckBoxBaseStateStyle)
+  published
+    property Fill;
+    property Shadow;
+    property Stroke;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxDisabledStateStyle = class(TALCheckBoxBaseStateStyle)
+  private
+    FOpacity: Single;
+    procedure SetOpacity(const Value: Single);
+    function IsOpacityStored: Boolean;
+  public
+    constructor Create(const AParent: TObject); override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Fill;
+    // Opacity is not part of the GetInherit function because it updates the
+    // disabledOpacity of the base control immediately every time it changes.
+    // Essentially, it acts merely as a link to the disabledOpacity of the base control.
+    property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
+    property Shadow;
+    property Stroke;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxHoveredStateStyle = class(TALCheckBoxBaseStateStyle)
+  published
+    property Fill;
+    property Shadow;
+    property StateLayer;
+    property Stroke;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxPressedStateStyle = class(TALCheckBoxBaseStateStyle)
+  published
+    property Fill;
+    property Shadow;
+    property StateLayer;
+    property Stroke;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxFocusedStateStyle = class(TALCheckBoxBaseStateStyle)
+  published
+    property Fill;
+    property Shadow;
+    property StateLayer;
+    property Stroke;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxCheckStateStyles = class(TALPersistentObserver)
+  private
+    FDefault: TALCheckBoxDefaultStateStyle;
+    FDisabled: TALCheckBoxDisabledStateStyle;
+    FHovered: TALCheckBoxHoveredStateStyle;
+    FPressed: TALCheckBoxPressedStateStyle;
+    FFocused: TALCheckBoxFocusedStateStyle;
+    procedure SetDefault(const AValue: TALCheckBoxDefaultStateStyle);
+    procedure SetDisabled(const AValue: TALCheckBoxDisabledStateStyle);
+    procedure SetHovered(const AValue: TALCheckBoxHoveredStateStyle);
+    procedure SetPressed(const AValue: TALCheckBoxPressedStateStyle);
+    procedure SetFocused(const AValue: TALCheckBoxFocusedStateStyle);
+    procedure DefaultChanged(ASender: TObject);
+    procedure DisabledChanged(ASender: TObject);
+    procedure HoveredChanged(ASender: TObject);
+    procedure PressedChanged(ASender: TObject);
+    procedure FocusedChanged(ASender: TObject);
+  public
+    constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property &Default: TALCheckBoxDefaultStateStyle read FDefault write SetDefault;
+    property Disabled: TALCheckBoxDisabledStateStyle read FDisabled write SetDisabled;
+    property Hovered: TALCheckBoxHoveredStateStyle read FHovered write SetHovered;
+    property Pressed: TALCheckBoxPressedStateStyle read FPressed write SetPressed;
+    property Focused: TALCheckBoxFocusedStateStyle read FFocused write SetFocused;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCheckBoxStateStyles = class(TALPersistentObserver)
+  private
+    FChecked: TALCheckBoxCheckStateStyles;
+    FUnchecked: TALCheckBoxCheckStateStyles;
+    procedure SetChecked(const AValue: TALCheckBoxCheckStateStyles);
+    procedure SetUnchecked(const AValue: TALCheckBoxCheckStateStyles);
+    procedure CheckedChanged(ASender: TObject);
+    procedure UncheckedChanged(ASender: TObject);
+  public
+    constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+  published
+    property Checked: TALCheckBoxCheckStateStyles read FChecked write SetChecked;
+    property Unchecked: TALCheckBoxCheckStateStyles read FUnchecked write SetUnchecked;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALCheckBox = class(TALControl, IALDoubleBufferedControl)
+  TALCheckBox = class(TALShape, IALDoubleBufferedControl)
   private
-    fBufDrawable: TALDrawable;
-    fBufDrawableRect: TRectF;
-    FbufResourceName: String;
-    //-----
-    FPressing: Boolean;
     FOnChange: TNotifyEvent;
+    FDoubleBuffered: boolean;
+    FXRadius: Single;
+    FYRadius: Single;
+    FHovered: boolean;
     FPressed: Boolean;
     FChecked: Boolean;
-    FIsPan: Boolean;
-    fImageCheckedResourceName: String;
-    fImageUncheckedResourceName: String;
-    FWrapMode: TALImageWrapMode;
-    procedure setImageCheckedResourceName(const Value: String);
-    procedure setImageUncheckedResourceName(const Value: String);
-    procedure SetWrapMode(const Value: TALImageWrapMode);
+    FCheckMark: TALCheckMarkBrush;
+    FStateStyles: TALCheckBoxStateStyles;
+    fBufCheckedDrawable: TALDrawable;
+    fBufCheckedDrawableRect: TRectF;
+    fBufCheckedDisabledDrawable: TALDrawable;
+    fBufCheckedDisabledDrawableRect: TRectF;
+    fBufCheckedHoveredDrawable: TALDrawable;
+    fBufCheckedHoveredDrawableRect: TRectF;
+    fBufCheckedPressedDrawable: TALDrawable;
+    fBufCheckedPressedDrawableRect: TRectF;
+    fBufCheckedFocusedDrawable: TALDrawable;
+    fBufCheckedFocusedDrawableRect: TRectF;
+    fBufUnCheckedDrawable: TALDrawable;
+    fBufUnCheckedDrawableRect: TRectF;
+    fBufUnCheckedDisabledDrawable: TALDrawable;
+    fBufUnCheckedDisabledDrawableRect: TRectF;
+    fBufUnCheckedHoveredDrawable: TALDrawable;
+    fBufUnCheckedHoveredDrawableRect: TRectF;
+    fBufUnCheckedPressedDrawable: TALDrawable;
+    fBufUnCheckedPressedDrawableRect: TRectF;
+    fBufUnCheckedFocusedDrawable: TALDrawable;
+    fBufUnCheckedFocusedDrawableRect: TRectF;
+    procedure SetCheckMark(const Value: TALCheckMarkBrush);
+    procedure SetStateStyles(const AValue: TALCheckBoxStateStyles);
   protected
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
-    procedure Paint; override;
-    property BufDrawable: TALDrawable read fBufDrawable;
-    property BufDrawableRect: TRectF read fBufDrawableRect;
-    procedure DoChanged; virtual;
+    procedure SetXRadius(const Value: Single); virtual;
+    procedure SetYRadius(const Value: Single); virtual;
+    procedure CheckMarkChanged(Sender: TObject); virtual;
+    procedure StateStylesChanged(Sender: TObject); virtual;
+    procedure FillChanged(Sender: TObject); override;
+    procedure StrokeChanged(Sender: TObject); override;
+    procedure ShadowChanged(Sender: TObject); override;
     function GetDefaultSize: TSizeF; override;
     function GetChecked: Boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
-    function ImageCheckedResourceNameStored: Boolean; virtual;
-    function ImageUncheckedResourceNameStored: Boolean; virtual;
+    procedure DoMouseEnter; override;
+    procedure DoMouseLeave; override;
+    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
+    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
+    procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+    procedure Click; override;
+    procedure DoChanged; virtual;
     procedure DoResized; override;
+    procedure DrawCheckMark(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const ACheckMark: TALCheckMarkBrush;
+            const AChecked: Boolean); virtual;
+    Procedure CreateBufDrawable(
+                var ABufDrawable: TALDrawable;
+                var ABufDrawableRect: TRectF;
+                const AFill: TALBrush;
+                const AStateLayer: TALBrush;
+                const AStroke: TALStrokeBrush;
+                const ACheckMark: TALCheckMarkBrush;
+                const AShadow: TALShadow); virtual;
+    procedure Paint; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
-    procedure SetNewScene(AScene: IScene); override;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
   published
-    property Action;
+    //property Action;
     property Align;
     property Anchors;
     property CanFocus default True;
-    property CanParentFocus;
-    property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
-    property DisableFocusEffect;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled;
-    property Locked default False;
-    property Height;
-    property Hint;
-    property HitTest default True;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property CheckMark: TALCheckMarkBrush read FCheckMark write SetCheckMark;
     property Checked: Boolean read GetChecked write SetChecked default False;
-    property ImageCheckedResourceName: String read fImageCheckedResourceName write setImageCheckedResourceName stored ImageCheckedResourceNameStored;
-    property ImageUncheckedResourceName: String read fImageUncheckedResourceName write setImageUncheckedResourceName stored ImageUncheckedResourceNameStored;
-    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
-    property Padding;
-    property Opacity;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor default crHandPoint;
+    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Fill;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
     property RotationCenter;
     property Scale;
+    property Shadow;
     property Size;
+    property StateStyles: TALCheckBoxStateStyles read FStateStyles write SetStateStyles;
+    property Stroke;
     property TabOrder;
     property TabStop;
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
+    property XRadius: Single read FXRadius write SetXRadius;
+    property YRadius: Single read FYRadius write SetYRadius;
+    property OnCanFocus;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnKeyDown;
-    property OnKeyUp;
-    property OnCanFocus;
-    property OnClick;
-    property OnDblClick;
     property OnEnter;
     property OnExit;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
@@ -634,8 +853,6 @@ type
     procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
   protected
     procedure SetChecked(const Value: Boolean); override;
-    function ImageCheckedResourceNameStored: Boolean; override;
-    function ImageUncheckedResourceNameStored: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -645,12 +862,13 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  (* todo move it inside TALSwitch *)
   TALSwitchThumb = class(TALBaseRectangle)
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property Locked default True;
     property HitTest default false;
+    property Locked default True;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -658,8 +876,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property Locked default True;
     property HitTest default false;
+    property Locked default True;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -708,21 +926,30 @@ type
     property Tracking: boolean read FTracking write FTracking default false;
     property Animation: TALFloatAnimation read FAnimation;
   published
-    property Action;
+    //property Action;
     property Align;
+    property AnimationDuration: single read fAnimationDuration write fAnimationDuration stored AnimationDurationStored nodefault;
     property Anchors;
-    property ClipChildren default False;
-    property ClipParent default False;
-    property Cursor default crDefault;
-    property DragMode default TDragMode.dmManual;
-    property EnableDragHighlight default True;
-    property Enabled default True;
-    property Locked default False;
+    property BackGround: TALSwitchBackGround read FBackGround;
+    property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property Checked: Boolean read FChecked write SetChecked default false;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
     property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest default False;
-    property Padding;
-    property Opacity;
+    property Locked;
     property Margins;
+    property Opacity;
+    property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
@@ -731,143 +958,165 @@ type
     property Size;
     property TabOrder;
     property TabStop;
-    property TouchTargetExpansion;
-    property ThumbSize: Single read FThumbSize write SetThumbSize;
     property Thumb: TALSwitchThumb read FThumb;
-    property BackGround: TALSwitchBackGround read FBackGround;
-    property Checked: Boolean read FChecked write SetChecked default false;
-    property AnimationDuration: single read fAnimationDuration write fAnimationDuration stored AnimationDurationStored;
-    property Visible default True;
+    property ThumbSize: Single read FThumbSize write SetThumbSize; (* todo delete *)
+    property TouchTargetExpansion;
+    property Visible;
     property Width;
+    property OnAnimationProcess: TNotifyEvent read FOnAnimationProcess write FOnAnimationProcess;
+    property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
+    property OnCanFocus;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnKeyDown;
-    property OnKeyUp;
-    property OnCanFocus;
-    property OnClick;
-    property OnDblClick;
     property OnEnter;
     property OnExit;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    property OnDblClick;
+    property OnKeyDown;
+    property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
-    property OnChange: TNotifyEvent read FOnChange write FOnChange;
-    property OnAnimationProcess: TNotifyEvent read FOnAnimationProcess write FOnAnimationProcess;
-    property OnAnimationFinish: TNotifyEvent read FOnAnimationFinish write FOnAnimationFinish;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALButtonStateStyleTextSettings = class(TALInheritBaseTextSettings)
-  published
-    property Font;
-    property Decoration;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALButtonStateStyle = class(TALPersistentObserver)
-  private
-    FText: String;
-    FFill: TALInheritBrush;
-    FStroke: TALInheritStrokeBrush;
-    FTextSettings: TALButtonStateStyleTextSettings;
-    FShadow: TALInheritShadow;
-    procedure SetText(const Value: string);
-    procedure SetFill(const AValue: TALInheritBrush);
-    procedure SetStroke(const AValue: TALInheritStrokeBrush);
-    procedure SetTextSettings(const AValue: TALButtonStateStyleTextSettings);
-    procedure SetShadow(const AValue: TALInheritShadow);
-    procedure FillChanged(ASender: TObject);
-    procedure StrokeChanged(ASender: TObject);
-    procedure TextSettingsChanged(ASender: TObject);
-    procedure ShadowChanged(ASender: TObject);
-  protected
-    function GetInherit: Boolean; virtual;
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-    Property Inherit: Boolean read GetInherit;
-  published
-    property Text: string read FText write SetText;
-    property Fill: TALInheritBrush read FFill write SetFill;
-    property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
-    property TextSettings: TALButtonStateStyleTextSettings read fTextSettings write SetTextSettings;
-    property Shadow: TALInheritShadow read FShadow write SetShadow;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALButtonDisabledStateStyle = class(TALButtonStateStyle)
-  private
-    FOpacity: Single;
-    function OpacityStored: Boolean;
-    procedure SetOpacity(const Value: Single);
-  public
-    constructor Create; override;
-    procedure Assign(Source: TPersistent); override;
-  published
-    property Opacity: Single read FOpacity write SetOpacity stored OpacityStored;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALButtonStateStyles = class(TALPersistentObserver)
-  private
-    FDisabled: TALButtonDisabledStateStyle;
-    FHovered: TALButtonStateStyle;
-    FPressed: TALButtonStateStyle;
-    FFocused: TALButtonStateStyle;
-    procedure SetDisabled(const AValue: TALButtonDisabledStateStyle);
-    procedure SetHovered(const AValue: TALButtonStateStyle);
-    procedure SetPressed(const AValue: TALButtonStateStyle);
-    procedure SetFocused(const AValue: TALButtonStateStyle);
-    procedure DisabledChanged(ASender: TObject);
-    procedure HoveredChanged(ASender: TObject);
-    procedure PressedChanged(ASender: TObject);
-    procedure FocusedChanged(ASender: TObject);
-  public
-    constructor Create; override;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-  published
-    property Disabled: TALButtonDisabledStateStyle read FDisabled write SetDisabled;
-    property Hovered: TALButtonStateStyle read FHovered write SetHovered;
-    property Pressed: TALButtonStateStyle read FPressed write SetPressed;
-    property Focused: TALButtonStateStyle read FFocused write SetFocused;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALButtonTextSettings = class(TALBaseTextSettings)
-  private
-  public
-  published
-    property Font;
-    property Decoration;
-    property Trimming;
-    property MaxLines;
-    property Ellipsis;
-    property HorzAlign;
-    property VertAlign;
-    property LineHeightMultiplier;
-    property LetterSpacing;
-    property IsHtml;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALButton = class(TALBaseText)
+  public
+    type
+      // TStateStyleTextSettings
+      TStateStyleTextSettings = class(TALInheritBaseTextSettings)
+      published
+        property Font;
+        property Decoration;
+      end;
+      // ---------------
+      // TBaseStateStyle
+      TBaseStateStyle = class(TALBaseStateStyle)
+      private
+        FText: String;
+        FTextSettings: TStateStyleTextSettings;
+        FPriorSupersedeText: String;
+        procedure SetText(const Value: string);
+        procedure SetTextSettings(const AValue: TStateStyleTextSettings);
+        procedure TextSettingsChanged(ASender: TObject);
+      protected
+        function GetInherit: Boolean; override;
+        procedure DoSupersede; override;
+        procedure DoReinstate; override;
+      public
+        constructor Create(const AParent: TObject); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
+        Property Inherit: Boolean read GetInherit;
+      published
+        property Text: string read FText write SetText;
+        property TextSettings: TStateStyleTextSettings read fTextSettings write SetTextSettings;
+      end;
+      // -------------------
+      // TDisabledStateStyle
+      TDisabledStateStyle = class(TBaseStateStyle)
+      private
+        FOpacity: Single;
+        procedure SetOpacity(const Value: Single);
+        function IsOpacityStored: Boolean;
+      public
+        constructor Create(const AParent: TObject); override;
+        procedure Assign(Source: TPersistent); override;
+      published
+        property Fill;
+        // Opacity is not part of the GetInherit function because it updates the
+        // disabledOpacity of the base control immediately every time it changes.
+        // Essentially, it acts merely as a link to the disabledOpacity of the base control.
+        property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
+        property Shadow;
+        property Stroke;
+      end;
+      // ------------------
+      // THoveredStateStyle
+      THoveredStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property StateLayer;
+        property Stroke;
+      end;
+      // ------------------
+      // TPressedStateStyle
+      TPressedStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property StateLayer;
+        property Stroke;
+      end;
+      // ------------------
+      // TFocusedStateStyle
+      TFocusedStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property StateLayer;
+        property Stroke;
+      end;
+      // ------------
+      // TStateStyles
+      TStateStyles = class(TALPersistentObserver)
+      private
+        FDisabled: TDisabledStateStyle;
+        FHovered: THoveredStateStyle;
+        FPressed: TPressedStateStyle;
+        FFocused: TFocusedStateStyle;
+        procedure SetDisabled(const AValue: TDisabledStateStyle);
+        procedure SetHovered(const AValue: THoveredStateStyle);
+        procedure SetPressed(const AValue: TPressedStateStyle);
+        procedure SetFocused(const AValue: TFocusedStateStyle);
+        procedure DisabledChanged(ASender: TObject);
+        procedure HoveredChanged(ASender: TObject);
+        procedure PressedChanged(ASender: TObject);
+        procedure FocusedChanged(ASender: TObject);
+      public
+        constructor Create(const AParent: TALButton); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
+      published
+        property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
+        property Hovered: THoveredStateStyle read FHovered write SetHovered;
+        property Pressed: TPressedStateStyle read FPressed write SetPressed;
+        property Focused: TFocusedStateStyle read FFocused write SetFocused;
+      end;
+      // -------------
+      // TTextSettings
+      TTextSettings = class(TALBaseTextSettings)
+      private
+      public
+      published
+        property Font;
+        property Decoration;
+        property Trimming;
+        property MaxLines;
+        property Ellipsis;
+        property HorzAlign;
+        property VertAlign;
+        property LineHeightMultiplier;
+        property LetterSpacing;
+        property IsHtml;
+      end;
   private
     FHovered: Boolean;
     FPressed: Boolean;
-    FStateStyles: TALButtonStateStyles;
+    FStateStyles: TStateStyles;
     fBufDisabledDrawable: TALDrawable;
     fBufDisabledDrawableRect: TRectF;
     fBufHoveredDrawable: TALDrawable;
@@ -876,17 +1125,17 @@ type
     fBufPressedDrawableRect: TRectF;
     fBufFocusedDrawable: TALDrawable;
     fBufFocusedDrawableRect: TRectF;
-    function GetTextSettings: TALButtonTextSettings;
+    function GetTextSettings: TTextSettings;
+    procedure SetStateStyles(const AValue: TStateStyles);
   protected
     function CreateTextSettings: TALBaseTextSettings; override;
-    procedure SetTextSettings(const Value: TALButtonTextSettings); reintroduce;
+    procedure SetTextSettings(const Value: TTextSettings); reintroduce;
+    procedure DoMouseEnter; override;
+    procedure DoMouseLeave; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure DoMouseEnter; override;
-    procedure DoMouseLeave; override;
     procedure SetName(const Value: TComponentName); override;
-    procedure SetStateStyles(const AValue: TALButtonStateStyles);
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure Paint; override;
     procedure Loaded; override;
@@ -896,17 +1145,16 @@ type
     procedure clearBufDrawable; override;
     procedure MakeBufDrawable; override;
   published
-    property CanFocus default False;
-    property HitTest default True;
     property AutoSize default True;
+    property CanFocus default true;
     property Cursor default crHandPoint;
+    property DoubleBuffered;
+    property HitTest default True;
+    property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
     property TabOrder;
     property TabStop;
-    property StateStyles: TALButtonStateStyles read FStateStyles write SetStateStyles;
-    property TextSettings: TALButtonTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
   end;
-
-procedure ALApplyThemeToButton(const AButton: TALButton; const ATheme: String);
 
 procedure Register;
 
@@ -915,15 +1163,21 @@ implementation
 uses
   System.SysUtils,
   system.Math.Vectors,
-  {$IF defined(ALSkiaCanvas)}
+  {$IF defined(ALSkiaEngine)}
   System.Skia.API,
   {$ENDIF}
   {$IFDEF ALDPK}
   DesignIntf,
   {$ENDIF}
+  {$IF DEFINED(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
+  {$ENDIF}
   {$IF DEFINED(IOS) or DEFINED(ANDROID)}
   FMX.Canvas.GPU,
   Alcinoe.FMX.Types3D,
+  {$ENDIF}
+  {$IF DEFINED(ALAppleOS)}
+  iOSapi.CoreGraphics,
   {$ENDIF}
   FMX.Platform,
   fmx.consts,
@@ -1004,9 +1258,13 @@ begin
 
   fBufDrawableRect := LocalRect;
   {$IFDEF ALDPK}
-  var LFileName := ALDPKGetResourceFilename(FResourceName);
-  if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale)
-  else fBufDrawable := ALNullDrawable;
+  try
+    var LFileName := ALGetResourceFilename(FResourceName);
+    if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale)
+    else fBufDrawable := ALNullDrawable;
+  except
+    fBufDrawable := ALNullDrawable;
+  end;
   {$ELSE}
   fBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(fResourceName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale);
   {$ENDIF}
@@ -1771,7 +2029,7 @@ begin
   FBackGround.Margins.DefaultValue := TrectF.Create(16,0,16,0);
   FBackGround.Margins.Left := 16;
   FBackGround.Margins.right := 16;
-  FBackGround.Stroke.Kind := TBrushKind.None;
+  FBackGround.Stroke.Color := TAlphaColors.Null;
   fBackGround.Fill.Color := $ffc5c5c5;
   //-----
   FHighlight := TALTrackHighlight.Create(FBackGround);
@@ -1782,7 +2040,7 @@ begin
   FHighlight.Position.Point := TpointF.Create(0,0);
   FHighlight.Size.Height := 2;
   FHighlight.Size.Width := 0;
-  FHighlight.Stroke.Kind := TBrushKind.None;
+  FHighlight.Stroke.Color := TalphaColors.Null;
   FHighlight.Fill.Color := $ff167efc;
   //-----
   FThumb := TALTrackThumb.Create(self, fValueRange, true{aWithGlyphObj});
@@ -1792,7 +2050,6 @@ begin
   FThumb.Name := 'Thumb';
   FThumb.XRadius := 16;
   FThumb.yRadius := 16;
-  FThumb.Stroke.Kind := TBrushKind.solid;
   fThumb.Stroke.Color := $ffd5d5d5;
   FThumb.Fill.Color := $ffffffff;
 end;
@@ -1815,7 +2072,7 @@ begin
   FThumb.Stored := False;
   FThumb.SetSubComponent(True);
   FThumb.Name := 'Thumb';
-  FThumb.Stroke.Kind := TBrushKind.none;
+  FThumb.Stroke.Color := Talphacolors.Null;
   FThumb.Fill.Color := $47000000;
 end;
 
@@ -1844,7 +2101,7 @@ begin
   FBackGround.Margins.DefaultValue := TrectF.Create(16,0,16,0);
   FBackGround.Margins.Left := 16;
   FBackGround.Margins.right := 16;
-  FBackGround.Stroke.Kind := TBrushKind.None;
+  FBackGround.Stroke.Color := Talphacolors.Null;
   fBackGround.Fill.Color := $ffc5c5c5;
   //-----
   FHighlight := TALTrackHighlight.Create(FBackGround);
@@ -1855,7 +2112,7 @@ begin
   FHighlight.Position.Point := TpointF.Create(0,0);
   FHighlight.Size.Height := 2;
   FHighlight.Size.Width := 0;
-  FHighlight.Stroke.Kind := TBrushKind.None;
+  FHighlight.Stroke.Color := Talphacolors.Null;
   FHighlight.Fill.Color := $ff167efc;
   //-----
   FThumb := TALTrackThumb.Create(self, FvalueRange, true{aWithGlyphObj});
@@ -1865,7 +2122,6 @@ begin
   FThumb.Name := 'MinThumb';
   FThumb.XRadius := 16;
   FThumb.yRadius := 16;
-  FThumb.Stroke.Kind := TBrushKind.solid;
   fThumb.Stroke.Color := $ffd5d5d5;
   FThumb.Fill.Color := $ffffffff;
   //-----
@@ -1876,7 +2132,6 @@ begin
   FMaxThumb.Name := 'MaxThumb';
   FMaxThumb.XRadius := 16;
   FMaxThumb.yRadius := 16;
-  FMaxThumb.Stroke.Kind := TBrushKind.solid;
   fMaxThumb.Stroke.Color := $ffd5d5d5;
   FMaxThumb.Fill.Color := $ffffffff;
 end;
@@ -2011,338 +2266,686 @@ begin
   FMaxValueRange.ViewportSize := Value;
 end;
 
+{**********************************************************************************************}
+constructor TALCheckMarkBrush.Create(const ADefaultColor: TAlphaColor);
+begin
+  inherited Create;
+  //--
+  FDefaultColor := ADefaultColor;
+  FDefaultResourceName := '';
+  FDefaultWrapMode := TALImageWrapMode.Fit;
+  FDefaultThickness := 2;
+  //--
+  FColor := FDefaultColor;
+  FResourceName := FDefaultResourceName;
+  FWrapMode := FDefaultWrapMode;
+  FThickness := FDefaultThickness;
+  //--
+  FPadding := TBounds.Create(TRectF.Empty);
+  FPadding.OnChange := PaddingChanged;
+end;
+
+{**************************}
+destructor TALCheckMarkBrush.Destroy;
+begin
+  ALFreeAndNil(FPadding);
+  inherited;
+end;
+
+{**********************************************}
+procedure TALCheckMarkBrush.Assign(Source: TPersistent);
+begin
+  if Source is TALCheckMarkBrush then begin
+    BeginUpdate;
+    Try
+      Color := TALCheckMarkBrush(Source).Color;
+      ResourceName := TALCheckMarkBrush(Source).ResourceName;
+      WrapMode := TALCheckMarkBrush(Source).WrapMode;
+      Thickness := TALStrokeBrush(Source).Thickness;
+      Padding.Assign(TALCheckMarkBrush(Source).Padding);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{************************}
+procedure TALCheckMarkBrush.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Color := DefaultColor;
+    ResourceName := DefaultResourceName;
+    WrapMode := DefaultWrapMode;
+    Thickness := DefaultThickness;
+    Padding.Rect := Padding.DefaultValue;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{************************}
+function TALCheckMarkBrush.HasCheckMark: boolean;
+begin
+  result := ((Color <> TalphaColors.Null) and
+             (CompareValue(FThickness, 0, TEpsilon.Vector) > 0)) or
+            (ResourceName <> '');
+end;
+
+{***************************************}
+function TALCheckMarkBrush.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor;
+end;
+
+{**********************************************}
+function TALCheckMarkBrush.IsResourceNameStored: Boolean;
+begin
+  result := FResourceName <> FDefaultResourceName;
+end;
+
+{**********************************************}
+function TALCheckMarkBrush.IsWrapModeStored: Boolean;
+begin
+  result := FWrapMode <> FDefaultWrapMode;
+end;
+
+{****************************************************}
+function TALCheckMarkBrush.IsThicknessStored: Boolean;
+begin
+  result := not SameValue(FThickness, FDefaultThickness, TEpsilon.Vector);
+end;
+
+{****************************************************}
+procedure TALCheckMarkBrush.SetColor(const Value: TAlphaColor);
+begin
+  if fColor <> Value then begin
+    fColor := Value;
+    Change;
+  end;
+end;
+
+{******************************************************}
+procedure TALCheckMarkBrush.SetResourceName(const Value: String);
+begin
+  if fResourceName <> Value then begin
+    fResourceName := Value;
+    Change;
+  end;
+end;
+
+{******************************************************}
+procedure TALCheckMarkBrush.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if fWrapMode <> Value then begin
+    fWrapMode := Value;
+    Change;
+  end;
+end;
+
+{*********************************************************}
+procedure TALCheckMarkBrush.SetThickness(const Value: Single);
+begin
+  if not SameValue(Value, FThickness, TEpsilon.Vector) then begin
+    fThickness := Value;
+    Change;
+  end;
+end;
+
+{**************************************************}
+procedure TALCheckMarkBrush.SetPadding(const Value: TBounds);
+begin
+  FPadding.Assign(Value);
+end;
+
+{*************************************************}
+procedure TALCheckMarkBrush.PaddingChanged(Sender: TObject);
+begin
+  change;
+end;
+
+{***************************************************************************************************}
+constructor TALInheritCheckMarkBrush.Create(const AParent: TALCheckMarkBrush; const ADefaultColor: TAlphaColor);
+begin
+  inherited create(ADefaultColor);
+  FParent := AParent;
+  FInherit := True;
+  fSuperseded := 0;
+  //FPriorSupersedeColor
+  //FPriorSupersedeResourceName
+  //FPriorSupersedeWrapMode
+  //FPriorSupersedeThickness
+  //FPriorSupersedePaddingRect
+end;
+
+{**********************************************************}
+procedure TALInheritCheckMarkBrush.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALInheritCheckMarkBrush.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALInheritCheckMarkBrush then
+      Inherit := TALInheritCheckMarkBrush(Source).Inherit
+    else
+      Inherit := False;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{******************************}
+procedure TALInheritCheckMarkBrush.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Inherit := True;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************}
+procedure TALInheritCheckMarkBrush.Supersede;
+begin
+  if (not inherit) or
+     (FParent = nil) then exit;
+  inc(fSuperseded);
+  if (FSuperseded <> 1) then exit;
+
+  FPriorSupersedeColor := FColor;
+  FPriorSupersedeResourceName := FResourceName;
+  FPriorSupersedeWrapMode := FWrapMode;
+  FPriorSupersedeThickness := FThickness;
+  FPriorSupersedePaddingRect := FPadding.Rect;
+  //--
+  var LParentSuperseded := False;
+  if FParent is TALInheritCheckMarkBrush then begin
+    TALInheritCheckMarkBrush(FParent).Supersede;
+    LParentSuperseded := True;
+  end;
+  try
+    FColor := FParent.FColor;
+    FResourceName := FParent.FResourceName;
+    FWrapMode := FParent.FWrapMode;
+    FThickness := FParent.FThickness;
+    var LPrevPaddingOnChange := FPadding.OnChange;
+    FPadding.OnChange := nil;
+    FPadding.Rect := FParent.Padding.Rect;
+    fPadding.OnChange := LPrevPaddingOnChange;
+  finally
+    if LParentSuperseded then
+      TALInheritCheckMarkBrush(FParent).Reinstate
+  end;
+end;
+
+{******************}
+procedure TALInheritCheckMarkBrush.Reinstate;
+begin
+  if fSuperseded <= 0 then exit;
+  dec(fSuperseded);
+  if fSuperseded = 0 then begin
+    FColor := FPriorSupersedeColor;
+    FResourceName := FPriorSupersedeResourceName;
+    FWrapMode := FPriorSupersedeWrapMode;
+    FThickness := FPriorSupersedeThickness;
+    var LPrevPaddingOnChange := FPadding.OnChange;
+    FPadding.OnChange := nil;
+    FPadding.Rect := FPriorSupersedePaddingRect;
+    fPadding.OnChange := LPrevPaddingOnChange;
+  end;
+end;
+
+{***********************************}
+constructor TALCheckBoxBaseStateStyle.Create(const AParent: TObject);
+begin
+  inherited Create(AParent);
+  //--
+  if StateStyleParent <> nil then begin
+    {$IF defined(debug)}
+    if not (StateStyleParent is TALCheckBoxBaseStateStyle) then
+      raise Exception.Create('Error E3138842-72E4-4726-B968-73701CE22E8F');
+    {$ENDIF}
+    FCheckMark := TALInheritCheckMarkBrush.Create(TALCheckBoxBaseStateStyle(StateStyleParent).CheckMark, TAlphaColors.Black{ADefaultColor});
+  end
+  else begin
+    {$IF defined(debug)}
+    if not (ControlParent is TALCheckBox) then
+      raise Exception.Create('Error 39844D3D-17F8-4E3F-8B09-BDB4FCEE8B70');
+    {$ENDIF}
+    FCheckMark := TALInheritCheckMarkBrush.Create(TALCheckBox(ControlParent).CheckMark, TAlphaColors.Black{ADefaultColor});
+  end;
+  //--
+  StateLayer.Padding.DefaultValue := TRectF.Create(-10,-10,-10,-10);
+  StateLayer.Padding.Rect := StateLayer.Padding.DefaultValue;
+  //--
+  FCheckMark.OnChanged := CheckMarkChanged;
+end;
+
+{*************************************}
+destructor TALCheckBoxBaseStateStyle.Destroy;
+begin
+  ALFreeAndNil(FCheckMark);
+  inherited Destroy;
+end;
+
+{******************************************************}
+procedure TALCheckBoxBaseStateStyle.Assign(Source: TPersistent);
+begin
+  if Source is TALCheckBoxBaseStateStyle then begin
+    BeginUpdate;
+    Try
+      CheckMark.Assign(TALCheckBoxBaseStateStyle(Source).CheckMark);
+      inherited Assign(Source);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************}
+procedure TALCheckBoxBaseStateStyle.DoSupersede;
+begin
+  inherited;
+  FCheckMark.Supersede;
+end;
+
+{******************}
+procedure TALCheckBoxBaseStateStyle.DoReinstate;
+begin
+  inherited;
+  FCheckMark.Reinstate;
+end;
+
+{********************************************************************************}
+procedure TALCheckBoxBaseStateStyle.SetCheckMark(const AValue: TALInheritCheckMarkBrush);
+begin
+  FCheckMark.Assign(AValue);
+end;
+
+{***********************************************}
+function TALCheckBoxBaseStateStyle.GetInherit: Boolean;
+begin
+  Result := inherited GetInherit and
+            CheckMark.Inherit;
+end;
+
+{*****************************************************************}
+procedure TALCheckBoxBaseStateStyle.CheckMarkChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{**********************************************************}
+function TALCheckBoxDisabledStateStyle.IsOpacityStored: Boolean;
+begin
+  Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
+end;
+
+{********************************************************************}
+procedure TALCheckBoxDisabledStateStyle.SetOpacity(const Value: Single);
+begin
+  if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
+    FOpacity := Value;
+    Change;
+  end;
+end;
+
+{***********************************************************************}
+constructor TALCheckBoxDisabledStateStyle.Create(const AParent: TObject);
+begin
+  inherited Create(AParent);
+  FOpacity := TControl.DefaultDisabledOpacity;
+end;
+
+{****************************************************************}
+procedure TALCheckBoxDisabledStateStyle.Assign(Source: TPersistent);
+begin
+  BeginUpdate;
+  Try
+    if Source is TALCheckBoxDisabledStateStyle then
+      Opacity := TALCheckBoxDisabledStateStyle(Source).Opacity
+    else
+      Opacity := TControl.DefaultDisabledOpacity;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{*************************************}
+constructor TALCheckBoxCheckStateStyles.Create(const AParent: TALCheckBox);
+begin
+  inherited Create;
+  //--
+  FDefault := TALCheckBoxDefaultStateStyle.Create(AParent);
+  FDefault.OnChanged := DefaultChanged;
+  //--
+  FDisabled := TALCheckBoxDisabledStateStyle.Create(FDefault);
+  FDisabled.OnChanged := DisabledChanged;
+  //--
+  FHovered := TALCheckBoxHoveredStateStyle.Create(FDefault);
+  FHovered.OnChanged := HoveredChanged;
+  //--
+  FPressed := TALCheckBoxPressedStateStyle.Create(FDefault);
+  FPressed.OnChanged := PressedChanged;
+  //--
+  FFocused := TALCheckBoxFocusedStateStyle.Create(FDefault);
+  FFocused.OnChanged := FocusedChanged;
+end;
+
+{*************************************}
+destructor TALCheckBoxCheckStateStyles.Destroy;
+begin
+  ALFreeAndNil(FDefault);
+  ALFreeAndNil(FDisabled);
+  ALFreeAndNil(FHovered);
+  ALFreeAndNil(FPressed);
+  ALFreeAndNil(FFocused);
+  inherited Destroy;
+end;
+
+{******************************************************}
+procedure TALCheckBoxCheckStateStyles.Assign(Source: TPersistent);
+begin
+  if Source is TALCheckBoxCheckStateStyles then begin
+    BeginUpdate;
+    Try
+      Default.Assign(TALCheckBoxCheckStateStyles(Source).Default);
+      Disabled.Assign(TALCheckBoxCheckStateStyles(Source).Disabled);
+      Hovered.Assign(TALCheckBoxCheckStateStyles(Source).Hovered);
+      Pressed.Assign(TALCheckBoxCheckStateStyles(Source).Pressed);
+      Focused.Assign(TALCheckBoxCheckStateStyles(Source).Focused);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{************************************************************************************}
+procedure TALCheckBoxCheckStateStyles.SetDefault(const AValue: TALCheckBoxDefaultStateStyle);
+begin
+  FDefault.Assign(AValue);
+end;
+
+{************************************************************************************}
+procedure TALCheckBoxCheckStateStyles.SetDisabled(const AValue: TALCheckBoxDisabledStateStyle);
+begin
+  FDisabled.Assign(AValue);
+end;
+
+{************************************************************************************}
+procedure TALCheckBoxCheckStateStyles.SetHovered(const AValue: TALCheckBoxHoveredStateStyle);
+begin
+  FHovered.Assign(AValue);
+end;
+
+{*******************************************************************************************}
+procedure TALCheckBoxCheckStateStyles.SetPressed(const AValue: TALCheckBoxPressedStateStyle);
+begin
+  FPressed.Assign(AValue);
+end;
+
+{*******************************************************************************************}
+procedure TALCheckBoxCheckStateStyles.SetFocused(const AValue: TALCheckBoxFocusedStateStyle);
+begin
+  FFocused.Assign(AValue);
+end;
+
+{**********************************************************}
+procedure TALCheckBoxCheckStateStyles.DefaultChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{**********************************************************}
+procedure TALCheckBoxCheckStateStyles.DisabledChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{************************************************************}
+procedure TALCheckBoxCheckStateStyles.HoveredChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{******************************************************************}
+procedure TALCheckBoxCheckStateStyles.PressedChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{******************************************************************}
+procedure TALCheckBoxCheckStateStyles.FocusedChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{*************************************}
+constructor TALCheckBoxStateStyles.Create(const AParent: TALCheckBox);
+begin
+  inherited Create;
+  //--
+  FChecked := TALCheckBoxCheckStateStyles.Create(AParent);
+  FChecked.OnChanged := CheckedChanged;
+  //--
+  FUnchecked := TALCheckBoxCheckStateStyles.Create(AParent);
+  FUnchecked.OnChanged := UncheckedChanged;
+end;
+
+{*************************************}
+destructor TALCheckBoxStateStyles.Destroy;
+begin
+  ALFreeAndNil(FChecked);
+  ALFreeAndNil(FUnchecked);
+  inherited Destroy;
+end;
+
+{******************************************************}
+procedure TALCheckBoxStateStyles.Assign(Source: TPersistent);
+begin
+  if Source is TALCheckBoxStateStyles then begin
+    BeginUpdate;
+    Try
+      Checked.Assign(TALCheckBoxStateStyles(Source).Checked);
+      Unchecked.Assign(TALCheckBoxStateStyles(Source).Unchecked);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{************************************************************************************}
+procedure TALCheckBoxStateStyles.SetChecked(const AValue: TALCheckBoxCheckStateStyles);
+begin
+  FChecked.Assign(AValue);
+end;
+
+{*********************************************************************************}
+procedure TALCheckBoxStateStyles.SetUnchecked(const AValue: TALCheckBoxCheckStateStyles);
+begin
+  FUnchecked.Assign(AValue);
+end;
+
+{**********************************************************}
+procedure TALCheckBoxStateStyles.CheckedChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{**********************************************************}
+procedure TALCheckBoxStateStyles.UncheckedChanged(ASender: TObject);
+begin
+  Change;
+end;
+
 {*************************************************}
 constructor TALCheckbox.Create(AOwner: TComponent);
 begin
   inherited;
-  fBufDrawable := ALNullDrawable;
+  //--
   SetAcceptsControls(False);
   CanFocus := True;
-  AutoCapture := True;
-  FPressing:= false;
+  Cursor := crHandPoint;
+  //--
+  Fill.DefaultColor := TAlphaColors.White;
+  Fill.Color := Fill.DefaultColor;
+  //--
+  Stroke.DefaultColor := TAlphaColors.Black;
+  Stroke.Color := Stroke.DefaultColor;
+  //--
   FOnChange := nil;
+  FDoubleBuffered := true;
+  FXRadius := 0;
+  FYRadius := 0;
+  FHovered := False;
   FPressed := False;
   FChecked := False;
-  FIsPan := False;
-  fImageCheckedResourceName := 'checkbox_checked_88x88';
-  fImageUncheckedResourceName := 'checkbox_unchecked_88x88';
-  FWrapMode := TALImageWrapMode.Fit;
+  FCheckMark := TALCheckMarkBrush.Create(TAlphaColors.Black);
+  FCheckMark.OnChanged := CheckMarkChanged;
+  //--
+  FStateStyles := TALCheckBoxStateStyles.Create(Self);
+  FStateStyles.OnChanged := StateStylesChanged;
+  //--
+  fBufCheckedDrawable := ALNullDrawable;
+  fBufCheckedDisabledDrawable := ALNullDrawable;
+  fBufCheckedHoveredDrawable := ALNullDrawable;
+  fBufCheckedPressedDrawable := ALNullDrawable;
+  fBufCheckedFocusedDrawable := ALNullDrawable;
+  fBufUnCheckedDrawable := ALNullDrawable;
+  fBufUnCheckedDisabledDrawable := ALNullDrawable;
+  fBufUnCheckedHoveredDrawable := ALNullDrawable;
+  fBufUnCheckedPressedDrawable := ALNullDrawable;
+  fBufUnCheckedFocusedDrawable := ALNullDrawable;
 end;
 
 {*****************************}
 destructor TALCheckbox.Destroy;
 begin
   clearBufDrawable;
+  ALFreeAndNil(FCheckMark);
+  ALFreeAndNil(FStateStyles);
   inherited;
 end;
 
-{***********************************}
-procedure TALCheckbox.clearBufDrawable;
+{*****************************}
+procedure TALCheckbox.DoMouseEnter;
 begin
-  {$IFDEF debug}
-  if (not (csDestroying in ComponentState)) and
-     (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
-  {$endif}
-  ALFreeAndNilDrawable(fBufDrawable);
-end;
-
-{******************************}
-procedure TALCheckbox.DoChanged;
-begin
-  if Assigned(FOnChange) then
-    FOnChange(Self);
+  inherited;
+  FHovered := True;
   Repaint;
 end;
 
-{************************************************}
-procedure TALCheckbox.SetNewScene(AScene: IScene);
+{*****************************}
+procedure TALCheckbox.DoMouseLeave;
 begin
-  if FPressed and (Scene <> nil) then
-  begin
-    FPressed := False;
-    if AScene <> nil then
-      StartTriggerAnimation(Self, 'Pressed');
-  end;
   inherited;
+  FHovered := False;
+  Repaint;
 end;
 
 {**************************************************************************************}
 procedure TALCheckbox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
   inherited;
-  if Button = TMouseButton.mbLeft then
-  begin
-    FPressing := True;
+  if Button = TMouseButton.mbLeft then begin
     FPressed := True;
-    FIsPan := False;
-    StartTriggerAnimation(Self, 'Pressed');
+    Repaint;
   end;
 end;
 
 {****************************************************************}
 procedure TALCheckbox.MouseMove(Shift: TShiftState; X, Y: Single);
-const
-  ThresholdMouseTap = 5;
-var
-  Distance: Single;
 begin
   inherited;
-  if (ssLeft in Shift) and FPressing then
-  begin
-    if FPressed <> LocalRect.Contains(PointF(X, Y)) then
-    begin
-      FPressed := LocalRect.Contains(PointF(X, Y));
-      StartTriggerAnimation(Self, 'Pressed');
-    end;
-    if not FIsPan then
-    begin
-      Distance := LocalToScreen(PressedPosition).Distance(LocalToScreen(TPointF.Create(X, Y)));
-      if Distance > ThresholdMouseTap then
-        FIsPan := True;
-    end;
-  end;
+  if not FHovered then
+    Repaint;
+  FHovered := True;
 end;
 
-{************************************************************************************}
+{********************************************************************************}
 procedure TALCheckbox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if FPressing then
-  begin
-    inherited;
-    FPressing := False;
-    FPressed := False;
+  inherited;
+  FPressed := False;
+  Repaint;
+end;
 
-    if LocalRect.Contains(PointF(X, Y)) then
-    begin
-      // Avoiding a changing "Checked" state if user moves cursor of finger through the control.
-      case TOSVersion.Platform of
-        TOSVersion.TPlatform.pfiOS,
-        TOSVersion.TPlatform.pfAndroid:
-          if not FIsPan then
-            Checked := not Checked;
-      else
-        Checked := not Checked;
-      end;
-    end
-  end;
+{*****************************}
+procedure TALCheckbox.Click;
+begin
+  Checked := not Checked;
+  inherited;
 end;
 
 {*********************************************************************************************}
 procedure TALCheckbox.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
 begin
   inherited;
-  if (KeyChar = ' ') then
-  begin
+  if (KeyChar = ' ') then begin
     Click; // Emulate mouse click to perform Action.OnExecute
-    Checked := not Checked;
     KeyChar := #0;
   end;
-end;
-
-{************************************}
-procedure TALCheckbox.MakeBufDrawable;
-begin
-
-  var LResourceName: String;
-  if Checked then LResourceName := ImageCheckedResourceName
-  else LResourceName := ImageUncheckedResourceName;
-
-  if (Size.Size.IsZero) or // Do not create BufDrawable if the size is 0
-     (LResourceName = '') then begin // Do not create BufDrawable if LResourceName is empty
-    clearBufDrawable;
-    exit;
-  end;
-
-  if (not ALIsDrawableNull(fBufDrawable)) and
-     (FbufResourceName = LResourceName) then exit;
-  clearBufDrawable;
-  FbufResourceName := LResourceName;
-
-  {$IFDEF ALDPK}
-  var LFileName := ALDPKGetResourceFilename(LResourceName);
-  {$ENDIF}
-
-  fBufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
-
-  case FWrapMode of
-
-    // Display the image with its original dimensions:
-    // * The image is placed in the upper-left corner of the rectangle of the control.
-    // * If the image is larger than the control's rectangle, then only the upper-left part of the image,
-    //   which fits in the rectangle of the control, is shown. The image is not resized.
-    TALImageWrapMode.Original:
-      begin
-        // todo
-      end;
-
-    // Best fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    //   (keeping image proportions – the ratio between the width and height) to fit the whole image in the rectangle
-    //   of the control. That is, either the width of the resized image is equal to the width of the control's rectangle
-    //   or the height of the resized image is equal to the height of the rectangle of the control. The whole image
-    //   should be displayed. The image is displayed centered in the rectangle of the control.
-    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    //   the rectangle of the control. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    TALImageWrapMode.Fit:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        fBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(LResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Stretch the image to fill the entire rectangle of the control.
-    TALImageWrapMode.Stretch:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndStretchToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        fBufDrawable := ALLoadFromResourceAndStretchToDrawable(LResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Tile (multiply) the image to cover the entire rectangle of the control:
-    // * If the image is larger than the rectangle of the control, then only the
-    //   upper-left part of the image, which fits in the rectangle of the control, is shown. The image is not resized.
-    // * If the image (original size) is smaller than the rectangle of the control, then the multiple images are tiled
-    //   (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
-    //   the upper-left corner of the rectangle of the control.
-    TALImageWrapMode.Tile:
-      begin
-        // todo
-      end;
-
-    // Center the image to the rectangle of the control:
-    // * The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
-    TALImageWrapMode.Center:
-      begin
-        // todo
-      end;
-
-    // Fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image (keeping image proportions--the ratio between the width and height)
-    //   to fit the whole image in the rectangle of the control. That is, either the width of the resized image is equal to the width of the control's rectangle or the height of the
-    //   resized image is equal to the height of the control's rectangle. Whole the image should be displayed. The image is displayed centered in the rectangle of the control.
-    // * If the original image is smaller than the rectangle of the control, then the image is not resized. The image is displayed centered in the rectangle of the control.
-    TALImageWrapMode.Place:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndPlaceIntoToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        fBufDrawable := ALLoadFromResourceAndPlaceIntoToDrawable(LResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Best fit the image in the rectangle of the control:
-    // * If any dimension of the image is larger than the rectangle of the control, then scales down the image
-    //   (keeping image proportions – the ratio between the width and height) to fit the height or the width of the image in the rectangle
-    //   of the control and crop the extra part of the image. That is, the width of the resized image is equal to the width of the control's rectangle
-    //   AND the height of the resized image is equal to the height of the rectangle of the control.
-    //  * If the original image is smaller than the rectangle of the control, then the image is stretched to best fit in
-    //   the rectangle of the control. Whole the image should be displayed.
-    TALImageWrapMode.FitAndCrop:
-      begin
-        {$IFDEF ALDPK}
-        if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoAndCropToDrawable(LFileName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-        else fBufDrawable := ALNullDrawable;
-        {$ELSE}
-        fBufDrawable := ALLoadFromResourceAndFitIntoAndCropToDrawable(LResourceName, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale);
-        {$ENDIF}
-      end;
-
-    // Error
-    else
-      Raise Exception.Create('Error 9D7CF8BF-AB6B-432F-8C2B-474E23B5535D')
-
-  end;
-
-  if not ALIsDrawableNull(fBufDrawable) then
-    fBufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(fBufDrawable)/ALGetScreenScale, ALGetDrawableHeight(fBufDrawable)/ALGetScreenScale).
-                          CenterAt(LocalRect);
-end;
-
-{**************************}
-procedure TALCheckbox.Paint;
-begin
-
-  if (csDesigning in ComponentState) and not Locked and not FInPaintTo then
-  begin
-    var R := LocalRect;
-    InflateRect(R, -0.5, -0.5);
-    Canvas.DrawDashRect(R, 0, 0, AllCorners, AbsoluteOpacity, $A0909090);
-  end;
-
-  MakeBufDrawable;
-
-  ALDrawDrawable(
-    Canvas, // const ACanvas: Tcanvas;
-    fBufDrawable, // const ADrawable: TALDrawable;
-    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
-    AbsoluteOpacity); // const AOpacity: Single);
-
 end;
 
 {***********************************************}
 function TALCheckbox.GetDoubleBuffered: boolean;
 begin
-  result := True;
+  result := fDoubleBuffered;
 end;
 
 {**************************************************************}
 procedure TALCheckbox.SetDoubleBuffered(const AValue: Boolean);
 begin
-  // Not yet supported
+  if AValue <> fDoubleBuffered then begin
+    fDoubleBuffered := AValue;
+    if not fDoubleBuffered then clearBufDrawable;
+  end;
 end;
 
-{******************************************}
-function TALCheckbox.GetDefaultSize: TSizeF;
+{****************************************************}
+procedure TALCheckbox.SetXRadius(const Value: Single);
+var
+  NewValue: Single;
 begin
-  Result := TSizeF.Create(22, 22);
-end;
-
-{***********************************************************}
-function TALCheckBox.ImageCheckedResourceNameStored: Boolean;
-begin
-  result := fImageCheckedResourceName <> 'checkbox_checked_88x88';
-end;
-
-{*************************************************************}
-function TALCheckBox.ImageUncheckedResourceNameStored: Boolean;
-begin
-  result := fImageUnCheckedResourceName <> 'checkbox_unchecked_88x88';
-end;
-
-{***************************************************************}
-procedure TALCheckBox.SetWrapMode(const Value: TALImageWrapMode);
-begin
-  if FWrapMode <> Value then begin
+  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
+  else NewValue := Value;
+  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
     clearBufDrawable;
-    FWrapMode := Value;
+    FXRadius := NewValue;
     Repaint;
   end;
 end;
 
-{*********************************************************************}
-procedure TALCheckbox.setImageCheckedResourceName(const Value: String);
+{****************************************************}
+procedure TALCheckbox.SetYRadius(const Value: Single);
+var
+  NewValue: Single;
 begin
-  if fImageCheckedResourceName <> Value then begin
+  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
+  else NewValue := Value;
+  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
     clearBufDrawable;
-    fImageCheckedResourceName := Value;
-    Repaint;
-  end;
-end;
-
-{***********************************************************************}
-procedure TALCheckbox.setImageUncheckedResourceName(const Value: String);
-begin
-  if fImageUncheckedResourceName <> Value then begin
-    clearBufDrawable;
-    fImageUncheckedResourceName := Value;
+    FYRadius := NewValue;
     Repaint;
   end;
 end;
@@ -2356,12 +2959,74 @@ end;
 {*****************************************************}
 procedure TALCheckbox.SetChecked(const Value: Boolean);
 begin
-  if FChecked <> Value then
-  begin
+  if FChecked <> Value then begin
     FChecked := Value;
-    StartTriggerAnimation(Self, 'Checked');
     DoChanged;
   end;
+end;
+
+{*********************************************************************}
+procedure TALCheckbox.SetStateStyles(const AValue: TALCheckBoxStateStyles);
+begin
+  FStateStyles.Assign(AValue);
+end;
+
+{******************************************************}
+procedure TALCheckbox.StateStylesChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  (* *)
+  if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
+  else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
+  Repaint;
+end;
+
+{***********************************************************}
+procedure TALCheckbox.SetCheckMark(const Value: TALCheckMarkBrush);
+begin
+  FCheckMark.Assign(Value);
+end;
+
+{******************************************************}
+procedure TALCheckbox.CheckMarkChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  Repaint;
+end;
+
+{**************************************************}
+procedure TALCheckbox.FillChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  inherited;
+end;
+
+{****************************************************}
+procedure TALCheckbox.StrokeChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  inherited;
+end;
+
+{****************************************************}
+procedure TALCheckbox.ShadowChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  inherited;
+end;
+
+{******************************************}
+function TALCheckbox.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(22, 22);
+end;
+
+{******************************}
+procedure TALCheckbox.DoChanged;
+begin
+  if Assigned(FOnChange) then
+    FOnChange(Self);
+  Repaint;
 end;
 
 {******************************}
@@ -2371,12 +3036,541 @@ begin
   inherited;
 end;
 
+{***********************************}
+procedure TALCheckbox.clearBufDrawable;
+begin
+  {$IFDEF debug}
+  if (not (csDestroying in ComponentState)) and
+     ((not ALIsDrawableNull(fBufCheckedDrawable)) or
+      (not ALIsDrawableNull(fBufCheckedDisabledDrawable)) or
+      (not ALIsDrawableNull(fBufCheckedHoveredDrawable)) or
+      (not ALIsDrawableNull(fBufCheckedPressedDrawable)) or
+      (not ALIsDrawableNull(fBufCheckedFocusedDrawable)) or
+      (not ALIsDrawableNull(fBufUnCheckedDrawable)) or
+      (not ALIsDrawableNull(fBufUnCheckedDisabledDrawable)) or
+      (not ALIsDrawableNull(fBufUnCheckedHoveredDrawable)) or
+      (not ALIsDrawableNull(fBufUnCheckedPressedDrawable)) or
+      (not ALIsDrawableNull(fBufUnCheckedFocusedDrawable))) then
+    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+  {$endif}
+  ALFreeAndNilDrawable(fBufCheckedDrawable);
+  ALFreeAndNilDrawable(fBufCheckedDisabledDrawable);
+  ALFreeAndNilDrawable(fBufCheckedHoveredDrawable);
+  ALFreeAndNilDrawable(fBufCheckedPressedDrawable);
+  ALFreeAndNilDrawable(fBufCheckedFocusedDrawable);
+  ALFreeAndNilDrawable(fBufUnCheckedDrawable);
+  ALFreeAndNilDrawable(fBufUnCheckedDisabledDrawable);
+  ALFreeAndNilDrawable(fBufUnCheckedHoveredDrawable);
+  ALFreeAndNilDrawable(fBufUnCheckedPressedDrawable);
+  ALFreeAndNilDrawable(fBufUnCheckedFocusedDrawable);
+end;
+
+{**********************************}
+procedure TALCheckbox.DrawCheckMark(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const ACheckMark: TALCheckMarkBrush;
+            const AChecked: Boolean);
+begin
+  var LRect := ADstRect;
+  LRect.Top := LRect.Top * AScale;
+  LRect.right := LRect.right * AScale;
+  LRect.left := LRect.left * AScale;
+  LRect.bottom := LRect.bottom * AScale;
+  var LScaledPaddingRect := ACheckMark.padding.Rect;
+  LScaledPaddingRect.Left := LScaledPaddingRect.Left * AScale;
+  LScaledPaddingRect.right := LScaledPaddingRect.right * AScale;
+  LScaledPaddingRect.top := LScaledPaddingRect.top * AScale;
+  LScaledPaddingRect.bottom := LScaledPaddingRect.bottom * AScale;
+  LRect.Top := LRect.Top + LScaledPaddingRect.top;
+  LRect.right := LRect.right - LScaledPaddingRect.right;
+  LRect.left := LRect.left + LScaledPaddingRect.left;
+  LRect.bottom := LRect.bottom - LScaledPaddingRect.bottom;
+
+  // Without ResourceName
+  if ACheckMark.ResourceName = '' then begin
+
+    // Exit if no color or no stroke
+    var LScaledCheckMarkThickness := ACheckMark.Thickness * AScale;
+    if (ACheckMark.Color = TalphaColors.Null) or (CompareValue(LScaledCheckMarkThickness, 0, TEpsilon.position) <= 0) then
+      exit;
+
+    // exit if not checked
+    if not checked then
+      exit;
+
+    // Try to find LPoint2.x so that LPoint1, LPoint2 and LPoint3 form
+    // a right triangle
+    Var LHalfScaledCheckMarkThickness := ((LScaledCheckMarkThickness / Sqrt(2)) / 2);
+    Var LCheckMarkRect := TRectF.Create(0,0,342,270).FitInto(Lrect);
+    var LPoint1 := TPointF.Create(LCheckMarkRect.left + LHalfScaledCheckMarkThickness, LCheckMarkRect.top+(LCheckMarkRect.height * 0.5));
+    var LPoint2 := TPointF.Create(0, LCheckMarkRect.Bottom - (2*LHalfScaledCheckMarkThickness));
+    var LPoint3 := TPointF.Create(LCheckMarkRect.right-LHalfScaledCheckMarkThickness, LCheckMarkRect.top+LHalfScaledCheckMarkThickness);
+    // Coefficients for the quadratic equation ax^2 + bx + c = 0
+    var a: Single := 1;
+    var b: Single := -(LPoint1.X + LPoint3.X);
+    var c: Single := LPoint1.X * LPoint3.X + LPoint1.Y * LPoint3.Y - LPoint1.Y * LPoint2.Y - LPoint2.Y * LPoint3.Y + Sqr(LPoint2.Y);
+    // Calculate the discriminant
+    var LDiscriminant: Single := b * b - 4 * a * c;
+    // Check if there are real solutions
+    if LDiscriminant < 0 then begin
+      // No real solution so use place LPoint2.x
+      // at 33% from the left border
+      LPoint2.x := LCheckMarkRect.Left + (LCheckMarkRect.Width * 0.33);
+    end
+    else begin
+      // 2 solutions:
+      //     (-b - Sqrt(LDiscriminant)) / (2 * a);
+      //     (-b + Sqrt(LDiscriminant)) / (2 * a);
+      // Use only the first one
+      LPoint2.x := (-b - Sqrt(LDiscriminant)) / (2 * a);
+    end;
+
+    {$REGION 'SKIA'}
+    {$IF defined(ALSkiaEngine)}
+
+    // Create LPaint
+    var LPaint := ALSkCheckHandle(sk4d_paint_create);
+    try
+
+      // Requests, but does not require, that edge pixels draw opaque or with partial transparency.
+      sk4d_paint_set_antialias(LPaint, true);
+      // Sets whether the geometry is filled, stroked, or filled and stroked.
+      sk4d_paint_set_dither(LPaint, true);
+
+      // Stroke with solid color
+      sk4d_paint_set_style(LPaint, sk_paintstyle_t.STROKE_SK_PAINTSTYLE);
+      sk4d_paint_set_stroke_width(LPaint, LScaledCheckMarkThickness);
+      sk4d_paint_set_color(LPaint, ACheckMark.Color);
+      var LPathBuilder := ALSkCheckHandle(sk4d_pathbuilder_create);
+      try
+        sk4d_pathbuilder_move_to(LPathBuilder, @LPoint1);
+        sk4d_pathbuilder_line_to(LPathBuilder, @LPoint2);
+        sk4d_pathbuilder_line_to(LPathBuilder, @LPoint3);
+        var LPath := sk4d_pathbuilder_detach(LPathBuilder);
+        try
+          sk4d_canvas_draw_Path(ACanvas, LPath, LPaint);
+        finally
+          sk4d_path_destroy(LPath);
+        end;
+      finally
+        sk4d_pathbuilder_destroy(LPathBuilder);
+      end;
+
+    finally
+      sk4d_paint_destroy(LPaint);
+    end;
+
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'ANDROID'}
+    {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+
+    // Create LPaint
+    var LPaint := TJPaint.JavaClass.init;
+    LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
+    LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
+    LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
+
+    // Stroke with solid color
+    LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
+    LPaint.setStrokeWidth(LScaledCheckMarkThickness);
+    LPaint.setColor(integer(ACheckMark.Color));
+    var LPath := TJPath.Create;
+    LPath.moveTo(LPoint1.x, LPoint1.y);
+    LPath.LineTo(LPoint2.x, LPoint2.y);
+    LPath.LineTo(LPoint3.x, LPoint3.y);
+    aCanvas.drawPath(LPath,LPaint);
+    LPath := nil;
+
+    //free the paint
+    LPaint := nil;
+
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'APPLEOS'}
+    {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+
+    var LAlphaColor := TAlphaColorCGFloat.Create(ACheckMark.Color);
+    CGContextSetRGBStrokeColor(ACanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+    CGContextSetLineWidth(ACanvas, LScaledCheckMarkThickness);
+
+    var LGridHeight := CGBitmapContextGetHeight(ACanvas);
+
+    CGContextBeginPath(ACanvas);
+    CGContextMoveToPoint(ACanvas, LPoint1.x, LGridHeight - LPoint1.y);
+    CGContextAddLineToPoint(ACanvas, LPoint2.x, LGridHeight - LPoint2.y);
+    CGContextAddLineToPoint(ACanvas, LPoint3.x, LGridHeight - LPoint3.y);
+    CGContextStrokePath(ACanvas);
+
+
+    {$ENDIF}
+    {$ENDREGION}
+
+    {$REGION 'MSWINDOWS'}
+    {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+
+    var LSaveState := ACanvas.SaveState;
+    try
+      ACanvas.Stroke.Color := ACheckMark.Color;
+      ACanvas.Stroke.Thickness := LScaledCheckMarkThickness;
+      ACanvas.DrawLine(LPoint1, LPoint2, 1{AOpacity});
+      ACanvas.DrawLine(LPoint2, LPoint3, 1{AOpacity});
+    finally
+      ACanvas.RestoreState(LSaveState)
+    end;
+
+    {$ENDIF}
+    {$ENDREGION}
+
+  end
+
+  // With ResourceName
+  else begin
+
+    ALDrawRectangle(
+      ACanvas, // const ACanvas: TALCanvas;
+      1, // const AScale: Single;
+      LRect, // const ADstRect: TrectF;
+      TAlphaColors.Null, // const AFillColor: TAlphaColor;
+      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
+      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      ACheckMark.ResourceName, // const AFillResourceName: String;
+      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      TRectF.Empty, // Const AFillPaddingRect: TRectF;
+      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
+      0, // const AStrokeThickness: Single;
+      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+      0, // const AShadowBlur: Single;
+      0, // const AShadowOffsetX: Single;
+      0, // const AShadowOffsetY: Single;
+      AllSides, // const ASides: TSides;
+      AllCorners, // const ACorners: TCorners;
+      0, // const AXRadius: Single;
+      0); // const AYRadius: Single)
+
+  end;
+
+end;
+
+{**************************************}
+Procedure TALCheckbox.CreateBufDrawable(
+            var ABufDrawable: TALDrawable;
+            var ABufDrawableRect: TRectF;
+            const AFill: TALBrush;
+            const AStateLayer: TALBrush;
+            const AStroke: TALStrokeBrush;
+            const ACheckMark: TALCheckMarkBrush;
+            const AShadow: TALShadow);
+begin
+
+  if (not ALIsDrawableNull(ABufDrawable)) then exit;
+
+  ABufDrawableRect := LocalRect;
+  var LRect := ABufDrawableRect;
+
+  if AFill.HasFill then begin
+    var LFillRect := LRect;
+    LfillRect.Inflate(-AFill.Padding.Left, -AFill.Padding.top, -AFill.Padding.right, -AFill.Padding.Bottom);
+    ABufDrawableRect := TRectF.Union(LfillRect, ABufDrawableRect); // add the extra space needed to draw the fill
+  end;
+
+  if AStateLayer.HasFill then begin
+    var LStateLayerRect := LRect;
+    LStateLayerRect.Inflate(-AStateLayer.Padding.Left, -AStateLayer.Padding.top, -AStateLayer.Padding.right, -AStateLayer.Padding.Bottom);
+    ABufDrawableRect := TRectF.Union(LStateLayerRect, ABufDrawableRect); // add the extra space needed to draw the StateLayer
+  end;
+
+  if ACheckMark.HasCheckMark then begin
+    var LCheckMarkRect := LRect;
+    LCheckMarkRect.Inflate(-ACheckMark.Padding.Left, -ACheckMark.Padding.top, -ACheckMark.Padding.right, -ACheckMark.Padding.Bottom);
+    ABufDrawableRect := TRectF.Union(LCheckMarkRect, ABufDrawableRect); // add the extra space needed to draw the CheckMark
+  end;
+
+  if AShadow.HasShadow then begin
+    var LShadowWidth := ALGetShadowWidth(AShadow.blur);
+    var LShadowRect := LRect;
+    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
+    LShadowRect.Offset(AShadow.OffsetX, AShadow.OffsetY);
+    ABufDrawableRect := TRectF.Union(LShadowRect, ABufDrawableRect); // add the extra space needed to draw the shadow
+  end;
+
+  ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
+  LRect.Offset(Max(0, -ABufDrawableRect.Left), Max(0, -ABufDrawableRect.top));
+
+  var LSurface: TALSurface;
+  var LCanvas: TALCanvas;
+  ALCreateSurface(
+    LSurface, // out ASurface: TALSurface;
+    LCanvas, // out ACanvas: TALCanvas;
+    ALGetScreenScale, // const AScale: Single;
+    ABufDrawableRect.Width, // const w: integer;
+    ABufDrawableRect.height);// const h: integer)
+  try
+
+    if ALCanvasBeginScene(LCanvas) then
+    try
+
+      ALDrawRectangle(
+        LCanvas, // const ACanvas: TALCanvas;
+        ALGetScreenScale, // const AScale: Single;
+        LRect, // const Rect: TrectF;
+        AFill, // const Fill: TALBrush;
+        AStroke, // const Stroke: TALStrokeBrush;
+        AShadow, // const Shadow: TALShadow
+        ALLSides, // const Sides: TSides;
+        ALLCorners, // const Corners: TCorners;
+        XRadius, // const XRadius: Single = 0;
+        YRadius); // const YRadius: Single = 0);
+
+      if AStateLayer.HasFill then begin
+        ALDrawRectangle(
+          LCanvas, // const ACanvas: TALCanvas;
+          ALGetScreenScale, // const AScale: Single;
+          LRect, // const Rect: TrectF;
+          AStateLayer, // const Fill: TALBrush;
+          nil, // const Stroke: TALStrokeBrush;
+          nil, // const Shadow: TALShadow
+          AllSides, // const Sides: TSides;
+          AllCorners, // const Corners: TCorners;
+          -50, // const XRadius: Single = 0;
+          -50); // const YRadius: Single = 0);
+      end;
+
+      DrawCheckMark(
+        LCanvas, // const ACanvas: TALCanvas;
+        ALGetScreenScale, // const AScale: Single;
+        LRect, // const ADstRect: TrectF;
+        ACheckMark, // const ACheckMark: TALCheckMarkBrush;
+        FChecked); // const AChecked: Boolean
+
+    finally
+      ALCanvasEndScene(LCanvas)
+    end;
+
+    ABufDrawable := ALSurfaceToDrawable(LSurface);
+
+  finally
+    ALFreeSurface(LSurface, LCanvas);
+  end;
+
+end;
+
+{************************************}
+procedure TALCheckbox.MakeBufDrawable;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _MakeBufDrawable(
+              const AStateStyle: TALCheckBoxBaseStateStyle;
+              var ABufDrawable: TALDrawable;
+              var ABufDrawableRect: TRectF);
+  begin
+    if (AStateStyle <> StateStyles.Checked.Default) and
+       (AStateStyle <> StateStyles.UnChecked.Default) and
+       (AStateStyle.Inherit) then exit;
+    if (not ALIsDrawableNull(ABufDrawable)) then exit;
+    AStateStyle.Supersede;
+    try
+      //--
+      CreateBufDrawable(
+        ABufDrawable, // var ABufDrawable: TALDrawable;
+        ABufDrawableRect, // var ABufDrawableRect: TRectF;
+        AStateStyle.Fill, // const AFill: TALBrush;
+        AStateStyle.StateLayer, // const AStateLayer: TALBrush;
+        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+        AStateStyle.CheckMark, // const ACheckMark: TALCheckMarkBrush;
+        AStateStyle.Shadow); // const AShadow: TALShadow);
+
+(*
+      // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.
+      // However, the fBufDrawableRect rectangle is offset by the shadow's dx and dy values,
+      // if a shadow is applied, to adjust for the visual shift caused by the shadow.
+      var LMainDrawableRect := BufDrawableRect;
+      LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
+      var LCenteredRect := ABufDrawableRect.CenterAt(LMainDrawableRect);
+      ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
+      ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
+*)
+    finally
+      AStateStyle.Reinstate;
+    end;
+  end;
+
+begin
+  if FChecked then begin
+    _MakeBufDrawable(
+      StateStyles.Checked.Default, // const AStateStyle: TALButtonStateStyle;
+      FBufCheckedDrawable, // var ABufDrawable: TALDrawable;
+      FBufCheckedDrawableRect); // var ABufDrawableRect: TRectF;
+    if Not Enabled then begin
+      _MakeBufDrawable(
+        StateStyles.Checked.Disabled, // const AStateStyle: TALButtonStateStyle;
+        FBufCheckedDisabledDrawable, // var ABufDrawable: TALDrawable;
+        FBufCheckedDisabledDrawableRect); // var ABufDrawableRect: TRectF;
+    end
+    else if FPressed then begin
+      _MakeBufDrawable(
+        StateStyles.Checked.Pressed, // const AStateStyle: TALButtonStateStyle;
+        FBufCheckedPressedDrawable, // var ABufDrawable: TALDrawable;
+        FBufCheckedPressedDrawableRect); // var ABufDrawableRect: TRectF;
+    end
+    else if IsFocused then begin
+      _MakeBufDrawable(
+        StateStyles.Checked.Focused, // const AStateStyle: TALButtonStateStyle;
+        FBufCheckedFocusedDrawable, // var ABufDrawable: TALDrawable;
+        FBufCheckedFocusedDrawableRect); // var ABufDrawableRect: TRectF;
+    end
+    else if FHovered then begin
+      _MakeBufDrawable(
+        StateStyles.Checked.Hovered, // const AStateStyle: TALButtonStateStyle;
+        FBufCheckedHoveredDrawable, // var ABufDrawable: TALDrawable;
+        FBufCheckedHoveredDrawableRect); // var ABufDrawableRect: TRectF;
+    end;
+  end
+  else begin
+    _MakeBufDrawable(
+      StateStyles.UnChecked.Default, // const AStateStyle: TALButtonStateStyle;
+      FBufUnCheckedDrawable, // var ABufDrawable: TALDrawable;
+      FBufUnCheckedDrawableRect); // var ABufDrawableRect: TRectF;
+    if Not Enabled then begin
+      _MakeBufDrawable(
+        StateStyles.UnChecked.Disabled, // const AStateStyle: TALButtonStateStyle;
+        FBufUnCheckedDisabledDrawable, // var ABufDrawable: TALDrawable;
+        FBufUnCheckedDisabledDrawableRect); // var ABufDrawableRect: TRectF;
+    end
+    else if FPressed then begin
+      _MakeBufDrawable(
+        StateStyles.UnChecked.Pressed, // const AStateStyle: TALButtonStateStyle;
+        FBufUnCheckedPressedDrawable, // var ABufDrawable: TALDrawable;
+        FBufUnCheckedPressedDrawableRect); // var ABufDrawableRect: TRectF;
+    end
+    else if IsFocused then begin
+      _MakeBufDrawable(
+        StateStyles.UnChecked.Focused, // const AStateStyle: TALButtonStateStyle;
+        FBufUnCheckedFocusedDrawable, // var ABufDrawable: TALDrawable;
+        FBufUnCheckedFocusedDrawableRect); // var ABufDrawableRect: TRectF;
+    end
+    else if FHovered then begin
+      _MakeBufDrawable(
+        StateStyles.UnChecked.Hovered, // const AStateStyle: TALButtonStateStyle;
+        FBufUnCheckedHoveredDrawable, // var ABufDrawable: TALDrawable;
+        FBufUnCheckedHoveredDrawableRect); // var ABufDrawableRect: TRectF;
+    end;
+  end;
+end;
+
+{**************************}
+procedure TALCheckbox.Paint;
+begin
+
+  MakeBufDrawable;
+
+  var LDrawable: TALDrawable;
+  var LDrawableRect: TRectF;
+
+  if Fchecked then begin
+    if Not Enabled then begin
+      LDrawable := fBufCheckedDisabledDrawable;
+      LDrawableRect := fBufCheckedDisabledDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufCheckedDrawable;
+        LDrawableRect := fBufCheckedDrawableRect;
+      end;
+    end
+    //--
+    else if FPressed then begin
+      LDrawable := fBufCheckedPressedDrawable;
+      LDrawableRect := fBufCheckedPressedDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufCheckedDrawable;
+        LDrawableRect := fBufCheckedDrawableRect;
+      end;
+    end
+    //--
+    else if IsFocused then begin
+      LDrawable := fBufCheckedFocusedDrawable;
+      LDrawableRect := fBufCheckedFocusedDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufCheckedDrawable;
+        LDrawableRect := fBufCheckedDrawableRect;
+      end;
+    end
+    //--
+    else if FHovered then begin
+      LDrawable := fBufCheckedHoveredDrawable;
+      LDrawableRect := fBufCheckedHoveredDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufCheckedDrawable;
+        LDrawableRect := fBufCheckedDrawableRect;
+      end;
+    end
+    //--
+    else begin
+      LDrawable := fBufCheckedDrawable;
+      LDrawableRect := fBufCheckedDrawableRect;
+    end;
+  end
+  else begin
+    if Not Enabled then begin
+      LDrawable := fBufUnCheckedDisabledDrawable;
+      LDrawableRect := fBufUnCheckedDisabledDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufUnCheckedDrawable;
+        LDrawableRect := fBufUnCheckedDrawableRect;
+      end;
+    end
+    //--
+    else if FPressed then begin
+      LDrawable := fBufUnCheckedPressedDrawable;
+      LDrawableRect := fBufUnCheckedPressedDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufUnCheckedDrawable;
+        LDrawableRect := fBufUnCheckedDrawableRect;
+      end;
+    end
+    //--
+    else if IsFocused then begin
+      LDrawable := fBufUnCheckedFocusedDrawable;
+      LDrawableRect := fBufUnCheckedFocusedDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufUnCheckedDrawable;
+        LDrawableRect := fBufUnCheckedDrawableRect;
+      end;
+    end
+    //--
+    else if FHovered then begin
+      LDrawable := fBufUnCheckedHoveredDrawable;
+      LDrawableRect := fBufUnCheckedHoveredDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := fBufUnCheckedDrawable;
+        LDrawableRect := fBufUnCheckedDrawableRect;
+      end;
+    end
+    //--
+    else begin
+      LDrawable := fBufUnCheckedDrawable;
+      LDrawableRect := fBufUnCheckedDrawableRect;
+    end;
+  end;
+
+  ALDrawDrawable(
+    Canvas, // const ACanvas: Tcanvas;
+    LDrawable, // const ADrawable: TALDrawable;
+    LDrawableRect.TopLeft, // const ATopLeft: TpointF;
+    AbsoluteOpacity); // const AOpacity: Single);
+
+end;
+
 {****************************************************}
 constructor TALRadioButton.Create(AOwner: TComponent);
 begin
   inherited;
-  fImageCheckedResourceName := 'radio_checked_88x88';
-  fImageUncheckedResourceName := 'radio_unchecked_88x88';
   FGroupName := '';
   fMandatory := false;
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
@@ -2403,21 +3597,8 @@ begin
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
     end;
-    StartTriggerAnimation(Self, 'Checked');
     DoChanged;
   end;
-end;
-
-{**************************************************************}
-function TALRadioButton.ImageCheckedResourceNameStored: Boolean;
-begin
-  result := fImageCheckedResourceName <> 'radio_checked_88x88';
-end;
-
-{****************************************************************}
-function TALRadioButton.ImageUncheckedResourceNameStored: Boolean;
-begin
-  result := fImageUnCheckedResourceName <> 'radio_unchecked_88x88';
 end;
 
 {*******************************************}
@@ -2519,7 +3700,7 @@ begin
   FBackGround.Margins.right := 6;
   FBackGround.XRadius := 7;
   FBackGround.yRadius := 7;
-  FBackGround.Stroke.Kind := TBrushKind.None;
+  FBackGround.Stroke.Color := Talphacolors.Null;
   fBackGround.Fill.Color := $ffc5c5c5;
   fBackGround.HitTest := False;
   //-----
@@ -2532,7 +3713,6 @@ begin
   FThumb.height := FThumbRect.height;
   FThumb.XRadius := 11;
   FThumb.yRadius := 11;
-  FThumb.Stroke.Kind := TBrushKind.solid;
   fThumb.Stroke.Color := $ffd5d5d5;
   FThumb.Fill.Color := $ffffffff;
   FThumb.HitTest := False;
@@ -2749,54 +3929,85 @@ begin
 end;
 
 {***********************************}
-constructor TALButtonStateStyle.Create;
+constructor TALButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
-  inherited Create;
+  inherited Create(AParent);
   FText := '';
   //--
-  FFill := TALInheritBrush.Create(TBrushKind.Solid{ADefaultKind}, $FFE1E1E1{ADefaultColor});
-  FFill.OnChanged := FillChanged;
+  if StateStyleParent <> nil then begin
+    {$IF defined(debug)}
+    if not (StateStyleParent is TBaseStateStyle) then
+      raise Exception.Create('Error 51C3F10E-1F1D-4845-8484-ADEEF0C6C2E9');
+    {$ENDIF}
+    FTextSettings := TStateStyleTextSettings.Create(TBaseStateStyle(StateStyleParent).TextSettings);
+  end
+  else begin
+    {$IF defined(debug)}
+    if not (ControlParent is TALButton) then
+      raise Exception.Create('Error D1F161D7-6BEA-4E25-A904-F95FA8943C6B');
+    {$ENDIF}
+    FTextSettings := TStateStyleTextSettings.Create(TALButton(ControlParent).TextSettings);
+  end;
   //--
-  FStroke := TALInheritStrokeBrush.Create(TBrushKind.Solid{ADefaultKind}, $FFADADAD{ADefaultColor});
-  FStroke.OnChanged := StrokeChanged;
+  Fill.DefaultColor := $FFE1E1E1;
+  Fill.Color := Fill.DefaultColor;
   //--
-  FTextSettings := TALButtonStateStyleTextSettings.Create;
+  Stroke.DefaultColor := $FFADADAD;
+  Stroke.Color := Stroke.DefaultColor;
+  //--
   FTextSettings.OnChanged := TextSettingsChanged;
   //--
-  FShadow := TALInheritShadow.Create;
-  FShadow.OnChanged := ShadowChanged;
+  //FPriorSupersedeText
 end;
 
 {*************************************}
-destructor TALButtonStateStyle.Destroy;
+destructor TALButton.TBaseStateStyle.Destroy;
 begin
-  ALFreeAndNil(FFill);
-  ALFreeAndNil(FStroke);
   ALFreeAndNil(FTextSettings);
-  ALFreeAndNil(FShadow);
   inherited Destroy;
 end;
 
 {******************************************************}
-procedure TALButtonStateStyle.Assign(Source: TPersistent);
+procedure TALButton.TBaseStateStyle.Assign(Source: TPersistent);
 begin
-  if Source is TALButtonStateStyle then begin
+  if Source is TBaseStateStyle then begin
     BeginUpdate;
     Try
-      Fill.Assign(TALButtonStateStyle(Source).Fill);
-      Stroke.Assign(TALButtonStateStyle(Source).Stroke);
-      TextSettings.Assign(TALButtonStateStyle(Source).TextSettings);
-      Shadow.Assign(TALButtonStateStyle(Source).Shadow);
+      Text := TBaseStateStyle(Source).text;
+      TextSettings.Assign(TBaseStateStyle(Source).TextSettings);
+      inherited Assign(Source);
     Finally
       EndUpdate;
     End;
   end
   else
-    inherited Assign(Source);
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************}
+procedure TALButton.TBaseStateStyle.DoSupersede;
+begin
+  Inherited;
+  //--
+  FPriorSupersedeText := FText;
+  //--
+  if FText = '' then begin
+    if StateStyleParent <> nil then FText := TBaseStateStyle(StateStyleParent).FText
+    else FText := TALButton(ControlParent).Text;
+  end;
+  FTextSettings.SuperSede;
+end;
+
+{******************}
+procedure TALButton.TBaseStateStyle.DoReinstate;
+begin
+  inherited;
+  FText := FPriorSupersedeText;
+  FTextSettings.Reinstate;
 end;
 
 {*********************************************************}
-procedure TALButtonStateStyle.SetText(const Value: string);
+procedure TALButton.TBaseStateStyle.SetText(const Value: string);
 begin
   if FText <> Value then begin
     FText := Value;
@@ -2804,71 +4015,34 @@ begin
   end;
 end;
 
-{****************************************************************************}
-procedure TALButtonStateStyle.SetFill(const AValue: TALInheritBrush);
-begin
-  FFill.Assign(AValue);
-end;
-
-{************************************************************************************}
-procedure TALButtonStateStyle.SetStroke(const AValue: TALInheritStrokeBrush);
-begin
-  FStroke.Assign(AValue);
-end;
-
 {*******************************************************************************************}
-procedure TALButtonStateStyle.SetTextSettings(const AValue: TALButtonStateStyleTextSettings);
+procedure TALButton.TBaseStateStyle.SetTextSettings(const AValue: TStateStyleTextSettings);
 begin
   FTextSettings.Assign(AValue);
 end;
 
-{*******************************************************************************}
-procedure TALButtonStateStyle.SetShadow(const AValue: TALInheritShadow);
-begin
-  FShadow.Assign(AValue);
-end;
-
 {***********************************************}
-function TALButtonStateStyle.GetInherit: Boolean;
+function TALButton.TBaseStateStyle.GetInherit: Boolean;
 begin
-  Result := Fill.Inherit and
-            Stroke.Inherit and
-            TextSettings.Inherit and
-            Shadow.Inherit;
-end;
-
-{**********************************************************}
-procedure TALButtonStateStyle.FillChanged(ASender: TObject);
-begin
-  Change;
-end;
-
-{************************************************************}
-procedure TALButtonStateStyle.StrokeChanged(ASender: TObject);
-begin
-  Change;
+  Result := inherited GetInherit and
+            Text.IsEmpty and
+            TextSettings.Inherit;
 end;
 
 {******************************************************************}
-procedure TALButtonStateStyle.TextSettingsChanged(ASender: TObject);
-begin
-  Change;
-end;
-
-{************************************************************}
-procedure TALButtonStateStyle.ShadowChanged(ASender: TObject);
+procedure TALButton.TBaseStateStyle.TextSettingsChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {**********************************************************}
-function TALButtonDisabledStateStyle.OpacityStored: Boolean;
+function TALButton.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
 {********************************************************************}
-procedure TALButtonDisabledStateStyle.SetOpacity(const Value: Single);
+procedure TALButton.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
     FOpacity := Value;
@@ -2877,19 +4051,19 @@ begin
 end;
 
 {*********************************************}
-constructor TALButtonDisabledStateStyle.Create;
+constructor TALButton.TDisabledStateStyle.Create(const AParent: TObject);
 begin
-  inherited Create;
+  inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
 {****************************************************************}
-procedure TALButtonDisabledStateStyle.Assign(Source: TPersistent);
+procedure TALButton.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALButtonDisabledStateStyle then
-      Opacity := TALButtonDisabledStateStyle(Source).Opacity
+    if Source is TDisabledStateStyle then
+      Opacity := TDisabledStateStyle(Source).Opacity
     else
       Opacity := TControl.DefaultDisabledOpacity;
     inherited Assign(Source);
@@ -2899,25 +4073,25 @@ begin
 end;
 
 {*************************************}
-constructor TALButtonStateStyles.Create;
+constructor TALButton.TStateStyles.Create(const AParent: TALButton);
 begin
   inherited Create;
   //--
-  FDisabled := TALButtonDisabledStateStyle.Create;
+  FDisabled := TDisabledStateStyle.Create(AParent);
   FDisabled.OnChanged := DisabledChanged;
   //--
-  FHovered := TALButtonStateStyle.Create;
+  FHovered := THoveredStateStyle.Create(AParent);
   FHovered.OnChanged := HoveredChanged;
   //--
-  FPressed := TALButtonStateStyle.Create;
+  FPressed := TPressedStateStyle.Create(AParent);
   FPressed.OnChanged := PressedChanged;
   //--
-  FFocused := TALButtonStateStyle.Create;
+  FFocused := TFocusedStateStyle.Create(AParent);
   FFocused.OnChanged := FocusedChanged;
 end;
 
 {*************************************}
-destructor TALButtonStateStyles.Destroy;
+destructor TALButton.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FDisabled);
   ALFreeAndNil(FHovered);
@@ -2927,67 +4101,67 @@ begin
 end;
 
 {******************************************************}
-procedure TALButtonStateStyles.Assign(Source: TPersistent);
+procedure TALButton.TStateStyles.Assign(Source: TPersistent);
 begin
-  if Source is TALButtonStateStyles then begin
+  if Source is TStateStyles then begin
     BeginUpdate;
     Try
-      Disabled.Assign(TALButtonStateStyles(Source).Disabled);
-      Hovered.Assign(TALButtonStateStyles(Source).Hovered);
-      Pressed.Assign(TALButtonStateStyles(Source).Pressed);
-      Focused.Assign(TALButtonStateStyles(Source).Focused);
+      Disabled.Assign(TStateStyles(Source).Disabled);
+      Hovered.Assign(TStateStyles(Source).Hovered);
+      Pressed.Assign(TStateStyles(Source).Pressed);
+      Focused.Assign(TStateStyles(Source).Focused);
     Finally
       EndUpdate;
     End;
   end
   else
-    inherited Assign(Source);
+    ALAssignError(Source{ASource}, Self{ADest});
 end;
 
 {************************************************************************************}
-procedure TALButtonStateStyles.SetDisabled(const AValue: TALButtonDisabledStateStyle);
+procedure TALButton.TStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
 {************************************************************************************}
-procedure TALButtonStateStyles.SetHovered(const AValue: TALButtonStateStyle);
+procedure TALButton.TStateStyles.SetHovered(const AValue: THoveredStateStyle);
 begin
   FHovered.Assign(AValue);
 end;
 
 {*******************************************************************************************}
-procedure TALButtonStateStyles.SetPressed(const AValue: TALButtonStateStyle);
+procedure TALButton.TStateStyles.SetPressed(const AValue: TPressedStateStyle);
 begin
   FPressed.Assign(AValue);
 end;
 
 {*******************************************************************************************}
-procedure TALButtonStateStyles.SetFocused(const AValue: TALButtonStateStyle);
+procedure TALButton.TStateStyles.SetFocused(const AValue: TFocusedStateStyle);
 begin
   FFocused.Assign(AValue);
 end;
 
 {**********************************************************}
-procedure TALButtonStateStyles.DisabledChanged(ASender: TObject);
+procedure TALButton.TStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {************************************************************}
-procedure TALButtonStateStyles.HoveredChanged(ASender: TObject);
+procedure TALButton.TStateStyles.HoveredChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {******************************************************************}
-procedure TALButtonStateStyles.PressedChanged(ASender: TObject);
+procedure TALButton.TStateStyles.PressedChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {******************************************************************}
-procedure TALButtonStateStyles.FocusedChanged(ASender: TObject);
+procedure TALButton.TStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
 end;
@@ -2997,30 +4171,15 @@ constructor TALButton.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   //--
-  FHovered := False;
-  FPressed := False;
-  //--
-  CanFocus := False;
+  CanFocus := True;
   HitTest := True;
   AutoSize := True;
   Cursor := crHandPoint;
   //--
-  FStateStyles := TALButtonStateStyles.Create;
-  FStateStyles.OnChanged := StateStylesChanged;
-  //--
-  fBufDisabledDrawable := ALNullDrawable;
-  fBufHoveredDrawable := ALNullDrawable;
-  fBufPressedDrawable := ALNullDrawable;
-  fBufFocusedDrawable := ALNullDrawable;
-  //--
-  Fill.DefaultKind := TBrushKind.Solid;
   Fill.DefaultColor := $ffe1e1e1;
-  Fill.Kind := Fill.DefaultKind;
   Fill.Color := Fill.DefaultColor;
   //--
-  Stroke.DefaultKind := TBrushKind.Solid;
   Stroke.DefaultColor := $ffadadad;
-  Stroke.Kind := Stroke.DefaultKind;
   Stroke.Color := Stroke.DefaultColor;
   //--
   TextSettings.Font.DefaultWeight := TFontWeight.medium;
@@ -3030,6 +4189,17 @@ begin
   //--
   Padding.DefaultValue := TRectF.create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
   Padding.Rect := Padding.DefaultValue;
+  //--
+  FHovered := False;
+  FPressed := False;
+  //--
+  FStateStyles := TStateStyles.Create(self);
+  FStateStyles.OnChanged := StateStylesChanged;
+  //--
+  fBufDisabledDrawable := ALNullDrawable;
+  fBufHoveredDrawable := ALNullDrawable;
+  fBufPressedDrawable := ALNullDrawable;
+  fBufFocusedDrawable := ALNullDrawable;
 end;
 
 {***************************}
@@ -3043,7 +4213,7 @@ end;
 procedure TALButton.Loaded;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _ConvertFontFamily(const AStateStyle: TALButtonStateStyle);
+  procedure _ConvertFontFamily(const AStateStyle: TBaseStateStyle);
   begin
     if (AStateStyle.TextSettings.Font.AutoConvert) and
        (AStateStyle.TextSettings.Font.Family <> '') and
@@ -3062,33 +4232,51 @@ end;
 {*********************************************************}
 function TALButton.CreateTextSettings: TALBaseTextSettings;
 begin
-  Result := TALButtonTextSettings.Create;
+  Result := TTextSettings.Create;
 end;
 
 {********************************************************}
-function TALButton.GetTextSettings: TALButtonTextSettings;
+function TALButton.GetTextSettings: TTextSettings;
 begin
-  Result := TALButtonTextSettings(Inherited TextSettings);
+  Result := TTextSettings(Inherited TextSettings);
 end;
 
 {**********************************************************************}
-procedure TALButton.SetTextSettings(const Value: TALButtonTextSettings);
+procedure TALButton.SetTextSettings(const Value: TTextSettings);
 begin
   Inherited SetTextSettings(Value);
+end;
+
+{*****************************}
+procedure TALButton.DoMouseEnter;
+begin
+  inherited;
+  FHovered := True;
+  Repaint;
+end;
+
+{*****************************}
+procedure TALButton.DoMouseLeave;
+begin
+  inherited;
+  FHovered := False;
+  Repaint;
 end;
 
 {**********************************************************************************}
 procedure TALButton.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  inherited MouseDown(Button, Shift, X, Y);
-  FPressed := True;
-  Repaint;
+  inherited;
+  if Button = TMouseButton.mbLeft then begin
+    FPressed := True;
+    Repaint;
+  end;
 end;
 
 {************************************************************}
 procedure TALButton.MouseMove(Shift: TShiftState; X, Y: Single);
 begin
-  inherited MouseMove(Shift, X, Y);
+  inherited;
   if not FHovered then
     Repaint;
   FHovered := True;
@@ -3097,24 +4285,8 @@ end;
 {********************************************************************************}
 procedure TALButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  inherited MouseUp(Button, Shift, X, Y);
+  inherited;
   FPressed := False;
-  Repaint;
-end;
-
-{*****************************}
-procedure TALButton.DoMouseEnter;
-begin
-  inherited DoMouseEnter;
-  FHovered := True;
-  Repaint;
-end;
-
-{*****************************}
-procedure TALButton.DoMouseLeave;
-begin
-  inherited DoMouseLeave;
-  FHovered := False;
   Repaint;
 end;
 
@@ -3129,7 +4301,7 @@ begin
 end;
 
 {*********************************************************************}
-procedure TALButton.SetStateStyles(const AValue: TALButtonStateStyles);
+procedure TALButton.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
@@ -3166,52 +4338,14 @@ procedure TALButton.MakeBufDrawable;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _MakeBufDrawable(
-              const AStateStyle: TALButtonStateStyle;
+              const AStateStyle: TBaseStateStyle;
               var ABufDrawable: TALDrawable;
               var ABufDrawableRect: TRectF);
   begin
     if AStateStyle.Inherit then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    //--
-    var LFont: TALFont;
-    var LDecoration: TALTextDecoration;
-    var LPrevFontSize: Single := 0;
-    var LPrevFontFamily: String := '';
-    var LPrevFontColor: TAlphaColor := TalphaColors.Null;
-    var LPrevFontOnchanged: TNotifyEvent := nil;
-    if not AStateStyle.TextSettings.inherit then begin
-      LFont := AStateStyle.TextSettings.Font;
-      LPrevFontOnchanged := LFont.OnChanged;
-      LPrevFontSize := LFont.Size;
-      LPrevFontFamily := LFont.Family;
-      LPrevFontColor := Lfont.Color;
-      LFont.OnChanged := nil;
-      if SameValue(LFont.Size, 0, TEpsilon.FontSize) then LFont.Size := TextSettings.Font.Size;
-      if LFont.Family = '' then LFont.Family := TextSettings.Font.family;
-      if LFont.Color = TalphaColors.Null then LFont.Color := TextSettings.Font.Color;
-      LDecoration := AStateStyle.TextSettings.Decoration;
-    end
-    else begin
-      LFont := TextSettings.Font;
-      LDecoration := TextSettings.Decoration;
-    end;
+    AStateStyle.Supersede;
     try
-      var LFill: TBrush;
-      if not AStateStyle.Fill.inherit then LFill := AStateStyle.Fill
-      else LFill := Fill;
-      //--
-      var LStroke: TStrokeBrush;
-      if not AStateStyle.Stroke.inherit then LStroke := AStateStyle.Stroke
-      else LStroke := Stroke;
-      //--
-      var LShadow: TALShadow;
-      if not AStateStyle.Shadow.inherit then LShadow := AStateStyle.Shadow
-      else LShadow := Shadow;
-      //--
-      var LText: String;
-      if AStateStyle.Text = '' then LText := Text
-      else LText := AStateStyle.Text;
-      //--
       var LTextBroken: Boolean;
       var LAllTextDrawn: Boolean;
       var LElements: TALTextElements;
@@ -3221,14 +4355,14 @@ procedure TALButton.MakeBufDrawable;
         LTextBroken, // var ABufTextBroken: Boolean;
         LAllTextDrawn, // var ABufAllTextDrawn: Boolean;
         LElements, // var ABufElements: TALTextElements;
-        LText, // const AText: String;
-        LFont, // const AFont: TALFont;
-        LDecoration, // const ADecoration: TALTextDecoration;
-        LFont, // const AEllipsisFont: TALFont;
-        LDecoration, // const AEllipsisDecoration: TALTextDecoration;
-        LFill, // const AFill: TBrush;
-        LStroke, // const AStroke: TStrokeBrush;
-        LShadow); // const AShadow: TALShadow);
+        AStateStyle.Text, // const AText: String;
+        AStateStyle.TextSettings.Font, // const AFont: TALFont;
+        AStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+        AStateStyle.TextSettings.Font, // const AEllipsisFont: TALFont;
+        AStateStyle.TextSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+        AStateStyle.Fill, // const AFill: TALBrush;
+        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+        AStateStyle.Shadow); // const AShadow: TALShadow);
 
       // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.
       // However, the fBufDrawableRect rectangle is offset by the shadow's dx and dy values,
@@ -3239,16 +4373,17 @@ procedure TALButton.MakeBufDrawable;
       ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
       ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
     finally
-      if not AStateStyle.TextSettings.inherit then begin
-        LFont.Size := LPrevFontSize;
-        LFont.Family := LPrevFontFamily;
-        Lfont.Color := LPrevFontColor;
-        LFont.OnChanged := LPrevFontOnchanged;
-      end;
+      AStateStyle.Reinstate;
     end;
   end;
 
 begin
+  //--- Do not create BufDrawable if not DoubleBuffered
+  if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
+    clearBufDrawable;
+    exit;
+  end;
+  //--
   inherited MakeBufDrawable;
   //--
   if Not Enabled then begin
@@ -3263,22 +4398,59 @@ begin
       FBufPressedDrawable, // var ABufDrawable: TALDrawable;
       FBufPressedDrawableRect); // var ABufDrawableRect: TRectF;
   end
-  else if FHovered then begin
-    _MakeBufDrawable(
-      StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
-      FBufHoveredDrawable, // var ABufDrawable: TALDrawable;
-      FBufHoveredDrawableRect); // var ABufDrawableRect: TRectF;
-  end
   else if IsFocused then begin
     _MakeBufDrawable(
       StateStyles.Focused, // const AStateStyle: TALButtonStateStyle;
       FBufFocusedDrawable, // var ABufDrawable: TALDrawable;
       FBufFocusedDrawableRect); // var ABufDrawableRect: TRectF;
+  end
+  else if FHovered then begin
+    _MakeBufDrawable(
+      StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
+      FBufHoveredDrawable, // var ABufDrawable: TALDrawable;
+      FBufHoveredDrawableRect); // var ABufDrawableRect: TRectF;
   end;
 end;
 
 {************************}
 procedure TALButton.Paint;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DrawMultilineText(const AStateStyle: TBaseStateStyle);
+  begin
+    {$IF DEFINED(ALSkiaCanvas)}
+    AStateStyle.Supersede;
+    try
+      var LTextBroken: Boolean;
+      var LAllTextDrawn: Boolean;
+      var LElements: TALTextElements;
+      DrawMultilineText(
+        Procedure(var ARect: TrectF)
+        begin
+          ARect := ARect.CenterAt(LocalRect);
+        end, // const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+        LTextBroken, // out ATextBroken: Boolean;
+        LAllTextDrawn, // out AAllTextDrawn: Boolean;
+        LElements, // out AElements: TALTextElements;
+        AStateStyle.Text, // const AText: String;
+        AStateStyle.TextSettings.Font, // const AFont: TALFont;
+        AStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+        AStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+        AStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+        AStateStyle.Fill, // const AFill: TALBrush;
+        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+        AStateStyle.Shadow); // const AShadow: TALShadow);
+    finally
+      AStateStyle.Reinstate;
+    end;
+    {$ELSE}
+    {$IF defined(DEBUG)}
+    if not doublebuffered then
+      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
+    {$ENDIF}
+    {$ENDIF}
+  end;
+
 begin
 
   MakeBufDrawable;
@@ -3304,18 +4476,18 @@ begin
     end;
   end
   //--
-  else if FHovered then begin
-    LDrawable := fBufHoveredDrawable;
-    LDrawableRect := fBufHoveredDrawableRect;
+  else if IsFocused then begin
+    LDrawable := fBufFocusedDrawable;
+    LDrawableRect := fBufFocusedDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
       LDrawable := BufDrawable;
       LDrawableRect := BufDrawableRect;
     end;
   end
   //--
-  else if IsFocused then begin
-    LDrawable := fBufFocusedDrawable;
-    LDrawableRect := fBufFocusedDrawableRect;
+  else if FHovered then begin
+    LDrawable := fBufHoveredDrawable;
+    LDrawableRect := fBufHoveredDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
       LDrawable := BufDrawable;
       LDrawableRect := BufDrawableRect;
@@ -3327,6 +4499,15 @@ begin
     LDrawableRect := BufDrawableRect;
   end;
 
+  if ALIsDrawableNull(LDrawable) then begin
+    if Not Enabled then _DrawMultilineText(StateStyles.Disabled)
+    else if FPressed then _DrawMultilineText(StateStyles.Pressed)
+    else if IsFocused then _DrawMultilineText(StateStyles.Focused)
+    else if FHovered then _DrawMultilineText(StateStyles.Hovered)
+    else inherited Paint;
+    exit;
+  end;
+
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
     LDrawable, // const ADrawable: TALDrawable;
@@ -3335,806 +4516,55 @@ begin
 
 end;
 
-{*****************************************************************************}
-procedure ALApplyThemeToButton(const AButton: TALButton; const ATheme: String);
-begin
-  With AButton do begin
-
-    {$REGION 'Default'}
-    if ATheme = 'Default' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := padding.DefaultValue;
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := 0;
-      YRadius := 0;
-      Fill.Kind := Fill.DefaultKind;
-      Fill.Color := Fill.DefaultColor;
-      Stroke.Kind := Stroke.DefaultKind;
-      Stroke.Color := Stroke.DefaultColor;
-      Stroke.Thickness := 1;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14;
-      TextSettings.Font.Weight := TFontWeight.medium;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := TControl.DefaultDisabledOpacity;
-      StateStyles.Disabled.Fill.reset;
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.reset;
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.reset;
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.reset;
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.reset;
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Windows'}
-    else if ATheme = 'Windows' then begin
-      //--Enabled (default)--
-      Canfocus := True;
-      AutoSize := True;
-      padding.Rect := padding.DefaultValue;
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := 0;
-      YRadius := 0;
-      Fill.Kind := Fill.DefaultKind;
-      Fill.Color := Fill.DefaultColor;
-      Stroke.Kind := Stroke.DefaultKind;
-      Stroke.Color := Stroke.DefaultColor;
-      Stroke.Thickness := 1;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14;
-      TextSettings.Font.Weight := TFontWeight.medium;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := TControl.DefaultDisabledOpacity;
-      StateStyles.Disabled.Fill.reset;
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.reset;
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := $FFe5f1fb;
-      StateStyles.Hovered.Stroke.Assign(Stroke);
-      StateStyles.Hovered.Stroke.Inherit := False;
-      StateStyles.Hovered.Stroke.Color := $FF0078d7;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := $FFcce4f7;
-      StateStyles.Pressed.Stroke.Assign(Stroke);
-      StateStyles.Pressed.Stroke.Inherit := False;
-      StateStyles.Pressed.Stroke.Color := $FF005499;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.reset;
-      StateStyles.Focused.Stroke.Assign(Stroke);
-      StateStyles.focused.Stroke.Inherit := False;
-      StateStyles.focused.Stroke.Color := $FF0078d7;
-      StateStyles.focused.Stroke.Thickness := 2;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Light.Filled'}
-    //https://m3.material.io/components/buttons/specs#cbfd91a6-d688-4be7-9a69-672549de3ea9
-    else if ATheme = 'Material3.Light.Filled' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.Solid;
-      Fill.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FFFFFFFF; // md.sys.color.on-primary // md.ref.palette.primary100
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Assign(Fill);
-      StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.Color := ALSetColorOpacity($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFFFFFFF, 0.08); // md.sys.color.on-primary / md.ref.palette.primary100
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-      StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.enabled := True;
-      StateStyles.Hovered.Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      StateStyles.Hovered.Shadow.blur := 2;
-      StateStyles.Hovered.Shadow.OffsetY := 1;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFFFFFFF, 0.12); // md.sys.color.on-primary / md.ref.palette.primary100
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFFFFFFF, 0.12); // md.sys.color.on-primary / md.ref.palette.primary100
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Light.Outlined'}
-    //https://m3.material.io/components/buttons/specs#4a0c06da-0b2f-47de-a583-97e0ae80b5a5
-    else if ATheme = 'Material3.Light.Outlined' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.none;
-      Stroke.Kind := TBrushKind.Solid;
-      Stroke.Color := $FF79747E; // md.sys.color.outline / md.ref.palette.neutral-variant50
-      Stroke.Thickness := 1;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Reset;
-      StateStyles.Disabled.Stroke.Assign(Stroke);
-      StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.Color := ALSetColorOpacity($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Kind := TBrushKind.Solid;
-      StateStyles.Hovered.Fill.Color := ALSetColorOpacity($FF6750A4, 0.08); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Kind := TBrushKind.Solid;
-      StateStyles.Pressed.Fill.Color := ALSetColorOpacity($FF6750A4, 0.12); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Kind := TBrushKind.Solid;
-      StateStyles.Focused.Fill.Color := ALSetColorOpacity($FF6750A4, 0.12); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Focused.Stroke.assign(Stroke);
-      StateStyles.Focused.Stroke.inherit := False;
-      StateStyles.Focused.Stroke.Color := $FF6750A4;  // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Light.Text'}
-    //https://m3.material.io/components/buttons/specs#398d84eb-fc8a-4c8a-bfb4-82d2e85dee4d
-    else if ATheme = 'Material3.Light.Text' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(12{Left}, 12{Top}, 12{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.none;
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FF6750A4; // md.sys.color.primary // md.ref.palette.primary40
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Reset;
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.kind := TBrushKind.Solid;
-      StateStyles.Hovered.Fill.Color := ALSetColorOpacity($FF6750A4, 0.08); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.kind := TBrushKind.Solid;
-      StateStyles.Pressed.Fill.Color := ALSetColorOpacity($FF6750A4, 0.12); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.kind := TBrushKind.Solid;
-      StateStyles.Focused.Fill.Color := ALSetColorOpacity($FF6750A4, 0.12); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Light.Elevated'}
-    //https://m3.material.io/components/buttons/specs#c75be779-5a59-4748-98d4-e47fc888d0b1
-    else if ATheme = 'Material3.Light.Elevated' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.Solid;
-      Fill.Color := $FFF7F2FA; // md.sys.color.surface-container-low / md.ref.palette.neutral96
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FF6750A4; // md.sys.color.primary // md.ref.palette.primary40
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-      Shadow.enabled := True;
-      Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      Shadow.blur := 2;
-      Shadow.OffsetY := 1;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Assign(Fill);
-      StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.Color := ALSetColorOpacity($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Shadow.Reset;
-      StateStyles.Disabled.Shadow.inherit := False;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF6750A4, 0.08); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-      StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.enabled := True;
-      StateStyles.Hovered.Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      StateStyles.Hovered.Shadow.blur := 3;
-      StateStyles.Hovered.Shadow.OffsetY := 1;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF6750A4, 0.12); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF6750A4, 0.12); // md.sys.color.primary / md.ref.palette.primary40
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Light.Tonal'}
-    //https://m3.material.io/components/buttons/specs#6ce8b926-87c4-4600-9bec-5deb4aaa65d8
-    else if ATheme = 'Material3.Light.Tonal' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.Solid;
-      Fill.Color := $FFE8DEF8; // md.sys.color.secondary-container / md.ref.palette.secondary90
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FF1D192B; // md.sys.color.on-secondary-container // md.ref.palette.secondary10
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Assign(Fill);
-      StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.Color := ALSetColorOpacity($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF1D192B, 0.08); // md.sys.color.on-secondary-container / md.ref.palette.secondary10
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-      StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.enabled := True;
-      StateStyles.Hovered.Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      StateStyles.Hovered.Shadow.blur := 2;
-      StateStyles.Hovered.Shadow.OffsetY := 1;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF1D192B, 0.12); // md.sys.color.on-secondary-container / md.ref.palette.secondary10
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF1D192B, 0.12); // md.sys.color.on-secondary-container / md.ref.palette.secondary10
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Dark.Filled'}
-    //https://m3.material.io/components/buttons/specs#cbfd91a6-d688-4be7-9a69-672549de3ea9
-    else if ATheme = 'Material3.Dark.Filled' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.Solid;
-      Fill.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Assign(Fill);
-      StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.Color := ALSetColorOpacity($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF381E72, 0.08); // md.sys.color.on-primary / md.ref.palette.primary20
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-      StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.enabled := True;
-      StateStyles.Hovered.Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      StateStyles.Hovered.Shadow.blur := 2;
-      StateStyles.Hovered.Shadow.OffsetY := 1;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF381E72, 0.12); // md.sys.color.on-primary / md.ref.palette.primary20
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FF381E72, 0.12); // md.sys.color.on-primary / md.ref.palette.primary20
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Dark.Outlined'}
-    //https://m3.material.io/components/buttons/specs#4a0c06da-0b2f-47de-a583-97e0ae80b5a5
-    else if ATheme = 'Material3.Dark.Outlined' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.none;
-      Stroke.Kind := TBrushKind.Solid;
-      Stroke.Color := $FF938F99; // md.sys.color.outline / md.ref.palette.neutral-variant60
-      Stroke.Thickness := 1;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Reset;
-      StateStyles.Disabled.Stroke.Assign(Stroke);
-      StateStyles.Disabled.Stroke.Inherit := False;
-      StateStyles.Disabled.Stroke.Color := ALSetColorOpacity($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Kind := TBrushKind.Solid;
-      StateStyles.Hovered.Fill.Color := ALSetColorOpacity($FFD0BCFF, 0.08); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Kind := TBrushKind.Solid;
-      StateStyles.Pressed.Fill.Color := ALSetColorOpacity($FFD0BCFF, 0.12); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Kind := TBrushKind.Solid;
-      StateStyles.Focused.Fill.Color := ALSetColorOpacity($FFD0BCFF, 0.12); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Focused.Stroke.assign(Stroke);
-      StateStyles.Focused.Stroke.inherit := False;
-      StateStyles.Focused.Stroke.Color := $FFD0BCFF;  // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Dark.Text'}
-    //https://m3.material.io/components/buttons/specs#398d84eb-fc8a-4c8a-bfb4-82d2e85dee4d
-    else if ATheme = 'Material3.Dark.Text' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(12{Left}, 12{Top}, 12{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.none;
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary // md.ref.palette.primary80
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Reset;
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.kind := TBrushKind.Solid;
-      StateStyles.Hovered.Fill.Color := ALSetColorOpacity($FFD0BCFF, 0.08); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.kind := TBrushKind.Solid;
-      StateStyles.Pressed.Fill.Color := ALSetColorOpacity($FFD0BCFF, 0.12); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.kind := TBrushKind.Solid;
-      StateStyles.Focused.Fill.Color := ALSetColorOpacity($FFD0BCFF, 0.12); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Dark.Elevated'}
-    //https://m3.material.io/components/buttons/specs#c75be779-5a59-4748-98d4-e47fc888d0b1
-    else if ATheme = 'Material3.Dark.Elevated' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.Solid;
-      Fill.Color := $FF1D1B20; // md.sys.color.surface-container-low / md.ref.palette.neutral10
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary // md.ref.palette.primary80
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-      Shadow.enabled := True;
-      Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      Shadow.blur := 2;
-      Shadow.OffsetY := 1;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Assign(Fill);
-      StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.Color := ALSetColorOpacity($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Shadow.Reset;
-      StateStyles.Disabled.Shadow.inherit := False;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFD0BCFF, 0.08); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-      StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.enabled := True;
-      StateStyles.Hovered.Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      StateStyles.Hovered.Shadow.blur := 3;
-      StateStyles.Hovered.Shadow.OffsetY := 1;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFD0BCFF, 0.12); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFD0BCFF, 0.12); // md.sys.color.primary / md.ref.palette.primary80
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    {$REGION 'Material3.Dark.Tonal'}
-    //https://m3.material.io/components/buttons/specs#6ce8b926-87c4-4600-9bec-5deb4aaa65d8
-    else if ATheme = 'Material3.Dark.Tonal' then begin
-      //--Enabled (default)--
-      Canfocus := False;
-      AutoSize := True;
-      padding.Rect := TRectF.Create(24{Left}, 12{Top}, 24{Right}, 12{Bottom});
-      Corners := AllCorners;
-      Sides := AllSides;
-      XRadius := -50;
-      YRadius := -50;
-      Fill.Kind := TBrushKind.Solid;
-      Fill.Color := $FF4A4458; // md.sys.color.secondary-container / md.ref.palette.secondary30
-      Stroke.Kind := TBrushKind.none;
-      var LPrevIsHtml := TextSettings.IsHtml;
-      TextSettings.Reset;
-      TextSettings.IsHtml := LPrevIsHtml;
-      TextSettings.Font.Size := 14; // icon size: 18dp
-      TextSettings.Font.Weight := TFontWeight.medium;
-      TextSettings.Font.Color := $FFE8DEF8; // md.sys.color.on-secondary-container // md.ref.palette.secondary90
-      TextSettings.LetterSpacing := 0.1;
-      Shadow.Reset;
-
-      //--Disabled--
-      StateStyles.Disabled.Opacity := 1;
-      StateStyles.Disabled.Fill.Assign(Fill);
-      StateStyles.Disabled.Fill.Inherit := False;
-      StateStyles.Disabled.Fill.Color := ALSetColorOpacity($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Stroke.Reset;
-      StateStyles.Disabled.TextSettings.Assign(TextSettings);
-      StateStyles.Disabled.TextSettings.Inherit := False;
-      StateStyles.Disabled.TextSettings.Font.Size := 0;
-      StateStyles.Disabled.TextSettings.Font.Family := '';
-      StateStyles.Disabled.TextSettings.Font.Color := ALSetColorOpacity($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
-      StateStyles.Disabled.Shadow.Reset;
-
-      //--Hovered--
-      StateStyles.Hovered.Fill.Assign(Fill);
-      StateStyles.Hovered.Fill.Inherit := False;
-      StateStyles.Hovered.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFE8DEF8, 0.08); // md.sys.color.on-secondary-container / md.ref.palette.secondary90
-      StateStyles.Hovered.Stroke.Reset;
-      StateStyles.Hovered.TextSettings.reset;
-      StateStyles.Hovered.Shadow.Reset;
-      StateStyles.Hovered.Shadow.Inherit := False;
-      StateStyles.Hovered.Shadow.enabled := True;
-      StateStyles.Hovered.Shadow.Color := ALSetColorOpacity($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
-      StateStyles.Hovered.Shadow.blur := 2;
-      StateStyles.Hovered.Shadow.OffsetY := 1;
-
-      //--Pressed--
-      StateStyles.Pressed.Fill.Assign(Fill);
-      StateStyles.Pressed.Fill.Inherit := False;
-      StateStyles.Pressed.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFE8DEF8, 0.12); // md.sys.color.on-secondary-container / md.ref.palette.secondary90
-      StateStyles.Pressed.Stroke.Reset;
-      StateStyles.Pressed.TextSettings.reset;
-      StateStyles.Pressed.Shadow.Reset;
-
-      //--Focused--
-      StateStyles.Focused.Fill.Assign(Fill);
-      StateStyles.Focused.Fill.Inherit := False;
-      StateStyles.Focused.Fill.Color := ALBlendColorWithOpacity(Fill.Color, $FFE8DEF8, 0.12); // md.sys.color.on-secondary-container / md.ref.palette.secondary90
-      StateStyles.Focused.Stroke.Reset;
-      StateStyles.Focused.TextSettings.reset;
-      StateStyles.Focused.Shadow.Reset;
-    end
-    {$ENDREGION}
-
-    else
-      raise Exception.Create('Error 9E2163E6-1342-4F02-B571-FC0276AD5BED');
-
-  end;
-end;
-
 {*****************}
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALAniIndicator, TALScrollBar, TALTrackBar, TALRangeTrackBar, TALCheckBox, TALRadioButton, TALSwitch, TALButton]);
   {$IFDEF ALDPK}
-  UnlistPublishedProperty(TALTrackThumbGlyph, 'Locked');
-  UnlistPublishedProperty(TALTrackThumbGlyph, 'StyleName');
+  UnlistPublishedProperty(TALAniIndicator, 'Size');
+  UnlistPublishedProperty(TALAniIndicator, 'StyleName');
+  UnlistPublishedProperty(TALAniIndicator, 'OnTap');
   //--
-  UnlistPublishedProperty(TALTrackThumb, 'Locked');
+  UnlistPublishedProperty(TALScrollBar, 'Size');
+  UnlistPublishedProperty(TALScrollBar, 'StyleName');
+  UnlistPublishedProperty(TALScrollBar, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALTrackBar, 'Size');
+  UnlistPublishedProperty(TALTrackBar, 'StyleName');
+  UnlistPublishedProperty(TALTrackBar, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALRangeTrackBar, 'Size');
+  UnlistPublishedProperty(TALRangeTrackBar, 'StyleName');
+  UnlistPublishedProperty(TALRangeTrackBar, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALCheckBox, 'Size');
+  UnlistPublishedProperty(TALCheckBox, 'StyleName');
+  UnlistPublishedProperty(TALCheckBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALRadioButton, 'Size');
+  UnlistPublishedProperty(TALRadioButton, 'StyleName');
+  UnlistPublishedProperty(TALRadioButton, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALSwitch, 'Size');
+  UnlistPublishedProperty(TALSwitch, 'StyleName');
+  UnlistPublishedProperty(TALSwitch, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALButton, 'Size');
+  UnlistPublishedProperty(TALButton, 'StyleName');
+  UnlistPublishedProperty(TALButton, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALTrackThumbGlyph, 'Size');
+  UnlistPublishedProperty(TALTrackThumbGlyph, 'StyleName');
+  UnlistPublishedProperty(TALTrackThumbGlyph, 'OnTap');
+  UnlistPublishedProperty(TALTrackThumbGlyph, 'Locked');
+  //--
+  UnlistPublishedProperty(TALTrackThumb, 'Size');
   UnlistPublishedProperty(TALTrackThumb, 'StyleName');
+  UnlistPublishedProperty(TALTrackThumb, 'OnTap');
+  UnlistPublishedProperty(TALTrackThumb, 'Locked');
   UnlistPublishedProperty(TALTrackThumb, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
   UnlistPublishedProperty(TALTrackThumb, 'Align');
   UnlistPublishedProperty(TALTrackThumb, 'Position');
-  UnlistPublishedProperty(TALTrackThumb, 'Size');
   UnlistPublishedProperty(TALTrackThumb, 'PopupMenu');
   UnlistPublishedProperty(TALTrackThumb, 'DragMode');
   UnlistPublishedProperty(TALTrackThumb, 'OnDragEnd');
@@ -4144,8 +4574,10 @@ begin
   UnlistPublishedProperty(TALTrackThumb, 'OnDragDrop');
   UnlistPublishedProperty(TALTrackThumb, 'EnableDragHighlight');
   //--
-  UnlistPublishedProperty(TALTrackBackground, 'Locked');
+  UnlistPublishedProperty(TALTrackBackground, 'Size');
   UnlistPublishedProperty(TALTrackBackground, 'StyleName');
+  UnlistPublishedProperty(TALTrackBackground, 'OnTap');
+  UnlistPublishedProperty(TALTrackBackground, 'Locked');
   UnlistPublishedProperty(TALTrackBackground, 'PopupMenu');
   UnlistPublishedProperty(TALTrackBackground, 'DragMode');
   UnlistPublishedProperty(TALTrackBackground, 'OnDragEnd');
@@ -4155,8 +4587,10 @@ begin
   UnlistPublishedProperty(TALTrackBackground, 'OnDragDrop');
   UnlistPublishedProperty(TALTrackBackground, 'EnableDragHighlight');
   //--
-  UnlistPublishedProperty(TALTrackHighlight, 'Locked');
+  UnlistPublishedProperty(TALTrackHighlight, 'Size');
   UnlistPublishedProperty(TALTrackHighlight, 'StyleName');
+  UnlistPublishedProperty(TALTrackHighlight, 'OnTap');
+  UnlistPublishedProperty(TALTrackHighlight, 'Locked');
   UnlistPublishedProperty(TALTrackHighlight, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
   UnlistPublishedProperty(TALTrackHighlight, 'Align');
   UnlistPublishedProperty(TALTrackHighlight, 'Position');
@@ -4169,12 +4603,13 @@ begin
   UnlistPublishedProperty(TALTrackHighlight, 'OnDragDrop');
   UnlistPublishedProperty(TALTrackHighlight, 'EnableDragHighlight');
   //--
-  UnlistPublishedProperty(TALSwitchThumb, 'Locked');
+  UnlistPublishedProperty(TALSwitchThumb, 'Size');
   UnlistPublishedProperty(TALSwitchThumb, 'StyleName');
+  UnlistPublishedProperty(TALSwitchThumb, 'OnTap');
+  UnlistPublishedProperty(TALSwitchThumb, 'Locked');
   UnlistPublishedProperty(TALSwitchThumb, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
   UnlistPublishedProperty(TALSwitchThumb, 'Align');
   UnlistPublishedProperty(TALSwitchThumb, 'Position');
-  UnlistPublishedProperty(TALSwitchThumb, 'Size');
   UnlistPublishedProperty(TALSwitchThumb, 'PopupMenu');
   UnlistPublishedProperty(TALSwitchThumb, 'DragMode');
   UnlistPublishedProperty(TALSwitchThumb, 'OnDragEnd');
@@ -4184,8 +4619,10 @@ begin
   UnlistPublishedProperty(TALSwitchThumb, 'OnDragDrop');
   UnlistPublishedProperty(TALSwitchThumb, 'EnableDragHighlight');
   //--
-  UnlistPublishedProperty(TALSwitchBackground, 'Locked');
+  UnlistPublishedProperty(TALSwitchBackground, 'Size');
   UnlistPublishedProperty(TALSwitchBackground, 'StyleName');
+  UnlistPublishedProperty(TALSwitchBackground, 'OnTap');
+  UnlistPublishedProperty(TALSwitchBackground, 'Locked');
   UnlistPublishedProperty(TALSwitchBackground, 'PopupMenu');
   UnlistPublishedProperty(TALSwitchBackground, 'DragMode');
   UnlistPublishedProperty(TALSwitchBackground, 'OnDragEnd');

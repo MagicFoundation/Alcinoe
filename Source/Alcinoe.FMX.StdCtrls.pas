@@ -705,8 +705,6 @@ type
     FDoubleBuffered: boolean;
     FXRadius: Single;
     FYRadius: Single;
-    FHovered: boolean;
-    FPressed: Boolean;
     FChecked: Boolean;
     FCheckMark: TALCheckMarkBrush;
     FStateStyles: TALCheckBoxStateStyles;
@@ -742,14 +740,11 @@ type
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
+    procedure IsMouseOverChanged; override;
+    procedure PressedChanged; override;
     function GetDefaultSize: TSizeF; override;
     function GetChecked: Boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
-    procedure DoMouseEnter; override;
-    procedure DoMouseLeave; override;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
     procedure Click; override;
     procedure DoChanged; virtual;
@@ -1037,6 +1032,7 @@ type
         procedure Assign(Source: TPersistent); override;
       published
         property Fill;
+        property Scale;
         // Opacity is not part of the GetInherit function because it updates the
         // disabledOpacity of the base control immediately every time it changes.
         // Essentially, it acts merely as a link to the disabledOpacity of the base control.
@@ -1049,27 +1045,33 @@ type
       THoveredStateStyle = class(TBaseStateStyle)
       published
         property Fill;
+        property Scale;
         property Shadow;
         property StateLayer;
         property Stroke;
+        property TransitionDuration;
       end;
       // ------------------
       // TPressedStateStyle
       TPressedStateStyle = class(TBaseStateStyle)
       published
         property Fill;
+        property Scale;
         property Shadow;
         property StateLayer;
         property Stroke;
+        property TransitionDuration;
       end;
       // ------------------
       // TFocusedStateStyle
       TFocusedStateStyle = class(TBaseStateStyle)
       published
         property Fill;
+        property Scale;
         property Shadow;
         property StateLayer;
         property Stroke;
+        property TransitionDuration;
       end;
       // ------------
       // TStateStyles
@@ -1115,8 +1117,6 @@ type
         property IsHtml;
       end;
   private
-    FHovered: Boolean;
-    FPressed: Boolean;
     FStateStyles: TStateStyles;
     fBufDisabledDrawable: TALDrawable;
     fBufDisabledDrawableRect: TRectF;
@@ -1131,13 +1131,10 @@ type
   protected
     function CreateTextSettings: TALBaseTextSettings; override;
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
-    procedure DoMouseEnter; override;
-    procedure DoMouseLeave; override;
-    procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
-    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
-    procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure SetName(const Value: TComponentName); override;
     procedure StateStylesChanged(Sender: TObject); virtual;
+    procedure IsMouseOverChanged; override;
+    procedure PressedChanged; override;
     procedure Paint; override;
     procedure Loaded; override;
   public
@@ -2818,8 +2815,6 @@ begin
   FDoubleBuffered := true;
   FXRadius := 0;
   FYRadius := 0;
-  FHovered := False;
-  FPressed := False;
   FChecked := False;
   FCheckMark := TALCheckMarkBrush.Create(TAlphaColors.Black);
   FCheckMark.OnChanged := CheckMarkChanged;
@@ -2846,49 +2841,6 @@ begin
   ALFreeAndNil(FCheckMark);
   ALFreeAndNil(FStateStyles);
   inherited;
-end;
-
-{*****************************}
-procedure TALCheckbox.DoMouseEnter;
-begin
-  inherited;
-  FHovered := True;
-  Repaint;
-end;
-
-{*****************************}
-procedure TALCheckbox.DoMouseLeave;
-begin
-  inherited;
-  FHovered := False;
-  Repaint;
-end;
-
-{**************************************************************************************}
-procedure TALCheckbox.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  inherited;
-  if Button = TMouseButton.mbLeft then begin
-    FPressed := True;
-    Repaint;
-  end;
-end;
-
-{****************************************************************}
-procedure TALCheckbox.MouseMove(Shift: TShiftState; X, Y: Single);
-begin
-  inherited;
-  if not FHovered then
-    Repaint;
-  FHovered := True;
-end;
-
-{********************************************************************************}
-procedure TALCheckbox.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  inherited;
-  FPressed := False;
-  Repaint;
 end;
 
 {*****************************}
@@ -3014,6 +2966,20 @@ procedure TALCheckbox.ShadowChanged(Sender: TObject);
 begin
   clearBufDrawable;
   inherited;
+end;
+
+{**************************************************}
+procedure TALCheckbox.IsMouseOverChanged;
+begin
+  inherited;
+  repaint;
+end;
+
+{**************************************************}
+procedure TALCheckbox.PressedChanged;
+begin
+  inherited;
+  repaint;
 end;
 
 {******************************************}
@@ -3415,7 +3381,7 @@ begin
         FBufCheckedDisabledDrawable, // var ABufDrawable: TALDrawable;
         FBufCheckedDisabledDrawableRect); // var ABufDrawableRect: TRectF;
     end
-    else if FPressed then begin
+    else if Pressed then begin
       _MakeBufDrawable(
         StateStyles.Checked.Pressed, // const AStateStyle: TALButtonStateStyle;
         FBufCheckedPressedDrawable, // var ABufDrawable: TALDrawable;
@@ -3427,7 +3393,7 @@ begin
         FBufCheckedFocusedDrawable, // var ABufDrawable: TALDrawable;
         FBufCheckedFocusedDrawableRect); // var ABufDrawableRect: TRectF;
     end
-    else if FHovered then begin
+    else if IsMouseOver then begin
       _MakeBufDrawable(
         StateStyles.Checked.Hovered, // const AStateStyle: TALButtonStateStyle;
         FBufCheckedHoveredDrawable, // var ABufDrawable: TALDrawable;
@@ -3445,7 +3411,7 @@ begin
         FBufUnCheckedDisabledDrawable, // var ABufDrawable: TALDrawable;
         FBufUnCheckedDisabledDrawableRect); // var ABufDrawableRect: TRectF;
     end
-    else if FPressed then begin
+    else if Pressed then begin
       _MakeBufDrawable(
         StateStyles.UnChecked.Pressed, // const AStateStyle: TALButtonStateStyle;
         FBufUnCheckedPressedDrawable, // var ABufDrawable: TALDrawable;
@@ -3457,7 +3423,7 @@ begin
         FBufUnCheckedFocusedDrawable, // var ABufDrawable: TALDrawable;
         FBufUnCheckedFocusedDrawableRect); // var ABufDrawableRect: TRectF;
     end
-    else if FHovered then begin
+    else if IsMouseOver then begin
       _MakeBufDrawable(
         StateStyles.UnChecked.Hovered, // const AStateStyle: TALButtonStateStyle;
         FBufUnCheckedHoveredDrawable, // var ABufDrawable: TALDrawable;
@@ -3485,7 +3451,7 @@ begin
       end;
     end
     //--
-    else if FPressed then begin
+    else if Pressed then begin
       LDrawable := fBufCheckedPressedDrawable;
       LDrawableRect := fBufCheckedPressedDrawableRect;
       if ALIsDrawableNull(LDrawable) then begin
@@ -3503,7 +3469,7 @@ begin
       end;
     end
     //--
-    else if FHovered then begin
+    else if IsMouseOver then begin
       LDrawable := fBufCheckedHoveredDrawable;
       LDrawableRect := fBufCheckedHoveredDrawableRect;
       if ALIsDrawableNull(LDrawable) then begin
@@ -3527,7 +3493,7 @@ begin
       end;
     end
     //--
-    else if FPressed then begin
+    else if Pressed then begin
       LDrawable := fBufUnCheckedPressedDrawable;
       LDrawableRect := fBufUnCheckedPressedDrawableRect;
       if ALIsDrawableNull(LDrawable) then begin
@@ -3545,7 +3511,7 @@ begin
       end;
     end
     //--
-    else if FHovered then begin
+    else if IsMouseOver then begin
       LDrawable := fBufUnCheckedHoveredDrawable;
       LDrawableRect := fBufUnCheckedHoveredDrawableRect;
       if ALIsDrawableNull(LDrawable) then begin
@@ -4191,9 +4157,6 @@ begin
   Padding.DefaultValue := TRectF.create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
   Padding.Rect := Padding.DefaultValue;
   //--
-  FHovered := False;
-  FPressed := False;
-  //--
   FStateStyles := TStateStyles.Create(self);
   FStateStyles.OnChanged := StateStylesChanged;
   //--
@@ -4248,49 +4211,6 @@ begin
   Inherited SetTextSettings(Value);
 end;
 
-{*****************************}
-procedure TALButton.DoMouseEnter;
-begin
-  inherited;
-  FHovered := True;
-  Repaint;
-end;
-
-{*****************************}
-procedure TALButton.DoMouseLeave;
-begin
-  inherited;
-  FHovered := False;
-  Repaint;
-end;
-
-{**********************************************************************************}
-procedure TALButton.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  inherited;
-  if Button = TMouseButton.mbLeft then begin
-    FPressed := True;
-    Repaint;
-  end;
-end;
-
-{************************************************************}
-procedure TALButton.MouseMove(Shift: TShiftState; X, Y: Single);
-begin
-  inherited;
-  if not FHovered then
-    Repaint;
-  FHovered := True;
-end;
-
-{********************************************************************************}
-procedure TALButton.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  inherited;
-  FPressed := False;
-  Repaint;
-end;
-
 {*******************************************************}
 procedure TALButton.SetName(const Value: TComponentName);
 begin
@@ -4313,6 +4233,20 @@ begin
   clearBufDrawable;
   DisabledOpacity := StateStyles.Disabled.opacity;
   Repaint;
+end;
+
+{**************************************************}
+procedure TALButton.IsMouseOverChanged;
+begin
+  inherited;
+  repaint;
+end;
+
+{**************************************************}
+procedure TALButton.PressedChanged;
+begin
+  inherited;
+  repaint;
 end;
 
 {***********************************}
@@ -4393,7 +4327,7 @@ begin
       FBufDisabledDrawable, // var ABufDrawable: TALDrawable;
       FBufDisabledDrawableRect); // var ABufDrawableRect: TRectF;
   end
-  else if FPressed then begin
+  else if Pressed then begin
     _MakeBufDrawable(
       StateStyles.Pressed, // const AStateStyle: TALButtonStateStyle;
       FBufPressedDrawable, // var ABufDrawable: TALDrawable;
@@ -4405,7 +4339,7 @@ begin
       FBufFocusedDrawable, // var ABufDrawable: TALDrawable;
       FBufFocusedDrawableRect); // var ABufDrawableRect: TRectF;
   end
-  else if FHovered then begin
+  else if IsMouseOver then begin
     _MakeBufDrawable(
       StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
       FBufHoveredDrawable, // var ABufDrawable: TALDrawable;
@@ -4468,7 +4402,7 @@ begin
     end;
   end
   //--
-  else if FPressed then begin
+  else if Pressed then begin
     LDrawable := fBufPressedDrawable;
     LDrawableRect := fBufPressedDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
@@ -4486,7 +4420,7 @@ begin
     end;
   end
   //--
-  else if FHovered then begin
+  else if IsMouseOver then begin
     LDrawable := fBufHoveredDrawable;
     LDrawableRect := fBufHoveredDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
@@ -4502,9 +4436,9 @@ begin
 
   if ALIsDrawableNull(LDrawable) then begin
     if Not Enabled then _DrawMultilineText(StateStyles.Disabled)
-    else if FPressed then _DrawMultilineText(StateStyles.Pressed)
+    else if Pressed then _DrawMultilineText(StateStyles.Pressed)
     else if IsFocused then _DrawMultilineText(StateStyles.Focused)
-    else if FHovered then _DrawMultilineText(StateStyles.Hovered)
+    else if IsMouseOver then _DrawMultilineText(StateStyles.Hovered)
     else inherited Paint;
     exit;
   end;

@@ -755,7 +755,6 @@ type
     FSupportingText: String;
     FSupportingTextSettings: TSupportingTextSettings;
     FSupportingTextMarginBottomUpdated: Boolean;
-    FHovered: Boolean;
     FStateStyles: TStateStyles;
     FIsTextEmpty: Boolean;
     FNativeViewRemoved: Boolean;
@@ -836,7 +835,6 @@ type
     function HasOpacityLabelTextAnimation: Boolean;
     function HasTranslationLabelTextAnimation: Boolean;
     procedure UpdateEditControlStyle;
-    procedure SetHovered(const AValue: Boolean);
     { IControlTypeSupportable }
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
@@ -858,9 +856,7 @@ type
     procedure InitEditControl; virtual;
     procedure DoEnter; override;
     procedure DoExit; override;
-    procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
-    procedure DoMouseEnter; override;
-    procedure DoMouseLeave; override;
+    procedure IsMouseOverChanged; override;
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
@@ -3720,7 +3716,6 @@ begin
   FSupportingTextSettings.Font.Size := FSupportingTextSettings.Font.DefaultSize;
   FSupportingTextSettings.OnChanged := SupportingTextSettingsChanged;
   FSupportingTextMarginBottomUpdated := False;
-  FHovered := False;
   FStateStyles := TStateStyles.Create(Self);
   FStateStyles.OnChanged := StateStylesChanged;
   FIsTextEmpty := True;
@@ -4099,7 +4094,7 @@ begin
   var LStateStyle: TBaseStateStyle;
   if Not Enabled then LStateStyle := StateStyles.Disabled
   else if IsFocused then LStateStyle := StateStyles.Focused
-  else if FHovered then LStateStyle := StateStyles.Hovered
+  else if IsMouseOver then LStateStyle := StateStyles.Hovered
   else LStateStyle := nil;
   if LStateStyle <> nil then
     LStateStyle.Supersede;
@@ -4123,15 +4118,6 @@ begin
 
   repaint;
 
-end;
-
-{**************************************************}
-procedure TALBaseEdit.SetHovered(const AValue: Boolean);
-begin
-  If FHovered <> AValue then begin
-    FHovered := AValue;
-    UpdateEditControlStyle;
-  end;
 end;
 
 {********************************************}
@@ -4181,35 +4167,20 @@ begin
             ((PromptText = '') or (PromptText = LabelText));
 end;
 
-{************************************************************}
-procedure TALBaseEdit.MouseMove(Shift: TShiftState; X, Y: Single);
+{**************************************************}
+procedure TALBaseEdit.IsMouseOverChanged;
 begin
   inherited;
-  SetHovered(True);
-end;
-
-{*****************************}
-procedure TALBaseEdit.DoMouseEnter;
-begin
-  inherited DoMouseEnter;
-  SetHovered(True);
-end;
-
-{*****************************}
-procedure TALBaseEdit.DoMouseLeave;
-begin
-  inherited DoMouseLeave;
-  {$IF defined(MSWindows)}
-  IF (Root is TCustomForm) then begin
-    var LMousePos := AbsoluteToLocal(TCustomForm(Root).ScreenToClient(Screen.MousePos));
-    if not LocalRect.Contains(LMousePos) then SetHovered(False);
-  end
-  else
-    SetHovered(False);
-  {$ELSE}
-  SetHovered(False);
-  {$ENDIF}
-  Repaint;
+  if not IsMouseOver then begin
+    {$IF defined(MSWindows)}
+    IF Form <> nil then begin
+      var LMousePos := AbsoluteToLocal(Form.ScreenToClient(Screen.MousePos));
+      if LocalRect.Contains(LMousePos) then
+        FIsMouseOver := true;
+    end;
+    {$ENDIF}
+  end;
+  UpdateEditControlStyle;
 end;
 
 {************************************************************}
@@ -5002,7 +4973,7 @@ begin
       FBufFocusedDrawable, // var ABufDrawable: TALDrawable;
       FBufFocusedDrawableRect); // var ABufDrawableRect: TRectF;
   end
-  else if FHovered then begin
+  else if IsMouseOver then begin
     _MakeBufDrawable(
       StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
       FBufHoveredDrawable, // var ABufDrawable: TALDrawable;
@@ -5120,7 +5091,7 @@ begin
       FBufPromptTextFocusedDrawable, // var ABufPromptTextDrawable: TALDrawable;
       FBufPromptTextFocusedDrawableRect); // var ABufPromptTextDrawableRect: TRectF;
   end
-  else if FHovered then begin
+  else if IsMouseOver then begin
     _MakeBufPromptTextDrawable(
       LPromptText, // const APromptText: String;
       StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
@@ -5180,7 +5151,7 @@ begin
       FBufLabelTextFocusedDrawable, // var ABufLabelTextDrawable: TALDrawable;
       FBufLabelTextFocusedDrawableRect); // var ABufLabelTextDrawableRect: TRectF;
   end
-  else if FHovered then begin
+  else if IsMouseOver then begin
     _MakeBufLabelTextDrawable(
       StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
       FBufLabelTextHoveredDrawable, // var ABufLabelTextDrawable: TALDrawable;
@@ -5252,7 +5223,7 @@ begin
       FBufSupportingTextFocusedDrawable, // var ABufSupportingTextDrawable: TALDrawable;
       FBufSupportingTextFocusedDrawableRect); // var ABufSupportingTextDrawableRect: TRectF;
   end
-  else if FHovered then begin
+  else if IsMouseOver then begin
     _MakeBufSupportingTextDrawable(
       StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
       FBufSupportingTextHoveredDrawable, // var ABufSupportingTextDrawable: TALDrawable;
@@ -5342,7 +5313,7 @@ begin
     end;
   end
   //--
-  else if FHovered then begin
+  else if IsMouseOver then begin
     LDrawable := fBufHoveredDrawable;
     LDrawableRect := fBufHoveredDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
@@ -5386,7 +5357,7 @@ begin
     end;
   end
   //--
-  else if FHovered then begin
+  else if IsMouseOver then begin
     LLabelTextDrawable := fBufLabelTextHoveredDrawable;
     LLabelTextDrawableRect := fBufLabelTextHoveredDrawableRect;
     if ALIsDrawableNull(LLabelTextDrawable) then begin
@@ -5458,7 +5429,7 @@ begin
       end;
     end
     //--
-    else if FHovered then begin
+    else if IsMouseOver then begin
       LPromptTextDrawable := fBufPromptTextHoveredDrawable;
       LPromptTextDrawableRect := fBufPromptTextHoveredDrawableRect;
       if ALIsDrawableNull(LPromptTextDrawable) then begin
@@ -5572,7 +5543,7 @@ begin
     end;
   end
   //--
-  else if FHovered then begin
+  else if IsMouseOver then begin
     LSupportingTextDrawable := fBufSupportingTextHoveredDrawable;
     LSupportingTextDrawableRect := fBufSupportingTextHoveredDrawableRect;
     if ALIsDrawableNull(LSupportingTextDrawable) then begin

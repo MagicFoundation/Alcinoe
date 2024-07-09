@@ -28,13 +28,18 @@ type
   protected
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
+    procedure DoMouseEnter; override;
+    procedure DoMouseLeave; override;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     function GetParentedVisible: Boolean; override;
     procedure DoRootChanged; override;
+    procedure IsMouseOverChanged; virtual;
+    procedure PressedChanged; virtual;
   public
     constructor Create(AOwner: TComponent); override;
+    procedure SetNewScene(AScene: IScene); override;
     function IsVisibleWithinFormBounds: Boolean;
     property Form: TCommonCustomForm read FForm;
   end;
@@ -139,9 +144,43 @@ begin
     Result := FForm.ClientRect.IntersectsWith(LocalToAbsolute(LocalRect));
 end;
 
+{***********************************************}
+procedure TALControl.SetNewScene(AScene: IScene);
+begin
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
+  {$ENDIF}
+  var LPrevPressed := Pressed;
+  var LPrevIsMouseOver := IsMouseOver;
+  inherited;
+  if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+  if LPrevPressed <> Pressed then PressedChanged;
+end;
+
+{*****************************}
+procedure TALControl.DoMouseEnter;
+begin
+  var LPrevIsMouseOver := IsMouseOver;
+  inherited;
+  if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+end;
+
+{*****************************}
+procedure TALControl.DoMouseLeave;
+begin
+  var LPrevIsMouseOver := IsMouseOver;
+  inherited;
+  if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
+end;
+
 {*************************************************************************************}
 procedure TALControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
+  {$ENDIF}
+  var LPrevPressed := Pressed;
+  //--
   fMouseDownPos := TpointF.Create(X,Y);
   FMouseDownAtLowVelocity := True;
   //--
@@ -169,12 +208,19 @@ begin
   end
   else
     inherited;
+  //--
+  if LPrevPressed <> Pressed then PressedChanged;
 end;
 
 {***********************************************************************************}
 procedure TALControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
+  {$ENDIF}
+  var LPrevPressed := Pressed;
   inherited;
+  if LPrevPressed <> Pressed then PressedChanged;
   if (FFocusOnMouseUp) and
      (FMouseDownAtLowVelocity) and
      (abs(fMouseDownPos.x - x) <= TALScrollEngine.DefaultTouchSlop) and
@@ -190,7 +236,12 @@ begin
   if (not FMouseDownAtLowVelocity) or
      (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) or
      (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop) then exit;
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
+  {$ENDIF}
+  var LPrevPressed := Pressed;
   inherited;
+  if LPrevPressed <> Pressed then PressedChanged;
 end;
 
 {*************************************}
@@ -217,6 +268,18 @@ begin
   inherited;
   if Root is TCommonCustomForm then FForm := TCommonCustomForm(Root)
   else FForm := Nil;
+end;
+
+{**************************************}
+procedure TALControl.IsMouseOverChanged;
+begin
+  // virtual
+end;
+
+{*********************************}
+procedure TALControl.PressedChanged;
+begin
+  // virtual
 end;
 
 {**}

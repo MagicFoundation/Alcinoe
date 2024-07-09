@@ -327,7 +327,7 @@ type
     type
       // -------------
       // TTextSettings
-      TMemoTextSettings = class(TTextSettings)
+      TMemoTextSettings = class(TALBaseEdit.TTextSettings)
       published
         property LineHeightMultiplier;
       end;

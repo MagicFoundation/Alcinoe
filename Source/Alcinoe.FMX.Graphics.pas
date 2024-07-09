@@ -52,6 +52,7 @@ function  ALGetDrawableWidth(const aDrawable: TALDrawable): integer; inline;
 function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
 function  ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean; inline;
 procedure ALCanvasEndScene(const aCanvas: TALCanvas); inline;
+function  ALGetDefaultPixelFormat: TPixelFormat; inline;
 
 {$IF defined(ALSkiaEngine)}
 // ALGlobalSkColorSpace represents the color space of the form's surface
@@ -75,14 +76,20 @@ var
   ALGlobalUseRasterSkSurface: Boolean;
   ALGlobalUseRasterSkImage: Boolean;
 
-function ALGetSkImageinfo(const W, H: int32_t; const AColorType: sk_colortype_t = sk_colortype_t.BGRA8888_SK_COLORTYPE): sk_imageinfo_t;
+function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 function ALCreateSkSurface(Const W, H: integer): sk_surface_t;
 function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
+function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+procedure ALUpdateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
+procedure ALUpdateBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
+procedure ALUpdateBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
 function ALCreateSkImageFromSkSurface(Const ASurface: sk_surface_t): sk_image_t;
 function ALCreateTextureFromSkSurface(Const ASurface: sk_surface_t): TTexture;
 function ALCreateTextureFromSkImage(Const AImage: sk_image_t): TTexture;
-function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
-Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+procedure ALUpdateTextureFromSkPixmap(Const APixmap: sk_pixmap_t; const ATexture: TTexture);
+procedure ALUpdateTextureFromSkSurface(Const ASurface: sk_surface_t; const ATexture: TTexture);
+procedure ALUpdateTextureFromSkImage(Const AImage: sk_image_t; const ATexture: TTexture);
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
@@ -12642,6 +12649,25 @@ begin
   {$ENDIF};
 end;
 
+{**********************************************}
+function  ALGetDefaultPixelFormat: TPixelFormat;
+begin
+  {$IF DEFINED(MSWINDOWS)}
+  Result := TPixelFormat.BGRA;
+  {$ELSEIF DEFINED(IOS)}
+  if GlobalUseMetal then
+    Result := TPixelFormat.BGRA
+  else
+    Result := TPixelFormat.RGBA;
+  {$ELSEIF DEFINED(MACOS)}
+  Result := TPixelFormat.BGRA;
+  {$ELSEIF DEFINED(LINUX)}
+  Result := TPixelFormat.BGRA;
+  {$ELSE}
+  Result := TPixelFormat.RGBA;
+  {$ENDIF}
+end;
+
 {*************************}
 {$IF defined(ALSkiaEngine)}
 function ALCreateDisplayP3SkColorSpace: sk_colorspace_t;
@@ -12849,14 +12875,14 @@ end;
 
 {*************************}
 {$IF defined(ALSkiaEngine)}
-function ALGetSkImageinfo(const W, H: int32_t; const AColorType: sk_colortype_t = sk_colortype_t.BGRA8888_SK_COLORTYPE): sk_imageinfo_t;
+function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_imageinfo_t didn''t changed'}
   {$ENDIF}
   Result.width := W;
   Result.height := H;
-  Result.color_type := AColorType;
+  Result.color_type := sk_colortype_t(SkFmxColorType[ALGetDefaultPixelFormat]);
   Result.alpha_type := sk_alphatype_t.PREMUL_SK_ALPHATYPE;
   // https://skia.org/docs/user/color/
   // how do nullptr SkColorSpace defaults work? :
@@ -12937,34 +12963,99 @@ begin
   var LHeight := sk4d_pixmap_get_Height(APixmap);
   Result := TBitmap.Create(LWidth, LHeight);
   Try
-    var LBitmapData: TBitmapData;
-    if Result.Map(TMapAccess.ReadWrite, LBitmapData) then begin
-      try
-        {$IF defined(DEBUG)}
-        var Lcolortype := sk4d_pixmap_get_color_type(APixmap);
-        if Lcolortype <> sk_colortype_t(SkFmxColorType[LBitmapData.PixelFormat]) then
-          Raise Exception.Create('Pixmap and TBitmap color types mismatch');
-        {$ENDIF}
-        var LBytesPerPixel := LBitmapData.BytesPerPixel;
-        var LSourceRowBytes := Integer(sk4d_pixmap_get_row_bytes(APixmap));
-        var LDestRowBytes := LBitmapData.Pitch;
-        var LSourceData := sk4d_pixmap_get_pixels(APixmap);
-        if LSourceRowBytes <> LDestRowBytes then begin
-          for var Y := 0 to LHeight - 1 do
-            ALMove(PByte(LSourceData)[Y * LSourceRowBytes], PByte(LBitmapData.Data)[Y * LDestRowBytes], LWidth * LBytesPerPixel);
-        end
-        else begin
-          ALMove(PByte(LSourceData)[0], PByte(LBitmapData.Data)[0], LWidth * LHeight * LBytesPerPixel);
-        end;
-      finally
-        Result.Unmap(LBitmapData);
-      end
-    end
-    else
-      Raise Exception.create('Failed to map the bitmap for read/write access');
+    ALUpdateBitmapFromSkPixmap(APixmap, Result);
   except
     ALFreeAndNil(Result);
     Raise;
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
+  try
+    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+  finally
+    sk4d_pixmap_destroy(LPixmap);
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
+  try
+    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+  finally
+    sk4d_pixmap_destroy(LPixmap);
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+procedure ALUpdateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
+begin
+  var LBitmapData: TBitmapData;
+  if ABitmap.Map(TMapAccess.ReadWrite, LBitmapData) then begin
+    try
+      {$IF defined(DEBUG)}
+      var Lcolortype := sk4d_pixmap_get_color_type(APixmap);
+      if Lcolortype <> sk_colortype_t(SkFmxColorType[LBitmapData.PixelFormat]) then
+        Raise Exception.Create('Pixmap and Bitmap color types mismatch');
+      {$ENDIF}
+      var LWidth := ABitmap.Width;
+      var LHeight := ABitmap.Height;
+      If (sk4d_pixmap_get_width(APixmap) <> LWidth) or
+         (sk4d_pixmap_get_height(APixmap) <> LHeight) then
+        Raise Exception.Create('Pixmap and Bitmap dimensions mismatch');
+      var LBytesPerPixel := LBitmapData.BytesPerPixel;
+      var LSourceRowBytes := Integer(sk4d_pixmap_get_row_bytes(APixmap));
+      var LDestRowBytes := LBitmapData.Pitch;
+      var LSourceData := sk4d_pixmap_get_pixels(APixmap);
+      if LSourceRowBytes <> LDestRowBytes then begin
+        for var Y := 0 to LHeight - 1 do
+          ALMove(PByte(LSourceData)[Y * LSourceRowBytes], PByte(LBitmapData.Data)[Y * LDestRowBytes], LWidth * LBytesPerPixel);
+      end
+      else begin
+        ALMove(PByte(LSourceData)[0], PByte(LBitmapData.Data)[0], LWidth * LHeight * LBytesPerPixel);
+      end;
+    finally
+      ABitmap.Unmap(LBitmapData);
+    end
+  end
+  else
+    Raise Exception.create('Failed to map the bitmap for read/write access');
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+procedure ALUpdateBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
+  try
+    ALUpdateBitmapFromSkPixmap(LPixmap, ABitmap);
+  finally
+    sk4d_pixmap_destroy(LPixmap);
+  end;
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+procedure ALUpdateBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
+begin
+  var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
+  try
+    ALUpdateBitmapFromSkPixmap(LPixmap, ABitmap);
+  finally
+    sk4d_pixmap_destroy(LPixmap);
   end;
 end;
 {$ENDIF}
@@ -12998,7 +13089,7 @@ begin
       result.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
       result.SetSize(sk4d_pixmap_get_Width(LPixmap), sk4d_pixmap_get_Height(LPixmap));
       result.PixelFormat := SkFmxPixelFormat[TSkColorType(sk4d_pixmap_get_color_type(LPixmap))];
-      result.UpdateTexture(sk4d_pixmap_get_pixels(LPixmap), sk4d_pixmap_get_row_bytes(LPixmap));
+      ALUpdateTextureFromSkPixmap(LPixmap, Result);
     except
       ALFreeAndNil(result);
       raise;
@@ -13020,7 +13111,7 @@ begin
       result.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
       result.SetSize(sk4d_pixmap_get_Width(LPixmap), sk4d_pixmap_get_Height(LPixmap));
       result.PixelFormat := SkFmxPixelFormat[TSkColorType(sk4d_pixmap_get_color_type(LPixmap))];
-      result.UpdateTexture(sk4d_pixmap_get_pixels(LPixmap), sk4d_pixmap_get_row_bytes(LPixmap));
+      ALUpdateTextureFromSkPixmap(LPixmap, Result);
     except
       ALFreeAndNil(result);
       raise;
@@ -13033,11 +13124,26 @@ end;
 
 {*************************}
 {$IF defined(ALSkiaEngine)}
-function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+procedure ALUpdateTextureFromSkPixmap(Const APixmap: sk_pixmap_t; const ATexture: TTexture);
+begin
+  {$IF defined(DEBUG)}
+  if ATexture.PixelFormat <> SkFmxPixelFormat[TSkColorType(sk4d_pixmap_get_color_type(APixmap))] then
+    Raise Exception.Create('Pixmap and Texture color types mismatch');
+  {$ENDIF}
+  If (sk4d_pixmap_get_width(APixmap) <> ATexture.Width) or
+     (sk4d_pixmap_get_height(APixmap) <> ATexture.Height) then
+    Raise Exception.Create('Pixmap and Texture dimensions mismatch');
+  ATexture.UpdateTexture(sk4d_pixmap_get_pixels(APixmap), sk4d_pixmap_get_row_bytes(APixmap));
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaEngine)}
+procedure ALUpdateTextureFromSkSurface(Const ASurface: sk_surface_t; const ATexture: TTexture);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
   try
-    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+    ALUpdateTextureFromSkPixmap(LPixmap, ATexture);
   finally
     sk4d_pixmap_destroy(LPixmap);
   end;
@@ -13046,11 +13152,11 @@ end;
 
 {*************************}
 {$IF defined(ALSkiaEngine)}
-Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+procedure ALUpdateTextureFromSkImage(Const AImage: sk_image_t; const ATexture: TTexture);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
   try
-    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+    ALUpdateTextureFromSkPixmap(LPixmap, ATexture);
   finally
     sk4d_pixmap_destroy(LPixmap);
   end;

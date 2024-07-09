@@ -33,6 +33,7 @@ uses
   FMX.types,
   FMX.graphics,
   FMX.objects,
+  Alcinoe.FMX.Types3D,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Controls,
   Alcinoe.FMX.Graphics,
@@ -244,8 +245,13 @@ type
       fAnimcodecplayer: sk_animcodecplayer_t;
       FRenderRect: TRectF;
       {$IF not defined(ALSkiaCanvas)}
-      FBufSurface: TALSurface;
-      FBufCanvas: TALCanvas;
+        FBufSurface: TALSurface;
+        FBufCanvas: TALCanvas;
+        {$IF defined(ALGPUCanvas)}
+        FbufTexture: TALTexture;
+        {$ELSE}
+        FBufBitmap: Tbitmap;
+        {$ENDIF}
       {$ENDIF}
     {$ENDIF}
     fResourceName: String;
@@ -901,6 +907,7 @@ uses
   DesignIntf,
   system.ioutils,
   {$ENDIF}
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {**********************************************}
@@ -1436,8 +1443,13 @@ begin
     fAnimcodecplayer := 0;
     //FRenderRect := TrectF.Empty;
     {$IF not defined(ALSkiaCanvas)}
-    FBufSurface := ALNullSurface;
-    FBufCanvas := ALNullCanvas;
+      FBufSurface := ALNullSurface;
+      FBufCanvas := ALNullCanvas;
+      {$IF defined(ALGPUCanvas)}
+      FbufTexture := nil;
+      {$ELSE}
+      FBufBitmap := nil;
+      {$ENDIF}
     {$ENDIF}
   {$ENDIF}
   fResourceName := '';
@@ -1566,20 +1578,31 @@ begin
 
   case FWrapMode of
     TALImageWrapMode.Fit: FRenderRect := FRenderRect.FitInto(LocalRect);
-    TALImageWrapMode.Stretch: FRenderRect := LocalRect;
+    TALImageWrapMode.Stretch: FRenderRect := FRenderRect.FitInto(LocalRect); // TALImageWrapMode.Stretch not yet supported, use TALImageWrapMode.Fit instead
     TALImageWrapMode.Place: FRenderRect := FRenderRect.PlaceInto(LocalRect);
-    TALImageWrapMode.FitAndCrop: FRenderRect := FRenderRect.FitInto(LocalRect);
+    TALImageWrapMode.FitAndCrop: FRenderRect := FRenderRect.FitInto(LocalRect); // TALImageWrapMode.FitAndCrop not yet supported, use TALImageWrapMode.Fit instead
     else
       Raise Exception.Create('Error 822CE359-8404-40CE-91B9-1CFC3DBA259F')
   end;
+  ALAlignDimensionToPixelRound(FRenderRect, ALGetScreenScale); // to have the pixel aligned width and height
 
   {$IF not defined(ALSkiaCanvas)}
-  if (fSkottieAnimation <> 0) then
-    ALCreateSurface(
-      FBufSurface, // out ASurface: TALSurface;
-      FbufCanvas, // out ACanvas: TALCanvas;
-      round(FRenderRect.width), // const w: Integer;
-      round(FRenderRect.height)); // const h: Integer);
+  var LBufRect: Trect;
+  if fSkottieAnimation <> 0 then LBufRect := TRectf.Create(0,0,FRenderRect.width * ALGetScreenScale, FRenderRect.height * ALGetScreenScale).Round
+  else LBufRect := TRect.Create(0,0,Round(LSize.width), round(LSize.height));
+  ALCreateSurface(
+    FBufSurface, // out ASurface: TALSurface;
+    FbufCanvas, // out ACanvas: TALCanvas;
+    LBufRect.width, // const w: Single;
+    LBufRect.height); // const h: Single);
+  {$IF defined(ALGPUCanvas)}
+  FbufTexture := TALTexture.Create;
+  FbufTexture.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+  FbufTexture.SetSize(LBufRect.width, LBufRect.height);
+  FbufTexture.PixelFormat := ALGetDefaultPixelFormat;
+  {$ELSE}
+  FBufBitmap := Tbitmap.create(LBufRect.width, LBufRect.height);
+  {$ENDIF}
   {$ENDIF}
 
   var LDuration: Single;
@@ -1588,6 +1611,16 @@ begin
   else
     LDuration := Single(sk4d_animcodecplayer_get_duration(fAnimCodecPlayer) / 1000);
   FAnimation.SetDuration(LDuration);
+
+  {$IFDEF debug}
+  ALLog(
+    'TALAnimatedImage.CreateCodec',
+    'ResourceName: '+ FResourceName + ' | '+
+    'Duration: '+ALFloatTostrW(LDuration, ALDefaultFormatSettingsW) + ' | '+
+    'Width: ' + ALFloatTostrW(LSize.Width, ALDefaultFormatSettingsW) + ' | '+
+    'Height: ' + ALFloatTostrW(LSize.Height, ALDefaultFormatSettingsW),
+    TalLogType.debug);
+  {$ENDIF}
 
   {$ENDIF}
 end;
@@ -1606,7 +1639,12 @@ begin
     end;
     FAnimation.SetDuration(0.0);
     {$IF (not defined(ALSkiaCanvas))}
-    ALFreeSurface(FBufSurface, FBufCanvas);
+      ALFreeSurface(FBufSurface, FBufCanvas);
+      {$IF defined(ALGPUCanvas)}
+      ALFreeAndNil(FbufTexture);
+      {$ELSE}
+      ALFreeAndNil(FBufBitmap);
+      {$ENDIF}
     {$ENDIF}
   {$ENDIF}
 end;
@@ -1650,6 +1688,8 @@ begin
     end;
     {$ELSEIF defined(ALGPUCanvas)}
     var LRect := FRenderRect;
+    Lrect.Width := Lrect.Width * ALGetScreenScale;
+    Lrect.Height := Lrect.Height * ALGetScreenScale;
     LRect.Offset(-LRect.Left,-LRect.Top);
     sk4d_canvas_clear(FBufCanvas, TAlphaColors.Null);
     sk4d_skottieanimation_render(
@@ -1657,18 +1697,16 @@ begin
       FBufCanvas, // canvas: sk_canvas_t;
       @LRect, // const dest: psk_rect_t;
       0); // render_flags: uint32_t); cdecl;
-    var LBufferTexture := ALCreateTextureFromSkSurface(FBufSurface);
-    try
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufferTexture, // const ADrawable: TALDrawable;
-        FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
-        AbsoluteOpacity); // const AOpacity: Single)
-    finally
-      ALFreeAndNil(LBufferTexture);
-    end;
+    ALUpdateTextureFromSkSurface(FBufSurface, FBufTexture);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufTexture, // const ADrawable: TALDrawable;
+      FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ELSE}
     var LRect := FRenderRect;
+    Lrect.Width := Lrect.Width * ALGetScreenScale;
+    Lrect.Height := Lrect.Height * ALGetScreenScale;
     LRect.Offset(-LRect.Left,-LRect.Top);
     sk4d_canvas_clear(FBufCanvas, TAlphaColors.Null);
     sk4d_skottieanimation_render(
@@ -1676,16 +1714,12 @@ begin
       FBufCanvas, // canvas: sk_canvas_t;
       @LRect, // const dest: psk_rect_t;
       0); // render_flags: uint32_t); cdecl;
-    var LBufferBitmap := ALCreateBitmapFromSkSurface(FBufSurface);
-    try
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufferBitmap, // const ADrawable: TALDrawable;
-        FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
-        AbsoluteOpacity); // const AOpacity: Single)
-    finally
-      ALFreeAndNil(LBufferBitmap);
-    end;
+    ALUpdateBitmapFromSkSurface(FBufSurface, FBufBitmap);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufBitmap, // const ADrawable: TALDrawable;
+      FRenderRect.TopLeft, // const ADstTopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ENDIF}
   end
   else if fAnimcodecplayer <> 0 then Begin
@@ -1697,27 +1731,19 @@ begin
       FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
       AbsoluteOpacity); // const AOpacity: Single)
     {$ELSEIF defined(ALGPUCanvas)}
-    var LBufferTexture := ALCreateTextureFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer));
-    try
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufferTexture, // const ADrawable: TALDrawable;
-        FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
-        AbsoluteOpacity); // const AOpacity: Single)
-    finally
-      ALFreeAndNil(LBufferTexture);
-    end;
+    ALUpdateTextureFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer), FBufTexture);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufTexture, // const ADrawable: TALDrawable;
+      FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ELSE}
-    var LBufferBitmap := ALCreateBitmapFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer));
-    try
-      ALDrawDrawable(
-        Canvas, // const ACanvas: Tcanvas;
-        LBufferBitmap, // const ADrawable: TALDrawable;
-        FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
-        AbsoluteOpacity); // const AOpacity: Single)
-    finally
-      ALFreeAndNil(LBufferBitmap);
-    end;
+    ALUpdateBitmapFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer), FBufBitmap);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      FBufBitmap, // const ADrawable: TALDrawable;
+      FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single)
     {$ENDIF}
   end;
   {$ELSE}

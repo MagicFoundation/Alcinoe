@@ -3474,31 +3474,31 @@ begin
   FPriorSupersedeTintColor := FTintColor;
   //--
   if StateStyleParent <> nil then begin
-    if FPromptTextColor = TAlphaColors.Null then
-      FPromptTextColor := TBaseStateStyle(StateStyleParent).FPromptTextColor;
-    if FTintColor = TAlphaColors.Null then
-      FTintColor := TBaseStateStyle(StateStyleParent).FTintColor;
+    if PromptTextColor = TAlphaColors.Null then
+      PromptTextColor := TBaseStateStyle(StateStyleParent).PromptTextColor;
+    if TintColor = TAlphaColors.Null then
+      TintColor := TBaseStateStyle(StateStyleParent).TintColor;
   end
   else begin
-    if FPromptTextColor = TAlphaColors.Null then
-      FPromptTextColor := TALBaseEdit(ControlParent).FPromptTextColor;
-    if FTintColor = TAlphaColors.Null then
-      FTintColor := TALBaseEdit(ControlParent).FTintColor;
+    if PromptTextColor = TAlphaColors.Null then
+      PromptTextColor := TALBaseEdit(ControlParent).PromptTextColor;
+    if TintColor = TAlphaColors.Null then
+      TintColor := TALBaseEdit(ControlParent).TintColor;
   end;
-  FTextSettings.Supersede;
-  FLabelTextSettings.Supersede;
-  FSupportingTextSettings.Supersede;
+  TextSettings.Supersede;
+  LabelTextSettings.Supersede;
+  SupportingTextSettings.Supersede;
 end;
 
 {************************************}
 procedure TALBaseEdit.TBaseStateStyle.DoReinstate;
 begin
   inherited;
-  FPromptTextColor := FPriorSupersedePromptTextColor;
-  FTintColor := FPriorSupersedeTintColor;
-  FTextSettings.Reinstate;
-  FLabelTextSettings.Reinstate;
-  FSupportingTextSettings.Reinstate;
+  PromptTextColor := FPriorSupersedePromptTextColor;
+  TintColor := FPriorSupersedeTintColor;
+  TextSettings.Reinstate;
+  LabelTextSettings.Reinstate;
+  SupportingTextSettings.Reinstate;
 end;
 
 {****************************************************************************}
@@ -4097,7 +4097,7 @@ begin
   else if IsMouseOver then LStateStyle := StateStyles.Hovered
   else LStateStyle := nil;
   if LStateStyle <> nil then
-    LStateStyle.Supersede;
+    LStateStyle.SupersedeNoChanges;
   try
     // FillColor
     if LStateStyle <> nil then EditControl.FillColor := LStateStyle.Fill.Color
@@ -4113,7 +4113,7 @@ begin
     else EditControl.TextSettings.Assign(TextSettings)
   finally
     if LStateStyle <> nil then
-      LStateStyle.Reinstate;
+      LStateStyle.ReinstateNoChanges;
   end;
 
   repaint;
@@ -4932,9 +4932,9 @@ procedure TALBaseEdit.MakeBufDrawable;
        AStateStyle.Stroke.Inherit and
        AStateStyle.Shadow.Inherit then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.Fill.Supersede;
-    AStateStyle.Stroke.Supersede;
-    AStateStyle.Shadow.Supersede;
+    AStateStyle.Fill.SupersedeNoChanges;
+    AStateStyle.Stroke.SupersedeNoChanges;
+    AStateStyle.Shadow.SupersedeNoChanges;
     try
       CreateBufDrawable(
         ABufDrawable, // var ABufDrawable: TALDrawable;
@@ -4943,9 +4943,9 @@ procedure TALBaseEdit.MakeBufDrawable;
         AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
         AStateStyle.Shadow); // const AShadow: TALShadow);
     finally
-      AStateStyle.Fill.Reinstate;
-      AStateStyle.Stroke.Reinstate;
-      AStateStyle.Shadow.Reinstate;
+      AStateStyle.Fill.ReinstateNoChanges;
+      AStateStyle.Stroke.ReinstateNoChanges;
+      AStateStyle.Shadow.ReinstateNoChanges;
     end;
   end;
 
@@ -4995,7 +4995,7 @@ procedure TALBaseEdit.MakeBufPromptTextDrawable;
     if (AStateStyle.TextSettings.Inherit) and
        ((not AUsePromptTextColor) or (AStateStyle.PromptTextColor = TalphaColors.Null)) then exit;
     if (not ALIsDrawableNull(ABufPromptTextDrawable)) then exit;
-    AStateStyle.Supersede;
+    AStateStyle.SupersedeNoChanges;
     try
       var LPrevFontColor := AStateStyle.TextSettings.font.Color;
       var LPrevFontOnchanged: TNotifyEvent;
@@ -5020,7 +5020,7 @@ procedure TALBaseEdit.MakeBufPromptTextDrawable;
         AStateStyle.TextSettings.OnChanged := LPrevFontOnchanged;
       end;
     finally
-      AStateStyle.Reinstate;
+      AStateStyle.ReinstateNoChanges;
     end;
   end;
 
@@ -5112,7 +5112,7 @@ procedure TALBaseEdit.MakeBufLabelTextDrawable;
   begin
     if AStateStyle.LabelTextSettings.Inherit then exit;
     if (not ALIsDrawableNull(ABufLabelTextDrawable)) then exit;
-    AStateStyle.LabelTextSettings.Supersede;
+    AStateStyle.LabelTextSettings.SupersedeNoChanges;
     try
       CreateBufLabelTextDrawable(
         ABufLabelTextDrawable, // var ABufLabelTextDrawable: TALDrawable;
@@ -5120,7 +5120,7 @@ procedure TALBaseEdit.MakeBufLabelTextDrawable;
         FLabelText, // const AText: String;
         AStateStyle.LabelTextSettings.font); // const AFont: TALFont;
     finally
-      AStateStyle.LabelTextSettings.Reinstate;
+      AStateStyle.LabelTextSettings.ReinstateNoChanges;
     end;
   end;
 
@@ -5170,7 +5170,7 @@ procedure TALBaseEdit.MakeBufSupportingTextDrawable;
   begin
     if AStateStyle.SupportingTextSettings.Inherit then exit;
     if (not ALIsDrawableNull(ABufSupportingTextDrawable)) then exit;
-    AStateStyle.SupportingTextSettings.Supersede;
+    AStateStyle.SupportingTextSettings.SupersedeNoChanges;
     try
       CreateBufSupportingTextDrawable(
         ABufSupportingTextDrawable, // var ABufSupportingTextDrawable: TALDrawable;
@@ -5181,7 +5181,7 @@ procedure TALBaseEdit.MakeBufSupportingTextDrawable;
         padding.Left + SupportingTextSettings.Margins.Left,
         Height+SupportingTextSettings.Margins.Top);
     finally
-      AStateStyle.SupportingTextSettings.Reinstate;
+      AStateStyle.SupportingTextSettings.ReinstateNoChanges;
     end;
   end;
 

@@ -541,6 +541,8 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single);
     function HasCheckMark: boolean;
     property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
     property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
@@ -570,8 +572,10 @@ type
     constructor Create(const AParent: TALCheckMarkBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede;
-    procedure Reinstate;
+    procedure Supersede; virtual;
+    procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
@@ -2325,6 +2329,47 @@ begin
   end;
 end;
 
+{*********************************************************************************}
+procedure TALCheckMarkBrush.Interpolate(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      ResourceName := ATo.ResourceName;
+      WrapMode := ATo.WrapMode;
+      Thickness := InterpolateSingle(Thickness{Start}, ATo.Thickness{Stop}, ANormalizedTime);
+      Padding.Left := InterpolateSingle(Padding.Left{Start}, ATo.Padding.Left{Stop}, ANormalizedTime);
+      Padding.Right := InterpolateSingle(Padding.Right{Start}, ATo.Padding.Right{Stop}, ANormalizedTime);
+      Padding.Top := InterpolateSingle(Padding.Top{Start}, ATo.Padding.Top{Stop}, ANormalizedTime);
+      Padding.Bottom := InterpolateSingle(Padding.Bottom{Start}, ATo.Padding.Bottom{Stop}, ANormalizedTime);
+    end
+    else begin
+      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      ResourceName := DefaultResourceName;
+      WrapMode := DefaultWrapMode;
+      Thickness := InterpolateSingle(Thickness{Start}, DefaultThickness{Stop}, ANormalizedTime);
+      Padding.Left := InterpolateSingle(Padding.Left{Start}, Padding.DefaultValue.Left{Stop}, ANormalizedTime);
+      Padding.Right := InterpolateSingle(Padding.Right{Start}, Padding.DefaultValue.Right{Stop}, ANormalizedTime);
+      Padding.Top := InterpolateSingle(Padding.Top{Start}, Padding.DefaultValue.Top{Stop}, ANormalizedTime);
+      Padding.Bottom := InterpolateSingle(Padding.Bottom{Start}, Padding.DefaultValue.Bottom{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALCheckMarkBrush.InterpolateNoChanges(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {************************}
 function TALCheckMarkBrush.HasCheckMark: boolean;
 begin
@@ -2458,51 +2503,77 @@ end;
 {******************}
 procedure TALInheritCheckMarkBrush.Supersede;
 begin
-  if (not inherit) or
-     (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeColor := FColor;
-  FPriorSupersedeResourceName := FResourceName;
-  FPriorSupersedeWrapMode := FWrapMode;
-  FPriorSupersedeThickness := FThickness;
-  FPriorSupersedePaddingRect := FPadding.Rect;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritCheckMarkBrush then begin
-    TALInheritCheckMarkBrush(FParent).Supersede;
-    LParentSuperseded := True;
-  end;
+  beginUpdate;
   try
-    FColor := FParent.FColor;
-    FResourceName := FParent.FResourceName;
-    FWrapMode := FParent.FWrapMode;
-    FThickness := FParent.FThickness;
-    var LPrevPaddingOnChange := FPadding.OnChange;
-    FPadding.OnChange := nil;
-    FPadding.Rect := FParent.Padding.Rect;
-    fPadding.OnChange := LPrevPaddingOnChange;
+    if (not inherit) or
+       (FParent = nil) then exit;
+    inc(fSuperseded);
+    if (FSuperseded <> 1) then exit;
+
+    FPriorSupersedeColor := Color;
+    FPriorSupersedeResourceName := ResourceName;
+    FPriorSupersedeWrapMode := WrapMode;
+    FPriorSupersedeThickness := Thickness;
+    FPriorSupersedePaddingRect := Padding.Rect;
+    //--
+    var LParentSuperseded := False;
+    if FParent is TALInheritCheckMarkBrush then begin
+      TALInheritCheckMarkBrush(FParent).SupersedeNoChanges;
+      LParentSuperseded := True;
+    end;
+    try
+      Color := FParent.Color;
+      ResourceName := FParent.ResourceName;
+      WrapMode := FParent.WrapMode;
+      Thickness := FParent.Thickness;
+      Padding.Rect := FParent.Padding.Rect;
+    finally
+      if LParentSuperseded then
+        TALInheritCheckMarkBrush(FParent).ReinstateNoChanges;
+    end;
   finally
-    if LParentSuperseded then
-      TALInheritCheckMarkBrush(FParent).Reinstate
+    EndUpdate;
   end;
 end;
 
 {******************}
 procedure TALInheritCheckMarkBrush.Reinstate;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then begin
-    FColor := FPriorSupersedeColor;
-    FResourceName := FPriorSupersedeResourceName;
-    FWrapMode := FPriorSupersedeWrapMode;
-    FThickness := FPriorSupersedeThickness;
-    var LPrevPaddingOnChange := FPadding.OnChange;
-    FPadding.OnChange := nil;
-    FPadding.Rect := FPriorSupersedePaddingRect;
-    fPadding.OnChange := LPrevPaddingOnChange;
+  beginUpdate;
+  try
+    if fSuperseded <= 0 then exit;
+    dec(fSuperseded);
+    if fSuperseded = 0 then begin
+      Color := FPriorSupersedeColor;
+      ResourceName := FPriorSupersedeResourceName;
+      WrapMode := FPriorSupersedeWrapMode;
+      Thickness := FPriorSupersedeThickness;
+      Padding.Rect := FPriorSupersedePaddingRect;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************}
+procedure TALInheritCheckMarkBrush.SupersedeNoChanges;
+begin
+  BeginUpdate;
+  try
+    Supersede;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALInheritCheckMarkBrush.ReinstateNoChanges;
+begin
+  BeginUpdate;
+  try
+    Reinstate;
+  finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -2559,14 +2630,14 @@ end;
 procedure TALCheckBoxBaseStateStyle.DoSupersede;
 begin
   inherited;
-  FCheckMark.Supersede;
+  CheckMark.Supersede;
 end;
 
 {******************}
 procedure TALCheckBoxBaseStateStyle.DoReinstate;
 begin
   inherited;
-  FCheckMark.Reinstate;
+  CheckMark.Reinstate;
 end;
 
 {********************************************************************************}
@@ -3342,7 +3413,7 @@ procedure TALCheckbox.MakeBufDrawable;
        (AStateStyle <> StateStyles.UnChecked.Default) and
        (AStateStyle.Inherit) then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.Supersede;
+    AStateStyle.SupersedeNoChanges;
     try
       //--
       CreateBufDrawable(
@@ -3365,7 +3436,7 @@ procedure TALCheckbox.MakeBufDrawable;
       ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 *)
     finally
-      AStateStyle.Reinstate;
+      AStateStyle.ReinstateNoChanges;
     end;
   end;
 
@@ -3956,21 +4027,21 @@ procedure TALButton.TBaseStateStyle.DoSupersede;
 begin
   Inherited;
   //--
-  FPriorSupersedeText := FText;
+  FPriorSupersedeText := Text;
   //--
-  if FText = '' then begin
-    if StateStyleParent <> nil then FText := TBaseStateStyle(StateStyleParent).FText
-    else FText := TALButton(ControlParent).Text;
+  if Text = '' then begin
+    if StateStyleParent <> nil then Text := TBaseStateStyle(StateStyleParent).Text
+    else Text := TALButton(ControlParent).Text;
   end;
-  FTextSettings.SuperSede;
+  TextSettings.SuperSede;
 end;
 
 {******************}
 procedure TALButton.TBaseStateStyle.DoReinstate;
 begin
   inherited;
-  FText := FPriorSupersedeText;
-  FTextSettings.Reinstate;
+  Text := FPriorSupersedeText;
+  TextSettings.Reinstate;
 end;
 
 {*********************************************************}
@@ -4279,7 +4350,7 @@ procedure TALButton.MakeBufDrawable;
   begin
     if AStateStyle.Inherit then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.Supersede;
+    AStateStyle.SupersedeNoChanges;
     try
       var LTextBroken: Boolean;
       var LAllTextDrawn: Boolean;
@@ -4308,7 +4379,7 @@ procedure TALButton.MakeBufDrawable;
       ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
       ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
     finally
-      AStateStyle.Reinstate;
+      AStateStyle.ReinstateNoChanges;
     end;
   end;
 
@@ -4354,7 +4425,7 @@ procedure TALButton.Paint;
   procedure _DrawMultilineText(const AStateStyle: TBaseStateStyle);
   begin
     {$IF DEFINED(ALSkiaCanvas)}
-    AStateStyle.Supersede;
+    AStateStyle.SupersedeNoChanges;
     try
       var LTextBroken: Boolean;
       var LAllTextDrawn: Boolean;
@@ -4376,7 +4447,7 @@ procedure TALButton.Paint;
         AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
         AStateStyle.Shadow); // const AShadow: TALShadow);
     finally
-      AStateStyle.Reinstate;
+      AStateStyle.ReinstateNoChanges;
     end;
     {$ELSE}
     {$IF defined(DEBUG)}

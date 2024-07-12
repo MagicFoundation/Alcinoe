@@ -169,13 +169,13 @@ type
     FUpdateCount: Integer;
     FIsChanged: Boolean;
     FOnChanged: TNotifyEvent;
-  private
     procedure DoChanged; virtual;
   public
     constructor Create; virtual;
     procedure Reset; virtual;
     procedure BeginUpdate; virtual;
     procedure EndUpdate; virtual;
+    procedure EndUpdateNoChanges; virtual;
     procedure Change; virtual;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property IsChanged: Boolean read FIsChanged write FIsChanged;
@@ -210,6 +210,8 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALShadow; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
     function HasShadow: boolean; virtual;
     property Defaultblur: Single read fDefaultblur write fDefaultblur;
     property DefaultOffsetX: Single read fDefaultOffsetX write fDefaultOffsetX;
@@ -237,8 +239,11 @@ type
     constructor Create(const AParent: TALShadow); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede;
-    procedure Reinstate;
+    procedure Supersede; virtual;
+    procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
+    property Parent: TALShadow read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
@@ -289,6 +294,8 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALFont; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
     property DefaultFamily: TFontName read FDefaultFamily write FDefaultFamily;
     property DefaultSize: Single read FDefaultSize write FDefaultSize;
     property DefaultWeight: TFontWeight read FDefaultWeight write FDefaultWeight;
@@ -326,9 +333,11 @@ type
     function IsThicknessMultiplierStored: Boolean;
     function IsColorStored: Boolean;
   public
-    constructor Create; override;
+    constructor Create; reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
     property DefaultKinds: TALTextDecorationKinds read FDefaultKinds write FDefaultKinds;
     property DefaultStyle: TALTextDecorationStyle read FDefaultStyle write FDefaultStyle;
     property DefaultThicknessMultiplier: Single read FDefaultThicknessMultiplier write FDefaultThicknessMultiplier;
@@ -346,16 +355,20 @@ type
     FInherit: Boolean;
     FFont: TALFont;
     FDecoration: TALTextDecoration;
+    FDefaultInherit: Boolean;
     procedure SetInherit(const AValue: Boolean);
     procedure SetFont(const AValue: TALFont);
     procedure SetDecoration(const AValue: TALTextDecoration);
     procedure FontChanged(ASender: TObject);
     procedure DecorationChanged(ASender: TObject);
   public
-    constructor Create; override;
+    constructor Create; reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
+    property DefaultInherit: Boolean read FDefaultInherit write FDefaultInherit;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
     property Font: TALFont read FFont write SetFont;
@@ -413,6 +426,8 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
     //--
     property DefaultEllipsis: String read FDefaultEllipsis write FDefaultEllipsis;
     property DefaultTrimming: TALTextTrimming read FDefaultTrimming write FDefaultTrimming;
@@ -438,8 +453,6 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTextSettings = class(TALBaseTextSettings)
-  private
-  public
   published
     property Font;
     property Decoration;
@@ -496,8 +509,11 @@ type
     constructor Create(const AParent: TALBaseTextSettings); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede;
-    procedure Reinstate;
+    procedure Supersede; virtual;
+    procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
+    property Parent: TALBaseTextSettings read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
@@ -529,6 +545,8 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALGradient; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single);
     property DefaultStyle: TGradientStyle read FDefaultStyle write FDefaultStyle;
     property DefaultAngle: Single read FDefaultAngle write FDefaultAngle;
     property Colors: TArray<TAlphaColor> read FColors write SetColors;
@@ -575,6 +593,8 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALBrush; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
     function HasFill: boolean; virtual;
     function Styles: TALBrushStyles; virtual;
     property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
@@ -607,8 +627,11 @@ type
     constructor Create(const AParent: TALBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede;
-    procedure Reinstate;
+    procedure Supersede; virtual;
+    procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
+    property Parent: TALBrush read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
@@ -634,6 +657,8 @@ type
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
     function HasStroke: boolean; virtual;
     property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
     property DefaultThickness: Single read FDefaultThickness write FDefaultThickness;
@@ -655,8 +680,11 @@ type
     constructor Create(const AParent: TALStrokeBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede;
-    procedure Reinstate;
+    procedure Supersede; virtual;
+    procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
+    property Parent: TALStrokeBrush read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
@@ -684,6 +712,8 @@ type
     constructor Create(const ADefaultColor: TAlphaColor); override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); reintroduce; virtual;
+    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
     function HasFill: boolean; override;
     function Styles: TALBrushStyles; override;
     property DefaultOpacity: Single read FDefaultOpacity write FDefaultOpacity;
@@ -702,6 +732,35 @@ type
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALPosition = class(TPosition)
+  public
+    procedure Interpolate(const ATo: TPosition; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TPosition; const ANormalizedTime: Single);
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALInheritPosition = class(TALPosition)
+  private
+    FParent: TPosition;
+    FInherit: Boolean;
+    FSuperseded: Integer;
+    FPriorSupersedeX: Single;
+    FPriorSupersedeY: Single;
+    procedure SetInherit(const AValue: Boolean);
+  public
+    constructor Create(const AParent: TPosition; const ADefaultValue: TPointF); reintroduce; virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; virtual;
+    procedure Supersede; virtual;
+    procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
+    property Parent: TPosition read FParent;
+  published
+    property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALBaseStateStyle = class(TALPersistentObserver)
   private
@@ -711,15 +770,22 @@ type
     FStateLayer: TALStateLayer;
     FStroke: TALInheritStrokeBrush;
     FShadow: TALInheritShadow;
+    FScale: TALInheritPosition;
+    FTransitionDuration: Single;
+    FDefaultTransitionDuration: Single;
     fSuperseded: Integer;
     procedure SetFill(const AValue: TALInheritBrush);
     procedure SetStateLayer(const AValue: TALStateLayer);
     procedure SetStroke(const AValue: TALInheritStrokeBrush);
     procedure SetShadow(const AValue: TALInheritShadow);
+    procedure SetScale(const Value: TALInheritPosition);
+    procedure SetTransitionDuration(const Value: Single);
     procedure FillChanged(ASender: TObject);
     procedure StateLayerChanged(ASender: TObject);
     procedure StrokeChanged(ASender: TObject);
     procedure ShadowChanged(ASender: TObject);
+    procedure ScaleChanged(ASender: TObject);
+    function IsTransitionDurationStored: Boolean;
   protected
     function GetInherit: Boolean; virtual;
     property Fill: TALInheritBrush read FFill write SetFill;
@@ -730,13 +796,20 @@ type
     property ControlParent: TALControl read FControlParent;
     procedure DoSupersede; virtual;
     procedure DoReinstate; virtual;
+    property Scale: TALInheritPosition read FScale write SetScale;
+    property TransitionDuration: Single read FTransitionDuration write SetTransitionDuration stored IsTransitionDurationStored nodefault;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     Property Inherit: Boolean read GetInherit;
+    procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
     procedure Supersede; virtual;
     procedure Reinstate; virtual;
+    procedure SupersedeNoChanges;
+    procedure ReinstateNoChanges;
+    property DefaultTransitionDuration: Single read FDefaultTransitionDuration write FDefaultTransitionDuration;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -1010,6 +1083,7 @@ uses
   System.SyncObjs,
   System.IOutils,
   System.UIConsts,
+  FMX.Utils,
   Fmx.Platform,
   {$IF defined(ALSkiaEngine)}
   FMX.Skia,
@@ -1085,6 +1159,20 @@ begin
       finally
         FIsChanged := False;
       end;
+  end;
+end;
+
+{***************************************}
+procedure TALPersistentObserver.EndUpdateNoChanges;
+begin
+  if FUpdateCount > 0 then
+  begin
+    Dec(FUpdateCount);
+    if (FUpdateCount = 0) and (FIsChanged) then
+      // If execution reaches this point, it means there was no previously unclosed
+      // beginUpdate since FUpdateCount is 0. Therefore, ignoring the doChanged
+      // call here will not affect any prior beginUpdate operations.
+      FIsChanged := False;
   end;
 end;
 
@@ -1172,6 +1260,39 @@ begin
     Color := DefaultColor;
   finally
     EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALShadow.Interpolate(const ATo: TALShadow; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      blur := InterpolateSingle(blur{Start}, ATo.blur{Stop}, ANormalizedTime);
+      OffsetX := InterpolateSingle(OffsetX{Start}, ATo.OffsetX{Stop}, ANormalizedTime);
+      OffsetY := InterpolateSingle(OffsetY{Start}, ATo.OffsetY{Stop}, ANormalizedTime);
+      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+    end
+    else begin
+      blur := InterpolateSingle(blur{Start}, Defaultblur{Stop}, ANormalizedTime);
+      OffsetX := InterpolateSingle(OffsetX{Start}, DefaultOffsetX{Stop}, ANormalizedTime);
+      OffsetY := InterpolateSingle(OffsetY{Start}, DefaultOffsetY{Stop}, ANormalizedTime);
+      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALShadow.InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -1294,42 +1415,74 @@ end;
 {******************}
 procedure TALInheritShadow.Supersede;
 begin
-  if (not inherit) or
-     (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeBlur := FBlur;
-  FPriorSupersedeOffsetX := FOffsetX;
-  FPriorSupersedeOffsetY := FOffsetY;
-  FPriorSupersedeColor := FColor;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritShadow then begin
-    TALInheritShadow(FParent).Supersede;
-    LParentSuperseded := True;
-  end;
+  beginUpdate;
   try
-    FBlur := FParent.blur;
-    FOffsetX := FParent.OffsetX;
-    FOffsetY := FParent.OffsetY;
-    FColor := FParent.Color;
+    if (not inherit) or
+       (FParent = nil) then exit;
+    inc(fSuperseded);
+    if (FSuperseded <> 1) then exit;
+
+    FPriorSupersedeBlur := Blur;
+    FPriorSupersedeOffsetX := OffsetX;
+    FPriorSupersedeOffsetY := OffsetY;
+    FPriorSupersedeColor := Color;
+    //--
+    var LParentSuperseded := False;
+    if FParent is TALInheritShadow then begin
+      TALInheritShadow(FParent).SupersedeNoChanges;
+      LParentSuperseded := True;
+    end;
+    try
+      Blur := FParent.blur;
+      OffsetX := FParent.OffsetX;
+      OffsetY := FParent.OffsetY;
+      Color := FParent.Color;
+    finally
+      if LParentSuperseded then
+        TALInheritShadow(FParent).ReinstateNoChanges;
+    end;
   finally
-    if LParentSuperseded then
-      TALInheritShadow(FParent).Reinstate
+    EndUpdate;
   end;
 end;
 
 {******************}
 procedure TALInheritShadow.Reinstate;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then begin
-    FBlur := FPriorSupersedeblur;
-    FOffsetX := FPriorSupersedeOffsetX;
-    FOffsetY := FPriorSupersedeOffsetY;
-    FColor := FPriorSupersedeColor;
+  beginUpdate;
+  try
+    if fSuperseded <= 0 then exit;
+    dec(fSuperseded);
+    if fSuperseded = 0 then begin
+      Blur := FPriorSupersedeblur;
+      OffsetX := FPriorSupersedeOffsetX;
+      OffsetY := FPriorSupersedeOffsetY;
+      Color := FPriorSupersedeColor;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************}
+procedure TALInheritShadow.SupersedeNoChanges;
+begin
+  BeginUpdate;
+  try
+    Supersede;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALInheritShadow.ReinstateNoChanges;
+begin
+  BeginUpdate;
+  try
+    Reinstate;
+  finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -1425,6 +1578,49 @@ begin
     AutoConvert := DefaultAutoConvert;
   finally
     EndUpdate;
+  end;
+end;
+
+{*******************************************************************************}
+procedure TALFont.Interpolate(const ATo: TALFont; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Family := ATo.Family;
+      Size := InterpolateSingle(Size{Start}, ATo.Size{Stop}, ANormalizedTime);
+      //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
+      Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(ATo.Weight), ANormalizedTime)));
+      Slant := ATo.Slant;
+      //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
+      Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(ATo.Stretch), ANormalizedTime)));
+      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      AutoConvert := ATo.AutoConvert;
+    end
+    else begin
+      Family := DefaultFamily;
+      Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
+      //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
+      Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(DefaultWeight), ANormalizedTime)));
+      Slant := DefaultSlant;
+      //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
+      Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(DefaultStretch), ANormalizedTime)));
+      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      AutoConvert := DefaultAutoConvert;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALFont.InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -1603,6 +1799,47 @@ begin
   end;
 end;
 
+{***************************************************************************************************}
+procedure TALTextDecoration.Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Kinds := ATo.Kinds;
+      Style := ATo.Style;
+      ThicknessMultiplier := InterpolateSingle(ThicknessMultiplier{Start}, ATo.ThicknessMultiplier{Stop}, ANormalizedTime);
+      if (ATo.Color = TalphaColors.Null) or
+         (Color = TalphaColors.Null) then
+        Color := ATo.Color
+      else
+        Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+    end
+    else begin
+      Kinds := DefaultKinds;
+      Style := DefaultStyle;
+      ThicknessMultiplier := InterpolateSingle(ThicknessMultiplier{Start}, DefaultThicknessMultiplier{Stop}, ANormalizedTime);
+      if (DefaultColor = TalphaColors.Null) or
+         (Color = TalphaColors.Null) then
+        Color := DefaultColor
+      else
+        Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALTextDecoration.InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {************************************************}
 function TALTextDecoration.IsKindsStored: Boolean;
 begin
@@ -1667,7 +1904,8 @@ end;
 constructor TALEllipsisSettings.Create;
 begin
   inherited Create;
-  FInherit := True;
+  FDefaultInherit := True;
+  FInherit := FDefaultInherit;
   FFont := TALFont.Create;
   FFont.OnChanged := FontChanged;
   FDecoration := TALTextDecoration.Create;
@@ -1716,11 +1954,56 @@ begin
   BeginUpdate;
   Try
     inherited Reset;
-    Inherit := True;
+    Inherit := DefaultInherit;
     Font.reset;
     Decoration.reset;
   finally
     EndUpdate;
+  end;
+end;
+
+{*******************************************************************************************************}
+procedure TALEllipsisSettings.Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      if ATo.Inherit or Inherit then begin
+        Font.assign(ATo.Font);
+        Decoration.assign(ATo.Decoration);
+        Inherit := ATo.Inherit; // True or False
+      end
+      else begin
+        Font.Interpolate(ATo.Font, ANormalizedTime);
+        Decoration.Interpolate(ATo.Decoration, ANormalizedTime);
+        Inherit := ATo.Inherit; // False
+      end;
+    end
+    else begin
+      if DefaultInherit or Inherit then begin
+        Font.Reset;
+        Decoration.reset;
+        Inherit := DefaultInherit; // True or False
+      end
+      else begin
+        Font.Interpolate(nil, ANormalizedTime);
+        Decoration.Interpolate(nil, ANormalizedTime);
+        Inherit := DefaultInherit; // False
+      end;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALEllipsisSettings.InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -1921,6 +2204,53 @@ begin
     IsHtml := DefaultIsHtml;
   finally
     EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALBaseTextSettings.Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Font.Interpolate(ATo.Font, ANormalizedTime);
+      Decoration.Interpolate(ATo.Decoration, ANormalizedTime);
+      EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime);
+      Ellipsis := ATo.Ellipsis;
+      Trimming := ATo.Trimming;
+      MaxLines := DefaultMaxLines;
+      HorzAlign := ATo.HorzAlign;
+      VertAlign := ATo.VertAlign;
+      LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, ATo.LineHeightMultiplier{Stop}, ANormalizedTime);
+      LetterSpacing := InterpolateSingle(LetterSpacing{Start}, ATo.LetterSpacing{Stop}, ANormalizedTime);
+      IsHtml := ATo.IsHtml;
+    end
+    else begin
+      Font.Interpolate(nil, ANormalizedTime);
+      Decoration.Interpolate(nil, ANormalizedTime);
+      EllipsisSettings.Interpolate(nil, ANormalizedTime);
+      Ellipsis := DefaultEllipsis;
+      Trimming := DefaultTrimming;
+      MaxLines := DefaultMaxLines;
+      HorzAlign := DefaultHorzAlign;
+      VertAlign := DefaultVertAlign;
+      LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, DefaultLineHeightMultiplier{Stop}, ANormalizedTime);
+      LetterSpacing := InterpolateSingle(LetterSpacing{Start}, DefaultLetterSpacing{Stop}, ANormalizedTime);
+      IsHtml := DefaultIsHtml;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALBaseTextSettings.InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -2169,129 +2499,162 @@ end;
 {******************}
 procedure TALInheritBaseTextSettings.Supersede;
 begin
-  if (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeFontFamily := FFont.FFamily;
-  FPriorSupersedeFontSize := FFont.FSize;
-  FPriorSupersedeFontWeight := FFont.FWeight;
-  FPriorSupersedeFontSlant := FFont.FSlant;
-  FPriorSupersedeFontStretch := FFont.FStretch;
-  FPriorSupersedeFontColor := FFont.FColor;
-  FPriorSupersedeFontAutoConvert := FFont.FAutoConvert;
-  FPriorSupersedeDecorationKinds := FDecoration.FKinds;
-  FPriorSupersedeDecorationStyle := FDecoration.FStyle;
-  FPriorSupersedeDecorationThicknessMultiplier := FDecoration.FThicknessMultiplier;
-  FPriorSupersedeDecorationColor := FDecoration.FColor;
-  FPriorSupersedeEllipsis := FEllipsis;
-  FPriorSupersedeEllipsisSettingsInherit := FEllipsisSettings.FInherit;
-  FPriorSupersedeEllipsisSettingsFontFamily := FEllipsisSettings.FFont.FFamily;
-  FPriorSupersedeEllipsisSettingsFontSize := FEllipsisSettings.FFont.FSize;
-  FPriorSupersedeEllipsisSettingsFontWeight := FEllipsisSettings.FFont.FWeight;
-  FPriorSupersedeEllipsisSettingsFontSlant := FEllipsisSettings.FFont.FSlant;
-  FPriorSupersedeEllipsisSettingsFontStretch := FEllipsisSettings.FFont.FStretch;
-  FPriorSupersedeEllipsisSettingsFontColor := FEllipsisSettings.FFont.FColor;
-  FPriorSupersedeEllipsisSettingsFontAutoConvert := FEllipsisSettings.FFont.FAutoConvert;
-  FPriorSupersedeEllipsisSettingsDecorationKinds := FEllipsisSettings.FDecoration.FKinds;
-  FPriorSupersedeEllipsisSettingsDecorationStyle := FEllipsisSettings.FDecoration.FStyle;
-  FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier := FEllipsisSettings.FDecoration.FThicknessMultiplier;
-  FPriorSupersedeEllipsisSettingsDecorationColor := FEllipsisSettings.FDecoration.FColor;
-  FPriorSupersedeTrimming := FTrimming;
-  FPriorSupersedeMaxLines := FMaxLines;
-  FPriorSupersedeHorzAlign := FHorzAlign;
-  FPriorSupersedeVertAlign := FVertAlign;
-  FPriorSupersedeLineHeightMultiplier := FLineHeightMultiplier;
-  FPriorSupersedeLetterSpacing := FLetterSpacing;
-  FPriorSupersedeIsHtml := FIsHtml;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritBaseTextSettings then begin
-    TALInheritBaseTextSettings(FParent).Supersede;
-    LParentSuperseded := True;
-  end;
+  beginUpdate;
   try
-    if inherit then begin
-      FFont.FFamily := FParent.FFont.FFamily;
-      FFont.FSize := FParent.FFont.FSize;
-      FFont.FWeight := FParent.FFont.FWeight;
-      FFont.FSlant := FParent.FFont.FSlant;
-      FFont.FStretch := FParent.FFont.FStretch;
-      FFont.FColor := FParent.FFont.FColor;
-      FFont.FAutoConvert := FParent.FFont.FAutoConvert;
-      FDecoration.FKinds := FParent.FDecoration.FKinds;
-      FDecoration.FStyle := FParent.FDecoration.FStyle;
-      FDecoration.FThicknessMultiplier := FParent.FDecoration.FThicknessMultiplier;
-      FDecoration.FColor := FParent.FDecoration.FColor;
-      FEllipsis := FParent.FEllipsis;
-      FEllipsisSettings.FInherit := FParent.FEllipsisSettings.FInherit;
-      FEllipsisSettings.FFont.FFamily := FParent.FEllipsisSettings.FFont.FFamily;
-      FEllipsisSettings.FFont.FSize := FParent.FEllipsisSettings.FFont.FSize;
-      FEllipsisSettings.FFont.FWeight := FParent.FEllipsisSettings.FFont.FWeight;
-      FEllipsisSettings.FFont.FSlant := FParent.FEllipsisSettings.FFont.FSlant;
-      FEllipsisSettings.FFont.FStretch := FParent.FEllipsisSettings.FFont.FStretch;
-      FEllipsisSettings.FFont.FColor := FParent.FEllipsisSettings.FFont.FColor;
-      FEllipsisSettings.FFont.FAutoConvert := FParent.FEllipsisSettings.FFont.FAutoConvert;
-      FEllipsisSettings.FDecoration.FKinds := FParent.FEllipsisSettings.FDecoration.FKinds;
-      FEllipsisSettings.FDecoration.FStyle := FParent.FEllipsisSettings.FDecoration.FStyle;
-      FEllipsisSettings.FDecoration.FThicknessMultiplier := FParent.FEllipsisSettings.FDecoration.FThicknessMultiplier;
-      FEllipsisSettings.FDecoration.FColor := FParent.FEllipsisSettings.FDecoration.FColor;
-      FTrimming := FParent.FTrimming;
-      FMaxLines := FParent.FMaxLines;
-      FHorzAlign := FParent.FHorzAlign;
-      FVertAlign := FParent.FVertAlign;
-      FLineHeightMultiplier := FParent.FLineHeightMultiplier;
-      FLetterSpacing := FParent.FLetterSpacing;
-      FIsHtml := FParent.FIsHtml;
-    end
-    else begin
-      if FFont.FFamily = '' then FFont.FFamily := FParent.FFont.FFamily;
-      if SameValue(FFont.FSize, 0, TEpsilon.FontSize) then FFont.FSize := FParent.FFont.FSize;
-      if FFont.FColor = TAlphaColors.Null then FFont.FColor := FParent.FFont.FColor;
+    if (FParent = nil) then exit;
+    inc(fSuperseded);
+    if (FSuperseded <> 1) then exit;
+
+    FPriorSupersedeFontFamily := Font.Family;
+    FPriorSupersedeFontSize := Font.Size;
+    FPriorSupersedeFontWeight := Font.Weight;
+    FPriorSupersedeFontSlant := Font.Slant;
+    FPriorSupersedeFontStretch := Font.Stretch;
+    FPriorSupersedeFontColor := Font.Color;
+    FPriorSupersedeFontAutoConvert := Font.AutoConvert;
+    FPriorSupersedeDecorationKinds := Decoration.Kinds;
+    FPriorSupersedeDecorationStyle := Decoration.Style;
+    FPriorSupersedeDecorationThicknessMultiplier := Decoration.ThicknessMultiplier;
+    FPriorSupersedeDecorationColor := Decoration.Color;
+    FPriorSupersedeEllipsis := Ellipsis;
+    FPriorSupersedeEllipsisSettingsInherit := EllipsisSettings.Inherit;
+    FPriorSupersedeEllipsisSettingsFontFamily := EllipsisSettings.Font.Family;
+    FPriorSupersedeEllipsisSettingsFontSize := EllipsisSettings.Font.Size;
+    FPriorSupersedeEllipsisSettingsFontWeight := EllipsisSettings.Font.Weight;
+    FPriorSupersedeEllipsisSettingsFontSlant := EllipsisSettings.Font.Slant;
+    FPriorSupersedeEllipsisSettingsFontStretch := EllipsisSettings.Font.Stretch;
+    FPriorSupersedeEllipsisSettingsFontColor := EllipsisSettings.Font.Color;
+    FPriorSupersedeEllipsisSettingsFontAutoConvert := EllipsisSettings.Font.AutoConvert;
+    FPriorSupersedeEllipsisSettingsDecorationKinds := EllipsisSettings.Decoration.Kinds;
+    FPriorSupersedeEllipsisSettingsDecorationStyle := EllipsisSettings.Decoration.Style;
+    FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier := EllipsisSettings.Decoration.ThicknessMultiplier;
+    FPriorSupersedeEllipsisSettingsDecorationColor := EllipsisSettings.Decoration.Color;
+    FPriorSupersedeTrimming := Trimming;
+    FPriorSupersedeMaxLines := MaxLines;
+    FPriorSupersedeHorzAlign := HorzAlign;
+    FPriorSupersedeVertAlign := VertAlign;
+    FPriorSupersedeLineHeightMultiplier := LineHeightMultiplier;
+    FPriorSupersedeLetterSpacing := LetterSpacing;
+    FPriorSupersedeIsHtml := IsHtml;
+    //--
+    var LParentSuperseded := False;
+    if FParent is TALInheritBaseTextSettings then begin
+      TALInheritBaseTextSettings(FParent).SupersedeNoChanges;
+      LParentSuperseded := True;
+    end;
+    try
+      if inherit then begin
+        Font.Family := FParent.Font.Family;
+        Font.Size := FParent.Font.Size;
+        Font.Weight := FParent.Font.Weight;
+        Font.Slant := FParent.Font.Slant;
+        Font.Stretch := FParent.Font.Stretch;
+        Font.Color := FParent.Font.Color;
+        Font.AutoConvert := FParent.Font.AutoConvert;
+        Decoration.Kinds := FParent.Decoration.Kinds;
+        Decoration.Style := FParent.Decoration.Style;
+        Decoration.ThicknessMultiplier := FParent.Decoration.ThicknessMultiplier;
+        Decoration.Color := FParent.Decoration.Color;
+        Ellipsis := FParent.Ellipsis;
+        EllipsisSettings.Inherit := FParent.EllipsisSettings.Inherit;
+        EllipsisSettings.Font.Family := FParent.EllipsisSettings.Font.Family;
+        EllipsisSettings.Font.Size := FParent.EllipsisSettings.Font.Size;
+        EllipsisSettings.Font.Weight := FParent.EllipsisSettings.Font.Weight;
+        EllipsisSettings.Font.Slant := FParent.EllipsisSettings.Font.Slant;
+        EllipsisSettings.Font.Stretch := FParent.EllipsisSettings.Font.Stretch;
+        EllipsisSettings.Font.Color := FParent.EllipsisSettings.Font.Color;
+        EllipsisSettings.Font.AutoConvert := FParent.EllipsisSettings.Font.AutoConvert;
+        EllipsisSettings.Decoration.Kinds := FParent.EllipsisSettings.Decoration.Kinds;
+        EllipsisSettings.Decoration.Style := FParent.EllipsisSettings.Decoration.Style;
+        EllipsisSettings.Decoration.ThicknessMultiplier := FParent.EllipsisSettings.Decoration.ThicknessMultiplier;
+        EllipsisSettings.Decoration.Color := FParent.EllipsisSettings.Decoration.Color;
+        Trimming := FParent.Trimming;
+        MaxLines := FParent.MaxLines;
+        HorzAlign := FParent.HorzAlign;
+        VertAlign := FParent.VertAlign;
+        LineHeightMultiplier := FParent.LineHeightMultiplier;
+        LetterSpacing := FParent.LetterSpacing;
+        IsHtml := FParent.IsHtml;
+      end
+      else begin
+        (* todo delete *)
+        if Font.Family = '' then Font.Family := FParent.Font.Family;
+        if SameValue(Font.Size, 0, TEpsilon.FontSize) then Font.Size := FParent.Font.Size;
+        if Font.Color = TAlphaColors.Null then Font.Color := FParent.Font.Color;
+      end;
+    finally
+      if LParentSuperseded then
+        TALInheritBaseTextSettings(FParent).ReinstateNoChanges;
     end;
   finally
-    if LParentSuperseded then
-      TALInheritBaseTextSettings(FParent).Reinstate
+    EndUpdate;
   end;
 end;
 
 {******************}
 procedure TALInheritBaseTextSettings.Reinstate;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then begin
-    FFont.FFamily := FPriorSupersedeFontFamily;
-    FFont.FSize := FPriorSupersedeFontSize;
-    FFont.FWeight := FPriorSupersedeFontWeight;
-    FFont.FSlant := FPriorSupersedeFontSlant;
-    FFont.FStretch := FPriorSupersedeFontStretch;
-    FFont.FColor := FPriorSupersedeFontColor;
-    FFont.FAutoConvert := FPriorSupersedeFontAutoConvert;
-    FDecoration.FKinds := FPriorSupersedeDecorationKinds;
-    FDecoration.FStyle := FPriorSupersedeDecorationStyle;
-    FDecoration.FThicknessMultiplier := FPriorSupersedeDecorationThicknessMultiplier;
-    FDecoration.FColor := FPriorSupersedeDecorationColor;
-    FEllipsis := FPriorSupersedeEllipsis;
-    FEllipsisSettings.FInherit := FPriorSupersedeEllipsisSettingsInherit;
-    FEllipsisSettings.FFont.FFamily := FPriorSupersedeEllipsisSettingsFontFamily;
-    FEllipsisSettings.FFont.FSize := FPriorSupersedeEllipsisSettingsFontSize;
-    FEllipsisSettings.FFont.FWeight := FPriorSupersedeEllipsisSettingsFontWeight;
-    FEllipsisSettings.FFont.FSlant := FPriorSupersedeEllipsisSettingsFontSlant;
-    FEllipsisSettings.FFont.FStretch := FPriorSupersedeEllipsisSettingsFontStretch;
-    FEllipsisSettings.FFont.FColor := FPriorSupersedeEllipsisSettingsFontColor;
-    FEllipsisSettings.FFont.FAutoConvert := FPriorSupersedeEllipsisSettingsFontAutoConvert;
-    FEllipsisSettings.FDecoration.FKinds := FPriorSupersedeEllipsisSettingsDecorationKinds;
-    FEllipsisSettings.FDecoration.FStyle := FPriorSupersedeEllipsisSettingsDecorationStyle;
-    FEllipsisSettings.FDecoration.FThicknessMultiplier := FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier;
-    FEllipsisSettings.FDecoration.FColor := FPriorSupersedeEllipsisSettingsDecorationColor;
-    FTrimming := FPriorSupersedeTrimming;
-    FMaxLines := FPriorSupersedeMaxLines;
-    FHorzAlign := FPriorSupersedeHorzAlign;
-    FVertAlign := FPriorSupersedeVertAlign;
-    FLineHeightMultiplier := FPriorSupersedeLineHeightMultiplier;
-    FLetterSpacing := FPriorSupersedeLetterSpacing;
-    FIsHtml := FPriorSupersedeIsHtml;
+  beginUpdate;
+  try
+    if fSuperseded <= 0 then exit;
+    dec(fSuperseded);
+    if fSuperseded = 0 then begin
+      Font.Family := FPriorSupersedeFontFamily;
+      Font.Size := FPriorSupersedeFontSize;
+      Font.Weight := FPriorSupersedeFontWeight;
+      Font.Slant := FPriorSupersedeFontSlant;
+      Font.Stretch := FPriorSupersedeFontStretch;
+      Font.Color := FPriorSupersedeFontColor;
+      Font.AutoConvert := FPriorSupersedeFontAutoConvert;
+      Decoration.Kinds := FPriorSupersedeDecorationKinds;
+      Decoration.Style := FPriorSupersedeDecorationStyle;
+      Decoration.ThicknessMultiplier := FPriorSupersedeDecorationThicknessMultiplier;
+      Decoration.Color := FPriorSupersedeDecorationColor;
+      Ellipsis := FPriorSupersedeEllipsis;
+      EllipsisSettings.Inherit := FPriorSupersedeEllipsisSettingsInherit;
+      EllipsisSettings.Font.Family := FPriorSupersedeEllipsisSettingsFontFamily;
+      EllipsisSettings.Font.Size := FPriorSupersedeEllipsisSettingsFontSize;
+      EllipsisSettings.Font.Weight := FPriorSupersedeEllipsisSettingsFontWeight;
+      EllipsisSettings.Font.Slant := FPriorSupersedeEllipsisSettingsFontSlant;
+      EllipsisSettings.Font.Stretch := FPriorSupersedeEllipsisSettingsFontStretch;
+      EllipsisSettings.Font.Color := FPriorSupersedeEllipsisSettingsFontColor;
+      EllipsisSettings.Font.AutoConvert := FPriorSupersedeEllipsisSettingsFontAutoConvert;
+      EllipsisSettings.Decoration.Kinds := FPriorSupersedeEllipsisSettingsDecorationKinds;
+      EllipsisSettings.Decoration.Style := FPriorSupersedeEllipsisSettingsDecorationStyle;
+      EllipsisSettings.Decoration.ThicknessMultiplier := FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier;
+      EllipsisSettings.Decoration.Color := FPriorSupersedeEllipsisSettingsDecorationColor;
+      Trimming := FPriorSupersedeTrimming;
+      MaxLines := FPriorSupersedeMaxLines;
+      HorzAlign := FPriorSupersedeHorzAlign;
+      VertAlign := FPriorSupersedeVertAlign;
+      LineHeightMultiplier := FPriorSupersedeLineHeightMultiplier;
+      LetterSpacing := FPriorSupersedeLetterSpacing;
+      IsHtml := FPriorSupersedeIsHtml;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************}
+procedure TALInheritBaseTextSettings.SupersedeNoChanges;
+begin
+  BeginUpdate;
+  try
+    Supersede;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALInheritBaseTextSettings.ReinstateNoChanges;
+begin
+  BeginUpdate;
+  try
+    Reinstate;
+  finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -2339,6 +2702,51 @@ begin
     Angle := DefaultAngle;
   finally
     EndUpdate;
+  end;
+end;
+
+{**************************}
+procedure TALGradient.Interpolate(const ATo: TALGradient; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      if (Style = ATo.Style) and
+         (length(Colors) = length(ATo.Colors)) and
+         (length(Offsets) = length(ATo.Offsets)) then begin
+        Style := ATo.Style;
+        for var I := Low(Colors) to High(Colors) do
+          Colors[i] := InterpolateColor(Colors[i]{Start}, ATo.Colors[i]{Stop}, ANormalizedTime);
+        for var I := Low(Offsets) to High(Offsets) do
+          Offsets[i] := InterpolateSingle(Offsets[i]{Start}, ATo.Offsets[i]{Stop}, ANormalizedTime);
+        Angle := InterpolateSingle(Angle{Start}, ATo.Angle{Stop}, ANormalizedTime);
+      end
+      else begin
+        Style := ATo.Style;
+        Colors := ATo.Colors;
+        Offsets := ATo.Offsets;
+        Angle := ATo.Angle;
+      end;
+    end
+    else begin
+      Style := DefaultStyle;
+      Colors := [];
+      Offsets := [];
+      Angle := DefaultAngle;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALGradient.InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -2749,6 +3157,47 @@ begin
   end;
 end;
 
+{*********************************************************************************}
+procedure TALBrush.Interpolate(const ATo: TALBrush; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
+      ResourceName := ATo.ResourceName;
+      WrapMode := ATo.WrapMode;
+      Padding.Left := InterpolateSingle(Padding.Left{Start}, ATo.Padding.Left{Stop}, ANormalizedTime);
+      Padding.Right := InterpolateSingle(Padding.Right{Start}, ATo.Padding.Right{Stop}, ANormalizedTime);
+      Padding.Top := InterpolateSingle(Padding.Top{Start}, ATo.Padding.Top{Stop}, ANormalizedTime);
+      Padding.Bottom := InterpolateSingle(Padding.Bottom{Start}, ATo.Padding.Bottom{Stop}, ANormalizedTime);
+    end
+    else begin
+      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Gradient.Interpolate(nil, ANormalizedTime);
+      ResourceName := DefaultResourceName;
+      WrapMode := DefaultWrapMode;
+      Padding.Left := InterpolateSingle(Padding.Left{Start}, Padding.DefaultValue.Left{Stop}, ANormalizedTime);
+      Padding.Right := InterpolateSingle(Padding.Right{Start}, Padding.DefaultValue.Right{Stop}, ANormalizedTime);
+      Padding.Top := InterpolateSingle(Padding.Top{Start}, Padding.DefaultValue.Top{Stop}, ANormalizedTime);
+      Padding.Bottom := InterpolateSingle(Padding.Bottom{Start}, Padding.DefaultValue.Bottom{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALBrush.InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {*********************************}
 function TALBrush.HasFill: boolean;
 begin
@@ -2889,60 +3338,86 @@ end;
 {******************}
 procedure TALInheritBrush.Supersede;
 begin
-  if (not inherit) or
-     (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeColor := FColor;
-  FPriorSupersedeGradientStyle := FGradient.FStyle;
-  FPriorSupersedeGradientColors := FGradient.FColors;
-  FPriorSupersedeGradientOffsets := FGradient.FOffsets;
-  FPriorSupersedeGradientAngle := FGradient.FAngle;
-  FPriorSupersedeResourceName := FResourceName;
-  FPriorSupersedeWrapMode := FWrapMode;
-  FPriorSupersedePaddingRect := FPadding.Rect;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritBrush then begin
-    TALInheritBrush(FParent).Supersede;
-    LParentSuperseded := True;
-  end;
+  beginUpdate;
   try
-    FColor := FParent.FColor;
-    FGradient.FStyle := FParent.FGradient.FStyle;
-    FGradient.FColors := FParent.FGradient.FColors;
-    FGradient.FOffsets := FParent.FGradient.FOffsets;
-    FGradient.FAngle := FParent.FGradient.FAngle;
-    FResourceName := FParent.FResourceName;
-    FWrapMode := FParent.FWrapMode;
-    var LPrevPaddingOnChange := FPadding.OnChange;
-    FPadding.OnChange := nil;
-    FPadding.Rect := FParent.Padding.Rect;
-    fPadding.OnChange := LPrevPaddingOnChange;
+    if (not inherit) or
+       (FParent = nil) then exit;
+    inc(fSuperseded);
+    if (FSuperseded <> 1) then exit;
+
+    FPriorSupersedeColor := Color;
+    FPriorSupersedeGradientStyle := Gradient.Style;
+    FPriorSupersedeGradientColors := Gradient.Colors;
+    FPriorSupersedeGradientOffsets := Gradient.Offsets;
+    FPriorSupersedeGradientAngle := Gradient.Angle;
+    FPriorSupersedeResourceName := ResourceName;
+    FPriorSupersedeWrapMode := WrapMode;
+    FPriorSupersedePaddingRect := Padding.Rect;
+    //--
+    var LParentSuperseded := False;
+    if FParent is TALInheritBrush then begin
+      TALInheritBrush(FParent).SupersedeNoChanges;
+      LParentSuperseded := True;
+    end;
+    try
+      Color := FParent.Color;
+      Gradient.Style := FParent.Gradient.Style;
+      Gradient.Colors := FParent.Gradient.Colors;
+      Gradient.Offsets := FParent.Gradient.Offsets;
+      Gradient.Angle := FParent.Gradient.Angle;
+      ResourceName := FParent.ResourceName;
+      WrapMode := FParent.WrapMode;
+      Padding.Rect := FParent.Padding.Rect;
+    finally
+      if LParentSuperseded then
+        TALInheritBrush(FParent).ReinstateNoChanges;
+    end;
   finally
-    if LParentSuperseded then
-      TALInheritBrush(FParent).Reinstate
+    EndUpdate;
   end;
 end;
 
 {******************}
 procedure TALInheritBrush.Reinstate;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then begin
-    FColor := FPriorSupersedeColor;
-    FGradient.FStyle := FPriorSupersedeGradientStyle;
-    FGradient.FColors := FPriorSupersedeGradientColors;
-    FGradient.FOffsets := FPriorSupersedeGradientOffsets;
-    FGradient.FAngle := FPriorSupersedeGradientAngle;
-    FResourceName := FPriorSupersedeResourceName;
-    FWrapMode := FPriorSupersedeWrapMode;
-    var LPrevPaddingOnChange := FPadding.OnChange;
-    FPadding.OnChange := nil;
-    FPadding.Rect := FPriorSupersedePaddingRect;
-    fPadding.OnChange := LPrevPaddingOnChange;
+  beginUpdate;
+  try
+    if fSuperseded <= 0 then exit;
+    dec(fSuperseded);
+    if fSuperseded = 0 then begin
+      Color := FPriorSupersedeColor;
+      Gradient.Style := FPriorSupersedeGradientStyle;
+      Gradient.Colors := FPriorSupersedeGradientColors;
+      Gradient.Offsets := FPriorSupersedeGradientOffsets;
+      Gradient.Angle := FPriorSupersedeGradientAngle;
+      ResourceName := FPriorSupersedeResourceName;
+      WrapMode := FPriorSupersedeWrapMode;
+      Padding.Rect := FPriorSupersedePaddingRect;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************}
+procedure TALInheritBrush.SupersedeNoChanges;
+begin
+  BeginUpdate;
+  try
+    Supersede;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALInheritBrush.ReinstateNoChanges;
+begin
+  BeginUpdate;
+  try
+    Reinstate;
+  finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -3002,6 +3477,35 @@ begin
     Thickness := DefaultThickness;
   finally
     EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALStrokeBrush.Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Thickness := InterpolateSingle(Thickness{Start}, ATo.Thickness{Stop}, ANormalizedTime);
+    end
+    else begin
+      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Thickness := InterpolateSingle(Thickness{Start}, DefaultThickness{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALStrokeBrush.InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -3092,36 +3596,68 @@ end;
 {******************}
 procedure TALInheritStrokeBrush.Supersede;
 begin
-  if (not inherit) or
-     (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeColor := FColor;
-  FPriorSupersedeThickness := FThickness;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritStrokeBrush then begin
-    TALInheritStrokeBrush(FParent).Supersede;
-    LParentSuperseded := True;
-  end;
+  beginUpdate;
   try
-    FColor := FParent.FColor;
-    FThickness := FParent.FThickness;
+    if (not inherit) or
+       (FParent = nil) then exit;
+    inc(fSuperseded);
+    if (FSuperseded <> 1) then exit;
+
+    FPriorSupersedeColor := Color;
+    FPriorSupersedeThickness := Thickness;
+    //--
+    var LParentSuperseded := False;
+    if FParent is TALInheritStrokeBrush then begin
+      TALInheritStrokeBrush(FParent).SupersedeNoChanges;
+      LParentSuperseded := True;
+    end;
+    try
+      Color := FParent.Color;
+      Thickness := FParent.Thickness;
+    finally
+      if LParentSuperseded then
+        TALInheritStrokeBrush(FParent).ReinstateNoChanges;
+    end;
   finally
-    if LParentSuperseded then
-      TALInheritStrokeBrush(FParent).Reinstate
+    EndUpdate;
   end;
 end;
 
 {******************}
 procedure TALInheritStrokeBrush.Reinstate;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then begin
-    FColor := FPriorSupersedeColor;
-    FThickness := FPriorSupersedeThickness;
+  beginUpdate;
+  try
+    if fSuperseded <= 0 then exit;
+    dec(fSuperseded);
+    if fSuperseded = 0 then begin
+      Color := FPriorSupersedeColor;
+      Thickness := FPriorSupersedeThickness;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************}
+procedure TALInheritStrokeBrush.SupersedeNoChanges;
+begin
+  BeginUpdate;
+  try
+    Supersede;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALInheritStrokeBrush.ReinstateNoChanges;
+begin
+  BeginUpdate;
+  try
+    Reinstate;
+  finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -3172,6 +3708,40 @@ begin
     YRadius := DefaultYRadius;
   finally
     EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    inherited Interpolate(ATo, ANormalizedTime);
+    if ATo <> nil then begin
+      Opacity := InterpolateSingle(Opacity{Start}, ATo.Opacity{Stop}, ANormalizedTime);
+      UseContentColor := ATo.UseContentColor;
+      XRadius := InterpolateSingle(XRadius{Start}, ATo.XRadius{Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, ATo.YRadius{Stop}, ANormalizedTime);
+    end
+    else begin
+      Opacity := InterpolateSingle(Opacity{Start}, DefaultOpacity{Stop}, ANormalizedTime);
+      UseContentColor := DefaultUseContentColor;
+      XRadius := InterpolateSingle(XRadius{Start}, DefaultXRadius{Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, DefaultYRadius{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*********************************************************************************}
+procedure TALStateLayer.InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
   end;
 end;
 
@@ -3249,10 +3819,147 @@ begin
   Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
 
+{*********************************************************************************}
+procedure TALPosition.Interpolate(const ATo: TPosition; const ANormalizedTime: Single);
+begin
+  if ATo <> nil then
+    Point := TpointF.Create(
+               InterpolateSingle(X{Start}, ATo.X{Stop}, ANormalizedTime),
+               InterpolateSingle(Y{Start}, ATo.Y{Stop}, ANormalizedTime))
+  else
+    Point := TpointF.Create(
+               InterpolateSingle(X{Start}, DefaultValue.X{Stop}, ANormalizedTime),
+               InterpolateSingle(Y{Start}, DefaultValue.Y{Stop}, ANormalizedTime));
+end;
+
+{*********************************************************************************}
+procedure TALPosition.InterpolateNoChanges(const ATo: TPosition; const ANormalizedTime: Single);
+begin
+  if ATo <> nil then
+    SetPointNoChange(
+      TpointF.Create(
+        InterpolateSingle(X{Start}, ATo.X{Stop}, ANormalizedTime),
+        InterpolateSingle(Y{Start}, ATo.Y{Stop}, ANormalizedTime)))
+  else
+    SetPointNoChange(
+      TpointF.Create(
+        InterpolateSingle(X{Start}, DefaultValue.X{Stop}, ANormalizedTime),
+        InterpolateSingle(Y{Start}, DefaultValue.Y{Stop}, ANormalizedTime)));
+end;
+
+{*************************************}
+constructor TALInheritPosition.Create(const AParent: TPosition; const ADefaultValue: TPointF);
+begin
+  inherited create(ADefaultValue);
+  FParent := AParent;
+  FInherit := True;
+  FSuperseded := 0;
+  //FPriorSupersedeX
+  //FPriorSupersedeY
+end;
+
+{**********************************************************}
+procedure TALInheritPosition.SetInherit(const AValue: Boolean);
+begin
+  If FInherit <> AValue then begin
+    FInherit := AValue;
+    DoChange;
+  end;
+end;
+
+{****************************************************}
+procedure TALInheritPosition.Assign(Source: TPersistent);
+begin
+  if Source is TALInheritPosition then
+    Inherit := TALInheritPosition(Source).Inherit
+  else
+    Inherit := False;
+  inherited Assign(Source);
+end;
+
+{******************************}
+procedure TALInheritPosition.Reset;
+begin
+  Point := DefaultValue;
+  Inherit := True;
+end;
+
+{******************}
+procedure TALInheritPosition.Supersede;
+begin
+  if (not inherit) or
+     (FParent = nil) then exit;
+  inc(fSuperseded);
+  if (FSuperseded <> 1) then exit;
+
+  FPriorSupersedeX := X;
+  FPriorSupersedeY := Y;
+  //--
+  var LParentSuperseded := False;
+  if FParent is TALInheritPosition then begin
+    TALInheritPosition(FParent).SupersedeNoChanges;
+    LParentSuperseded := True;
+  end;
+  try
+    Point := FParent.Point;
+  finally
+    if LParentSuperseded then
+      TALInheritPosition(FParent).ReinstateNoChanges;
+  end;
+end;
+
+{******************}
+procedure TALInheritPosition.Reinstate;
+begin
+  if fSuperseded <= 0 then exit;
+  dec(fSuperseded);
+  if fSuperseded = 0 then
+    Point := TpointF.Create(FPriorSupersedeX, FPriorSupersedeY);
+end;
+
+{*************************}
+procedure TALInheritPosition.SupersedeNoChanges;
+begin
+  if (not inherit) or
+     (FParent = nil) then exit;
+  inc(fSuperseded);
+  if (FSuperseded <> 1) then exit;
+
+  FPriorSupersedeX := X;
+  FPriorSupersedeY := Y;
+  //--
+  var LParentSuperseded := False;
+  if FParent is TALInheritPosition then begin
+    TALInheritPosition(FParent).SupersedeNoChanges;
+    LParentSuperseded := True;
+  end;
+  try
+    SetPointNoChange(FParent.Point);
+  finally
+    if LParentSuperseded then
+      TALInheritPosition(FParent).ReinstateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALInheritPosition.ReinstateNoChanges;
+begin
+  if fSuperseded <= 0 then exit;
+  dec(fSuperseded);
+  if fSuperseded = 0 then
+    SetPointNoChange(TpointF.Create(FPriorSupersedeX, FPriorSupersedeY));
+end;
+
+{**}
+Type
+  _TControlAccessProtected = class(Tcontrol);
+
 {***********************************}
 constructor TALBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create;
+  //--
+  FDefaultTransitionDuration := 0.2;
   //--
   var LShapeControl: IALShapeControl;
   if Supports(AParent, IALShapeControl, LShapeControl) then begin
@@ -3265,6 +3972,7 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(LShapeControl.GetStroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(LShapeControl.GetShadow);
+    FScale := TALInheritPosition.Create(_TControlAccessProtected(AParent).Scale,TPointF.Create(1,1));
   end
   else begin
     {$IF defined(debug)}
@@ -3276,11 +3984,15 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(FStateStyleParent.Stroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(FStateStyleParent.Shadow);
+    FScale := TALInheritPosition.Create(FStateStyleParent.Scale, TPointF.Create(1,1));
   end;
   FFill.OnChanged := FillChanged;
   FStateLayer.OnChanged := StateLayerChanged;
   FStroke.OnChanged := StrokeChanged;
   FShadow.OnChanged := ShadowChanged;
+  FScale.OnChange := ScaleChanged;
+  //--
+  FTransitionDuration := FDefaultTransitionDuration;
   //--
   fSuperseded := 0;
 end;
@@ -3292,6 +4004,7 @@ begin
   ALFreeAndNil(FStateLayer);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
+  ALFreeAndNil(FScale);
   inherited Destroy;
 end;
 
@@ -3305,6 +4018,8 @@ begin
       StateLayer.Assign(TALBaseStateStyle(Source).StateLayer);
       Stroke.Assign(TALBaseStateStyle(Source).Stroke);
       Shadow.Assign(TALBaseStateStyle(Source).Shadow);
+      Scale.Assign(TALBaseStateStyle(Source).Scale);
+      TransitionDuration := TALBaseStateStyle(Source).TransitionDuration;
     Finally
       EndUpdate;
     End;
@@ -3313,45 +4028,132 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
+{******************************************************}
+procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    if ATo <> nil then begin
+      Fill.Interpolate(ATo.Fill, ANormalizedTime);
+      StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime);
+      Stroke.Interpolate(ATo.Stroke, ANormalizedTime);
+      Shadow.Interpolate(ATo.Shadow, ANormalizedTime);
+      Scale.Interpolate(ATo.Scale, ANormalizedTime);
+      //TransitionDuration
+    end
+    else if FStateStyleParent <> nil then begin
+      Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime);
+      StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime);
+      Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
+      Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
+      Scale.Interpolate(FStateStyleParent.Scale, ANormalizedTime);
+      //TransitionDuration
+    end
+    else if (FControlParent <> nil) and (FControlParent is TALShape) then begin
+      Fill.Interpolate(TALShape(FControlParent).Fill, ANormalizedTime);
+      StateLayer.Interpolate(nil, ANormalizedTime);
+      Stroke.Interpolate(TALShape(FControlParent).Stroke, ANormalizedTime);
+      Shadow.Interpolate(TALShape(FControlParent).Shadow, ANormalizedTime);
+      Scale.Interpolate(_TControlAccessProtected(FControlParent).Scale, ANormalizedTime);
+      //TransitionDuration
+    end
+    else begin
+      Fill.Interpolate(nil, ANormalizedTime);
+      StateLayer.Interpolate(nil, ANormalizedTime);
+      Stroke.Interpolate(nil, ANormalizedTime);
+      Shadow.Interpolate(nil, ANormalizedTime);
+      Scale.Interpolate(nil, ANormalizedTime);
+      //TransitionDuration
+    end;
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{*********************************************************************************}
+procedure TALBaseStateStyle.InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {******************}
 procedure TALBaseStateStyle.DoSupersede;
 begin
-  FFill.Supersede;
-  FStroke.Supersede;
-  FShadow.Supersede;
+  Fill.Supersede;
+  Stroke.Supersede;
+  Shadow.Supersede;
+  Scale.Supersede;
 end;
 
 {******************}
 procedure TALBaseStateStyle.Supersede;
 begin
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  if StateStyleParent <> nil then
-    StateStyleParent.Supersede;
+  beginUpdate;
   try
-    DoSupersede;
-  finally
+    inc(fSuperseded);
+    if (FSuperseded <> 1) then exit;
+
     if StateStyleParent <> nil then
-      StateStyleParent.Reinstate
+      StateStyleParent.SupersedeNoChanges;
+    try
+      DoSupersede;
+    finally
+      if StateStyleParent <> nil then
+        StateStyleParent.ReinstateNoChanges;
+    end;
+  finally
+    EndUpdate;
   end;
 end;
 
 {******************}
 procedure TALBaseStateStyle.DoReinstate;
 begin
-  FFill.Reinstate;
-  FStroke.Reinstate;
-  FShadow.Reinstate;
+  Fill.Reinstate;
+  Stroke.Reinstate;
+  Shadow.Reinstate;
+  Scale.Reinstate;
 end;
 
 {******************}
 procedure TALBaseStateStyle.Reinstate;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then
-    DoReinstate;
+  beginUpdate;
+  try
+    if fSuperseded <= 0 then exit;
+    dec(fSuperseded);
+    if fSuperseded = 0 then
+      DoReinstate;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*************************}
+procedure TALBaseStateStyle.SupersedeNoChanges;
+begin
+  BeginUpdate;
+  try
+    Supersede;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{*************************}
+procedure TALBaseStateStyle.ReinstateNoChanges;
+begin
+  BeginUpdate;
+  try
+    Reinstate;
+  finally
+    EndUpdateNoChanges;
+  end;
 end;
 
 {****************************************************************************}
@@ -3379,12 +4181,28 @@ begin
 end;
 
 {***********************************************}
+procedure TALBaseStateStyle.SetScale(const Value: TALInheritPosition);
+begin
+  FScale.Assign(Value);
+end;
+
+{***********************************************}
+procedure TALBaseStateStyle.SetTransitionDuration(const Value: Single);
+begin
+  if not SameValue(FTransitionDuration, Value, TEpsilon.Vector) then begin
+    FTransitionDuration := Value;
+    Change;
+  end;
+end;
+
+{***********************************************}
 function TALBaseStateStyle.GetInherit: Boolean;
 begin
   Result := Fill.Inherit and
             (not StateLayer.HasFill) and
             Stroke.Inherit and
-            Shadow.Inherit;
+            Shadow.Inherit and
+            Scale.Inherit;
 end;
 
 {**********************************************************}
@@ -3409,6 +4227,18 @@ end;
 procedure TALBaseStateStyle.ShadowChanged(ASender: TObject);
 begin
   Change;
+end;
+
+{*********************************************************}
+procedure TALBaseStateStyle.ScaleChanged(ASender: TObject);
+begin
+  Change;
+end;
+
+{**************************************************}
+function TALBaseStateStyle.IsTransitionDurationStored: Boolean;
+begin
+  Result := not SameValue(FTransitionDuration, FDefaultTransitionDuration, TEpsilon.Vector);
 end;
 
 {***************************************************************************************}

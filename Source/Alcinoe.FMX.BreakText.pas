@@ -430,13 +430,19 @@ end;
 {********************************************************}
 function TALMultiLineTextOptions.GetScaledXRadius: Single;
 begin
-  Result := XRadius * Scale;
+  if compareValue(XRadius, 0, TEpsilon.Vector) > 0 then
+    Result := XRadius * Scale
+  else
+    Result := XRadius;
 end;
 
 {********************************************************}
 function TALMultiLineTextOptions.GetScaledYRadius: Single;
 begin
-  Result := YRadius * Scale;
+  if compareValue(YRadius, 0, TEpsilon.Vector) > 0 then
+    Result := YRadius * Scale
+  else
+    Result := XRadius;
 end;
 
 {***********************************************************}

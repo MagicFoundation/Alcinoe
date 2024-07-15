@@ -25,6 +25,7 @@ type
     FFocusOnMouseUp: Boolean;
     FMouseDownPos: TpointF;
     FMouseDownAtLowVelocity: Boolean;
+    FDisableDoubleClickHandling: Boolean;
   protected
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
@@ -42,6 +43,7 @@ type
     procedure SetNewScene(AScene: IScene); override;
     function IsVisibleWithinFormBounds: Boolean;
     property Form: TCommonCustomForm read FForm;
+    property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
   end;
 
   {**************************************}
@@ -107,7 +109,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -133,6 +135,14 @@ begin
   FFocusOnMouseUp := False;
   FMouseDownPos := TpointF.zero;
   FMouseDownAtLowVelocity := True;
+  // Double-clicks, or double-taps, are rarely used in mobile design due to
+  // touch screen challenges and user experience considerations. Mobile devices
+  // favor simpler, more intuitive gestures like swiping and pinching, which are
+  // better suited to smaller screens and prevent confusion with similar
+  // actions. Consequently, functionalities often tied to double-clicks on
+  // desktops are handled by different gestures or interface elements in
+  // mobile apps, leading to a more user-friendly experience.
+  FDisableDoubleClickHandling := True;
 end;
 
 {*****************************************************}
@@ -183,6 +193,8 @@ begin
   //--
   fMouseDownPos := TpointF.Create(X,Y);
   FMouseDownAtLowVelocity := True;
+  //--
+  if FDisableDoubleClickHandling then Shift := Shift - [ssDouble];
   //--
   var LScrollableControl: IALScrollableControl;
   var LParent := Parent;

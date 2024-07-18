@@ -531,6 +531,12 @@ function ALTryRGBAHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlp
 function ALRGBAHexToAlphaColor(const aHexValue: String): TAlphaColor;
 function ALTryARGBHexToAlphaColor(const aHexValue: String; out AAlphaColor: TAlphaColor): Boolean;
 function ALARGBHexToAlphaColor(const aHexValue: String): TAlphaColor;
+function ALCeil(const X: Single; const Epsilon: Single = 0): Integer; overload;
+function ALCeil(const X: Double; const Epsilon: Double = 0): Integer; overload;
+function ALCeil(const X: Extended; const Epsilon: Extended = 0): Integer; overload;
+function ALFloor(const X: Single; const Epsilon: Single = 0): Integer; overload;
+function ALFloor(const X: Double; const Epsilon: Double = 0): Integer; overload;
+function ALFloor(const X: Extended; const Epsilon: Extended = 0): Integer; overload;
 
 {**************************************************************************************************************}
 function  ALIfThen(AValue: Boolean; const ATrue: Integer; const AFalse: Integer = 0): Integer; overload; inline;
@@ -2680,6 +2686,42 @@ function ALARGBHexToAlphaColor(const aHexValue: String): TAlphaColor;
 begin
   if not ALTryARGBHexToAlphaColor(aHexValue, Result) then
     raise Exception.Create('Invalid ARGB hex color format');
+end;
+
+{*******************************************************************}
+function ALCeil(const X: Single; const Epsilon: Single = 0): Integer;
+begin
+  Result := ceil(X - Epsilon);
+end;
+
+{*******************************************************************}
+function ALCeil(const X: Double; const Epsilon: Double = 0): Integer;
+begin
+  Result := ceil(X - Epsilon);
+end;
+
+{*******************************************************************}
+function ALCeil(const X: Extended; const Epsilon: Extended = 0): Integer;
+begin
+  Result := ceil(X - Epsilon);
+end;
+
+{*******************************************************************}
+function ALFloor(const X: Single; const Epsilon: Single = 0): Integer;
+begin
+  Result := Floor(X + Epsilon);
+end;
+
+{*******************************************************************}
+function ALFloor(const X: Double; const Epsilon: Double = 0): Integer;
+begin
+  Result := Floor(X + Epsilon);
+end;
+
+{*******************************************************************}
+function ALFloor(const X: Extended; const Epsilon: Extended = 0): Integer;
+begin
+  Result := Floor(X + Epsilon);
 end;
 
 {************************************************************************************************}

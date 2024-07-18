@@ -110,7 +110,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -263,7 +263,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;

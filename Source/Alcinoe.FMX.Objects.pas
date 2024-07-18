@@ -166,7 +166,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -328,7 +328,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -430,7 +430,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -542,7 +542,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -628,7 +628,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -714,7 +714,8 @@ type
     procedure DoEndUpdate; override;
     procedure AdjustSize; virtual;
     function GetMultiLineTextOptions(
-               const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+               const AScale: Single;
+               const AOpacity: Single;
                const AFont: TALFont;
                const ADecoration: TALTextDecoration;
                const AEllipsisFont: TALFont;
@@ -722,11 +723,14 @@ type
                const AFill: TALBrush;
                const AStroke: TALStrokeBrush;
                const AShadow: TALShadow): TALMultiLineTextOptions;
+    Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF); virtual;
+    Procedure DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; Const ARect: TrectF); virtual;
+    Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; Const ARect: TrectF); virtual;
     Procedure DrawMultilineText(
-                const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
                 out ATextBroken: Boolean;
                 out AAllTextDrawn: Boolean;
                 out AElements: TALTextElements;
+                const AScale: Single;
                 const AText: String;
                 const AFont: TALFont;
                 const ADecoration: TALTextDecoration;
@@ -740,6 +744,7 @@ type
                 out ATextBroken: Boolean;
                 out AAllTextDrawn: Boolean;
                 out AElements: TALTextElements;
+                const AScale: Single;
                 const AText: String;
                 const AFont: TALFont;
                 const ADecoration: TALTextDecoration;
@@ -754,6 +759,7 @@ type
                 out ATextBroken: Boolean;
                 out AAllTextDrawn: Boolean;
                 out AElements: TALTextElements;
+                const AScale: Single;
                 const AText: String;
                 const AFont: TALFont;
                 const ADecoration: TALTextDecoration;
@@ -842,7 +848,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -865,7 +871,7 @@ type
     property DoubleBuffered;
     property TextSettings: TALTextSettings read GetTextSettings write SetTextSettings;
     property OnElementClick;
-    property OnElementDblClick;
+    //property OnElementDblClick;
     property OnElementMouseDown;
     property OnElementMouseMove;
     property OnElementMouseUp;
@@ -1959,6 +1965,7 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
         LRect, // const Rect: TrectF;
+        1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
         AStroke, // const Stroke: TALStrokeBrush;
         AShadow, // const Shadow: TALShadow
@@ -2024,11 +2031,11 @@ begin
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     var LRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
-    LRect := TrectF.Create(0, 0, LRect.Width, LRect.height);
     ALDrawRectangle(
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
       Canvas.AlignToPixel(LRect), // const Rect: TrectF;
+      AbsoluteOpacity, // const AOpacity: Single;
       Fill, // const Fill: TALBrush;
       Stroke, // const Stroke: TALStrokeBrush;
       Shadow, // const Shadow: TALShadow
@@ -2213,6 +2220,7 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
         LRect, // const Rect: TrectF;
+        1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
         AStroke, // const Stroke: TALStrokeBrush;
         AShadow); // const Shadow: TALShadow
@@ -2261,11 +2269,11 @@ begin
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     var LRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), ALGetScreenScale); // to have the pixel aligned width and height
-    LRect := TrectF.Create(0, 0, LRect.Width, LRect.height);
     ALDrawCircle(
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
       Canvas.AlignToPixel(LRect), // const Rect: TrectF;
+      AbsoluteOpacity, // const AOpacity: Single;
       Fill, // const Fill: TALBrush;
       Stroke, // const Stroke: TALStrokeBrush;
       Shadow); // const Shadow: TALShadow
@@ -2386,7 +2394,7 @@ begin
     else
       raise Exception.Create('Error C251AE86-B150-43E8-80DE-A6D96F085AF2');
   end;
-  var LRect := TrectF.Create(0, 0, round(fBufDrawableRect.Width * ALGetScreenScale), round(fBufDrawableRect.height * ALGetScreenScale));
+  var LRect := TrectF.Create(0, 0, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.height * ALGetScreenScale);
 
   {$IF DEFINED(ALSkiaEngine)}
 
@@ -2395,8 +2403,8 @@ begin
   ALCreateSurface(
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
-    round(LRect.Width), // const w: integer;
-    round(LRect.Height)); // const h: integer)
+    ALCeil(LRect.Width, TEpsilon.Position), // const w: integer;
+    ALCeil(LRect.Height, TEpsilon.Position)); // const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
@@ -2482,8 +2490,8 @@ begin
   ALCreateSurface(
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
-    round(LRect.Width), // const w: integer;
-    round(LRect.Height)); // const h: integer)
+    ALCeil(LRect.Width, TEpsilon.Position), // const w: integer;
+    ALCeil(LRect.Height, TEpsilon.Position)); // const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
@@ -2549,13 +2557,13 @@ begin
 
   {$ELSEIF DEFINED(IOS)}
 
-  var LGridHeight := round(LRect.Height);
+  var LGridHeight := ALCeil(LRect.Height, TEpsilon.Position);
   var LSurface: CGContextRef;
   var LCanvas: CGContextRef;
   ALCreateSurface(
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
-    round(LRect.Width), // const w: integer;
+    ALCeil(LRect.Width, TEpsilon.Position), // const w: integer;
     LGridHeight); // const h: integer)
   try
 
@@ -2813,6 +2821,7 @@ begin
           FTextBroken, // out ATextBroken: Boolean;
           FAllTextDrawn, // out AAllTextDrawn: Boolean;
           FElements, // out AElements: TALTextElements;
+          1, // const AScale: Single;
           Text, // const AText: String;
           TextSettings.Font, // const AFont: TALFont;
           TextSettings.Decoration, // const ADecoration: TALTextDecoration;
@@ -3058,10 +3067,10 @@ begin
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
     DrawMultilineText(
-      nil, // const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
       FTextBroken, // out ATextBroken: Boolean;
       FAllTextDrawn, // out AAllTextDrawn: Boolean;
       FElements, // out AElements: TALTextElements;
+      1, // const AScale: Single;
       Text, // const AText: String;
       TextSettings.Font, // const AFont: TALFont;
       TextSettings.Decoration, // const ADecoration: TALTextDecoration;
@@ -3182,7 +3191,8 @@ end;
 
 {*******************************************}
 function TALBaseText.GetMultiLineTextOptions(
-           const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
+           const AScale: Single;
+           const AOpacity: Single;
            const AFont: TALFont;
            const ADecoration: TALTextDecoration;
            const AEllipsisFont: TALFont;
@@ -3192,7 +3202,8 @@ function TALBaseText.GetMultiLineTextOptions(
            const AShadow: TALShadow): TALMultiLineTextOptions;
 begin
   Result := FMultiLineTextOptions;
-  Result.Scale := ALGetScreenScale;
+  Result.Scale := AScale;
+  Result.Opacity := AOpacity;
   //--
   Result.FontFamily := Afont.Family;
   Result.FontSize := Afont.Size;
@@ -3262,15 +3273,35 @@ begin
   //--
   Result.TextIsHtml := TextSettings.IsHtml;
   //--
-  Result.OnAdjustRect := AOnAdjustRect;
+  Result.OnAdjustRect := DrawMultilineTextAdjustRect;
+  Result.OnBeforeDrawBackground := DrawMultilineTextBeforeDrawBackground;
+  Result.OnBeforeDrawParagraph := DrawMultilineTextBeforeDrawParagraph;
+end;
+
+{**************************************}
+Procedure TALBaseText.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF);
+begin
+  // virtual
+end;
+
+{**************************************}
+Procedure TALBaseText.DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; Const ARect: TrectF);
+begin
+  // virtual
+end;
+
+{**************************************}
+Procedure TALBaseText.DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; Const ARect: TrectF);
+begin
+  // virtual
 end;
 
 {**************************************}
 Procedure TALBaseText.DrawMultilineText(
-            const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
             out ATextBroken: Boolean;
             out AAllTextDrawn: Boolean;
             out AElements: TALTextElements;
+            const AScale: Single;
             const AText: String;
             const AFont: TALFont;
             const ADecoration: TALTextDecoration;
@@ -3300,7 +3331,8 @@ begin
     AAllTextDrawn,
     AElements,
     GetMultiLineTextOptions(
-      AOnAdjustRect,
+      AScale,
+      AbsoluteOpacity,
       AFont,
       ADecoration,
       AEllipsisFont,
@@ -3321,6 +3353,7 @@ Procedure TALBaseText.MeasureMultilineText(
             out ATextBroken: Boolean;
             out AAllTextDrawn: Boolean;
             out AElements: TALTextElements;
+            const AScale: Single;
             const AText: String;
             const AFont: TALFont;
             const ADecoration: TALTextDecoration;
@@ -3345,7 +3378,8 @@ begin
     AAllTextDrawn,
     AElements,
     GetMultiLineTextOptions(
-      nil{AOnAdjustRect},
+      AScale,
+      AbsoluteOpacity,
       AFont,
       ADecoration,
       AEllipsisFont,
@@ -3362,6 +3396,7 @@ Procedure TALBaseText.CreateBufDrawable(
            out ATextBroken: Boolean;
            out AAllTextDrawn: Boolean;
            out AElements: TALTextElements;
+           const AScale: Single;
            const AText: String;
            const AFont: TALFont;
            const ADecoration: TALTextDecoration;
@@ -3390,7 +3425,8 @@ begin
                     AAllTextDrawn,
                     AElements,
                     GetMultiLineTextOptions(
-                      nil{AOnAdjustRect},
+                      AScale,
+                      1{AOpacity},
                       AFont,
                       ADecoration,
                       AEllipsisFont,
@@ -3424,6 +3460,7 @@ begin
             LCanvas, // const ACanvas: sk_canvas_t;
             ALGetScreenScale, // const AScale: Single;
             ABufDrawableRect, // const Rect: TrectF;
+            1, // const AOpacity: Single;
             Fill, // const Fill: TALBrush;
             Stroke, // const Stroke: TALStrokeBrush;
             Shadow, // const Shadow: TALShadow
@@ -3461,6 +3498,7 @@ begin
     FTextBroken, // out ATextBroken: Boolean;
     FAllTextDrawn, // out AAllTextDrawn: Boolean;
     FElements, // out AElements: TALTextElements;
+    ALGetScreenScale, // const AScale: Single;
     Text, // const AText: String;
     TextSettings.Font, // const AFont: TALFont;
     TextSettings.Decoration, // const ADecoration: TALTextDecoration;

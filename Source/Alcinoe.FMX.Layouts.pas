@@ -90,7 +90,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -300,7 +300,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -374,7 +374,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -448,7 +448,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -478,6 +478,10 @@ uses
   Alcinoe.StringUtils,
   Alcinoe.FMX.Objects,
   Alcinoe.Common;
+
+{**}
+Type
+  _TControlAccessProtected = class(Tcontrol);
 
 {***********************************************}
 constructor TALLayout.Create(AOwner: TComponent);
@@ -556,9 +560,9 @@ function TALScrollBoxContent.IsVisibleObject(const AObject: TControl): Boolean;
 begin
   if AObject.Visible then begin
     Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
-              (AObject.Position.Y + AObject.Height > -Position.Y) and
+              (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > -Position.Y) and
               (AObject.Position.X < -Position.X + FscrollBox.Width) and
-              (AObject.Position.X + AObject.Width > Position.X);
+              (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > Position.X);
   end
   else
     result := False;
@@ -1029,10 +1033,6 @@ begin
   inherited;
   internalMouseLeave;
 end;
-
-{**}
-Type
-  _TControlAccessProtected = class(Tcontrol);
 
 {*************}
 {$IFNDEF ALDPK}

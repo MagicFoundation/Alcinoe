@@ -2324,7 +2324,7 @@ begin
         if aColor <> tAlphaColors.Null then LUIColor := AlphaColorToUIColor(aColor)
         else LUIColor := AlphaColorToUIColor(
                            TAlphaColorF.Create(
-                             ALSetColorOpacity(TextSettings.Font.Color, 0.5)).
+                             ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                                PremultipliedAlpha.
                                ToAlphaColor);
         LPromptTextAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LUIColor), LTextRange);
@@ -2692,7 +2692,7 @@ begin
         if aColor <> tAlphaColors.Null then LNSColor := AlphaColorToNSColor(aColor)
         else LNSColor := AlphaColorToNSColor(
                            TAlphaColorF.Create(
-                             ALSetColorOpacity(TextSettings.Font.Color, 0.5)).
+                             ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                                PremultipliedAlpha.
                                ToAlphaColor);
         LPromptTextAttr.addAttribute(NSForegroundColorAttributeName, NSObjectToID(LNSColor), LTextRange);
@@ -2978,7 +2978,7 @@ begin
     Try
       var LPromptTextColor := FeditControl.PromptTextColor;
       if LPromptTextColor = TAlphaColors.Null then
-        LPromptTextColor := ALBlendColorWithOpacity(FEditControl.fillColor, FeditControl.TextSettings.Font.Color, 0.3);
+        LPromptTextColor := ALBlendColor(FEditControl.fillColor, FeditControl.TextSettings.Font.Color, 0.3);
       if SetTextColor(LDC, TAlphaColors.ColorToRGB(LPromptTextColor)) = CLR_INVALID then RaiseLastOSError;
       if SetBkColor(LDC, TAlphaColors.ColorToRGB(FeditControl.fillColor)) = CLR_INVALID then RaiseLastOSError;
       if FBackgroundBrush <> 0 then begin
@@ -4564,6 +4564,7 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
+    LOptions.Opacity := 1;
     //--
     LOptions.FontFamily := Afont.Family;
     LOptions.FontSize := Afont.Size;
@@ -4629,6 +4630,8 @@ begin
     //LOptions.TextIsHtml := TextSettings.IsHtml;
     //--
     //LOptions.OnAdjustRect: TALMultiLineTextAdjustRectProc; // default = nil
+    //LOptions.OnBeforeDrawBackground: TALMultiLineTextBeforeDrawBackgroundProc; // default = nil
+    //LOptions.OnBeforeDrawParagraph: TALMultiLineTextBeforeDrawParagraphProc; // default = nil
 
     //build ABufDrawable
     var LTextBroken: Boolean;
@@ -4689,6 +4692,7 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
+    LOptions.Opacity := 1;
     //--
     LOptions.FontFamily := Afont.Family;
     LOptions.FontSize := Afont.Size;
@@ -4754,6 +4758,8 @@ begin
     LOptions.TextIsHtml := LabelTextSettings.IsHtml;
     //--
     //LOptions.OnAdjustRect: TALMultiLineTextAdjustRectProc; // default = nil
+    //LOptions.OnBeforeDrawBackground: TALMultiLineTextBeforeDrawBackgroundProc; // default = nil
+    //LOptions.OnBeforeDrawParagraph: TALMultiLineTextBeforeDrawParagraphProc; // default = nil
 
     //build ABufDrawable
     var LTextBroken: Boolean;
@@ -4814,6 +4820,7 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
+    LOptions.Opacity := 1;
     //--
     LOptions.FontFamily := Afont.Family;
     LOptions.FontSize := Afont.Size;
@@ -4879,6 +4886,8 @@ begin
     LOptions.TextIsHtml := SupportingTextSettings.IsHtml;
     //--
     //LOptions.OnAdjustRect: TALMultiLineTextAdjustRectProc; // default = nil
+    //LOptions.OnBeforeDrawBackground: TALMultiLineTextBeforeDrawBackgroundProc; // default = nil
+    //LOptions.OnBeforeDrawParagraph: TALMultiLineTextBeforeDrawParagraphProc; // default = nil
 
     //build ABufDrawable
     var LTextBroken: Boolean;
@@ -5006,7 +5015,7 @@ procedure TALBaseEdit.MakeBufPromptTextDrawable;
           if AStateStyle.PromptTextColor <> TAlphaColors.Null then AStateStyle.TextSettings.Font.Color := AStateStyle.PromptTextColor
           else if PromptTextColor <> TalphaColors.Null then AStateStyle.TextSettings.Font.Color := PromptTextColor
           else AStateStyle.TextSettings.Font.Color := TAlphaColorF.Create(
-                                                        ALSetColorOpacity(TextSettings.Font.Color, 0.5)).
+                                                        ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                                                           PremultipliedAlpha.
                                                           ToAlphaColor;
         end;
@@ -5059,7 +5068,7 @@ begin
     if LUsePromptTextColor then begin
       if PromptTextColor <> TalphaColors.Null then LFont.Color := PromptTextColor
       else LFont.Color := TAlphaColorF.Create(
-                            ALSetColorOpacity(TextSettings.Font.Color, 0.5)).
+                            ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                               PremultipliedAlpha.
                               ToAlphaColor;
     end;
@@ -5384,7 +5393,7 @@ begin
      ((Labeltext <> '') and (prompttext <> '') and (prompttext <> labeltext)) or
      (not GetIsTextEmpty) or
      (GetIsTextEmpty and HasOpacityLabelTextAnimation and FLabelTextAnimation.Running) then begin
-    if (not ALisDrawableNull(LLabelTextDrawable)) then begin
+    if (not ALisDrawableNull(LLabelTextDrawable)) and SameValue(AbsoluteOpacity, 1, TEpsilon.Scale) then begin
       var LRect := LLabelTextDrawableRect;
       LRect.Inflate(4{DL}, 4{DT}, 4{DR}, 4{DB});
       LRect.Intersect(LocalRect);
@@ -5392,7 +5401,7 @@ begin
         LRect := Canvas.AlignToPixel(LRect);
         Canvas.Fill.Kind := TBrushKind.Solid;
         Canvas.Fill.Color := EditControl.FillColor;
-        Canvas.FillRect(LRect, ALIfThen(FLabelTextAnimation.Running, Min(1,FlabelTextAnimation.CurrentValue*2), 1));
+        Canvas.FillRect(LRect, ALIfThen(FLabelTextAnimation.Running, Min(AbsoluteOpacity,FlabelTextAnimation.CurrentValue*AbsoluteOpacity*2), AbsoluteOpacity));
       end;
     end;
     //--
@@ -5400,7 +5409,7 @@ begin
       Canvas, // const ACanvas: Tcanvas;
       LLabelTextDrawable, // const ADrawable: TALDrawable;
       LLabelTextDrawableRect.TopLeft, // const ATopLeft: TpointF;
-      ALIfThen(FLabelTextAnimation.Running, FLabelTextAnimation.CurrentValue, 1)); // const AOpacity: Single);
+      ALIfThen(FLabelTextAnimation.Running, FLabelTextAnimation.CurrentValue*AbsoluteOpacity, AbsoluteOpacity)); // const AOpacity: Single);
   end;
   {$ENDREGION}
 

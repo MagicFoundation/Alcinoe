@@ -270,7 +270,10 @@ begin
     if not p.Visible then Exit;
     P := P.ParentControl;
   end;
-  Result := (FForm = nil) or (FForm.visible);
+  // We do not care about FForm.visible like in
+  // Inherited GetParentedVisible
+  // Result := (FForm = nil) or (FForm.visible);
+  Result := True;
   {$ENDIF}
 end;
 

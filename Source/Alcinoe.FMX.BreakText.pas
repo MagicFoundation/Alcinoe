@@ -22,15 +22,20 @@ type
   end;
   TALTextElements = array of TALTextElement;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMultiLineTextAdjustRectProc = reference to procedure(var ARect: TrectF);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALMultiLineTextAdjustRectProc = procedure(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF) of object;
+  TALMultiLineTextBeforeDrawBackgroundProc = procedure(const ACanvas: TALCanvas; Const ARect: TrectF) of object;
+  TALMultiLineTextBeforeDrawParagraphProc = procedure(const ACanvas: TALCanvas; Const ARect: TrectF) of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALMultiLineTextOptions = class(Tobject)
   private
     FOnAdjustRect: TALMultiLineTextAdjustRectProc;
+    FOnBeforeDrawBackground: TALMultiLineTextBeforeDrawBackgroundProc;
+    FOnBeforeDrawParagraph: TALMultiLineTextBeforeDrawParagraphProc;
   public
     Scale: Single; // default = 1
+    Opacity: Single; // Default = 1
     //--
     FontFamily: String; // default = ''
     FontSize: single; // default = 14
@@ -125,6 +130,8 @@ type
     TextIsHtml: boolean; // default = false;
     //--
     property OnAdjustRect: TALMultiLineTextAdjustRectProc read FOnAdjustRect write FOnAdjustRect; // default = nil
+    property OnBeforeDrawBackground: TALMultiLineTextBeforeDrawBackgroundProc read FOnBeforeDrawBackground write FOnBeforeDrawBackground; // default = nil
+    property OnBeforeDrawParagraph: TALMultiLineTextBeforeDrawParagraphProc read FOnBeforeDrawParagraph write FOnBeforeDrawParagraph; // default = nil
     //--
     constructor Create;
     //--
@@ -318,8 +325,11 @@ end;
 constructor TALMultiLineTextOptions.Create;
 begin
   FOnAdjustRect := nil;
+  FOnBeforeDrawBackground := nil;
+  FOnBeforeDrawParagraph := nil;
   //--
   Scale := 1;
+  Opacity := 1;
   //--
   FontFamily := '';
   FontSize := 14;
@@ -2435,23 +2445,23 @@ begin
 
               // Though it's an unlikely scenario, this ensures avoidance of a crash in
               // the subsequent ALCreateSurface call.
-              If (Round(ARect.Width) = 0) or
-                 (Round(ARect.Height) = 0)then begin
+              If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
+                 (ALCeil(ARect.Height, TEpsilon.Position) = 0)then begin
                 ARect.Width := 0;
                 ARect.Height := 0;
                 exit;
               end;
 
               // Handle Shadow
-              var LRect := ARect;
+              var LSurfaceRect := ARect;
               if (AOptions.ShadowColor <> TalphaColors.Null) then begin
                 var LShadowOffsetX: Single := AOptions.GetScaledShadowOffsetX;
                 var LShadowOffsetY: Single := AOptions.GetScaledShadowOffsetY;
                 var LShadowWidth := ALGetShadowWidth(AOptions.GetScaledShadowblur);
-                var LShadowRect := LRect;
+                var LShadowRect := LSurfaceRect;
                 LShadowRect.Inflate(LShadowWidth, LShadowWidth);
                 LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
-                LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
+                LSurfaceRect := TRectF.Union(LShadowRect, LSurfaceRect); // add the extra space needed to draw the shadow
                 if ALIsCanvasNull(ACanvas) then begin
                   ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
                   LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
@@ -2461,7 +2471,9 @@ begin
               // Adjust the rect
               if Assigned(AOptions.OnAdjustRect) then begin
                 var LPrevRect := ARect;
-                AOptions.OnAdjustRect(ARect);
+                var LSurfaceSize := LSurfaceRect.Size;
+                AOptions.OnAdjustRect(ACanvas, ARect, LSurfaceSize);
+                LSurfaceRect.Size := LSurfaceSize;
                 LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
               end;
 
@@ -2472,101 +2484,123 @@ begin
               if ALIsCanvasNull(ACanvas) then begin
                 if not ALIsSurfaceNull(ASurface) then
                   raise Exception.Create('ASurface must also be null when ACanvas is null');
+                // Use Ceil instead of Round because if the height is, for example, 75.4, it's better to have
+                // 76 px in height than 75 px. If there is a border, then it will look better in such cases.
                 ALCreateSurface(
                   ASurface, // out ASurface: TALSurface;
                   ACanvas, // out ACanvas: TALCanvas;
-                  round(LRect.Width), // const w: integer;
-                  round(LRect.Height));// const h: integer)
+                  ALCeil(LSurfaceRect.Width, TEpsilon.Position), // const w: integer;
+                  ALCeil(LSurfaceRect.Height, TEpsilon.Position));// const h: integer)
               end;
               if ALCanvasBeginScene(ACanvas) then
               try
 
-                // Draw the background
-                if (AOptions.FillColor <> TalphaColors.Null) or
-                   (length(AOptions.FillGradientColors) > 0) or
-                   (AOptions.FillResourceName <> '') or
-                   (AOptions.StrokeColor <> TalphaColors.Null) or
-                   (AOptions.ShadowColor <> TalphaColors.Null) then begin
-                  ALDrawRectangle(
-                    ACanvas, // const ACanvas: TALCanvas;
-                    1, // const AScale: Single;
-                    ARect, // const ARect: TrectF;
-                    AOptions.FillColor, // const AFillColor: TAlphaColor;
-                    AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-                    AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                    AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-                    AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-                    AOptions.FillResourceName, // const AFillResourceName: String;
-                    AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-                    AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
-                    AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-                    AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-                    AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-                    AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
-                    AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
-                    AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
-                    AOptions.Sides, // const Sides: TSides;
-                    AOptions.Corners, // const Corners: TCorners;
-                    AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                    AOptions.GetScaledYRadius); // const YRadius: Single = 0);
-                end;
+                // Create the alpha layer
+                if compareValue(AOptions.Opacity, 1, Tepsilon.Scale) < 0 then
+                  sk4d_canvas_save_layer_alpha(ACanvas, @LSurfaceRect, round(255 * AOptions.Opacity));
+                try
 
-                // Paint the paragraph
-                sk4d_paragraph_paint(
-                  LParagraph, // self: sk_paragraph_t;
-                  ACanvas, // canvas: sk_canvas_t;
-                  LParagraphRect.left - LSk4dParagraphOffsetX, // x: float;
-                  LParagraphRect.top); // y: float
+                  // Handle custom event
+                  if Assigned(AOptions.OnBeforeDrawBackground) then
+                    AOptions.OnBeforeDrawBackground(ACanvas, ARect);
 
-                // retrieve the rect of all placeholders
-                SetLength(LTextBoxes, sk4d_paragraph_get_rects_for_placeholders(LParagraph, nil));
-                if length(LTextBoxes) > 0 then
-                  sk4d_paragraph_get_rects_for_placeholders(LParagraph, @LTextBoxes[0]);
+                  // Draw the background
+                  if (AOptions.FillColor <> TalphaColors.Null) or
+                     (length(AOptions.FillGradientColors) > 0) or
+                     (AOptions.FillResourceName <> '') or
+                     (AOptions.StrokeColor <> TalphaColors.Null) or
+                     (AOptions.ShadowColor <> TalphaColors.Null) then begin
+                    ALDrawRectangle(
+                      ACanvas, // const ACanvas: TALCanvas;
+                      1, // const AScale: Single;
+                      ARect, // const ARect: TrectF;
+                      1, //const AOpacity: Single;
+                      AOptions.FillColor, // const AFillColor: TAlphaColor;
+                      AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+                      AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+                      AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+                      AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
+                      AOptions.FillResourceName, // const AFillResourceName: String;
+                      AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+                      AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
+                      AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
+                      AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
+                      AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+                      AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
+                      AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
+                      AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
+                      AOptions.Sides, // const Sides: TSides;
+                      AOptions.Corners, // const Corners: TCorners;
+                      AOptions.GetScaledXRadius, // const XRadius: Single = 0;
+                      AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+                  end;
 
-                // Paint all images
-                if Length(LTextBoxes) > LPlaceHolders.Count then
-                  raise Exception.Create('Error 155FE121-9CA2-46F8-A51C-0CB72EADC7EC');
-                For var i := low(LTextBoxes) to high(LTextBoxes) do begin
-                  Var LImgSrc := LPlaceHolders[i];
-                  If LImgSrc <> '' then begin
-                    Var LDstRect := TRectF.Create(
-                                      LTextBoxes[i].rect.left - LSk4dParagraphOffsetX,
-                                      LTextBoxes[i].rect.Top,
-                                      LTextBoxes[i].rect.Right - LSk4dParagraphOffsetX,
-                                      LTextBoxes[i].rect.Bottom);
-                    LDstRect.Offset(LParagraphRect.TopLeft);
-                    var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-                    {$IFDEF ALDPK}
-                    var LImg: sk_image_t;
-                    var LFileName := ALGetResourceFilename(LImgSrc);
-                    if LFileName <> '' then begin
-                      try
-                        LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
-                      except
-                        LImg := 0;
+                  // Handle custom event
+                  if Assigned(AOptions.OnBeforeDrawParagraph) then
+                    AOptions.OnBeforeDrawParagraph(ACanvas, ARect);
+
+                  // Paint the paragraph
+                  sk4d_paragraph_paint(
+                    LParagraph, // self: sk_paragraph_t;
+                    ACanvas, // canvas: sk_canvas_t;
+                    LParagraphRect.left - LSk4dParagraphOffsetX, // x: float;
+                    LParagraphRect.top); // y: float
+
+                  // retrieve the rect of all placeholders
+                  SetLength(LTextBoxes, sk4d_paragraph_get_rects_for_placeholders(LParagraph, nil));
+                  if length(LTextBoxes) > 0 then
+                    sk4d_paragraph_get_rects_for_placeholders(LParagraph, @LTextBoxes[0]);
+
+                  // Paint all images
+                  if Length(LTextBoxes) > LPlaceHolders.Count then
+                    raise Exception.Create('Error 155FE121-9CA2-46F8-A51C-0CB72EADC7EC');
+                  For var i := low(LTextBoxes) to high(LTextBoxes) do begin
+                    Var LImgSrc := LPlaceHolders[i];
+                    If LImgSrc <> '' then begin
+                      Var LDstRect := TRectF.Create(
+                                        LTextBoxes[i].rect.left - LSk4dParagraphOffsetX,
+                                        LTextBoxes[i].rect.Top,
+                                        LTextBoxes[i].rect.Right - LSk4dParagraphOffsetX,
+                                        LTextBoxes[i].rect.Bottom);
+                      LDstRect.Offset(LParagraphRect.TopLeft);
+                      var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+                      {$IFDEF ALDPK}
+                      var LImg: sk_image_t;
+                      var LFileName := ALGetResourceFilename(LImgSrc);
+                      if LFileName <> '' then begin
+                        try
+                          LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
+                        except
+                          LImg := 0;
+                        end
                       end
-                    end
-                    else
-                      LImg := 0;
-                    {$ELSE}
-                    var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
-                    {$ENDIF}
-                    If LImg <> 0 then begin
-                      try
-                        var LSamplingoptions := ALGetNearestSkSamplingoptions;
-                        sk4d_canvas_draw_image_rect(
-                          ACanvas, // self: sk_canvas_t;
-                          LImg, // const image: sk_image_t;
-                          @LSrcRect, // const src: psk_rect_t;
-                          @LDstRect,  // const dest: psk_rect_t;
-                          @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                          LPaint, // const paint: sk_paint_t;
-                          FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
-                      finally
-                        sk4d_refcnt_unref(LImg);
+                      else
+                        LImg := 0;
+                      {$ELSE}
+                      var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
+                      {$ENDIF}
+                      If LImg <> 0 then begin
+                        try
+                          var LSamplingoptions := ALGetNearestSkSamplingoptions;
+                          sk4d_canvas_draw_image_rect(
+                            ACanvas, // self: sk_canvas_t;
+                            LImg, // const image: sk_image_t;
+                            @LSrcRect, // const src: psk_rect_t;
+                            @LDstRect,  // const dest: psk_rect_t;
+                            @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+                            LPaint, // const paint: sk_paint_t;
+                            FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+                        finally
+                          sk4d_refcnt_unref(LImg);
+                        end;
                       end;
                     end;
                   end;
+
+                finally
+                  // Remove the alpha layer
+                  if compareValue(AOptions.Opacity, 1, Tepsilon.Scale) < 0 then
+                    sk4d_canvas_restore(ACanvas);
                 end;
 
               finally
@@ -3665,23 +3699,23 @@ begin
 
       // Though it's an unlikely scenario, this ensures avoidance of a crash in
       // the subsequent ALCreateSurface call.
-      If (Round(ARect.Width) = 0) or
-         (Round(ARect.Height) = 0) then begin
+      If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
+         (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
         ARect.Width := 0;
         ARect.Height := 0;
         exit;
       end;
 
       // Handle Shadow
-      var LRect := ARect;
+      var LSurfaceRect := ARect;
       if (AOptions.ShadowColor <> TalphaColors.Null) then begin
         var LShadowOffsetX: Single := AOptions.GetScaledShadowOffsetX;
         var LShadowOffsetY: Single := AOptions.GetScaledShadowOffsetY;
         var LShadowWidth := ALGetShadowWidth(AOptions.GetScaledShadowblur);
-        var LShadowRect := LRect;
+        var LShadowRect := LSurfaceRect;
         LShadowRect.Inflate(LShadowWidth, LShadowWidth);
         LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
-        LRect := TRectF.Union(LShadowRect, LRect); // add the extra space needed to draw the shadow
+        LSurfaceRect := TRectF.Union(LShadowRect, LSurfaceRect); // add the extra space needed to draw the shadow
         if ALIsCanvasNull(ACanvas) then begin
           ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
           LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
@@ -3691,7 +3725,9 @@ begin
       // Adjust the rect
       if Assigned(AOptions.OnAdjustRect) then begin
         var LPrevRect := ARect;
-        AOptions.OnAdjustRect(ARect);
+        var LSurfaceSize := LSurfaceRect.Size;
+        AOptions.OnAdjustRect(ACanvas, ARect, LSurfaceSize);
+        LSurfaceRect.Size := LSurfaceSize;
         LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
       end;
 
@@ -3702,215 +3738,275 @@ begin
       if ALIsCanvasNull(ACanvas) then begin
         if not ALIsSurfaceNull(ASurface) then
           raise Exception.Create('ASurface must also be null when ACanvas is null');
+        // Use Ceil instead of Round because if the height is, for example, 75.4, it's better to have
+        // 76 px in height than 75 px. If there is a border, then it will look better in such cases.
         ALCreateSurface(
           ASurface, // out ASurface: TALSurface;
           ACanvas, // out ACanvas: TALCanvas;
-          round(LRect.Width), // const w: integer;
-          round(LRect.Height));// const h: integer)
+          ALCeil(LSurfaceRect.Width, TEpsilon.Position), // const w: integer;
+          ALCeil(LSurfaceRect.Height, TEpsilon.Position));// const h: integer)
       end;
       if ALCanvasBeginScene(ACanvas) then
       try
 
-        // Draw the background
-        if (AOptions.FillColor <> TalphaColors.Null) or
-           (length(AOptions.FillGradientColors) > 0) or
-           (AOptions.FillResourceName <> '') or
-           (AOptions.StrokeColor <> TalphaColors.Null) or
-           (AOptions.ShadowColor <> TalphaColors.Null) then begin
-          ALDrawRectangle(
-            ACanvas, // const ACanvas: TALCanvas;
-            1, // const AScale: Single;
-            ARect, // const ARect: TrectF;
-            AOptions.FillColor, // const AFillColor: TAlphaColor;
-            AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-            AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-            AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-            AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-            AOptions.FillResourceName, // const AFillResourceName: String;
-            AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-            AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
-            AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-            AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
-            AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-            AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
-            AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
-            AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
-            AOptions.Sides, // const Sides: TSides;
-            AOptions.Corners, // const Corners: TCorners;
-            AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-            AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+        // Create the alpha layer
+        if compareValue(AOptions.Opacity, 1, Tepsilon.Scale) < 0 then begin
+
+          {$REGION 'ANDROID'}
+          {$IF defined(ANDROID)}
+          var LJLayerRect := TJRectF.JavaClass.init(LSurfaceRect.left, LSurfaceRect.top, LSurfaceRect.right, LSurfaceRect.bottom);
+          aCanvas.saveLayerAlpha(LJLayerRect, round(255 * AOptions.Opacity));
+          LJLayerRect := nil;
+          {$ENDIF}
+          {$ENDREGION}
+
+          {$REGION 'IOS/MACOS'}
+          {$IF defined(ALAppleOS)}
+          CGContextSaveGState(ACanvas);
+          CGContextSetAlpha(ACanvas, AOpacity);
+          CGContextBeginTransparencyLayerWithRect(
+            ACanvas,
+            ALLowerLeftCGRect(
+              LLayerRect.TopLeft,
+              LLayerRect.Width,
+              LLayerRect.Height,
+              LGridHeight),
+              nil{auxiliaryInfo});
+          {$ENDIF}
+          {$ENDREGION}
+
         end;
+        try
 
-        {$REGION 'ANDROID'}
-        {$IF defined(ANDROID)}
+          // Handle custom event
+          if Assigned(AOptions.OnBeforeDrawBackground) then
+            AOptions.OnBeforeDrawBackground(ACanvas, ARect);
 
-        for i := 0 to LExtendedTextElements.count - 1 do begin
-          var LExtendedTextElement := LExtendedTextElements[i];
-          if LExtendedTextElement.imgSrc <> '' then begin
-            Var LDstRect := LExtendedTextElement.Rect;
-            LDstRect.Offset(LParagraphRect.TopLeft);
-            var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-            var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
-            try
-              LCanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
-            finally
-              LImg.recycle;
-              LImg := nil;
-            end;
-          end
-          else begin
-            Var LDstRect := LExtendedTextElement.Rect;
-            LDstRect.Offset(LParagraphRect.TopLeft);
-            _UpdatePaint(
-              LExtendedTextElement.FontFamily,
-              LExtendedTextElement.FontSize,
-              LExtendedTextElement.FontWeight,
-              LExtendedTextElement.FontSlant,
-              LExtendedTextElement.FontStretch,
-              LExtendedTextElement.FontColor,
-              LExtendedTextElement.DecorationKinds,
-              LExtendedTextElement.DecorationStyle,
-              LExtendedTextElement.DecorationThicknessMultiplier,
-              LExtendedTextElement.DecorationColor,
-              LExtendedTextElement.LetterSpacing);
-            LCanvas.drawText(
-              StringToJString(LExtendedTextElement.text){text},
-              LDstRect.left {x},
-              LDstRect.Top + (-1 * LExtendedTextElement.Ascent){y},
-              _Paint {paint});
+          // Draw the background
+          if (AOptions.FillColor <> TalphaColors.Null) or
+             (length(AOptions.FillGradientColors) > 0) or
+             (AOptions.FillResourceName <> '') or
+             (AOptions.StrokeColor <> TalphaColors.Null) or
+             (AOptions.ShadowColor <> TalphaColors.Null) then begin
+            ALDrawRectangle(
+              ACanvas, // const ACanvas: TALCanvas;
+              1, // const AScale: Single;
+              ARect, // const ARect: TrectF;
+              1, //const AOpacity: Single;
+              AOptions.FillColor, // const AFillColor: TAlphaColor;
+              AOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+              AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+              AOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+              AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
+              AOptions.FillResourceName, // const AFillResourceName: String;
+              AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+              AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
+              AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
+              AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
+              AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+              AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
+              AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
+              AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
+              AOptions.Sides, // const Sides: TSides;
+              AOptions.Corners, // const Corners: TCorners;
+              AOptions.GetScaledXRadius, // const XRadius: Single = 0;
+              AOptions.GetScaledYRadius); // const YRadius: Single = 0);
           end;
-        end;
 
-        {$ENDIF}
-        {$ENDREGION}
+          // Handle custom event
+          if Assigned(AOptions.OnBeforeDrawParagraph) then
+            AOptions.OnBeforeDrawParagraph(ACanvas, ARect);
 
-        {$REGION 'IOS/MACOS'}
-        {$IF defined(ALAppleOS)}
+          {$REGION 'ANDROID'}
+          {$IF defined(ANDROID)}
 
-        var LGridHeight := CGBitmapContextGetHeight(LCanvas);
-        for i := 0 to LExtendedTextElements.count - 1 do begin
-          var LExtendedTextElement := LExtendedTextElements[i];
-          if LExtendedTextElement.imgSrc <> '' then begin
-            Var LDstRect := LExtendedTextElement.Rect;
-            LDstRect.Offset(LParagraphRect.TopLeft);
-            var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-            var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
-            try
-              CGContextDrawImage(
-                LCanvas, // c: The graphics context in which to draw the image.
-                ALLowerLeftCGRect(
-                  TPointF.Create(LDstRect.left, LDstRect.top),
-                  LDstRect.Width,
-                  LDstRect.Height,
-                  LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                LImg); // image The image to draw.
-            finally
-              CGImageRelease(LImg);
-            end;
-          end
-          else begin
-            Var LDstRect := LExtendedTextElement.Rect;
-            LDstRect.Offset(LParagraphRect.TopLeft);
-            If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
-              var LAlphaColor := TAlphaColorCGFloat.Create(LExtendedTextElement.BackgroundColor);
-              CGContextSetRGBFillColor(LCanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
-              CGContextFillRect(
-                LCanvas,
-                ALLowerLeftCGRect(
-                  LDstRect.TopLeft,
-                  LDstRect.Width,
-                  LDstRect.Height,
-                  LGridHeight));
-            end;
-            var LAttributedString := _CreateAttributedString(
-                                       LExtendedTextElement.Text, //const AText: String;
-                                       LExtendedTextElement.FontFamily, //const AFontFamily: String;
-                                       LExtendedTextElement.FontSize, //const AFontSize: single;
-                                       LExtendedTextElement.FontWeight, //const AFontWeight: TFontWeight;
-                                       LExtendedTextElement.FontSlant, //const AFontSlant: TFontSlant;
-                                       LExtendedTextElement.FontStretch, //const AFontStretch: TFontStretch;
-                                       LExtendedTextElement.FontColor, //const AFontColor: TalphaColor;
-                                       LExtendedTextElement.DecorationKinds, //const ADecorationKinds: TALTextDecorationKinds;
-                                       LExtendedTextElement.DecorationStyle, //const ADecorationStyle: TALTextDecorationStyle;
-                                       LExtendedTextElement.DecorationThicknessMultiplier, //const ADecorationThicknessMultiplier: Single;
-                                       LExtendedTextElement.DecorationColor, //const ADecorationColor: TAlphaColor;
-                                       LExtendedTextElement.LetterSpacing, //const ALetterSpacing: Single
-                                       AOptions.Direction); // const ADirection: TALTextDirection
-            try
-              var LLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LAttributedString));
+          for i := 0 to LExtendedTextElements.count - 1 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            if LExtendedTextElement.imgSrc <> '' then begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+              var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
               try
-                CGContextSetTextPosition(
-                  LCanvas,
-                  LDstRect.left {x},
-                  LGridHeight - (LDstRect.Top + (-1 * LExtendedTextElement.Ascent)));{y}
-                CTLineDraw(LLine, LCanvas); // Draws a complete line.
+                ACanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
               finally
-                CFRelease(LLine);
+                LImg.recycle;
+                LImg := nil;
               end;
-            finally
-              CFRelease(LAttributedString);
+            end
+            else begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              _UpdatePaint(
+                LExtendedTextElement.FontFamily,
+                LExtendedTextElement.FontSize,
+                LExtendedTextElement.FontWeight,
+                LExtendedTextElement.FontSlant,
+                LExtendedTextElement.FontStretch,
+                LExtendedTextElement.FontColor,
+                LExtendedTextElement.DecorationKinds,
+                LExtendedTextElement.DecorationStyle,
+                LExtendedTextElement.DecorationThicknessMultiplier,
+                LExtendedTextElement.DecorationColor,
+                LExtendedTextElement.LetterSpacing);
+              ACanvas.drawText(
+                StringToJString(LExtendedTextElement.text){text},
+                LDstRect.left {x},
+                LDstRect.Top + (-1 * LExtendedTextElement.Ascent){y},
+                _Paint {paint});
             end;
           end;
-        end;
 
-        {$ENDIF}
-        {$ENDREGION}
+          {$ENDIF}
+          {$ENDREGION}
 
-        {$REGION 'MSWINDOWS'}
-        {$IF defined(MSWINDOWS)}
+          {$REGION 'IOS/MACOS'}
+          {$IF defined(ALAppleOS)}
 
-        ACanvas.Fill.Kind := TBrushKind.Solid;
-        for i := 0 to LExtendedTextElements.count - 1 do begin
-          var LExtendedTextElement := LExtendedTextElements[i];
-          if LExtendedTextElement.imgSrc <> '' then begin
-            Var LDstRect := LExtendedTextElement.Rect;
-            LDstRect.Offset(LParagraphRect.TopLeft);
-            var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-            var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
-            try
-              ACanvas.drawBitmap(
-                LImg,
-                LSrcRect,
-                LDstRect,
-                1{AOpacity},
-                false{HighSpeed});
-            finally
-              ALFreeAndNil(LImg);
+          var LGridHeight := CGBitmapContextGetHeight(ACanvas);
+          for i := 0 to LExtendedTextElements.count - 1 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            if LExtendedTextElement.imgSrc <> '' then begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+              var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              try
+                CGContextDrawImage(
+                  ACanvas, // c: The graphics context in which to draw the image.
+                  ALLowerLeftCGRect(
+                    TPointF.Create(LDstRect.left, LDstRect.top),
+                    LDstRect.Width,
+                    LDstRect.Height,
+                    LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+                  LImg); // image The image to draw.
+              finally
+                CGImageRelease(LImg);
+              end;
+            end
+            else begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
+                var LAlphaColor := TAlphaColorCGFloat.Create(LExtendedTextElement.BackgroundColor);
+                CGContextSetRGBFillColor(ACanvas, LAlphaColor.R, LAlphaColor.G, LAlphaColor.B, LAlphaColor.A);
+                CGContextFillRect(
+                  ACanvas,
+                  ALLowerLeftCGRect(
+                    LDstRect.TopLeft,
+                    LDstRect.Width,
+                    LDstRect.Height,
+                    LGridHeight));
+              end;
+              var LAttributedString := _CreateAttributedString(
+                                         LExtendedTextElement.Text, //const AText: String;
+                                         LExtendedTextElement.FontFamily, //const AFontFamily: String;
+                                         LExtendedTextElement.FontSize, //const AFontSize: single;
+                                         LExtendedTextElement.FontWeight, //const AFontWeight: TFontWeight;
+                                         LExtendedTextElement.FontSlant, //const AFontSlant: TFontSlant;
+                                         LExtendedTextElement.FontStretch, //const AFontStretch: TFontStretch;
+                                         LExtendedTextElement.FontColor, //const AFontColor: TalphaColor;
+                                         LExtendedTextElement.DecorationKinds, //const ADecorationKinds: TALTextDecorationKinds;
+                                         LExtendedTextElement.DecorationStyle, //const ADecorationStyle: TALTextDecorationStyle;
+                                         LExtendedTextElement.DecorationThicknessMultiplier, //const ADecorationThicknessMultiplier: Single;
+                                         LExtendedTextElement.DecorationColor, //const ADecorationColor: TAlphaColor;
+                                         LExtendedTextElement.LetterSpacing, //const ALetterSpacing: Single
+                                         AOptions.Direction); // const ADirection: TALTextDirection
+              try
+                var LLine := CTLineCreateWithAttributedString(CFAttributedStringRef(LAttributedString));
+                try
+                  CGContextSetTextPosition(
+                    ACanvas,
+                    LDstRect.left {x},
+                    LGridHeight - (LDstRect.Top + (-1 * LExtendedTextElement.Ascent)));{y}
+                  CTLineDraw(LLine, ACanvas); // Draws a complete line.
+                finally
+                  CFRelease(LLine);
+                end;
+              finally
+                CFRelease(LAttributedString);
+              end;
             end;
-          end
-          else begin
-            Var LDstRect := LExtendedTextElement.Rect;
-            LDstRect.Offset(LParagraphRect.TopLeft);
-            ACanvas.Font.Family := _getFontFamily(LExtendedTextElement.FontFamily);
-            ACanvas.Font.Size := LExtendedTextElement.FontSize;
-            ACanvas.Font.StyleExt := _getFontStyleExt(LExtendedTextElement.FontWeight, LExtendedTextElement.FontSlant, LExtendedTextElement.FontStretch, LExtendedTextElement.DecorationKinds);
-            If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
-              ACanvas.Fill.Color := LExtendedTextElement.BackgroundColor;
-              ACanvas.FillRect(
-                LDstRect,
-                1{AOpacity});
+          end;
+
+          {$ENDIF}
+          {$ENDREGION}
+
+          {$REGION 'MSWINDOWS'}
+          {$IF defined(MSWINDOWS)}
+
+          ACanvas.Fill.Kind := TBrushKind.Solid;
+          for i := 0 to LExtendedTextElements.count - 1 do begin
+            var LExtendedTextElement := LExtendedTextElements[i];
+            if LExtendedTextElement.imgSrc <> '' then begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
+              var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              try
+                ACanvas.drawBitmap(
+                  LImg,
+                  LSrcRect,
+                  LDstRect,
+                  1{AOpacity},
+                  false{HighSpeed});
+              finally
+                ALFreeAndNil(LImg);
+              end;
+            end
+            else begin
+              Var LDstRect := LExtendedTextElement.Rect;
+              LDstRect.Offset(LParagraphRect.TopLeft);
+              ACanvas.Font.Family := _getFontFamily(LExtendedTextElement.FontFamily);
+              ACanvas.Font.Size := LExtendedTextElement.FontSize;
+              ACanvas.Font.StyleExt := _getFontStyleExt(LExtendedTextElement.FontWeight, LExtendedTextElement.FontSlant, LExtendedTextElement.FontStretch, LExtendedTextElement.DecorationKinds);
+              If LExtendedTextElement.BackgroundColor <> Talphacolors.Null then begin
+                ACanvas.Fill.Color := LExtendedTextElement.BackgroundColor;
+                ACanvas.FillRect(
+                  LDstRect,
+                  1{AOpacity});
+              end;
+              ACanvas.Fill.Color := LExtendedTextElement.FontColor;
+              var LFlags: TFillTextFlags;
+              if AOptions.Direction = TALTextDirection.RightToLeft then
+                LFlags := [TFillTextFlag.RightToLeft]
+              else
+                LFlags := [];
+              LDstRect.Offset(0, LExtendedTextElement.DrawTextOffsetY);
+              // It appears that FillText includes the default font leading,
+              // which is not included in LDstRect.
+              ACanvas.FillText(
+                LDstRect, // const ARect: TRectF;
+                LExtendedTextElement.Text, // const AText: string;
+                False, // const WordWrap: Boolean;
+                1, // const AOpacity: Single;
+                LFlags, // const Flags: TFillTextFlags;
+                TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
             end;
-            ACanvas.Fill.Color := LExtendedTextElement.FontColor;
-            var LFlags: TFillTextFlags;
-            if AOptions.Direction = TALTextDirection.RightToLeft then
-              LFlags := [TFillTextFlag.RightToLeft]
-            else
-              LFlags := [];
-            LDstRect.Offset(0, LExtendedTextElement.DrawTextOffsetY);
-            // It appears that FillText includes the default font leading,
-            // which is not included in LDstRect.
-            ACanvas.FillText(
-              LDstRect, // const ARect: TRectF;
-              LExtendedTextElement.Text, // const AText: string;
-              False, // const WordWrap: Boolean;
-              1, // const AOpacity: Single;
-              LFlags, // const Flags: TFillTextFlags;
-              TTextAlign.Leading, TTextAlign.Leading);// const ATextAlign, AVTextAlign: TTextAlign
+          end;
+
+          {$ENDIF}
+          {$ENDREGION}
+
+        finally
+          // Remove the alpha layer
+          if compareValue(AOptions.Opacity, 1, Tepsilon.Scale) < 0 then begin
+
+            {$REGION 'ANDROID'}
+            {$IF defined(ANDROID)}
+            ACanvas.restore;
+            {$ENDIF}
+            {$ENDREGION}
+
+            {$REGION 'IOS/MACOS'}
+            {$IF defined(ALAppleOS)}
+            CGContextEndTransparencyLayer(ACanvas);
+            CGContextRestoreGState(ACanvas)
+            {$ENDIF}
+            {$ENDREGION}
+
           end;
         end;
-
-        {$ENDIF}
-        {$ENDREGION}
 
       finally
         ALCanvasEndScene(ACanvas);

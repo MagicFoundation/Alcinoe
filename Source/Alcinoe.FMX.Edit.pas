@@ -590,6 +590,7 @@ type
       public
         constructor Create; override;
         destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
       published
         property Font;
@@ -618,6 +619,7 @@ type
       public
         constructor Create; override;
         destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
       published
         property Font;
@@ -645,8 +647,12 @@ type
         FTextSettings: TStateStyleTextSettings;
         FLabelTextSettings: TStateStyleTextSettings;
         FSupportingTextSettings: TStateStyleTextSettings;
+        FDefaultPromptTextColor: TalphaColor;
+        FDefaultTintColor: TalphaColor;
         FPriorSupersedePromptTextColor: TalphaColor;
         FPriorSupersedeTintColor: TalphaColor;
+        function GetStateStyleParent: TBaseStateStyle;
+        function GetControlParent: TALBaseEdit;
         procedure SetPromptTextColor(const AValue: TAlphaColor);
         procedure SetTintColor(const AValue: TAlphaColor);
         procedure SetTextSettings(const AValue: TStateStyleTextSettings);
@@ -655,21 +661,28 @@ type
         procedure TextSettingsChanged(ASender: TObject);
         procedure LabelTextSettingsChanged(ASender: TObject);
         procedure SupportingTextSettingsChanged(ASender: TObject);
+        function IsPromptTextColorStored: Boolean;
+        function IsTintColorStored: Boolean;
       protected
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
-        procedure DoReinstate; override;
       public
-        constructor Create(const AParent: TObject); reintroduce; virtual;
+        constructor Create(const AParent: TObject); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
-        Property Inherit: Boolean read GetInherit;
+        procedure Reset; override;
+        procedure Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce; virtual;
+        procedure InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce;
+        property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
+        property ControlParent: TALBaseEdit read GetControlParent;
+        property DefaultPromptTextColor: TalphaColor read FDefaultPromptTextColor write FDefaultPromptTextColor;
+        property DefaultTintColor: TalphaColor read FDefaultTintColor write FDefaultTintColor;
       published
         property LabelTextSettings: TStateStyleTextSettings read fLabelTextSettings write SetLabelTextSettings;
-        property PromptTextColor: TAlphaColor read FPromptTextColor write SetPromptTextColor default TalphaColors.Null;
+        property PromptTextColor: TAlphaColor read FPromptTextColor write SetPromptTextColor stored IsPromptTextColorStored;
         property SupportingTextSettings: TStateStyleTextSettings read fSupportingTextSettings write SetSupportingTextSettings;
         property TextSettings: TStateStyleTextSettings read fTextSettings write SetTextSettings;
-        property TintColor: TAlphaColor read FTintColor write SetTintColor default TalphaColors.Null;
+        property TintColor: TAlphaColor read FTintColor write SetTintColor stored IsTintColorStored;
       end;
       // -------------------
       // TDisabledStateStyle
@@ -678,14 +691,14 @@ type
         FOpacity: Single;
         procedure SetOpacity(const Value: Single);
         function IsOpacityStored: Boolean;
+      protected
+        function GetInherit: Boolean; override;
       public
         constructor Create(const AParent: TObject); override;
         procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
       published
         property Fill;
-        // Opacity is not part of the GetInherit function because it updates the
-        // disabledOpacity of the base control immediately every time it changes.
-        // Essentially, it acts merely as a link to the disabledOpacity of the base control.
         property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
         property Shadow;
         property Stroke;
@@ -721,10 +734,13 @@ type
         procedure DisabledChanged(ASender: TObject);
         procedure HoveredChanged(ASender: TObject);
         procedure FocusedChanged(ASender: TObject);
+      protected
+        function CreateSavedState: TALPersistentObserver; override;
       public
         constructor Create(const AParent: TALBaseEdit); reintroduce; virtual;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
       published
         property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
         property Hovered: THoveredStateStyle read FHovered write SetHovered;
@@ -3304,6 +3320,24 @@ begin
 end;
 
 {***************************************}
+procedure TALBaseEdit.TLabelTextSettings.Assign(Source: TPersistent);
+begin
+  if Source is TLabelTextSettings then begin
+    BeginUpdate;
+    Try
+      Margins.Assign(TLabelTextSettings(Source).margins);
+      Layout := TLabelTextSettings(Source).Layout;
+      Animation := TLabelTextSettings(Source).Animation;
+      inherited Assign(Source);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{***************************************}
 procedure TALBaseEdit.TLabelTextSettings.Reset;
 begin
   BeginUpdate;
@@ -3363,6 +3397,23 @@ begin
   Inherited Destroy;
 end;
 
+{***************************************}
+procedure TALBaseEdit.TSupportingTextSettings.Assign(Source: TPersistent);
+begin
+  if Source is TSupportingTextSettings then begin
+    BeginUpdate;
+    Try
+      Margins.Assign(TSupportingTextSettings(Source).margins);
+      Layout := TSupportingTextSettings(Source).Layout;
+      inherited Assign(Source);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
 {********************************************}
 procedure TALBaseEdit.TSupportingTextSettings.Reset;
 begin
@@ -3401,28 +3452,27 @@ end;
 constructor TALBaseEdit.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
-  FPromptTextColor := TalphaColors.Null;
-  FTintColor := TalphaColors.Null;
+  //--
+  FDefaultPromptTextColor := TalphaColors.Null;
+  FDefaultTintColor := TalphaColors.Null;
+  //--
+  FPromptTextColor := FDefaultPromptTextColor;
+  FTintColor := FDefaultTintColor;
   //--
   if StateStyleParent <> nil then begin
-    {$IF defined(debug)}
-    if not (StateStyleParent is TBaseStateStyle) then
-      raise Exception.Create('Error 907D5340-D79D-4FDE-B0BF-06BCFD4B6C57');
-    {$ENDIF}
-    var LParent := TBaseStateStyle(StateStyleParent);
-    FTextSettings := TStateStyleTextSettings.Create(LParent.TextSettings);
-    FLabelTextSettings := TStateStyleTextSettings.Create(LParent.LabelTextSettings);
-    FSupportingTextSettings := TStateStyleTextSettings.Create(LParent.SupportingTextSettings);
+    FTextSettings := TStateStyleTextSettings.Create(StateStyleParent.TextSettings);
+    FLabelTextSettings := TStateStyleTextSettings.Create(StateStyleParent.LabelTextSettings);
+    FSupportingTextSettings := TStateStyleTextSettings.Create(StateStyleParent.SupportingTextSettings);
+  end
+  else if ControlParent <> nil then begin
+    FTextSettings := TStateStyleTextSettings.Create(ControlParent.TextSettings);
+    FLabelTextSettings := TStateStyleTextSettings.Create(ControlParent.LabelTextSettings);
+    FSupportingTextSettings := TStateStyleTextSettings.Create(ControlParent.SupportingTextSettings);
   end
   else begin
-    {$IF defined(debug)}
-    if not (ControlParent is TALBaseEdit) then
-      raise Exception.Create('Error 07F2490E-92B7-445B-9AD5-FFE0695C5583');
-    {$ENDIF}
-    var LParent := TALBaseEdit(ControlParent);
-    FTextSettings := TStateStyleTextSettings.Create(LParent.TextSettings);
-    FLabelTextSettings := TStateStyleTextSettings.Create(LParent.LabelTextSettings);
-    FSupportingTextSettings := TStateStyleTextSettings.Create(LParent.SupportingTextSettings);
+    FTextSettings := TStateStyleTextSettings.Create(nil);
+    FLabelTextSettings := TStateStyleTextSettings.Create(nil);
+    FSupportingTextSettings := TStateStyleTextSettings.Create(nil);
   end;
   //--
   Stroke.DefaultColor := $FF7a7a7a;
@@ -3465,6 +3515,55 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
+
+{******************************}
+procedure TALBaseEdit.TBaseStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    PromptTextColor := DefaultPromptTextColor;
+    TintColor := DefaultTintColor;
+    TextSettings.Reset;
+    LabelTextSettings.Reset;
+    SupportingTextSettings.Reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    inherited Interpolate(ATo, ANormalizedTime);
+    if ATo <> nil then begin
+      PromptTextColor := InterpolateColor(PromptTextColor{Start}, ATo.PromptTextColor{Stop}, ANormalizedTime);
+      TextSettings.Interpolate(ATo.TextSettings, ANormalizedTime);
+      TintColor := InterpolateColor(TintColor{Start}, ATo.TintColor{Stop}, ANormalizedTime);
+    end
+    else begin
+      PromptTextColor := InterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
+      TextSettings.Interpolate(nil, ANormalizedTime);
+      TintColor := InterpolateColor(TintColor{Start}, DefaultTintColor{Stop}, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {************************************}
 procedure TALBaseEdit.TBaseStateStyle.DoSupersede;
 begin
@@ -3474,31 +3573,38 @@ begin
   FPriorSupersedeTintColor := FTintColor;
   //--
   if StateStyleParent <> nil then begin
-    if PromptTextColor = TAlphaColors.Null then
-      PromptTextColor := TBaseStateStyle(StateStyleParent).PromptTextColor;
-    if TintColor = TAlphaColors.Null then
-      TintColor := TBaseStateStyle(StateStyleParent).TintColor;
+    if PromptTextColor = TAlphaColors.Null then PromptTextColor := StateStyleParent.PromptTextColor;
+    if TintColor = TAlphaColors.Null then TintColor := StateStyleParent.TintColor;
   end
-  else begin
-    if PromptTextColor = TAlphaColors.Null then
-      PromptTextColor := TALBaseEdit(ControlParent).PromptTextColor;
-    if TintColor = TAlphaColors.Null then
-      TintColor := TALBaseEdit(ControlParent).TintColor;
+  else if ControlParent <> nil then begin
+    if PromptTextColor = TAlphaColors.Null then PromptTextColor := ControlParent.PromptTextColor;
+    if TintColor = TAlphaColors.Null then TintColor := ControlParent.TintColor;
   end;
   TextSettings.Supersede;
   LabelTextSettings.Supersede;
   SupportingTextSettings.Supersede;
 end;
 
-{************************************}
-procedure TALBaseEdit.TBaseStateStyle.DoReinstate;
+{********************************************************************************}
+function TALBaseEdit.TBaseStateStyle.GetStateStyleParent: TBaseStateStyle;
 begin
-  inherited;
-  PromptTextColor := FPriorSupersedePromptTextColor;
-  TintColor := FPriorSupersedeTintColor;
-  TextSettings.Reinstate;
-  LabelTextSettings.Reinstate;
-  SupportingTextSettings.Reinstate;
+  {$IF defined(debug)}
+  if (inherited StateStyleParent <> nil) and
+     (not (inherited StateStyleParent is TBaseStateStyle)) then
+    raise Exception.Create('StateStyleParent must be of type TBaseStateStyle');
+  {$ENDIF}
+  result := TBaseStateStyle(inherited StateStyleParent);
+end;
+
+{***************************************************************}
+function TALBaseEdit.TBaseStateStyle.GetControlParent: TALBaseEdit;
+begin
+  {$IF defined(debug)}
+  if (inherited ControlParent <> nil) and
+     (not (inherited ControlParent is TALBaseEdit)) then
+    raise Exception.Create('ControlParent must be of type TALBaseEdit');
+  {$ENDIF}
+  result := TALBaseEdit(inherited ControlParent);
 end;
 
 {****************************************************************************}
@@ -3566,6 +3672,18 @@ begin
   Change;
 end;
 
+{******************************************************************}
+function TALBaseEdit.TBaseStateStyle.IsPromptTextColorStored: Boolean;
+begin
+  result := FPromptTextColor <> FDefaultPromptTextColor;
+end;
+
+{******************************************************************}
+function TALBaseEdit.TBaseStateStyle.IsTintColorStored: Boolean;
+begin
+  result := FTintColor <> FDefaultTintColor;
+end;
+
 {**********************************************************}
 function TALBaseEdit.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
@@ -3603,6 +3721,27 @@ begin
   End;
 end;
 
+{******************************}
+procedure TALBaseEdit.TDisabledStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Opacity := TControl.DefaultDisabledOpacity;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+function TALBaseEdit.TDisabledStateStyle.GetInherit: Boolean;
+begin
+  // Opacity is not part of the GetInherit function because it updates the
+  // disabledOpacity of the base control immediately every time it changes.
+  // Essentially, it acts merely as a link to the disabledOpacity of the base control.
+  Result := inherited GetInherit;
+end;
+
 {****************************************************************}
 constructor TALBaseEdit.TStateStyles.Create(const AParent: TALBaseEdit);
 begin
@@ -3628,6 +3767,14 @@ begin
 end;
 
 {******************************************************}
+function TALBaseEdit.TStateStyles.CreateSavedState: TALPersistentObserver;
+type
+  TStateStylesClass = class of TStateStyles;
+begin
+  result := TStateStylesClass(classtype).Create(nil{AParent});
+end;
+
+{******************************************************}
 procedure TALBaseEdit.TStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TStateStyles then begin
@@ -3642,6 +3789,20 @@ begin
   end
   else
     ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************************}
+procedure TALBaseEdit.TStateStyles.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Disabled.reset;
+    Hovered.reset;
+    Focused.reset;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {************************************************************************************}
@@ -4097,7 +4258,7 @@ begin
   else if IsMouseOver then LStateStyle := StateStyles.Hovered
   else LStateStyle := nil;
   if LStateStyle <> nil then
-    LStateStyle.SupersedeNoChanges;
+    LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
     // FillColor
     if LStateStyle <> nil then EditControl.FillColor := LStateStyle.Fill.Color
@@ -4113,7 +4274,7 @@ begin
     else EditControl.TextSettings.Assign(TextSettings)
   finally
     if LStateStyle <> nil then
-      LStateStyle.ReinstateNoChanges;
+      LStateStyle.RestorestateNoChanges;
   end;
 
   repaint;
@@ -4941,9 +5102,9 @@ procedure TALBaseEdit.MakeBufDrawable;
        AStateStyle.Stroke.Inherit and
        AStateStyle.Shadow.Inherit then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.Fill.SupersedeNoChanges;
-    AStateStyle.Stroke.SupersedeNoChanges;
-    AStateStyle.Shadow.SupersedeNoChanges;
+    AStateStyle.Fill.SupersedeNoChanges(true{ASaveState});
+    AStateStyle.Stroke.SupersedeNoChanges(true{ASaveState});
+    AStateStyle.Shadow.SupersedeNoChanges(true{ASaveState});
     try
       CreateBufDrawable(
         ABufDrawable, // var ABufDrawable: TALDrawable;
@@ -4952,9 +5113,9 @@ procedure TALBaseEdit.MakeBufDrawable;
         AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
         AStateStyle.Shadow); // const AShadow: TALShadow);
     finally
-      AStateStyle.Fill.ReinstateNoChanges;
-      AStateStyle.Stroke.ReinstateNoChanges;
-      AStateStyle.Shadow.ReinstateNoChanges;
+      AStateStyle.Fill.RestorestateNoChanges;
+      AStateStyle.Stroke.RestorestateNoChanges;
+      AStateStyle.Shadow.RestoreStateNoChanges;
     end;
   end;
 
@@ -5004,7 +5165,7 @@ procedure TALBaseEdit.MakeBufPromptTextDrawable;
     if (AStateStyle.TextSettings.Inherit) and
        ((not AUsePromptTextColor) or (AStateStyle.PromptTextColor = TalphaColors.Null)) then exit;
     if (not ALIsDrawableNull(ABufPromptTextDrawable)) then exit;
-    AStateStyle.SupersedeNoChanges;
+    AStateStyle.SupersedeNoChanges(true{ASaveState});
     try
       var LPrevFontColor := AStateStyle.TextSettings.font.Color;
       var LPrevFontOnchanged: TNotifyEvent;
@@ -5029,7 +5190,7 @@ procedure TALBaseEdit.MakeBufPromptTextDrawable;
         AStateStyle.TextSettings.OnChanged := LPrevFontOnchanged;
       end;
     finally
-      AStateStyle.ReinstateNoChanges;
+      AStateStyle.RestorestateNoChanges;
     end;
   end;
 
@@ -5121,7 +5282,7 @@ procedure TALBaseEdit.MakeBufLabelTextDrawable;
   begin
     if AStateStyle.LabelTextSettings.Inherit then exit;
     if (not ALIsDrawableNull(ABufLabelTextDrawable)) then exit;
-    AStateStyle.LabelTextSettings.SupersedeNoChanges;
+    AStateStyle.LabelTextSettings.SupersedeNoChanges(true{ASaveState});
     try
       CreateBufLabelTextDrawable(
         ABufLabelTextDrawable, // var ABufLabelTextDrawable: TALDrawable;
@@ -5129,7 +5290,7 @@ procedure TALBaseEdit.MakeBufLabelTextDrawable;
         FLabelText, // const AText: String;
         AStateStyle.LabelTextSettings.font); // const AFont: TALFont;
     finally
-      AStateStyle.LabelTextSettings.ReinstateNoChanges;
+      AStateStyle.LabelTextSettings.RestorestateNoChanges;
     end;
   end;
 
@@ -5179,7 +5340,7 @@ procedure TALBaseEdit.MakeBufSupportingTextDrawable;
   begin
     if AStateStyle.SupportingTextSettings.Inherit then exit;
     if (not ALIsDrawableNull(ABufSupportingTextDrawable)) then exit;
-    AStateStyle.SupportingTextSettings.SupersedeNoChanges;
+    AStateStyle.SupportingTextSettings.SupersedeNoChanges(true{ASaveState});
     try
       CreateBufSupportingTextDrawable(
         ABufSupportingTextDrawable, // var ABufSupportingTextDrawable: TALDrawable;
@@ -5190,7 +5351,7 @@ procedure TALBaseEdit.MakeBufSupportingTextDrawable;
         padding.Left + SupportingTextSettings.Margins.Left,
         Height+SupportingTextSettings.Margins.Top);
     finally
-      AStateStyle.SupportingTextSettings.ReinstateNoChanges;
+      AStateStyle.SupportingTextSettings.RestorestateNoChanges;
     end;
   end;
 

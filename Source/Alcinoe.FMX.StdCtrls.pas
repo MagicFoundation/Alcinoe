@@ -122,7 +122,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     //property OnKeyDown;
     //property OnKeyUp;
     property OnPainting;
@@ -334,7 +334,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -407,7 +407,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -501,7 +501,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -536,6 +536,8 @@ type
     function IsResourceNameStored: Boolean;
     function IsWrapModeStored: Boolean;
     function IsThicknessStored: Boolean;
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
   public
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     destructor Destroy; override;
@@ -561,21 +563,19 @@ type
   private
     FParent: TALCheckMarkBrush;
     FInherit: Boolean;
-    fSuperseded: Integer;
-    FPriorSupersedeColor: TAlphaColor;
-    FPriorSupersedeResourceName: String;
-    FPriorSupersedeWrapMode: TALImageWrapMode;
-    FPriorSupersedeThickness: Single;
-    FPriorSupersedePaddingRect: TRectF;
+    fSuperseded: Boolean;
     procedure SetInherit(const AValue: Boolean);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+    procedure DoSupersede; virtual;
   public
     constructor Create(const AParent: TALCheckMarkBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
+    property Parent: TALCheckMarkBrush read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
@@ -584,17 +584,22 @@ type
   TALCheckBoxBaseStateStyle = class(TALBaseStateStyle)
   private
     FCheckMark: TALInheritCheckMarkBrush;
+    function GetStateStyleParent: TALCheckBoxBaseStateStyle;
+    function GetControlParent: TALCheckBox;
     procedure SetCheckMark(const AValue: TALInheritCheckMarkBrush);
     procedure CheckMarkChanged(ASender: TObject);
   protected
     function GetInherit: Boolean; override;
     procedure DoSupersede; override;
-    procedure DoReinstate; override;
   public
-    constructor Create(const AParent: TObject); reintroduce; virtual;
+    constructor Create(const AParent: TObject); override;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
-    Property Inherit: Boolean read GetInherit;
+    procedure Reset; override;
+    procedure Interpolate(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single); reintroduce; virtual;
+    procedure InterpolateNoChanges(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single); reintroduce;
+    property StateStyleParent: TALCheckBoxBaseStateStyle read GetStateStyleParent;
+    property ControlParent: TALCheckBox read GetControlParent;
   published
     property CheckMark: TALInheritCheckMarkBrush read FCheckMark write SetCheckMark;
   end;
@@ -613,14 +618,14 @@ type
     FOpacity: Single;
     procedure SetOpacity(const Value: Single);
     function IsOpacityStored: Boolean;
+  protected
+    function GetInherit: Boolean; override;
   public
     constructor Create(const AParent: TObject); override;
     procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
   published
     property Fill;
-    // Opacity is not part of the GetInherit function because it updates the
-    // disabledOpacity of the base control immediately every time it changes.
-    // Essentially, it acts merely as a link to the disabledOpacity of the base control.
     property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
     property Shadow;
     property Stroke;
@@ -671,10 +676,13 @@ type
     procedure HoveredChanged(ASender: TObject);
     procedure PressedChanged(ASender: TObject);
     procedure FocusedChanged(ASender: TObject);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
   public
     constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
   published
     property &Default: TALCheckBoxDefaultStateStyle read FDefault write SetDefault;
     property Disabled: TALCheckBoxDisabledStateStyle read FDisabled write SetDisabled;
@@ -692,10 +700,13 @@ type
     procedure SetUnchecked(const AValue: TALCheckBoxCheckStateStyles);
     procedure CheckedChanged(ASender: TObject);
     procedure UncheckedChanged(ASender: TObject);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
   public
     constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
   published
     property Checked: TALCheckBoxCheckStateStyles read FChecked write SetChecked;
     property Unchecked: TALCheckBoxCheckStateStyles read FUnchecked write SetUnchecked;
@@ -831,7 +842,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -980,7 +991,7 @@ type
     property OnMouseMove;
     property OnMouseWheel;
     property OnClick;
-    property OnDblClick;
+    //property OnDblClick;
     property OnKeyDown;
     property OnKeyUp;
     property OnPainting;
@@ -1007,21 +1018,29 @@ type
       private
         FText: String;
         FTextSettings: TStateStyleTextSettings;
+        FDefaultText: String;
         FPriorSupersedeText: String;
+        function GetStateStyleParent: TBaseStateStyle;
+        function GetControlParent: TALButton;
         procedure SetText(const Value: string);
         procedure SetTextSettings(const AValue: TStateStyleTextSettings);
         procedure TextSettingsChanged(ASender: TObject);
+        function IsTextStored: Boolean;
       protected
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
-        procedure DoReinstate; override;
       public
-        constructor Create(const AParent: TObject); reintroduce; virtual;
+        constructor Create(const AParent: TObject); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
-        Property Inherit: Boolean read GetInherit;
+        procedure Reset; override;
+        procedure Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce; virtual;
+        procedure InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce;
+        property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
+        property ControlParent: TALButton read GetControlParent;
+        property DefaultText: String read FDefaultText write FDefaultText;
       published
-        property Text: string read FText write SetText;
+        property Text: string read FText write SetText stored IsTextStored nodefault;
         property TextSettings: TStateStyleTextSettings read fTextSettings write SetTextSettings;
       end;
       // -------------------
@@ -1031,15 +1050,15 @@ type
         FOpacity: Single;
         procedure SetOpacity(const Value: Single);
         function IsOpacityStored: Boolean;
+      protected
+        function GetInherit: Boolean; override;
       public
         constructor Create(const AParent: TObject); override;
         procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
       published
         property Fill;
         property Scale;
-        // Opacity is not part of the GetInherit function because it updates the
-        // disabledOpacity of the base control immediately every time it changes.
-        // Essentially, it acts merely as a link to the disabledOpacity of the base control.
         property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
         property Shadow;
         property Stroke;
@@ -1053,7 +1072,7 @@ type
         property Shadow;
         property StateLayer;
         property Stroke;
-        property TransitionDuration;
+        property Transition;
       end;
       // ------------------
       // TPressedStateStyle
@@ -1064,7 +1083,7 @@ type
         property Shadow;
         property StateLayer;
         property Stroke;
-        property TransitionDuration;
+        property Transition;
       end;
       // ------------------
       // TFocusedStateStyle
@@ -1075,7 +1094,7 @@ type
         property Shadow;
         property StateLayer;
         property Stroke;
-        property TransitionDuration;
+        property Transition;
       end;
       // ------------
       // TStateStyles
@@ -1093,10 +1112,13 @@ type
         procedure HoveredChanged(ASender: TObject);
         procedure PressedChanged(ASender: TObject);
         procedure FocusedChanged(ASender: TObject);
+      protected
+        function CreateSavedState: TALPersistentObserver; override;
       public
         constructor Create(const AParent: TALButton); reintroduce; virtual;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
       published
         property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
         property Hovered: THoveredStateStyle read FHovered write SetHovered;
@@ -1106,8 +1128,6 @@ type
       // -------------
       // TTextSettings
       TTextSettings = class(TALBaseTextSettings)
-      private
-      public
       published
         property Font;
         property Decoration;
@@ -1122,6 +1142,10 @@ type
       end;
   private
     FStateStyles: TStateStyles;
+    FStateTransitionAnimation: TALfloatAnimation;
+    FStateTransitionFrom: TBaseStateStyle;
+    FStateTransitionTo: TBaseStateStyle;
+    FCurrentStateStyle: TBaseStateStyle;
     fBufDisabledDrawable: TALDrawable;
     fBufDisabledDrawableRect: TRectF;
     fBufHoveredDrawable: TALDrawable;
@@ -1136,9 +1160,15 @@ type
     function CreateTextSettings: TALBaseTextSettings; override;
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
     procedure SetName(const Value: TComponentName); override;
+    function GetCurrentStateStyle: TBaseStateStyle; virtual;
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure IsMouseOverChanged; override;
     procedure PressedChanged; override;
+    procedure startStateTransition; virtual;
+    procedure StateTransitionAnimationProcess(Sender: TObject); virtual;
+    procedure StateTransitionAnimationFinish(Sender: TObject); virtual;
+    Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF); override;
+    Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; Const ARect: TrectF); override;
     procedure Paint; override;
     procedure Loaded; override;
   public
@@ -2294,6 +2324,14 @@ begin
   inherited;
 end;
 
+{*********************************}
+function TALCheckMarkBrush.CreateSavedState: TALPersistentObserver;
+type
+  TALCheckMarkBrushClass = class of TALCheckMarkBrush;
+begin
+  result := TALCheckMarkBrushClass(classtype).Create(DefaultColor);
+end;
+
 {**********************************************}
 procedure TALCheckMarkBrush.Assign(Source: TPersistent);
 begin
@@ -2456,12 +2494,15 @@ begin
   inherited create(ADefaultColor);
   FParent := AParent;
   FInherit := True;
-  fSuperseded := 0;
-  //FPriorSupersedeColor
-  //FPriorSupersedeResourceName
-  //FPriorSupersedeWrapMode
-  //FPriorSupersedeThickness
-  //FPriorSupersedePaddingRect
+  fSuperseded := False;
+end;
+
+{*********************************}
+function TALInheritCheckMarkBrush.CreateSavedState: TALPersistentObserver;
+type
+  TALInheritCheckMarkBrushClass = class of TALInheritCheckMarkBrush;
+begin
+  result := TALInheritCheckMarkBrushClass(classtype).Create(nil{AParent}, DefaultColor);
 end;
 
 {**********************************************************}
@@ -2478,10 +2519,14 @@ procedure TALInheritCheckMarkBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritCheckMarkBrush then
-      Inherit := TALInheritCheckMarkBrush(Source).Inherit
-    else
+    if Source is TALInheritCheckMarkBrush then begin
+      Inherit := TALInheritCheckMarkBrush(Source).Inherit;
+      fSuperseded := TALInheritCheckMarkBrush(Source).fSuperseded;
+    end
+    else begin
       Inherit := False;
+      fSuperseded := False;
+    end;
     inherited Assign(Source);
   Finally
     EndUpdate;
@@ -2495,83 +2540,51 @@ begin
   Try
     inherited Reset;
     Inherit := True;
+    fSuperseded := False;
   finally
     EndUpdate;
   end;
 end;
 
 {******************}
-procedure TALInheritCheckMarkBrush.Supersede;
+procedure TALInheritCheckMarkBrush.DoSupersede;
 begin
+  Assign(FParent);
+end;
+
+{******************}
+procedure TALInheritCheckMarkBrush.Supersede(Const ASaveState: Boolean = False);
+begin
+  if ASaveState then SaveState;
+  if (FSuperseded) or
+     (not inherit) or
+     (FParent = nil) then exit;
   beginUpdate;
   try
-    if (not inherit) or
-       (FParent = nil) then exit;
-    inc(fSuperseded);
-    if (FSuperseded <> 1) then exit;
-
-    FPriorSupersedeColor := Color;
-    FPriorSupersedeResourceName := ResourceName;
-    FPriorSupersedeWrapMode := WrapMode;
-    FPriorSupersedeThickness := Thickness;
-    FPriorSupersedePaddingRect := Padding.Rect;
-    //--
     var LParentSuperseded := False;
     if FParent is TALInheritCheckMarkBrush then begin
-      TALInheritCheckMarkBrush(FParent).SupersedeNoChanges;
+      TALInheritCheckMarkBrush(FParent).SupersedeNoChanges(true{ASaveState});
       LParentSuperseded := True;
     end;
     try
-      Color := FParent.Color;
-      ResourceName := FParent.ResourceName;
-      WrapMode := FParent.WrapMode;
-      Thickness := FParent.Thickness;
-      Padding.Rect := FParent.Padding.Rect;
+      DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritCheckMarkBrush(FParent).ReinstateNoChanges;
+        TALInheritCheckMarkBrush(FParent).restoreState;
     end;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALInheritCheckMarkBrush.Reinstate;
-begin
-  beginUpdate;
-  try
-    if fSuperseded <= 0 then exit;
-    dec(fSuperseded);
-    if fSuperseded = 0 then begin
-      Color := FPriorSupersedeColor;
-      ResourceName := FPriorSupersedeResourceName;
-      WrapMode := FPriorSupersedeWrapMode;
-      Thickness := FPriorSupersedeThickness;
-      Padding.Rect := FPriorSupersedePaddingRect;
-    end;
+    Inherit := False;
+    FSuperseded := True;
   finally
     EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALInheritCheckMarkBrush.SupersedeNoChanges;
+procedure TALInheritCheckMarkBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
-    Supersede;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{*************************}
-procedure TALInheritCheckMarkBrush.ReinstateNoChanges;
-begin
-  BeginUpdate;
-  try
-    Reinstate;
+    Supersede(ASaveState);
   finally
     EndUpdateNoChanges;
   end;
@@ -2582,20 +2595,9 @@ constructor TALCheckBoxBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   //--
-  if StateStyleParent <> nil then begin
-    {$IF defined(debug)}
-    if not (StateStyleParent is TALCheckBoxBaseStateStyle) then
-      raise Exception.Create('Error E3138842-72E4-4726-B968-73701CE22E8F');
-    {$ENDIF}
-    FCheckMark := TALInheritCheckMarkBrush.Create(TALCheckBoxBaseStateStyle(StateStyleParent).CheckMark, TAlphaColors.Black{ADefaultColor});
-  end
-  else begin
-    {$IF defined(debug)}
-    if not (ControlParent is TALCheckBox) then
-      raise Exception.Create('Error 39844D3D-17F8-4E3F-8B09-BDB4FCEE8B70');
-    {$ENDIF}
-    FCheckMark := TALInheritCheckMarkBrush.Create(TALCheckBox(ControlParent).CheckMark, TAlphaColors.Black{ADefaultColor});
-  end;
+  if StateStyleParent <> nil then FCheckMark := TALInheritCheckMarkBrush.Create(StateStyleParent.CheckMark, TAlphaColors.Black{ADefaultColor})
+  else if ControlParent <> nil then FCheckMark := TALInheritCheckMarkBrush.Create(ControlParent.CheckMark, TAlphaColors.Black{ADefaultColor})
+  else FCheckMark := TALInheritCheckMarkBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
   //--
   StateLayer.Padding.DefaultValue := TRectF.Create(-10,-10,-10,-10);
   StateLayer.Padding.Rect := StateLayer.Padding.DefaultValue;
@@ -2626,6 +2628,44 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
+{******************************}
+procedure TALCheckBoxBaseStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    CheckMark.Reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************************************}
+procedure TALCheckBoxBaseStateStyle.Interpolate(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    inherited Interpolate(ATo, ANormalizedTime);
+    if ATo <> nil then CheckMark.Interpolate(ATo.CheckMark, ANormalizedTime)
+    else if StateStyleParent <> nil then CheckMark.Interpolate(StateStyleParent.CheckMark, ANormalizedTime)
+    else if ControlParent <> nil then CheckMark.Interpolate(ControlParent.CheckMark, ANormalizedTime)
+    else CheckMark.Interpolate(nil, ANormalizedTime);
+  Finally
+    EndUpdate;
+  End;
+end;
+
+{******************************************************}
+procedure TALCheckBoxBaseStateStyle.InterpolateNoChanges(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {******************}
 procedure TALCheckBoxBaseStateStyle.DoSupersede;
 begin
@@ -2633,11 +2673,26 @@ begin
   CheckMark.Supersede;
 end;
 
-{******************}
-procedure TALCheckBoxBaseStateStyle.DoReinstate;
+{********************************************************************************}
+function TALCheckBoxBaseStateStyle.GetStateStyleParent: TALCheckBoxBaseStateStyle;
 begin
-  inherited;
-  CheckMark.Reinstate;
+  {$IF defined(debug)}
+  if (inherited StateStyleParent <> nil) and
+     (not (inherited StateStyleParent is TALCheckBoxBaseStateStyle)) then
+    raise Exception.Create('StateStyleParent must be of type TALCheckBoxBaseStateStyle');
+  {$ENDIF}
+  result := TALCheckBoxBaseStateStyle(inherited StateStyleParent);
+end;
+
+{***************************************************************}
+function TALCheckBoxBaseStateStyle.GetControlParent: TALCheckBox;
+begin
+  {$IF defined(debug)}
+  if (inherited ControlParent <> nil) and
+     (not (inherited ControlParent is TALCheckBox)) then
+    raise Exception.Create('ControlParent must be of type TALCheckBox');
+  {$ENDIF}
+  result := TALCheckBox(inherited ControlParent);
 end;
 
 {********************************************************************************}
@@ -2696,6 +2751,27 @@ begin
   End;
 end;
 
+{******************************}
+procedure TALCheckBoxDisabledStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Opacity := TControl.DefaultDisabledOpacity;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+function TALCheckBoxDisabledStateStyle.GetInherit: Boolean;
+begin
+  // Opacity is not part of the GetInherit function because it updates the
+  // disabledOpacity of the base control immediately every time it changes.
+  // Essentially, it acts merely as a link to the disabledOpacity of the base control.
+  Result := inherited GetInherit;
+end;
+
 {*************************************}
 constructor TALCheckBoxCheckStateStyles.Create(const AParent: TALCheckBox);
 begin
@@ -2728,6 +2804,14 @@ begin
   inherited Destroy;
 end;
 
+{*********************************}
+function TALCheckBoxCheckStateStyles.CreateSavedState: TALPersistentObserver;
+type
+  TALCheckBoxCheckStateStylesClass = class of TALCheckBoxCheckStateStyles;
+begin
+  result := TALCheckBoxCheckStateStylesClass(classtype).Create(nil{AParent});
+end;
+
 {******************************************************}
 procedure TALCheckBoxCheckStateStyles.Assign(Source: TPersistent);
 begin
@@ -2745,6 +2829,22 @@ begin
   end
   else
     ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************************}
+procedure TALCheckBoxCheckStateStyles.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Default.Reset;
+    Disabled.Reset;
+    Hovered.Reset;
+    Pressed.Reset;
+    Focused.Reset;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {************************************************************************************}
@@ -2827,6 +2927,14 @@ begin
   inherited Destroy;
 end;
 
+{*********************************}
+function TALCheckBoxStateStyles.CreateSavedState: TALPersistentObserver;
+type
+  TALCheckBoxStateStylesClass = class of TALCheckBoxStateStyles;
+begin
+  result := TALCheckBoxStateStylesClass(classtype).Create(nil{AParent});
+end;
+
 {******************************************************}
 procedure TALCheckBoxStateStyles.Assign(Source: TPersistent);
 begin
@@ -2841,6 +2949,19 @@ begin
   end
   else
     ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************************}
+procedure TALCheckBoxStateStyles.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Checked.reset;
+    Unchecked.reset;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {************************************************************************************}
@@ -3273,6 +3394,7 @@ begin
       ACanvas, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
       LRect, // const ADstRect: TrectF;
+      1, // const AOpacity: Single;
       TAlphaColors.Null, // const AFillColor: TAlphaColor;
       TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
       [], // const AFillGradientColors: TArray<TAlphaColor>;
@@ -3359,6 +3481,7 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
         LRect, // const Rect: TrectF;
+        1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
         AStroke, // const Stroke: TALStrokeBrush;
         AShadow, // const Shadow: TALShadow
@@ -3372,6 +3495,7 @@ begin
           LCanvas, // const ACanvas: TALCanvas;
           ALGetScreenScale, // const AScale: Single;
           LRect, // const Rect: TrectF;
+          1, // const AOpacity: Single;
           AStateLayer, // const Fill: TALBrush;
           nil, // const Stroke: TALStrokeBrush;
           nil, // const Shadow: TALShadow
@@ -3413,7 +3537,7 @@ procedure TALCheckbox.MakeBufDrawable;
        (AStateStyle <> StateStyles.UnChecked.Default) and
        (AStateStyle.Inherit) then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.SupersedeNoChanges;
+    AStateStyle.SupersedeNoChanges(true{ASaveState});
     try
       //--
       CreateBufDrawable(
@@ -3436,7 +3560,7 @@ procedure TALCheckbox.MakeBufDrawable;
       ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 *)
     finally
-      AStateStyle.ReinstateNoChanges;
+      AStateStyle.RestoreStateNoChanges;
     end;
   end;
 
@@ -3970,22 +4094,12 @@ end;
 constructor TALButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
-  FText := '';
+  FDefaultText := '';
+  FText := FDefaultText;
   //--
-  if StateStyleParent <> nil then begin
-    {$IF defined(debug)}
-    if not (StateStyleParent is TBaseStateStyle) then
-      raise Exception.Create('Error 51C3F10E-1F1D-4845-8484-ADEEF0C6C2E9');
-    {$ENDIF}
-    FTextSettings := TStateStyleTextSettings.Create(TBaseStateStyle(StateStyleParent).TextSettings);
-  end
-  else begin
-    {$IF defined(debug)}
-    if not (ControlParent is TALButton) then
-      raise Exception.Create('Error D1F161D7-6BEA-4E25-A904-F95FA8943C6B');
-    {$ENDIF}
-    FTextSettings := TStateStyleTextSettings.Create(TALButton(ControlParent).TextSettings);
-  end;
+  if StateStyleParent <> nil then FTextSettings := TStateStyleTextSettings.Create(StateStyleParent.TextSettings)
+  else if ControlParent <> nil then FTextSettings := TStateStyleTextSettings.Create(ControlParent.TextSettings)
+  else FTextSettings := TStateStyleTextSettings.Create(nil);
   //--
   Fill.DefaultColor := $FFE1E1E1;
   Fill.Color := Fill.DefaultColor;
@@ -4022,6 +4136,57 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
+{******************************}
+procedure TALButton.TBaseStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Text := DefaultText;
+    TextSettings.reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************************************}
+procedure TALButton.TBaseStateStyle.Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  try
+    Inherited Interpolate(ATo, ANormalizedTime);
+    if ATo <> nil then begin
+      Text := ATo.Text;
+      TextSettings.Interpolate(ATo.TextSettings, ANormalizedTime);
+    end
+    else if StateStyleParent <> nil then begin
+      Text := StateStyleParent.Text;
+      TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime);
+    end
+    else if ControlParent <> nil then begin
+      Text := ControlParent.Text;
+      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+    end
+    else begin
+      Text := DefaultText;
+      TextSettings.Interpolate(nil, ANormalizedTime);
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************************************}
+procedure TALButton.TBaseStateStyle.InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
+begin
+  BeginUpdate;
+  Try
+    Interpolate(ATo, ANormalizedTime);
+  Finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {******************}
 procedure TALButton.TBaseStateStyle.DoSupersede;
 begin
@@ -4030,18 +4195,32 @@ begin
   FPriorSupersedeText := Text;
   //--
   if Text = '' then begin
-    if StateStyleParent <> nil then Text := TBaseStateStyle(StateStyleParent).Text
-    else Text := TALButton(ControlParent).Text;
+    if StateStyleParent <> nil then Text := StateStyleParent.Text
+    else Text := ControlParent.Text;
   end;
   TextSettings.SuperSede;
 end;
 
-{******************}
-procedure TALButton.TBaseStateStyle.DoReinstate;
+{*********************************************************}
+function TALButton.TBaseStateStyle.GetStateStyleParent: TBaseStateStyle;
 begin
-  inherited;
-  Text := FPriorSupersedeText;
-  TextSettings.Reinstate;
+  {$IF defined(debug)}
+  if (inherited StateStyleParent <> nil) and
+     (not (inherited StateStyleParent is TBaseStateStyle)) then
+    raise Exception.Create('StateStyleParent must be of type TBaseStateStyle');
+  {$ENDIF}
+  Result := TBaseStateStyle(inherited StateStyleParent);
+end;
+
+{*********************************************************}
+function TALButton.TBaseStateStyle.GetControlParent: TALButton;
+begin
+  {$IF defined(debug)}
+  if (inherited ControlParent <> nil) and
+     (not (inherited ControlParent is TALButton)) then
+    raise Exception.Create('ControlParent must be of type TALButton');
+  {$ENDIF}
+  Result := TALButton(inherited ControlParent);
 end;
 
 {*********************************************************}
@@ -4071,6 +4250,12 @@ end;
 procedure TALButton.TBaseStateStyle.TextSettingsChanged(ASender: TObject);
 begin
   Change;
+end;
+
+{******************************************************************}
+function TALButton.TBaseStateStyle.IsTextStored: Boolean;
+begin
+  Result := FText <> FDefaultText;
 end;
 
 {**********************************************************}
@@ -4110,6 +4295,27 @@ begin
   End;
 end;
 
+{******************************}
+procedure TALButton.TDisabledStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Opacity := TControl.DefaultDisabledOpacity;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+function TALButton.TDisabledStateStyle.GetInherit: Boolean;
+begin
+  // Opacity is not part of the GetInherit function because it updates the
+  // disabledOpacity of the base control immediately every time it changes.
+  // Essentially, it acts merely as a link to the disabledOpacity of the base control.
+  Result := inherited GetInherit;
+end;
+
 {*************************************}
 constructor TALButton.TStateStyles.Create(const AParent: TALButton);
 begin
@@ -4138,6 +4344,14 @@ begin
   inherited Destroy;
 end;
 
+{*********************************}
+function TALButton.TStateStyles.CreateSavedState: TALPersistentObserver;
+type
+  TALButtonStateStylesClass = class of TStateStyles;
+begin
+  result := TALButtonStateStylesClass(classtype).Create(nil{AParent});
+end;
+
 {******************************************************}
 procedure TALButton.TStateStyles.Assign(Source: TPersistent);
 begin
@@ -4154,6 +4368,21 @@ begin
   end
   else
     ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************************}
+procedure TALButton.TStateStyles.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Disabled.reset;
+    Hovered.reset;
+    Pressed.reset;
+    Focused.reset;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {************************************************************************************}
@@ -4231,6 +4460,14 @@ begin
   FStateStyles := TStateStyles.Create(self);
   FStateStyles.OnChanged := StateStylesChanged;
   //--
+  FStateTransitionAnimation := TALFloatAnimation.Create;
+  FStateTransitionAnimation.OnProcess := StateTransitionAnimationProcess;
+  FStateTransitionAnimation.OnFinish := StateTransitionAnimationFinish;
+  //--
+  FStateTransitionFrom := nil;
+  FStateTransitionTo := nil;
+  FCurrentStateStyle := nil;
+  //--
   fBufDisabledDrawable := ALNullDrawable;
   fBufHoveredDrawable := ALNullDrawable;
   fBufPressedDrawable := ALNullDrawable;
@@ -4241,6 +4478,7 @@ end;
 destructor TALButton.Destroy;
 begin
   ALFreeAndNil(FStateStyles);
+  ALFreeAndNil(FStateTransitionAnimation);
   inherited Destroy;
 end;
 
@@ -4298,6 +4536,16 @@ begin
   FStateStyles.Assign(AValue);
 end;
 
+{*******************************************************}
+function TALButton.GetCurrentStateStyle: TBaseStateStyle;
+begin
+  if Not Enabled then Result := StateStyles.Disabled
+  else if Pressed then Result := StateStyles.Pressed
+  else if IsFocused then Result := StateStyles.Focused
+  else if IsMouseOver then Result := StateStyles.Hovered
+  else result := nil;
+end;
+
 {******************************************************}
 procedure TALButton.StateStylesChanged(Sender: TObject);
 begin
@@ -4310,6 +4558,7 @@ end;
 procedure TALButton.IsMouseOverChanged;
 begin
   inherited;
+  startStateTransition;
   repaint;
 end;
 
@@ -4317,7 +4566,74 @@ end;
 procedure TALButton.PressedChanged;
 begin
   inherited;
+  startStateTransition;
   repaint;
+end;
+
+{**************************************************}
+procedure TALButton.startStateTransition;
+begin
+  var LPrevStateTransitionAnimationFrom := FStateTransitionFrom;
+  var LPrevStateTransitionAnimationTo := FStateTransitionTo;
+  FStateTransitionFrom := FStateTransitionTo;
+  FStateTransitionTo := GetCurrentStateStyle;
+  //--
+  var LDuration: Single;
+  var LanimationType: TAnimationType;
+  var LInterpolation: TALInterpolationType;
+  if FStateTransitionTo <> nil then begin
+    LDuration := FStateTransitionTo.Transition.Duration;
+    LanimationType := FStateTransitionTo.Transition.animationType;
+    LInterpolation := FStateTransitionTo.Transition.Interpolation;
+  end
+  else if FStateTransitionFrom <> nil then begin
+    LDuration := FStateTransitionFrom.Transition.Duration;
+    LanimationType := FStateTransitionFrom.Transition.animationType;
+    LInterpolation := FStateTransitionFrom.Transition.Interpolation;
+  end
+  else
+    Raise Exception.Create('Error #B2B17EF6-4F6A-4CBF-B1D6-C880B70D2141');
+  //--
+  if FStateTransitionAnimation.Enabled then begin
+    FStateTransitionAnimation.StopAtCurrent;
+    FStateTransitionAnimation.Enabled := False;
+    if (LPrevStateTransitionAnimationFrom = FStateTransitionTo) and
+       (LPrevStateTransitionAnimationTo = FStateTransitionFrom) then begin
+      FStateTransitionAnimation.StartValue := 1-FStateTransitionAnimation.CurrentValue;
+      FStateTransitionAnimation.StopValue := 1;
+      if FStateTransitionTo <> nil then
+        FStateTransitionAnimation.Duration := FStateTransitionTo.Transition.Duration * FStateTransitionAnimation.CurrentValue
+      else if FStateTransitionFrom <> nil then
+        FStateTransitionAnimation.Duration := FStateTransitionFrom.Transition.Duration * FStateTransitionAnimation.CurrentValue
+      else
+        Raise Exception.Create('Error #7AF71AE4-115F-4F8C-AA36-D7BC3B246759');
+      FStateTransitionAnimation.Start;
+    end;
+    exit;
+  end;
+  //--
+  if SameValue(LDuration,0.0,TEpsilon.Scale) then
+    Exit;
+  //--
+  FStateTransitionAnimation.StartValue := 0;
+  FStateTransitionAnimation.StopValue := 1;
+  FStateTransitionAnimation.Duration := LDuration;
+  FStateTransitionAnimation.AnimationType := LAnimationType;
+  FStateTransitionAnimation.Interpolation := LInterpolation;
+  FStateTransitionAnimation.Start;
+end;
+
+{**************************************************}
+procedure TALButton.StateTransitionAnimationProcess(Sender: TObject);
+begin
+  Repaint;
+end;
+
+{**************************************************}
+procedure TALButton.StateTransitionAnimationFinish(Sender: TObject);
+begin
+  FStateTransitionAnimation.Enabled := False;
+  Repaint;
 end;
 
 {***********************************}
@@ -4350,17 +4666,24 @@ procedure TALButton.MakeBufDrawable;
   begin
     if AStateStyle.Inherit then exit;
     if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.SupersedeNoChanges;
+    FCurrentStateStyle := AStateStyle;
+    AStateStyle.SupersedeNoChanges(true{ASaveState});
     try
       var LTextBroken: Boolean;
       var LAllTextDrawn: Boolean;
       var LElements: TALTextElements;
+      var LScale: Single;
+      if Abs(AStateStyle.Scale.x - 1) > Abs(AStateStyle.Scale.y - 1) then
+        LScale := AStateStyle.Scale.x
+      else
+        LScale := AStateStyle.Scale.y;
       CreateBufDrawable(
         ABufDrawable, // var ABufDrawable: TALDrawable;
         ABufDrawableRect, // var ABufDrawableRect: TRectF;
         LTextBroken, // var ABufTextBroken: Boolean;
         LAllTextDrawn, // var ABufAllTextDrawn: Boolean;
         LElements, // var ABufElements: TALTextElements;
+        ALGetScreenScale * LScale, // const AScale: Single;
         AStateStyle.Text, // const AText: String;
         AStateStyle.TextSettings.Font, // const AFont: TALFont;
         AStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
@@ -4379,7 +4702,8 @@ procedure TALButton.MakeBufDrawable;
       ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
       ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
     finally
-      AStateStyle.ReinstateNoChanges;
+      AStateStyle.RestorestateNoChanges;
+      FCurrentStateStyle := nil;
     end;
   end;
 
@@ -4419,35 +4743,124 @@ begin
 end;
 
 {************************}
+Procedure TALButton.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF);
+begin
+  if (ALIsCanvasNull(ACanvas)) and (FCurrentStateStyle <> nil) and (FCurrentStateStyle.StateLayer.HasFill) then begin
+    var LRect := ARect;
+    var LPaddingRect := FCurrentStateStyle.StateLayer.Padding.Rect;
+    LRect.Inflate(-LPaddingRect.Left{DL}, -LPaddingRect.top{DT}, -LPaddingRect.Right{DR}, -LPaddingRect.Bottom{DB});
+    var LSurfaceRect := TRectF.Union(TRectF.Create(0, 0, ASurfaceSize.Width, ASurfaceSize.Height), LRect);
+    ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
+    ASurfaceSize := LSurfaceRect.Size;
+  end;
+  //--
+  If not ALIsCanvasNull(ACanvas) then
+    ARect := ARect.CenterAt(LocalRect);
+end;
+
+{************************}
+Procedure TALButton.DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; Const ARect: TrectF);
+begin
+  if (FCurrentStateStyle = nil) or (not FCurrentStateStyle.StateLayer.HasFill) then
+    exit;
+  {$IF defined(DEBUG)}
+  if not FCurrentStateStyle.Superseded then
+    Raise Exception.Create('Error #828F2B09-D501-41BB-99D3-A06A467CC3D9');
+  {$ENDIF}
+  var LFillColor: TalphaColor;
+  if FCurrentStateStyle.StateLayer.UseContentColor then LFillColor := FCurrentStateStyle.TextSettings.Font.Color
+  else LFillColor := FCurrentStateStyle.StateLayer.Color;
+  ALDrawRectangle(
+    ACanvas, // const ACanvas: TALCanvas;
+    1, // const AScale: Single;
+    ARect, // const ADstRect: TrectF;
+    FCurrentStateStyle.StateLayer.Opacity, // const AOpacity: Single;
+    LFillColor, // const AFillColor: TAlphaColor;
+    FCurrentStateStyle.StateLayer.Gradient.Style, // const AFillGradientStyle: TGradientStyle;
+    FCurrentStateStyle.StateLayer.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
+    FCurrentStateStyle.StateLayer.Gradient.Offsets, // const AFillGradientOffsets: TArray<Single>;
+    FCurrentStateStyle.StateLayer.Gradient.Angle, // const AFillGradientAngle: Single;
+    FCurrentStateStyle.StateLayer.ResourceName, // const AFillResourceName: String;
+    FCurrentStateStyle.StateLayer.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    FCurrentStateStyle.StateLayer.Padding.Rect, // Const AFillPaddingRect: TRectF;
+    TAlphaColors.Null, // const AStrokeColor: TalphaColor;
+    0, // const AStrokeThickness: Single;
+    TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    0, // const AShadowBlur: Single;
+    0, // const AShadowOffsetX: Single;
+    0, // const AShadowOffsetY: Single;
+    AllSides, // const ASides: TSides;
+    AllCorners, // const ACorners: TCorners;
+    FCurrentStateStyle.StateLayer.XRadius, // const AXRadius: Single;
+    FCurrentStateStyle.StateLayer.YRadius); // const AYRadius: Single)
+end;
+
+{************************}
 procedure TALButton.Paint;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _DrawMultilineText(const AStateStyle: TBaseStateStyle);
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DrawMultilineText(const AFromStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
     {$IF DEFINED(ALSkiaCanvas)}
-    AStateStyle.SupersedeNoChanges;
+    var LStateStyle := AFromStateStyle;
+    if LStateStyle = nil then LStateStyle := AToStateStyle;
+    if LStateStyle = nil then
+      raise Exception.Create('Error 45CB6D22-AB78-4857-B03F-1636E5184C12');
+    FCurrentStateStyle := LStateStyle;
+    LStateStyle.SupersedeNoChanges(true{ASaveState});
     try
-      var LTextBroken: Boolean;
-      var LAllTextDrawn: Boolean;
-      var LElements: TALTextElements;
-      DrawMultilineText(
-        Procedure(var ARect: TrectF)
-        begin
-          ARect := ARect.CenterAt(LocalRect);
-        end, // const AOnAdjustRect: TALMultiLineTextAdjustRectProc;
-        LTextBroken, // out ATextBroken: Boolean;
-        LAllTextDrawn, // out AAllTextDrawn: Boolean;
-        LElements, // out AElements: TALTextElements;
-        AStateStyle.Text, // const AText: String;
-        AStateStyle.TextSettings.Font, // const AFont: TALFont;
-        AStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
-        AStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
-        AStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
-        AStateStyle.Fill, // const AFill: TALBrush;
-        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        AStateStyle.Shadow); // const AShadow: TALShadow);
+      if FStateTransitionAnimation.Enabled then begin
+        if AFromStateStyle = nil then LStateStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FStateTransitionAnimation.CurrentValue)
+        else if AToStateStyle = nil then LStateStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FStateTransitionAnimation.CurrentValue)
+        else begin
+          AToStateStyle.SupersedeNoChanges(true{ASaveState});
+          try
+            LStateStyle{AFromStateStyle}.InterpolateNoChanges(AToStateStyle{AToStateStyle}, FStateTransitionAnimation.CurrentValue);
+          finally
+            AToStateStyle.RestorestateNoChanges;
+          end;
+        end;
+      end;
+      // Using a matrix on the canvas results in smoother animations compared to using
+      // Ascale with DrawMultilineText. This is because changes in scale affect the font size,
+      // leading to rounding issues (I spent many hours looking for a way to avoid this).
+      // If there is an animation, it appears jerky because the text position
+      // shifts up or down with scale changes due to pixel alignment.
+      var LCanvasSaveState: TCanvasSaveState := nil;
+      if Not LStateStyle.Scale.Inherit then begin
+        LCanvasSaveState := Canvas.SaveState;
+        Var LAbsoluteRect := AbsoluteRect;
+        var LMatrix := TMatrix.CreateTranslation(-LAbsoluteRect.Left, -LAbsoluteRect.Top);
+        LMatrix := LMatrix * TMatrix.CreateScaling(LStateStyle.Scale.x, LStateStyle.Scale.y);
+        LMatrix := LMatrix * TMatrix.CreateTranslation(
+                               LAbsoluteRect.Left - (((LAbsoluteRect.Width * LStateStyle.Scale.x) - LAbsoluteRect.Width) / 2),
+                               LAbsoluteRect.Top - (((LAbsoluteRect.height * LStateStyle.Scale.y) - LAbsoluteRect.Height) / 2));
+        Canvas.SetMatrix(Canvas.Matrix * LMatrix);
+      end;
+      try
+        var LTextBroken: Boolean;
+        var LAllTextDrawn: Boolean;
+        var LElements: TALTextElements;
+        DrawMultilineText(
+          LTextBroken, // out ATextBroken: Boolean;
+          LAllTextDrawn, // out AAllTextDrawn: Boolean;
+          LElements, // out AElements: TALTextElements;
+          1{Ascale},
+          LStateStyle.Text, // const AText: String;
+          LStateStyle.TextSettings.Font, // const AFont: TALFont;
+          LStateStyle.TextSettings.Decoration, // const ADecoration: TALTextDecoration;
+          LStateStyle.TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
+          LStateStyle.TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
+          LStateStyle.Fill, // const AFill: TALBrush;
+          LStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+          LStateStyle.Shadow); // const AShadow: TALShadow);
+      finally
+        if Not LStateStyle.Scale.Inherit then
+          Canvas.RestoreState(LCanvasSaveState);
+      end;
     finally
-      AStateStyle.ReinstateNoChanges;
+      LStateStyle.RestorestateNoChanges;
+      FCurrentStateStyle := nil;
     end;
     {$ELSE}
     {$IF defined(DEBUG)}
@@ -4464,7 +4877,13 @@ begin
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
 
-  if Not Enabled then begin
+  var LStateStyle := GetCurrentStateStyle;
+
+  If FStateTransitionAnimation.Enabled then begin
+    LDrawable := ALNullDrawable;
+    LDrawableRect := TRectF.Empty;
+  end
+  else if Not Enabled then begin
     LDrawable := fBufDisabledDrawable;
     LDrawableRect := fBufDisabledDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
@@ -4506,19 +4925,33 @@ begin
   end;
 
   if ALIsDrawableNull(LDrawable) then begin
-    if Not Enabled then _DrawMultilineText(StateStyles.Disabled)
-    else if Pressed then _DrawMultilineText(StateStyles.Pressed)
-    else if IsFocused then _DrawMultilineText(StateStyles.Focused)
-    else if IsMouseOver then _DrawMultilineText(StateStyles.Hovered)
+    if FStateTransitionAnimation.Enabled then _DrawMultilineText(FStateTransitionFrom, FStateTransitionTo)
+    else if Not Enabled then _DrawMultilineText(StateStyles.Disabled, StateStyles.Disabled)
+    else if Pressed then _DrawMultilineText(StateStyles.Pressed, StateStyles.Pressed)
+    else if IsFocused then _DrawMultilineText(StateStyles.Focused, StateStyles.Focused)
+    else if IsMouseOver then _DrawMultilineText(StateStyles.Hovered, StateStyles.Hovered)
     else inherited Paint;
     exit;
   end;
 
-  ALDrawDrawable(
-    Canvas, // const ACanvas: Tcanvas;
-    LDrawable, // const ADrawable: TALDrawable;
-    LDrawableRect.TopLeft, // const ATopLeft: TpointF;
-    AbsoluteOpacity); // const AOpacity: Single);
+  if (LStateStyle <> nil) and (not LStateStyle.Scale.Inherit) then begin
+    var LDstRect := LDrawableRect;
+    LDstRect.Width := LDstRect.Width * LStateStyle.Scale.x;
+    LDstRect.Height := LDstRect.Height * LStateStyle.Scale.y;
+    LDstRect := LdstRect.CenterAt(LDrawableRect);
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LDrawable, // const ADrawable: TALDrawable;
+      LDstRect.TopLeft, // const ADstRect: TrectF; // IN Virtual pixels !
+      AbsoluteOpacity); // const AOpacity: Single);
+  end
+  else begin
+    ALDrawDrawable(
+      Canvas, // const ACanvas: Tcanvas;
+      LDrawable, // const ADrawable: TALDrawable;
+      LDrawableRect.TopLeft, // const ATopLeft: TpointF;
+      AbsoluteOpacity); // const AOpacity: Single);
+  end;
 
 end;
 

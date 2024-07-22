@@ -39,6 +39,7 @@ uses
   FMX.Filter,
   FMX.Effects,
   FMX.controls,
+  Alcinoe.FMX.Ani,
   ALcinoe.FMX.Controls,
   Alcinoe.FMX.ScrollEngine;
 
@@ -163,19 +164,27 @@ type
     {$ENDIF}
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // !! This class is duplicated inside TALPosition !!
   TALPersistentObserver = class(TPersistent)
   private
     FUpdateCount: Integer;
     FIsChanged: Boolean;
     FOnChanged: TNotifyEvent;
+    FSavedStates: TObjectQueue<TALPersistentObserver>;
     procedure DoChanged; virtual;
+  protected
+    function CreateSavedState: TALPersistentObserver; virtual;
   public
     constructor Create; virtual;
+    destructor Destroy; override;
     procedure Reset; virtual;
     procedure BeginUpdate; virtual;
     procedure EndUpdate; virtual;
     procedure EndUpdateNoChanges; virtual;
+    procedure SaveState; virtual;
+    procedure RestoreState; virtual;
+    procedure RestoreStateNoChanges; virtual;
     procedure Change; virtual;
     property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
     property IsChanged: Boolean read FIsChanged write FIsChanged;
@@ -229,20 +238,18 @@ type
   private
     FParent: TALShadow;
     FInherit: Boolean;
-    fSuperseded: Integer;
-    FPriorSupersedeBlur: Single;
-    FPriorSupersedeOffsetX: Single;
-    FPriorSupersedeOffsetY: Single;
-    FPriorSupersedeColor: TAlphaColor;
+    fSuperseded: Boolean;
     procedure SetInherit(const AValue: Boolean);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+    procedure DoSupersede; virtual;
   public
     constructor Create(const AParent: TALShadow); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
     property Parent: TALShadow read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
@@ -333,7 +340,7 @@ type
     function IsThicknessMultiplierStored: Boolean;
     function IsColorStored: Boolean;
   public
-    constructor Create; reintroduce; virtual;
+    constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single); virtual;
@@ -361,8 +368,9 @@ type
     procedure SetDecoration(const AValue: TALTextDecoration);
     procedure FontChanged(ASender: TObject);
     procedure DecorationChanged(ASender: TObject);
+    function IsInheritStored: Boolean;
   public
-    constructor Create; reintroduce; virtual;
+    constructor Create; override;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
@@ -370,7 +378,7 @@ type
     procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
     property DefaultInherit: Boolean read FDefaultInherit write FDefaultInherit;
   published
-    property Inherit: Boolean read FInherit write SetInherit Default True;
+    property Inherit: Boolean read FInherit write SetInherit stored IsInheritStored;
     property Font: TALFont read FFont write SetFont;
     property Decoration: TALTextDecoration read FDecoration write SetDecoration;
   end;
@@ -472,47 +480,18 @@ type
   private
     FParent: TALBaseTextSettings;
     FInherit: Boolean;
-    fSuperseded: Integer;
-    FPriorSupersedeFontFamily: TFontName;
-    FPriorSupersedeFontSize: Single;
-    FPriorSupersedeFontWeight: TFontWeight;
-    FPriorSupersedeFontSlant: TFontSlant;
-    FPriorSupersedeFontStretch: TFontStretch;
-    FPriorSupersedeFontColor: TAlphaColor;
-    FPriorSupersedeFontAutoConvert: Boolean;
-    FPriorSupersedeDecorationKinds: TALTextDecorationKinds;
-    FPriorSupersedeDecorationStyle: TALTextDecorationStyle;
-    FPriorSupersedeDecorationThicknessMultiplier: Single;
-    FPriorSupersedeDecorationColor: TAlphaColor;
-    FPriorSupersedeEllipsis: String;
-    FPriorSupersedeEllipsisSettingsInherit: Boolean;
-    FPriorSupersedeEllipsisSettingsFontFamily: TFontName;
-    FPriorSupersedeEllipsisSettingsFontSize: Single;
-    FPriorSupersedeEllipsisSettingsFontWeight: TFontWeight;
-    FPriorSupersedeEllipsisSettingsFontSlant: TFontSlant;
-    FPriorSupersedeEllipsisSettingsFontStretch: TFontStretch;
-    FPriorSupersedeEllipsisSettingsFontColor: TAlphaColor;
-    FPriorSupersedeEllipsisSettingsFontAutoConvert: Boolean;
-    FPriorSupersedeEllipsisSettingsDecorationKinds: TALTextDecorationKinds;
-    FPriorSupersedeEllipsisSettingsDecorationStyle: TALTextDecorationStyle;
-    FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier: Single;
-    FPriorSupersedeEllipsisSettingsDecorationColor: TAlphaColor;
-    FPriorSupersedeTrimming: TALTextTrimming;
-    FPriorSupersedeMaxLines: integer;
-    FPriorSupersedeHorzAlign: TALTextHorzAlign;
-    FPriorSupersedeVertAlign: TALTextVertAlign;
-    FPriorSupersedeLineHeightMultiplier: Single;
-    FPriorSupersedeLetterSpacing: Single;
-    FPriorSupersedeIsHtml: Boolean;
+    fSuperseded: Boolean;
     procedure SetInherit(const AValue: Boolean);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+    procedure DoSupersede; virtual;
   public
     constructor Create(const AParent: TALBaseTextSettings); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
     property Parent: TALBaseTextSettings read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
@@ -588,6 +567,8 @@ type
   protected
     procedure DefineProperties(Filer: TFiler); override;
   {$ENDIF}
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
   public
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     destructor Destroy; override;
@@ -613,24 +594,18 @@ type
   private
     FParent: TALBrush;
     FInherit: Boolean;
-    fSuperseded: Integer;
-    FPriorSupersedeColor: TAlphaColor;
-    FPriorSupersedeGradientStyle: TGradientStyle;
-    FPriorSupersedeGradientColors: TArray<TAlphaColor>;
-    FPriorSupersedeGradientOffsets: TArray<Single>;
-    FPriorSupersedeGradientAngle: Single;
-    FPriorSupersedeResourceName: String;
-    FPriorSupersedeWrapMode: TALImageWrapMode;
-    FPriorSupersedePaddingRect: TRectF;
+    fSuperseded: Boolean;
     procedure SetInherit(const AValue: Boolean);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+    procedure DoSupersede; virtual;
   public
     constructor Create(const AParent: TALBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
     property Parent: TALBrush read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
@@ -653,6 +628,8 @@ type
   protected
     procedure DefineProperties(Filer: TFiler); override;
   {$ENDIF}
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
   public
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
@@ -672,18 +649,18 @@ type
   private
     FParent: TALStrokeBrush;
     FInherit: Boolean;
-    FSuperseded: Integer;
-    FPriorSupersedeColor: TAlphaColor;
-    FPriorSupersedeThickness: Single;
+    fSuperseded: Boolean;
     procedure SetInherit(const AValue: Boolean);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+    procedure DoSupersede; virtual;
   public
     constructor Create(const AParent: TALStrokeBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
     property Parent: TALStrokeBrush read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
@@ -713,7 +690,7 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); reintroduce; virtual;
-    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
+    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single); reintroduce;
     function HasFill: boolean; override;
     function Styles: TALBrushStyles; override;
     property DefaultOpacity: Single read FDefaultOpacity write FDefaultOpacity;
@@ -734,9 +711,28 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALPosition = class(TPosition)
+  private
+    FUpdateCount: Integer;
+    FIsChanged: Boolean;
+    FOnChanged: TNotifyEvent;
+    FSavedStates: TObjectQueue<TALPosition>;
+    procedure DoChanged; virtual;
+  protected
+    function CreateSavedState: TALPosition; virtual;
   public
+    constructor Create(const ADefaultValue: TPointF); override;
+    destructor Destroy; override;
+    procedure Reset; virtual;
     procedure Interpolate(const ATo: TPosition; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TPosition; const ANormalizedTime: Single);
+    procedure BeginUpdate; virtual;
+    procedure EndUpdate; virtual;
+    procedure EndUpdateNoChanges; virtual;
+    procedure SaveState; virtual;
+    procedure RestoreState; virtual;
+    procedure RestoreStateNoChanges; virtual;
+    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
+    property IsChanged: Boolean read FIsChanged write FIsChanged;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -744,21 +740,51 @@ type
   private
     FParent: TPosition;
     FInherit: Boolean;
-    FSuperseded: Integer;
-    FPriorSupersedeX: Single;
-    FPriorSupersedeY: Single;
+    fSuperseded: Boolean;
     procedure SetInherit(const AValue: Boolean);
+  protected
+    function CreateSavedState: TALPosition; override;
+    procedure DoSupersede; virtual;
   public
     constructor Create(const AParent: TPosition; const ADefaultValue: TPointF); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
-    procedure Reset; virtual;
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
+    procedure Reset; override;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
     property Parent: TPosition read FParent;
   published
     property Inherit: Boolean read FInherit write SetInherit Default True;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALStateTransition = class(TALPersistentObserver)
+  private
+    FAnimationType: TAnimationType;
+    FDuration: Single;
+    FInterpolation: TALInterpolationType;
+    FDefaultAnimationType: TAnimationType;
+    FDefaultDuration: Single;
+    FDefaultInterpolation: TALInterpolationType;
+    procedure SetAnimationType(const Value: TAnimationType);
+    procedure SetDuration(const Value: Single);
+    procedure SetInterpolation(const Value: TALInterpolationType);
+    function IsAnimationTypeStored: Boolean;
+    function IsDurationStored: Boolean;
+    function IsInterpolationStored: Boolean;
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+  public
+    constructor Create(const ADefaultDuration: Single); reintroduce; virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    property DefaultAnimationType: TAnimationType read FDefaultAnimationType write FDefaultAnimationType;
+    property DefaultDuration: Single read FDefaultDuration write FDefaultDuration;
+    property DefaultInterpolation: TALInterpolationType read FDefaultInterpolation write FDefaultInterpolation;
+  published
+    property AnimationType: TAnimationType read FAnimationType write SetAnimationType stored IsAnimationTypeStored;
+    property Duration: Single read FDuration write SetDuration stored IsDurationStored nodefault;
+    property Interpolation: TALInterpolationType read FInterpolation write SetInterpolation stored IsInterpolationStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -771,45 +797,43 @@ type
     FStroke: TALInheritStrokeBrush;
     FShadow: TALInheritShadow;
     FScale: TALInheritPosition;
-    FTransitionDuration: Single;
-    FDefaultTransitionDuration: Single;
-    fSuperseded: Integer;
+    FTransition: TALStateTransition;
+    fSuperseded: Boolean;
     procedure SetFill(const AValue: TALInheritBrush);
     procedure SetStateLayer(const AValue: TALStateLayer);
     procedure SetStroke(const AValue: TALInheritStrokeBrush);
     procedure SetShadow(const AValue: TALInheritShadow);
     procedure SetScale(const Value: TALInheritPosition);
-    procedure SetTransitionDuration(const Value: Single);
+    procedure SetTransition(const Value: TALStateTransition);
     procedure FillChanged(ASender: TObject);
     procedure StateLayerChanged(ASender: TObject);
     procedure StrokeChanged(ASender: TObject);
     procedure ShadowChanged(ASender: TObject);
     procedure ScaleChanged(ASender: TObject);
-    function IsTransitionDurationStored: Boolean;
+    procedure TransitionChanged(ASender: TObject);
   protected
+    function CreateSavedState: TALPersistentObserver; override;
     function GetInherit: Boolean; virtual;
+    procedure DoSupersede; virtual;
     property Fill: TALInheritBrush read FFill write SetFill;
     property Shadow: TALInheritShadow read FShadow write SetShadow;
     property StateLayer: TALStateLayer read FStateLayer write SetStateLayer;
     property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
-    property StateStyleParent: TALBaseStateStyle read FStateStyleParent;
-    property ControlParent: TALControl read FControlParent;
-    procedure DoSupersede; virtual;
-    procedure DoReinstate; virtual;
     property Scale: TALInheritPosition read FScale write SetScale;
-    property TransitionDuration: Single read FTransitionDuration write SetTransitionDuration stored IsTransitionDurationStored nodefault;
+    property Transition: TALStateTransition read FTransition write SetTransition;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
-    procedure Supersede; virtual;
-    procedure Reinstate; virtual;
-    procedure SupersedeNoChanges;
-    procedure ReinstateNoChanges;
-    property DefaultTransitionDuration: Single read FDefaultTransitionDuration write FDefaultTransitionDuration;
+    procedure Supersede(Const ASaveState: Boolean = False); virtual;
+    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+    property Superseded: Boolean read FSuperseded;
+    property StateStyleParent: TALBaseStateStyle read FStateStyleParent;
+    property ControlParent: TALControl read FControlParent;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -853,8 +877,8 @@ Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffer
 procedure ALAutoSize(const AControl: TControl);
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single; overload;
-function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF; overload;
-function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single): single; overload;
+function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
+function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
 function  ALAlignToPixelRound(const Point: TPointF; const Scale: single): TpointF; overload;
 function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
 
@@ -1133,6 +1157,20 @@ begin
   FUpdateCount := 0;
   FIsChanged := False;
   FOnChanged := nil;
+  FSavedStates := nil;
+end;
+
+{************************************}
+destructor TALPersistentObserver.Destroy;
+begin
+  ALFreeAndNil(FSavedStates);
+  Inherited;
+end;
+
+{************************************}
+function TALPersistentObserver.CreateSavedState: TALPersistentObserver;
+begin
+  result := TALPersistentObserver(classtype.Create);
 end;
 
 {************************************}
@@ -1177,6 +1215,43 @@ begin
 end;
 
 {***************************************}
+procedure TALPersistentObserver.SaveState;
+begin
+  if FSavedStates = nil then
+    FSavedStates := TObjectQueue<TALPersistentObserver>.Create(True{AOwnsObjects});
+  var LSavedState := CreateSavedState;
+  if LSavedState.classtype <> classtype then
+    Raise Exception.create('The saved state type returned by "CreateSavedState" does not match the current object type');
+  LSavedState.Assign(self);
+  FSavedStates.Enqueue(LSavedState);
+end;
+
+{***************************************}
+procedure TALPersistentObserver.RestoreState;
+begin
+  if (FSavedStates = nil) or
+     (FSavedStates.Count = 0) then
+    raise Exception.Create('No saved state available');
+  var LSavedState := FSavedStates.extract;
+  try
+    Assign(LSavedState);
+  finally
+    ALFreeAndNil(LSavedState);
+  end;
+end;
+
+{***************************************}
+procedure TALPersistentObserver.RestoreStateNoChanges;
+begin
+  BeginUpdate;
+  try
+    RestoreState;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{***************************************}
 procedure TALPersistentObserver.DoChanged;
 begin
   if Assigned(OnChanged) then
@@ -1202,7 +1277,7 @@ constructor TALShadow.Create;
 begin
   inherited Create;
   //--
-  FDefaultblur := 12;
+  FDefaultblur := 0; // 12
   FDefaultOffsetX := 0;
   FDefaultOffsetY := 0;
   FDefaultColor := TAlphaColors.null; // $96000000;
@@ -1369,11 +1444,15 @@ begin
   inherited create;
   FParent := AParent;
   FInherit := True;
-  fSuperseded := 0;
-  //FPriorSupersedeBlur
-  //FPriorSupersedeOffsetX
-  //FPriorSupersedeOffsetY
-  //FPriorSupersedeColor
+  fSuperseded := False;
+end;
+
+{*********************************}
+function TALInheritShadow.CreateSavedState: TALPersistentObserver;
+type
+  TALInheritShadowClass = class of TALInheritShadow;
+begin
+  result := TALInheritShadowClass(classtype).Create(nil{AParent});
 end;
 
 {**********************************************************}
@@ -1390,10 +1469,14 @@ procedure TALInheritShadow.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritShadow then
-      Inherit := TALInheritShadow(Source).Inherit
-    else
+    if Source is TALInheritShadow then begin
+      Inherit := TALInheritShadow(Source).Inherit;
+      fSuperseded := TALInheritShadow(Source).fSuperseded;
+    end
+    else begin
       Inherit := False;
+      fSuperseded := False;
+    end;
     inherited Assign(Source);
   Finally
     EndUpdate;
@@ -1407,80 +1490,51 @@ begin
   Try
     inherited Reset;
     Inherit := True;
+    fSuperseded := False;
   finally
     EndUpdate;
   end;
 end;
 
 {******************}
-procedure TALInheritShadow.Supersede;
+procedure TALInheritShadow.DoSupersede;
 begin
+  Assign(FParent);
+end;
+
+{******************}
+procedure TALInheritShadow.Supersede(Const ASaveState: Boolean = False);
+begin
+  if ASaveState then SaveState;
+  if (FSuperseded) or
+     (not inherit) or
+     (FParent = nil) then exit;
   beginUpdate;
   try
-    if (not inherit) or
-       (FParent = nil) then exit;
-    inc(fSuperseded);
-    if (FSuperseded <> 1) then exit;
-
-    FPriorSupersedeBlur := Blur;
-    FPriorSupersedeOffsetX := OffsetX;
-    FPriorSupersedeOffsetY := OffsetY;
-    FPriorSupersedeColor := Color;
-    //--
     var LParentSuperseded := False;
     if FParent is TALInheritShadow then begin
-      TALInheritShadow(FParent).SupersedeNoChanges;
+      TALInheritShadow(FParent).SupersedeNoChanges(true{ASaveState});
       LParentSuperseded := True;
     end;
     try
-      Blur := FParent.blur;
-      OffsetX := FParent.OffsetX;
-      OffsetY := FParent.OffsetY;
-      Color := FParent.Color;
+      DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritShadow(FParent).ReinstateNoChanges;
+        TALInheritShadow(FParent).restoreState;
     end;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALInheritShadow.Reinstate;
-begin
-  beginUpdate;
-  try
-    if fSuperseded <= 0 then exit;
-    dec(fSuperseded);
-    if fSuperseded = 0 then begin
-      Blur := FPriorSupersedeblur;
-      OffsetX := FPriorSupersedeOffsetX;
-      OffsetY := FPriorSupersedeOffsetY;
-      Color := FPriorSupersedeColor;
-    end;
+    Inherit := False;
+    FSuperseded := True;
   finally
     EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALInheritShadow.SupersedeNoChanges;
+procedure TALInheritShadow.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
-    Supersede;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{*************************}
-procedure TALInheritShadow.ReinstateNoChanges;
-begin
-  BeginUpdate;
-  try
-    Reinstate;
+    Supersede(ASaveState);
   finally
     EndUpdateNoChanges;
   end;
@@ -2019,6 +2073,12 @@ begin
   Change;
 end;
 
+{****************************************************}
+function TALEllipsisSettings.IsInheritStored: Boolean;
+begin
+  Result := FInherit <> FDefaultInherit;
+end;
+
 {**************************************************************}
 procedure TALEllipsisSettings.SetInherit(const AValue: Boolean);
 begin
@@ -2218,7 +2278,7 @@ begin
       EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime);
       Ellipsis := ATo.Ellipsis;
       Trimming := ATo.Trimming;
-      MaxLines := DefaultMaxLines;
+      MaxLines := ATo.MaxLines;
       HorzAlign := ATo.HorzAlign;
       VertAlign := ATo.VertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, ATo.LineHeightMultiplier{Stop}, ANormalizedTime);
@@ -2416,48 +2476,15 @@ begin
   inherited create;
   FParent := AParent;
   FInherit := True;
-  // Font size = 0 mean inherit the font size
-  Font.DefaultSize := 0;
-  Font.Size := Font.DefaultSize;
-  // Font family = '' mean inherit the font family
-  Font.DefaultFamily := '';
-  Font.Family := Font.DefaultFamily;
-  // Font Color = Null mean inherit the font Color
-  Font.DefaultColor := TAlphaColors.Null;
-  Font.Color := Font.DefaultColor;
+  fSuperseded := False;
+end;
 
-  fSuperseded := 0;
-  //FPriorSupersedeFontFamily
-  //FPriorSupersedeFontSize
-  //FPriorSupersedeFontWeight
-  //FPriorSupersedeFontSlant
-  //FPriorSupersedeFontStretch
-  //FPriorSupersedeFontColor
-  //FPriorSupersedeFontAutoConvert
-  //FPriorSupersedeDecorationKinds
-  //FPriorSupersedeDecorationStyle
-  //FPriorSupersedeDecorationThicknessMultiplier
-  //FPriorSupersedeDecorationColor
-  //FPriorSupersedeEllipsis: String;
-  //FPriorSupersedeEllipsisSettingsInherit
-  //FPriorSupersedeEllipsisSettingsFontFamily
-  //FPriorSupersedeEllipsisSettingsFontSize
-  //FPriorSupersedeEllipsisSettingsFontWeight
-  //FPriorSupersedeEllipsisSettingsFontSlant
-  //FPriorSupersedeEllipsisSettingsFontStretch
-  //FPriorSupersedeEllipsisSettingsFontColor
-  //FPriorSupersedeEllipsisSettingsFontAutoConvert
-  //FPriorSupersedeEllipsisSettingsDecorationKinds
-  //FPriorSupersedeEllipsisSettingsDecorationStyle
-  //FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier
-  //FPriorSupersedeEllipsisSettingsDecorationColor
-  //FPriorSupersedeTrimming: TALTextTrimming;
-  //FPriorSupersedeMaxLines: integer;
-  //FPriorSupersedeHorzAlign: TALTextHorzAlign;
-  //FPriorSupersedeVertAlign: TALTextVertAlign;
-  //FPriorSupersedeLineHeightMultiplier
-  //FPriorSupersedeLetterSpacing
-  //FPriorSupersedeIsHtml
+{*********************************}
+function TALInheritBaseTextSettings.CreateSavedState: TALPersistentObserver;
+type
+  TALInheritBaseTextSettingsClass = class of TALInheritBaseTextSettings;
+begin
+  result := TALInheritBaseTextSettingsClass(classtype).Create(nil{AParent});
 end;
 
 {**********************************************************}
@@ -2474,10 +2501,14 @@ procedure TALInheritBaseTextSettings.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritBaseTextSettings then
-      Inherit := TALInheritBaseTextSettings(Source).Inherit
-    else
+    if Source is TALInheritBaseTextSettings then begin
+      Inherit := TALInheritBaseTextSettings(Source).Inherit;
+      fSuperseded := TALInheritBaseTextSettings(Source).fSuperseded;
+    end
+    else begin
       Inherit := False;
+      fSuperseded := False;
+    end;
     inherited Assign(Source);
   Finally
     EndUpdate;
@@ -2491,168 +2522,51 @@ begin
   Try
     inherited Reset;
     Inherit := True;
+    fSuperseded := False;
   finally
     EndUpdate;
   end;
 end;
 
 {******************}
-procedure TALInheritBaseTextSettings.Supersede;
+procedure TALInheritBaseTextSettings.DoSupersede;
 begin
+  Assign(FParent);
+end;
+
+{******************}
+procedure TALInheritBaseTextSettings.Supersede(Const ASaveState: Boolean = False);
+begin
+  if ASaveState then SaveState;
+  if (FSuperseded) or
+     (not inherit) or
+     (FParent = nil) then exit;
   beginUpdate;
   try
-    if (FParent = nil) then exit;
-    inc(fSuperseded);
-    if (FSuperseded <> 1) then exit;
-
-    FPriorSupersedeFontFamily := Font.Family;
-    FPriorSupersedeFontSize := Font.Size;
-    FPriorSupersedeFontWeight := Font.Weight;
-    FPriorSupersedeFontSlant := Font.Slant;
-    FPriorSupersedeFontStretch := Font.Stretch;
-    FPriorSupersedeFontColor := Font.Color;
-    FPriorSupersedeFontAutoConvert := Font.AutoConvert;
-    FPriorSupersedeDecorationKinds := Decoration.Kinds;
-    FPriorSupersedeDecorationStyle := Decoration.Style;
-    FPriorSupersedeDecorationThicknessMultiplier := Decoration.ThicknessMultiplier;
-    FPriorSupersedeDecorationColor := Decoration.Color;
-    FPriorSupersedeEllipsis := Ellipsis;
-    FPriorSupersedeEllipsisSettingsInherit := EllipsisSettings.Inherit;
-    FPriorSupersedeEllipsisSettingsFontFamily := EllipsisSettings.Font.Family;
-    FPriorSupersedeEllipsisSettingsFontSize := EllipsisSettings.Font.Size;
-    FPriorSupersedeEllipsisSettingsFontWeight := EllipsisSettings.Font.Weight;
-    FPriorSupersedeEllipsisSettingsFontSlant := EllipsisSettings.Font.Slant;
-    FPriorSupersedeEllipsisSettingsFontStretch := EllipsisSettings.Font.Stretch;
-    FPriorSupersedeEllipsisSettingsFontColor := EllipsisSettings.Font.Color;
-    FPriorSupersedeEllipsisSettingsFontAutoConvert := EllipsisSettings.Font.AutoConvert;
-    FPriorSupersedeEllipsisSettingsDecorationKinds := EllipsisSettings.Decoration.Kinds;
-    FPriorSupersedeEllipsisSettingsDecorationStyle := EllipsisSettings.Decoration.Style;
-    FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier := EllipsisSettings.Decoration.ThicknessMultiplier;
-    FPriorSupersedeEllipsisSettingsDecorationColor := EllipsisSettings.Decoration.Color;
-    FPriorSupersedeTrimming := Trimming;
-    FPriorSupersedeMaxLines := MaxLines;
-    FPriorSupersedeHorzAlign := HorzAlign;
-    FPriorSupersedeVertAlign := VertAlign;
-    FPriorSupersedeLineHeightMultiplier := LineHeightMultiplier;
-    FPriorSupersedeLetterSpacing := LetterSpacing;
-    FPriorSupersedeIsHtml := IsHtml;
-    //--
     var LParentSuperseded := False;
     if FParent is TALInheritBaseTextSettings then begin
-      TALInheritBaseTextSettings(FParent).SupersedeNoChanges;
+      TALInheritBaseTextSettings(FParent).SupersedeNoChanges(true{ASaveState});
       LParentSuperseded := True;
     end;
     try
-      if inherit then begin
-        Font.Family := FParent.Font.Family;
-        Font.Size := FParent.Font.Size;
-        Font.Weight := FParent.Font.Weight;
-        Font.Slant := FParent.Font.Slant;
-        Font.Stretch := FParent.Font.Stretch;
-        Font.Color := FParent.Font.Color;
-        Font.AutoConvert := FParent.Font.AutoConvert;
-        Decoration.Kinds := FParent.Decoration.Kinds;
-        Decoration.Style := FParent.Decoration.Style;
-        Decoration.ThicknessMultiplier := FParent.Decoration.ThicknessMultiplier;
-        Decoration.Color := FParent.Decoration.Color;
-        Ellipsis := FParent.Ellipsis;
-        EllipsisSettings.Inherit := FParent.EllipsisSettings.Inherit;
-        EllipsisSettings.Font.Family := FParent.EllipsisSettings.Font.Family;
-        EllipsisSettings.Font.Size := FParent.EllipsisSettings.Font.Size;
-        EllipsisSettings.Font.Weight := FParent.EllipsisSettings.Font.Weight;
-        EllipsisSettings.Font.Slant := FParent.EllipsisSettings.Font.Slant;
-        EllipsisSettings.Font.Stretch := FParent.EllipsisSettings.Font.Stretch;
-        EllipsisSettings.Font.Color := FParent.EllipsisSettings.Font.Color;
-        EllipsisSettings.Font.AutoConvert := FParent.EllipsisSettings.Font.AutoConvert;
-        EllipsisSettings.Decoration.Kinds := FParent.EllipsisSettings.Decoration.Kinds;
-        EllipsisSettings.Decoration.Style := FParent.EllipsisSettings.Decoration.Style;
-        EllipsisSettings.Decoration.ThicknessMultiplier := FParent.EllipsisSettings.Decoration.ThicknessMultiplier;
-        EllipsisSettings.Decoration.Color := FParent.EllipsisSettings.Decoration.Color;
-        Trimming := FParent.Trimming;
-        MaxLines := FParent.MaxLines;
-        HorzAlign := FParent.HorzAlign;
-        VertAlign := FParent.VertAlign;
-        LineHeightMultiplier := FParent.LineHeightMultiplier;
-        LetterSpacing := FParent.LetterSpacing;
-        IsHtml := FParent.IsHtml;
-      end
-      else begin
-        (* todo delete *)
-        if Font.Family = '' then Font.Family := FParent.Font.Family;
-        if SameValue(Font.Size, 0, TEpsilon.FontSize) then Font.Size := FParent.Font.Size;
-        if Font.Color = TAlphaColors.Null then Font.Color := FParent.Font.Color;
-      end;
+      DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritBaseTextSettings(FParent).ReinstateNoChanges;
+        TALInheritBaseTextSettings(FParent).restoreState;
     end;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALInheritBaseTextSettings.Reinstate;
-begin
-  beginUpdate;
-  try
-    if fSuperseded <= 0 then exit;
-    dec(fSuperseded);
-    if fSuperseded = 0 then begin
-      Font.Family := FPriorSupersedeFontFamily;
-      Font.Size := FPriorSupersedeFontSize;
-      Font.Weight := FPriorSupersedeFontWeight;
-      Font.Slant := FPriorSupersedeFontSlant;
-      Font.Stretch := FPriorSupersedeFontStretch;
-      Font.Color := FPriorSupersedeFontColor;
-      Font.AutoConvert := FPriorSupersedeFontAutoConvert;
-      Decoration.Kinds := FPriorSupersedeDecorationKinds;
-      Decoration.Style := FPriorSupersedeDecorationStyle;
-      Decoration.ThicknessMultiplier := FPriorSupersedeDecorationThicknessMultiplier;
-      Decoration.Color := FPriorSupersedeDecorationColor;
-      Ellipsis := FPriorSupersedeEllipsis;
-      EllipsisSettings.Inherit := FPriorSupersedeEllipsisSettingsInherit;
-      EllipsisSettings.Font.Family := FPriorSupersedeEllipsisSettingsFontFamily;
-      EllipsisSettings.Font.Size := FPriorSupersedeEllipsisSettingsFontSize;
-      EllipsisSettings.Font.Weight := FPriorSupersedeEllipsisSettingsFontWeight;
-      EllipsisSettings.Font.Slant := FPriorSupersedeEllipsisSettingsFontSlant;
-      EllipsisSettings.Font.Stretch := FPriorSupersedeEllipsisSettingsFontStretch;
-      EllipsisSettings.Font.Color := FPriorSupersedeEllipsisSettingsFontColor;
-      EllipsisSettings.Font.AutoConvert := FPriorSupersedeEllipsisSettingsFontAutoConvert;
-      EllipsisSettings.Decoration.Kinds := FPriorSupersedeEllipsisSettingsDecorationKinds;
-      EllipsisSettings.Decoration.Style := FPriorSupersedeEllipsisSettingsDecorationStyle;
-      EllipsisSettings.Decoration.ThicknessMultiplier := FPriorSupersedeEllipsisSettingsDecorationThicknessMultiplier;
-      EllipsisSettings.Decoration.Color := FPriorSupersedeEllipsisSettingsDecorationColor;
-      Trimming := FPriorSupersedeTrimming;
-      MaxLines := FPriorSupersedeMaxLines;
-      HorzAlign := FPriorSupersedeHorzAlign;
-      VertAlign := FPriorSupersedeVertAlign;
-      LineHeightMultiplier := FPriorSupersedeLineHeightMultiplier;
-      LetterSpacing := FPriorSupersedeLetterSpacing;
-      IsHtml := FPriorSupersedeIsHtml;
-    end;
+    Inherit := False;
+    FSuperseded := True;
   finally
     EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALInheritBaseTextSettings.SupersedeNoChanges;
+procedure TALInheritBaseTextSettings.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
-    Supersede;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{*************************}
-procedure TALInheritBaseTextSettings.ReinstateNoChanges;
-begin
-  BeginUpdate;
-  try
-    Reinstate;
+    Supersede(ASaveState);
   finally
     EndUpdateNoChanges;
   end;
@@ -3105,6 +3019,14 @@ begin
 end;
 
 {*********************************}
+function TALBrush.CreateSavedState: TALPersistentObserver;
+type
+  TALBrushClass = class of TALBrush;
+begin
+  result := TALBrushClass(classtype).Create(DefaultColor);
+end;
+
+{*********************************}
 {$IF defined(ALBackwardCompatible)}
 procedure TALBrush.DefineProperties(Filer: TFiler);
 begin
@@ -3288,15 +3210,15 @@ begin
   inherited create(ADefaultColor);
   FParent := AParent;
   FInherit := True;
-  fSuperseded := 0;
-  //FPriorSupersedeColor
-  //FPriorSupersedeGradientStyle
-  //FPriorSupersedeGradientColors
-  //FPriorSupersedeGradientOffsets
-  //FPriorSupersedeGradientAngle
-  //FPriorSupersedeResourceName
-  //FPriorSupersedeWrapMode
-  //FPriorSupersedePaddingRect
+  fSuperseded := False;
+end;
+
+{*********************************}
+function TALInheritBrush.CreateSavedState: TALPersistentObserver;
+type
+  TALInheritBrushClass = class of TALInheritBrush;
+begin
+  result := TALInheritBrushClass(classtype).Create(nil{AParent}, DefaultColor);
 end;
 
 {**********************************************************}
@@ -3313,10 +3235,14 @@ procedure TALInheritBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritBrush then
-      Inherit := TALInheritBrush(Source).Inherit
-    else
+    if Source is TALInheritBrush then begin
+      Inherit := TALInheritBrush(Source).Inherit;
+      fSuperseded := TALInheritBrush(Source).fSuperseded;
+    end
+    else begin
       Inherit := False;
+      fSuperseded := False;
+    end;
     inherited Assign(Source);
   Finally
     EndUpdate;
@@ -3330,92 +3256,51 @@ begin
   Try
     inherited Reset;
     Inherit := True;
+    fSuperseded := False;
   finally
     EndUpdate;
   end;
 end;
 
 {******************}
-procedure TALInheritBrush.Supersede;
+procedure TALInheritBrush.DoSupersede;
 begin
+  Assign(FParent);
+end;
+
+{******************}
+procedure TALInheritBrush.Supersede(Const ASaveState: Boolean = False);
+begin
+  if ASaveState then SaveState;
+  if (FSuperseded) or
+     (not inherit) or
+     (FParent = nil) then exit;
   beginUpdate;
   try
-    if (not inherit) or
-       (FParent = nil) then exit;
-    inc(fSuperseded);
-    if (FSuperseded <> 1) then exit;
-
-    FPriorSupersedeColor := Color;
-    FPriorSupersedeGradientStyle := Gradient.Style;
-    FPriorSupersedeGradientColors := Gradient.Colors;
-    FPriorSupersedeGradientOffsets := Gradient.Offsets;
-    FPriorSupersedeGradientAngle := Gradient.Angle;
-    FPriorSupersedeResourceName := ResourceName;
-    FPriorSupersedeWrapMode := WrapMode;
-    FPriorSupersedePaddingRect := Padding.Rect;
-    //--
     var LParentSuperseded := False;
     if FParent is TALInheritBrush then begin
-      TALInheritBrush(FParent).SupersedeNoChanges;
+      TALInheritBrush(FParent).SupersedeNoChanges(true{ASaveState});
       LParentSuperseded := True;
     end;
     try
-      Color := FParent.Color;
-      Gradient.Style := FParent.Gradient.Style;
-      Gradient.Colors := FParent.Gradient.Colors;
-      Gradient.Offsets := FParent.Gradient.Offsets;
-      Gradient.Angle := FParent.Gradient.Angle;
-      ResourceName := FParent.ResourceName;
-      WrapMode := FParent.WrapMode;
-      Padding.Rect := FParent.Padding.Rect;
+      DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritBrush(FParent).ReinstateNoChanges;
+        TALInheritBrush(FParent).restoreState;
     end;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALInheritBrush.Reinstate;
-begin
-  beginUpdate;
-  try
-    if fSuperseded <= 0 then exit;
-    dec(fSuperseded);
-    if fSuperseded = 0 then begin
-      Color := FPriorSupersedeColor;
-      Gradient.Style := FPriorSupersedeGradientStyle;
-      Gradient.Colors := FPriorSupersedeGradientColors;
-      Gradient.Offsets := FPriorSupersedeGradientOffsets;
-      Gradient.Angle := FPriorSupersedeGradientAngle;
-      ResourceName := FPriorSupersedeResourceName;
-      WrapMode := FPriorSupersedeWrapMode;
-      Padding.Rect := FPriorSupersedePaddingRect;
-    end;
+    Inherit := False;
+    FSuperseded := True;
   finally
     EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALInheritBrush.SupersedeNoChanges;
+procedure TALInheritBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
-    Supersede;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{*************************}
-procedure TALInheritBrush.ReinstateNoChanges;
-begin
-  BeginUpdate;
-  try
-    Reinstate;
+    Supersede(ASaveState);
   finally
     EndUpdateNoChanges;
   end;
@@ -3431,6 +3316,14 @@ begin
   //--
   FColor := FDefaultColor;
   FThickness := FDefaultThickness;
+end;
+
+{*********************************}
+function TALStrokeBrush.CreateSavedState: TALPersistentObserver;
+type
+  TALStrokeBrushClass = class of TALStrokeBrush;
+begin
+  result := TALStrokeBrushClass(classtype).Create(DefaultColor);
 end;
 
 {*********************************}
@@ -3552,9 +3445,15 @@ begin
   inherited create(ADefaultColor);
   FParent := AParent;
   FInherit := True;
-  FSuperseded := 0;
-  //FPriorSupersedeColor
-  //FPriorSupersedeThickness
+  fSuperseded := False;
+end;
+
+{*********************************}
+function TALInheritStrokeBrush.CreateSavedState: TALPersistentObserver;
+type
+  TALInheritStrokeBrushClass = class of TALInheritStrokeBrush;
+begin
+  result := TALInheritStrokeBrushClass(classtype).Create(nil{AParent}, DefaultColor);
 end;
 
 {**********************************************************}
@@ -3571,10 +3470,14 @@ procedure TALInheritStrokeBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritStrokeBrush then
-      Inherit := TALInheritStrokeBrush(Source).Inherit
-    else
+    if Source is TALInheritStrokeBrush then begin
+      Inherit := TALInheritStrokeBrush(Source).Inherit;
+      fSuperseded := TALInheritStrokeBrush(Source).fSuperseded;
+    end
+    else begin
       Inherit := False;
+      fSuperseded := False;
+    end;
     inherited Assign(Source);
   Finally
     EndUpdate;
@@ -3588,74 +3491,51 @@ begin
   Try
     inherited Reset;
     Inherit := True;
+    fSuperseded := False;
   finally
     EndUpdate;
   end;
 end;
 
 {******************}
-procedure TALInheritStrokeBrush.Supersede;
+procedure TALInheritStrokeBrush.DoSupersede;
 begin
+  Assign(FParent);
+end;
+
+{******************}
+procedure TALInheritStrokeBrush.Supersede(Const ASaveState: Boolean = False);
+begin
+  if ASaveState then SaveState;
+  if (FSuperseded) or
+     (not inherit) or
+     (FParent = nil) then exit;
   beginUpdate;
   try
-    if (not inherit) or
-       (FParent = nil) then exit;
-    inc(fSuperseded);
-    if (FSuperseded <> 1) then exit;
-
-    FPriorSupersedeColor := Color;
-    FPriorSupersedeThickness := Thickness;
-    //--
     var LParentSuperseded := False;
     if FParent is TALInheritStrokeBrush then begin
-      TALInheritStrokeBrush(FParent).SupersedeNoChanges;
+      TALInheritStrokeBrush(FParent).SupersedeNoChanges(true{ASaveState});
       LParentSuperseded := True;
     end;
     try
-      Color := FParent.Color;
-      Thickness := FParent.Thickness;
+      DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritStrokeBrush(FParent).ReinstateNoChanges;
+        TALInheritStrokeBrush(FParent).restoreState;
     end;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALInheritStrokeBrush.Reinstate;
-begin
-  beginUpdate;
-  try
-    if fSuperseded <= 0 then exit;
-    dec(fSuperseded);
-    if fSuperseded = 0 then begin
-      Color := FPriorSupersedeColor;
-      Thickness := FPriorSupersedeThickness;
-    end;
+    Inherit := False;
+    FSuperseded := True;
   finally
     EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALInheritStrokeBrush.SupersedeNoChanges;
+procedure TALInheritStrokeBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
-    Supersede;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{*************************}
-procedure TALInheritStrokeBrush.ReinstateNoChanges;
-begin
-  BeginUpdate;
-  try
-    Reinstate;
+    Supersede(ASaveState);
   finally
     EndUpdateNoChanges;
   end;
@@ -3819,6 +3699,121 @@ begin
   Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
 
+{***************************************}
+constructor TALPosition.Create(const ADefaultValue: TPointF);
+begin
+  inherited create(ADefaultValue);
+  FUpdateCount := 0;
+  FIsChanged := False;
+  FOnChanged := nil;
+  FSavedStates := nil;
+end;
+
+{************************************}
+destructor TALPosition.Destroy;
+begin
+  ALFreeAndNil(FSavedStates);
+  Inherited;
+end;
+
+{************************************}
+function TALPosition.CreateSavedState: TALPosition;
+begin
+  result := TALPosition(classtype.Create);
+end;
+
+{************************************}
+procedure TALPosition.Reset;
+begin
+  Point := DefaultValue;
+end;
+
+{***************************************}
+procedure TALPosition.BeginUpdate;
+begin
+  Inc(FUpdateCount);
+end;
+
+{***************************************}
+procedure TALPosition.EndUpdate;
+begin
+  if FUpdateCount > 0 then
+  begin
+    Dec(FUpdateCount);
+    if (FUpdateCount = 0) and (FIsChanged) then
+      try
+        DoChanged;
+      finally
+        FIsChanged := False;
+      end;
+  end;
+end;
+
+{***************************************}
+procedure TALPosition.EndUpdateNoChanges;
+begin
+  if FUpdateCount > 0 then
+  begin
+    Dec(FUpdateCount);
+    if (FUpdateCount = 0) and (FIsChanged) then
+      // If execution reaches this point, it means there was no previously unclosed
+      // beginUpdate since FUpdateCount is 0. Therefore, ignoring the doChanged
+      // call here will not affect any prior beginUpdate operations.
+      FIsChanged := False;
+  end;
+end;
+
+{***************************************}
+procedure TALPosition.SaveState;
+begin
+  if FSavedStates = nil then
+    FSavedStates := TObjectQueue<TALPosition>.Create(True{AOwnsObjects});
+  var LSavedState := CreateSavedState;
+  if LSavedState.classtype <> classtype then
+    Raise Exception.create('The saved state type returned by "CreateSavedState" does not match the current object type');
+  LSavedState.Assign(self);
+  FSavedStates.Enqueue(LSavedState);
+end;
+
+{***************************************}
+procedure TALPosition.RestoreState;
+begin
+  if (FSavedStates = nil) or
+     (FSavedStates.Count = 0) then
+    raise Exception.Create('No saved state available');
+  var LSavedState := FSavedStates.extract;
+  try
+    Assign(LSavedState);
+  finally
+    ALFreeAndNil(LSavedState);
+  end;
+end;
+
+{***************************************}
+procedure TALPosition.RestoreStateNoChanges;
+begin
+  BeginUpdate;
+  try
+    RestoreState;
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{***************************************}
+procedure TALPosition.DoChanged;
+begin
+  FIsChanged := True;
+  if (FUpdateCount = 0) then
+  begin
+    try
+      inherited;
+    finally
+      FIsChanged := False;
+    end;
+  end;
+end;
+
 {*********************************************************************************}
 procedure TALPosition.Interpolate(const ATo: TPosition; const ANormalizedTime: Single);
 begin
@@ -3853,9 +3848,15 @@ begin
   inherited create(ADefaultValue);
   FParent := AParent;
   FInherit := True;
-  FSuperseded := 0;
-  //FPriorSupersedeX
-  //FPriorSupersedeY
+  fSuperseded := False;
+end;
+
+{********************************************************}
+function TALInheritPosition.CreateSavedState: TALPosition;
+type
+  TALInheritPositionClass = class of TALInheritPosition;
+begin
+  result := TALInheritPositionClass(classtype).Create(nil{AParent}, DefaultValue);
 end;
 
 {**********************************************************}
@@ -3870,84 +3871,175 @@ end;
 {****************************************************}
 procedure TALInheritPosition.Assign(Source: TPersistent);
 begin
-  if Source is TALInheritPosition then
-    Inherit := TALInheritPosition(Source).Inherit
-  else
-    Inherit := False;
-  inherited Assign(Source);
+  BeginUpdate;
+  Try
+    if Source is TALInheritPosition then begin
+      Inherit := TALInheritPosition(Source).Inherit;
+      fSuperseded := TALInheritPosition(Source).fSuperseded;
+    end
+    else begin
+      Inherit := False;
+      fSuperseded := False;
+    end;
+    inherited Assign(Source);
+  Finally
+    EndUpdate;
+  End;
 end;
 
 {******************************}
 procedure TALInheritPosition.Reset;
 begin
-  Point := DefaultValue;
-  Inherit := True;
-end;
-
-{******************}
-procedure TALInheritPosition.Supersede;
-begin
-  if (not inherit) or
-     (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeX := X;
-  FPriorSupersedeY := Y;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritPosition then begin
-    TALInheritPosition(FParent).SupersedeNoChanges;
-    LParentSuperseded := True;
-  end;
-  try
-    Point := FParent.Point;
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Inherit := True;
+    fSuperseded := False;
   finally
-    if LParentSuperseded then
-      TALInheritPosition(FParent).ReinstateNoChanges;
+    EndUpdate;
   end;
 end;
 
 {******************}
-procedure TALInheritPosition.Reinstate;
+procedure TALInheritPosition.DoSupersede;
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then
-    Point := TpointF.Create(FPriorSupersedeX, FPriorSupersedeY);
+  Assign(FParent);
 end;
 
-{*************************}
-procedure TALInheritPosition.SupersedeNoChanges;
+{******************}
+procedure TALInheritPosition.Supersede(Const ASaveState: Boolean = False);
 begin
-  if (not inherit) or
+  if ASaveState then SaveState;
+  if (FSuperseded) or
+     (not inherit) or
      (FParent = nil) then exit;
-  inc(fSuperseded);
-  if (FSuperseded <> 1) then exit;
-
-  FPriorSupersedeX := X;
-  FPriorSupersedeY := Y;
-  //--
-  var LParentSuperseded := False;
-  if FParent is TALInheritPosition then begin
-    TALInheritPosition(FParent).SupersedeNoChanges;
-    LParentSuperseded := True;
-  end;
+  beginUpdate;
   try
-    SetPointNoChange(FParent.Point);
+    var LParentSuperseded := False;
+    if FParent is TALInheritPosition then begin
+      TALInheritPosition(FParent).SupersedeNoChanges(true{ASaveState});
+      LParentSuperseded := True;
+    end;
+    try
+      DoSupersede;
+    finally
+      if LParentSuperseded then
+        TALInheritPosition(FParent).restoreState;
+    end;
+    Inherit := False;
+    FSuperseded := True;
   finally
-    if LParentSuperseded then
-      TALInheritPosition(FParent).ReinstateNoChanges;
+    EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALInheritPosition.ReinstateNoChanges;
+procedure TALInheritPosition.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
-  if fSuperseded <= 0 then exit;
-  dec(fSuperseded);
-  if fSuperseded = 0 then
-    SetPointNoChange(TpointF.Create(FPriorSupersedeX, FPriorSupersedeY));
+  BeginUpdate;
+  try
+    Supersede(ASaveState);
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
+{**********************************************************************************************}
+constructor TALStateTransition.Create(const ADefaultDuration: Single);
+begin
+  inherited Create;
+  //--
+  FDefaultAnimationType := TAnimationType.Out;
+  FDefaultDuration := ADefaultDuration;
+  FDefaultInterpolation := TALInterpolationType.Cubic;
+  //--
+  FAnimationType := FDefaultAnimationType;
+  FDuration := FDefaultDuration;
+  FInterpolation := FDefaultInterpolation;
+end;
+
+{**********************************************}
+function TALStateTransition.CreateSavedState: TALPersistentObserver;
+type
+  TALStateTransitionClass = class of TALStateTransition;
+begin
+  result := TALStateTransitionClass(classtype).Create(0{ADefaultDuration});
+end;
+
+{**********************************************}
+procedure TALStateTransition.Assign(Source: TPersistent);
+begin
+  if Source is TALStateTransition then begin
+    BeginUpdate;
+    Try
+      AnimationType := TALStateTransition(Source).AnimationType;
+      Duration := TALStateTransition(Source).Duration;
+      Interpolation := TALStateTransition(Source).Interpolation;
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{************************}
+procedure TALStateTransition.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    AnimationType := DefaultAnimationType;
+    Duration := DefaultDuration;
+    Interpolation := DefaultInterpolation;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************************}
+function TALStateTransition.IsAnimationTypeStored: Boolean;
+begin
+  result := FAnimationType <> FDefaultAnimationType;
+end;
+
+{***************************************}
+function TALStateTransition.IsDurationStored: Boolean;
+begin
+  result := not SameValue(fDuration, fDefaultDuration, Tepsilon.Scale);
+end;
+
+{**********************************************}
+function TALStateTransition.IsInterpolationStored: Boolean;
+begin
+  result := FInterpolation <> FDefaultInterpolation;
+end;
+
+{******************************************************}
+procedure TALStateTransition.SetAnimationType(const Value: TAnimationType);
+begin
+  if fAnimationType <> Value then begin
+    fAnimationType := Value;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALStateTransition.SetDuration(const Value: Single);
+begin
+  if Not SameValue(fDuration, Value, Tepsilon.Scale) then begin
+    fDuration := Value;
+    Change;
+  end;
+end;
+
+{******************************************************}
+procedure TALStateTransition.SetInterpolation(const Value: TALInterpolationType);
+begin
+  if fInterpolation <> Value then begin
+    fInterpolation := Value;
+    Change;
+  end;
 end;
 
 {**}
@@ -3959,42 +4051,53 @@ constructor TALBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create;
   //--
-  FDefaultTransitionDuration := 0.2;
-  //--
   var LShapeControl: IALShapeControl;
   if Supports(AParent, IALShapeControl, LShapeControl) then begin
     {$IF defined(debug)}
     if not (AParent is TALControl) then
-      raise Exception.Create('Error AFF4CD13-6544-4914-AC4E-B3AAB4D6DB43');
+      raise Exception.Create('Parent object must be of type TALControl');
     {$ENDIF}
+    FStateStyleParent := nil;
     FControlParent := TALControl(AParent);
     FFill := TALInheritBrush.Create(LShapeControl.Getfill, TAlphaColors.White{ADefaultColor});
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(LShapeControl.GetStroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(LShapeControl.GetShadow);
     FScale := TALInheritPosition.Create(_TControlAccessProtected(AParent).Scale,TPointF.Create(1,1));
+    FTransition := TALStateTransition.Create(0); // 0.2
   end
-  else begin
-    {$IF defined(debug)}
-    if not (AParent is TALBaseStateStyle) then
-      raise Exception.Create('Error 54F5A9EA-9BD8-447E-B99C-B288950FF234');
-    {$ENDIF}
+  else if (AParent is TALBaseStateStyle) then begin
     FStateStyleParent := TALBaseStateStyle(AParent);
+    FControlParent := nil;
     FFill := TALInheritBrush.Create(FStateStyleParent.fill, TAlphaColors.White{ADefaultColor});
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(FStateStyleParent.Stroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(FStateStyleParent.Shadow);
     FScale := TALInheritPosition.Create(FStateStyleParent.Scale, TPointF.Create(1,1));
+    FTransition := TALStateTransition.Create(0); // 0.2
+  end
+  else begin
+    {$IF defined(debug)}
+    if (AParent <> nil) then
+      raise Exception.Create('Parent object type is invalid');
+    {$ENDIF}
+    FStateStyleParent := nil;
+    FControlParent := nil;
+    FFill := TALInheritBrush.Create(nil, TAlphaColors.White{ADefaultColor});
+    FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
+    FStroke := TALInheritStrokeBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
+    FShadow := TALInheritShadow.Create(nil);
+    FScale := TALInheritPosition.Create(nil, TPointF.Create(1,1));
+    FTransition := TALStateTransition.Create(0); // 0.2
   end;
   FFill.OnChanged := FillChanged;
   FStateLayer.OnChanged := StateLayerChanged;
   FStroke.OnChanged := StrokeChanged;
   FShadow.OnChanged := ShadowChanged;
   FScale.OnChange := ScaleChanged;
+  FTransition.OnChanged := TransitionChanged;
   //--
-  FTransitionDuration := FDefaultTransitionDuration;
-  //--
-  fSuperseded := 0;
+  fSuperseded := False;
 end;
 
 {*************************************}
@@ -4005,7 +4108,16 @@ begin
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
   ALFreeAndNil(FScale);
+  ALFreeAndNil(FTransition);
   inherited Destroy;
+end;
+
+{*********************************}
+function TALBaseStateStyle.CreateSavedState: TALPersistentObserver;
+type
+  TALBaseStateStyleClass = class of TALBaseStateStyle;
+begin
+  result := TALBaseStateStyleClass(classtype).Create(nil{AParent});
 end;
 
 {******************************************************}
@@ -4019,13 +4131,32 @@ begin
       Stroke.Assign(TALBaseStateStyle(Source).Stroke);
       Shadow.Assign(TALBaseStateStyle(Source).Shadow);
       Scale.Assign(TALBaseStateStyle(Source).Scale);
-      TransitionDuration := TALBaseStateStyle(Source).TransitionDuration;
+      Transition.Assign(TALBaseStateStyle(Source).Transition);
+      fSuperseded := TALBaseStateStyle(Source).fSuperseded;
     Finally
       EndUpdate;
     End;
   end
   else
     ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************************}
+procedure TALBaseStateStyle.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Fill.Reset;
+    StateLayer.Reset;
+    Stroke.Reset;
+    Shadow.Reset;
+    Scale.Reset;
+    Transition.Reset;
+    fSuperseded := False;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {******************************************************}
@@ -4039,7 +4170,7 @@ begin
       Stroke.Interpolate(ATo.Stroke, ANormalizedTime);
       Shadow.Interpolate(ATo.Shadow, ANormalizedTime);
       Scale.Interpolate(ATo.Scale, ANormalizedTime);
-      //TransitionDuration
+      //Transition
     end
     else if FStateStyleParent <> nil then begin
       Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime);
@@ -4047,7 +4178,7 @@ begin
       Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
       Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
       Scale.Interpolate(FStateStyleParent.Scale, ANormalizedTime);
-      //TransitionDuration
+      //Transition
     end
     else if (FControlParent <> nil) and (FControlParent is TALShape) then begin
       Fill.Interpolate(TALShape(FControlParent).Fill, ANormalizedTime);
@@ -4055,7 +4186,7 @@ begin
       Stroke.Interpolate(TALShape(FControlParent).Stroke, ANormalizedTime);
       Shadow.Interpolate(TALShape(FControlParent).Shadow, ANormalizedTime);
       Scale.Interpolate(_TControlAccessProtected(FControlParent).Scale, ANormalizedTime);
-      //TransitionDuration
+      //Transition
     end
     else begin
       Fill.Interpolate(nil, ANormalizedTime);
@@ -4063,7 +4194,7 @@ begin
       Stroke.Interpolate(nil, ANormalizedTime);
       Shadow.Interpolate(nil, ANormalizedTime);
       Scale.Interpolate(nil, ANormalizedTime);
-      //TransitionDuration
+      //Transition
     end;
   Finally
     EndUpdate;
@@ -4091,66 +4222,25 @@ begin
 end;
 
 {******************}
-procedure TALBaseStateStyle.Supersede;
+procedure TALBaseStateStyle.Supersede(Const ASaveState: Boolean = False);
 begin
+  if ASaveState then SaveState;
+  if (FSuperseded) then exit;
   beginUpdate;
   try
-    inc(fSuperseded);
-    if (FSuperseded <> 1) then exit;
-
-    if StateStyleParent <> nil then
-      StateStyleParent.SupersedeNoChanges;
-    try
-      DoSupersede;
-    finally
-      if StateStyleParent <> nil then
-        StateStyleParent.ReinstateNoChanges;
-    end;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALBaseStateStyle.DoReinstate;
-begin
-  Fill.Reinstate;
-  Stroke.Reinstate;
-  Shadow.Reinstate;
-  Scale.Reinstate;
-end;
-
-{******************}
-procedure TALBaseStateStyle.Reinstate;
-begin
-  beginUpdate;
-  try
-    if fSuperseded <= 0 then exit;
-    dec(fSuperseded);
-    if fSuperseded = 0 then
-      DoReinstate;
+    DoSupersede;
+    FSuperseded := True;
   finally
     EndUpdate;
   end;
 end;
 
 {*************************}
-procedure TALBaseStateStyle.SupersedeNoChanges;
+procedure TALBaseStateStyle.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
-    Supersede;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{*************************}
-procedure TALBaseStateStyle.ReinstateNoChanges;
-begin
-  BeginUpdate;
-  try
-    Reinstate;
+    Supersede(ASaveState);
   finally
     EndUpdateNoChanges;
   end;
@@ -4187,12 +4277,9 @@ begin
 end;
 
 {***********************************************}
-procedure TALBaseStateStyle.SetTransitionDuration(const Value: Single);
+procedure TALBaseStateStyle.SetTransition(const Value: TALStateTransition);
 begin
-  if not SameValue(FTransitionDuration, Value, TEpsilon.Vector) then begin
-    FTransitionDuration := Value;
-    Change;
-  end;
+  FTransition.Assign(Value);
 end;
 
 {***********************************************}
@@ -4236,9 +4323,9 @@ begin
 end;
 
 {**************************************************}
-function TALBaseStateStyle.IsTransitionDurationStored: Boolean;
+procedure TALBaseStateStyle.TransitionChanged(ASender: TObject);
 begin
-  Result := not SameValue(FTransitionDuration, FDefaultTransitionDuration, TEpsilon.Vector);
+  Change;
 end;
 
 {***************************************************************************************}
@@ -4749,18 +4836,18 @@ begin
   result := Round(Dimension * Scale) / Scale;
 end;
 
-{*************************************************************************************}
-function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single): TRectF;
+{****************************************************************************************************************}
+function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
   result := Rect;
-  result.Width := ceil(Rect.Width * Scale - TEpsilon.Vector) / Scale;
-  result.height := ceil(Rect.height * Scale - TEpsilon.Vector) / Scale;
+  result.Width := ceil(Rect.Width * Scale - Epsilon) / Scale;
+  result.height := ceil(Rect.height * Scale - Epsilon) / Scale;
 end;
 
 {******************************************************************************************}
-function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single): single;
+function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single;
 begin
-  result := ceil(Dimension * Scale - TEpsilon.Vector) / Scale;
+  result := ceil(Dimension * Scale - Epsilon) / Scale;
 end;
 
 {********************************************************************************}

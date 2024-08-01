@@ -4774,7 +4774,8 @@ begin
     //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillPaddingRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageMarginsRect: TRectF; // default = TRectF.Empty
     //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null
     //LOptions.StrokeThickness: Single; // default = 1
     //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null
@@ -4821,9 +4822,9 @@ begin
         ABufDrawableRect.Width, // const w: integer;
         ABufDrawableRect.height);// const h: integer)
       try
-        ABufDrawable := ALSurfaceToDrawable(LSurface);
+        ABufDrawable := ALCreateDrawableFromSurface(LSurface);
       finally
-        ALFreeSurface(LSurface, LCanvas);
+        ALFreeAndNilSurface(LSurface, LCanvas);
       end;
     end;
 
@@ -4902,7 +4903,8 @@ begin
     //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillPaddingRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageMarginsRect: TRectF; // default = TRectF.Empty
     //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null
     //LOptions.StrokeThickness: Single; // default = 1
     //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null
@@ -4949,9 +4951,9 @@ begin
         ABufDrawableRect.Width, // const w: integer;
         ABufDrawableRect.height);// const h: integer)
       try
-        ABufDrawable := ALSurfaceToDrawable(LSurface);
+        ABufDrawable := ALCreateDrawableFromSurface(LSurface);
       finally
-        ALFreeSurface(LSurface, LCanvas);
+        ALFreeAndNilSurface(LSurface, LCanvas);
       end;
     end;
 
@@ -5030,7 +5032,8 @@ begin
     //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillPaddingRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageMarginsRect: TRectF; // default = TRectF.Empty
     //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null
     //LOptions.StrokeThickness: Single; // default = 1
     //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null
@@ -5077,9 +5080,9 @@ begin
         ABufDrawableRect.Width, // const w: integer;
         ABufDrawableRect.height);// const h: integer)
       try
-        ABufDrawable := ALSurfaceToDrawable(LSurface);
+        ABufDrawable := ALCreateDrawableFromSurface(LSurface);
       finally
-        ALFreeSurface(LSurface, LCanvas);
+        ALFreeAndNilSurface(LSurface, LCanvas);
       end;
     end;
 

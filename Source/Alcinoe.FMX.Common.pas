@@ -547,7 +547,8 @@ type
     FGradient: TALGradient;
     FResourceName: String;
     FWrapMode: TALImageWrapMode;
-    FPadding: TBounds;
+    FBackgroundMargins: TBounds;
+    FImageMargins: TBounds;
     FDefaultColor: TAlphaColor;
     FDefaultResourceName: String;
     FDefaultWrapMode: TALImageWrapMode;
@@ -555,9 +556,11 @@ type
     procedure SetGradient(const Value: TALGradient);
     procedure SetResourceName(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure SetPadding(const Value: TBounds);
+    procedure SetBackgroundMargins(const Value: TBounds);
+    procedure SetImageMargins(const Value: TBounds);
     procedure GradientChanged(Sender: TObject); virtual;
-    procedure PaddingChanged(Sender: TObject); virtual;
+    procedure BackgroundMarginsChanged(Sender: TObject); virtual;
+    procedure ImageMarginsChanged(Sender: TObject); virtual;
     function IsColorStored: Boolean;
     function IsResourceNameStored: Boolean;
     function IsWrapModeStored: Boolean;
@@ -586,7 +589,8 @@ type
     property Gradient: TALGradient read FGradient write SetGradient;
     property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
-    property Padding: TBounds read FPadding write SetPadding;
+    property BackgroundMargins: TBounds read FBackgroundMargins write SetBackgroundMargins;
+    property ImageMargins: TBounds read FImageMargins write SetImageMargins;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -666,25 +670,22 @@ type
     property Inherit: Boolean read FInherit write SetInherit Default True;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  // https://m3.material.io/foundations/interaction/states/state-layers
+  // A state layer is a semi-transparent covering on an element that indicates
+  // its state. State layers provide a systematic approach to visualizing states
+  // by using opacity. A layer can be applied to an entire element or in a
+  // circular shape and only one state layer can be applied at a given time.
   TALStateLayer = class(TALBrush)
   private
     FOpacity: Single;
     FUseContentColor: Boolean;
-    FXRadius: Single;
-    FYRadius: Single;
     FDefaultOpacity: Single;
     FDefaultUseContentColor: Boolean;
-    FDefaultXRadius: Single;
-    FDefaultYRadius: Single;
     procedure SetOpacity(const Value: Single);
     procedure SetUseContentColor(const Value: Boolean);
-    procedure SetXRadius(const Value: Single);
-    procedure SetYRadius(const Value: Single);
     function IsOpacityStored: Boolean;
     function IsUseContentColorStored: Boolean;
-    function IsXRadiusStored: Boolean;
-    function IsYRadiusStored: Boolean;
   public
     constructor Create(const ADefaultColor: TAlphaColor); override;
     procedure Assign(Source: TPersistent); override;
@@ -695,8 +696,6 @@ type
     function Styles: TALBrushStyles; override;
     property DefaultOpacity: Single read FDefaultOpacity write FDefaultOpacity;
     property DefaultUseContentColor: Boolean read FDefaultUseContentColor write FDefaultUseContentColor;
-    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
-    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
   published
     property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
     /// <summary>
@@ -705,8 +704,6 @@ type
     ///   label's text.
     /// </summary>
     property UseContentColor: Boolean read FUseContentColor write SetUseContentColor stored IsUseContentColorStored;
-    property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
-    property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -736,42 +733,24 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALInheritPosition = class(TALPosition)
-  private
-    FParent: TPosition;
-    FInherit: Boolean;
-    fSuperseded: Boolean;
-    procedure SetInherit(const AValue: Boolean);
-  protected
-    function CreateSavedState: TALPosition; override;
-    procedure DoSupersede; virtual;
-  public
-    constructor Create(const AParent: TPosition; const ADefaultValue: TPointF); reintroduce; virtual;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-    procedure Supersede(Const ASaveState: Boolean = False); virtual;
-    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
-    property Superseded: Boolean read FSuperseded;
-    property Parent: TPosition read FParent;
-  published
-    property Inherit: Boolean read FInherit write SetInherit Default True;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALStateTransition = class(TALPersistentObserver)
   private
     FAnimationType: TAnimationType;
     FDuration: Single;
     FInterpolation: TALInterpolationType;
+    FDelayClick: Boolean;
     FDefaultAnimationType: TAnimationType;
     FDefaultDuration: Single;
     FDefaultInterpolation: TALInterpolationType;
+    FDefaultDelayClick: Boolean;
     procedure SetAnimationType(const Value: TAnimationType);
     procedure SetDuration(const Value: Single);
     procedure SetInterpolation(const Value: TALInterpolationType);
+    procedure SetDelayClick(const Value: Boolean);
     function IsAnimationTypeStored: Boolean;
     function IsDurationStored: Boolean;
     function IsInterpolationStored: Boolean;
+    function IsDelayClickStored: Boolean;
   protected
     function CreateSavedState: TALPersistentObserver; override;
   public
@@ -781,6 +760,8 @@ type
     property DefaultAnimationType: TAnimationType read FDefaultAnimationType write FDefaultAnimationType;
     property DefaultDuration: Single read FDefaultDuration write FDefaultDuration;
     property DefaultInterpolation: TALInterpolationType read FDefaultInterpolation write FDefaultInterpolation;
+    property DefaultDelayClick: Boolean read FDefaultDelayClick write FDefaultDelayClick;
+    property DelayClick: Boolean read FDelayClick write SetDelayClick stored IsDelayClickStored;
   published
     property AnimationType: TAnimationType read FAnimationType write SetAnimationType stored IsAnimationTypeStored;
     property Duration: Single read FDuration write SetDuration stored IsDurationStored nodefault;
@@ -790,20 +771,21 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALBaseStateStyle = class(TALPersistentObserver)
   private
+    FParent: Tobject;
     FStateStyleParent: TALBaseStateStyle;
     FControlParent: TALControl;
     FFill: TALInheritBrush;
     FStateLayer: TALStateLayer;
     FStroke: TALInheritStrokeBrush;
     FShadow: TALInheritShadow;
-    FScale: TALInheritPosition;
+    FScale: TALPosition;
     FTransition: TALStateTransition;
     fSuperseded: Boolean;
     procedure SetFill(const AValue: TALInheritBrush);
     procedure SetStateLayer(const AValue: TALStateLayer);
     procedure SetStroke(const AValue: TALInheritStrokeBrush);
     procedure SetShadow(const AValue: TALInheritShadow);
-    procedure SetScale(const Value: TALInheritPosition);
+    procedure SetScale(const Value: TALPosition);
     procedure SetTransition(const Value: TALStateTransition);
     procedure FillChanged(ASender: TObject);
     procedure StateLayerChanged(ASender: TObject);
@@ -813,25 +795,29 @@ type
     procedure TransitionChanged(ASender: TObject);
   protected
     function CreateSavedState: TALPersistentObserver; override;
+    function CreateTransition: TALStateTransition; virtual;
     function GetInherit: Boolean; virtual;
     procedure DoSupersede; virtual;
     property Fill: TALInheritBrush read FFill write SetFill;
     property Shadow: TALInheritShadow read FShadow write SetShadow;
     property StateLayer: TALStateLayer read FStateLayer write SetStateLayer;
     property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
-    property Scale: TALInheritPosition read FScale write SetScale;
+    property Scale: TALPosition read FScale write SetScale;
     property Transition: TALStateTransition read FTransition write SetTransition;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure BlendStateLayerIntoFillAndStroke(const AContentColor: TAlphaColor); virtual;
+    procedure BlendStateLayerIntoFillAndStrokeNoChanges(const AContentColor: TAlphaColor);
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
     procedure Supersede(Const ASaveState: Boolean = False); virtual;
     procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
     property Superseded: Boolean read FSuperseded;
+    property Parent: TObject read FParent;
     property StateStyleParent: TALBaseStateStyle read FStateStyleParent;
     property ControlParent: TALControl read FControlParent;
   end;
@@ -1143,6 +1129,7 @@ uses
   {$IF defined(ALDPK)}
   DesignEditors,
   {$ENDIF}
+  Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.Common,
@@ -3006,15 +2993,19 @@ begin
   FGradient := TALGradient.Create;
   FGradient.OnChanged := GradientChanged;
   //--
-  FPadding := TBounds.Create(TRectF.Empty);
-  FPadding.OnChange := PaddingChanged;
+  FBackgroundMargins := TBounds.Create(TRectF.Empty);
+  FBackgroundMargins.OnChange := BackgroundMarginsChanged;
+  //--
+  FImageMargins := TBounds.Create(TRectF.Empty);
+  FImageMargins.OnChange := ImageMarginsChanged;
 end;
 
 {**************************}
 destructor TALBrush.Destroy;
 begin
   ALFreeAndNil(FGradient);
-  ALFreeAndNil(FPadding);
+  ALFreeAndNil(FBackgroundMargins);
+  ALFreeAndNil(FImageMargins);
   inherited;
 end;
 
@@ -3054,7 +3045,8 @@ begin
       Gradient.Assign(TALBrush(Source).Gradient);
       ResourceName := TALBrush(Source).ResourceName;
       WrapMode := TALBrush(Source).WrapMode;
-      Padding.Assign(TALBrush(Source).Padding);
+      BackgroundMargins.Assign(TALBrush(Source).BackgroundMargins);
+      ImageMargins.Assign(TALBrush(Source).ImageMargins);
     Finally
       EndUpdate;
     End;
@@ -3073,7 +3065,8 @@ begin
     Gradient.Reset;
     ResourceName := DefaultResourceName;
     WrapMode := DefaultWrapMode;
-    Padding.Rect := Padding.DefaultValue;
+    BackgroundMargins.Rect := BackgroundMargins.DefaultValue;
+    ImageMargins.Rect := ImageMargins.DefaultValue;
   finally
     EndUpdate;
   end;
@@ -3089,20 +3082,28 @@ begin
       Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
       ResourceName := ATo.ResourceName;
       WrapMode := ATo.WrapMode;
-      Padding.Left := InterpolateSingle(Padding.Left{Start}, ATo.Padding.Left{Stop}, ANormalizedTime);
-      Padding.Right := InterpolateSingle(Padding.Right{Start}, ATo.Padding.Right{Stop}, ANormalizedTime);
-      Padding.Top := InterpolateSingle(Padding.Top{Start}, ATo.Padding.Top{Stop}, ANormalizedTime);
-      Padding.Bottom := InterpolateSingle(Padding.Bottom{Start}, ATo.Padding.Bottom{Stop}, ANormalizedTime);
+      BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, ATo.BackgroundMargins.Left{Stop}, ANormalizedTime);
+      BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, ATo.BackgroundMargins.Right{Stop}, ANormalizedTime);
+      BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, ATo.BackgroundMargins.Top{Stop}, ANormalizedTime);
+      BackgroundMargins.Bottom := InterpolateSingle(BackgroundMargins.Bottom{Start}, ATo.BackgroundMargins.Bottom{Stop}, ANormalizedTime);
+      ImageMargins.Left := InterpolateSingle(ImageMargins.Left{Start}, ATo.ImageMargins.Left{Stop}, ANormalizedTime);
+      ImageMargins.Right := InterpolateSingle(ImageMargins.Right{Start}, ATo.ImageMargins.Right{Stop}, ANormalizedTime);
+      ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ATo.ImageMargins.Top{Stop}, ANormalizedTime);
+      ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ATo.ImageMargins.Bottom{Stop}, ANormalizedTime);
     end
     else begin
       Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       Gradient.Interpolate(nil, ANormalizedTime);
       ResourceName := DefaultResourceName;
       WrapMode := DefaultWrapMode;
-      Padding.Left := InterpolateSingle(Padding.Left{Start}, Padding.DefaultValue.Left{Stop}, ANormalizedTime);
-      Padding.Right := InterpolateSingle(Padding.Right{Start}, Padding.DefaultValue.Right{Stop}, ANormalizedTime);
-      Padding.Top := InterpolateSingle(Padding.Top{Start}, Padding.DefaultValue.Top{Stop}, ANormalizedTime);
-      Padding.Bottom := InterpolateSingle(Padding.Bottom{Start}, Padding.DefaultValue.Bottom{Stop}, ANormalizedTime);
+      BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, BackgroundMargins.DefaultValue.Left{Stop}, ANormalizedTime);
+      BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, BackgroundMargins.DefaultValue.Right{Stop}, ANormalizedTime);
+      BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, BackgroundMargins.DefaultValue.Top{Stop}, ANormalizedTime);
+      BackgroundMargins.Bottom := InterpolateSingle(BackgroundMargins.Bottom{Start}, BackgroundMargins.DefaultValue.Bottom{Stop}, ANormalizedTime);
+      ImageMargins.Left := InterpolateSingle(ImageMargins.Left{Start}, ImageMargins.DefaultValue.Left{Stop}, ANormalizedTime);
+      ImageMargins.Right := InterpolateSingle(ImageMargins.Right{Start}, ImageMargins.DefaultValue.Right{Stop}, ANormalizedTime);
+      ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ImageMargins.DefaultValue.Top{Stop}, ANormalizedTime);
+      ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ImageMargins.DefaultValue.Bottom{Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -3187,9 +3188,15 @@ begin
 end;
 
 {**************************************************}
-procedure TALBrush.SetPadding(const Value: TBounds);
+procedure TALBrush.SetBackgroundMargins(const Value: TBounds);
 begin
-  FPadding.Assign(Value);
+  FBackgroundMargins.Assign(Value);
+end;
+
+{**************************************************}
+procedure TALBrush.SetImageMargins(const Value: TBounds);
+begin
+  FImageMargins.Assign(Value);
 end;
 
 {**************************************************}
@@ -3199,7 +3206,13 @@ begin
 end;
 
 {*************************************************}
-procedure TALBrush.PaddingChanged(Sender: TObject);
+procedure TALBrush.BackgroundMarginsChanged(Sender: TObject);
+begin
+  change;
+end;
+
+{*************************************************}
+procedure TALBrush.ImageMarginsChanged(Sender: TObject);
 begin
   change;
 end;
@@ -3547,14 +3560,10 @@ begin
   inherited Create(ADefaultColor);
   //--
   FDefaultOpacity := 0;
-  FDefaultUseContentColor := True;
-  FDefaultXRadius := 0;
-  FDefaultYRadius := 0;
+  FDefaultUseContentColor := False;
   //--
   FOpacity := FDefaultOpacity;
   FUseContentColor := FDefaultUseContentColor;
-  FXRadius := FDefaultXRadius;
-  FYRadius := FDefaultYRadius;
 end;
 
 {**************************************************}
@@ -3565,8 +3574,6 @@ begin
     Try
       Opacity := TALStateLayer(Source).Opacity;
       UseContentColor := TALStateLayer(Source).UseContentColor;
-      XRadius := TALStateLayer(Source).XRadius;
-      YRadius := TALStateLayer(Source).YRadius;
       inherited Assign(Source);
     Finally
       EndUpdate;
@@ -3584,8 +3591,6 @@ begin
     inherited Reset;
     Opacity := DefaultOpacity;
     UseContentColor := DefaultUseContentColor;
-    XRadius := DefaultXRadius;
-    YRadius := DefaultYRadius;
   finally
     EndUpdate;
   end;
@@ -3600,14 +3605,10 @@ begin
     if ATo <> nil then begin
       Opacity := InterpolateSingle(Opacity{Start}, ATo.Opacity{Stop}, ANormalizedTime);
       UseContentColor := ATo.UseContentColor;
-      XRadius := InterpolateSingle(XRadius{Start}, ATo.XRadius{Stop}, ANormalizedTime);
-      YRadius := InterpolateSingle(YRadius{Start}, ATo.YRadius{Stop}, ANormalizedTime);
     end
     else begin
       Opacity := InterpolateSingle(Opacity{Start}, DefaultOpacity{Stop}, ANormalizedTime);
       UseContentColor := DefaultUseContentColor;
-      XRadius := InterpolateSingle(XRadius{Start}, DefaultXRadius{Stop}, ANormalizedTime);
-      YRadius := InterpolateSingle(YRadius{Start}, DefaultYRadius{Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -3658,24 +3659,6 @@ begin
 end;
 
 {**************************************************}
-procedure TALStateLayer.SetXRadius(const Value: Single);
-begin
-  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
-    FXRadius := Value;
-    Change;
-  end;
-end;
-
-{**************************************************}
-procedure TALStateLayer.SetYRadius(const Value: Single);
-begin
-  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
-    FYRadius := Value;
-    Change;
-  end;
-end;
-
-{**************************************************}
 function TALStateLayer.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, FDefaultOpacity, TEpsilon.Scale);
@@ -3685,18 +3668,6 @@ end;
 function TALStateLayer.IsUseContentColorStored: Boolean;
 begin
   Result := FUseContentColor <> FDefaultUseContentColor;
-end;
-
-{**************************************************}
-function TALStateLayer.IsXRadiusStored: Boolean;
-begin
-  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
-end;
-
-{**************************************************}
-function TALStateLayer.IsYRadiusStored: Boolean;
-begin
-  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
 
 {***************************************}
@@ -3842,108 +3813,6 @@ begin
         InterpolateSingle(Y{Start}, DefaultValue.Y{Stop}, ANormalizedTime)));
 end;
 
-{*************************************}
-constructor TALInheritPosition.Create(const AParent: TPosition; const ADefaultValue: TPointF);
-begin
-  inherited create(ADefaultValue);
-  FParent := AParent;
-  FInherit := True;
-  fSuperseded := False;
-end;
-
-{********************************************************}
-function TALInheritPosition.CreateSavedState: TALPosition;
-type
-  TALInheritPositionClass = class of TALInheritPosition;
-begin
-  result := TALInheritPositionClass(classtype).Create(nil{AParent}, DefaultValue);
-end;
-
-{**********************************************************}
-procedure TALInheritPosition.SetInherit(const AValue: Boolean);
-begin
-  If FInherit <> AValue then begin
-    FInherit := AValue;
-    DoChange;
-  end;
-end;
-
-{****************************************************}
-procedure TALInheritPosition.Assign(Source: TPersistent);
-begin
-  BeginUpdate;
-  Try
-    if Source is TALInheritPosition then begin
-      Inherit := TALInheritPosition(Source).Inherit;
-      fSuperseded := TALInheritPosition(Source).fSuperseded;
-    end
-    else begin
-      Inherit := False;
-      fSuperseded := False;
-    end;
-    inherited Assign(Source);
-  Finally
-    EndUpdate;
-  End;
-end;
-
-{******************************}
-procedure TALInheritPosition.Reset;
-begin
-  BeginUpdate;
-  Try
-    inherited Reset;
-    Inherit := True;
-    fSuperseded := False;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************}
-procedure TALInheritPosition.DoSupersede;
-begin
-  Assign(FParent);
-end;
-
-{******************}
-procedure TALInheritPosition.Supersede(Const ASaveState: Boolean = False);
-begin
-  if ASaveState then SaveState;
-  if (FSuperseded) or
-     (not inherit) or
-     (FParent = nil) then exit;
-  beginUpdate;
-  try
-    var LParentSuperseded := False;
-    if FParent is TALInheritPosition then begin
-      TALInheritPosition(FParent).SupersedeNoChanges(true{ASaveState});
-      LParentSuperseded := True;
-    end;
-    try
-      DoSupersede;
-    finally
-      if LParentSuperseded then
-        TALInheritPosition(FParent).restoreState;
-    end;
-    Inherit := False;
-    FSuperseded := True;
-  finally
-    EndUpdate;
-  end;
-end;
-
-{*************************}
-procedure TALInheritPosition.SupersedeNoChanges(Const ASaveState: Boolean = False);
-begin
-  BeginUpdate;
-  try
-    Supersede(ASaveState);
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
 {**********************************************************************************************}
 constructor TALStateTransition.Create(const ADefaultDuration: Single);
 begin
@@ -3952,10 +3821,12 @@ begin
   FDefaultAnimationType := TAnimationType.Out;
   FDefaultDuration := ADefaultDuration;
   FDefaultInterpolation := TALInterpolationType.Cubic;
+  FDefaultDelayClick := False;
   //--
   FAnimationType := FDefaultAnimationType;
   FDuration := FDefaultDuration;
   FInterpolation := FDefaultInterpolation;
+  FDelayClick := FDefaultDelayClick;
 end;
 
 {**********************************************}
@@ -3975,6 +3846,7 @@ begin
       AnimationType := TALStateTransition(Source).AnimationType;
       Duration := TALStateTransition(Source).Duration;
       Interpolation := TALStateTransition(Source).Interpolation;
+      DelayClick := TALStateTransition(Source).DelayClick;
     Finally
       EndUpdate;
     End;
@@ -3992,6 +3864,7 @@ begin
     AnimationType := DefaultAnimationType;
     Duration := DefaultDuration;
     Interpolation := DefaultInterpolation;
+    DelayClick := DefaultDelayClick;
   finally
     EndUpdate;
   end;
@@ -4013,6 +3886,12 @@ end;
 function TALStateTransition.IsInterpolationStored: Boolean;
 begin
   result := FInterpolation <> FDefaultInterpolation;
+end;
+
+{**********************************************}
+function TALStateTransition.IsDelayClickStored: Boolean;
+begin
+  result := FDelayClick <> FDefaultDelayClick;
 end;
 
 {******************************************************}
@@ -4042,6 +3921,15 @@ begin
   end;
 end;
 
+{******************************************************}
+procedure TALStateTransition.SetDelayClick(const Value: Boolean);
+begin
+  if fDelayClick <> Value then begin
+    fDelayClick := Value;
+    Change;
+  end;
+end;
+
 {**}
 Type
   _TControlAccessProtected = class(Tcontrol);
@@ -4051,6 +3939,7 @@ constructor TALBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create;
   //--
+  FParent := AParent;
   var LShapeControl: IALShapeControl;
   if Supports(AParent, IALShapeControl, LShapeControl) then begin
     {$IF defined(debug)}
@@ -4063,8 +3952,8 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(LShapeControl.GetStroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(LShapeControl.GetShadow);
-    FScale := TALInheritPosition.Create(_TControlAccessProtected(AParent).Scale,TPointF.Create(1,1));
-    FTransition := TALStateTransition.Create(0); // 0.2
+    FScale := TALPosition.Create(TPointF.Create(1,1));
+    FTransition := CreateTransition;
   end
   else if (AParent is TALBaseStateStyle) then begin
     FStateStyleParent := TALBaseStateStyle(AParent);
@@ -4073,8 +3962,8 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(FStateStyleParent.Stroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(FStateStyleParent.Shadow);
-    FScale := TALInheritPosition.Create(FStateStyleParent.Scale, TPointF.Create(1,1));
-    FTransition := TALStateTransition.Create(0); // 0.2
+    FScale := TALPosition.Create(TPointF.Create(1,1));
+    FTransition := CreateTransition;
   end
   else begin
     {$IF defined(debug)}
@@ -4087,8 +3976,8 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(nil);
-    FScale := TALInheritPosition.Create(nil, TPointF.Create(1,1));
-    FTransition := TALStateTransition.Create(0); // 0.2
+    FScale := TALPosition.Create(TPointF.Create(1,1));
+    FTransition := CreateTransition;
   end;
   FFill.OnChanged := FillChanged;
   FStateLayer.OnChanged := StateLayerChanged;
@@ -4118,6 +4007,12 @@ type
   TALBaseStateStyleClass = class of TALBaseStateStyle;
 begin
   result := TALBaseStateStyleClass(classtype).Create(nil{AParent});
+end;
+
+{**************************************************************}
+function TALBaseStateStyle.CreateTransition: TALStateTransition;
+begin
+  result := TALStateTransition.Create(0{ADefaultDuration})
 end;
 
 {******************************************************}
@@ -4159,11 +4054,62 @@ begin
   end;
 end;
 
+{******************************}
+procedure TALBaseStateStyle.BlendStateLayerIntoFillAndStroke(const AContentColor: TAlphaColor);
+begin
+  if not statelayer.HasFill then exit;
+  BeginUpdate;
+  try
+
+    // Fill.BackgroundMargins
+    // If the fill doesn't have any background, then we can use the
+    // state layer BackgroundMargins.
+    if (Fill.Color = TalphaColors.Null) and
+       (length(Fill.Gradient.Colors) = 0) then
+      Fill.BackgroundMargins.Rect := statelayer.BackgroundMargins.Rect;
+
+    // Fill.Color & Stroke.Color
+    if StateLayer.UseContentColor then begin
+      Fill.Color := ALblendColor(fill.Color, AContentColor, statelayer.Opacity);
+      Stroke.Color := ALblendColor(Stroke.Color, AContentColor, statelayer.Opacity);
+    end
+    else begin
+      Fill.Color := ALblendColor(fill.Color, statelayer.Color, statelayer.Opacity);
+      Stroke.Color := ALblendColor(Stroke.Color, statelayer.Color, statelayer.Opacity);
+    end;
+
+    // fill.Gradient
+    // Not yet supported
+
+    // Fill.ResourceName
+    if Fill.ResourceName = '' then begin
+      Fill.ResourceName := statelayer.ResourceName;
+      Fill.WrapMode := statelayer.WrapMode;
+      Fill.ImageMargins := statelayer.ImageMargins;
+    end;
+
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALBaseStateStyle.BlendStateLayerIntoFillAndStrokeNoChanges(const AContentColor: TAlphaColor);
+begin
+  BeginUpdate;
+  try
+    BlendStateLayerIntoFillAndStroke(AContentColor);
+  finally
+    EndUpdateNoChanges;
+  end;
+end;
+
 {******************************************************}
 procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
+    var LShapeControl: IALShapeControl;
     if ATo <> nil then begin
       Fill.Interpolate(ATo.Fill, ANormalizedTime);
       StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime);
@@ -4180,11 +4126,13 @@ begin
       Scale.Interpolate(FStateStyleParent.Scale, ANormalizedTime);
       //Transition
     end
-    else if (FControlParent <> nil) and (FControlParent is TALShape) then begin
-      Fill.Interpolate(TALShape(FControlParent).Fill, ANormalizedTime);
+    else if Supports(FControlParent, IALShapeControl, LShapeControl) then begin
+      Fill.Interpolate(LShapeControl.GetFill, ANormalizedTime);
+      var LprevUseContentColor := StateLayer.UseContentColor;
       StateLayer.Interpolate(nil, ANormalizedTime);
-      Stroke.Interpolate(TALShape(FControlParent).Stroke, ANormalizedTime);
-      Shadow.Interpolate(TALShape(FControlParent).Shadow, ANormalizedTime);
+      StateLayer.UseContentColor := LprevUseContentColor;
+      Stroke.Interpolate(LShapeControl.GetStroke, ANormalizedTime);
+      Shadow.Interpolate(LShapeControl.GetShadow, ANormalizedTime);
       Scale.Interpolate(_TControlAccessProtected(FControlParent).Scale, ANormalizedTime);
       //Transition
     end
@@ -4218,7 +4166,6 @@ begin
   Fill.Supersede;
   Stroke.Supersede;
   Shadow.Supersede;
-  Scale.Supersede;
 end;
 
 {******************}
@@ -4271,7 +4218,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALBaseStateStyle.SetScale(const Value: TALInheritPosition);
+procedure TALBaseStateStyle.SetScale(const Value: TALPosition);
 begin
   FScale.Assign(Value);
 end;
@@ -4289,7 +4236,8 @@ begin
             (not StateLayer.HasFill) and
             Stroke.Inherit and
             Shadow.Inherit and
-            Scale.Inherit;
+            Samevalue(Scale.X, 1, TEpsilon.Scale) and
+            Samevalue(Scale.X, 1, TEpsilon.Scale);
 end;
 
 {**********************************************************}

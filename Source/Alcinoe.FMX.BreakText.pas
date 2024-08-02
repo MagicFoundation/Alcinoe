@@ -14,6 +14,9 @@ uses
 
 type
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALMultiLineTextOptions = class;
+
   {~~~~~~~~~~~~~~~~~~~~~}
   TALTextElement = record
     Id: string;
@@ -22,10 +25,10 @@ type
   end;
   TALTextElements = array of TALTextElement;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMultiLineTextAdjustRectProc = procedure(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF) of object;
-  TALMultiLineTextBeforeDrawBackgroundProc = procedure(const ACanvas: TALCanvas; Const ARect: TrectF) of object;
-  TALMultiLineTextBeforeDrawParagraphProc = procedure(const ACanvas: TALCanvas; Const ARect: TrectF) of object;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALMultiLineTextAdjustRectProc = procedure(const ACanvas: TALCanvas; Const AScale: Single; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF) of object;
+  TALMultiLineTextBeforeDrawBackgroundProc = procedure(const ACanvas: TALCanvas; Const AScale: Single; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF) of object;
+  TALMultiLineTextBeforeDrawParagraphProc = procedure(const ACanvas: TALCanvas; Const AScale: Single; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF) of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALMultiLineTextOptions = class(Tobject)
@@ -86,7 +89,8 @@ type
     FillGradientAngle: Single; // Default = 180;
     FillResourceName: String; // default = ''
     FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    FillPaddingRect: TRectF; // default = TRectF.Empty
+    FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
+    FillImageMarginsRect: TRectF; // default = TRectF.Empty
     StrokeColor: TalphaColor; // default = TAlphaColors.null
     StrokeThickness: Single; // default = 1
     ShadowColor: TAlphaColor; // default = TAlphaColors.null
@@ -378,7 +382,8 @@ begin
   FillGradientAngle := 180;
   FillResourceName := '';
   FillWrapMode := TALImageWrapMode.Fit;
-  FillPaddingRect := TRectF.Empty;
+  FillBackgroundMarginsRect := TRectF.Empty;
+  FillImageMarginsRect := TRectF.Empty;
   StrokeColor := TalphaColors.Null;
   StrokeThickness := 1;
   ShadowColor := TAlphaColors.Null;
@@ -1684,6 +1689,12 @@ procedure ALDrawMultiLineText(
   {$ENDREGION}
 
 begin
+  if AText = '' then begin
+    ARect.Width := 0;
+    ARect.Height := 0;
+    Exit;
+  end;
+
   ARect.Top := ARect.Top * AOptions.Scale;
   ARect.right := ARect.right * AOptions.Scale;
   ARect.left := ARect.left * AOptions.Scale;
@@ -2446,7 +2457,7 @@ begin
               // Though it's an unlikely scenario, this ensures avoidance of a crash in
               // the subsequent ALCreateSurface call.
               If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
-                 (ALCeil(ARect.Height, TEpsilon.Position) = 0)then begin
+                 (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
                 ARect.Width := 0;
                 ARect.Height := 0;
                 exit;
@@ -2472,7 +2483,7 @@ begin
               if Assigned(AOptions.OnAdjustRect) then begin
                 var LPrevRect := ARect;
                 var LSurfaceSize := LSurfaceRect.Size;
-                AOptions.OnAdjustRect(ACanvas, ARect, LSurfaceSize);
+                AOptions.OnAdjustRect(ACanvas, 1{AScale}, AOptions, ARect, LSurfaceSize);
                 LSurfaceRect.Size := LSurfaceSize;
                 LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
               end;
@@ -2502,7 +2513,7 @@ begin
 
                   // Handle custom event
                   if Assigned(AOptions.OnBeforeDrawBackground) then
-                    AOptions.OnBeforeDrawBackground(ACanvas, ARect);
+                    AOptions.OnBeforeDrawBackground(ACanvas, 1{AScale}, AOptions, ARect);
 
                   // Draw the background
                   if (AOptions.FillColor <> TalphaColors.Null) or
@@ -2522,7 +2533,8 @@ begin
                       AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
                       AOptions.FillResourceName, // const AFillResourceName: String;
                       AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-                      AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
+                      AOptions.FillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
+                      AOptions.FillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
                       AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
                       AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
                       AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
@@ -2537,7 +2549,7 @@ begin
 
                   // Handle custom event
                   if Assigned(AOptions.OnBeforeDrawParagraph) then
-                    AOptions.OnBeforeDrawParagraph(ACanvas, ARect);
+                    AOptions.OnBeforeDrawParagraph(ACanvas, 1{AScale}, AOptions, ARect);
 
                   // Paint the paragraph
                   sk4d_paragraph_paint(
@@ -3726,7 +3738,7 @@ begin
       if Assigned(AOptions.OnAdjustRect) then begin
         var LPrevRect := ARect;
         var LSurfaceSize := LSurfaceRect.Size;
-        AOptions.OnAdjustRect(ACanvas, ARect, LSurfaceSize);
+        AOptions.OnAdjustRect(ACanvas, 1{AScale}, AOptions, ARect, LSurfaceSize);
         LSurfaceRect.Size := LSurfaceSize;
         LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
       end;
@@ -3763,14 +3775,14 @@ begin
           {$REGION 'IOS/MACOS'}
           {$IF defined(ALAppleOS)}
           CGContextSaveGState(ACanvas);
-          CGContextSetAlpha(ACanvas, AOpacity);
+          CGContextSetAlpha(ACanvas, AOptions.Opacity);
           CGContextBeginTransparencyLayerWithRect(
             ACanvas,
             ALLowerLeftCGRect(
-              LLayerRect.TopLeft,
-              LLayerRect.Width,
-              LLayerRect.Height,
-              LGridHeight),
+              LSurfaceRect.TopLeft,
+              LSurfaceRect.Width,
+              LSurfaceRect.Height,
+              CGBitmapContextGetHeight(ACanvas)),
               nil{auxiliaryInfo});
           {$ENDIF}
           {$ENDREGION}
@@ -3780,7 +3792,7 @@ begin
 
           // Handle custom event
           if Assigned(AOptions.OnBeforeDrawBackground) then
-            AOptions.OnBeforeDrawBackground(ACanvas, ARect);
+            AOptions.OnBeforeDrawBackground(ACanvas, 1{AScale}, AOptions, ARect);
 
           // Draw the background
           if (AOptions.FillColor <> TalphaColors.Null) or
@@ -3800,7 +3812,8 @@ begin
               AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
               AOptions.FillResourceName, // const AFillResourceName: String;
               AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-              AOptions.FillPaddingRect, // Const AFillPaddingRect: TRectF;
+              AOptions.FillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
+              AOptions.FillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
               AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
               AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
               AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
@@ -3815,7 +3828,7 @@ begin
 
           // Handle custom event
           if Assigned(AOptions.OnBeforeDrawParagraph) then
-            AOptions.OnBeforeDrawParagraph(ACanvas, ARect);
+            AOptions.OnBeforeDrawParagraph(ACanvas, 1{AScale}, AOptions, ARect);
 
           {$REGION 'ANDROID'}
           {$IF defined(ANDROID)}
@@ -4239,9 +4252,9 @@ begin
     AOptions);
   if not ALIsSurfaceNull(LSurface) then begin
     try
-      result := ALSurfaceToDrawable(LSurface);
+      result := ALCreateDrawableFromSurface(LSurface);
     finally
-      ALFreeSurface(LSurface, LCanvas);
+      ALFreeAndNilSurface(LSurface, LCanvas);
     end;
   end
   else result := ALNullDrawable;

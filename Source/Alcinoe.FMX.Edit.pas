@@ -667,6 +667,19 @@ type
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
+        BufDrawable: TALDrawable;
+        BufDrawableRect: TRectF;
+        BufPromptTextDrawable: TALDrawable;
+        BufPromptTextDrawableRect: TRectF;
+        BufLabelTextDrawable: TALDrawable;
+        BufLabelTextDrawableRect: TRectF;
+        BufSupportingTextDrawable: TALDrawable;
+        BufSupportingTextDrawableRect: TRectF;
+        procedure ClearBufDrawable;
+        procedure ClearBufPromptTextDrawable;
+        procedure ClearBufLabelTextDrawable;
+        procedure ClearBufSupportingTextDrawable;
+      public
         constructor Create(const AParent: TObject); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
@@ -741,6 +754,10 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure ClearBufDrawable;
+        procedure ClearBufPromptTextDrawable;
+        procedure ClearBufLabelTextDrawable;
+        procedure ClearBufSupportingTextDrawable;
       published
         property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
         property Hovered: THoveredStateStyle read FHovered write SetHovered;
@@ -776,39 +793,12 @@ type
     FNativeViewRemoved: Boolean;
     fEditControl: TALBaseEditControl;
     //--
-    fBufDisabledDrawable: TALDrawable;
-    fBufDisabledDrawableRect: TRectF;
-    fBufHoveredDrawable: TALDrawable;
-    fBufHoveredDrawableRect: TRectF;
-    fBufFocusedDrawable: TALDrawable;
-    fBufFocusedDrawableRect: TRectF;
-    //--
     fBufPromptTextDrawable: TALDrawable;
     fBufPromptTextDrawableRect: TRectF;
-    fBufPromptTextDisabledDrawable: TALDrawable;
-    fBufPromptTextDisabledDrawableRect: TRectF;
-    fBufPromptTextHoveredDrawable: TALDrawable;
-    fBufPromptTextHoveredDrawableRect: TRectF;
-    fBufPromptTextFocusedDrawable: TALDrawable;
-    fBufPromptTextFocusedDrawableRect: TRectF;
-    //--
     fBufLabelTextDrawable: TALDrawable;
     fBufLabelTextDrawableRect: TRectF;
-    fBufLabelTextDisabledDrawable: TALDrawable;
-    fBufLabelTextDisabledDrawableRect: TRectF;
-    fBufLabelTextHoveredDrawable: TALDrawable;
-    fBufLabelTextHoveredDrawableRect: TRectF;
-    fBufLabelTextFocusedDrawable: TALDrawable;
-    fBufLabelTextFocusedDrawableRect: TRectF;
-    //--
     fBufSupportingTextDrawable: TALDrawable;
     fBufSupportingTextDrawableRect: TRectF;
-    fBufSupportingTextDisabledDrawable: TALDrawable;
-    fBufSupportingTextDisabledDrawableRect: TRectF;
-    fBufSupportingTextHoveredDrawable: TALDrawable;
-    fBufSupportingTextHoveredDrawableRect: TRectF;
-    fBufSupportingTextFocusedDrawable: TALDrawable;
-    fBufSupportingTextFocusedDrawableRect: TRectF;
     //--
     procedure UpdateEditControlPromptText;
     procedure UpdateNativeViewVisibility;
@@ -878,6 +868,7 @@ type
     procedure TextSettingsChanged(Sender: TObject); virtual;
     procedure LabelTextSettingsChanged(Sender: TObject); virtual;
     procedure SupportingTextSettingsChanged(Sender: TObject); virtual;
+    function GetCurrentStateStyle: TBaseStateStyle; virtual;
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure EnabledChanged; override;
     procedure PaddingChanged; override;
@@ -3478,9 +3469,27 @@ begin
   Stroke.DefaultColor := $FF7a7a7a;
   Stroke.Color := Stroke.DefaultColor;
   //--
+  FTextSettings.Font.DefaultSize := 16;
+  FTextSettings.Font.Size := FTextSettings.Font.DefaultSize;
+  //--
+  FLabelTextSettings.Font.DefaultSize := 12;
+  FLabelTextSettings.Font.Size := FLabelTextSettings.Font.DefaultSize;
+  //--
+  FSupportingTextSettings.Font.DefaultSize := 12;
+  FSupportingTextSettings.Font.Size := FSupportingTextSettings.Font.DefaultSize;
+  //--
   FTextSettings.OnChanged := TextSettingsChanged;
   FLabelTextSettings.OnChanged := LabelTextSettingsChanged;
   FSupportingTextSettings.OnChanged := SupportingTextSettingsChanged;
+  //--
+  BufDrawable := ALNullDrawable;
+  //BufDisabledDrawableRect
+  BufPromptTextDrawable := ALNullDrawable;
+  //BufPromptTextDrawableRect: TRectF;
+  BufLabelTextDrawable := ALNullDrawable;
+  //BufLabelTextDrawableRect: TRectF;
+  BufSupportingTextDrawable := ALNullDrawable;
+  //BufSupportingTextDrawableRect: TRectF;
   //--
   //FPriorSupersedePromptTextColor
   //FPriorSupersedeTintColor
@@ -3489,6 +3498,7 @@ end;
 {*************************************}
 destructor TALBaseEdit.TBaseStateStyle.Destroy;
 begin
+  ClearBufDrawable;
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FLabelTextSettings);
   ALFreeAndNil(FSupportingTextSettings);
@@ -3530,6 +3540,33 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{******************************}
+procedure TALBaseEdit.TBaseStateStyle.ClearBufDrawable;
+begin
+  ALFreeAndNilDrawable(BufDrawable);
+  ClearBufPromptTextDrawable;
+  ClearBufLabelTextDrawable;
+  ClearBufSupportingTextDrawable
+end;
+
+{******************************}
+procedure TALBaseEdit.TBaseStateStyle.ClearBufPromptTextDrawable;
+begin
+  ALFreeAndNilDrawable(BufPromptTextDrawable);
+end;
+
+{******************************}
+procedure TALBaseEdit.TBaseStateStyle.ClearBufLabelTextDrawable;
+begin
+  ALFreeAndNilDrawable(BufLabelTextDrawable);
+end;
+
+{******************************}
+procedure TALBaseEdit.TBaseStateStyle.ClearBufSupportingTextDrawable;
+begin
+  ALFreeAndNilDrawable(BufSupportingTextDrawable);
 end;
 
 {**************************************************************}
@@ -3805,6 +3842,38 @@ begin
   end;
 end;
 
+{******************************}
+procedure TALBaseEdit.TStateStyles.ClearBufDrawable;
+begin
+  Disabled.ClearBufDrawable;
+  Hovered.ClearBufDrawable;
+  Focused.ClearBufDrawable;
+end;
+
+{******************************}
+procedure TALBaseEdit.TStateStyles.ClearBufPromptTextDrawable;
+begin
+  Disabled.ClearBufPromptTextDrawable;
+  Hovered.ClearBufPromptTextDrawable;
+  Focused.ClearBufPromptTextDrawable;
+end;
+
+{******************************}
+procedure TALBaseEdit.TStateStyles.ClearBufLabelTextDrawable;
+begin
+  Disabled.ClearBufLabelTextDrawable;
+  Hovered.ClearBufLabelTextDrawable;
+  Focused.ClearBufLabelTextDrawable;
+end;
+
+{******************************}
+procedure TALBaseEdit.TStateStyles.ClearBufSupportingTextDrawable;
+begin
+  Disabled.ClearBufSupportingTextDrawable;
+  Hovered.ClearBufSupportingTextDrawable;
+  Focused.ClearBufSupportingTextDrawable;
+end;
+
 {************************************************************************************}
 procedure TALBaseEdit.TStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
@@ -3883,24 +3952,12 @@ begin
   FNativeViewRemoved := False;
   FIsAdjustingSize := False;
   //--
-  fBufDisabledDrawable := ALNullDrawable;
-  fBufHoveredDrawable := ALNullDrawable;
-  fBufFocusedDrawable := ALNullDrawable;
-  //--
   fBufPromptTextDrawable := ALNullDrawable;
-  fBufPromptTextDisabledDrawable := ALNullDrawable;
-  fBufPromptTextHoveredDrawable := ALNullDrawable;
-  fBufPromptTextFocusedDrawable := ALNullDrawable;
-  //--
+  //fBufPromptTextDrawableRect
   fBufLabelTextDrawable := ALNullDrawable;
-  fBufLabelTextDisabledDrawable := ALNullDrawable;
-  fBufLabelTextHoveredDrawable := ALNullDrawable;
-  fBufLabelTextFocusedDrawable := ALNullDrawable;
-  //--
+  //fBufLabelTextDrawableRect
   fBufSupportingTextDrawable := ALNullDrawable;
-  fBufSupportingTextDisabledDrawable := ALNullDrawable;
-  fBufSupportingTextHoveredDrawable := ALNullDrawable;
-  fBufSupportingTextFocusedDrawable := ALNullDrawable;
+  //fBufSupportingTextDrawableRect
   //--
   FocusOnMouseUp := True;
   Cursor := crIBeam;
@@ -4252,14 +4309,18 @@ begin
 
   if (csLoading in ComponentState) then exit;
 
-  var LStateStyle: TBaseStateStyle;
-  if Not Enabled then LStateStyle := StateStyles.Disabled
-  else if IsFocused then LStateStyle := StateStyles.Focused
-  else if IsMouseOver then LStateStyle := StateStyles.Hovered
-  else LStateStyle := nil;
+  var LStateStyle := GetCurrentStateStyle;
   if LStateStyle <> nil then
     LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
+
+    // Merge the state layer with the fill and stroke. This does not work if the
+    // fill has an image or margins, but honestly, I don't think anyone
+    // will use this. So, let's not complicate things for now. KISS (Keep It Simple,
+    // Keep It Stupid) way.
+    if (LStateStyle <> nil) then
+      LStateStyle.BlendStateLayerIntoFillAndStrokeNoChanges(LStateStyle.TextSettings.Font.Color);
+
     // FillColor
     if LStateStyle <> nil then EditControl.FillColor := LStateStyle.Fill.Color
     else EditControl.FillColor := Fill.Color;
@@ -4394,6 +4455,15 @@ end;
 procedure TALBaseEdit.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
+end;
+
+{*****************************************************************}
+function TALBaseEdit.GetCurrentStateStyle: TBaseStateStyle;
+begin
+  if Not Enabled then Result := StateStyles.Disabled
+  else if IsFocused then Result := StateStyles.Focused
+  else if IsMouseOver then Result := StateStyles.Hovered
+  else result := nil;
 end;
 
 {****************************************************}
@@ -5094,109 +5164,48 @@ end;
 
 {********************************}
 procedure TALBaseEdit.MakeBufDrawable;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _MakeBufDrawable(
-              const AStateStyle: TBaseStateStyle;
-              var ABufDrawable: TALDrawable;
-              var ABufDrawableRect: TRectF);
-  begin
-    if AStateStyle.Fill.Inherit and
-       AStateStyle.Stroke.Inherit and
-       AStateStyle.Shadow.Inherit then exit;
-    if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.Fill.SupersedeNoChanges(true{ASaveState});
-    AStateStyle.Stroke.SupersedeNoChanges(true{ASaveState});
-    AStateStyle.Shadow.SupersedeNoChanges(true{ASaveState});
-    try
-      CreateBufDrawable(
-        ABufDrawable, // var ABufDrawable: TALDrawable;
-        ABufDrawableRect, // var ABufDrawableRect: TRectF;
-        AStateStyle.Fill, // const AFill: TALBrush;
-        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        AStateStyle.Shadow); // const AShadow: TALShadow);
-    finally
-      AStateStyle.Fill.RestorestateNoChanges;
-      AStateStyle.Stroke.RestorestateNoChanges;
-      AStateStyle.Shadow.RestoreStateNoChanges;
-    end;
-  end;
-
 begin
-  inherited MakeBufDrawable;
-  //--
-  MakeBufPromptTextDrawable;
-  MakeBufLabelTextDrawable;
-  MakeBufSupportingTextDrawable;
-  //--
-  if (Size.Size.IsZero) then begin // Do not create BufDrawable if the size is 0
+  //--- Do not create BufDrawable if the size is 0
+  if (Size.Size.IsZero) then begin
     clearBufDrawable;
     exit;
   end;
   //--
-  if Not Enabled then begin
-    _MakeBufDrawable(
-      StateStyles.Disabled, // const AStateStyle: TALButtonStateStyle;
-      FBufDisabledDrawable, // var ABufDrawable: TALDrawable;
-      FBufDisabledDrawableRect); // var ABufDrawableRect: TRectF;
-  end
-  else if IsFocused then begin
-    _MakeBufDrawable(
-      StateStyles.Focused, // const AStateStyle: TALButtonStateStyle;
-      FBufFocusedDrawable, // var ABufDrawable: TALDrawable;
-      FBufFocusedDrawableRect); // var ABufDrawableRect: TRectF;
-  end
-  else if IsMouseOver then begin
-    _MakeBufDrawable(
-      StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
-      FBufHoveredDrawable, // var ABufDrawable: TALDrawable;
-      FBufHoveredDrawableRect); // var ABufDrawableRect: TRectF;
+  inherited MakeBufDrawable;
+  MakeBufPromptTextDrawable;
+  MakeBufLabelTextDrawable;
+  MakeBufSupportingTextDrawable;
+  //--
+  var LStateStyle := GetCurrentStateStyle;
+  if LStateStyle = nil then exit;
+  if LStateStyle.Fill.Inherit and
+     (not LStateStyle.StateLayer.HasFill) and
+     LStateStyle.Stroke.Inherit and
+     LStateStyle.Shadow.Inherit then exit;
+  if (not ALIsDrawableNull(LStateStyle.BufDrawable)) then exit;
+  LStateStyle.SupersedeNoChanges(true{ASaveState});
+  try
+
+    // Merge the state layer with the fill and stroke. This does not work if the
+    // fill has an image or margins, but honestly, I don't think anyone
+    // will use this. So, let's not complicate things for now. KISS (Keep It Simple,
+    // Keep It Stupid) way.
+    LStateStyle.BlendStateLayerIntoFillAndStrokeNoChanges(LStateStyle.TextSettings.Font.Color{AContentColor});
+
+    CreateBufDrawable(
+      LStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
+      LStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
+      LStateStyle.Fill, // const AFill: TALBrush;
+      LStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+      LStateStyle.Shadow); // const AShadow: TALShadow);
+
+  finally
+    LStateStyle.RestorestateNoChanges;
   end;
 end;
 
 {*****************************************}
 procedure TALBaseEdit.MakeBufPromptTextDrawable;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _MakeBufPromptTextDrawable(
-              const APromptText: String;
-              const AStateStyle: TBaseStateStyle;
-              const AUsePromptTextColor: Boolean;
-              var ABufPromptTextDrawable: TALDrawable;
-              var ABufPromptTextDrawableRect: TRectF);
-  begin
-    if (AStateStyle.TextSettings.Inherit) and
-       ((not AUsePromptTextColor) or (AStateStyle.PromptTextColor = TalphaColors.Null)) then exit;
-    if (not ALIsDrawableNull(ABufPromptTextDrawable)) then exit;
-    AStateStyle.SupersedeNoChanges(true{ASaveState});
-    try
-      var LPrevFontColor := AStateStyle.TextSettings.font.Color;
-      var LPrevFontOnchanged: TNotifyEvent;
-      LPrevFontOnchanged := AStateStyle.TextSettings.OnChanged;
-      AStateStyle.TextSettings.OnChanged := nil;
-      try
-        if AUsePromptTextColor then begin
-          if AStateStyle.PromptTextColor <> TAlphaColors.Null then AStateStyle.TextSettings.Font.Color := AStateStyle.PromptTextColor
-          else if PromptTextColor <> TalphaColors.Null then AStateStyle.TextSettings.Font.Color := PromptTextColor
-          else AStateStyle.TextSettings.Font.Color := TAlphaColorF.Create(
-                                                        ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
-                                                          PremultipliedAlpha.
-                                                          ToAlphaColor;
-        end;
-        CreateBufPromptTextDrawable(
-          ABufPromptTextDrawable, // var ABufPromptTextDrawable: TALDrawable;
-          ABufPromptTextDrawableRect, // var ABufPromptTextDrawableRect: TRectF;
-          APromptText, // const AText: String;
-          AStateStyle.TextSettings.font); // const AFont: TALFont;
-      finally
-        AStateStyle.TextSettings.font.Color := LPrevFontColor;
-        AStateStyle.TextSettings.OnChanged := LPrevFontOnchanged;
-      end;
-    finally
-      AStateStyle.RestorestateNoChanges;
-    end;
-  end;
-
 begin
   Var LPromptText: String;
   var LUsePromptTextColor: Boolean;
@@ -5217,9 +5226,11 @@ begin
     LPromptText := '';
     LUsePromptTextColor := True;
   end;
-
-  if (LPromptText = '') or // Do not create BufPromptTextDrawable if LPromptText is empty
-     (Size.Size.IsZero) then begin // Do not create BufPromptTextDrawable if the size is 0
+  //--
+  if //--- Do not create BufPromptTextDrawable if LPromptText is empty
+     (LPromptText = '') or
+     //--- Do not create BufPromptTextDrawable if the size is 0
+     (Size.Size.IsZero) then begin
     clearBufPromptTextDrawable;
     exit;
   end;
@@ -5248,58 +5259,47 @@ begin
     end;
   end;
   //--
-  if Not Enabled then begin
-    _MakeBufPromptTextDrawable(
-      LPromptText, // const APromptText: String;
-      StateStyles.Disabled, // const AStateStyle: TALButtonStateStyle;
-      LUsePromptTextColor, // const AUsePromptTextColor: Boolean;
-      FBufPromptTextDisabledDrawable, // var ABufPromptTextDrawable: TALDrawable;
-      FBufPromptTextDisabledDrawableRect); // var ABufPromptTextDrawableRect: TRectF;
-  end
-  else if IsFocused then begin
-    _MakeBufPromptTextDrawable(
-      LPromptText, // const APromptText: String;
-      StateStyles.Focused, // const AStateStyle: TALButtonStateStyle;
-      LUsePromptTextColor, // const AUsePromptTextColor: Boolean;
-      FBufPromptTextFocusedDrawable, // var ABufPromptTextDrawable: TALDrawable;
-      FBufPromptTextFocusedDrawableRect); // var ABufPromptTextDrawableRect: TRectF;
-  end
-  else if IsMouseOver then begin
-    _MakeBufPromptTextDrawable(
-      LPromptText, // const APromptText: String;
-      StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
-      LUsePromptTextColor, // const AUsePromptTextColor: Boolean;
-      FBufPromptTextHoveredDrawable, // var ABufPromptTextDrawable: TALDrawable;
-      FBufPromptTextHoveredDrawableRect); // var ABufPromptTextDrawableRect: TRectF;
+  var LStateStyle := GetCurrentStateStyle;
+  if LStateStyle = nil then exit;
+  if (LStateStyle.TextSettings.Inherit) and
+     ((not LUsePromptTextColor) or (LStateStyle.PromptTextColor = TalphaColors.Null)) then exit;
+  if (not ALIsDrawableNull(LStateStyle.BufPromptTextDrawable)) then exit;
+  LStateStyle.SupersedeNoChanges(true{ASaveState});
+  try
+    var LPrevFontColor := LStateStyle.TextSettings.font.Color;
+    var LPrevFontOnchanged: TNotifyEvent;
+    LPrevFontOnchanged := LStateStyle.TextSettings.OnChanged;
+    LStateStyle.TextSettings.OnChanged := nil;
+    try
+      if LUsePromptTextColor then begin
+        if LStateStyle.PromptTextColor <> TAlphaColors.Null then LStateStyle.TextSettings.Font.Color := LStateStyle.PromptTextColor
+        else if PromptTextColor <> TalphaColors.Null then LStateStyle.TextSettings.Font.Color := PromptTextColor
+        else LStateStyle.TextSettings.Font.Color := TAlphaColorF.Create(
+                                                      ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
+                                                        PremultipliedAlpha.
+                                                        ToAlphaColor;
+      end;
+      CreateBufPromptTextDrawable(
+        LStateStyle.BufPromptTextDrawable, // var ABufPromptTextDrawable: TALDrawable;
+        LStateStyle.BufPromptTextDrawableRect, // var ABufPromptTextDrawableRect: TRectF;
+        LPromptText, // const AText: String;
+        LStateStyle.TextSettings.font); // const AFont: TALFont;
+    finally
+      LStateStyle.TextSettings.font.Color := LPrevFontColor;
+      LStateStyle.TextSettings.OnChanged := LPrevFontOnchanged;
+    end;
+  finally
+    LStateStyle.RestorestateNoChanges;
   end;
 end;
 
 {*****************************************}
 procedure TALBaseEdit.MakeBufLabelTextDrawable;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _MakeBufLabelTextDrawable(
-              const AStateStyle: TBaseStateStyle;
-              var ABufLabelTextDrawable: TALDrawable;
-              var ABufLabelTextDrawableRect: TRectF);
-  begin
-    if AStateStyle.LabelTextSettings.Inherit then exit;
-    if (not ALIsDrawableNull(ABufLabelTextDrawable)) then exit;
-    AStateStyle.LabelTextSettings.SupersedeNoChanges(true{ASaveState});
-    try
-      CreateBufLabelTextDrawable(
-        ABufLabelTextDrawable, // var ABufLabelTextDrawable: TALDrawable;
-        ABufLabelTextDrawableRect, // var ABufLabelTextDrawableRect: TRectF;
-        FLabelText, // const AText: String;
-        AStateStyle.LabelTextSettings.font); // const AFont: TALFont;
-    finally
-      AStateStyle.LabelTextSettings.RestorestateNoChanges;
-    end;
-  end;
-
 begin
-  if (FLabelText = '') or // Do not create BufLabelTextDrawable if LPromptText is empty
-     (Size.Size.IsZero) then begin // Do not create BufLabelTextDrawable if the size is 0
+  if //--- Do not create BufLabelTextDrawable if LPromptText is empty
+     (FLabelText = '') or
+     //--- Do not create BufLabelTextDrawable if the size is 0
+     (Size.Size.IsZero) then begin
     clearBufLabelTextDrawable;
     exit;
   end;
@@ -5312,55 +5312,29 @@ begin
       LabelTextSettings.font); // const AFont: TALFont;
   end;
   //--
-  if Not Enabled then begin
-    _MakeBufLabelTextDrawable(
-      StateStyles.Disabled, // const AStateStyle: TALButtonStateStyle;
-      FBufLabelTextDisabledDrawable, // var ABufLabelTextDrawable: TALDrawable;
-      FBufLabelTextDisabledDrawableRect); // var ABufLabelTextDrawableRect: TRectF;
-  end
-  else if IsFocused then begin
-    _MakeBufLabelTextDrawable(
-      StateStyles.Focused, // const AStateStyle: TALButtonStateStyle;
-      FBufLabelTextFocusedDrawable, // var ABufLabelTextDrawable: TALDrawable;
-      FBufLabelTextFocusedDrawableRect); // var ABufLabelTextDrawableRect: TRectF;
-  end
-  else if IsMouseOver then begin
-    _MakeBufLabelTextDrawable(
-      StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
-      FBufLabelTextHoveredDrawable, // var ABufLabelTextDrawable: TALDrawable;
-      FBufLabelTextHoveredDrawableRect); // var ABufLabelTextDrawableRect: TRectF;
+  var LStateStyle := GetCurrentStateStyle;
+  if LStateStyle = nil then exit;
+  if LStateStyle.LabelTextSettings.Inherit then exit;
+  if (not ALIsDrawableNull(LStateStyle.BufLabelTextDrawable)) then exit;
+  LStateStyle.LabelTextSettings.SupersedeNoChanges(true{ASaveState});
+  try
+    CreateBufLabelTextDrawable(
+      LStateStyle.BufLabelTextDrawable, // var ABufLabelTextDrawable: TALDrawable;
+      LStateStyle.BufLabelTextDrawableRect, // var ABufLabelTextDrawableRect: TRectF;
+      FLabelText, // const AText: String;
+      LStateStyle.LabelTextSettings.font); // const AFont: TALFont;
+  finally
+    LStateStyle.LabelTextSettings.RestorestateNoChanges;
   end;
 end;
 
 {*********************************}
 procedure TALBaseEdit.MakeBufSupportingTextDrawable;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _MakeBufSupportingTextDrawable(
-              const AStateStyle: TBaseStateStyle;
-              var ABufSupportingTextDrawable: TALDrawable;
-              var ABufSupportingTextDrawableRect: TRectF);
-  begin
-    if AStateStyle.SupportingTextSettings.Inherit then exit;
-    if (not ALIsDrawableNull(ABufSupportingTextDrawable)) then exit;
-    AStateStyle.SupportingTextSettings.SupersedeNoChanges(true{ASaveState});
-    try
-      CreateBufSupportingTextDrawable(
-        ABufSupportingTextDrawable, // var ABufSupportingTextDrawable: TALDrawable;
-        ABufSupportingTextDrawableRect, // var ABufSupportingTextDrawableRect: TRectF;
-        FSupportingText, // const AText: String;
-        AStateStyle.SupportingTextSettings.font); // const AFont: TALFont;
-      ABufSupportingTextDrawableRect.SetLocation(
-        padding.Left + SupportingTextSettings.Margins.Left,
-        Height+SupportingTextSettings.Margins.Top);
-    finally
-      AStateStyle.SupportingTextSettings.RestorestateNoChanges;
-    end;
-  end;
-
 begin
-  if (FSupportingText = '') or // Do not create BufSupportingTextDrawable if LPromptText is empty
-     (Size.Size.IsZero) then begin // Do not create BufSupportingTextDrawable if the size is 0
+  if //--- Do not create BufSupportingTextDrawable if LPromptText is empty
+     (FSupportingText = '') or
+     //--- Do not create BufSupportingTextDrawable if the size is 0
+     (Size.Size.IsZero) then begin
     clearBufSupportingTextDrawable;
     exit;
   end;
@@ -5384,23 +5358,22 @@ begin
     end;
   end;
   //--
-  if Not Enabled then begin
-    _MakeBufSupportingTextDrawable(
-      StateStyles.Disabled, // const AStateStyle: TALButtonStateStyle;
-      FBufSupportingTextDisabledDrawable, // var ABufSupportingTextDrawable: TALDrawable;
-      FBufSupportingTextDisabledDrawableRect); // var ABufSupportingTextDrawableRect: TRectF;
-  end
-  else if IsFocused then begin
-    _MakeBufSupportingTextDrawable(
-      StateStyles.Focused, // const AStateStyle: TALButtonStateStyle;
-      FBufSupportingTextFocusedDrawable, // var ABufSupportingTextDrawable: TALDrawable;
-      FBufSupportingTextFocusedDrawableRect); // var ABufSupportingTextDrawableRect: TRectF;
-  end
-  else if IsMouseOver then begin
-    _MakeBufSupportingTextDrawable(
-      StateStyles.Hovered, // const AStateStyle: TALButtonStateStyle;
-      FBufSupportingTextHoveredDrawable, // var ABufSupportingTextDrawable: TALDrawable;
-      FBufSupportingTextHoveredDrawableRect); // var ABufSupportingTextDrawableRect: TRectF;
+  var LStateStyle := GetCurrentStateStyle;
+  if LStateStyle = nil then exit;
+  if LStateStyle.SupportingTextSettings.Inherit then exit;
+  if (not ALIsDrawableNull(LStateStyle.BufSupportingTextDrawable)) then exit;
+  LStateStyle.SupportingTextSettings.SupersedeNoChanges(true{ASaveState});
+  try
+    CreateBufSupportingTextDrawable(
+      LStateStyle.BufSupportingTextDrawable, // var ABufSupportingTextDrawable: TALDrawable;
+      LStateStyle.BufSupportingTextDrawableRect, // var ABufSupportingTextDrawableRect: TRectF;
+      FSupportingText, // const AText: String;
+      LStateStyle.SupportingTextSettings.font); // const AFont: TALFont;
+    LStateStyle.BufSupportingTextDrawableRect.SetLocation(
+      padding.Left + SupportingTextSettings.Margins.Left,
+      Height+SupportingTextSettings.Margins.Top);
+  finally
+    LStateStyle.SupportingTextSettings.RestorestateNoChanges;
   end;
 end;
 
@@ -5410,17 +5383,14 @@ begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (ALIsDrawableNull(BufDrawable)) and // warn will be raise in inherited
-     ((not ALIsDrawableNull(fBufDisabledDrawable)) or
-      (not ALIsDrawableNull(fBufHoveredDrawable)) or
-      (not ALIsDrawableNull(fBufFocusedDrawable))) then
+     ((not ALIsDrawableNull(FStateStyles.Disabled.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Hovered.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Focused.BufDrawable))) then
     ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
+  if FStateStyles <> nil then
+    FStateStyles.ClearBufDrawable;
   inherited clearBufDrawable;
-  //--
-  ALFreeAndNilDrawable(fBufDisabledDrawable);
-  ALFreeAndNilDrawable(fBufHoveredDrawable);
-  ALFreeAndNilDrawable(fBufFocusedDrawable);
-  //--
   clearBufPromptTextDrawable;
   clearBufLabelTextDrawable;
   clearBufSupportingTextDrawable;
@@ -5430,18 +5400,16 @@ end;
 procedure TALBaseEdit.clearBufPromptTextDrawable;
 begin
   ALFreeAndNilDrawable(fBufPromptTextDrawable);
-  ALFreeAndNilDrawable(fBufPromptTextDisabledDrawable);
-  ALFreeAndNilDrawable(fBufPromptTextHoveredDrawable);
-  ALFreeAndNilDrawable(fBufPromptTextFocusedDrawable);
+  if FStateStyles <> nil then
+    FStateStyles.clearBufPromptTextDrawable;
 end;
 
 {*********************************}
 procedure TALBaseEdit.clearBufLabelTextDrawable;
 begin
   ALFreeAndNilDrawable(fBufLabelTextDrawable);
-  ALFreeAndNilDrawable(fBufLabelTextDisabledDrawable);
-  ALFreeAndNilDrawable(fBufLabelTextHoveredDrawable);
-  ALFreeAndNilDrawable(fBufLabelTextFocusedDrawable);
+  if FStateStyles <> nil then
+    FStateStyles.clearBufLabelTextDrawable;
 end;
 
 {*********************************}
@@ -5454,9 +5422,8 @@ begin
     Margins.Bottom := FSupportingTextSettings.Margins.Bottom;
   end;
   ALFreeAndNilDrawable(fBufSupportingTextDrawable);
-  ALFreeAndNilDrawable(fBufSupportingTextDisabledDrawable);
-  ALFreeAndNilDrawable(fBufSupportingTextHoveredDrawable);
-  ALFreeAndNilDrawable(fBufSupportingTextFocusedDrawable);
+  if FStateStyles <> nil then
+    FStateStyles.clearBufSupportingTextDrawable;
 end;
 
 {**********************}
@@ -5464,37 +5431,19 @@ procedure TALBaseEdit.Paint;
 begin
 
   MakeBufDrawable;
+  var LStateStyle := GetCurrentStateStyle;
 
   {$REGION 'Background'}
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
-  if Not Enabled then begin
-    LDrawable := fBufDisabledDrawable;
-    LDrawableRect := fBufDisabledDrawableRect;
+  if LStateStyle <> nil then begin
+    LDrawable := LStateStyle.BufDrawable;
+    LDrawableRect := LStateStyle.BufDrawableRect;
     if ALIsDrawableNull(LDrawable) then begin
       LDrawable := BufDrawable;
       LDrawableRect := BufDrawableRect;
     end;
   end
-  //--
-  else if IsFocused then begin
-    LDrawable := fBufFocusedDrawable;
-    LDrawableRect := fBufFocusedDrawableRect;
-    if ALIsDrawableNull(LDrawable) then begin
-      LDrawable := BufDrawable;
-      LDrawableRect := BufDrawableRect;
-    end;
-  end
-  //--
-  else if IsMouseOver then begin
-    LDrawable := fBufHoveredDrawable;
-    LDrawableRect := fBufHoveredDrawableRect;
-    if ALIsDrawableNull(LDrawable) then begin
-      LDrawable := BufDrawable;
-      LDrawableRect := BufDrawableRect;
-    end;
-  end
-  //--
   else begin
     LDrawable := BufDrawable;
     LDrawableRect := BufDrawableRect;
@@ -5512,36 +5461,17 @@ begin
   {$REGION 'LabelText'}
   var LLabelTextDrawable: TALDrawable;
   var LLabelTextDrawableRect: TRectF;
-  if Not Enabled then begin
-    LLabelTextDrawable := fBufLabelTextDisabledDrawable;
-    LLabelTextDrawableRect := fBufLabelTextDisabledDrawableRect;
+  if LStateStyle <> nil then begin
+    LLabelTextDrawable := LStateStyle.BufLabelTextDrawable;
+    LLabelTextDrawableRect := LStateStyle.BufLabelTextDrawableRect;
     if ALIsDrawableNull(LLabelTextDrawable) then begin
-      LLabelTextDrawable := FBufLabelTextDrawable;
-      LLabelTextDrawableRect := FBufLabelTextDrawableRect;
+      LLabelTextDrawable := BufLabelTextDrawable;
+      LLabelTextDrawableRect := BufLabelTextDrawableRect;
     end;
   end
-  //--
-  else if IsFocused then begin
-    LLabelTextDrawable := fBufLabelTextFocusedDrawable;
-    LLabelTextDrawableRect := fBufLabelTextFocusedDrawableRect;
-    if ALIsDrawableNull(LLabelTextDrawable) then begin
-      LLabelTextDrawable := FBufLabelTextDrawable;
-      LLabelTextDrawableRect := FBufLabelTextDrawableRect;
-    end;
-  end
-  //--
-  else if IsMouseOver then begin
-    LLabelTextDrawable := fBufLabelTextHoveredDrawable;
-    LLabelTextDrawableRect := fBufLabelTextHoveredDrawableRect;
-    if ALIsDrawableNull(LLabelTextDrawable) then begin
-      LLabelTextDrawable := FBufLabelTextDrawable;
-      LLabelTextDrawableRect := FBufLabelTextDrawableRect;
-    end;
-  end
-  //--
   else begin
-    LLabelTextDrawable := FBufLabelTextDrawable;
-    LLabelTextDrawableRect := FBufLabelTextDrawableRect;
+    LLabelTextDrawable := BufLabelTextDrawable;
+    LLabelTextDrawableRect := BufLabelTextDrawableRect;
   end;
   //--
   if LabelTextSettings.Layout = TLabelTextLayout.Inline then
@@ -5583,37 +5513,17 @@ begin
      {$IF defined(ALDPK)}or true{$ENDIF} then begin
     var LPromptTextDrawable: TALDrawable;
     var LPromptTextDrawableRect: TRectF;
-    if Not Enabled then begin
-      LPromptTextDrawable := fBufPromptTextDisabledDrawable;
-      LPromptTextDrawableRect := fBufPromptTextDisabledDrawableRect;
+    if LStateStyle <> nil then begin
+      LPromptTextDrawable := LStateStyle.BufPromptTextDrawable;
+      LPromptTextDrawableRect := LStateStyle.BufPromptTextDrawableRect;
       if ALIsDrawableNull(LPromptTextDrawable) then begin
-        LPromptTextDrawable := FBufPromptTextDrawable;
-        LPromptTextDrawableRect := FBufPromptTextDrawableRect;
+        LPromptTextDrawable := BufPromptTextDrawable;
+        LPromptTextDrawableRect := BufPromptTextDrawableRect;
       end;
     end
-    //--
-    //--
-    else if IsFocused then begin
-      LPromptTextDrawable := fBufPromptTextFocusedDrawable;
-      LPromptTextDrawableRect := fBufPromptTextFocusedDrawableRect;
-      if ALIsDrawableNull(LPromptTextDrawable) then begin
-        LPromptTextDrawable := FBufPromptTextDrawable;
-        LPromptTextDrawableRect := FBufPromptTextDrawableRect;
-      end;
-    end
-    //--
-    else if IsMouseOver then begin
-      LPromptTextDrawable := fBufPromptTextHoveredDrawable;
-      LPromptTextDrawableRect := fBufPromptTextHoveredDrawableRect;
-      if ALIsDrawableNull(LPromptTextDrawable) then begin
-        LPromptTextDrawable := FBufPromptTextDrawable;
-        LPromptTextDrawableRect := FBufPromptTextDrawableRect;
-      end;
-    end
-    //--
     else begin
-      LPromptTextDrawable := FBufPromptTextDrawable;
-      LPromptTextDrawableRect := FBufPromptTextDrawableRect;
+      LPromptTextDrawable := BufPromptTextDrawable;
+      LPromptTextDrawableRect := BufPromptTextDrawableRect;
     end;
     //--
     Var LPos: TpointF;
@@ -5698,36 +5608,17 @@ begin
   {$REGION 'SupportingText'}
   var LSupportingTextDrawable: TALDrawable;
   var LSupportingTextDrawableRect: TRectF;
-  if Not Enabled then begin
-    LSupportingTextDrawable := fBufSupportingTextDisabledDrawable;
-    LSupportingTextDrawableRect := fBufSupportingTextDisabledDrawableRect;
+  if LStateStyle <> nil then begin
+    LSupportingTextDrawable := LStateStyle.BufSupportingTextDrawable;
+    LSupportingTextDrawableRect := LStateStyle.BufSupportingTextDrawableRect;
     if ALIsDrawableNull(LSupportingTextDrawable) then begin
-      LSupportingTextDrawable := FBufSupportingTextDrawable;
-      LSupportingTextDrawableRect := FBufSupportingTextDrawableRect;
+      LSupportingTextDrawable := BufSupportingTextDrawable;
+      LSupportingTextDrawableRect := BufSupportingTextDrawableRect;
     end;
   end
-  //--
-  else if IsFocused then begin
-    LSupportingTextDrawable := fBufSupportingTextFocusedDrawable;
-    LSupportingTextDrawableRect := fBufSupportingTextFocusedDrawableRect;
-    if ALIsDrawableNull(LSupportingTextDrawable) then begin
-      LSupportingTextDrawable := FBufSupportingTextDrawable;
-      LSupportingTextDrawableRect := FBufSupportingTextDrawableRect;
-    end;
-  end
-  //--
-  else if IsMouseOver then begin
-    LSupportingTextDrawable := fBufSupportingTextHoveredDrawable;
-    LSupportingTextDrawableRect := fBufSupportingTextHoveredDrawableRect;
-    if ALIsDrawableNull(LSupportingTextDrawable) then begin
-      LSupportingTextDrawable := FBufSupportingTextDrawable;
-      LSupportingTextDrawableRect := FBufSupportingTextDrawableRect;
-    end;
-  end
-  //--
   else begin
-    LSupportingTextDrawable := FBufSupportingTextDrawable;
-    LSupportingTextDrawableRect := FBufSupportingTextDrawableRect;
+    LSupportingTextDrawable := BufSupportingTextDrawable;
+    LSupportingTextDrawableRect := BufSupportingTextDrawableRect;
   end;
   //--
   ALDrawDrawable(

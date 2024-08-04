@@ -115,6 +115,7 @@ type
 
   {~~~~~~~~~~~~~~~}
   TALBrush = Class;
+  TALStateLayer = Class;
   TALStrokeBrush = class;
   TALShadow = class;
 
@@ -676,34 +677,58 @@ type
   // its state. State layers provide a systematic approach to visualizing states
   // by using opacity. A layer can be applied to an entire element or in a
   // circular shape and only one state layer can be applied at a given time.
-  TALStateLayer = class(TALBrush)
+  TALStateLayer = class(TALPersistentObserver)
   private
     FOpacity: Single;
+    FColor: TAlphaColor;
     FUseContentColor: Boolean;
+    FMargins: TBounds;
+    FXRadius: Single;
+    FYRadius: Single;
     FDefaultOpacity: Single;
+    FDefaultColor: TAlphaColor;
     FDefaultUseContentColor: Boolean;
+    FDefaultXRadius: Single;
+    FDefaultYRadius: Single;
     procedure SetOpacity(const Value: Single);
+    procedure SetColor(const Value: TAlphaColor);
     procedure SetUseContentColor(const Value: Boolean);
+    procedure SetMargins(const Value: TBounds);
+    procedure SetXRadius(const Value: Single);
+    procedure SetYRadius(const Value: Single);
+    procedure MarginsChanged(Sender: TObject); virtual;
     function IsOpacityStored: Boolean;
+    function IsColorStored: Boolean;
     function IsUseContentColorStored: Boolean;
+    function IsXRadiusStored: Boolean;
+    function IsYRadiusStored: Boolean;
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
   public
-    constructor Create(const ADefaultColor: TAlphaColor); override;
+    constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+    destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); reintroduce; virtual;
-    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single); reintroduce;
-    function HasFill: boolean; override;
-    function Styles: TALBrushStyles; override;
+    procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); virtual;
+    procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
+    function HasFill: boolean; virtual;
     property DefaultOpacity: Single read FDefaultOpacity write FDefaultOpacity;
+    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
     property DefaultUseContentColor: Boolean read FDefaultUseContentColor write FDefaultUseContentColor;
+    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
+    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
   published
     property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
+    property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
     /// <summary>
     ///   When UseContentColor is true, the color property is ignored, and the
     ///   color is derived from the component content, such as the color of a
     ///   label's text.
     /// </summary>
     property UseContentColor: Boolean read FUseContentColor write SetUseContentColor stored IsUseContentColorStored;
+    property Margins: TBounds read FMargins write SetMargins;
+    property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
+    property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -809,8 +834,6 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
-    procedure BlendStateLayerIntoFillAndStroke(const AContentColor: TAlphaColor); virtual;
-    procedure BlendStateLayerIntoFillAndStrokeNoChanges(const AContentColor: TAlphaColor);
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
@@ -1362,7 +1385,7 @@ end;
 function TALShadow.HasShadow: boolean;
 begin
   result := (Color <> TalphaColors.Null) and
-            (CompareValue(fBlur, 0, Tepsilon.vector) > 0);
+            (CompareValue(Blur, 0, Tepsilon.vector) > 0);
 end;
 
 {***************************************}
@@ -3419,7 +3442,7 @@ end;
 function TALStrokeBrush.HasStroke: boolean;
 begin
   result := (Color <> TalphaColors.Null) and
-            (CompareValue(FThickness, 0, TEpsilon.Vector) > 0);
+            (CompareValue(Thickness, 0, TEpsilon.Vector) > 0);
 end;
 
 {***************************************}
@@ -3554,27 +3577,54 @@ begin
   end;
 end;
 
-{**************************************************}
+{**********************************************************************************************}
 constructor TALStateLayer.Create(const ADefaultColor: TAlphaColor);
 begin
-  inherited Create(ADefaultColor);
+  inherited Create;
   //--
   FDefaultOpacity := 0;
+  FDefaultColor := ADefaultColor;
   FDefaultUseContentColor := False;
+  FDefaultXRadius := 0;
+  FDefaultYRadius := 0;
   //--
   FOpacity := FDefaultOpacity;
+  FColor := FDefaultColor;
   FUseContentColor := FDefaultUseContentColor;
+  FXRadius := FDefaultXRadius;
+  FYRadius := FDefaultYRadius;
+  //--
+  FMargins := TBounds.Create(TRectF.Empty);
+  FMargins.OnChange := MarginsChanged;
 end;
 
-{**************************************************}
+{**************************}
+destructor TALStateLayer.Destroy;
+begin
+  ALFreeAndNil(FMargins);
+  inherited;
+end;
+
+{*********************************}
+function TALStateLayer.CreateSavedState: TALPersistentObserver;
+type
+  TALStateLayerClass = class of TALStateLayer;
+begin
+  result := TALStateLayerClass(classtype).Create(DefaultColor);
+end;
+
+{**********************************************}
 procedure TALStateLayer.Assign(Source: TPersistent);
 begin
   if Source is TALStateLayer then begin
     BeginUpdate;
     Try
       Opacity := TALStateLayer(Source).Opacity;
+      Color := TALStateLayer(Source).Color;
       UseContentColor := TALStateLayer(Source).UseContentColor;
-      inherited Assign(Source);
+      Margins.Assign(TALStateLayer(Source).Margins);
+      XRadius := TALStateLayer(Source).XRadius;
+      YRadius := TALStateLayer(Source).YRadius;
     Finally
       EndUpdate;
     End;
@@ -3583,14 +3633,18 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{**************************************************}
+{************************}
 procedure TALStateLayer.Reset;
 begin
   BeginUpdate;
   Try
     inherited Reset;
     Opacity := DefaultOpacity;
+    Color := DefaultColor;
     UseContentColor := DefaultUseContentColor;
+    Margins.Rect := Margins.DefaultValue;
+    XRadius := DefaultXRadius;
+    YRadius := DefaultYRadius;
   finally
     EndUpdate;
   end;
@@ -3601,14 +3655,27 @@ procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedT
 begin
   BeginUpdate;
   Try
-    inherited Interpolate(ATo, ANormalizedTime);
     if ATo <> nil then begin
       Opacity := InterpolateSingle(Opacity{Start}, ATo.Opacity{Stop}, ANormalizedTime);
+      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       UseContentColor := ATo.UseContentColor;
+      Margins.Left := InterpolateSingle(Margins.Left{Start}, ATo.Margins.Left{Stop}, ANormalizedTime);
+      Margins.Right := InterpolateSingle(Margins.Right{Start}, ATo.Margins.Right{Stop}, ANormalizedTime);
+      Margins.Top := InterpolateSingle(Margins.Top{Start}, ATo.Margins.Top{Stop}, ANormalizedTime);
+      Margins.Bottom := InterpolateSingle(Margins.Bottom{Start}, ATo.Margins.Bottom{Stop}, ANormalizedTime);
+      XRadius := InterpolateSingle(XRadius{Start}, ATo.XRadius{Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, ATo.YRadius{Stop}, ANormalizedTime);
     end
     else begin
       Opacity := InterpolateSingle(Opacity{Start}, DefaultOpacity{Stop}, ANormalizedTime);
+      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       UseContentColor := DefaultUseContentColor;
+      Margins.Left := InterpolateSingle(Margins.Left{Start}, Margins.DefaultValue.Left{Stop}, ANormalizedTime);
+      Margins.Right := InterpolateSingle(Margins.Right{Start}, Margins.DefaultValue.Right{Stop}, ANormalizedTime);
+      Margins.Top := InterpolateSingle(Margins.Top{Start}, Margins.DefaultValue.Top{Stop}, ANormalizedTime);
+      Margins.Bottom := InterpolateSingle(Margins.Bottom{Start}, Margins.DefaultValue.Bottom{Stop}, ANormalizedTime);
+      XRadius := InterpolateSingle(XRadius{Start}, DefaultXRadius{Stop}, ANormalizedTime);
+      YRadius := InterpolateSingle(YRadius{Start}, DefaultYRadius{Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -3626,18 +3693,41 @@ begin
   end;
 end;
 
-{**************************************}
+{*********************************}
 function TALStateLayer.HasFill: boolean;
 begin
-  Result := (Inherited HasFill) and
+  result := ((Color <> TalphaColors.Null) or (UseContentColor)) and
             (CompareValue(Opacity, 0, TEpsilon.Scale) > 0);
 end;
 
-{********************************************}
-function TALStateLayer.Styles: TALBrushStyles;
+{**************************************************}
+function TALStateLayer.IsOpacityStored: Boolean;
 begin
-  Result := inherited Styles;
-  if UseContentColor then result := result + [TALBrushStyle.Solid];
+  Result := not SameValue(FOpacity, FDefaultOpacity, TEpsilon.Scale);
+end;
+
+{***************************************}
+function TALStateLayer.IsColorStored: Boolean;
+begin
+  result := FColor <> FDefaultColor;
+end;
+
+{**************************************************}
+function TALStateLayer.IsUseContentColorStored: Boolean;
+begin
+  Result := FUseContentColor <> FDefaultUseContentColor;
+end;
+
+{**************************************************}
+function TALStateLayer.IsXRadiusStored: Boolean;
+begin
+  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+end;
+
+{**************************************************}
+function TALStateLayer.IsYRadiusStored: Boolean;
+begin
+  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
 
 {**************************************************}
@@ -3645,6 +3735,15 @@ procedure TALStateLayer.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
     FOpacity := Value;
+    Change;
+  end;
+end;
+
+{****************************************************}
+procedure TALStateLayer.SetColor(const Value: TAlphaColor);
+begin
+  if fColor <> Value then begin
+    fColor := Value;
     Change;
   end;
 end;
@@ -3659,15 +3758,33 @@ begin
 end;
 
 {**************************************************}
-function TALStateLayer.IsOpacityStored: Boolean;
+procedure TALStateLayer.SetMargins(const Value: TBounds);
 begin
-  Result := not SameValue(FOpacity, FDefaultOpacity, TEpsilon.Scale);
+  FMargins.Assign(Value);
 end;
 
 {**************************************************}
-function TALStateLayer.IsUseContentColorStored: Boolean;
+procedure TALStateLayer.SetXRadius(const Value: Single);
 begin
-  Result := FUseContentColor <> FDefaultUseContentColor;
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
+    FXRadius := Value;
+    Change;
+  end;
+end;
+
+{**************************************************}
+procedure TALStateLayer.SetYRadius(const Value: Single);
+begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
+    FYRadius := Value;
+    Change;
+  end;
+end;
+
+{*************************************************}
+procedure TALStateLayer.MarginsChanged(Sender: TObject);
+begin
+  change;
 end;
 
 {***************************************}
@@ -4054,56 +4171,6 @@ begin
   end;
 end;
 
-{******************************}
-procedure TALBaseStateStyle.BlendStateLayerIntoFillAndStroke(const AContentColor: TAlphaColor);
-begin
-  if not statelayer.HasFill then exit;
-  BeginUpdate;
-  try
-
-    // Fill.BackgroundMargins
-    // If the fill doesn't have any background, then we can use the
-    // state layer BackgroundMargins.
-    if (Fill.Color = TalphaColors.Null) and
-       (length(Fill.Gradient.Colors) = 0) then
-      Fill.BackgroundMargins.Rect := statelayer.BackgroundMargins.Rect;
-
-    // Fill.Color & Stroke.Color
-    if StateLayer.UseContentColor then begin
-      Fill.Color := ALblendColor(fill.Color, AContentColor, statelayer.Opacity);
-      Stroke.Color := ALblendColor(Stroke.Color, AContentColor, statelayer.Opacity);
-    end
-    else begin
-      Fill.Color := ALblendColor(fill.Color, statelayer.Color, statelayer.Opacity);
-      Stroke.Color := ALblendColor(Stroke.Color, statelayer.Color, statelayer.Opacity);
-    end;
-
-    // fill.Gradient
-    // Not yet supported
-
-    // Fill.ResourceName
-    if Fill.ResourceName = '' then begin
-      Fill.ResourceName := statelayer.ResourceName;
-      Fill.WrapMode := statelayer.WrapMode;
-      Fill.ImageMargins := statelayer.ImageMargins;
-    end;
-
-  finally
-    EndUpdate;
-  end;
-end;
-
-{******************************}
-procedure TALBaseStateStyle.BlendStateLayerIntoFillAndStrokeNoChanges(const AContentColor: TAlphaColor);
-begin
-  BeginUpdate;
-  try
-    BlendStateLayerIntoFillAndStroke(AContentColor);
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
 {******************************************************}
 procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
@@ -4127,13 +4194,17 @@ begin
       //Transition
     end
     else if Supports(FControlParent, IALShapeControl, LShapeControl) then begin
-      Fill.Interpolate(LShapeControl.GetFill, ANormalizedTime);
       var LprevUseContentColor := StateLayer.UseContentColor;
+      var LprevXRadius := StateLayer.XRadius;
+      var LprevYRadius := StateLayer.YRadius;
+      Fill.Interpolate(LShapeControl.GetFill, ANormalizedTime);
       StateLayer.Interpolate(nil, ANormalizedTime);
-      StateLayer.UseContentColor := LprevUseContentColor;
       Stroke.Interpolate(LShapeControl.GetStroke, ANormalizedTime);
       Shadow.Interpolate(LShapeControl.GetShadow, ANormalizedTime);
       Scale.Interpolate(_TControlAccessProtected(FControlParent).Scale, ANormalizedTime);
+      StateLayer.UseContentColor := LprevUseContentColor;
+      StateLayer.XRadius := LprevXRadius;
+      StateLayer.YRadius := LprevYRadius;
       //Transition
     end
     else begin

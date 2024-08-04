@@ -26,9 +26,9 @@ type
   TALTextElements = array of TALTextElement;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALMultiLineTextAdjustRectProc = procedure(const ACanvas: TALCanvas; Const AScale: Single; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF) of object;
-  TALMultiLineTextBeforeDrawBackgroundProc = procedure(const ACanvas: TALCanvas; Const AScale: Single; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF) of object;
-  TALMultiLineTextBeforeDrawParagraphProc = procedure(const ACanvas: TALCanvas; Const AScale: Single; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF) of object;
+  TALMultiLineTextAdjustRectProc = procedure(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF) of object;
+  TALMultiLineTextBeforeDrawBackgroundProc = procedure(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF) of object;
+  TALMultiLineTextBeforeDrawParagraphProc = procedure(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF) of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALMultiLineTextOptions = class(Tobject)
@@ -89,10 +89,18 @@ type
     FillGradientAngle: Single; // Default = 180;
     FillResourceName: String; // default = ''
     FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
-    FillImageMarginsRect: TRectF; // default = TRectF.Empty
+    FillBackgroundMargins: TRectF; // default = TRectF.Empty
+    FillImageMargins: TRectF; // default = TRectF.Empty
+    //--
+    StateLayerOpacity: Single; // Default = 0
+    StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
+    StateLayerMargins: TRectF; // default = TRectF.Empty
+    StateLayerXRadius: Single; // default = 0
+    StateLayerYRadius: Single; // default = 0
+    //--
     StrokeColor: TalphaColor; // default = TAlphaColors.null
     StrokeThickness: Single; // default = 1
+    //--
     ShadowColor: TAlphaColor; // default = TAlphaColors.null
     ShadowBlur: Single; // default = 12
     ShadowOffsetX: Single; // default = 0
@@ -139,9 +147,24 @@ type
     //--
     constructor Create;
     //--
+    procedure ScaleProperties;
     function GetScaledFontSize: Single; inline;
     function GetScaledEllipsisFontSize: Single; inline;
     function GetScaledLetterSpacing: Single; inline;
+    function GetScaledFillBackgroundMarginTop: Single; inline;
+    function GetScaledFillBackgroundMarginRight: Single; inline;
+    function GetScaledFillBackgroundMarginLeft: Single; inline;
+    function GetScaledFillBackgroundMarginBottom: Single; inline;
+    function GetScaledFillImageMarginTop: Single; inline;
+    function GetScaledFillImageMarginRight: Single; inline;
+    function GetScaledFillImageMarginLeft: Single; inline;
+    function GetScaledFillImageMarginBottom: Single; inline;
+    function GetScaledStateLayerMarginTop: Single; inline;
+    function GetScaledStateLayerMarginRight: Single; inline;
+    function GetScaledStateLayerMarginLeft: Single; inline;
+    function GetScaledStateLayerMarginBottom: Single; inline;
+    function GetScaledStateLayerXRadius: Single; inline;
+    function GetScaledStateLayerYRadius: Single; inline;
     function GetScaledStrokeThickness: Single; inline;
     function GetScaledShadowBlur: Single; inline;
     function GetScaledShadowOffsetX: Single; inline;
@@ -382,10 +405,18 @@ begin
   FillGradientAngle := 180;
   FillResourceName := '';
   FillWrapMode := TALImageWrapMode.Fit;
-  FillBackgroundMarginsRect := TRectF.Empty;
-  FillImageMarginsRect := TRectF.Empty;
+  FillBackgroundMargins := TRectF.Empty;
+  FillImageMargins := TRectF.Empty;
+  //--
+  StateLayerOpacity := 0;
+  StateLayerColor := TAlphaColors.null;
+  StateLayerMargins := TRectF.Empty;
+  StateLayerXRadius := 0;
+  StateLayerYRadius := 0;
+  //--
   StrokeColor := TalphaColors.Null;
   StrokeThickness := 1;
+  //--
   ShadowColor := TAlphaColors.Null;
   ShadowBlur := 12;
   ShadowOffsetX := 0;
@@ -416,6 +447,96 @@ end;
 function TALMultiLineTextOptions.GetScaledLetterSpacing: Single;
 begin
   Result := LetterSpacing * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillBackgroundMarginTop: Single;
+begin
+  Result := FillBackgroundMargins.Top * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillBackgroundMarginRight: Single;
+begin
+  Result := FillBackgroundMargins.Right * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillBackgroundMarginLeft: Single;
+begin
+  Result := FillBackgroundMargins.Left * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillBackgroundMarginBottom: Single;
+begin
+  Result := FillBackgroundMargins.Bottom * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillImageMarginTop: Single;
+begin
+  Result := FillImageMargins.Top * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillImageMarginRight: Single;
+begin
+  Result := FillImageMargins.Right * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillImageMarginLeft: Single;
+begin
+  Result := FillImageMargins.Left * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledFillImageMarginBottom: Single;
+begin
+  Result := FillImageMargins.Bottom * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledStateLayerMarginTop: Single;
+begin
+  Result := StateLayerMargins.Top * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledStateLayerMarginRight: Single;
+begin
+  Result := StateLayerMargins.Right * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledStateLayerMarginLeft: Single;
+begin
+  Result := StateLayerMargins.Left * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledStateLayerMarginBottom: Single;
+begin
+  Result := StateLayerMargins.Bottom * Scale;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledStateLayerXRadius: Single;
+begin
+  if compareValue(StateLayerXRadius, 0, TEpsilon.Vector) > 0 then
+    Result := StateLayerXRadius * Scale
+  else
+    Result := StateLayerXRadius;
+end;
+
+{**************************************************************}
+function TALMultiLineTextOptions.GetScaledStateLayerYRadius: Single;
+begin
+  if compareValue(StateLayerYRadius, 0, TEpsilon.Vector) > 0 then
+    Result := StateLayerYRadius * Scale
+  else
+    Result := StateLayerYRadius;
 end;
 
 {****************************************************************}
@@ -457,7 +578,7 @@ begin
   if compareValue(YRadius, 0, TEpsilon.Vector) > 0 then
     Result := YRadius * Scale
   else
-    Result := XRadius;
+    Result := YRadius;
 end;
 
 {***********************************************************}
@@ -484,6 +605,39 @@ begin
   Result := Padding.Bottom * Scale;
 end;
 
+{************************************************}
+procedure TALMultiLineTextOptions.ScaleProperties;
+begin
+  FontSize := FontSize * Scale;
+  EllipsisFontSize := EllipsisFontSize * Scale;
+  LetterSpacing := LetterSpacing * Scale;
+  FillBackgroundMargins.Top := FillBackgroundMargins.Top * Scale;
+  FillBackgroundMargins.Right := FillBackgroundMargins.Right * Scale;
+  FillBackgroundMargins.Left := FillBackgroundMargins.Left * Scale;
+  FillBackgroundMargins.Bottom := FillBackgroundMargins.Bottom * Scale;
+  FillImageMargins.Top := FillImageMargins.Top * Scale;
+  FillImageMargins.Right := FillImageMargins.Right * Scale;
+  FillImageMargins.Left := FillImageMargins.Left * Scale;
+  FillImageMargins.Bottom := FillImageMargins.Bottom * Scale;
+  StateLayerMargins.Top := StateLayerMargins.Top * Scale;
+  StateLayerMargins.Right := StateLayerMargins.Right * Scale;
+  StateLayerMargins.Left := StateLayerMargins.Left * Scale;
+  StateLayerMargins.Bottom := StateLayerMargins.Bottom * Scale;
+  if compareValue(StateLayerXRadius, 0, TEpsilon.Vector) > 0 then StateLayerXRadius := StateLayerXRadius * Scale;
+  if compareValue(StateLayerYRadius, 0, TEpsilon.Vector) > 0 then StateLayerYRadius := StateLayerYRadius * Scale;
+  StrokeThickness := StrokeThickness * Scale;
+  ShadowBlur := ShadowBlur * Scale;
+  ShadowOffsetX := ShadowOffsetX * Scale;
+  ShadowOffsetY := ShadowOffsetY * Scale;
+  if compareValue(XRadius, 0, TEpsilon.Vector) > 0 then XRadius := XRadius * Scale;
+  if compareValue(YRadius, 0, TEpsilon.Vector) > 0 then YRadius := YRadius * Scale;
+  Padding.Top := Padding.Top * Scale;
+  Padding.Right := Padding.Right * Scale;
+  Padding.Left := Padding.Left * Scale;
+  Padding.Bottom := Padding.Bottom * Scale;
+  Scale := 1;
+end;
+
 {****************************}
 procedure ALDrawMultiLineText(
             var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
@@ -498,6 +652,8 @@ procedure ALDrawMultiLineText(
             out AElements: TALTextElements; // out => The list of rectangles describing all span elements.
             const AOptions: TALMultiLineTextOptions;
             const AOnlyMeasure: Boolean = False);
+
+  var LScale: Single;
 
   {$REGION 'TRangeIndex'}
   {$IF defined(ALSkiaEngine)}
@@ -696,9 +852,9 @@ procedure ALDrawMultiLineText(
       //--
       if AFontSizes <> nil then begin
         var LFontSizeFloat: Single;
-        if _TryStrPxValueToFloat(ALLowerCase(LParamList.Values['font-size']), LFontSizeFloat) then AFontSizes.Add(LFontSizeFloat * AOptions.Scale) // <span font-size="14px">
+        if _TryStrPxValueToFloat(ALLowerCase(LParamList.Values['font-size']), LFontSizeFloat) then AFontSizes.Add(LFontSizeFloat * LScale) // <span font-size="14px">
         else if AFontSizes.Count > 0 then AFontSizes.Add(AFontSizes[AFontSizes.Count - 1])
-        else AFontSizes.Add(AOptions.GetScaledFontSize);
+        else AFontSizes.Add(AOptions.FontSize);
       end;
       //--
       if AFontWeights <> nil then begin
@@ -804,16 +960,16 @@ procedure ALDrawMultiLineText(
       //--
       If ALetterSpacings <> nil then begin
         var LLetterSpacingFloat: Single;
-        if _TryStrPxValueToFloat(ALLowerCase(LParamList.Values['letter-spacing']), LLetterSpacingFloat) then ALetterSpacings.Add(LLetterSpacingFloat * AOptions.Scale) // <span letter-spacing="3px">
+        if _TryStrPxValueToFloat(ALLowerCase(LParamList.Values['letter-spacing']), LLetterSpacingFloat) then ALetterSpacings.Add(LLetterSpacingFloat * LScale) // <span letter-spacing="3px">
         else if ALetterSpacings.Count > 0 then ALetterSpacings.Add(ALetterSpacings[ALetterSpacings.Count - 1])
-        else ALetterSpacings.Add(AOptions.GetScaledLetterSpacing);
+        else ALetterSpacings.Add(AOptions.LetterSpacing);
       end;
       //--
       AImgSrc := LParamList.Values['src'];
       //--
-      AImgWidth := ALStrToFloatDef(LParamList.Values['width'], 0, ALDefaultFormatSettingsW) * AOptions.Scale;
+      AImgWidth := ALStrToFloatDef(LParamList.Values['width'], 0, ALDefaultFormatSettingsW) * LScale;
       //--
-      AImgHeight := ALStrToFloatDef(LParamList.Values['height'], 0, ALDefaultFormatSettingsW) * AOptions.Scale;
+      AImgHeight := ALStrToFloatDef(LParamList.Values['height'], 0, ALDefaultFormatSettingsW) * LScale;
     finally
       ALFreeAndNil(LParamList);
     end;
@@ -1695,10 +1851,12 @@ begin
     Exit;
   end;
 
-  ARect.Top := ARect.Top * AOptions.Scale;
-  ARect.right := ARect.right * AOptions.Scale;
-  ARect.left := ARect.left * AOptions.Scale;
-  ARect.bottom := ARect.bottom * AOptions.Scale;
+  LScale := AOptions.Scale;
+  AOptions.ScaleProperties;
+  ARect.Top := ARect.Top * LScale;
+  ARect.right := ARect.right * LScale;
+  ARect.left := ARect.left * LScale;
+  ARect.bottom := ARect.bottom * LScale;
   Try
 
     {$REGION 'SKIA'}
@@ -1883,7 +2041,7 @@ begin
               if LCurrIndex = LInsertEllipsisAt then begin
                 if not AOptions.EllipsisInheritSettings then begin
                   LFontFamilies.Add(AOptions.EllipsisFontFamily);
-                  LFontSizes.Add(AOptions.GetScaledEllipsisFontSize);
+                  LFontSizes.Add(AOptions.EllipsisFontSize);
                   LFontWeights.Add(AOptions.EllipsisFontWeight);
                   LFontSlants.Add(AOptions.EllipsisFontSlant);
                   LFontStretchs.Add(AOptions.EllipsisFontStretch);
@@ -1894,7 +2052,7 @@ begin
                   LDecorationColors.Add(AOptions.EllipsisDecorationColor);
                   LBackgroundColors.Add(TALphaColors.Null);
                   LLineHeightMultipliers.Add(AOptions.LineHeightMultiplier);
-                  LLetterSpacings.Add(AOptions.GetScaledLetterSpacing);
+                  LLetterSpacings.Add(AOptions.LetterSpacing);
                 end;
                 LSpanIDs.Add('ellipsis');
                 if (length(AOptions.EllipsisText) > 2) and (ALPosW('… ', AOptions.EllipsisText) = 1) then
@@ -2039,7 +2197,7 @@ begin
                 // Init LFontSize
                 var LFontSize: Single;
                 if LFontSizes.Count > 0 then LFontSize := LFontSizes[LFontSizes.Count - 1]
-                else LFontSize := AOptions.GetScaledFontSize;
+                else LFontSize := AOptions.FontSize;
 
                 // Init LFontWeight
                 var LFontWeight: TFontWeight;
@@ -2094,7 +2252,7 @@ begin
                 // Init LLetterSpacing
                 var LLetterSpacing: Single;
                 if LLetterSpacings.Count > 0 then LLetterSpacing := LLetterSpacings[LLetterSpacings.Count - 1]
-                else LLetterSpacing := AOptions.GetScaledLetterSpacing;
+                else LLetterSpacing := AOptions.LetterSpacing;
 
                 // Init LSpanID
                 var LSpanID: String;
@@ -2266,8 +2424,8 @@ begin
                       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
                     {$ENDIF}
                     var LPlaceholderStyle: sk_placeholderstyle_t;
-                    if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.GetScaledFontSize;
-                    if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.GetScaledFontSize;
+                    if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.FontSize;
+                    if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.FontSize;
                     LPlaceholderStyle.width := LcurrImgWidth;
                     LPlaceholderStyle.height := LcurrImgHeight;
                     LPlaceholderStyle.alignment := sk_placeholderalignment_t.MIDDLE_SK_PLACEHOLDERALIGNMENT;
@@ -2309,7 +2467,7 @@ begin
               // Layout the paragraph
               // https://api.flutter.dev/flutter/dart-ui/Paragraph/layout.html
               // Computes the size and position of each glyph in the paragraph.
-              var LMaxWidth := ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight;
+              var LMaxWidth := ARect.Width - AOptions.Padding.Left - AOptions.Padding.Right;
               sk4d_paragraph_layout(Lparagraph, LMaxWidth);
 
               // Get the Metrics of each lines
@@ -2341,7 +2499,7 @@ begin
 
               // Update ARect
               var LReLayout: Boolean := False;
-              var LMaxHeight := ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom;
+              var LMaxHeight := ARect.Height - AOptions.Padding.Top - AOptions.Padding.Bottom;
               Var LParagraphRect := TrectF.Empty;
               for var I := Low(LMetrics) to High(LMetrics) do begin
                 LParagraphRect.Width := Max(LParagraphRect.Width, LMetrics[I].width);
@@ -2413,17 +2571,17 @@ begin
               //
               var LOriginalRectWidth: Single := ARect.Width;
               if AOptions.Autosize or (AOptions.AutosizeX and AOptions.AutosizeY) then begin
-                ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight);
-                ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+                ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + AOptions.Padding.Left + AOptions.Padding.Right);
+                ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.Padding.Top + AOptions.Padding.Bottom);
               end
-              else if AOptions.AutosizeX then ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight)
-              else if AOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+              else if AOptions.AutosizeX then ARect.Width := Min(ARect.Width, Ceil(LParagraphRect.Width) + AOptions.Padding.Left + AOptions.Padding.Right)
+              else if AOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.Padding.Top + AOptions.Padding.Bottom);
 
               // init LParagraphRect.topleft
               case AOptions.VTextAlign of
-                TALTextVertAlign.Center: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, AOptions.GetScaledPaddingTop + ((ARect.Height - LParagraphRect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom) / 2));
-                TALTextVertAlign.Leading: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, AOptions.GetScaledPaddingTop);
-                TALTextVertAlign.Trailing: LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, ARect.Height - AOptions.GetScaledPaddingBottom - LParagraphRect.Height);
+                TALTextVertAlign.Center: LParagraphRect.Offset(AOptions.Padding.Left, AOptions.Padding.Top + ((ARect.Height - LParagraphRect.Height - AOptions.Padding.Top - AOptions.Padding.Bottom) / 2));
+                TALTextVertAlign.Leading: LParagraphRect.Offset(AOptions.Padding.Left, AOptions.Padding.Top);
+                TALTextVertAlign.Trailing: LParagraphRect.Offset(AOptions.Padding.Left, ARect.Height - AOptions.Padding.Bottom - LParagraphRect.Height);
                 Else raise Exception.Create('Error 6DBA0B08-4F9E-4D89-9998-6B054D527F1F');
               end;
 
@@ -2446,10 +2604,10 @@ begin
                     var Ltextbox := Ltextboxes[K];
                     AElements[J+K].Id := LRangeIndexes[I].SpanID;
                     AElements[J+K].rect := TRectF.Create(
-                                             (LParagraphRect.Left + Ltextbox.rect.Left - LSk4dParagraphOffsetX) / AOptions.Scale,
-                                             (LParagraphRect.Top + Ltextbox.rect.Top) / AOptions.Scale,
-                                             (LParagraphRect.Left + Ltextbox.rect.Right - LSk4dParagraphOffsetX) / AOptions.Scale,
-                                             (LParagraphRect.Top + Ltextbox.rect.Bottom) / AOptions.Scale);
+                                             (LParagraphRect.Left + Ltextbox.rect.Left - LSk4dParagraphOffsetX) / LScale,
+                                             (LParagraphRect.Top + Ltextbox.rect.Top) / LScale,
+                                             (LParagraphRect.Left + Ltextbox.rect.Right - LSk4dParagraphOffsetX) / LScale,
+                                             (LParagraphRect.Top + Ltextbox.rect.Bottom) / LScale);
                   end;
                 end;
               end;
@@ -2463,27 +2621,32 @@ begin
                 exit;
               end;
 
-              // Handle Shadow
-              var LSurfaceRect := ARect;
-              if (AOptions.ShadowColor <> TalphaColors.Null) then begin
-                var LShadowOffsetX: Single := AOptions.GetScaledShadowOffsetX;
-                var LShadowOffsetY: Single := AOptions.GetScaledShadowOffsetY;
-                var LShadowWidth := ALGetShadowWidth(AOptions.GetScaledShadowblur);
-                var LShadowRect := LSurfaceRect;
-                LShadowRect.Inflate(LShadowWidth, LShadowWidth);
-                LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
-                LSurfaceRect := TRectF.Union(LShadowRect, LSurfaceRect); // add the extra space needed to draw the shadow
-                if ALIsCanvasNull(ACanvas) then begin
-                  ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
-                  LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
-                end;
+              // Calculate the SurfaceRect
+              var LSurfaceRect := ALGetShapeSurfaceRect(
+                                    ARect, // const ARect: TRectF;
+                                    AOptions.FillColor, // const AFillColor: TAlphaColor;
+                                    AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+                                    AOptions.FillResourceName, // const AFillResourceName: String;
+                                    AOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
+                                    AOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
+                                    AOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
+                                    AOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
+                                    false, // const AStateLayerUseContentColor: Boolean;
+                                    AOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
+                                    AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+                                    AOptions.ShadowBlur, // const AShadowBlur: Single;
+                                    AOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
+                                    AOptions.ShadowOffsetY); // const AShadowOffsetY: Single;
+              if ALIsCanvasNull(ACanvas) then begin
+                ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
+                LParagraphRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
               end;
 
               // Adjust the rect
               if Assigned(AOptions.OnAdjustRect) then begin
                 var LPrevRect := ARect;
                 var LSurfaceSize := LSurfaceRect.Size;
-                AOptions.OnAdjustRect(ACanvas, 1{AScale}, AOptions, ARect, LSurfaceSize);
+                AOptions.OnAdjustRect(ACanvas, AOptions, ARect, LSurfaceSize);
                 LSurfaceRect.Size := LSurfaceSize;
                 LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
               end;
@@ -2513,7 +2676,7 @@ begin
 
                   // Handle custom event
                   if Assigned(AOptions.OnBeforeDrawBackground) then
-                    AOptions.OnBeforeDrawBackground(ACanvas, 1{AScale}, AOptions, ARect);
+                    AOptions.OnBeforeDrawBackground(ACanvas, AOptions, ARect);
 
                   // Draw the background
                   if (AOptions.FillColor <> TalphaColors.Null) or
@@ -2523,7 +2686,7 @@ begin
                      (AOptions.ShadowColor <> TalphaColors.Null) then begin
                     ALDrawRectangle(
                       ACanvas, // const ACanvas: TALCanvas;
-                      1, // const AScale: Single;
+                      AOptions.Scale, // const AScale: Single;
                       ARect, // const ARect: TrectF;
                       1, //const AOpacity: Single;
                       AOptions.FillColor, // const AFillColor: TAlphaColor;
@@ -2533,23 +2696,29 @@ begin
                       AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
                       AOptions.FillResourceName, // const AFillResourceName: String;
                       AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-                      AOptions.FillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-                      AOptions.FillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
+                      AOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
+                      AOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
+                      AOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
+                      AOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
+                      AOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
+                      AOptions.StateLayerXRadius, // const AStateLayerXRadius: Single;
+                      AOptions.StateLayerYRadius, // const AStateLayerYRadius: Single;
+                      True, // const ADrawStateLayerOnTop: Boolean;
                       AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-                      AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
+                      AOptions.StrokeThickness, // const AStrokeThickness: Single;
                       AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-                      AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
-                      AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
-                      AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
+                      AOptions.ShadowBlur, // const AShadowBlur: Single;
+                      AOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
+                      AOptions.ShadowOffsetY, // const AShadowOffsetY: Single;
                       AOptions.Sides, // const Sides: TSides;
                       AOptions.Corners, // const Corners: TCorners;
-                      AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-                      AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+                      AOptions.XRadius, // const XRadius: Single = 0;
+                      AOptions.YRadius); // const YRadius: Single = 0);
                   end;
 
                   // Handle custom event
                   if Assigned(AOptions.OnBeforeDrawParagraph) then
-                    AOptions.OnBeforeDrawParagraph(ACanvas, 1{AScale}, AOptions, ARect);
+                    AOptions.OnBeforeDrawParagraph(ACanvas, AOptions, ARect);
 
                   // Paint the paragraph
                   sk4d_paragraph_paint(
@@ -2871,7 +3040,7 @@ begin
               //--
               if not AOptions.EllipsisInheritSettings then begin
                 LFontFamilies.Add(AOptions.EllipsisFontFamily);
-                LFontSizes.Add(AOptions.GetScaledEllipsisFontSize);
+                LFontSizes.Add(AOptions.EllipsisFontSize);
                 LFontWeights.Add(AOptions.EllipsisFontWeight);
                 LFontSlants.Add(AOptions.EllipsisFontSlant);
                 LFontStretchs.Add(AOptions.EllipsisFontStretch);
@@ -2882,7 +3051,7 @@ begin
                 LDecorationColors.Add(AOptions.EllipsisDecorationColor);
                 LBackgroundColors.Add(TALphaColors.Null);
                 LLineHeightMultipliers.Add(AOptions.LineHeightMultiplier);
-                LLetterSpacings.Add(AOptions.GetScaledLetterSpacing);
+                LLetterSpacings.Add(AOptions.LetterSpacing);
                 LSpanIDs.Add('ellipsis');
               end
               else if LExtendedTextElements.Count > 0 then begin
@@ -3185,7 +3354,7 @@ begin
           // Init LFontSize
           var LFontSize: Single;
           if LFontSizes.Count > 0 then LFontSize := LFontSizes[LFontSizes.Count - 1]
-          else LFontSize := AOptions.GetScaledFontSize;
+          else LFontSize := AOptions.FontSize;
 
           // Init LFontWeight
           var LFontWeight: TFontWeight;
@@ -3240,7 +3409,7 @@ begin
           // Init LLetterSpacing
           var LLetterSpacing: Single;
           if LLetterSpacings.Count > 0 then LLetterSpacing := LLetterSpacings[LLetterSpacings.Count - 1]
-          else LLetterSpacing := AOptions.GetScaledLetterSpacing;
+          else LLetterSpacing := AOptions.LetterSpacing;
 
           // Init LSpanID
           var LSpanID: String;
@@ -3300,7 +3469,7 @@ begin
                                     LDecorationColor, // const ADecorationColor: TAlphaColor;
                                     LLetterSpacing, // const ALetterSpacing: Single;
                                     AOptions.Direction, // const ADirection: TALTextDirection
-                                    ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight - LCurrLineWidth, // const AMaxWidth: Single;
+                                    ARect.Width - AOptions.Padding.Left - AOptions.Padding.Right - LCurrLineWidth, // const AMaxWidth: Single;
                                     samevalue(LCurrLineWidth, 0, TEpsilon.Position), // const AHardBreak: Boolean;
                                     LMeasuredWidth, // out AMeasuredWidth: Single): integer;
                                     LMeasuredHeight) // out AMeasuredHeight: Single): integer;
@@ -3360,7 +3529,7 @@ begin
               end;
 
               // No Vertical space left to add the Image
-              If CompareValue(LCurrParagraphHeight + (-1 * LFontMetrics.Ascent) + LFontMetrics.Descent, ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom, TEpsilon.Position) > 0 then begin
+              If CompareValue(LCurrParagraphHeight + (-1 * LFontMetrics.Ascent) + LFontMetrics.Descent, ARect.Height - AOptions.Padding.Top - AOptions.Padding.Bottom, TEpsilon.Position) > 0 then begin
                 inc(LAddEllipsis);
                 P1 := -1;
                 Break; // => break the loop => While LCurrText <> '' do begin => Go to the loop => while P1 <= high(Ltext) do begin
@@ -3457,11 +3626,11 @@ begin
           else if LCurrImgSrc <> '' then begin
 
             // Update LCurrImgWidth / LCurrImgHeight
-            if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.GetScaledFontSize;
-            if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.GetScaledFontSize;
+            if CompareValue(LCurrImgWidth, 0, TEpsilon.FontSize) <= 0 then LCurrImgWidth := AOptions.FontSize;
+            if CompareValue(LCurrImgHeight, 0, TEpsilon.FontSize) <= 0 then LCurrImgHeight := AOptions.FontSize;
 
             // No horizontal space left to add the Image
-            If CompareValue(LCurrLineWidth + LCurrImgWidth, ARect.Width - AOptions.GetScaledPaddingLeft - AOptions.GetScaledPaddingRight, TEpsilon.Position) > 0 then begin
+            If CompareValue(LCurrLineWidth + LCurrImgWidth, ARect.Width - AOptions.Padding.Left - AOptions.Padding.Right, TEpsilon.Position) > 0 then begin
               if samevalue(LCurrLineWidth, 0, TEpsilon.Position) then begin
                 inc(LAddEllipsis);
                 P1 := -1;
@@ -3515,7 +3684,7 @@ begin
             end;
 
             // No Vertical space left to add the Image
-            If CompareValue(LCurrParagraphHeight + LCurrImgHeight, ARect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom, TEpsilon.Position) > 0 then begin
+            If CompareValue(LCurrParagraphHeight + LCurrImgHeight, ARect.Height - AOptions.Padding.Top - AOptions.Padding.Bottom, TEpsilon.Position) > 0 then begin
               inc(LAddEllipsis);
               P1 := -1;
               continue; // => => Go to the loop => while P1 <= high(Ltext) do begin
@@ -3629,11 +3798,11 @@ begin
 
       // Autosize
       if AOptions.Autosize or (AOptions.AutosizeX and AOptions.AutosizeY) then begin
-        ARect.Width := Min(ARect.Width, LParagraphRect.Width + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight);
-        ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+        ARect.Width := Min(ARect.Width, LParagraphRect.Width + AOptions.Padding.Left + AOptions.Padding.Right);
+        ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.Padding.Top + AOptions.Padding.Bottom);
       end
-      else if AOptions.AutosizeX then ARect.Width := Min(ARect.Width, LParagraphRect.Width + AOptions.GetScaledPaddingLeft + AOptions.GetScaledPaddingRight)
-      else if AOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.GetScaledPaddingTop + AOptions.GetScaledPaddingBottom);
+      else if AOptions.AutosizeX then ARect.Width := Min(ARect.Width, LParagraphRect.Width + AOptions.Padding.Left + AOptions.Padding.Right)
+      else if AOptions.AutosizeY then ARect.Height := Min(ARect.Height, LParagraphRect.Height + AOptions.Padding.Top + AOptions.Padding.Bottom);
 
       // HTextAlign/VTextAlign
       // TALTextHorzAlign.Justify is not yet supported
@@ -3660,12 +3829,12 @@ begin
             LExtendedTextElement.Rect.Offset((LParagraphRect.Width - LCurrLineWidth) / 2, 0);
             LExtendedTextElements[i] := LExtendedTextElement;
           end;
-          LParagraphRect.Offset(AOptions.GetScaledPaddingLeft + ((ARect.Width-AOptions.GetScaledPaddingLeft-AOptions.GetScaledPaddingRight-LParagraphRect.Width) / 2), 0);
+          LParagraphRect.Offset(AOptions.Padding.Left + ((ARect.Width-AOptions.Padding.Left-AOptions.Padding.Right-LParagraphRect.Width) / 2), 0);
         end;
         //--
         TALTextHorzAlign.Leading,
         TALTextHorzAlign.Justify: begin
-          LParagraphRect.Offset(AOptions.GetScaledPaddingLeft, 0);
+          LParagraphRect.Offset(AOptions.Padding.Left, 0);
         end;
         //--
         TALTextHorzAlign.Trailing: begin
@@ -3680,15 +3849,15 @@ begin
             LExtendedTextElement.Rect.Offset(LParagraphRect.Width - LCurrLineWidth, 0);
             LExtendedTextElements[i] := LExtendedTextElement;
           end;
-          LParagraphRect.Offset((ARect.Width-LParagraphRect.Width-AOptions.GetScaledPaddingRight), 0);
+          LParagraphRect.Offset((ARect.Width-LParagraphRect.Width-AOptions.Padding.Right), 0);
         end;
         //--
         else raise Exception.Create('Error 768AE40A-1C99-47BD-BD6E-1F7AABFB018C');
       end;
       case AOptions.VTextAlign of
-        TALTextVertAlign.Center: LParagraphRect.Offset(0, AOptions.GetScaledPaddingTop + ((ARect.Height - LParagraphRect.Height - AOptions.GetScaledPaddingTop - AOptions.GetScaledPaddingBottom) / 2));
-        TALTextVertAlign.Leading: LParagraphRect.Offset(0, AOptions.GetScaledPaddingTop);
-        TALTextVertAlign.Trailing: LParagraphRect.Offset(0, ARect.Height - AOptions.GetScaledPaddingBottom - LParagraphRect.Height);
+        TALTextVertAlign.Center: LParagraphRect.Offset(0, AOptions.Padding.Top + ((ARect.Height - LParagraphRect.Height - AOptions.Padding.Top - AOptions.Padding.Bottom) / 2));
+        TALTextVertAlign.Leading: LParagraphRect.Offset(0, AOptions.Padding.Top);
+        TALTextVertAlign.Trailing: LParagraphRect.Offset(0, ARect.Height - AOptions.Padding.Bottom - LParagraphRect.Height);
         Else raise Exception.Create('Error 6DBA0B08-4F9E-4D89-9998-6B054D527F1F');
       end;
 
@@ -3700,10 +3869,10 @@ begin
         If LExtendedTextElement.id <> '' then begin
           AElements[I].Id := LExtendedTextElement.ID;
           AElements[I].rect := TRectF.Create(
-                                 (LParagraphRect.Left + LExtendedTextElement.Rect.Left) / AOptions.Scale,
-                                 (LParagraphRect.Top + LExtendedTextElement.Rect.Top) / AOptions.Scale,
-                                 (LParagraphRect.Left + LExtendedTextElement.Rect.Right) / AOptions.Scale,
-                                 (LParagraphRect.Top + LExtendedTextElement.Rect.Bottom) / AOptions.Scale);
+                                 (LParagraphRect.Left + LExtendedTextElement.Rect.Left) / LScale,
+                                 (LParagraphRect.Top + LExtendedTextElement.Rect.Top) / LScale,
+                                 (LParagraphRect.Left + LExtendedTextElement.Rect.Right) / LScale,
+                                 (LParagraphRect.Top + LExtendedTextElement.Rect.Bottom) / LScale);
           inc(I);
         end;
       end;
@@ -3718,27 +3887,32 @@ begin
         exit;
       end;
 
-      // Handle Shadow
-      var LSurfaceRect := ARect;
-      if (AOptions.ShadowColor <> TalphaColors.Null) then begin
-        var LShadowOffsetX: Single := AOptions.GetScaledShadowOffsetX;
-        var LShadowOffsetY: Single := AOptions.GetScaledShadowOffsetY;
-        var LShadowWidth := ALGetShadowWidth(AOptions.GetScaledShadowblur);
-        var LShadowRect := LSurfaceRect;
-        LShadowRect.Inflate(LShadowWidth, LShadowWidth);
-        LShadowRect.Offset(LShadowOffsetX, LShadowOffsetY);
-        LSurfaceRect := TRectF.Union(LShadowRect, LSurfaceRect); // add the extra space needed to draw the shadow
-        if ALIsCanvasNull(ACanvas) then begin
-          ARect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
-          LParagraphRect.Offset(Max(0, LShadowWidth - LShadowOffsetX), Max(0, LShadowWidth - LShadowOffsetY));
-        end;
+      // Calculate the SurfaceRect
+      var LSurfaceRect := ALGetShapeSurfaceRect(
+                            ARect, // const ARect: TRectF;
+                            AOptions.FillColor, // const AFillColor: TAlphaColor;
+                            AOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+                            AOptions.FillResourceName, // const AFillResourceName: String;
+                            AOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
+                            AOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
+                            AOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
+                            AOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
+                            false, // const AStateLayerUseContentColor: Boolean;
+                            AOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
+                            AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
+                            AOptions.ShadowBlur, // const AShadowBlur: Single;
+                            AOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
+                            AOptions.ShadowOffsetY); // const AShadowOffsetY: Single;
+      if ALIsCanvasNull(ACanvas) then begin
+        ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
+        LParagraphRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
       end;
 
       // Adjust the rect
       if Assigned(AOptions.OnAdjustRect) then begin
         var LPrevRect := ARect;
         var LSurfaceSize := LSurfaceRect.Size;
-        AOptions.OnAdjustRect(ACanvas, 1{AScale}, AOptions, ARect, LSurfaceSize);
+        AOptions.OnAdjustRect(ACanvas, AOptions, ARect, LSurfaceSize);
         LSurfaceRect.Size := LSurfaceSize;
         LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
       end;
@@ -3792,7 +3966,7 @@ begin
 
           // Handle custom event
           if Assigned(AOptions.OnBeforeDrawBackground) then
-            AOptions.OnBeforeDrawBackground(ACanvas, 1{AScale}, AOptions, ARect);
+            AOptions.OnBeforeDrawBackground(ACanvas, AOptions, ARect);
 
           // Draw the background
           if (AOptions.FillColor <> TalphaColors.Null) or
@@ -3802,7 +3976,7 @@ begin
              (AOptions.ShadowColor <> TalphaColors.Null) then begin
             ALDrawRectangle(
               ACanvas, // const ACanvas: TALCanvas;
-              1, // const AScale: Single;
+              AOptions.Scale, // const AScale: Single;
               ARect, // const ARect: TrectF;
               1, //const AOpacity: Single;
               AOptions.FillColor, // const AFillColor: TAlphaColor;
@@ -3812,23 +3986,29 @@ begin
               AOptions.FillGradientAngle, // const AFillGradientAngle: Single;
               AOptions.FillResourceName, // const AFillResourceName: String;
               AOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-              AOptions.FillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-              AOptions.FillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
+              AOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
+              AOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
+              AOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
+              AOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
+              AOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
+              AOptions.StateLayerXRadius, // const AStateLayerXRadius: Single;
+              AOptions.StateLayerYRadius, // const AStateLayerYRadius: Single;
+              True, // const ADrawStateLayerOnTop: Boolean;
               AOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-              AOptions.GetScaledStrokeThickness, // const AStrokeThickness: Single;
+              AOptions.StrokeThickness, // const AStrokeThickness: Single;
               AOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-              AOptions.GetScaledShadowBlur, // const AShadowBlur: Single;
-              AOptions.GetScaledShadowOffsetX, // const AShadowOffsetX: Single;
-              AOptions.GetScaledShadowOffsetY, // const AShadowOffsetY: Single;
+              AOptions.ShadowBlur, // const AShadowBlur: Single;
+              AOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
+              AOptions.ShadowOffsetY, // const AShadowOffsetY: Single;
               AOptions.Sides, // const Sides: TSides;
               AOptions.Corners, // const Corners: TCorners;
-              AOptions.GetScaledXRadius, // const XRadius: Single = 0;
-              AOptions.GetScaledYRadius); // const YRadius: Single = 0);
+              AOptions.XRadius, // const XRadius: Single = 0;
+              AOptions.YRadius); // const YRadius: Single = 0);
           end;
 
           // Handle custom event
           if Assigned(AOptions.OnBeforeDrawParagraph) then
-            AOptions.OnBeforeDrawParagraph(ACanvas, 1{AScale}, AOptions, ARect);
+            AOptions.OnBeforeDrawParagraph(ACanvas, AOptions, ARect);
 
           {$REGION 'ANDROID'}
           {$IF defined(ANDROID)}
@@ -4050,6 +4230,9 @@ begin
     {$ENDREGION}
 
   finally
+    AOptions.Scale := 1 / LScale;
+    AOptions.ScaleProperties;
+    AOptions.Scale := LScale;
     ARect.Top := ARect.Top / AOptions.Scale;
     ARect.right := ARect.right / AOptions.Scale;
     ARect.left := ARect.left / AOptions.Scale;

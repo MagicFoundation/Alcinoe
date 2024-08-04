@@ -39,7 +39,17 @@ type
   {*************************************}
   TALEditEditor = class(TComponentEditor)
   protected
-    procedure ThemeClick(Sender: TObject); virtual;
+    procedure ApplyThemeClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
+  {*************************************}
+  TALMemoEditor = class(TComponentEditor)
+  protected
+    procedure ApplyThemeClick(Sender: TObject); virtual;
   public
     function GetVerb(Index: Integer): string; override;
     function GetVerbCount: Integer; override;
@@ -49,7 +59,27 @@ type
   {**************************************}
   TALButtonEditor = class(TComponentEditor)
   protected
-    procedure ThemeClick(Sender: TObject); virtual;
+    procedure ApplyThemeClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
+  {*****************************************}
+  TALCheckBoxEditor = class(TComponentEditor)
+  protected
+    procedure ApplyThemeClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
+  {********************************************}
+  TALRadioButtonEditor = class(TComponentEditor)
+  protected
+    procedure ApplyThemeClick(Sender: TObject); virtual;
   public
     function GetVerb(Index: Integer): string; override;
     function GetVerbCount: Integer; override;
@@ -153,7 +183,10 @@ uses
   System.UIConsts,
   Vcl.Menus,
   FMX.Graphics,
+  Alcinoe.Common,
+  Alcinoe.StringList,
   Alcinoe.StringUtils,
+  Alcinoe.FMX.Themes,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.Memo,
   Alcinoe.fmx.common,
@@ -176,26 +209,65 @@ begin
   result := 1;
 end;
 
-{****************************************************}
-procedure TALEditEditor.ThemeClick(Sender: TObject);
+{*******************************************************}
+procedure TALEditEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
   LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
-  ALApplyThemeToEdit(TALBaseEdit(Component), LTheme);
+  ALApplyEditTheme(LTheme, TALEdit(Component));
 end;
 
 {****************************************************************************}
 procedure TALEditEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
-  AItem.AddItem('Default'{ACaption},                  0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
-  AItem.AddItem('Material3.Light.Filled'{ACaption},   0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Light.Outlined'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
-  AItem.AddItem('Material3.Dark.Filled'{ACaption},   0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Dark.Outlined'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
-  AItem.AddItem('Facebook.Outlined'{ACaption},       0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALEditThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
+end;
+
+{*******************************************************}
+function TALMemoEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Theme';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{*********************************************}
+function TALMemoEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{*******************************************************}
+procedure TALMemoEditor.ApplyThemeClick(Sender: TObject);
+begin
+  var LTheme := TmenuItem(Sender).Caption;
+  LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
+  ALApplyMemoTheme(LTheme, TALMemo(Component));
+end;
+
+{****************************************************************************}
+procedure TALMemoEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALMemoThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
 end;
 
 {*******************************************************}
@@ -214,31 +286,102 @@ begin
 end;
 
 {****************************************************}
-procedure TALButtonEditor.ThemeClick(Sender: TObject);
+procedure TALButtonEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
   LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
-  ALApplyThemeToButton(TALButton(Component), LTheme);
+  ALApplyButtonTheme(LTheme, TALButton(Component));
 end;
 
 {****************************************************************************}
 procedure TALButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
-  AItem.AddItem('Default'{ACaption},                  0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
-  AItem.AddItem('Windows'{ACaption},                  0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
-  AItem.AddItem('Material3.Light.Filled'{ACaption},   0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Light.Outlined'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Light.Text'{ACaption},     0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Light.Elevated'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Light.Tonal'{ACaption},    0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  //--
-  AItem.AddItem('Material3.Dark.Filled'{ACaption},   0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Dark.Outlined'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Dark.Text'{ACaption},     0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Dark.Elevated'{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
-  AItem.AddItem('Material3.Dark.Tonal'{ACaption},    0{AShortCut}, false{AChecked}, true{AEnabled}, ThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALButtonThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
+end;
+
+{*******************************************************}
+function TALCheckBoxEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Theme';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{*********************************************}
+function TALCheckBoxEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{****************************************************}
+procedure TALCheckBoxEditor.ApplyThemeClick(Sender: TObject);
+begin
+  var LTheme := TmenuItem(Sender).Caption;
+  LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
+  ALApplyCheckBoxTheme(LTheme, TALCheckBox(Component));
+end;
+
+{****************************************************************************}
+procedure TALCheckBoxEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALCheckBoxThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
+end;
+
+{*******************************************************}
+function TALRadioButtonEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Theme';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{*********************************************}
+function TALRadioButtonEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{****************************************************}
+procedure TALRadioButtonEditor.ApplyThemeClick(Sender: TObject);
+begin
+  var LTheme := TmenuItem(Sender).Caption;
+  LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
+  ALApplyRadioButtonTheme(LTheme, TALRadioButton(Component));
+end;
+
+{****************************************************************************}
+procedure TALRadioButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALRadioButtonThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
 end;
 
 {**********************************}
@@ -606,8 +749,10 @@ end;
 procedure Register;
 begin
   RegisterComponentEditor(TALEdit, TALEditEditor);
-  RegisterComponentEditor(TALMemo, TALEditEditor);
+  RegisterComponentEditor(TALMemo, TALMemoEditor);
   RegisterComponentEditor(TALButton, TALButtonEditor);
+  RegisterComponentEditor(TALCheckBox, TALCheckBoxEditor);
+  RegisterComponentEditor(TALRadioButton, TALRadioButtonEditor);
   RegisterComponentEditor(TALTabControl, TALTabControlEditor);
   RegisterComponentEditor(TALTabItem, TALTabItemEditor);
   RegisterPropertyEditor(TypeInfo(string), TALText, 'Text', TALTextTextPropertyEditor);

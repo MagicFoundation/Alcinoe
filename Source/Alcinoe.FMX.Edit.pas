@@ -788,6 +788,9 @@ type
     FSupportingText: String;
     FSupportingTextSettings: TSupportingTextSettings;
     FSupportingTextMarginBottomUpdated: Boolean;
+    {$IF defined(ALDPK)}
+    FPrevStateStyles: TStateStyles;
+    {$ENDIF}
     FStateStyles: TStateStyles;
     FIsTextEmpty: Boolean;
     FNativeViewRemoved: Boolean;
@@ -865,6 +868,8 @@ type
     procedure IsMouseOverChanged; override;
     function GetDefaultSize: TSizeF; override;
     procedure Loaded; override;
+    procedure SetXRadius(const Value: Single); override;
+    procedure SetYRadius(const Value: Single); override;
     procedure TextSettingsChanged(Sender: TObject); virtual;
     procedure LabelTextSettingsChanged(Sender: TObject); virtual;
     procedure SupportingTextSettingsChanged(Sender: TObject); virtual;
@@ -3946,6 +3951,9 @@ begin
   FSupportingTextSettings.Font.Size := FSupportingTextSettings.Font.DefaultSize;
   FSupportingTextSettings.OnChanged := SupportingTextSettingsChanged;
   FSupportingTextMarginBottomUpdated := False;
+  {$IF defined(ALDPK)}
+  FPrevStateStyles := TStateStyles.Create(nil);
+  {$ENDIF}
   FStateStyles := TStateStyles.Create(Self);
   FStateStyles.OnChanged := StateStylesChanged;
   FIsTextEmpty := True;
@@ -4005,6 +4013,9 @@ begin
   ALFreeAndNil(FLabelTextSettings);
   ALFreeAndNil(FlabelTextAnimation);
   ALFreeAndNil(FSupportingTextSettings);
+  {$IF defined(ALDPK)}
+  ALFreeAndNil(FPrevStateStyles);
+  {$ENDIF}
   ALFreeAndNil(FStateStyles);
   ALFreeAndNil(fEditControl);
   inherited Destroy;
@@ -4313,14 +4324,6 @@ begin
   if LStateStyle <> nil then
     LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
-
-    // Merge the state layer with the fill and stroke. This does not work if the
-    // fill has an image or margins, but honestly, I don't think anyone
-    // will use this. So, let's not complicate things for now. KISS (Keep It Simple,
-    // Keep It Stupid) way.
-    if (LStateStyle <> nil) then
-      LStateStyle.BlendStateLayerIntoFillAndStrokeNoChanges(LStateStyle.TextSettings.Font.Color);
-
     // FillColor
     if LStateStyle <> nil then EditControl.FillColor := LStateStyle.Fill.Color
     else EditControl.FillColor := Fill.Color;
@@ -4413,11 +4416,104 @@ end;
 
 {*****************************************************}
 procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~}
+  {$IF defined(ALDPK)}
+  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
+  begin
+
+    if (not (csLoading in ComponentState)) and
+       (not AToStateStyle.TextSettings.inherit) then begin
+
+      if APrevStateStyle.TextSettings.font.Family = AToStateStyle.TextSettings.font.Family then AToStateStyle.TextSettings.font.Family := TextSettings.font.Family;
+      if SameValue(APrevStateStyle.TextSettings.font.Size, AToStateStyle.TextSettings.font.Size, TEpsilon.fontSize) then AToStateStyle.TextSettings.font.Size := TextSettings.font.Size;
+      if APrevStateStyle.TextSettings.font.Weight = AToStateStyle.TextSettings.font.Weight then AToStateStyle.TextSettings.font.Weight := TextSettings.font.Weight;
+      if APrevStateStyle.TextSettings.font.Slant = AToStateStyle.TextSettings.font.Slant then AToStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
+      if APrevStateStyle.TextSettings.font.Stretch = AToStateStyle.TextSettings.font.Stretch then AToStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
+      if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+      if APrevStateStyle.TextSettings.font.AutoConvert = AToStateStyle.TextSettings.font.AutoConvert then AToStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
+
+      if APrevStateStyle.TextSettings.Decoration.Kinds = AToStateStyle.TextSettings.Decoration.Kinds then AToStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
+      if APrevStateStyle.TextSettings.Decoration.Style = AToStateStyle.TextSettings.Decoration.Style then AToStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
+      if SameValue(APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier, AToStateStyle.TextSettings.Decoration.ThicknessMultiplier, TEpsilon.Scale) then AToStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
+      if APrevStateStyle.TextSettings.Decoration.Color = AToStateStyle.TextSettings.Decoration.Color then AToStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+
+    end;
+
+    APrevStateStyle.TextSettings.font.Family := TextSettings.font.Family;
+    APrevStateStyle.TextSettings.font.Size := TextSettings.font.Size;
+    APrevStateStyle.TextSettings.font.Weight := TextSettings.font.Weight;
+    APrevStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
+    APrevStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
+    APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
+    APrevStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
+
+    APrevStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
+    APrevStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
+    APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
+    APrevStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
+
+  end;
+  {$ENDIF}
+
 begin
+  {$IF defined(ALDPK)}
+  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  {$ENDIF}
   if csLoading in componentState then exit;
   ClearBufPromptTextDrawable;
   UpdateEditControlStyle;
   AdjustSize;
+end;
+
+{******************************************************}
+procedure TALBaseEdit.SetXRadius(const Value: Single);
+
+  {~~~~~~~~~~~~~~~~~~}
+  {$IF defined(ALDPK)}
+  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
+  begin
+    if (not (csLoading in ComponentState)) and
+       (not AToStateStyle.TextSettings.inherit) then begin
+      if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
+    end;
+    APrevStateStyle.StateLayer.XRadius := XRadius;
+  end;
+  {$ENDIF}
+
+begin
+  inherited;
+  {$IF defined(ALDPK)}
+  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  {$ENDIF}
+end;
+
+{******************************************************}
+procedure TALBaseEdit.SetYRadius(const Value: Single);
+
+  {~~~~~~~~~~~~~~~~~~}
+  {$IF defined(ALDPK)}
+  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
+  begin
+    if (not (csLoading in ComponentState)) and
+       (not AToStateStyle.TextSettings.inherit) then begin
+      if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
+    end;
+    APrevStateStyle.StateLayer.YRadius := YRadius;
+  end;
+  {$ENDIF}
+
+begin
+  inherited;
+  {$IF defined(ALDPK)}
+  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  {$ENDIF}
 end;
 
 {****************************************************************************}
@@ -4844,10 +4940,18 @@ begin
     //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
-    //LOptions.FillImageMarginsRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //--
+    //LOptions.StateLayerOpacity: Single; // Default = 0
+    //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
+    //LOptions.StateLayerMargins: TRectF; // default = TRectF.Empty
+    //LOptions.StateLayerXRadius: Single; // default = 0
+    //LOptions.StateLayerYRadius: Single; // default = 0
+    //--
     //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null
     //LOptions.StrokeThickness: Single; // default = 1
+    //--
     //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.ShadowBlur: Single; // default = 12
     //LOptions.ShadowOffsetX: Single; // default = 0
@@ -4973,10 +5077,18 @@ begin
     //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
-    //LOptions.FillImageMarginsRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //--
+    //LOptions.StateLayerOpacity: Single; // Default = 0
+    //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
+    //LOptions.StateLayerMargins: TRectF; // default = TRectF.Empty
+    //LOptions.StateLayerXRadius: Single; // default = 0
+    //LOptions.StateLayerYRadius: Single; // default = 0
+    //--
     //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null
     //LOptions.StrokeThickness: Single; // default = 1
+    //--
     //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.ShadowBlur: Single; // default = 12
     //LOptions.ShadowOffsetX: Single; // default = 0
@@ -5102,10 +5214,18 @@ begin
     //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
-    //LOptions.FillBackgroundMarginsRect: TRectF; // default = TRectF.Empty
-    //LOptions.FillImageMarginsRect: TRectF; // default = TRectF.Empty
+    //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //--
+    //LOptions.StateLayerOpacity: Single; // Default = 0
+    //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
+    //LOptions.StateLayerMargins: TRectF; // default = TRectF.Empty
+    //LOptions.StateLayerXRadius: Single; // default = 0
+    //LOptions.StateLayerYRadius: Single; // default = 0
+    //--
     //LOptions.StrokeColor: TalphaColor; // default = TAlphaColors.null
     //LOptions.StrokeThickness: Single; // default = 1
+    //--
     //LOptions.ShadowColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.ShadowBlur: Single; // default = 12
     //LOptions.ShadowOffsetX: Single; // default = 0
@@ -5185,20 +5305,15 @@ begin
   if (not ALIsDrawableNull(LStateStyle.BufDrawable)) then exit;
   LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
-
-    // Merge the state layer with the fill and stroke. This does not work if the
-    // fill has an image or margins, but honestly, I don't think anyone
-    // will use this. So, let's not complicate things for now. KISS (Keep It Simple,
-    // Keep It Stupid) way.
-    LStateStyle.BlendStateLayerIntoFillAndStrokeNoChanges(LStateStyle.TextSettings.Font.Color{AContentColor});
-
     CreateBufDrawable(
       LStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
       LStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
       LStateStyle.Fill, // const AFill: TALBrush;
+      LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+      LStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
+      True, // const ADrawStateLayerOnTop: Boolean;
       LStateStyle.Stroke, // const AStroke: TALStrokeBrush;
       LStateStyle.Shadow); // const AShadow: TALShadow);
-
   finally
     LStateStyle.RestorestateNoChanges;
   end;

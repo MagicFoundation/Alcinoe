@@ -366,6 +366,9 @@ type
                 var ABufDrawable: TALDrawable;
                 var ABufDrawableRect: TRectF;
                 const AFill: TALBrush;
+                const AStateLayer: TALStateLayer;
+                const AStateLayerContentColor: TAlphaColor;
+                const ADrawStateLayerOnTop: Boolean;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow); virtual;
     procedure DoResized; override;
@@ -481,8 +484,11 @@ type
                 var ABufDrawable: TALDrawable;
                 var ABufDrawableRect: TRectF;
                 const AFill: TALBrush;
+                const AStateLayer: TALStateLayer;
+                const AStateLayerContentColor: TAlphaColor;
+                const ADrawStateLayerOnTop: Boolean;
                 const AStroke: TALStrokeBrush;
-                const AShadow: TALShadow);
+                const AShadow: TALShadow); virtual;
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
@@ -721,22 +727,27 @@ type
                const AEllipsisFont: TALFont;
                const AEllipsisDecoration: TALTextDecoration;
                const AFill: TALBrush;
+               const AStateLayer: TALStateLayer;
                const AStroke: TALStrokeBrush;
                const AShadow: TALShadow): TALMultiLineTextOptions;
-    Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF); virtual;
-    Procedure DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; Const ARect: TrectF); virtual;
-    Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; Const ARect: TrectF); virtual;
+    Procedure DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF); virtual;
+    Procedure DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
+    Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
     Procedure DrawMultilineText(
+                const ACanvas: TALCanvas;
+                out ARect: TRectF;
                 out ATextBroken: Boolean;
                 out AAllTextDrawn: Boolean;
                 out AElements: TALTextElements;
                 const AScale: Single;
+                const AOpacity: Single;
                 const AText: String;
                 const AFont: TALFont;
                 const ADecoration: TALTextDecoration;
                 const AEllipsisFont: TALFont;
                 const AEllipsisDecoration: TALTextDecoration;
                 const AFill: TALBrush;
+                const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
     Procedure MeasureMultilineText(
@@ -751,6 +762,7 @@ type
                 const AEllipsisFont: TALFont;
                 const AEllipsisDecoration: TALTextDecoration;
                 const AFill: TALBrush;
+                const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
     Procedure CreateBufDrawable(
@@ -766,6 +778,7 @@ type
                 const AEllipsisFont: TALFont;
                 const AEllipsisDecoration: TALTextDecoration;
                 const AFill: TALBrush;
+                const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
                 const AShadow: TALShadow);
     property Elements: TALTextElements read fElements;
@@ -907,7 +920,6 @@ uses
   iOSapi.UIKit,
   FMX.Canvas.GPU,
   FMX.Surfaces,
-  Alcinoe.FMX.Types3D,
   {$ENDIF}
   {$IFDEF ALDPK}
   DesignIntf,
@@ -1645,7 +1657,7 @@ begin
     end;
     FAnimation.SetDuration(0.0);
     {$IF (not defined(ALSkiaCanvas))}
-      ALFreeSurface(FBufSurface, FBufCanvas);
+      ALFreeAndNilSurface(FBufSurface, FBufCanvas);
       {$IF defined(ALGPUCanvas)}
       ALFreeAndNil(FbufTexture);
       {$ELSE}
@@ -1930,23 +1942,23 @@ Procedure TALBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             var ABufDrawableRect: TRectF;
             const AFill: TALBrush;
+            const AStateLayer: TALStateLayer;
+            const AStateLayerContentColor: TAlphaColor;
+            const ADrawStateLayerOnTop: Boolean;
             const AStroke: TALStrokeBrush;
             const AShadow: TALShadow);
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  ABufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
-  var LRect := TrectF.Create(0, 0, ABufDrawableRect.Width, ABufDrawableRect.height);
-  if AShadow.HasShadow then begin
-    var LShadowWidth := ALGetShadowWidth(AShadow.blur);
-    var LShadowRect := ABufDrawableRect;
-    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
-    LShadowRect.Offset(AShadow.OffsetX, AShadow.OffsetY);
-    ABufDrawableRect := TRectF.Union(LShadowRect, ABufDrawableRect); // add the extra space needed to draw the shadow
-    ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
-    LRect.Offset(Max(0, LShadowWidth - AShadow.OffsetX), Max(0, LShadowWidth - AShadow.OffsetY));
-  end;
+  var LRect := LocalRect;
+  ABufDrawableRect := ALGetShapeSurfaceRect(
+                        LRect, // const ARect: TRectF;
+                        AFill, // const AFill: TALBrush;
+                        AStateLayer, // const AStateLayer: TALStateLayer;
+                        AShadow); // const AShadow: TALShadow): TRectF;
+  ABufDrawableRect := ALAlignDimensionToPixelCeil(ABufDrawableRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+  LRect.Offset(-ABufDrawableRect.Left, -ABufDrawableRect.Top);
 
   var LSurface: TALSurface;
   var LCanvas: TALCanvas;
@@ -1967,6 +1979,9 @@ begin
         LRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
+        AStateLayer, // const StateLayer: TALStateLayer;
+        AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
+        ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
         AStroke, // const Stroke: TALStrokeBrush;
         AShadow, // const Shadow: TALShadow
         Sides, // const Sides: TSides;
@@ -1978,10 +1993,10 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    ABufDrawable := ALSurfaceToDrawable(LSurface);
+    ABufDrawable := ALCreateDrawableFromSurface(LSurface);
 
   finally
-    ALFreeSurface(LSurface, LCanvas);
+    ALFreeAndNilSurface(LSurface, LCanvas);
   end;
 
 end;
@@ -2017,6 +2032,9 @@ begin
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // var ABufDrawableRect: TRectF;
     Fill, // const AFill: TALBrush;
+    nil, // const AStateLayer: TALStateLayer;
+    TAlphaColors.null, // const AStateLayerContentColor: TAlphaColor;
+    True, // const ADrawStateLayerOnTop: Boolean;
     Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
 
@@ -2037,6 +2055,9 @@ begin
       Canvas.AlignToPixel(LRect), // const Rect: TrectF;
       AbsoluteOpacity, // const AOpacity: Single;
       Fill, // const Fill: TALBrush;
+      nil, // const StateLayer: TALStateLayer;
+      TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
+      True, // const ADrawStateLayerOnTop: Boolean;
       Stroke, // const Stroke: TALStrokeBrush;
       Shadow, // const Shadow: TALShadow
       Sides, // const Sides: TSides;
@@ -2185,23 +2206,23 @@ Procedure TALCircle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             var ABufDrawableRect: TRectF;
             const AFill: TALBrush;
+            const AStateLayer: TALStateLayer;
+            const AStateLayerContentColor: TAlphaColor;
+            const ADrawStateLayerOnTop: Boolean;
             const AStroke: TALStrokeBrush;
             const AShadow: TALShadow);
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  ABufDrawableRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), ALGetScreenScale); // to have the pixel aligned width and height
-  var LRect := TrectF.Create(0, 0, ABufDrawableRect.Width, ABufDrawableRect.height);
-  if AShadow.HasShadow then begin
-    var LShadowWidth := ALGetShadowWidth(AShadow.blur);
-    var LShadowRect := ABufDrawableRect;
-    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
-    LShadowRect.Offset(AShadow.OffsetX, AShadow.OffsetY);
-    ABufDrawableRect := TRectF.Union(LShadowRect, ABufDrawableRect); // add the extra space needed to draw the shadow
-    ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
-    LRect.Offset(Max(0, LShadowWidth - AShadow.OffsetX), Max(0, LShadowWidth - AShadow.OffsetY));
-  end;
+  var LRect := LocalRect;
+  ABufDrawableRect := ALGetShapeSurfaceRect(
+                        LRect, // const ARect: TRectF;
+                        AFill, // const AFill: TALBrush;
+                        AStateLayer, // const AStateLayer: TALStateLayer;
+                        AShadow); // const AShadow: TALShadow): TRectF;
+  ABufDrawableRect := ALAlignDimensionToPixelCeil(ABufDrawableRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+  LRect.Offset(-ABufDrawableRect.Left, -ABufDrawableRect.Top);
 
   var LSurface: TALSurface;
   var LCanvas: TALCanvas;
@@ -2222,6 +2243,9 @@ begin
         LRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
+        AStateLayer, // const StateLayer: TALStateLayer;
+        AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
+        ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
         AStroke, // const Stroke: TALStrokeBrush;
         AShadow); // const Shadow: TALShadow
 
@@ -2229,10 +2253,10 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    ABufDrawable := ALSurfaceToDrawable(LSurface);
+    ABufDrawable := ALCreateDrawableFromSurface(LSurface);
 
   finally
-    ALFreeSurface(LSurface, LCanvas);
+    ALFreeAndNilSurface(LSurface, LCanvas);
   end;
 
 end;
@@ -2255,6 +2279,9 @@ begin
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // var ABufDrawableRect: TRectF;
     Fill, // const AFill: TALBrush;
+    nil, // const AStateLayer: TALStateLayer;
+    TAlphaColors.null, // const AStateLayerContentColor: TAlphaColor;
+    True, // const ADrawStateLayerOnTop: Boolean;
     Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
 
@@ -2275,6 +2302,9 @@ begin
       Canvas.AlignToPixel(LRect), // const Rect: TrectF;
       AbsoluteOpacity, // const AOpacity: Single;
       Fill, // const Fill: TALBrush;
+      nil, // const StateLayer: TALStateLayer;
+      TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
+      True, // const ADrawStateLayerOnTop: Boolean;
       Stroke, // const Stroke: TALStrokeBrush;
       Shadow); // const Shadow: TALShadow
     {$ELSE}
@@ -2477,10 +2507,10 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufDrawable := ALSurfaceToDrawable(LSurface);
+    fBufDrawable := ALCreateDrawableFromSurface(LSurface);
 
   finally
-    ALFreeSurface(LSurface, LCanvas);
+    ALFreeAndNilSurface(LSurface, LCanvas);
   end;
 
   {$ELSEIF DEFINED(ANDROID)}
@@ -2549,10 +2579,10 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufDrawable := ALSurfaceToDrawable(LSurface);
+    fBufDrawable := ALCreateDrawableFromSurface(LSurface);
 
   finally
-    ALFreeSurface(LSurface, LCanvas);
+    ALFreeAndNilSurface(LSurface, LCanvas);
   end;
 
   {$ELSEIF DEFINED(IOS)}
@@ -2609,10 +2639,10 @@ begin
       ALCanvasEndScene(LCanvas)
     end;
 
-    fBufDrawable := ALSurfaceToDrawable(LCanvas);
+    fBufDrawable := ALCreateDrawableFromSurface(LCanvas);
 
   finally
-    ALFreeSurface(LSurface, LCanvas); // Var aContext: CGContextRef;
+    ALFreeAndNilSurface(LSurface, LCanvas); // Var aContext: CGContextRef;
   end;
 
   {$ENDIF}
@@ -2828,6 +2858,7 @@ begin
           TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
           TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
           Fill, // const AFill: TALBrush;
+          nil, // const AStateLayer: TALStateLayer;
           Stroke, // const AStroke: TALStrokeBrush;
           Shadow); // const AShadow: TALShadow);
       end;
@@ -3066,17 +3097,22 @@ begin
 
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
+    var LRect: TrectF;
     DrawMultilineText(
+      TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+      LRect, // out ARect: TRectF;
       FTextBroken, // out ATextBroken: Boolean;
       FAllTextDrawn, // out AAllTextDrawn: Boolean;
       FElements, // out AElements: TALTextElements;
       1, // const AScale: Single;
+      AbsoluteOpacity, // const AOpacity: Single;
       Text, // const AText: String;
       TextSettings.Font, // const AFont: TALFont;
       TextSettings.Decoration, // const ADecoration: TALTextDecoration;
       TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
       TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
       Fill, // const AFill: TALBrush;
+      nil, // const AStateLayer: TALStateLayer;
       Stroke, // const AStroke: TALStrokeBrush;
       Shadow); // const AShadow: TALShadow);
     {$ELSE}
@@ -3198,6 +3234,7 @@ function TALBaseText.GetMultiLineTextOptions(
            const AEllipsisFont: TALFont;
            const AEllipsisDecoration: TALTextDecoration;
            const AFill: TALBrush;
+           const AStateLayer: TALStateLayer;
            const AStroke: TALStrokeBrush;
            const AShadow: TALShadow): TALMultiLineTextOptions;
 begin
@@ -3257,9 +3294,28 @@ begin
   Result.FillGradientAngle := AFill.Gradient.Angle;
   Result.FillResourceName := AFill.ResourceName;
   Result.FillWrapMode := AFill.WrapMode;
-  Result.FillPaddingRect := AFill.Padding.Rect;
+  Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
+  Result.FillImageMargins := AFill.ImageMargins.Rect;
+  //--
+  if AStateLayer <> nil then begin
+    Result.StateLayerOpacity := AStateLayer.Opacity;
+    if AStateLayer.UseContentColor then Result.StateLayerColor := AFont.Color
+    else Result.StateLayerColor := AStateLayer.Color;
+    Result.StateLayerMargins := AStateLayer.Margins.Rect;
+    Result.StateLayerXRadius := AStateLayer.XRadius;
+    Result.StateLayerYRadius := AStateLayer.YRadius;
+  end
+  else begin
+    Result.StateLayerOpacity := 0;
+    Result.StateLayerColor := TalphaColors.Null;
+    Result.StateLayerMargins := TRectF.Empty;
+    Result.StateLayerXRadius := 0;
+    Result.StateLayerYRadius := 0;
+  end;
+  //--
   Result.StrokeColor := AStroke.Color;
   Result.StrokeThickness := AStroke.Thickness;
+  //--
   Result.ShadowColor := AShadow.Color;
   Result.ShadowBlur := AShadow.Blur;
   Result.ShadowOffsetX := AShadow.OffsetX;
@@ -3279,72 +3335,122 @@ begin
 end;
 
 {**************************************}
-Procedure TALBaseText.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; var ARect: TrectF; var ASurfaceSize: TSizeF);
+Procedure TALBaseText.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF);
 begin
-  // virtual
+  // Virtual
 end;
 
 {**************************************}
-Procedure TALBaseText.DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; Const ARect: TrectF);
+Procedure TALBaseText.DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF);
 begin
-  // virtual
+  // Virtual
 end;
 
 {**************************************}
-Procedure TALBaseText.DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; Const ARect: TrectF);
+Procedure TALBaseText.DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF);
 begin
-  // virtual
+  // Virtual
 end;
 
 {**************************************}
 Procedure TALBaseText.DrawMultilineText(
+            const ACanvas: TALCanvas;
+            out ARect: TRectF;
             out ATextBroken: Boolean;
             out AAllTextDrawn: Boolean;
             out AElements: TALTextElements;
             const AScale: Single;
+            const AOpacity: Single;
             const AText: String;
             const AFont: TALFont;
             const ADecoration: TALTextDecoration;
             const AEllipsisFont: TALFont;
             const AEllipsisDecoration: TALTextDecoration;
             const AFill: TALBrush;
+            const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
             const AShadow: TALShadow);
 begin
-  {$IF DEFINED(ALSkiaCanvas)}
-  var LMaxSize: TSizeF;
-  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-  else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
-  else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
-  else LMaxSize := TSizeF.Create(width, height);
 
-  var LRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+  var LMultiLineTextOptions := GetMultiLineTextOptions(
+                                 AScale,
+                                 AOpacity,
+                                 AFont,
+                                 ADecoration,
+                                 AEllipsisFont,
+                                 AEllipsisDecoration,
+                                 AFill,
+                                 AStateLayer,
+                                 AStroke,
+                                 AShadow);
 
-  var LSurface: TALSurface := ALNullSurface;
-  var LCanvas: TALCanvas := TSkCanvasCustom(Canvas).Canvas.Handle;
-  ALDrawMultiLineText(
-    LSurface,
-    LCanvas,
-    AText,
-    LRect,
-    ATextBroken,
-    AAllTextDrawn,
-    AElements,
-    GetMultiLineTextOptions(
-      AScale,
-      AbsoluteOpacity,
-      AFont,
-      ADecoration,
-      AEllipsisFont,
-      AEllipsisDecoration,
-      AFill,
-      AStroke,
-      AShadow));
-  {$ELSE}
-  {$IF defined(DEBUG)}
-  raise Exception.Create('DrawMultilineText work only when SKIA is enabled.');
-  {$ENDIF}
-  {$ENDIF}
+  if (AText <> '') then begin
+
+    var LMaxSize: TSizeF;
+    if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+    else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
+    else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+    else LMaxSize := TSizeF.Create(width, height);
+
+    ARect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+
+    var LSurface: TALSurface := ALNullSurface;
+    var LCanvas: TALCanvas := ACanvas;
+    if ALIsCanvasNull(LCanvas) then
+      Raise Exception.Create('Canvas cannot be null');
+    ALDrawMultiLineText(
+      LSurface,
+      LCanvas,
+      AText,
+      ARect,
+      ATextBroken,
+      AAllTextDrawn,
+      AElements,
+      LMultiLineTextOptions);
+
+  end
+  else begin
+
+    ARect := LocalRect;
+    ARect.Width := Min(MaxWidth, ARect.Width);
+    ARect.Height := Min(MaxHeight, ARect.Height);
+    ARect := ALAlignDimensionToPixelRound(ARect, ALGetScreenScale); // to have the pixel aligned width and height
+
+    Var LSurfaceSize := ARect.Size;
+    DrawMultilineTextAdjustRect(
+      ACanvas, // const ACanvas: TALCanvas;
+      LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
+      ARect, // var ARect: TrectF;
+      LSurfaceSize); // var ASurfaceSize: TSizeF
+
+    DrawMultilineTextBeforeDrawBackground(
+      ACanvas, //const ACanvas: TALCanvas;
+      LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
+      ARect); // Const ARect: TrectF
+
+    ALDrawRectangle(
+      ACanvas, // const ACanvas: TALCanvas;
+      AScale, // const AScale: Single;
+      ARect, // const Rect: TrectF;
+      AOpacity, // const AOpacity: Single;
+      AFill, // const Fill: TALBrush;
+      AStateLayer, // const StateLayer: TALStateLayer;
+      AFont.color, // const AStateLayerContentColor: TAlphaColor;
+      AText <> '', // const ADrawStateLayerOnTop: Boolean;
+      AStroke, // const Stroke: TALStrokeBrush;
+      AShadow, // const Shadow: TALShadow
+      Sides, // const Sides: TSides;
+      Corners, // const Corners: TCorners;
+      XRadius, // const XRadius: Single = 0;
+      YRadius); // const YRadius: Single = 0);
+
+    DrawMultilineTextBeforeDrawParagraph(
+      ACanvas, //const ACanvas: TALCanvas;
+      LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
+      ARect); // Const ARect: TrectF
+
+  end;
+
 end;
 
 {*****************************************}
@@ -3360,6 +3466,7 @@ Procedure TALBaseText.MeasureMultilineText(
             const AEllipsisFont: TALFont;
             const AEllipsisDecoration: TALTextDecoration;
             const AFill: TALBrush;
+            const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
             const AShadow: TALShadow);
 begin
@@ -3385,6 +3492,7 @@ begin
       AEllipsisFont,
       AEllipsisDecoration,
       AFill,
+      AStateLayer,
       AStroke,
       AShadow));
 end;
@@ -3403,79 +3511,121 @@ Procedure TALBaseText.CreateBufDrawable(
            const AEllipsisFont: TALFont;
            const AEllipsisDecoration: TALTextDecoration;
            const AFill: TALBrush;
+           const AStateLayer: TALStateLayer;
            const AStroke: TALStrokeBrush;
            const AShadow: TALShadow);
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  var LMaxSize: TSizeF;
-  if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
-  else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
-  else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
-  else LMaxSize := TSizeF.Create(width, height);
+  var LMultiLineTextOptions := GetMultiLineTextOptions(
+                                 AScale,
+                                 1{AOpacity},
+                                 AFont,
+                                 ADecoration,
+                                 AEllipsisFont,
+                                 AEllipsisDecoration,
+                                 AFill,
+                                 AStateLayer,
+                                 AStroke,
+                                 AShadow);
 
-  ABufDrawableRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+  if (AText <> '') then begin
 
-  //build ABufDrawable
-  ABufDrawable := ALCreateMultiLineTextDrawable(
-                    AText,
-                    ABufDrawableRect,
-                    ATextBroken,
-                    AAllTextDrawn,
-                    AElements,
-                    GetMultiLineTextOptions(
-                      AScale,
-                      1{AOpacity},
-                      AFont,
-                      ADecoration,
-                      AEllipsisFont,
-                      AEllipsisDecoration,
-                      AFill,
-                      AStroke,
-                      AShadow));
+    var LMaxSize: TSizeF;
+    if HasUnconstrainedAutosizeX and HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(maxWidth, maxHeight)
+    else if HasUnconstrainedAutosizeX then LMaxSize := TSizeF.Create(maxWidth, Height)
+    else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
+    else LMaxSize := TSizeF.Create(width, height);
 
-  //Special case where it's impossible to draw at least one char.
-  //To avoid to call again ALDrawMultiLineText on each paint
-  //return a "blank" drawable. Also to avoid to have a control
-  //with a "zero" size, do not do any autoresize
+    ABufDrawableRect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+    ABufDrawable := ALCreateMultiLineTextDrawable(
+                      AText,
+                      ABufDrawableRect,
+                      ATextBroken,
+                      AAllTextDrawn,
+                      AElements,
+                      LMultiLineTextOptions);
+
+  end;
+
   if (ALIsDrawableNull(ABufDrawable)) then begin
-    if (not LocalRect.IsEmpty) then begin
-      ABufDrawableRect := LocalRect;
-      ABufDrawableRect.Width := Min(MaxWidth, ABufDrawableRect.Width);
-      ABufDrawableRect.Height := Min(MaxHeight, ABufDrawableRect.Height);
-      ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale);
-      var LSurface: TALSurface;
-      var LCanvas: TALCanvas;
-      ALCreateSurface(
-        LSurface, // out ASurface: sk_surface_t;
-        LCanvas, // out ACanvas: sk_canvas_t;
-        ALGetScreenScale, // const AScale: Single;
-        ABufDrawableRect.Width, // const w: integer;
-        ABufDrawableRect.height);// const h: integer)
-      try
-        if ALCanvasBeginScene(LCanvas) then
-        try
-          ALDrawRectangle(
-            LCanvas, // const ACanvas: sk_canvas_t;
-            ALGetScreenScale, // const AScale: Single;
-            ABufDrawableRect, // const Rect: TrectF;
-            1, // const AOpacity: Single;
-            Fill, // const Fill: TALBrush;
-            Stroke, // const Stroke: TALStrokeBrush;
-            Shadow, // const Shadow: TALShadow
-            Sides, // const Sides: TSides;
-            Corners, // const Corners: TCorners;
-            XRadius, // const XRadius: Single = 0;
-            YRadius); // const YRadius: Single = 0);
-        finally
-          ALCanvasEndScene(LCanvas)
-        end;
-        ABufDrawable := ALSurfaceToDrawable(LSurface);
-      finally
-        ALFreeSurface(LSurface, LCanvas);
-      end;
+
+    if (AText <> '') or (LocalRect.IsEmpty) then begin
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      ABufDrawableRect := TRectF.Create(0,0,1,1);
+      exit;
     end;
+
+    var LRect := LocalRect;
+    ABufDrawableRect := ALGetShapeSurfaceRect(
+                          LRect, // const ARect: TRectF;
+                          AFill, // const AFill: TALBrush;
+                          AStateLayer, // const AStateLayer: TALStateLayer;
+                          AShadow); // const AShadow: TALShadow): TRectF;
+    ABufDrawableRect.Width := Min(MaxWidth, ABufDrawableRect.Width);
+    ABufDrawableRect.Height := Min(MaxHeight, ABufDrawableRect.Height);
+    ABufDrawableRect := ALAlignDimensionToPixelCeil(ABufDrawableRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+    LRect.Offset(-ABufDrawableRect.Left, -ABufDrawableRect.Top);
+
+    Var LSurfaceSize := ABufDrawableRect.Size;
+    DrawMultilineTextAdjustRect(
+      ALNullCanvas, // const ACanvas: TALCanvas;
+      LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
+      LRect, // var ARect: TrectF;
+      LSurfaceSize); // var ASurfaceSize: TSizeF
+    ABufDrawableRect.Width := LSurfaceSize.Width;
+    ABufDrawableRect.Height := LSurfaceSize.Height;
+
+    var LSurface: TALSurface;
+    var LCanvas: TALCanvas;
+    ALCreateSurface(
+      LSurface, // out ASurface: TALSurface;
+      LCanvas, // out ACanvas: TALCanvas;
+      AScale, // const AScale: Single;
+      ABufDrawableRect.Width, // const w: integer;
+      ABufDrawableRect.height);// const h: integer)
+    try
+
+      if ALCanvasBeginScene(LCanvas) then
+      try
+
+        DrawMultilineTextBeforeDrawBackground(
+          LCanvas, //const ACanvas: TALCanvas;
+          LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
+          ABufDrawableRect); // Const ARect: TrectF
+
+        ALDrawRectangle(
+          LCanvas, // const ACanvas: TALCanvas;
+          AScale, // const AScale: Single;
+          LRect, // const Rect: TrectF;
+          1, // const AOpacity: Single;
+          AFill, // const Fill: TALBrush;
+          AStateLayer, // const StateLayer: TALStateLayer;
+          AFont.color, // const AStateLayerContentColor: TAlphaColor;
+          Atext <> '', // const ADrawStateLayerOnTop: Boolean;
+          AStroke, // const Stroke: TALStrokeBrush;
+          AShadow, // const Shadow: TALShadow
+          Sides, // const Sides: TSides;
+          Corners, // const Corners: TCorners;
+          XRadius, // const XRadius: Single = 0;
+          YRadius); // const YRadius: Single = 0);
+
+        DrawMultilineTextBeforeDrawParagraph(
+          LCanvas, //const ACanvas: TALCanvas;
+          LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
+          ABufDrawableRect); // Const ARect: TrectF
+
+      finally
+        ALCanvasEndScene(LCanvas)
+      end;
+
+      ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+
+    finally
+      ALFreeAndNilSurface(LSurface, LCanvas);
+    end;
+
   end;
 
 end;
@@ -3505,6 +3655,7 @@ begin
     TextSettings.EllipsisSettings.font, // const AEllipsisFont: TALFont;
     TextSettings.EllipsisSettings.Decoration, // const AEllipsisDecoration: TALTextDecoration;
     Fill, // const AFill: TALBrush;
+    nil, // const AStateLayer: TALStateLayer;
     Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
 

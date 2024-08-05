@@ -511,219 +511,217 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~}
-  TALCheckBox = Class;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  (* todo move it inside TALCheckBox *)
-  TALCheckMarkBrush = class(TALPersistentObserver)
-  private
-    FColor: TAlphaColor;
-    FResourceName: String;
-    FWrapMode: TALImageWrapMode;
-    FThickness: Single;
-    FMargins: TBounds;
-    FDefaultColor: TAlphaColor;
-    FDefaultResourceName: String;
-    FDefaultWrapMode: TALImageWrapMode;
-    FDefaultThickness: Single;
-    procedure SetColor(const Value: TAlphaColor);
-    procedure SetResourceName(const Value: String);
-    procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure SetThickness(const Value: Single);
-    procedure SetMargins(const Value: TBounds);
-    procedure MarginsChanged(Sender: TObject); virtual;
-    function IsColorStored: Boolean;
-    function IsResourceNameStored: Boolean;
-    function IsWrapModeStored: Boolean;
-    function IsThicknessStored: Boolean;
-  protected
-    function CreateSavedState: TALPersistentObserver; override;
-  public
-    constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-    procedure Interpolate(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single);
-    function HasCheckMark: boolean;
-    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
-    property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
-    property DefaultWrapMode: TALImageWrapMode read FDefaultWrapMode write FDefaultWrapMode;
-    property DefaultThickness: Single read FDefaultThickness write FDefaultThickness;
-  published
-    property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
-    property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
-    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
-    property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
-    property Margins: TBounds read FMargins write SetMargins;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALInheritCheckMarkBrush = class(TALCheckMarkBrush)
-  private
-    FParent: TALCheckMarkBrush;
-    FInherit: Boolean;
-    fSuperseded: Boolean;
-    procedure SetInherit(const AValue: Boolean);
-  protected
-    function CreateSavedState: TALPersistentObserver; override;
-    procedure DoSupersede; virtual;
-  public
-    constructor Create(const AParent: TALCheckMarkBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-    procedure Supersede(Const ASaveState: Boolean = False); virtual;
-    procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
-    property Superseded: Boolean read FSuperseded;
-    property Parent: TALCheckMarkBrush read FParent;
-  published
-    property Inherit: Boolean read FInherit write SetInherit Default True;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxBaseStateStyle = class(TALBaseStateStyle)
-  private
-    FCheckMark: TALInheritCheckMarkBrush;
-    function GetStateStyleParent: TALCheckBoxBaseStateStyle;
-    function GetControlParent: TALCheckBox;
-    procedure SetCheckMark(const AValue: TALInheritCheckMarkBrush);
-    procedure CheckMarkChanged(ASender: TObject);
-  protected
-    function GetInherit: Boolean; override;
-    procedure DoSupersede; override;
-  public
-    constructor Create(const AParent: TObject); override;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-    procedure Interpolate(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single); reintroduce; virtual;
-    procedure InterpolateNoChanges(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single); reintroduce;
-    property StateStyleParent: TALCheckBoxBaseStateStyle read GetStateStyleParent;
-    property ControlParent: TALCheckBox read GetControlParent;
-  published
-    property CheckMark: TALInheritCheckMarkBrush read FCheckMark write SetCheckMark;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxDefaultStateStyle = class(TALCheckBoxBaseStateStyle)
-  published
-    property Fill;
-    property Shadow;
-    property Stroke;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxDisabledStateStyle = class(TALCheckBoxBaseStateStyle)
-  private
-    FOpacity: Single;
-    procedure SetOpacity(const Value: Single);
-    function IsOpacityStored: Boolean;
-  protected
-    function GetInherit: Boolean; override;
-  public
-    constructor Create(const AParent: TObject); override;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-  published
-    property Fill;
-    property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
-    property Shadow;
-    property Stroke;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxHoveredStateStyle = class(TALCheckBoxBaseStateStyle)
-  published
-    property Fill;
-    property Shadow;
-    property StateLayer;
-    property Stroke;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxPressedStateStyle = class(TALCheckBoxBaseStateStyle)
-  published
-    property Fill;
-    property Shadow;
-    property StateLayer;
-    property Stroke;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxFocusedStateStyle = class(TALCheckBoxBaseStateStyle)
-  published
-    property Fill;
-    property Shadow;
-    property StateLayer;
-    property Stroke;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxCheckStateStyles = class(TALPersistentObserver)
-  private
-    FDefault: TALCheckBoxDefaultStateStyle;
-    FDisabled: TALCheckBoxDisabledStateStyle;
-    FHovered: TALCheckBoxHoveredStateStyle;
-    FPressed: TALCheckBoxPressedStateStyle;
-    FFocused: TALCheckBoxFocusedStateStyle;
-    procedure SetDefault(const AValue: TALCheckBoxDefaultStateStyle);
-    procedure SetDisabled(const AValue: TALCheckBoxDisabledStateStyle);
-    procedure SetHovered(const AValue: TALCheckBoxHoveredStateStyle);
-    procedure SetPressed(const AValue: TALCheckBoxPressedStateStyle);
-    procedure SetFocused(const AValue: TALCheckBoxFocusedStateStyle);
-    procedure DefaultChanged(ASender: TObject);
-    procedure DisabledChanged(ASender: TObject);
-    procedure HoveredChanged(ASender: TObject);
-    procedure PressedChanged(ASender: TObject);
-    procedure FocusedChanged(ASender: TObject);
-  protected
-    function CreateSavedState: TALPersistentObserver; override;
-  public
-    constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-  published
-    property &Default: TALCheckBoxDefaultStateStyle read FDefault write SetDefault;
-    property Disabled: TALCheckBoxDisabledStateStyle read FDisabled write SetDisabled;
-    property Hovered: TALCheckBoxHoveredStateStyle read FHovered write SetHovered;
-    property Pressed: TALCheckBoxPressedStateStyle read FPressed write SetPressed;
-    property Focused: TALCheckBoxFocusedStateStyle read FFocused write SetFocused;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCheckBoxStateStyles = class(TALPersistentObserver)
-  private
-    FChecked: TALCheckBoxCheckStateStyles;
-    FUnchecked: TALCheckBoxCheckStateStyles;
-    procedure SetChecked(const AValue: TALCheckBoxCheckStateStyles);
-    procedure SetUnchecked(const AValue: TALCheckBoxCheckStateStyles);
-    procedure CheckedChanged(ASender: TObject);
-    procedure UncheckedChanged(ASender: TObject);
-  protected
-    function CreateSavedState: TALPersistentObserver; override;
-  public
-    constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
-    destructor Destroy; override;
-    procedure Assign(Source: TPersistent); override;
-    procedure Reset; override;
-  published
-    property Checked: TALCheckBoxCheckStateStyles read FChecked write SetChecked;
-    property Unchecked: TALCheckBoxCheckStateStyles read FUnchecked write SetUnchecked;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALCheckBox = class(TALShape, IALDoubleBufferedControl)
+  public
+    type
+      // ---------------
+      // TCheckMarkBrush
+      TCheckMarkBrush = class(TALPersistentObserver)
+      private
+        FColor: TAlphaColor;
+        FResourceName: String;
+        FWrapMode: TALImageWrapMode;
+        FThickness: Single;
+        FMargins: TBounds;
+        FDefaultColor: TAlphaColor;
+        FDefaultResourceName: String;
+        FDefaultWrapMode: TALImageWrapMode;
+        FDefaultThickness: Single;
+        procedure SetColor(const Value: TAlphaColor);
+        procedure SetResourceName(const Value: String);
+        procedure SetWrapMode(const Value: TALImageWrapMode);
+        procedure SetThickness(const Value: Single);
+        procedure SetMargins(const Value: TBounds);
+        procedure MarginsChanged(Sender: TObject); virtual;
+        function IsColorStored: Boolean;
+        function IsResourceNameStored: Boolean;
+        function IsWrapModeStored: Boolean;
+        function IsThicknessStored: Boolean;
+      protected
+        function CreateSavedState: TALPersistentObserver; override;
+      public
+        constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
+        procedure Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single); virtual;
+        procedure InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
+        function HasCheckMark: boolean;
+        property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+        property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
+        property DefaultWrapMode: TALImageWrapMode read FDefaultWrapMode write FDefaultWrapMode;
+        property DefaultThickness: Single read FDefaultThickness write FDefaultThickness;
+      published
+        property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
+        property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
+        property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
+        property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
+        property Margins: TBounds read FMargins write SetMargins;
+      end;
+      // ----------------------
+      // TInheritCheckMarkBrush
+      TInheritCheckMarkBrush = class(TCheckMarkBrush)
+      private
+        FParent: TCheckMarkBrush;
+        FInherit: Boolean;
+        fSuperseded: Boolean;
+        procedure SetInherit(const AValue: Boolean);
+      protected
+        function CreateSavedState: TALPersistentObserver; override;
+        procedure DoSupersede; virtual;
+      public
+        constructor Create(const AParent: TCheckMarkBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
+        procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
+        procedure Supersede(Const ASaveState: Boolean = False); virtual;
+        procedure SupersedeNoChanges(Const ASaveState: Boolean = False);
+        property Superseded: Boolean read FSuperseded;
+        property Parent: TCheckMarkBrush read FParent;
+      published
+        property Inherit: Boolean read FInherit write SetInherit Default True;
+      end;
+      // ---------------
+      // TBaseStateStyle
+      TBaseStateStyle = class(TALBaseStateStyle)
+      private
+        FCheckMark: TInheritCheckMarkBrush;
+        function GetStateStyleParent: TBaseStateStyle;
+        function GetControlParent: TALCheckBox;
+        procedure SetCheckMark(const AValue: TInheritCheckMarkBrush);
+        procedure CheckMarkChanged(ASender: TObject);
+      protected
+        function GetInherit: Boolean; override;
+        procedure DoSupersede; override;
+      public
+        constructor Create(const AParent: TObject); override;
+        destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
+        procedure Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce; virtual;
+        procedure InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce;
+        property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
+        property ControlParent: TALCheckBox read GetControlParent;
+      published
+        property CheckMark: TInheritCheckMarkBrush read FCheckMark write SetCheckMark;
+      end;
+      // ------------------
+      // TDefaultStateStyle
+      TDefaultStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property Stroke;
+      end;
+      // -------------------
+      // TDisabledStateStyle
+      TDisabledStateStyle = class(TBaseStateStyle)
+      private
+        FOpacity: Single;
+        procedure SetOpacity(const Value: Single);
+        function IsOpacityStored: Boolean;
+      protected
+        function GetInherit: Boolean; override;
+      public
+        constructor Create(const AParent: TObject); override;
+        procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
+      published
+        property Fill;
+        property Opacity: Single read FOpacity write SetOpacity stored IsOpacityStored nodefault;
+        property Shadow;
+        property Stroke;
+      end;
+      // ------------------
+      // THoveredStateStyle
+      THoveredStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property StateLayer;
+        property Stroke;
+      end;
+      // ------------------
+      // TPressedStateStyle
+      TPressedStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property StateLayer;
+        property Stroke;
+      end;
+      // ------------------
+      // TFocusedStateStyle
+      TFocusedStateStyle = class(TBaseStateStyle)
+      published
+        property Fill;
+        property Shadow;
+        property StateLayer;
+        property Stroke;
+      end;
+      // -----------------
+      // TCheckStateStyles
+      TCheckStateStyles = class(TALPersistentObserver)
+      private
+        FDefault: TDefaultStateStyle;
+        FDisabled: TDisabledStateStyle;
+        FHovered: THoveredStateStyle;
+        FPressed: TPressedStateStyle;
+        FFocused: TFocusedStateStyle;
+        procedure SetDefault(const AValue: TDefaultStateStyle);
+        procedure SetDisabled(const AValue: TDisabledStateStyle);
+        procedure SetHovered(const AValue: THoveredStateStyle);
+        procedure SetPressed(const AValue: TPressedStateStyle);
+        procedure SetFocused(const AValue: TFocusedStateStyle);
+        procedure DefaultChanged(ASender: TObject);
+        procedure DisabledChanged(ASender: TObject);
+        procedure HoveredChanged(ASender: TObject);
+        procedure PressedChanged(ASender: TObject);
+        procedure FocusedChanged(ASender: TObject);
+      protected
+        function CreateSavedState: TALPersistentObserver; override;
+      public
+        constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
+      published
+        property &Default: TDefaultStateStyle read FDefault write SetDefault;
+        property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
+        property Hovered: THoveredStateStyle read FHovered write SetHovered;
+        property Pressed: TPressedStateStyle read FPressed write SetPressed;
+        property Focused: TFocusedStateStyle read FFocused write SetFocused;
+      end;
+      // ------------
+      // TStateStyles
+      TStateStyles = class(TALPersistentObserver)
+      private
+        FChecked: TCheckStateStyles;
+        FUnchecked: TCheckStateStyles;
+        procedure SetChecked(const AValue: TCheckStateStyles);
+        procedure SetUnchecked(const AValue: TCheckStateStyles);
+        procedure CheckedChanged(ASender: TObject);
+        procedure UncheckedChanged(ASender: TObject);
+      protected
+        function CreateSavedState: TALPersistentObserver; override;
+      public
+        constructor Create(const AParent: TALCheckBox); reintroduce; virtual;
+        destructor Destroy; override;
+        procedure Assign(Source: TPersistent); override;
+        procedure Reset; override;
+      published
+        property Checked: TCheckStateStyles read FChecked write SetChecked;
+        property Unchecked: TCheckStateStyles read FUnchecked write SetUnchecked;
+      end;
   private
     FOnChange: TNotifyEvent;
     FDoubleBuffered: boolean;
     FXRadius: Single;
     FYRadius: Single;
     FChecked: Boolean;
-    FCheckMark: TALCheckMarkBrush;
-    FStateStyles: TALCheckBoxStateStyles;
+    FCheckMark: TCheckMarkBrush;
+    FStateStyles: TStateStyles;
     fBufCheckedDrawable: TALDrawable;
     fBufCheckedDrawableRect: TRectF;
     fBufCheckedDisabledDrawable: TALDrawable;
@@ -744,8 +742,8 @@ type
     fBufUnCheckedPressedDrawableRect: TRectF;
     fBufUnCheckedFocusedDrawable: TALDrawable;
     fBufUnCheckedFocusedDrawableRect: TRectF;
-    procedure SetCheckMark(const Value: TALCheckMarkBrush);
-    procedure SetStateStyles(const AValue: TALCheckBoxStateStyles);
+    procedure SetCheckMark(const Value: TCheckMarkBrush);
+    procedure SetStateStyles(const AValue: TStateStyles);
   protected
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
@@ -769,7 +767,7 @@ type
             const ACanvas: TALCanvas;
             const AScale: Single;
             const ADstRect: TrectF;
-            const ACheckMark: TALCheckMarkBrush;
+            const ACheckMark: TCheckMarkBrush;
             const AChecked: Boolean); virtual;
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
@@ -777,7 +775,7 @@ type
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
-                const ACheckMark: TALCheckMarkBrush;
+                const ACheckMark: TCheckMarkBrush;
                 const AShadow: TALShadow); virtual;
     procedure Paint; override;
   public
@@ -792,7 +790,7 @@ type
     property CanFocus default True;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    property CheckMark: TALCheckMarkBrush read FCheckMark write SetCheckMark;
+    property CheckMark: TCheckMarkBrush read FCheckMark write SetCheckMark;
     property Checked: Boolean read GetChecked write SetChecked default False;
     property ClipChildren;
     //property ClipParent;
@@ -818,7 +816,7 @@ type
     property Scale;
     property Shadow;
     property Size;
-    property StateStyles: TALCheckBoxStateStyles read FStateStyles write SetStateStyles;
+    property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
     property Stroke;
     property TabOrder;
     property TabStop;
@@ -2326,7 +2324,7 @@ begin
 end;
 
 {**********************************************************************************************}
-constructor TALCheckMarkBrush.Create(const ADefaultColor: TAlphaColor);
+constructor TALCheckBox.TCheckMarkBrush.Create(const ADefaultColor: TAlphaColor);
 begin
   inherited Create;
   //--
@@ -2345,31 +2343,31 @@ begin
 end;
 
 {**************************}
-destructor TALCheckMarkBrush.Destroy;
+destructor TALCheckBox.TCheckMarkBrush.Destroy;
 begin
   ALFreeAndNil(FMargins);
   inherited;
 end;
 
 {*********************************}
-function TALCheckMarkBrush.CreateSavedState: TALPersistentObserver;
+function TALCheckBox.TCheckMarkBrush.CreateSavedState: TALPersistentObserver;
 type
-  TALCheckMarkBrushClass = class of TALCheckMarkBrush;
+  TCheckMarkBrushClass = class of TCheckMarkBrush;
 begin
-  result := TALCheckMarkBrushClass(classtype).Create(DefaultColor);
+  result := TCheckMarkBrushClass(classtype).Create(DefaultColor);
 end;
 
 {**********************************************}
-procedure TALCheckMarkBrush.Assign(Source: TPersistent);
+procedure TALCheckBox.TCheckMarkBrush.Assign(Source: TPersistent);
 begin
-  if Source is TALCheckMarkBrush then begin
+  if Source is TCheckMarkBrush then begin
     BeginUpdate;
     Try
-      Color := TALCheckMarkBrush(Source).Color;
-      ResourceName := TALCheckMarkBrush(Source).ResourceName;
-      WrapMode := TALCheckMarkBrush(Source).WrapMode;
+      Color := TCheckMarkBrush(Source).Color;
+      ResourceName := TCheckMarkBrush(Source).ResourceName;
+      WrapMode := TCheckMarkBrush(Source).WrapMode;
       Thickness := TALStrokeBrush(Source).Thickness;
-      Margins.Assign(TALCheckMarkBrush(Source).Margins);
+      Margins.Assign(TCheckMarkBrush(Source).Margins);
     Finally
       EndUpdate;
     End;
@@ -2379,7 +2377,7 @@ begin
 end;
 
 {************************}
-procedure TALCheckMarkBrush.Reset;
+procedure TALCheckBox.TCheckMarkBrush.Reset;
 begin
   BeginUpdate;
   Try
@@ -2395,7 +2393,7 @@ begin
 end;
 
 {*********************************************************************************}
-procedure TALCheckMarkBrush.Interpolate(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single);
+procedure TALCheckBox.TCheckMarkBrush.Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
@@ -2425,7 +2423,7 @@ begin
 end;
 
 {*********************************************************************************}
-procedure TALCheckMarkBrush.InterpolateNoChanges(const ATo: TALCheckMarkBrush; const ANormalizedTime: Single);
+procedure TALCheckBox.TCheckMarkBrush.InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
@@ -2436,7 +2434,7 @@ begin
 end;
 
 {************************}
-function TALCheckMarkBrush.HasCheckMark: boolean;
+function TALCheckBox.TCheckMarkBrush.HasCheckMark: boolean;
 begin
   result := ((Color <> TalphaColors.Null) and
              (CompareValue(FThickness, 0, TEpsilon.Vector) > 0)) or
@@ -2444,31 +2442,31 @@ begin
 end;
 
 {***************************************}
-function TALCheckMarkBrush.IsColorStored: Boolean;
+function TALCheckBox.TCheckMarkBrush.IsColorStored: Boolean;
 begin
   result := FColor <> FDefaultColor;
 end;
 
 {**********************************************}
-function TALCheckMarkBrush.IsResourceNameStored: Boolean;
+function TALCheckBox.TCheckMarkBrush.IsResourceNameStored: Boolean;
 begin
   result := FResourceName <> FDefaultResourceName;
 end;
 
 {**********************************************}
-function TALCheckMarkBrush.IsWrapModeStored: Boolean;
+function TALCheckBox.TCheckMarkBrush.IsWrapModeStored: Boolean;
 begin
   result := FWrapMode <> FDefaultWrapMode;
 end;
 
 {****************************************************}
-function TALCheckMarkBrush.IsThicknessStored: Boolean;
+function TALCheckBox.TCheckMarkBrush.IsThicknessStored: Boolean;
 begin
   result := not SameValue(FThickness, FDefaultThickness, TEpsilon.Vector);
 end;
 
 {****************************************************}
-procedure TALCheckMarkBrush.SetColor(const Value: TAlphaColor);
+procedure TALCheckBox.TCheckMarkBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
     fColor := Value;
@@ -2477,7 +2475,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALCheckMarkBrush.SetResourceName(const Value: String);
+procedure TALCheckBox.TCheckMarkBrush.SetResourceName(const Value: String);
 begin
   if fResourceName <> Value then begin
     fResourceName := Value;
@@ -2486,7 +2484,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALCheckMarkBrush.SetWrapMode(const Value: TALImageWrapMode);
+procedure TALCheckBox.TCheckMarkBrush.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if fWrapMode <> Value then begin
     fWrapMode := Value;
@@ -2495,7 +2493,7 @@ begin
 end;
 
 {*********************************************************}
-procedure TALCheckMarkBrush.SetThickness(const Value: Single);
+procedure TALCheckBox.TCheckMarkBrush.SetThickness(const Value: Single);
 begin
   if not SameValue(Value, FThickness, TEpsilon.Vector) then begin
     fThickness := Value;
@@ -2504,19 +2502,19 @@ begin
 end;
 
 {**************************************************}
-procedure TALCheckMarkBrush.SetMargins(const Value: TBounds);
+procedure TALCheckBox.TCheckMarkBrush.SetMargins(const Value: TBounds);
 begin
   FMargins.Assign(Value);
 end;
 
 {*************************************************}
-procedure TALCheckMarkBrush.MarginsChanged(Sender: TObject);
+procedure TALCheckBox.TCheckMarkBrush.MarginsChanged(Sender: TObject);
 begin
   change;
 end;
 
 {***************************************************************************************************}
-constructor TALInheritCheckMarkBrush.Create(const AParent: TALCheckMarkBrush; const ADefaultColor: TAlphaColor);
+constructor TALCheckBox.TInheritCheckMarkBrush.Create(const AParent: TCheckMarkBrush; const ADefaultColor: TAlphaColor);
 begin
   inherited create(ADefaultColor);
   FParent := AParent;
@@ -2525,15 +2523,15 @@ begin
 end;
 
 {*********************************}
-function TALInheritCheckMarkBrush.CreateSavedState: TALPersistentObserver;
+function TALCheckBox.TInheritCheckMarkBrush.CreateSavedState: TALPersistentObserver;
 type
-  TALInheritCheckMarkBrushClass = class of TALInheritCheckMarkBrush;
+  TInheritCheckMarkBrushClass = class of TInheritCheckMarkBrush;
 begin
-  result := TALInheritCheckMarkBrushClass(classtype).Create(nil{AParent}, DefaultColor);
+  result := TInheritCheckMarkBrushClass(classtype).Create(nil{AParent}, DefaultColor);
 end;
 
 {**********************************************************}
-procedure TALInheritCheckMarkBrush.SetInherit(const AValue: Boolean);
+procedure TALCheckBox.TInheritCheckMarkBrush.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
     FInherit := AValue;
@@ -2542,13 +2540,13 @@ begin
 end;
 
 {****************************************************}
-procedure TALInheritCheckMarkBrush.Assign(Source: TPersistent);
+procedure TALCheckBox.TInheritCheckMarkBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALInheritCheckMarkBrush then begin
-      Inherit := TALInheritCheckMarkBrush(Source).Inherit;
-      fSuperseded := TALInheritCheckMarkBrush(Source).fSuperseded;
+    if Source is TInheritCheckMarkBrush then begin
+      Inherit := TInheritCheckMarkBrush(Source).Inherit;
+      fSuperseded := TInheritCheckMarkBrush(Source).fSuperseded;
     end
     else begin
       Inherit := False;
@@ -2561,7 +2559,7 @@ begin
 end;
 
 {******************************}
-procedure TALInheritCheckMarkBrush.Reset;
+procedure TALCheckBox.TInheritCheckMarkBrush.Reset;
 begin
   BeginUpdate;
   Try
@@ -2574,13 +2572,13 @@ begin
 end;
 
 {******************}
-procedure TALInheritCheckMarkBrush.DoSupersede;
+procedure TALCheckBox.TInheritCheckMarkBrush.DoSupersede;
 begin
   Assign(FParent);
 end;
 
 {******************}
-procedure TALInheritCheckMarkBrush.Supersede(Const ASaveState: Boolean = False);
+procedure TALCheckBox.TInheritCheckMarkBrush.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
   if (FSuperseded) or
@@ -2589,15 +2587,15 @@ begin
   beginUpdate;
   try
     var LParentSuperseded := False;
-    if FParent is TALInheritCheckMarkBrush then begin
-      TALInheritCheckMarkBrush(FParent).SupersedeNoChanges(true{ASaveState});
+    if FParent is TInheritCheckMarkBrush then begin
+      TInheritCheckMarkBrush(FParent).SupersedeNoChanges(true{ASaveState});
       LParentSuperseded := True;
     end;
     try
       DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritCheckMarkBrush(FParent).restoreState;
+        TInheritCheckMarkBrush(FParent).restoreState;
     end;
     Inherit := False;
     FSuperseded := True;
@@ -2607,7 +2605,7 @@ begin
 end;
 
 {*************************}
-procedure TALInheritCheckMarkBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
+procedure TALCheckBox.TInheritCheckMarkBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
   try
@@ -2618,13 +2616,13 @@ begin
 end;
 
 {***********************************}
-constructor TALCheckBoxBaseStateStyle.Create(const AParent: TObject);
+constructor TALCheckBox.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   //--
-  if StateStyleParent <> nil then FCheckMark := TALInheritCheckMarkBrush.Create(StateStyleParent.CheckMark, TAlphaColors.Black{ADefaultColor})
-  else if ControlParent <> nil then FCheckMark := TALInheritCheckMarkBrush.Create(ControlParent.CheckMark, TAlphaColors.Black{ADefaultColor})
-  else FCheckMark := TALInheritCheckMarkBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
+  if StateStyleParent <> nil then FCheckMark := TInheritCheckMarkBrush.Create(StateStyleParent.CheckMark, TAlphaColors.Black{ADefaultColor})
+  else if ControlParent <> nil then FCheckMark := TInheritCheckMarkBrush.Create(ControlParent.CheckMark, TAlphaColors.Black{ADefaultColor})
+  else FCheckMark := TInheritCheckMarkBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
   //--
   StateLayer.Margins.DefaultValue := TRectF.Create(-10,-10,-10,-10);
   StateLayer.Margins.Rect := StateLayer.Margins.DefaultValue;
@@ -2633,19 +2631,19 @@ begin
 end;
 
 {*************************************}
-destructor TALCheckBoxBaseStateStyle.Destroy;
+destructor TALCheckBox.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FCheckMark);
   inherited Destroy;
 end;
 
 {******************************************************}
-procedure TALCheckBoxBaseStateStyle.Assign(Source: TPersistent);
+procedure TALCheckBox.TBaseStateStyle.Assign(Source: TPersistent);
 begin
-  if Source is TALCheckBoxBaseStateStyle then begin
+  if Source is TBaseStateStyle then begin
     BeginUpdate;
     Try
-      CheckMark.Assign(TALCheckBoxBaseStateStyle(Source).CheckMark);
+      CheckMark.Assign(TBaseStateStyle(Source).CheckMark);
       inherited Assign(Source);
     Finally
       EndUpdate;
@@ -2656,7 +2654,7 @@ begin
 end;
 
 {******************************}
-procedure TALCheckBoxBaseStateStyle.Reset;
+procedure TALCheckBox.TBaseStateStyle.Reset;
 begin
   BeginUpdate;
   Try
@@ -2668,7 +2666,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALCheckBoxBaseStateStyle.Interpolate(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single);
+procedure TALCheckBox.TBaseStateStyle.Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
@@ -2683,7 +2681,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALCheckBoxBaseStateStyle.InterpolateNoChanges(const ATo: TALCheckBoxBaseStateStyle; const ANormalizedTime: Single);
+procedure TALCheckBox.TBaseStateStyle.InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
 begin
   BeginUpdate;
   Try
@@ -2694,25 +2692,25 @@ begin
 end;
 
 {******************}
-procedure TALCheckBoxBaseStateStyle.DoSupersede;
+procedure TALCheckBox.TBaseStateStyle.DoSupersede;
 begin
   inherited;
   CheckMark.Supersede;
 end;
 
 {********************************************************************************}
-function TALCheckBoxBaseStateStyle.GetStateStyleParent: TALCheckBoxBaseStateStyle;
+function TALCheckBox.TBaseStateStyle.GetStateStyleParent: TBaseStateStyle;
 begin
   {$IF defined(debug)}
   if (inherited StateStyleParent <> nil) and
-     (not (inherited StateStyleParent is TALCheckBoxBaseStateStyle)) then
-    raise Exception.Create('StateStyleParent must be of type TALCheckBoxBaseStateStyle');
+     (not (inherited StateStyleParent is TBaseStateStyle)) then
+    raise Exception.Create('StateStyleParent must be of type TBaseStateStyle');
   {$ENDIF}
-  result := TALCheckBoxBaseStateStyle(inherited StateStyleParent);
+  result := TBaseStateStyle(inherited StateStyleParent);
 end;
 
 {***************************************************************}
-function TALCheckBoxBaseStateStyle.GetControlParent: TALCheckBox;
+function TALCheckBox.TBaseStateStyle.GetControlParent: TALCheckBox;
 begin
   {$IF defined(debug)}
   if (inherited ControlParent <> nil) and
@@ -2723,32 +2721,32 @@ begin
 end;
 
 {********************************************************************************}
-procedure TALCheckBoxBaseStateStyle.SetCheckMark(const AValue: TALInheritCheckMarkBrush);
+procedure TALCheckBox.TBaseStateStyle.SetCheckMark(const AValue: TInheritCheckMarkBrush);
 begin
   FCheckMark.Assign(AValue);
 end;
 
 {***********************************************}
-function TALCheckBoxBaseStateStyle.GetInherit: Boolean;
+function TALCheckBox.TBaseStateStyle.GetInherit: Boolean;
 begin
   Result := inherited GetInherit and
             CheckMark.Inherit;
 end;
 
 {*****************************************************************}
-procedure TALCheckBoxBaseStateStyle.CheckMarkChanged(ASender: TObject);
+procedure TALCheckBox.TBaseStateStyle.CheckMarkChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {**********************************************************}
-function TALCheckBoxDisabledStateStyle.IsOpacityStored: Boolean;
+function TALCheckBox.TDisabledStateStyle.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, TControl.DefaultDisabledOpacity, TEpsilon.Scale);
 end;
 
 {********************************************************************}
-procedure TALCheckBoxDisabledStateStyle.SetOpacity(const Value: Single);
+procedure TALCheckBox.TDisabledStateStyle.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
     FOpacity := Value;
@@ -2757,19 +2755,19 @@ begin
 end;
 
 {***********************************************************************}
-constructor TALCheckBoxDisabledStateStyle.Create(const AParent: TObject);
+constructor TALCheckBox.TDisabledStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   FOpacity := TControl.DefaultDisabledOpacity;
 end;
 
 {****************************************************************}
-procedure TALCheckBoxDisabledStateStyle.Assign(Source: TPersistent);
+procedure TALCheckBox.TDisabledStateStyle.Assign(Source: TPersistent);
 begin
   BeginUpdate;
   Try
-    if Source is TALCheckBoxDisabledStateStyle then
-      Opacity := TALCheckBoxDisabledStateStyle(Source).Opacity
+    if Source is TDisabledStateStyle then
+      Opacity := TDisabledStateStyle(Source).Opacity
     else
       Opacity := TControl.DefaultDisabledOpacity;
     inherited Assign(Source);
@@ -2779,7 +2777,7 @@ begin
 end;
 
 {******************************}
-procedure TALCheckBoxDisabledStateStyle.Reset;
+procedure TALCheckBox.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
   Try
@@ -2791,7 +2789,7 @@ begin
 end;
 
 {******************************}
-function TALCheckBoxDisabledStateStyle.GetInherit: Boolean;
+function TALCheckBox.TDisabledStateStyle.GetInherit: Boolean;
 begin
   // Opacity is not part of the GetInherit function because it updates the
   // disabledOpacity of the base control immediately every time it changes.
@@ -2800,28 +2798,28 @@ begin
 end;
 
 {*************************************}
-constructor TALCheckBoxCheckStateStyles.Create(const AParent: TALCheckBox);
+constructor TALCheckBox.TCheckStateStyles.Create(const AParent: TALCheckBox);
 begin
   inherited Create;
   //--
-  FDefault := TALCheckBoxDefaultStateStyle.Create(AParent);
+  FDefault := TDefaultStateStyle.Create(AParent);
   FDefault.OnChanged := DefaultChanged;
   //--
-  FDisabled := TALCheckBoxDisabledStateStyle.Create(FDefault);
+  FDisabled := TDisabledStateStyle.Create(FDefault);
   FDisabled.OnChanged := DisabledChanged;
   //--
-  FHovered := TALCheckBoxHoveredStateStyle.Create(FDefault);
+  FHovered := THoveredStateStyle.Create(FDefault);
   FHovered.OnChanged := HoveredChanged;
   //--
-  FPressed := TALCheckBoxPressedStateStyle.Create(FDefault);
+  FPressed := TPressedStateStyle.Create(FDefault);
   FPressed.OnChanged := PressedChanged;
   //--
-  FFocused := TALCheckBoxFocusedStateStyle.Create(FDefault);
+  FFocused := TFocusedStateStyle.Create(FDefault);
   FFocused.OnChanged := FocusedChanged;
 end;
 
 {*************************************}
-destructor TALCheckBoxCheckStateStyles.Destroy;
+destructor TALCheckBox.TCheckStateStyles.Destroy;
 begin
   ALFreeAndNil(FDefault);
   ALFreeAndNil(FDisabled);
@@ -2832,24 +2830,24 @@ begin
 end;
 
 {*********************************}
-function TALCheckBoxCheckStateStyles.CreateSavedState: TALPersistentObserver;
+function TALCheckBox.TCheckStateStyles.CreateSavedState: TALPersistentObserver;
 type
-  TALCheckBoxCheckStateStylesClass = class of TALCheckBoxCheckStateStyles;
+  TCheckStateStylesClass = class of TCheckStateStyles;
 begin
-  result := TALCheckBoxCheckStateStylesClass(classtype).Create(nil{AParent});
+  result := TCheckStateStylesClass(classtype).Create(nil{AParent});
 end;
 
 {******************************************************}
-procedure TALCheckBoxCheckStateStyles.Assign(Source: TPersistent);
+procedure TALCheckBox.TCheckStateStyles.Assign(Source: TPersistent);
 begin
-  if Source is TALCheckBoxCheckStateStyles then begin
+  if Source is TCheckStateStyles then begin
     BeginUpdate;
     Try
-      Default.Assign(TALCheckBoxCheckStateStyles(Source).Default);
-      Disabled.Assign(TALCheckBoxCheckStateStyles(Source).Disabled);
-      Hovered.Assign(TALCheckBoxCheckStateStyles(Source).Hovered);
-      Pressed.Assign(TALCheckBoxCheckStateStyles(Source).Pressed);
-      Focused.Assign(TALCheckBoxCheckStateStyles(Source).Focused);
+      Default.Assign(TCheckStateStyles(Source).Default);
+      Disabled.Assign(TCheckStateStyles(Source).Disabled);
+      Hovered.Assign(TCheckStateStyles(Source).Hovered);
+      Pressed.Assign(TCheckStateStyles(Source).Pressed);
+      Focused.Assign(TCheckStateStyles(Source).Focused);
     Finally
       EndUpdate;
     End;
@@ -2859,7 +2857,7 @@ begin
 end;
 
 {******************************}
-procedure TALCheckBoxCheckStateStyles.Reset;
+procedure TALCheckBox.TCheckStateStyles.Reset;
 begin
   BeginUpdate;
   Try
@@ -2875,79 +2873,79 @@ begin
 end;
 
 {************************************************************************************}
-procedure TALCheckBoxCheckStateStyles.SetDefault(const AValue: TALCheckBoxDefaultStateStyle);
+procedure TALCheckBox.TCheckStateStyles.SetDefault(const AValue: TDefaultStateStyle);
 begin
   FDefault.Assign(AValue);
 end;
 
 {************************************************************************************}
-procedure TALCheckBoxCheckStateStyles.SetDisabled(const AValue: TALCheckBoxDisabledStateStyle);
+procedure TALCheckBox.TCheckStateStyles.SetDisabled(const AValue: TDisabledStateStyle);
 begin
   FDisabled.Assign(AValue);
 end;
 
 {************************************************************************************}
-procedure TALCheckBoxCheckStateStyles.SetHovered(const AValue: TALCheckBoxHoveredStateStyle);
+procedure TALCheckBox.TCheckStateStyles.SetHovered(const AValue: THoveredStateStyle);
 begin
   FHovered.Assign(AValue);
 end;
 
 {*******************************************************************************************}
-procedure TALCheckBoxCheckStateStyles.SetPressed(const AValue: TALCheckBoxPressedStateStyle);
+procedure TALCheckBox.TCheckStateStyles.SetPressed(const AValue: TPressedStateStyle);
 begin
   FPressed.Assign(AValue);
 end;
 
 {*******************************************************************************************}
-procedure TALCheckBoxCheckStateStyles.SetFocused(const AValue: TALCheckBoxFocusedStateStyle);
+procedure TALCheckBox.TCheckStateStyles.SetFocused(const AValue: TFocusedStateStyle);
 begin
   FFocused.Assign(AValue);
 end;
 
 {**********************************************************}
-procedure TALCheckBoxCheckStateStyles.DefaultChanged(ASender: TObject);
+procedure TALCheckBox.TCheckStateStyles.DefaultChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {**********************************************************}
-procedure TALCheckBoxCheckStateStyles.DisabledChanged(ASender: TObject);
+procedure TALCheckBox.TCheckStateStyles.DisabledChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {************************************************************}
-procedure TALCheckBoxCheckStateStyles.HoveredChanged(ASender: TObject);
+procedure TALCheckBox.TCheckStateStyles.HoveredChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {******************************************************************}
-procedure TALCheckBoxCheckStateStyles.PressedChanged(ASender: TObject);
+procedure TALCheckBox.TCheckStateStyles.PressedChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {******************************************************************}
-procedure TALCheckBoxCheckStateStyles.FocusedChanged(ASender: TObject);
+procedure TALCheckBox.TCheckStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {*************************************}
-constructor TALCheckBoxStateStyles.Create(const AParent: TALCheckBox);
+constructor TALCheckBox.TStateStyles.Create(const AParent: TALCheckBox);
 begin
   inherited Create;
   //--
-  FChecked := TALCheckBoxCheckStateStyles.Create(AParent);
+  FChecked := TCheckStateStyles.Create(AParent);
   FChecked.OnChanged := CheckedChanged;
   //--
-  FUnchecked := TALCheckBoxCheckStateStyles.Create(AParent);
+  FUnchecked := TCheckStateStyles.Create(AParent);
   FUnchecked.OnChanged := UncheckedChanged;
 end;
 
 {*************************************}
-destructor TALCheckBoxStateStyles.Destroy;
+destructor TALCheckBox.TStateStyles.Destroy;
 begin
   ALFreeAndNil(FChecked);
   ALFreeAndNil(FUnchecked);
@@ -2955,21 +2953,21 @@ begin
 end;
 
 {*********************************}
-function TALCheckBoxStateStyles.CreateSavedState: TALPersistentObserver;
+function TALCheckBox.TStateStyles.CreateSavedState: TALPersistentObserver;
 type
-  TALCheckBoxStateStylesClass = class of TALCheckBoxStateStyles;
+  TStateStylesClass = class of TStateStyles;
 begin
-  result := TALCheckBoxStateStylesClass(classtype).Create(nil{AParent});
+  result := TStateStylesClass(classtype).Create(nil{AParent});
 end;
 
 {******************************************************}
-procedure TALCheckBoxStateStyles.Assign(Source: TPersistent);
+procedure TALCheckBox.TStateStyles.Assign(Source: TPersistent);
 begin
-  if Source is TALCheckBoxStateStyles then begin
+  if Source is TStateStyles then begin
     BeginUpdate;
     Try
-      Checked.Assign(TALCheckBoxStateStyles(Source).Checked);
-      Unchecked.Assign(TALCheckBoxStateStyles(Source).Unchecked);
+      Checked.Assign(TStateStyles(Source).Checked);
+      Unchecked.Assign(TStateStyles(Source).Unchecked);
     Finally
       EndUpdate;
     End;
@@ -2979,7 +2977,7 @@ begin
 end;
 
 {******************************}
-procedure TALCheckBoxStateStyles.Reset;
+procedure TALCheckBox.TStateStyles.Reset;
 begin
   BeginUpdate;
   Try
@@ -2992,25 +2990,25 @@ begin
 end;
 
 {************************************************************************************}
-procedure TALCheckBoxStateStyles.SetChecked(const AValue: TALCheckBoxCheckStateStyles);
+procedure TALCheckBox.TStateStyles.SetChecked(const AValue: TCheckStateStyles);
 begin
   FChecked.Assign(AValue);
 end;
 
 {*********************************************************************************}
-procedure TALCheckBoxStateStyles.SetUnchecked(const AValue: TALCheckBoxCheckStateStyles);
+procedure TALCheckBox.TStateStyles.SetUnchecked(const AValue: TCheckStateStyles);
 begin
   FUnchecked.Assign(AValue);
 end;
 
 {**********************************************************}
-procedure TALCheckBoxStateStyles.CheckedChanged(ASender: TObject);
+procedure TALCheckBox.TStateStyles.CheckedChanged(ASender: TObject);
 begin
   Change;
 end;
 
 {**********************************************************}
-procedure TALCheckBoxStateStyles.UncheckedChanged(ASender: TObject);
+procedure TALCheckBox.TStateStyles.UncheckedChanged(ASender: TObject);
 begin
   Change;
 end;
@@ -3035,10 +3033,10 @@ begin
   FXRadius := 0;
   FYRadius := 0;
   FChecked := False;
-  FCheckMark := TALCheckMarkBrush.Create(TAlphaColors.Black);
+  FCheckMark := TCheckMarkBrush.Create(TAlphaColors.Black);
   FCheckMark.OnChanged := CheckMarkChanged;
   //--
-  FStateStyles := TALCheckBoxStateStyles.Create(Self);
+  FStateStyles := TStateStyles.Create(Self);
   FStateStyles.OnChanged := StateStylesChanged;
   //--
   fBufCheckedDrawable := ALNullDrawable;
@@ -3138,7 +3136,7 @@ begin
 end;
 
 {*********************************************************************}
-procedure TALCheckbox.SetStateStyles(const AValue: TALCheckBoxStateStyles);
+procedure TALCheckbox.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
 end;
@@ -3154,7 +3152,7 @@ begin
 end;
 
 {***********************************************************}
-procedure TALCheckbox.SetCheckMark(const Value: TALCheckMarkBrush);
+procedure TALCheckbox.SetCheckMark(const Value: TCheckMarkBrush);
 begin
   FCheckMark.Assign(Value);
 end;
@@ -3256,7 +3254,7 @@ procedure TALCheckbox.DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
             const ADstRect: TrectF;
-            const ACheckMark: TALCheckMarkBrush;
+            const ACheckMark: TCheckMarkBrush;
             const AChecked: Boolean);
 begin
   var LRect := ADstRect;
@@ -3456,7 +3454,7 @@ Procedure TALCheckbox.CreateBufDrawable(
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
-            const ACheckMark: TALCheckMarkBrush;
+            const ACheckMark: TCheckMarkBrush;
             const AShadow: TALShadow);
 begin
 (*
@@ -3539,7 +3537,7 @@ begin
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
         LRect, // const ADstRect: TrectF;
-        ACheckMark, // const ACheckMark: TALCheckMarkBrush;
+        ACheckMark, // const ACheckMark: TCheckMarkBrush;
         FChecked); // const AChecked: Boolean
 
     finally
@@ -3559,7 +3557,7 @@ procedure TALCheckbox.MakeBufDrawable;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _MakeBufDrawable(
-              const AStateStyle: TALCheckBoxBaseStateStyle;
+              const AStateStyle: TBaseStateStyle;
               var ABufDrawable: TALDrawable;
               var ABufDrawableRect: TRectF);
   begin
@@ -3576,7 +3574,7 @@ procedure TALCheckbox.MakeBufDrawable;
         AStateStyle.Fill, // const AFill: TALBrush;
         AStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
         AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        AStateStyle.CheckMark, // const ACheckMark: TALCheckMarkBrush;
+        AStateStyle.CheckMark, // const ACheckMark: TCheckMarkBrush;
         AStateStyle.Shadow); // const AShadow: TALShadow);
 
 (*

@@ -2612,15 +2612,6 @@ begin
                 end;
               end;
 
-              // Though it's an unlikely scenario, this ensures avoidance of a crash in
-              // the subsequent ALCreateSurface call.
-              If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
-                 (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
-                ARect.Width := 0;
-                ARect.Height := 0;
-                exit;
-              end;
-
               // Calculate the SurfaceRect
               var LSurfaceRect := ALGetShapeSurfaceRect(
                                     ARect, // const ARect: TRectF;
@@ -2637,18 +2628,28 @@ begin
                                     AOptions.ShadowBlur, // const AShadowBlur: Single;
                                     AOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
                                     AOptions.ShadowOffsetY); // const AShadowOffsetY: Single;
-              if ALIsCanvasNull(ACanvas) then begin
+              if ALIsCanvasNull(ACanvas) then
                 ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
-                LParagraphRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
-              end;
 
               // Adjust the rect
               if Assigned(AOptions.OnAdjustRect) then begin
-                var LPrevRect := ARect;
                 var LSurfaceSize := LSurfaceRect.Size;
                 AOptions.OnAdjustRect(ACanvas, AOptions, ARect, LSurfaceSize);
                 LSurfaceRect.Size := LSurfaceSize;
-                LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
+              end;
+
+              // Offset the ParagraphRect and AElements according to the Arect coordinates
+              LParagraphRect.Offset(ARect.Left, ARect.top);
+              for var I := low(AElements) to high(AElements) do
+                AElements[I].rect.Offset(ARect.Left, ARect.top);
+
+              // Though it's an unlikely scenario, this ensures avoidance of a crash in
+              // the subsequent ALCreateSurface call.
+              If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
+                 (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
+                ARect.Width := 0;
+                ARect.Height := 0;
+                exit;
               end;
 
               // Exit if AOnlyMeasure
@@ -3878,15 +3879,6 @@ begin
       end;
       setlength(AElements, I);
 
-      // Though it's an unlikely scenario, this ensures avoidance of a crash in
-      // the subsequent ALCreateSurface call.
-      If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
-         (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
-        ARect.Width := 0;
-        ARect.Height := 0;
-        exit;
-      end;
-
       // Calculate the SurfaceRect
       var LSurfaceRect := ALGetShapeSurfaceRect(
                             ARect, // const ARect: TRectF;
@@ -3903,18 +3895,28 @@ begin
                             AOptions.ShadowBlur, // const AShadowBlur: Single;
                             AOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
                             AOptions.ShadowOffsetY); // const AShadowOffsetY: Single;
-      if ALIsCanvasNull(ACanvas) then begin
+      if ALIsCanvasNull(ACanvas) then
         ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
-        LParagraphRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.top);
-      end;
 
       // Adjust the rect
       if Assigned(AOptions.OnAdjustRect) then begin
-        var LPrevRect := ARect;
         var LSurfaceSize := LSurfaceRect.Size;
         AOptions.OnAdjustRect(ACanvas, AOptions, ARect, LSurfaceSize);
         LSurfaceRect.Size := LSurfaceSize;
-        LParagraphRect.Offset(ARect.Left - LPrevRect.Left, ARect.top - LPrevRect.top);
+      end;
+
+      // Offset the ParagraphRect and AElements according to the Arect coordinates
+      LParagraphRect.Offset(ARect.Left, ARect.top);
+      for var I := low(AElements) to high(AElements) do
+        AElements[I].rect.Offset(ARect.Left, ARect.top);
+
+      // Though it's an unlikely scenario, this ensures avoidance of a crash in
+      // the subsequent ALCreateSurface call.
+      If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
+         (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
+        ARect.Width := 0;
+        ARect.Height := 0;
+        exit;
       end;
 
       // Exit if AOnlyMeasure

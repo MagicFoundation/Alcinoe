@@ -735,7 +735,7 @@ type
     Procedure DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF); virtual;
     Procedure DrawMultilineText(
                 const ACanvas: TALCanvas;
-                out ARect: TRectF;
+                var ARect: TRectF;
                 out ATextBroken: Boolean;
                 out AAllTextDrawn: Boolean;
                 out AElements: TALTextElements;
@@ -3097,7 +3097,7 @@ begin
 
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
-    var LRect: TrectF;
+    var LRect := LocalRect;
     DrawMultilineText(
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       LRect, // out ARect: TRectF;
@@ -3355,7 +3355,7 @@ end;
 {**************************************}
 Procedure TALBaseText.DrawMultilineText(
             const ACanvas: TALCanvas;
-            out ARect: TRectF;
+            var ARect: TRectF;
             out ATextBroken: Boolean;
             out AAllTextDrawn: Boolean;
             out AElements: TALTextElements;
@@ -3392,7 +3392,8 @@ begin
     else if HasUnconstrainedAutosizeY then LMaxSize := TSizeF.Create(Width, maxHeight)
     else LMaxSize := TSizeF.Create(width, height);
 
-    ARect := TRectF.Create(0, 0, LMaxSize.cX, LMaxSize.cY);
+    ARect.Width := LMaxSize.cX;
+    ARect.Height := LMaxSize.cY;
 
     var LSurface: TALSurface := ALNullSurface;
     var LCanvas: TALCanvas := ACanvas;
@@ -3411,10 +3412,8 @@ begin
   end
   else begin
 
-    ARect := LocalRect;
     ARect.Width := Min(MaxWidth, ARect.Width);
     ARect.Height := Min(MaxHeight, ARect.Height);
-    ARect := ALAlignDimensionToPixelRound(ARect, ALGetScreenScale); // to have the pixel aligned width and height
 
     Var LSurfaceSize := ARect.Size;
     DrawMultilineTextAdjustRect(

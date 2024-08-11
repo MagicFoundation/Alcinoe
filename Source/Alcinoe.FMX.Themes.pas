@@ -13,19 +13,20 @@ Type
   TALApplyEditThemeProc = Procedure(const AEdit: TALBaseEdit);
   TALApplyButtonThemeProc = Procedure(const AButton: TALButton);
   TALApplyCheckBoxThemeProc = Procedure(const ACheckBox: TALCheckBox);
+  TALApplyRadioButtonThemeProc = Procedure(const ARadioButton: TALRadioButton);
 
 var
   ALEditThemes: TDictionary<String, TALApplyEditThemeProc>;
   ALMemoThemes: TDictionary<String, TALApplyEditThemeProc>;
   ALButtonThemes: TDictionary<String, TALApplyButtonThemeProc>;
   ALCheckBoxThemes: TDictionary<String, TALApplyCheckBoxThemeProc>;
-  ALRadioButtonThemes: TDictionary<String, TALApplyCheckBoxThemeProc>;
+  ALRadioButtonThemes: TDictionary<String, TALApplyRadioButtonThemeProc>;
 
 procedure ALApplyEditTheme(const ATheme: String; const AEdit: TALBaseEdit);
 procedure ALApplyMemoTheme(const ATheme: String; const AMemo: TALBaseEdit);
 procedure ALApplyButtonTheme(const ATheme: String; const AButton: TALButton);
 procedure ALApplyCheckBoxTheme(const ATheme: String; const ACheckBox: TALCheckBox);
-procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALCheckBox);
+procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALRadioButton);
 
 implementation
 
@@ -71,35 +72,8 @@ begin
     SupportingTextSettings.Reset;
     SupportingTextSettings.IsHtml := LPrevIsHtml;
     Shadow.Reset;
+    StateStyles.Reset;
     PromptTextcolor := TAlphaColors.null;
-    //--Disabled--
-    StateStyles.Disabled.TintColor := TAlphaColors.Null;
-    StateStyles.Disabled.Opacity := TControl.DefaultDisabledOpacity;
-    StateStyles.Disabled.Fill.Reset;
-    StateStyles.Disabled.Stroke.Reset;
-    StateStyles.Disabled.TextSettings.Reset;
-    StateStyles.Disabled.LabelTextSettings.Reset;
-    StateStyles.Disabled.SupportingTextSettings.Reset;
-    StateStyles.Disabled.Shadow.Reset;
-    StateStyles.Disabled.PromptTextcolor := TAlphaColors.Null;
-    //--Hovered--
-    StateStyles.Hovered.TintColor := TAlphaColors.Null;
-    StateStyles.Hovered.Fill.Reset;
-    StateStyles.Hovered.Stroke.Reset;
-    StateStyles.Hovered.TextSettings.Reset;
-    StateStyles.Hovered.LabelTextSettings.Reset;
-    StateStyles.Hovered.SupportingTextSettings.Reset;
-    StateStyles.Hovered.Shadow.Reset;
-    StateStyles.Hovered.PromptTextcolor := TAlphaColors.Null;
-    //--Focused--
-    StateStyles.Focused.TintColor := TAlphaColors.Null;
-    StateStyles.Focused.Fill.Reset;
-    StateStyles.Focused.Stroke.Reset;
-    StateStyles.Focused.TextSettings.Reset;
-    StateStyles.Focused.LabelTextSettings.Reset;
-    StateStyles.Focused.SupportingTextSettings.Reset;
-    StateStyles.Focused.Shadow.Reset;
-    StateStyles.Focused.PromptTextcolor := TAlphaColors.Null;
   end;
 end;
 
@@ -745,14 +719,7 @@ begin
     TextSettings.Reset;
     TextSettings.IsHtml := LPrevIsHtml;
     Shadow.Reset;
-    //--Disabled--
-    StateStyles.Disabled.Reset;
-    //--Hovered--
-    StateStyles.Hovered.Reset;
-    //--Pressed--
-    StateStyles.Pressed.Reset;
-    //--Focused--
-    StateStyles.Focused.Reset;
+    StateStyles.Reset;
   end;
 end;
 
@@ -1568,27 +1535,621 @@ end;
 {***********************************************************}
 procedure ALResetCheckBoxTheme(const ACheckBox: TALCheckBox);
 begin
+  With ACheckBox do begin
+    //--Enabled (default)--
+    Width := 18;
+    Height := 18;
+    TouchTargetExpansion.Rect := TRectF.Empty;
+    XRadius := 0;
+    YRadius := 0;
+    Checkmark.Reset;
+    Fill.Reset;
+    Stroke.Reset;
+    Shadow.Reset;
+    StateStyles.Reset;
+  end;
+end;
 
+{*************************************************************************************}
+//https://m3.material.io/components/checkbox/specs#fd29f662-6e61-4c1f-9b97-1145c3b33075
+procedure ALApplyMaterial3LightCheckBoxTheme(const ACheckBox: TALCheckBox);
+begin
+  ALResetCheckBoxTheme(ACheckBox);
+  With ACheckBox do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(15,15,15,15);
+    XRadius := 2;
+    YRadius := 2;
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+    StateStyles.Checked.Default.Fill.Assign(Fill);
+    StateStyles.Checked.Default.Fill.Inherit := False;
+    StateStyles.Checked.Default.Fill.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Default.Stroke.Assign(Stroke);
+    StateStyles.Checked.Default.Stroke.Inherit := False;
+    StateStyles.Checked.Default.Stroke.Thickness := 0;
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FFFFFFFF; // md.sys.color.on-primary / md.ref.palette.primary100
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Fill.Assign(Fill);
+    StateStyles.Checked.Disabled.Fill.Inherit := False;
+    StateStyles.Checked.Disabled.Fill.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := $FFFEF7FF; // md.sys.color.surface / md.ref.palette.neutral98
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FF1D1B20; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{***************************************************************************}
+//https://m3.material.io/components/checkbox/specs#fd29f662-6e61-4c1f-9b97-1145c3b33075
+procedure ALApplyMaterial3LightErrorCheckBoxTheme(const ACheckBox: TALCheckBox);
+begin
+  ALResetCheckBoxTheme(ACheckBox);
+  With ACheckBox do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(15,15,15,15);
+    XRadius := 2;
+    YRadius := 2;
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+    StateStyles.Checked.Default.Fill.Assign(Fill);
+    StateStyles.Checked.Default.Fill.Inherit := False;
+    StateStyles.Checked.Default.Fill.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Default.Stroke.Assign(Stroke);
+    StateStyles.Checked.Default.Stroke.Inherit := False;
+    StateStyles.Checked.Default.Stroke.Thickness := 0;
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FFFFFFFF; // md.sys.color.on-error / md.ref.palette.error100
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Fill.Assign(Fill);
+    StateStyles.Checked.Disabled.Fill.Inherit := False;
+    StateStyles.Checked.Disabled.Fill.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := $FFFEF7FF; // md.sys.color.surface / md.ref.palette.neutral98
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/checkbox/specs#fd29f662-6e61-4c1f-9b97-1145c3b33075
+procedure ALApplyMaterial3DarkCheckBoxTheme(const ACheckBox: TALCheckBox);
+begin
+  ALResetCheckBoxTheme(ACheckBox);
+  With ACheckBox do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(15,15,15,15);
+    XRadius := 2;
+    YRadius := 2;
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+    StateStyles.Checked.Default.Fill.Assign(Fill);
+    StateStyles.Checked.Default.Fill.Inherit := False;
+    StateStyles.Checked.Default.Fill.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Default.Stroke.Assign(Stroke);
+    StateStyles.Checked.Default.Stroke.Inherit := False;
+    StateStyles.Checked.Default.Stroke.Thickness := 0;
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.primary / md.ref.palette.primary80
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Fill.Assign(Fill);
+    StateStyles.Checked.Disabled.Fill.Inherit := False;
+    StateStyles.Checked.Disabled.Fill.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := $FF141218; // md.sys.color.surface / md.ref.palette.neutral6
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{***************************************************************************}
+//https://m3.material.io/components/checkbox/specs#fd29f662-6e61-4c1f-9b97-1145c3b33075
+procedure ALApplyMaterial3DarkErrorCheckBoxTheme(const ACheckBox: TALCheckBox);
+begin
+  ALResetCheckBoxTheme(ACheckBox);
+  With ACheckBox do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(15,15,15,15);
+    XRadius := 2;
+    YRadius := 2;
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+    StateStyles.Checked.Default.Fill.Assign(Fill);
+    StateStyles.Checked.Default.Fill.Inherit := False;
+    StateStyles.Checked.Default.Fill.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Default.Stroke.Assign(Stroke);
+    StateStyles.Checked.Default.Stroke.Inherit := False;
+    StateStyles.Checked.Default.Stroke.Thickness := 0;
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FF601410; // md.sys.color.on-error / md.ref.palette.error20
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.primary / md.ref.palette.primary80
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Fill.Assign(Fill);
+    StateStyles.Checked.Disabled.Fill.Inherit := False;
+    StateStyles.Checked.Disabled.Fill.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := $FF141218; // md.sys.color.surface / md.ref.palette.neutral6
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
 end;
 
 {***************************************************************************}
 procedure ALApplyCheckBoxTheme(const ATheme: String; const ACheckBox: TALCheckBox);
 begin
+  Var LApplyCheckBoxThemeProc: TALApplyCheckBoxThemeProc;
+  If not ALCheckBoxThemes.TryGetValue(Atheme,LApplyCheckBoxThemeProc) then
+    Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
+  ACheckBox.BeginUpdate;
+  try
+    LApplyCheckBoxThemeProc(ACheckBox);
+  finally
+    ACheckBox.EndUpdate;
+  end;
 end;
 
 /////////////////
 // RADIOBUTTON //
 /////////////////
 
-{*****************************************************************}
-procedure ALResetRadioButtonTheme(const ARadioButton: TALCheckBox);
+{***********************************************************}
+procedure ALResetRadioButtonTheme(const ARadioButton: TALRadioButton);
 begin
-
+  With ARadioButton do begin
+    //--Enabled (default)--
+    Width := 20;
+    Height := 20;
+    TouchTargetExpansion.Rect := TRectF.Empty;
+    XRadius := -50;
+    YRadius := -50;
+    Checkmark.Reset;
+    Fill.Reset;
+    Stroke.Reset;
+    Shadow.Reset;
+    StateStyles.Reset;
+  end;
 end;
 
-{***************************************************************************************}
-procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALCheckBox);
+{*************************************************************************************}
+//https://m3.material.io/components/radio-button/specs#4eca59b9-dfb5-4ca4-9c76-8e664fb02137
+procedure ALApplyMaterial3LightRadioButtonTheme(const ARadioButton: TALRadioButton);
 begin
+  ALResetRadioButtonTheme(ARadioButton);
+  With ARadioButton do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(14,14,14,14);
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+    StateStyles.Checked.Default.Stroke.Assign(Stroke);
+    StateStyles.Checked.Default.Stroke.Inherit := False;
+    StateStyles.Checked.Default.Stroke.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Stroke.assign(Stroke);
+    StateStyles.Checked.Disabled.Stroke.Inherit := False;
+    StateStyles.Checked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FF1D1B20; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{***************************************************************************}
+//https://m3.material.io/components/radio-button/specs#4eca59b9-dfb5-4ca4-9c76-8e664fb02137
+procedure ALApplyMaterial3LightErrorRadioButtonTheme(const ARadioButton: TALRadioButton);
+begin
+  ALResetRadioButtonTheme(ARadioButton);
+  With ARadioButton do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(14,14,14,14);
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Stroke.assign(Stroke);
+    StateStyles.Checked.Disabled.Stroke.Inherit := False;
+    StateStyles.Checked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/radio-button/specs#4eca59b9-dfb5-4ca4-9c76-8e664fb02137
+procedure ALApplyMaterial3DarkRadioButtonTheme(const ARadioButton: TALRadioButton);
+begin
+  ALResetRadioButtonTheme(ARadioButton);
+  With ARadioButton do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(14,14,14,14);
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+    StateStyles.Checked.Default.Stroke.Assign(Stroke);
+    StateStyles.Checked.Default.Stroke.Inherit := False;
+    StateStyles.Checked.Default.Stroke.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.primary / md.ref.palette.primary80
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Stroke.assign(Stroke);
+    StateStyles.Checked.Disabled.Stroke.Inherit := False;
+    StateStyles.Checked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.primary / md.ref.palette.primary80
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{***************************************************************************}
+//https://m3.material.io/components/radio-button/specs#4eca59b9-dfb5-4ca4-9c76-8e664fb02137
+procedure ALApplyMaterial3DarkErrorRadioButtonTheme(const ARadioButton: TALRadioButton);
+begin
+  ALResetRadioButtonTheme(ARadioButton);
+  With ARadioButton do begin
+    //--Enabled (default)--
+    TouchTargetExpansion.Rect := TRectf.Create(14,14,14,14);
+    Fill.Color := TalphaColors.Null;
+    Stroke.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    Stroke.Thickness := 2;
+    CheckMark.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+
+    //--Default (UnChecked)--
+    //--Default (Checked)--
+
+    //--Disabled (UnChecked)--
+    StateStyles.UnChecked.Disabled.Opacity := 1;
+    StateStyles.UnChecked.Disabled.Stroke.assign(Stroke);
+    StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+    StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+    StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.primary / md.ref.palette.primary80
+    //--Disabled (Checked)--
+    StateStyles.Checked.Disabled.Opacity := 1;
+    StateStyles.Checked.Disabled.Stroke.assign(Stroke);
+    StateStyles.Checked.Disabled.Stroke.Inherit := False;
+    StateStyles.Checked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.Checked.Disabled.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+    StateStyles.Checked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.primary / md.ref.palette.primary80
+
+    //--Hovered (UnChecked)--
+    StateStyles.UnChecked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
+    //--Hovered (Checked)--
+    StateStyles.Checked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
+
+    //--Pressed (UnChecked)--
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
+    //--Pressed (Checked)--
+    StateStyles.Checked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
+
+    //--Focused (UnChecked)--
+    StateStyles.UnChecked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
+    //--Focused (Checked)--
+    StateStyles.Checked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
+    StateStyles.Checked.Focused.Transition.Duration := 0.2;
+  end;
+end;
+
+{***************************************************************************}
+procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALRadioButton);
+begin
+  Var LApplyRadioButtonThemeProc: TALApplyRadioButtonThemeProc;
+  If not ALRadioButtonThemes.TryGetValue(Atheme,LApplyRadioButtonThemeProc) then
+    Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
+  ARadioButton.BeginUpdate;
+  try
+    LApplyRadioButtonThemeProc(ARadioButton);
+  finally
+    ARadioButton.EndUpdate;
+  end;
 end;
 
 initialization
@@ -1596,7 +2157,7 @@ initialization
   ALMemoThemes := TDictionary<String, TALApplyEditThemeProc>.Create;
   ALButtonThemes := TDictionary<String, TALApplyButtonThemeProc>.Create;
   ALCheckBoxThemes := TDictionary<String, TALApplyCheckBoxThemeProc>.Create;
-  ALRadioButtonThemes := TDictionary<String, TALApplyCheckBoxThemeProc>.Create;
+  ALRadioButtonThemes := TDictionary<String, TALApplyRadioButtonThemeProc>.Create;
 
   ALEditThemes.Add('Default', ALResetEditTheme);
   ALEditThemes.Add('Material3.Light.Filled', ALApplyMaterial3LightFilledEditTheme);
@@ -1642,6 +2203,19 @@ initialization
   ALButtonThemes.Add('Material3.Dark.Icon.Outlined', ALApplyMaterial3DarkOutlinedIconButtonTheme);
   ALButtonThemes.Add('Material3.Dark.Icon.Standard', ALApplyMaterial3DarkStandardIconButtonTheme);
   ALButtonThemes.Add('Material3.Dark.Icon.Tonal', ALApplyMaterial3DarkTonalIconButtonTheme);
+
+  ALCheckBoxThemes.Add('Default', ALResetCheckBoxTheme);
+  ALCheckBoxThemes.Add('Material3.Light', ALApplyMaterial3LightCheckBoxTheme);
+  ALCheckBoxThemes.Add('Material3.Light.Error', ALApplyMaterial3LightErrorCheckBoxTheme);
+  ALCheckBoxThemes.Add('Material3.Dark', ALApplyMaterial3DarkCheckBoxTheme);
+  ALCheckBoxThemes.Add('Material3.Dark.Error', ALApplyMaterial3DarkErrorCheckBoxTheme);
+
+  ALRadioButtonThemes.Add('Default', ALResetRadioButtonTheme);
+  ALRadioButtonThemes.Add('Material3.Light', ALApplyMaterial3LightRadioButtonTheme);
+  ALRadioButtonThemes.Add('Material3.Light.Error', ALApplyMaterial3LightErrorRadioButtonTheme);
+  ALRadioButtonThemes.Add('Material3.Dark', ALApplyMaterial3DarkRadioButtonTheme);
+  ALRadioButtonThemes.Add('Material3.Dark.Error', ALApplyMaterial3DarkErrorRadioButtonTheme);
+
 
 finalization
   ALFreeAndNil(ALEditThemes);

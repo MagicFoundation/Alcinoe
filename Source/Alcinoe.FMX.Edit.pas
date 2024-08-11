@@ -3581,14 +3581,14 @@ begin
   Try
     inherited Interpolate(ATo, ANormalizedTime);
     if ATo <> nil then begin
-      PromptTextColor := InterpolateColor(PromptTextColor{Start}, ATo.PromptTextColor{Stop}, ANormalizedTime);
+      PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, ATo.PromptTextColor{Stop}, ANormalizedTime);
       TextSettings.Interpolate(ATo.TextSettings, ANormalizedTime);
-      TintColor := InterpolateColor(TintColor{Start}, ATo.TintColor{Stop}, ANormalizedTime);
+      TintColor := ALInterpolateColor(TintColor{Start}, ATo.TintColor{Stop}, ANormalizedTime);
     end
     else begin
-      PromptTextColor := InterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
+      PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
       TextSettings.Interpolate(nil, ANormalizedTime);
-      TintColor := InterpolateColor(TintColor{Start}, DefaultTintColor{Stop}, ANormalizedTime);
+      TintColor := ALInterpolateColor(TintColor{Start}, DefaultTintColor{Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -3919,6 +3919,7 @@ end;
 constructor TALBaseEdit.Create(AOwner: TComponent);
 begin
   inherited;
+  //--
   fDefStyleAttr := '';
   fDefStyleRes := '';
   FAutoTranslate := true;
@@ -3926,13 +3927,17 @@ begin
   FOnReturnKey := nil;
   fOnEnter := nil;
   fOnExit := nil;
+  //--
   FTextSettings := CreateTextSettings;
   FTextSettings.Font.DefaultSize := 16;
   FTextSettings.Font.Size := FTextSettings.Font.DefaultSize;
   FTextSettings.OnChanged := TextSettingsChanged;
+  //--
   FPromptText := '';
   FPromptTextColor := TAlphaColors.null;
+  //--
   FTintcolor := TAlphaColors.null;
+  //--
   FLabelText := '';
   FLabelTextSettings := TLabelTextSettings.create;
   FLabelTextSettings.Font.DefaultSize := 12;
@@ -3945,17 +3950,14 @@ begin
   FlabelTextAnimation.Interpolation := TALInterpolationType.linear;
   FlabelTextAnimation.OnProcess := labelTextAnimationProcess;
   FlabelTextAnimation.OnFinish := labelTextAnimationFinish;
+  //--
   FSupportingText := '';
   FSupportingTextSettings := TSupportingTextSettings.Create;
   FSupportingTextSettings.Font.DefaultSize := 12;
   FSupportingTextSettings.Font.Size := FSupportingTextSettings.Font.DefaultSize;
   FSupportingTextSettings.OnChanged := SupportingTextSettingsChanged;
   FSupportingTextMarginBottomUpdated := False;
-  {$IF defined(ALDPK)}
-  FPrevStateStyles := TStateStyles.Create(nil);
-  {$ENDIF}
-  FStateStyles := TStateStyles.Create(Self);
-  FStateStyles.OnChanged := StateStylesChanged;
+  //--
   FIsTextEmpty := True;
   FNativeViewRemoved := False;
   FIsAdjustingSize := False;
@@ -3970,22 +3972,31 @@ begin
   FocusOnMouseUp := True;
   Cursor := crIBeam;
   CanFocus := True;
+  //--
   var LFillChanged: TNotifyEvent := fill.OnChanged;
   fill.OnChanged := nil;
   fill.DefaultColor := $ffffffff;
   fill.Color := fill.DefaultColor;
   fill.OnChanged := LFillChanged;
+  //--
   var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
   stroke.OnChanged := Nil;
   stroke.DefaultColor := $FF7a7a7a;
   stroke.Color := stroke.DefaultColor;
   stroke.OnChanged := LStrokeChanged;
+  //--
   var LPaddingChange: TNotifyEvent := Padding.OnChange;
   Padding.OnChange := nil;
   Padding.DefaultValue := TRectF.create(16{Left}, 16{Top}, 16{Right}, 16{Bottom});
   Padding.Rect := Padding.DefaultValue;
   padding.OnChange := LPaddingChange;
-  //-----
+  //--
+  {$IF defined(ALDPK)}
+  FPrevStateStyles := TStateStyles.Create(nil);
+  {$ENDIF}
+  FStateStyles := TStateStyles.Create(Self);
+  FStateStyles.OnChanged := StateStylesChanged;
+  //--
   {$IF defined(DEBUG)}
   if fEditControl <> nil then
     raise Exception.Create('Error CE2932F6-E44A-4A4B-AAE3-71FE4077FCF2');
@@ -4433,11 +4444,6 @@ procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
       if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
       if APrevStateStyle.TextSettings.font.AutoConvert = AToStateStyle.TextSettings.font.AutoConvert then AToStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
 
-      if APrevStateStyle.TextSettings.Decoration.Kinds = AToStateStyle.TextSettings.Decoration.Kinds then AToStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
-      if APrevStateStyle.TextSettings.Decoration.Style = AToStateStyle.TextSettings.Decoration.Style then AToStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
-      if SameValue(APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier, AToStateStyle.TextSettings.Decoration.ThicknessMultiplier, TEpsilon.Scale) then AToStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
-      if APrevStateStyle.TextSettings.Decoration.Color = AToStateStyle.TextSettings.Decoration.Color then AToStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
-
     end;
 
     APrevStateStyle.TextSettings.font.Family := TextSettings.font.Family;
@@ -4448,19 +4454,16 @@ procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
     APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
     APrevStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
 
-    APrevStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
-    APrevStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
-    APrevStateStyle.TextSettings.Decoration.ThicknessMultiplier := TextSettings.Decoration.ThicknessMultiplier;
-    APrevStateStyle.TextSettings.Decoration.Color := TextSettings.Decoration.Color;
-
   end;
   {$ENDIF}
 
 begin
   {$IF defined(ALDPK)}
-  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
   {$ENDIF}
   if csLoading in componentState then exit;
   ClearBufPromptTextDrawable;
@@ -4476,7 +4479,7 @@ procedure TALBaseEdit.SetXRadius(const Value: Single);
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
     if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.TextSettings.inherit) then begin
+       (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.XRadius, AToStateStyle.StateLayer.XRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.XRadius := XRadius;
     end;
     APrevStateStyle.StateLayer.XRadius := XRadius;
@@ -4486,9 +4489,11 @@ procedure TALBaseEdit.SetXRadius(const Value: Single);
 begin
   inherited;
   {$IF defined(ALDPK)}
-  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
   {$ENDIF}
 end;
 
@@ -4500,7 +4505,7 @@ procedure TALBaseEdit.SetYRadius(const Value: Single);
   procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
   begin
     if (not (csLoading in ComponentState)) and
-       (not AToStateStyle.TextSettings.inherit) then begin
+       (not AToStateStyle.StateLayer.HasFill) then begin
       if (SameValue(APrevStateStyle.StateLayer.YRadius, AToStateStyle.StateLayer.YRadius, TEpsilon.Vector)) then AToStateStyle.StateLayer.YRadius := YRadius;
     end;
     APrevStateStyle.StateLayer.YRadius := YRadius;
@@ -4510,9 +4515,11 @@ procedure TALBaseEdit.SetYRadius(const Value: Single);
 begin
   inherited;
   {$IF defined(ALDPK)}
-  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
   {$ENDIF}
 end;
 
@@ -4522,9 +4529,46 @@ begin
   FLabelTextSettings.Assign(Value);
 end;
 
-{**********************************************************}
+{*****************************************************}
 procedure TALBaseEdit.LabelTextSettingsChanged(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~}
+  {$IF defined(ALDPK)}
+  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
+  begin
+
+    if (not (csLoading in ComponentState)) and
+       (not AToStateStyle.LabelTextSettings.inherit) then begin
+
+      if APrevStateStyle.LabelTextSettings.font.Family = AToStateStyle.LabelTextSettings.font.Family then AToStateStyle.LabelTextSettings.font.Family := LabelTextSettings.font.Family;
+      if SameValue(APrevStateStyle.LabelTextSettings.font.Size, AToStateStyle.LabelTextSettings.font.Size, TEpsilon.fontSize) then AToStateStyle.LabelTextSettings.font.Size := LabelTextSettings.font.Size;
+      if APrevStateStyle.LabelTextSettings.font.Weight = AToStateStyle.LabelTextSettings.font.Weight then AToStateStyle.LabelTextSettings.font.Weight := LabelTextSettings.font.Weight;
+      if APrevStateStyle.LabelTextSettings.font.Slant = AToStateStyle.LabelTextSettings.font.Slant then AToStateStyle.LabelTextSettings.font.Slant := LabelTextSettings.font.Slant;
+      if APrevStateStyle.LabelTextSettings.font.Stretch = AToStateStyle.LabelTextSettings.font.Stretch then AToStateStyle.LabelTextSettings.font.Stretch := LabelTextSettings.font.Stretch;
+      if APrevStateStyle.LabelTextSettings.font.Color = AToStateStyle.LabelTextSettings.font.Color then AToStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
+      if APrevStateStyle.LabelTextSettings.font.AutoConvert = AToStateStyle.LabelTextSettings.font.AutoConvert then AToStateStyle.LabelTextSettings.font.AutoConvert := LabelTextSettings.font.AutoConvert;
+
+    end;
+
+    APrevStateStyle.LabelTextSettings.font.Family := LabelTextSettings.font.Family;
+    APrevStateStyle.LabelTextSettings.font.Size := LabelTextSettings.font.Size;
+    APrevStateStyle.LabelTextSettings.font.Weight := LabelTextSettings.font.Weight;
+    APrevStateStyle.LabelTextSettings.font.Slant := LabelTextSettings.font.Slant;
+    APrevStateStyle.LabelTextSettings.font.Stretch := LabelTextSettings.font.Stretch;
+    APrevStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
+    APrevStateStyle.LabelTextSettings.font.AutoConvert := LabelTextSettings.font.AutoConvert;
+
+  end;
+  {$ENDIF}
+
 begin
+  {$IF defined(ALDPK)}
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
+  {$ENDIF}
   if csLoading in componentState then exit;
   ClearBufLabelTextDrawable;
   UpdateEditControlPromptText;
@@ -4539,9 +4583,46 @@ begin
   FSupportingTextSettings.Assign(Value);
 end;
 
-{***************************************************************}
+{*****************************************************}
 procedure TALBaseEdit.SupportingTextSettingsChanged(Sender: TObject);
+
+  {~~~~~~~~~~~~~~~~~~}
+  {$IF defined(ALDPK)}
+  procedure _PropagateChanges(const APrevStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
+  begin
+
+    if (not (csLoading in ComponentState)) and
+       (not AToStateStyle.SupportingTextSettings.inherit) then begin
+
+      if APrevStateStyle.SupportingTextSettings.font.Family = AToStateStyle.SupportingTextSettings.font.Family then AToStateStyle.SupportingTextSettings.font.Family := SupportingTextSettings.font.Family;
+      if SameValue(APrevStateStyle.SupportingTextSettings.font.Size, AToStateStyle.SupportingTextSettings.font.Size, TEpsilon.fontSize) then AToStateStyle.SupportingTextSettings.font.Size := SupportingTextSettings.font.Size;
+      if APrevStateStyle.SupportingTextSettings.font.Weight = AToStateStyle.SupportingTextSettings.font.Weight then AToStateStyle.SupportingTextSettings.font.Weight := SupportingTextSettings.font.Weight;
+      if APrevStateStyle.SupportingTextSettings.font.Slant = AToStateStyle.SupportingTextSettings.font.Slant then AToStateStyle.SupportingTextSettings.font.Slant := SupportingTextSettings.font.Slant;
+      if APrevStateStyle.SupportingTextSettings.font.Stretch = AToStateStyle.SupportingTextSettings.font.Stretch then AToStateStyle.SupportingTextSettings.font.Stretch := SupportingTextSettings.font.Stretch;
+      if APrevStateStyle.SupportingTextSettings.font.Color = AToStateStyle.SupportingTextSettings.font.Color then AToStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
+      if APrevStateStyle.SupportingTextSettings.font.AutoConvert = AToStateStyle.SupportingTextSettings.font.AutoConvert then AToStateStyle.SupportingTextSettings.font.AutoConvert := SupportingTextSettings.font.AutoConvert;
+
+    end;
+
+    APrevStateStyle.SupportingTextSettings.font.Family := SupportingTextSettings.font.Family;
+    APrevStateStyle.SupportingTextSettings.font.Size := SupportingTextSettings.font.Size;
+    APrevStateStyle.SupportingTextSettings.font.Weight := SupportingTextSettings.font.Weight;
+    APrevStateStyle.SupportingTextSettings.font.Slant := SupportingTextSettings.font.Slant;
+    APrevStateStyle.SupportingTextSettings.font.Stretch := SupportingTextSettings.font.Stretch;
+    APrevStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
+    APrevStateStyle.SupportingTextSettings.font.AutoConvert := SupportingTextSettings.font.AutoConvert;
+
+  end;
+  {$ENDIF}
+
 begin
+  {$IF defined(ALDPK)}
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
+  {$ENDIF}
   if csLoading in componentState then exit;
   ClearBufSupportingTextDrawable;
   repaint;

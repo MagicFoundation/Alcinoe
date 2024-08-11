@@ -1357,13 +1357,13 @@ begin
       blur := InterpolateSingle(blur{Start}, ATo.blur{Stop}, ANormalizedTime);
       OffsetX := InterpolateSingle(OffsetX{Start}, ATo.OffsetX{Stop}, ANormalizedTime);
       OffsetY := InterpolateSingle(OffsetY{Start}, ATo.OffsetY{Stop}, ANormalizedTime);
-      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
     end
     else begin
       blur := InterpolateSingle(blur{Start}, Defaultblur{Stop}, ANormalizedTime);
       OffsetX := InterpolateSingle(OffsetX{Start}, DefaultOffsetX{Stop}, ANormalizedTime);
       OffsetY := InterpolateSingle(OffsetY{Start}, DefaultOffsetY{Stop}, ANormalizedTime);
-      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -1530,7 +1530,7 @@ begin
       DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritShadow(FParent).restoreState;
+        TALInheritShadow(FParent).restoreStateNoChanges;
     end;
     Inherit := False;
     FSuperseded := True;
@@ -1658,7 +1658,7 @@ begin
       Slant := ATo.Slant;
       //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(ATo.Stretch), ANormalizedTime)));
-      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       AutoConvert := ATo.AutoConvert;
     end
     else begin
@@ -1669,7 +1669,7 @@ begin
       Slant := DefaultSlant;
       //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(DefaultStretch), ANormalizedTime)));
-      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       AutoConvert := DefaultAutoConvert;
     end;
   finally
@@ -1876,7 +1876,7 @@ begin
          (Color = TalphaColors.Null) then
         Color := ATo.Color
       else
-        Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+        Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
     end
     else begin
       Kinds := DefaultKinds;
@@ -1886,7 +1886,7 @@ begin
          (Color = TalphaColors.Null) then
         Color := DefaultColor
       else
-        Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+        Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
     end;
   finally
     EndUpdate;
@@ -2562,7 +2562,7 @@ begin
       DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritBaseTextSettings(FParent).restoreState;
+        TALInheritBaseTextSettings(FParent).restoreStateNoChanges;
     end;
     Inherit := False;
     FSuperseded := True;
@@ -2640,7 +2640,7 @@ begin
          (length(Offsets) = length(ATo.Offsets)) then begin
         Style := ATo.Style;
         for var I := Low(Colors) to High(Colors) do
-          Colors[i] := InterpolateColor(Colors[i]{Start}, ATo.Colors[i]{Stop}, ANormalizedTime);
+          Colors[i] := ALInterpolateColor(Colors[i]{Start}, ATo.Colors[i]{Stop}, ANormalizedTime);
         for var I := Low(Offsets) to High(Offsets) do
           Offsets[i] := InterpolateSingle(Offsets[i]{Start}, ATo.Offsets[i]{Stop}, ANormalizedTime);
         Angle := InterpolateSingle(Angle{Start}, ATo.Angle{Stop}, ANormalizedTime);
@@ -3101,7 +3101,7 @@ begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
-      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
       ResourceName := ATo.ResourceName;
       WrapMode := ATo.WrapMode;
@@ -3115,7 +3115,7 @@ begin
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ATo.ImageMargins.Bottom{Stop}, ANormalizedTime);
     end
     else begin
-      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       Gradient.Interpolate(nil, ANormalizedTime);
       ResourceName := DefaultResourceName;
       WrapMode := DefaultWrapMode;
@@ -3322,7 +3322,7 @@ begin
       DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritBrush(FParent).restoreState;
+        TALInheritBrush(FParent).restoreStateNoChanges;
     end;
     Inherit := False;
     FSuperseded := True;
@@ -3415,11 +3415,11 @@ begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
-      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Thickness := InterpolateSingle(Thickness{Start}, ATo.Thickness{Stop}, ANormalizedTime);
     end
     else begin
-      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       Thickness := InterpolateSingle(Thickness{Start}, DefaultThickness{Stop}, ANormalizedTime);
     end;
   finally
@@ -3557,7 +3557,7 @@ begin
       DoSupersede;
     finally
       if LParentSuperseded then
-        TALInheritStrokeBrush(FParent).restoreState;
+        TALInheritStrokeBrush(FParent).restoreStateNoChanges;
     end;
     Inherit := False;
     FSuperseded := True;
@@ -3657,7 +3657,7 @@ begin
   Try
     if ATo <> nil then begin
       Opacity := InterpolateSingle(Opacity{Start}, ATo.Opacity{Stop}, ANormalizedTime);
-      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       UseContentColor := ATo.UseContentColor;
       Margins.Left := InterpolateSingle(Margins.Left{Start}, ATo.Margins.Left{Stop}, ANormalizedTime);
       Margins.Right := InterpolateSingle(Margins.Right{Start}, ATo.Margins.Right{Stop}, ANormalizedTime);
@@ -3668,7 +3668,7 @@ begin
     end
     else begin
       Opacity := InterpolateSingle(Opacity{Start}, DefaultOpacity{Stop}, ANormalizedTime);
-      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       UseContentColor := DefaultUseContentColor;
       Margins.Left := InterpolateSingle(Margins.Left{Start}, Margins.DefaultValue.Left{Stop}, ANormalizedTime);
       Margins.Right := InterpolateSingle(Margins.Right{Start}, Margins.DefaultValue.Right{Stop}, ANormalizedTime);
@@ -4177,6 +4177,11 @@ begin
   BeginUpdate;
   Try
     var LShapeControl: IALShapeControl;
+    var LPrevStateLayerHasfill := StateLayer.HasFill;
+    var LPrevStateLayerUseContentColor := StateLayer.UseContentColor;
+    var LPrevStateLayerXRadius := StateLayer.XRadius;
+    var LPrevStateLayerYRadius := StateLayer.YRadius;
+
     if ATo <> nil then begin
       Fill.Interpolate(ATo.Fill, ANormalizedTime);
       StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime);
@@ -4186,25 +4191,24 @@ begin
       //Transition
     end
     else if FStateStyleParent <> nil then begin
-      Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime);
-      StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime);
-      Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
-      Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
-      Scale.Interpolate(FStateStyleParent.Scale, ANormalizedTime);
-      //Transition
+      FStateStyleParent.SupersedeNoChanges(true{ASaveState});
+      try
+        Fill.Interpolate(FStateStyleParent.Fill, ANormalizedTime);
+        StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime);
+        Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
+        Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
+        Scale.Interpolate(FStateStyleParent.Scale, ANormalizedTime);
+        //Transition
+      finally
+        FStateStyleParent.RestoreStateNoChanges;
+      end;
     end
     else if Supports(FControlParent, IALShapeControl, LShapeControl) then begin
-      var LprevUseContentColor := StateLayer.UseContentColor;
-      var LprevXRadius := StateLayer.XRadius;
-      var LprevYRadius := StateLayer.YRadius;
       Fill.Interpolate(LShapeControl.GetFill, ANormalizedTime);
       StateLayer.Interpolate(nil, ANormalizedTime);
       Stroke.Interpolate(LShapeControl.GetStroke, ANormalizedTime);
       Shadow.Interpolate(LShapeControl.GetShadow, ANormalizedTime);
       Scale.Interpolate(_TControlAccessProtected(FControlParent).Scale, ANormalizedTime);
-      StateLayer.UseContentColor := LprevUseContentColor;
-      StateLayer.XRadius := LprevXRadius;
-      StateLayer.YRadius := LprevYRadius;
       //Transition
     end
     else begin
@@ -4214,6 +4218,20 @@ begin
       Shadow.Interpolate(nil, ANormalizedTime);
       Scale.Interpolate(nil, ANormalizedTime);
       //Transition
+    end;
+
+    // If StateLayer or ATo.StateLayer is empty, then the interpolation
+    // should only be applied to its opacity. Do not modify UseContentColor,
+    // XRadius, or YRadius.
+    if (ATo = nil) or (not ATo.StateLayer.HasFill) then begin
+      StateLayer.UseContentColor := LPrevStateLayerUseContentColor;
+      StateLayer.XRadius := LPrevStateLayerXRadius;
+      StateLayer.YRadius := LPrevStateLayerYRadius;
+    end
+    else if (not LPrevStateLayerHasfill) and (ATo <> nil) then begin
+      StateLayer.UseContentColor := ATo.StateLayer.UseContentColor;
+      StateLayer.XRadius := ATo.StateLayer.XRadius;
+      StateLayer.YRadius := ATo.StateLayer.YRadius;
     end;
   Finally
     EndUpdate;

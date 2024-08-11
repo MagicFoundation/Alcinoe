@@ -885,7 +885,7 @@ begin
     if PromptTextColor <> tAlphaColors.Null then LUIColor := AlphaColorToUIColor(PromptTextColor)
     else LUIColor := AlphaColorToUIColor(
                        TAlphaColorF.Create(
-                         ALSetColorOpacity(TextSettings.Font.Color, 0.5)).
+                         ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                            PremultipliedAlpha.
                            ToAlphaColor);
     FPlaceholderLabel.setTextColor(LUIColor);
@@ -1376,7 +1376,7 @@ begin
     if PromptTextColor <> tAlphaColors.Null then LNSColor := AlphaColorToNSColor(PromptTextColor)
     else LNSColor := AlphaColorToNSColor(
                        TAlphaColorF.Create(
-                         ALSetColorOpacity(TextSettings.Font.Color, 0.5)).
+                         ALSetColorAlpha(TextSettings.Font.Color, 0.5)).
                            PremultipliedAlpha.
                            ToAlphaColor);
     FPlaceholderLabel.view.setTextColor(LNSColor);

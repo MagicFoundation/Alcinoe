@@ -200,6 +200,17 @@ type
     property TagFloat: Double read FTagFloat write FTagFloat;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDisplayAnimation = class(TALAnimation)
+  protected
+    procedure ProcessTick(const ATime, ADeltaTime: Double); override;
+    procedure ProcessAnimation; override;
+  public
+    procedure Start; override;
+    procedure Stop; override;
+    procedure StopAtCurrent; override;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~}
   TALInterpolationType = (
     Linear,
@@ -461,6 +472,7 @@ type
 function ALInterpolateBounce(AElapsedTime, ADuration: Single; AType: TAnimationType): Single;
 function ALInterpolateDecelerate(input: Single; const factor: Single = 1.0): Single;
 function ALInterpolateViscousFluid(input: Single): Single;
+function ALInterpolateColor(Start, Stop: TAlphaColor; T: Single): TAlphaColor;
 
 type
 
@@ -814,6 +826,29 @@ begin
   else result := interpolated;
 end;
 
+{****************************************************************************}
+function ALInterpolateColor(Start, Stop: TAlphaColor; T: Single): TAlphaColor;
+begin
+  // If start or stop is null, then perform the animation only on the alpha channel.
+  if Start = TALphaColors.Null then begin
+    TAlphaColorRec(Start).A := 0;
+    TAlphaColorRec(Start).R := TAlphaColorRec(Stop).R;
+    TAlphaColorRec(Start).G := TAlphaColorRec(Stop).G;
+    TAlphaColorRec(Start).B := TAlphaColorRec(Stop).B;
+  end;
+  if Stop = TALphaColors.Null then begin
+    TAlphaColorRec(Stop).A := 0;
+    TAlphaColorRec(Stop).R := TAlphaColorRec(Start).R;
+    TAlphaColorRec(Stop).G := TAlphaColorRec(Start).G;
+    TAlphaColorRec(Stop).B := TAlphaColorRec(Start).B;
+  end;
+  TAlphaColorRec(Result).A := TAlphaColorRec(Start).A + Trunc((TAlphaColorRec(Stop).A - TAlphaColorRec(Start).A) * T);
+  TAlphaColorRec(Result).R := TAlphaColorRec(Start).R + Trunc((TAlphaColorRec(Stop).R - TAlphaColorRec(Start).R) * T);
+  TAlphaColorRec(Result).G := TAlphaColorRec(Start).G + Trunc((TAlphaColorRec(Stop).G - TAlphaColorRec(Start).G) * T);
+  TAlphaColorRec(Result).B := TAlphaColorRec(Start).B + Trunc((TAlphaColorRec(Stop).B - TAlphaColorRec(Start).B) * T);
+end;
+
+
 {$IFDEF ANDROID}
 
 {************************************************************************************************************************}
@@ -1077,6 +1112,83 @@ begin
   ALFreeAndNil(FAniThread);
 end;
 
+{******************************************************************************}
+procedure TALDisplayAnimation.ProcessTick(const ATime, ADeltaTime: Double);
+begin
+  if (not FRunning) or FPause then
+    Exit;
+
+  if (FDelay > 0) and (FDelayTimeLeft <> 0) then begin
+    FDelayTimeLeft := FDelayTimeLeft - ADeltaTime;
+    if FDelayTimeLeft <= 0 then begin
+      FDelayTimeLeft := 0;
+      FirstFrame;
+      ProcessAnimation;
+      DoProcess;
+    end;
+    Exit;
+  end;
+
+  FTime := FTime + ADeltaTime;
+
+  ProcessAnimation;
+  DoProcess;
+
+  if not FRunning then begin
+    if AniThread <> nil then
+      AniThread.RemoveAnimation(Self);
+    DoFinish;
+  end;
+end;
+
+{*********************************************}
+procedure TALDisplayAnimation.ProcessAnimation;
+begin
+  // Nothing to do
+end;
+
+{***************************************}
+procedure TALDisplayAnimation.Start;
+begin
+  if (FRunning) then
+    Exit;
+  FEnabled := True;
+  FRunning := True;
+  FTime := 0;
+  FDelayTimeLeft := FDelay;
+  if FDelay = 0 then begin
+    FirstFrame;
+    ProcessAnimation;
+    DoProcess;
+  end;
+
+  if AniThread = nil then
+    FAniThread := TALAniThread.Create;
+
+  AniThread.AddAnimation(Self);
+  if not AniThread.Enabled then
+    Stop;
+end;
+
+{**************************************}
+procedure TALDisplayAnimation.Stop;
+begin
+  StopAtCurrent;
+end;
+
+{***********************************************}
+procedure TALDisplayAnimation.StopAtCurrent;
+begin
+  if not FRunning then
+    Exit;
+
+  if AniThread <> nil then
+    AniThread.RemoveAnimation(Self);
+
+  FRunning := False;
+  DoFinish;
+end;
+
 {******************************************}
 constructor TALInterpolatedAnimation.Create;
 begin
@@ -1305,7 +1417,7 @@ end;
 {*******************************************}
 procedure TALColorAnimation.ProcessAnimation;
 begin
-  fCurrentValue := InterpolateColor(FStartValue, FStopValue, NormalizedTime);
+  fCurrentValue := ALInterpolateColor(FStartValue, FStopValue, NormalizedTime);
 end;
 
 {********************************************************}

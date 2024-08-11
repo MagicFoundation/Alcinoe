@@ -53,6 +53,8 @@ function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
 function  ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean; inline;
 procedure ALCanvasEndScene(const aCanvas: TALCanvas); inline;
 procedure ALClearCanvas(const aCanvas: TALCanvas; const AColor: TAlphaColor);
+procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single);
+procedure ALEndTransparencyLayer(const aCanvas: TALCanvas);
 function  ALCreateDrawableFromSurface(const ASurface: TALSurface): TALDrawable;
 procedure ALUpdateDrawableFromSurface(const aSurface: TALSurface; const aDrawable: TALDrawable);
 function  ALGetDefaultPixelFormat: TPixelFormat; inline;
@@ -10612,7 +10614,8 @@ begin
     LScaledStateLayerDstRect := TRectf.Empty;
   //--
   LStateLayerColor := AStateLayerColor;
-  if LScaledStateLayerDstRect.IsEmpty then
+  if (LScaledStateLayerDstRect.IsEmpty) or
+     (CompareValue(AStatelayerOpacity, 0, TEpsilon.Scale) <= 0) then
     LStateLayerColor := TALphaColors.Null;
   //--
   if (LStateLayerColor <> TALphaColors.Null) and
@@ -10622,7 +10625,8 @@ begin
      (sameValue(AStateLayerXRadius, AXRadius, TEpsilon.Vector)) and
      (sameValue(AStateLayerYRadius, AYRadius, TEpsilon.Vector)) then begin
     LFillColor := ALblendColor(LfillColor, LStateLayerColor, AStatelayerOpacity);
-    if ADrawStateLayerOnTop then
+    if (ADrawStateLayerOnTop) and
+       (LStrokeColor <> TAlphaColors.Null) then
       LStrokeColor := ALblendColor(LStrokeColor, LStateLayerColor, AStatelayerOpacity);
     LStateLayerColor := TALphaColors.Null;
   end;
@@ -10686,8 +10690,7 @@ begin
                         LScaledShadowBlur, // const AShadowBlur: Single;
                         LScaledShadowOffsetX, // const AShadowOffsetX: Single;
                         LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    //--
-    sk4d_canvas_save_layer_alpha(ACanvas, @LLayerRect, round(255 * AOpacity));
+    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
   end;
   try
 
@@ -10889,7 +10892,11 @@ begin
             end;
         end;
 
-      end;
+      end
+
+      // Draw the StateLayer
+      else if not ADrawStateLayerOnTop then
+        _DrawStateLayer;
 
       // Stroke the rectangle
       if LStrokeColor <> TalphaColorRec.Null then begin
@@ -10910,7 +10917,7 @@ begin
   finally
     // Remove the alpha layer
     if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      sk4d_canvas_restore(ACanvas);
+      ALEndTransparencyLayer(ACanvas);
   end;
 
   {$ENDIF}
@@ -10936,10 +10943,7 @@ begin
                         LScaledShadowBlur, // const AShadowBlur: Single;
                         LScaledShadowOffsetX, // const AShadowOffsetX: Single;
                         LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    //--
-    var LJLayerRect := TJRectF.JavaClass.init(LLayerRect.left, LLayerRect.top, LLayerRect.right, LLayerRect.bottom);
-    aCanvas.saveLayerAlpha(LJLayerRect, round(255 * AOpacity));
-    LJLayerRect := nil;
+    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
   end;
   try
 
@@ -11174,7 +11178,11 @@ begin
         end;
       end;
 
-    end;
+    end
+
+    // Draw the StateLayer
+    else if not ADrawStateLayerOnTop then
+      _DrawStateLayer;
 
     //stroke the rectangle
     if LStrokeColor <> TalphaColorRec.Null then begin
@@ -11194,7 +11202,7 @@ begin
   finally
     // Remove the alpha layer
     if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      ACanvas.restore;
+      ALEndTransparencyLayer(ACanvas);
   end;
 
   {$ENDIF}
@@ -11220,17 +11228,7 @@ begin
                         LScaledShadowBlur, // const AShadowBlur: Single;
                         LScaledShadowOffsetX, // const AShadowOffsetX: Single;
                         LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    //--
-    CGContextSaveGState(ACanvas);
-    CGContextSetAlpha(ACanvas, AOpacity);
-    CGContextBeginTransparencyLayerWithRect(
-      ACanvas,
-      ALLowerLeftCGRect(
-        LLayerRect.TopLeft,
-        LLayerRect.Width,
-        LLayerRect.Height,
-        LGridHeight),
-        nil{auxiliaryInfo});
+    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
   end;
   try
 
@@ -11463,7 +11461,11 @@ begin
         end;
       end;
 
-    end;
+    end
+
+    // Draw the StateLayer
+    else if not ADrawStateLayerOnTop then
+      _DrawStateLayer;
 
     //stroke the rectangle
     if LStrokeColor <> TalphaColorRec.Null then begin
@@ -11479,10 +11481,8 @@ begin
 
   finally
     // Remove the alpha layer
-    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then begin
-      CGContextEndTransparencyLayer(ACanvas);
-      CGContextRestoreGState(ACanvas)
-    end;
+    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
+      ALEndTransparencyLayer(ACanvas);
   end;
 
   {$ENDIF}
@@ -12196,7 +12196,8 @@ begin
     LScaledStateLayerDstRect := TRectf.Empty;
   //--
   LStateLayerColor := AStateLayerColor;
-  if LScaledStateLayerDstRect.IsEmpty then
+  if (LScaledStateLayerDstRect.IsEmpty) or
+     (CompareValue(AStatelayerOpacity, 0, TEpsilon.Scale) <= 0) then
     LStateLayerColor := TALphaColors.Null;
   //--
   if (LStateLayerColor <> TALphaColors.Null) and
@@ -12206,7 +12207,8 @@ begin
      (sameValue(AStateLayerXRadius, -50, TEpsilon.Vector)) and
      (sameValue(AStateLayerYRadius, -50, TEpsilon.Vector)) then begin
     LFillColor := ALblendColor(LfillColor, LStateLayerColor, AStatelayerOpacity);
-    if ADrawStateLayerOnTop then
+    if (ADrawStateLayerOnTop) and
+       (LStrokeColor <> TAlphaColors.Null) then
       LStrokeColor := ALblendColor(LStrokeColor, LStateLayerColor, AStatelayerOpacity);
     LStateLayerColor := TALphaColors.Null;
   end;
@@ -12235,8 +12237,7 @@ begin
                         LScaledShadowBlur, // const AShadowBlur: Single;
                         LScaledShadowOffsetX, // const AShadowOffsetX: Single;
                         LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    //--
-    sk4d_canvas_save_layer_alpha(ACanvas, @LLayerRect, round(255 * AOpacity));
+    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
   end;
   try
 
@@ -12404,7 +12405,11 @@ begin
             end;
         end;
 
-      end;
+      end
+
+      // Draw the StateLayer
+      else if not ADrawStateLayerOnTop then
+        _DrawStateLayer;
 
       // Stroke the circle
       if LStrokeColor <> TalphaColorRec.Null then begin
@@ -12425,7 +12430,7 @@ begin
   finally
     // Remove the alpha layer
     if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      sk4d_canvas_restore(ACanvas);
+      ALEndTransparencyLayer(ACanvas);
   end;
 
   {$ENDIF}
@@ -12451,10 +12456,7 @@ begin
                         LScaledShadowBlur, // const AShadowBlur: Single;
                         LScaledShadowOffsetX, // const AShadowOffsetX: Single;
                         LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    //--
-    var LJLayerRect := TJRectF.JavaClass.init(LLayerRect.left, LLayerRect.top, LLayerRect.right, LLayerRect.bottom);
-    aCanvas.saveLayerAlpha(LJLayerRect, round(255 * AOpacity));
-    LJLayerRect := nil;
+    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
   end;
   try
 
@@ -12652,7 +12654,11 @@ begin
         end;
       end;
 
-    end;
+    end
+
+    // Draw the StateLayer
+    else if not ADrawStateLayerOnTop then
+      _DrawStateLayer;
 
     //stroke the circle
     if LStrokeColor <> TalphaColorRec.Null then begin
@@ -12672,7 +12678,7 @@ begin
   finally
     // Remove the alpha layer
     if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      ACanvas.restore;
+      ALEndTransparencyLayer(ACanvas);
   end;
 
   {$ENDIF}
@@ -12698,17 +12704,7 @@ begin
                         LScaledShadowBlur, // const AShadowBlur: Single;
                         LScaledShadowOffsetX, // const AShadowOffsetX: Single;
                         LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    //--
-    CGContextSaveGState(ACanvas);
-    CGContextSetAlpha(ACanvas, AOpacity);
-    CGContextBeginTransparencyLayerWithRect(
-      ACanvas,
-      ALLowerLeftCGRect(
-        LLayerRect.TopLeft,
-        LLayerRect.Width,
-        LLayerRect.Height,
-        LGridHeight),
-        nil{auxiliaryInfo});
+    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
   end;
   try
 
@@ -12906,7 +12902,11 @@ begin
         end;
       end;
 
-    end;
+    end
+
+    // Draw the StateLayer
+    else if not ADrawStateLayerOnTop then
+      _DrawStateLayer;
 
     //stroke the circle
     if LStrokeColor <> TalphaColorRec.Null then begin
@@ -12922,10 +12922,8 @@ begin
 
   finally
     // Remove the alpha layer
-    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then begin
-      CGContextEndTransparencyLayer(ACanvas);
-      CGContextRestoreGState(ACanvas)
-    end;
+    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
+      ALEndTransparencyLayer(ACanvas);
   end;
 
   {$ENDIF}
@@ -13568,6 +13566,94 @@ begin
   {$ELSE}
   aCanvas.Clear(AColor);
   {$ENDIF};
+end;
+
+{******************************************************************}
+procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single);
+begin
+
+  {$REGION 'SKIA'}
+  {$IF defined(ALSkiaEngine)}
+
+  sk4d_canvas_save_layer_alpha(ACanvas, @ARect, round(255 * AOpacity));
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'ANDROID'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+
+  var LJRect := TJRectF.JavaClass.init(ARect.left, ARect.top, ARect.right, ARect.bottom);
+  aCanvas.saveLayerAlpha(LJRect, round(255 * AOpacity));
+  LJRect := nil;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'APPLEOS'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+
+  CGContextSaveGState(ACanvas);
+  CGContextSetAlpha(ACanvas, AOpacity);
+  CGContextBeginTransparencyLayerWithRect(
+    ACanvas,
+    ALLowerLeftCGRect(
+      ARect.TopLeft,
+      ARect.Width,
+      ARect.Height,
+      CGBitmapContextGetHeight(ACanvas)),
+      nil{auxiliaryInfo});
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'MSWINDOWS'}
+  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+
+  // not supported
+
+  {$ENDIF}
+  {$ENDREGION}
+
+end;
+
+{******************************************************************}
+procedure ALEndTransparencyLayer(const aCanvas: TALCanvas);
+begin
+
+  {$REGION 'SKIA'}
+  {$IF defined(ALSkiaEngine)}
+
+  sk4d_canvas_restore(ACanvas);
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'ANDROID'}
+  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
+
+  ACanvas.restore;
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'APPLEOS'}
+  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+
+  CGContextEndTransparencyLayer(ACanvas);
+  CGContextRestoreGState(ACanvas)
+
+  {$ENDIF}
+  {$ENDREGION}
+
+  {$REGION 'MSWINDOWS'}
+  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
+
+  // not supported
+
+  {$ENDIF}
+  {$ENDREGION}
+
 end;
 
 {******************************************************************}

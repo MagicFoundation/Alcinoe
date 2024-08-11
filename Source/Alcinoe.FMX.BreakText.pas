@@ -2683,6 +2683,7 @@ begin
                   if (AOptions.FillColor <> TalphaColors.Null) or
                      (length(AOptions.FillGradientColors) > 0) or
                      (AOptions.FillResourceName <> '') or
+                     (AOptions.StateLayerColor <> TalphaColors.Null) or
                      (AOptions.StrokeColor <> TalphaColors.Null) or
                      (AOptions.ShadowColor <> TalphaColors.Null) then begin
                     ALDrawRectangle(
@@ -3974,6 +3975,7 @@ begin
           if (AOptions.FillColor <> TalphaColors.Null) or
              (length(AOptions.FillGradientColors) > 0) or
              (AOptions.FillResourceName <> '') or
+             (AOptions.StateLayerColor <> TalphaColors.Null) or
              (AOptions.StrokeColor <> TalphaColors.Null) or
              (AOptions.ShadowColor <> TalphaColors.Null) then begin
             ALDrawRectangle(

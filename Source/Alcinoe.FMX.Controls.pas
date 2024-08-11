@@ -164,11 +164,17 @@ procedure TALControl.SetNewScene(AScene: IScene);
 begin
   {$IFNDEF ALCompilerVersionSupported120}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if Pressed is still changed only SetNewScene/DoMouseLeave/MouseDown/MouseUp/MouseClick'}
+    {$MESSAGE WARN 'Check if IsFocused is still changed only SetNewScene/DoEnter/DoExit'}
+    {$MESSAGE WARN 'Check if IsMouseOver is still changed only SetNewScene/DoMouseEnter/DoMouseLeave'}
   {$ENDIF}
   var LPrevPressed := Pressed;
   var LPrevIsFocused := IsFocused;
   var LPrevIsMouseOver := IsMouseOver;
   inherited;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FIsMouseOver := False;
+  {$ENDIF}
   if LPrevPressed <> Pressed then PressedChanged;
   if LPrevIsFocused <> IsFocused then IsFocusedChanged;
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
@@ -195,6 +201,9 @@ procedure TALControl.DoMouseEnter;
 begin
   var LPrevIsMouseOver := IsMouseOver;
   inherited;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FIsMouseOver := False;
+  {$ENDIF}
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
@@ -204,6 +213,9 @@ begin
   var LPrevPressed := Pressed;
   var LPrevIsMouseOver := IsMouseOver;
   inherited;
+  {$IF defined(ANDROID) or defined(IOS)}
+  FIsMouseOver := False;
+  {$ENDIF}
   if not AutoCapture then
     Pressed := False;
   if LPrevPressed <> Pressed then PressedChanged;

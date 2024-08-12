@@ -282,7 +282,7 @@ begin
       //  <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
       //
       // Deletes <DeployFile> nodes unless they have a Class attribute equal to
-      // 'File' and an Enabled attribute not equal to false. Enabled attribute
+      // 'File' or 'Skia' and an Enabled attribute not equal to false. Enabled attribute
       // not equal to false to prevents the IDE from automatically re-adding and
       // deploying these files when the project is reopened:
       //  <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144">
@@ -301,6 +301,7 @@ begin
               if (LEnabledNode <> nil) and (ALSameTextA(LEnabledNode.Text,'false')) then break;
             end;
             if (not ALSameTextA(LDeployFileNode.attributes['Class'], 'File')) and
+               (not ALSameTextA(LDeployFileNode.attributes['Class'], 'Skia')) and
                ((LEnabledNode = nil) or                             // normally we can also update other properties of a deploy file not only
                 (not ALSameTextA(LEnabledNode.Text,'false'))) then  // enabled, but i consider we can only update enabled
               LDeploymentNode.ChildNodes.Delete(i);

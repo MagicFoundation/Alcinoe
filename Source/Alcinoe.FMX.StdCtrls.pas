@@ -595,6 +595,10 @@ type
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
+        BufDrawable: TALDrawable;
+        BufDrawableRect: TRectF;
+        procedure ClearBufDrawable;
+      public
         constructor Create(const AParent: TObject); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
@@ -641,6 +645,7 @@ type
         property Shadow;
         property StateLayer;
         property Stroke;
+        property Transition;
       end;
       // ------------------
       // TPressedStateStyle
@@ -650,6 +655,7 @@ type
         property Shadow;
         property StateLayer;
         property Stroke;
+        property Transition;
       end;
       // ------------------
       // TFocusedStateStyle
@@ -659,6 +665,7 @@ type
         property Shadow;
         property StateLayer;
         property Stroke;
+        property Transition;
       end;
       // -----------------
       // TCheckStateStyles
@@ -686,6 +693,7 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure ClearBufDrawable;
       published
         property &Default: TDefaultStateStyle read FDefault write SetDefault;
         property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
@@ -710,41 +718,34 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure ClearBufDrawable;
       published
         property Checked: TCheckStateStyles read FChecked write SetChecked;
         property Unchecked: TCheckStateStyles read FUnchecked write SetUnchecked;
       end;
   private
-    FOnChange: TNotifyEvent;
+    FStateStyles: TStateStyles;
+    FStateTransitionAnimation: TALfloatAnimation;
+    FStateTransitionFrom: TBaseStateStyle;
+    FStateTransitionTo: TBaseStateStyle;
+    FStateTransitionPrevFrom: TBaseStateStyle;
+    FStateTransitionPrevTo: TBaseStateStyle;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FStateTransitionBufSurface: TALSurface;
+    FStateTransitionBufCanvas: TALCanvas;
+    FStateTransitionBufDrawable: TALDrawable;
+    {$ENDIF}
+    FCurrentAdjustedStateStyle: TBaseStateStyle;
+    FCheckMark: TCheckMarkBrush;
+    FChecked: Boolean;
     FDoubleBuffered: boolean;
     FXRadius: Single;
     FYRadius: Single;
-    FChecked: Boolean;
-    FCheckMark: TCheckMarkBrush;
-    FStateStyles: TStateStyles;
-    fBufCheckedDrawable: TALDrawable;
-    fBufCheckedDrawableRect: TRectF;
-    fBufCheckedDisabledDrawable: TALDrawable;
-    fBufCheckedDisabledDrawableRect: TRectF;
-    fBufCheckedHoveredDrawable: TALDrawable;
-    fBufCheckedHoveredDrawableRect: TRectF;
-    fBufCheckedPressedDrawable: TALDrawable;
-    fBufCheckedPressedDrawableRect: TRectF;
-    fBufCheckedFocusedDrawable: TALDrawable;
-    fBufCheckedFocusedDrawableRect: TRectF;
-    fBufUnCheckedDrawable: TALDrawable;
-    fBufUnCheckedDrawableRect: TRectF;
-    fBufUnCheckedDisabledDrawable: TALDrawable;
-    fBufUnCheckedDisabledDrawableRect: TRectF;
-    fBufUnCheckedHoveredDrawable: TALDrawable;
-    fBufUnCheckedHoveredDrawableRect: TRectF;
-    fBufUnCheckedPressedDrawable: TALDrawable;
-    fBufUnCheckedPressedDrawableRect: TRectF;
-    fBufUnCheckedFocusedDrawable: TALDrawable;
-    fBufUnCheckedFocusedDrawableRect: TRectF;
+    FOnChange: TNotifyEvent;
     procedure SetCheckMark(const Value: TCheckMarkBrush);
     procedure SetStateStyles(const AValue: TStateStyles);
   protected
+    function GetCurrentStateStyle: TBaseStateStyle; virtual;
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
     procedure SetXRadius(const Value: Single); virtual;
@@ -755,23 +756,28 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
     procedure IsMouseOverChanged; override;
+    procedure IsFocusedChanged; override;
     procedure PressedChanged; override;
+    procedure EnabledChanged; override;
     function GetDefaultSize: TSizeF; override;
     function GetChecked: Boolean; virtual;
     procedure SetChecked(const Value: Boolean); virtual;
     procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
     procedure Click; override;
+    procedure startStateTransition; virtual;
+    procedure StateTransitionAnimationProcess(Sender: TObject); virtual;
+    procedure StateTransitionAnimationFinish(Sender: TObject); virtual;
     procedure DoChanged; virtual;
     procedure DoResized; override;
     procedure DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
             const ADstRect: TrectF;
-            const ACheckMark: TCheckMarkBrush;
-            const AChecked: Boolean); virtual;
+            const AChecked: Boolean;
+            const ACheckMark: TCheckMarkBrush); virtual;
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
-                var ABufDrawableRect: TRectF;
+                out ABufDrawableRect: TRectF;
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStroke: TALStrokeBrush;
@@ -862,6 +868,13 @@ type
     procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
   protected
     procedure SetChecked(const Value: Boolean); override;
+    function GetDefaultSize: TSizeF; override;
+    procedure DrawCheckMark(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const AChecked: Boolean;
+            const ACheckMark: TALCheckBox.TCheckMarkBrush); override;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1197,8 +1210,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure clearBufDrawable; override;
     procedure MakeBufDrawable; override;
+    procedure clearBufDrawable; override;
   published
     property AutoSize default True;
     property CanFocus default true;
@@ -2338,7 +2351,7 @@ begin
   FWrapMode := FDefaultWrapMode;
   FThickness := FDefaultThickness;
   //--
-  FMargins := TBounds.Create(TRectF.Empty);
+  FMargins := TBounds.Create(TRectF.Create(3,3,3,3));
   FMargins.OnChange := MarginsChanged;
 end;
 
@@ -2366,7 +2379,7 @@ begin
       Color := TCheckMarkBrush(Source).Color;
       ResourceName := TCheckMarkBrush(Source).ResourceName;
       WrapMode := TCheckMarkBrush(Source).WrapMode;
-      Thickness := TALStrokeBrush(Source).Thickness;
+      Thickness := TCheckMarkBrush(Source).Thickness;
       Margins.Assign(TCheckMarkBrush(Source).Margins);
     Finally
       EndUpdate;
@@ -2398,7 +2411,7 @@ begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
-      Color := InterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       ResourceName := ATo.ResourceName;
       WrapMode := ATo.WrapMode;
       Thickness := InterpolateSingle(Thickness{Start}, ATo.Thickness{Stop}, ANormalizedTime);
@@ -2408,7 +2421,7 @@ begin
       Margins.Bottom := InterpolateSingle(Margins.Bottom{Start}, ATo.Margins.Bottom{Stop}, ANormalizedTime);
     end
     else begin
-      Color := InterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
+      Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       ResourceName := DefaultResourceName;
       WrapMode := DefaultWrapMode;
       Thickness := InterpolateSingle(Thickness{Start}, DefaultThickness{Stop}, ANormalizedTime);
@@ -2595,7 +2608,7 @@ begin
       DoSupersede;
     finally
       if LParentSuperseded then
-        TInheritCheckMarkBrush(FParent).restoreState;
+        TInheritCheckMarkBrush(FParent).restoreStateNoChanges;
     end;
     Inherit := False;
     FSuperseded := True;
@@ -2623,16 +2636,24 @@ begin
   if StateStyleParent <> nil then FCheckMark := TInheritCheckMarkBrush.Create(StateStyleParent.CheckMark, TAlphaColors.Black{ADefaultColor})
   else if ControlParent <> nil then FCheckMark := TInheritCheckMarkBrush.Create(ControlParent.CheckMark, TAlphaColors.Black{ADefaultColor})
   else FCheckMark := TInheritCheckMarkBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
+  FCheckMark.OnChanged := CheckMarkChanged;
   //--
-  StateLayer.Margins.DefaultValue := TRectF.Create(-10,-10,-10,-10);
+  StateLayer.Margins.DefaultValue := TRectF.Create(-12,-12,-12,-12);
   StateLayer.Margins.Rect := StateLayer.Margins.DefaultValue;
   //--
-  FCheckMark.OnChanged := CheckMarkChanged;
+  StateLayer.DefaultXRadius := -50;
+  StateLayer.DefaultYRadius := -50;
+  StateLayer.XRadius := StateLayer.DefaultXRadius;
+  StateLayer.YRadius := StateLayer.DefaultYRadius;
+  //--
+  BufDrawable := ALNullDrawable;
+  //BufDisabledDrawableRect
 end;
 
 {*************************************}
 destructor TALCheckBox.TBaseStateStyle.Destroy;
 begin
+  ClearBufDrawable;
   ALFreeAndNil(FCheckMark);
   inherited Destroy;
 end;
@@ -2665,6 +2686,12 @@ begin
   end;
 end;
 
+{******************************}
+procedure TALCheckBox.TBaseStateStyle.ClearBufDrawable;
+begin
+  ALFreeAndNilDrawable(BufDrawable);
+end;
+
 {******************************************************}
 procedure TALCheckBox.TBaseStateStyle.Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
 begin
@@ -2672,7 +2699,14 @@ begin
   Try
     inherited Interpolate(ATo, ANormalizedTime);
     if ATo <> nil then CheckMark.Interpolate(ATo.CheckMark, ANormalizedTime)
-    else if StateStyleParent <> nil then CheckMark.Interpolate(StateStyleParent.CheckMark, ANormalizedTime)
+    else if StateStyleParent <> nil then begin
+      StateStyleParent.SupersedeNoChanges(true{ASaveState});
+      try
+        CheckMark.Interpolate(StateStyleParent.CheckMark, ANormalizedTime)
+      finally
+        StateStyleParent.RestoreStateNoChanges;
+      end;
+    end
     else if ControlParent <> nil then CheckMark.Interpolate(ControlParent.CheckMark, ANormalizedTime)
     else CheckMark.Interpolate(nil, ANormalizedTime);
   Finally
@@ -2872,6 +2906,16 @@ begin
   end;
 end;
 
+{******************************}
+procedure TALCheckBox.TCheckStateStyles.ClearBufDrawable;
+begin
+  Default.ClearBufDrawable;
+  Disabled.ClearBufDrawable;
+  Hovered.ClearBufDrawable;
+  Pressed.ClearBufDrawable;
+  Focused.ClearBufDrawable;
+end;
+
 {************************************************************************************}
 procedure TALCheckBox.TCheckStateStyles.SetDefault(const AValue: TDefaultStateStyle);
 begin
@@ -2989,6 +3033,13 @@ begin
   end;
 end;
 
+{******************************}
+procedure TALCheckBox.TStateStyles.ClearBufDrawable;
+begin
+  Checked.ClearBufDrawable;
+  Unchecked.ClearBufDrawable;
+end;
+
 {************************************************************************************}
 procedure TALCheckBox.TStateStyles.SetChecked(const AValue: TCheckStateStyles);
 begin
@@ -3022,59 +3073,65 @@ begin
   CanFocus := True;
   Cursor := crHandPoint;
   //--
+  var LFillChanged: TNotifyEvent := fill.OnChanged;
+  fill.OnChanged := nil;
   Fill.DefaultColor := TAlphaColors.White;
   Fill.Color := Fill.DefaultColor;
+  fill.OnChanged := LFillChanged;
   //--
+  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
+  stroke.OnChanged := Nil;
   Stroke.DefaultColor := TAlphaColors.Black;
   Stroke.Color := Stroke.DefaultColor;
+  stroke.OnChanged := LStrokeChanged;
   //--
-  FOnChange := nil;
-  FDoubleBuffered := true;
-  FXRadius := 0;
-  FYRadius := 0;
-  FChecked := False;
+  FStateTransitionAnimation := TALFloatAnimation.Create;
+  FStateTransitionAnimation.OnProcess := StateTransitionAnimationProcess;
+  FStateTransitionAnimation.OnFinish := StateTransitionAnimationFinish;
+  //--
+  FStateTransitionFrom := nil;
+  FStateTransitionTo := nil;
+  FStateTransitionPrevFrom := nil;
+  FStateTransitionPrevTo := nil;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FStateTransitionBufSurface := ALNullSurface;
+  FStateTransitionBufCanvas := ALNullCanvas;
+  FStateTransitionBufDrawable := ALNullDrawable;
+  {$ENDIF}
+  //--
+  FCurrentAdjustedStateStyle := nil;
+  //--
   FCheckMark := TCheckMarkBrush.Create(TAlphaColors.Black);
   FCheckMark.OnChanged := CheckMarkChanged;
   //--
-  FStateStyles := TStateStyles.Create(Self);
-  FStateStyles.OnChanged := StateStylesChanged;
+  FChecked := False;
+  FDoubleBuffered := true;
+  FXRadius := 0;
+  FYRadius := 0;
+  FOnChange := nil;
   //--
-  fBufCheckedDrawable := ALNullDrawable;
-  fBufCheckedDisabledDrawable := ALNullDrawable;
-  fBufCheckedHoveredDrawable := ALNullDrawable;
-  fBufCheckedPressedDrawable := ALNullDrawable;
-  fBufCheckedFocusedDrawable := ALNullDrawable;
-  fBufUnCheckedDrawable := ALNullDrawable;
-  fBufUnCheckedDisabledDrawable := ALNullDrawable;
-  fBufUnCheckedHoveredDrawable := ALNullDrawable;
-  fBufUnCheckedPressedDrawable := ALNullDrawable;
-  fBufUnCheckedFocusedDrawable := ALNullDrawable;
+  // Must be created at the end because it requires FCheckMark to
+  // be already created.
+  FStateStyles := TStateStyles.Create(self);
+  FStateStyles.OnChanged := StateStylesChanged;
 end;
 
 {*****************************}
 destructor TALCheckbox.Destroy;
 begin
-  clearBufDrawable;
-  ALFreeAndNil(FCheckMark);
   ALFreeAndNil(FStateStyles);
+  ALFreeAndNil(FStateTransitionAnimation);
+  ALfreeandNil(FStateTransitionFrom);
+  ALfreeandNil(FStateTransitionTo);
+  ALfreeandNil(FStateTransitionPrevFrom);
+  ALfreeandNil(FStateTransitionPrevTo);
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ALFreeAndNilDrawable(FStateTransitionBufDrawable);
+  ALFreeAndNilSurface(FStateTransitionBufSurface, FStateTransitionBufCanvas);
+  {$ENDIF}
+  ALfreeandNil(FCurrentAdjustedStateStyle);
+  ALFreeAndNil(FCheckMark);
   inherited;
-end;
-
-{*****************************}
-procedure TALCheckbox.Click;
-begin
-  Checked := not Checked;
-  inherited;
-end;
-
-{*********************************************************************************************}
-procedure TALCheckbox.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
-begin
-  inherited;
-  if (KeyChar = ' ') then begin
-    Click; // Emulate mouse click to perform Action.OnExecute
-    KeyChar := #0;
-  end;
 end;
 
 {***********************************************}
@@ -3089,6 +3146,57 @@ begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
     if not fDoubleBuffered then clearBufDrawable;
+  end;
+end;
+
+{***************************************}
+function TALCheckbox.GetChecked: Boolean;
+begin
+  Result := FChecked;
+end;
+
+{*****************************************************}
+procedure TALCheckbox.SetChecked(const Value: Boolean);
+begin
+  if FChecked <> Value then begin
+    FChecked := Value;
+    // Update DisabledOpacity that is taken from
+    // StateStyles.Checked or StateStyles.UnChecked
+    if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
+    else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
+    If not Enabled then ClearBufDrawable;
+    DoChanged;
+  end;
+end;
+
+{***********************************************************}
+procedure TALCheckbox.SetCheckMark(const Value: TCheckMarkBrush);
+begin
+  FCheckMark.Assign(Value);
+end;
+
+{*********************************************************************}
+procedure TALCheckbox.SetStateStyles(const AValue: TStateStyles);
+begin
+  FStateStyles.Assign(AValue);
+end;
+
+{*******************************************************}
+function TALCheckbox.GetCurrentStateStyle: TBaseStateStyle;
+begin
+  if Checked then begin
+    if Not Enabled then Result := StateStyles.Checked.Disabled
+    else if Pressed then Result := StateStyles.Checked.Pressed
+    else if IsFocused then Result := StateStyles.Checked.Focused
+    else if IsMouseOver then Result := StateStyles.Checked.Hovered
+    else result := StateStyles.Checked.Default;
+  end
+  else begin
+    if Not Enabled then Result := StateStyles.UnChecked.Disabled
+    else if Pressed then Result := StateStyles.UnChecked.Pressed
+    else if IsFocused then Result := StateStyles.UnChecked.Focused
+    else if IsMouseOver then Result := StateStyles.UnChecked.Hovered
+    else result := StateStyles.UnChecked.Default;
   end;
 end;
 
@@ -3120,43 +3228,6 @@ begin
   end;
 end;
 
-{***************************************}
-function TALCheckbox.GetChecked: Boolean;
-begin
-  Result := FChecked;
-end;
-
-{*****************************************************}
-procedure TALCheckbox.SetChecked(const Value: Boolean);
-begin
-  if FChecked <> Value then begin
-    FChecked := Value;
-    DoChanged;
-  end;
-end;
-
-{*********************************************************************}
-procedure TALCheckbox.SetStateStyles(const AValue: TStateStyles);
-begin
-  FStateStyles.Assign(AValue);
-end;
-
-{******************************************************}
-procedure TALCheckbox.StateStylesChanged(Sender: TObject);
-begin
-  clearBufDrawable;
-  (* *)
-  if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
-  else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
-  Repaint;
-end;
-
-{***********************************************************}
-procedure TALCheckbox.SetCheckMark(const Value: TCheckMarkBrush);
-begin
-  FCheckMark.Assign(Value);
-end;
-
 {******************************************************}
 procedure TALCheckbox.CheckMarkChanged(Sender: TObject);
 begin
@@ -3185,10 +3256,28 @@ begin
   inherited;
 end;
 
+{******************************************************}
+procedure TALCheckbox.StateStylesChanged(Sender: TObject);
+begin
+  clearBufDrawable;
+  if FChecked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
+  else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
+  Repaint;
+end;
+
 {**************************************************}
 procedure TALCheckbox.IsMouseOverChanged;
 begin
   inherited;
+  startStateTransition;
+  repaint;
+end;
+
+{********************************************}
+procedure TALCheckbox.IsFocusedChanged;
+begin
+  inherited;
+  startStateTransition;
   repaint;
 end;
 
@@ -3196,13 +3285,39 @@ end;
 procedure TALCheckbox.PressedChanged;
 begin
   inherited;
+  startStateTransition;
   repaint;
+end;
+
+{**************************************************}
+procedure TALCheckbox.EnabledChanged;
+begin
+  inherited;
+  startStateTransition;
+  repaint;
+end;
+
+{*********************************************************************************************}
+procedure TALCheckbox.KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState);
+begin
+  inherited;
+  if (KeyChar = ' ') then begin
+    Click; // Emulate mouse click to perform Action.OnExecute
+    KeyChar := #0;
+  end;
+end;
+
+{*****************************}
+procedure TALCheckbox.Click;
+begin
+  Checked := not Checked;
+  inherited;
 end;
 
 {******************************************}
 function TALCheckbox.GetDefaultSize: TSizeF;
 begin
-  Result := TSizeF.Create(22, 22);
+  Result := TSizeF.Create(18, 18);
 end;
 
 {******************************}
@@ -3220,33 +3335,234 @@ begin
   inherited;
 end;
 
+{***************************************}
+procedure TALCheckbox.startStateTransition;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _IsSameStateStyleClass(const AStateStyleA, AStateStyleB: TBaseStateStyle): boolean;
+  begin
+    result := AStateStyleA = AStateStyleB;
+    if (not result) and
+       (AStateStyleA <> nil) and
+       (AStateStyleB <> nil) then begin
+      result := AStateStyleA.ClassType = AStateStyleB.ClassType;
+    end;
+  end;
+
+type
+  TBaseStateStyleClass = class of TBaseStateStyle;
+
+begin
+  If CSLoading in componentState then Exit;
+  var LCurrentStateStyle := GetCurrentStateStyle;
+  //--
+  if FStateTransitionFrom = nil then begin
+    var LStateStyle : TBaseStateStyle;
+    if Checked then LStateStyle := FStateStyles.Checked.Default
+    else LStateStyle := FStateStyles.UnChecked.Default;
+    FStateTransitionFrom := TBaseStateStyleClass(LStateStyle.classtype).Create(LStateStyle.Parent{AParent});
+    FStateTransitionFrom.Assign(LStateStyle);
+  end;
+  //--
+  if FStateTransitionTo = nil then begin
+    var LStateStyle : TBaseStateStyle;
+    if Checked then LStateStyle := FStateStyles.Checked.Default
+    else LStateStyle := FStateStyles.UnChecked.Default;
+    FStateTransitionTo := TBaseStateStyleClass(LStateStyle.classtype).Create(LStateStyle.Parent{AParent});
+    FStateTransitionTo.Assign(LStateStyle);
+  end;
+  //--
+  if _IsSameStateStyleClass(FStateTransitionTo, LCurrentStateStyle) then
+    exit;
+  //--
+  Var LStateTransitionAnimationCurrentValue: Single;
+  if (FStateTransitionAnimation.Enabled) and
+     (FStateTransitionAnimation.Tag <= 1{It means the animation never really ran}) then begin
+    // Free FStateTransitionFrom and FStateTransitionTo as we
+    // do not need them anymore.
+    ALFreeAndNil(FStateTransitionFrom);
+    ALFreeAndNil(FStateTransitionTo);
+    // Copy the values of FStateTransitionPrevFrom and FStateTransitionPrevTo into FStateTransitionFrom
+    // and FStateTransitionTo. Note that FStateTransitionFrom and FStateTransitionTo will not be freed later;
+    // therefore, we retain their instances in FStateTransitionPrevFrom and FStateTransitionPrevTo,
+    // from where they will be freed.
+    FStateTransitionFrom := FStateTransitionPrevFrom;
+    FStateTransitionTo := FStateTransitionPrevTo;
+    // If the animation has never run, initialize LStateTransitionAnimationCurrentValue
+    // from FStateTransitionAnimation.TagFloat, where we stored the previous version
+    // of FStateTransitionAnimation.CurrentValue.
+    LStateTransitionAnimationCurrentValue := FStateTransitionAnimation.TagFloat;
+  end
+  else begin
+    // Free FStateTransitionPrevFrom and FStateTransitionPrevTo as we
+    // do not need them anymore.
+    ALFreeandNil(FStateTransitionPrevFrom);
+    ALFreeandNil(FStateTransitionPrevTo);
+    // Copy the values of FStateTransitionPrevFrom and FStateTransitionPrevTo into FStateTransitionFrom
+    // and FStateTransitionTo. Note that FStateTransitionFrom and FStateTransitionTo will not be freed later;
+    // therefore, we retain their instances in FStateTransitionPrevFrom and FStateTransitionPrevTo,
+    // from where they will be freed.
+    FStateTransitionPrevFrom := FStateTransitionFrom;
+    FStateTransitionPrevTo := FStateTransitionTo;
+    // If the animation has run, initialize LStateTransitionAnimationCurrentValue
+    // from FStateTransitionAnimation.CurrentValue.
+    LStateTransitionAnimationCurrentValue := FStateTransitionAnimation.CurrentValue;
+  end;
+  //--
+  var LIsInReverseAnimation := False;
+  if (FStateTransitionAnimation.Enabled) and
+     (FCurrentAdjustedStateStyle <> nil) then begin
+    if _IsSameStateStyleClass(FStateTransitionFrom, LCurrentStateStyle) then
+      LIsInReverseAnimation := True;
+    //ALFreeAndNil(FStateTransitionFrom);
+    FStateTransitionFrom := TBaseStateStyleClass(FCurrentAdjustedStateStyle.classtype).Create(FCurrentAdjustedStateStyle.Parent{AParent});
+    FStateTransitionFrom.Assign(FCurrentAdjustedStateStyle);
+  end
+  else begin
+    //ALFreeAndNil(FStateTransitionFrom);
+    if FStateTransitionTo = nil then FStateTransitionFrom := nil
+    else begin
+      FStateTransitionFrom := TBaseStateStyleClass(FStateTransitionTo.classtype).Create(FStateTransitionTo.Parent{AParent});
+      FStateTransitionFrom.Assign(FStateTransitionTo);
+    end;
+  end;
+  //--
+  //ALFreeAndNil(FStateTransitionTo);
+  if LCurrentStateStyle = nil then FStateTransitionTo := nil
+  else begin
+    FStateTransitionTo := TBaseStateStyleClass(LCurrentStateStyle.classtype).Create(LCurrentStateStyle.parent{AParent});
+    FStateTransitionTo.Assign(LCurrentStateStyle);
+  end;
+  //--
+  FStateTransitionAnimation.Enabled := False;
+  FStateTransitionAnimation.Tag := 0;
+  FStateTransitionAnimation.TagFloat := LStateTransitionAnimationCurrentValue;
+  //--
+  if (FStateTransitionFrom = nil) and (FStateTransitionto = nil) then
+    exit;
+  //--
+  if FStateTransitionFrom <> nil then FStateTransitionFrom.SupersedeNoChanges(false{ASaveState});
+  if FStateTransitionTo <> nil then FStateTransitionTo.SupersedeNoChanges(false{ASaveState});
+  //--
+  var LTransition: TALStateTransition;
+  if (FStateTransitionFrom <> nil) and (FStateTransitionTo <> nil) then begin
+    // If we are coming from the Disabled state or transitioning to the Disabled state, then use the Disabled transition.
+    if (FStateTransitionFrom.ClassType = TDisabledStateStyle) then LTransition := FStateTransitionFrom.Transition
+    else if (FStateTransitionTo.ClassType = TDisabledStateStyle) then LTransition := FStateTransitionTo.Transition
+    // If we are coming from the Pressed state or transitioning to the Pressed state, then use the Pressed transition.
+    else if (FStateTransitionFrom.ClassType = TPressedStateStyle) then LTransition := FStateTransitionFrom.Transition
+    else if (FStateTransitionTo.ClassType = TPressedStateStyle) then LTransition := FStateTransitionTo.Transition
+    // Else if we are coming from the Focused state or transitioning to the Focused state, then use the Focused transition.
+    else if (FStateTransitionFrom.ClassType = TFocusedStateStyle) then LTransition := FStateTransitionFrom.Transition
+    else if (FStateTransitionTo.ClassType = TFocusedStateStyle) then LTransition := FStateTransitionTo.Transition
+    // Else If we are coming from the Hovered state or transitioning to the Hovered state, then use the Hovered transition.
+    else if (FStateTransitionFrom.ClassType = THoveredStateStyle) then LTransition := FStateTransitionFrom.Transition
+    else if (FStateTransitionTo.ClassType = THoveredStateStyle) then LTransition := FStateTransitionTo.Transition
+    // Else If we are coming from the Default state or transitioning to the Default state, then use the Default transition.
+    else if (FStateTransitionFrom.ClassType = TDefaultStateStyle) then LTransition := FStateTransitionFrom.Transition
+    else if (FStateTransitionTo.ClassType = TDefaultStateStyle) then LTransition := FStateTransitionTo.Transition
+    // Else their is an error somewhere
+    else raise Exception.Create('Error 76B212FA-5853-4A51-9A9D-8D3CCB7F3C7F');
+  end
+  else if FStateTransitionFrom <> nil then LTransition := FStateTransitionFrom.Transition
+  else if FStateTransitionTo <> nil then LTransition := FStateTransitionTo.Transition
+  else Raise Exception.Create('Error B2B17EF6-4F6A-4CBF-B1D6-C880B70D2141');
+  //--
+  var LDuration: Single := LTransition.Duration;
+  var LanimationType := LTransition.animationType;
+  var LInterpolation := LTransition.Interpolation;
+  //--
+  if SameValue(LDuration,0.0,TEpsilon.Scale) then
+    Exit;
+  //--
+  if LIsInReverseAnimation then FStateTransitionAnimation.Duration := LDuration * LStateTransitionAnimationCurrentValue
+  else FStateTransitionAnimation.Duration := LDuration;
+  FStateTransitionAnimation.StartValue := 0;
+  FStateTransitionAnimation.StopValue := 1;
+  FStateTransitionAnimation.AnimationType := LAnimationType;
+  FStateTransitionAnimation.Interpolation := LInterpolation;
+  FStateTransitionAnimation.Start;
+end;
+
+{**************************************************}
+procedure TALCheckbox.StateTransitionAnimationProcess(Sender: TObject);
+begin
+  FStateTransitionAnimation.Tag := FStateTransitionAnimation.Tag + 1;
+  Repaint;
+end;
+
+{**************************************************}
+procedure TALCheckbox.StateTransitionAnimationFinish(Sender: TObject);
+begin
+  FStateTransitionAnimation.Enabled := False;
+  Repaint;
+end;
+
 {***********************************}
 procedure TALCheckbox.clearBufDrawable;
 begin
   {$IFDEF debug}
-  if (not (csDestroying in ComponentState)) and
-     ((not ALIsDrawableNull(fBufCheckedDrawable)) or
-      (not ALIsDrawableNull(fBufCheckedDisabledDrawable)) or
-      (not ALIsDrawableNull(fBufCheckedHoveredDrawable)) or
-      (not ALIsDrawableNull(fBufCheckedPressedDrawable)) or
-      (not ALIsDrawableNull(fBufCheckedFocusedDrawable)) or
-      (not ALIsDrawableNull(fBufUnCheckedDrawable)) or
-      (not ALIsDrawableNull(fBufUnCheckedDisabledDrawable)) or
-      (not ALIsDrawableNull(fBufUnCheckedHoveredDrawable)) or
-      (not ALIsDrawableNull(fBufUnCheckedPressedDrawable)) or
-      (not ALIsDrawableNull(fBufUnCheckedFocusedDrawable))) then
+  if (FStateStyles <> nil) and
+     (not (csDestroying in ComponentState)) and
+     ((not ALIsDrawableNull(FStateStyles.Checked.Default.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Checked.Disabled.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Checked.Hovered.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Checked.Pressed.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.Checked.Focused.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.UnChecked.Default.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.UnChecked.Disabled.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.UnChecked.Hovered.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.UnChecked.Pressed.BufDrawable)) or
+      (not ALIsDrawableNull(FStateStyles.UnChecked.Focused.BufDrawable))) then
     ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
-  ALFreeAndNilDrawable(fBufCheckedDrawable);
-  ALFreeAndNilDrawable(fBufCheckedDisabledDrawable);
-  ALFreeAndNilDrawable(fBufCheckedHoveredDrawable);
-  ALFreeAndNilDrawable(fBufCheckedPressedDrawable);
-  ALFreeAndNilDrawable(fBufCheckedFocusedDrawable);
-  ALFreeAndNilDrawable(fBufUnCheckedDrawable);
-  ALFreeAndNilDrawable(fBufUnCheckedDisabledDrawable);
-  ALFreeAndNilDrawable(fBufUnCheckedHoveredDrawable);
-  ALFreeAndNilDrawable(fBufUnCheckedPressedDrawable);
-  ALFreeAndNilDrawable(fBufUnCheckedFocusedDrawable);
+  if FStateStyles <> nil then
+    FStateStyles.ClearBufDrawable;
+end;
+
+{************************************}
+procedure TALCheckbox.MakeBufDrawable;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _DoMakeBufDrawable(const AStateStyle: TBaseStateStyle): boolean;
+  begin
+    if (not ALIsDrawableNull(AStateStyle.BufDrawable)) then exit(False);
+    AStateStyle.SupersedeNoChanges(true{ASaveState});
+    try
+      CreateBufDrawable(
+        AStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
+        AStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
+        AStateStyle.Fill, // const AFill: TALBrush;
+        AStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
+        AStateStyle.CheckMark, // const ACheckMark: TCheckMarkBrush;
+        AStateStyle.Shadow); // const AShadow: TALShadow);
+    finally
+      AStateStyle.RestorestateNoChanges;
+    end;
+    Result := True;
+  end;
+
+begin
+  //--- Do not create BufDrawable if we are in the middle of a transition
+  if FStateTransitionAnimation.Enabled then
+    exit;
+  //--- Do not create BufDrawable if not DoubleBuffered
+  if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
+    clearBufDrawable;
+    exit;
+  end;
+  //--
+  if Checked then _DoMakeBufDrawable(StateStyles.Checked.Default)
+  else _DoMakeBufDrawable(StateStyles.UnChecked.Default);
+  //--
+  var LStateStyle := GetCurrentStateStyle;
+  if LStateStyle = nil then exit;
+  if LStateStyle.Inherit then exit;
+  _DoMakeBufDrawable(LStateStyle);
+  // No need to center LStateStyle.BufDrawableRect on the main BufDrawableRect
+  // because BufDrawableRect always has the width and height of the localRect.
+
 end;
 
 {**********************************}
@@ -3254,9 +3570,10 @@ procedure TALCheckbox.DrawCheckMark(
             const ACanvas: TALCanvas;
             const AScale: Single;
             const ADstRect: TrectF;
-            const ACheckMark: TCheckMarkBrush;
-            const AChecked: Boolean);
+            const AChecked: Boolean;
+            const ACheckMark: TCheckMarkBrush);
 begin
+
   var LRect := ADstRect;
   LRect.Top := LRect.Top * AScale;
   LRect.right := LRect.right * AScale;
@@ -3271,6 +3588,7 @@ begin
   LRect.right := LRect.right - LScaledMarginsRect.right;
   LRect.left := LRect.left + LScaledMarginsRect.left;
   LRect.bottom := LRect.bottom - LScaledMarginsRect.bottom;
+  if LRect.IsEmpty then exit;
 
   // Without ResourceName
   if ACheckMark.ResourceName = '' then begin
@@ -3281,7 +3599,7 @@ begin
       exit;
 
     // exit if not checked
-    if not checked then
+    if not Achecked then
       exit;
 
     // Try to find LPoint2.x so that LPoint1, LPoint2 and LPoint3 form
@@ -3415,13 +3733,12 @@ begin
   // With ResourceName
   else begin
 
-(*
     ALDrawRectangle(
       ACanvas, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
       LRect, // const ADstRect: TrectF;
       1, // const AOpacity: Single;
-      TAlphaColors.Null, // const AFillColor: TAlphaColor;
+      ACheckMark.Color, // const AFillColor: TAlphaColor;
       TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
       [], // const AFillGradientColors: TArray<TAlphaColor>;
       [], // const AFillGradientOffsets: TArray<Single>;
@@ -3431,6 +3748,12 @@ begin
       ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+      0, // const AStateLayerOpacity: Single;
+      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
+      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
+      0, // const AStateLayerXRadius: Single;
+      0, // const AStateLayerYRadius: Single;
+      False, // const ADrawStateLayerOnTop: Boolean;
       TAlphaColors.Null, // const AStrokeColor: TalphaColor;
       0, // const AStrokeThickness: Single;
       TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
@@ -3441,7 +3764,6 @@ begin
       AllCorners, // const ACorners: TCorners;
       0, // const AXRadius: Single;
       0); // const AYRadius: Single)
-*)
 
   end;
 
@@ -3450,47 +3772,29 @@ end;
 {**************************************}
 Procedure TALCheckbox.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
-            var ABufDrawableRect: TRectF;
+            out ABufDrawableRect: TRectF;
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStroke: TALStrokeBrush;
             const ACheckMark: TCheckMarkBrush;
             const AShadow: TALShadow);
 begin
-(*
+
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
   ABufDrawableRect := LocalRect;
-  var LRect := ABufDrawableRect;
-
-  if AFill.HasFill then begin
-    var LFillRect := LRect;
-    LfillRect.Inflate(-AFill.Padding.Left, -AFill.Padding.top, -AFill.Padding.right, -AFill.Padding.Bottom);
-    ABufDrawableRect := TRectF.Union(LfillRect, ABufDrawableRect); // add the extra space needed to draw the fill
-  end;
-
-  if AStateLayer.HasFill then begin
-    var LStateLayerRect := LRect;
-    LStateLayerRect.Inflate(-AStateLayer.Padding.Left, -AStateLayer.Padding.top, -AStateLayer.Padding.right, -AStateLayer.Padding.Bottom);
-    ABufDrawableRect := TRectF.Union(LStateLayerRect, ABufDrawableRect); // add the extra space needed to draw the StateLayer
-  end;
-
+  var LSurfaceRect := ALGetShapeSurfaceRect(
+                        ABufDrawableRect, // const ARect: TRectF;
+                        AFill, // const AFill: TALBrush;
+                        AStateLayer, // const AStateLayer: TALStateLayer;
+                        AShadow); // const AShadow: TALShadow): TRectF;
   if ACheckMark.HasCheckMark then begin
-    var LCheckMarkRect := LRect;
-    LCheckMarkRect.Inflate(-ACheckMark.Padding.Left, -ACheckMark.Padding.top, -ACheckMark.Padding.right, -ACheckMark.Padding.Bottom);
-    ABufDrawableRect := TRectF.Union(LCheckMarkRect, ABufDrawableRect); // add the extra space needed to draw the CheckMark
+    var LCheckMarkRect := ABufDrawableRect;
+    LCheckMarkRect.Inflate(-ACheckMark.margins.Left, -ACheckMark.margins.top, -ACheckMark.margins.right, -ACheckMark.margins.Bottom);
+    LSurfaceRect := TRectF.Union(LCheckMarkRect, LSurfaceRect);
   end;
-
-  if AShadow.HasShadow then begin
-    var LShadowWidth := ALGetShadowWidth(AShadow.blur);
-    var LShadowRect := LRect;
-    LShadowRect.Inflate(LShadowWidth, LShadowWidth);
-    LShadowRect.Offset(AShadow.OffsetX, AShadow.OffsetY);
-    ABufDrawableRect := TRectF.Union(LShadowRect, ABufDrawableRect); // add the extra space needed to draw the shadow
-  end;
-
-  ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale); // to have the pixel aligned width and height
-  LRect.Offset(Max(0, -ABufDrawableRect.Left), Max(0, -ABufDrawableRect.top));
+  LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+  ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
   var LSurface: TALSurface;
   var LCanvas: TALCanvas;
@@ -3498,256 +3802,307 @@ begin
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
     ALGetScreenScale, // const AScale: Single;
-    ABufDrawableRect.Width, // const w: integer;
-    ABufDrawableRect.height);// const h: integer)
+    LSurfaceRect.Width, // const w: integer;
+    LSurfaceRect.height);// const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
     try
 
+      var LStateLayerContentColor := ACheckMark.Color;
+      if LStateLayerContentColor = TalphaColors.Null then
+        LStateLayerContentColor := AStroke.Color;
+
       ALDrawRectangle(
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
-        LRect, // const Rect: TrectF;
+        ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
+        AStateLayer, // const StateLayer: TALStateLayer;
+        LStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
+        False, // const ADrawStateLayerOnTop: Boolean;
         AStroke, // const Stroke: TALStrokeBrush;
         AShadow, // const Shadow: TALShadow
-        ALLSides, // const Sides: TSides;
-        ALLCorners, // const Corners: TCorners;
+        AllSides, // const Sides: TSides;
+        AllCorners, // const Corners: TCorners;
         XRadius, // const XRadius: Single = 0;
         YRadius); // const YRadius: Single = 0);
-
-      if AStateLayer.HasFill then begin
-        ALDrawRectangle(
-          LCanvas, // const ACanvas: TALCanvas;
-          ALGetScreenScale, // const AScale: Single;
-          LRect, // const Rect: TrectF;
-          1, // const AOpacity: Single;
-          AStateLayer, // const Fill: TALBrush;
-          nil, // const Stroke: TALStrokeBrush;
-          nil, // const Shadow: TALShadow
-          AllSides, // const Sides: TSides;
-          AllCorners, // const Corners: TCorners;
-          -50, // const XRadius: Single = 0;
-          -50); // const YRadius: Single = 0);
-      end;
 
       DrawCheckMark(
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
-        LRect, // const ADstRect: TrectF;
-        ACheckMark, // const ACheckMark: TCheckMarkBrush;
-        FChecked); // const AChecked: Boolean
+        ABufDrawableRect, // const ADstRect: TrectF;
+        FChecked, // const AChecked: Boolean
+        ACheckMark); // const ACheckMark: TCheckMarkBrush;
 
     finally
       ALCanvasEndScene(LCanvas)
     end;
 
-    ABufDrawable := ALSurfaceToDrawable(LSurface);
+    ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+    // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+    // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
 
   finally
     ALFreeAndNilSurface(LSurface, LCanvas);
   end;
-*)
-end;
 
-{************************************}
-procedure TALCheckbox.MakeBufDrawable;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _MakeBufDrawable(
-              const AStateStyle: TBaseStateStyle;
-              var ABufDrawable: TALDrawable;
-              var ABufDrawableRect: TRectF);
-  begin
-    if (AStateStyle <> StateStyles.Checked.Default) and
-       (AStateStyle <> StateStyles.UnChecked.Default) and
-       (AStateStyle.Inherit) then exit;
-    if (not ALIsDrawableNull(ABufDrawable)) then exit;
-    AStateStyle.SupersedeNoChanges(true{ASaveState});
-    try
-      //--
-      CreateBufDrawable(
-        ABufDrawable, // var ABufDrawable: TALDrawable;
-        ABufDrawableRect, // var ABufDrawableRect: TRectF;
-        AStateStyle.Fill, // const AFill: TALBrush;
-        AStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
-        AStateStyle.Stroke, // const AStroke: TALStrokeBrush;
-        AStateStyle.CheckMark, // const ACheckMark: TCheckMarkBrush;
-        AStateStyle.Shadow); // const AShadow: TALShadow);
-
-(*
-      // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.
-      // However, the fBufDrawableRect rectangle is offset by the shadow's dx and dy values,
-      // if a shadow is applied, to adjust for the visual shift caused by the shadow.
-      var LMainDrawableRect := BufDrawableRect;
-      LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
-      var LCenteredRect := ABufDrawableRect.CenterAt(LMainDrawableRect);
-      ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
-      ABufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
-*)
-    finally
-      AStateStyle.RestoreStateNoChanges;
-    end;
-  end;
-
-begin
-  if FChecked then begin
-    _MakeBufDrawable(
-      StateStyles.Checked.Default, // const AStateStyle: TALButtonStateStyle;
-      FBufCheckedDrawable, // var ABufDrawable: TALDrawable;
-      FBufCheckedDrawableRect); // var ABufDrawableRect: TRectF;
-    if Not Enabled then begin
-      _MakeBufDrawable(
-        StateStyles.Checked.Disabled, // const AStateStyle: TALButtonStateStyle;
-        FBufCheckedDisabledDrawable, // var ABufDrawable: TALDrawable;
-        FBufCheckedDisabledDrawableRect); // var ABufDrawableRect: TRectF;
-    end
-    else if Pressed then begin
-      _MakeBufDrawable(
-        StateStyles.Checked.Pressed, // const AStateStyle: TALButtonStateStyle;
-        FBufCheckedPressedDrawable, // var ABufDrawable: TALDrawable;
-        FBufCheckedPressedDrawableRect); // var ABufDrawableRect: TRectF;
-    end
-    else if IsFocused then begin
-      _MakeBufDrawable(
-        StateStyles.Checked.Focused, // const AStateStyle: TALButtonStateStyle;
-        FBufCheckedFocusedDrawable, // var ABufDrawable: TALDrawable;
-        FBufCheckedFocusedDrawableRect); // var ABufDrawableRect: TRectF;
-    end
-    else if IsMouseOver then begin
-      _MakeBufDrawable(
-        StateStyles.Checked.Hovered, // const AStateStyle: TALButtonStateStyle;
-        FBufCheckedHoveredDrawable, // var ABufDrawable: TALDrawable;
-        FBufCheckedHoveredDrawableRect); // var ABufDrawableRect: TRectF;
-    end;
-  end
-  else begin
-    _MakeBufDrawable(
-      StateStyles.UnChecked.Default, // const AStateStyle: TALButtonStateStyle;
-      FBufUnCheckedDrawable, // var ABufDrawable: TALDrawable;
-      FBufUnCheckedDrawableRect); // var ABufDrawableRect: TRectF;
-    if Not Enabled then begin
-      _MakeBufDrawable(
-        StateStyles.UnChecked.Disabled, // const AStateStyle: TALButtonStateStyle;
-        FBufUnCheckedDisabledDrawable, // var ABufDrawable: TALDrawable;
-        FBufUnCheckedDisabledDrawableRect); // var ABufDrawableRect: TRectF;
-    end
-    else if Pressed then begin
-      _MakeBufDrawable(
-        StateStyles.UnChecked.Pressed, // const AStateStyle: TALButtonStateStyle;
-        FBufUnCheckedPressedDrawable, // var ABufDrawable: TALDrawable;
-        FBufUnCheckedPressedDrawableRect); // var ABufDrawableRect: TRectF;
-    end
-    else if IsFocused then begin
-      _MakeBufDrawable(
-        StateStyles.UnChecked.Focused, // const AStateStyle: TALButtonStateStyle;
-        FBufUnCheckedFocusedDrawable, // var ABufDrawable: TALDrawable;
-        FBufUnCheckedFocusedDrawableRect); // var ABufDrawableRect: TRectF;
-    end
-    else if IsMouseOver then begin
-      _MakeBufDrawable(
-        StateStyles.UnChecked.Hovered, // const AStateStyle: TALButtonStateStyle;
-        FBufUnCheckedHoveredDrawable, // var ABufDrawable: TALDrawable;
-        FBufUnCheckedHoveredDrawableRect); // var ABufDrawableRect: TRectF;
-    end;
-  end;
 end;
 
 {**************************}
 procedure TALCheckbox.Paint;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _DrawCheckBox(const AFromStateStyle: TBaseStateStyle; const AToStateStyle: TBaseStateStyle);
+  type
+    TBaseStateStyleClass = class of TBaseStateStyle;
+  begin
+
+    var LStateStyle := AToStateStyle;
+    if LStateStyle = nil then LStateStyle := AFromStateStyle;
+    if LStateStyle = nil then
+      raise Exception.Create('Error 45CB6D22-AB78-4857-B03F-1636E5184C12');
+    //--
+    if (FCurrentAdjustedStateStyle = nil) or
+       (FCurrentAdjustedStateStyle.ClassType <> LStateStyle.ClassType) then begin
+      ALFreeAndNil(FCurrentAdjustedStateStyle);
+      FCurrentAdjustedStateStyle := TBaseStateStyleClass(LStateStyle.classtype).Create(LStateStyle.parent{AParent});
+    end;
+    FCurrentAdjustedStateStyle.Assign(LStateStyle);
+    FCurrentAdjustedStateStyle.SupersedeNoChanges(false{ASaveState});
+    //--
+    if FStateTransitionAnimation.Enabled then begin
+      if AToStateStyle = nil then FCurrentAdjustedStateStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FStateTransitionAnimation.CurrentValue)
+      else if AFromStateStyle = nil then FCurrentAdjustedStateStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FStateTransitionAnimation.CurrentValue)
+      else begin
+        {$IF defined(debug)}
+        if not AFromStateStyle.Superseded then
+          raise Exception.Create('Error 3A71A6B7-40C3-40A6-B678-D1FC6A0DD152');
+        {$ENDIF}
+        FCurrentAdjustedStateStyle{AToStateStyle}.InterpolateNoChanges(AFromStateStyle{AFromStateStyle}, 1-FStateTransitionAnimation.CurrentValue);
+      end;
+    end;
+
+    // Using a matrix on the canvas results in smoother animations compared to using
+    // Ascale with DrawMultilineText. This is because changes in scale affect the font size,
+    // leading to rounding issues (I spent many hours looking for a way to avoid this).
+    // If there is an animation, it appears jerky because the text position
+    // shifts up or down with scale changes due to pixel alignment.
+    var LCanvasSaveState: TCanvasSaveState := nil;
+    if (not samevalue(FCurrentAdjustedStateStyle.Scale.X, 1, TEpsilon.Scale)) or
+       (not samevalue(FCurrentAdjustedStateStyle.Scale.Y, 1, TEpsilon.Scale)) then begin
+      LCanvasSaveState := Canvas.SaveState;
+      Var LAbsoluteRect := AbsoluteRect;
+      var LMatrix := TMatrix.CreateTranslation(-LAbsoluteRect.Left, -LAbsoluteRect.Top);
+      LMatrix := LMatrix * TMatrix.CreateScaling(FCurrentAdjustedStateStyle.Scale.x, FCurrentAdjustedStateStyle.Scale.y);
+      LMatrix := LMatrix * TMatrix.CreateTranslation(
+                             LAbsoluteRect.Left - (((LAbsoluteRect.Width * FCurrentAdjustedStateStyle.Scale.x) - LAbsoluteRect.Width) / 2),
+                             LAbsoluteRect.Top - (((LAbsoluteRect.height * FCurrentAdjustedStateStyle.Scale.y) - LAbsoluteRect.Height) / 2));
+      Canvas.SetMatrix(Canvas.Matrix * LMatrix);
+    end;
+    try
+
+      var LStateLayerContentColor := FCurrentAdjustedStateStyle.CheckMark.Color;
+      if LStateLayerContentColor = TalphaColors.Null then
+        LStateLayerContentColor :=  FCurrentAdjustedStateStyle.Stroke.Color;
+
+      {$IF DEFINED(ALSkiaCanvas)}
+
+      var LRect := LocalRect;
+
+      if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then begin
+        var LLayerRect := ALGetShapeSurfaceRect(
+                            LRect, // const ARect: TrectF;
+                            FCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
+                            FCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
+                            FCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
+                            FCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
+                            FCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
+                            FCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
+                            FCurrentAdjustedStateStyle.StateLayer.Color, // const AStateLayerColor: TAlphaColor;
+                            FCurrentAdjustedStateStyle.StateLayer.UseContentColor, // const AStateLayerUseContentColor: Boolean;
+                            FCurrentAdjustedStateStyle.StateLayer.Margins.Rect, // Const AStateLayerMarginsRect: TRectF;
+                            FCurrentAdjustedStateStyle.Shadow.Color, // const AShadowColor: TAlphaColor;
+                            FCurrentAdjustedStateStyle.Shadow.Blur, // const AShadowBlur: Single;
+                            FCurrentAdjustedStateStyle.Shadow.OffsetX, // const AShadowOffsetX: Single;
+                            FCurrentAdjustedStateStyle.Shadow.OffsetY); // const AShadowOffsetY: Single);
+        ALBeginTransparencyLayer(
+          TSkCanvasCustom(Canvas).Canvas.Handle, // const aCanvas: TALCanvas;
+          LLayerRect, // const ARect: TRectF;
+          AbsoluteOpacity); // const AOpacity: Single);
+      end;
+      try
+
+        ALDrawRectangle(
+          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+          1, // const AScale: Single;
+          LRect, // const Rect: TrectF;
+          1, // const AOpacity: Single;
+          FCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          FCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
+          LStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
+          False, // const ADrawStateLayerOnTop: Boolean;
+          FCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
+          FCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
+          AllSides, // const Sides: TSides;
+          AllCorners, // const Corners: TCorners;
+          XRadius, // const XRadius: Single = 0;
+          YRadius); // const YRadius: Single = 0);
+
+        DrawCheckMark(
+          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+          1, // const AScale: Single;
+          LRect, // const ADstRect: TrectF;
+          FChecked, // const AChecked: Boolean
+          FCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+      finally
+        if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then
+          ALEndTransparencyLayer(TSkCanvasCustom(Canvas).Canvas.Handle);
+      end;
+
+      {$ELSE}
+
+      if FStateTransitionAnimation.Enabled then begin
+
+        var LRect := LocalRect;
+        var LSurfaceRect := LRect;
+        if AFromStateStyle <> nil then begin
+          var LFromSurfaceRect := ALGetShapeSurfaceRect(
+                                    LRect, // const ARect: TRectF;
+                                    AFromStateStyle.Fill, // const AFill: TALBrush;
+                                    AFromStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+                                    AFromStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
+          LSurfaceRect := TRectF.Union(LSurfaceRect, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+        end;
+        if AToStateStyle <> nil then begin
+          var LToSurfaceRect := ALGetShapeSurfaceRect(
+                                  LRect, // const ARect: TRectF;
+                                  AToStateStyle.Fill, // const AFill: TALBrush;
+                                  AToStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
+                                  AToStateStyle.Shadow); // const AShadow: TALShadow): TRectF;
+          LSurfaceRect := TRectF.Union(LSurfaceRect, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+        end;
+        LRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+
+        if (ALIsDrawableNull(FStateTransitionBufDrawable)) or
+           (CompareValue(ALGetDrawableWidth(FStateTransitionBufDrawable), LSurfaceRect.Width, TEpsilon.Position) < 0) or
+           (CompareValue(ALGetDrawableHeight(FStateTransitionBufDrawable), LSurfaceRect.Height, TEpsilon.Position) < 0) then begin
+          LSurfaceRect.Width := LSurfaceRect.Width * 1.5{to be on the safe side};
+          LSurfaceRect.height := LSurfaceRect.height * 1.5{to be on the safe side};
+          ALFreeAndNilDrawable(FStateTransitionBufDrawable);
+          ALFreeAndNilSurface(FStateTransitionBufSurface, FStateTransitionBufCanvas);
+          ALCreateSurface(
+            FStateTransitionBufSurface, // out ASurface: TALSurface;
+            FStateTransitionBufCanvas, // out ACanvas: TALCanvas;
+            ALGetScreenScale{Ascale},
+            LSurfaceRect.width, // const w: Single;
+            LSurfaceRect.height); // const h: Single);
+          {$IF defined(ALSkiaCanvas)}
+          Raise Exception.create('Error 71AD6B8B-AF32-468D-818A-168EFC96C368')
+          {$ELSEIF defined(ALGpuCanvas)}
+          FStateTransitionBufDrawable := TALTexture.Create;
+          FStateTransitionBufDrawable.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+          FStateTransitionBufDrawable.SetSize(ALCeil(LSurfaceRect.width * ALGetScreenScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * ALGetScreenScale, TEpsilon.Position));
+          FStateTransitionBufDrawable.PixelFormat := ALGetDefaultPixelFormat;
+          {$ELSE}
+          FStateTransitionBufDrawable := TBitmap.Create(ALCeil(LSurfaceRect.width, TEpsilon.Position), ALCeil(LSurfaceRect.height, TEpsilon.Position));
+          {$ENDIF};
+        end;
+
+        ALClearCanvas(FStateTransitionBufCanvas, TAlphaColors.Null);
+
+        ALDrawRectangle(
+          FStateTransitionBufCanvas, // const ACanvas: TALCanvas;
+          ALGetScreenScale, // const AScale: Single;
+          LRect, // const Rect: TrectF;
+          1, // const AOpacity: Single;
+          FCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          FCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
+          LStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
+          False, // const ADrawStateLayerOnTop: Boolean;
+          FCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
+          FCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
+          AllSides, // const Sides: TSides;
+          AllCorners, // const Corners: TCorners;
+          XRadius, // const XRadius: Single = 0;
+          YRadius); // const YRadius: Single = 0);
+
+        DrawCheckMark(
+          FStateTransitionBufCanvas, // const ACanvas: TALCanvas;
+          ALGetScreenScale, // const AScale: Single;
+          LRect, // const ADstRect: TrectF;
+          FChecked, // const AChecked: Boolean
+          FCurrentAdjustedStateStyle.CheckMark); // const ACheckMark: TCheckMarkBrush;
+
+        // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+        // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+        LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+
+        ALUpdateDrawableFromSurface(FStateTransitionBufSurface, FStateTransitionBufDrawable);
+        ALDrawDrawable(
+          Canvas, // const ACanvas: Tcanvas;
+          FStateTransitionBufDrawable, // const ADrawable: TALDrawable;
+          LRect.TopLeft, // const ADstTopLeft: TpointF;
+          AbsoluteOpacity); // const AOpacity: Single)
+
+      end
+
+      {$IF defined(DEBUG)}
+      else if not doublebuffered then
+        raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
+      {$ENDIF}
+
+      {$ENDIF}
+
+    finally
+      if LCanvasSaveState <> nil then
+        Canvas.RestoreState(LCanvasSaveState);
+    end;
+
+  end;
+
 begin
 
   MakeBufDrawable;
 
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
-
-  if Fchecked then begin
-    if Not Enabled then begin
-      LDrawable := fBufCheckedDisabledDrawable;
-      LDrawableRect := fBufCheckedDisabledDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufCheckedDrawable;
-        LDrawableRect := fBufCheckedDrawableRect;
+  var LStateStyle := GetCurrentStateStyle;
+  if FStateTransitionAnimation.Enabled then begin
+    LDrawable := ALNullDrawable;
+    LDrawableRect := TRectF.Empty;
+  end
+  else if LStateStyle <> nil then begin
+    LDrawable := LStateStyle.BufDrawable;
+    LDrawableRect := LStateStyle.BufDrawableRect;
+    if ALIsDrawableNull(LDrawable) then begin
+      if checked then begin
+        LDrawable := StateStyles.Checked.default.BufDrawable;
+        LDrawableRect := StateStyles.Checked.default.BufDrawableRect;
+      end
+      else begin
+        LDrawable := StateStyles.UnChecked.default.BufDrawable;
+        LDrawableRect := StateStyles.UnChecked.default.BufDrawableRect;
       end;
-    end
-    //--
-    else if Pressed then begin
-      LDrawable := fBufCheckedPressedDrawable;
-      LDrawableRect := fBufCheckedPressedDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufCheckedDrawable;
-        LDrawableRect := fBufCheckedDrawableRect;
-      end;
-    end
-    //--
-    else if IsFocused then begin
-      LDrawable := fBufCheckedFocusedDrawable;
-      LDrawableRect := fBufCheckedFocusedDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufCheckedDrawable;
-        LDrawableRect := fBufCheckedDrawableRect;
-      end;
-    end
-    //--
-    else if IsMouseOver then begin
-      LDrawable := fBufCheckedHoveredDrawable;
-      LDrawableRect := fBufCheckedHoveredDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufCheckedDrawable;
-        LDrawableRect := fBufCheckedDrawableRect;
-      end;
-    end
-    //--
-    else begin
-      LDrawable := fBufCheckedDrawable;
-      LDrawableRect := fBufCheckedDrawableRect;
     end;
   end
-  else begin
-    if Not Enabled then begin
-      LDrawable := fBufUnCheckedDisabledDrawable;
-      LDrawableRect := fBufUnCheckedDisabledDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufUnCheckedDrawable;
-        LDrawableRect := fBufUnCheckedDrawableRect;
-      end;
-    end
-    //--
-    else if Pressed then begin
-      LDrawable := fBufUnCheckedPressedDrawable;
-      LDrawableRect := fBufUnCheckedPressedDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufUnCheckedDrawable;
-        LDrawableRect := fBufUnCheckedDrawableRect;
-      end;
-    end
-    //--
-    else if IsFocused then begin
-      LDrawable := fBufUnCheckedFocusedDrawable;
-      LDrawableRect := fBufUnCheckedFocusedDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufUnCheckedDrawable;
-        LDrawableRect := fBufUnCheckedDrawableRect;
-      end;
-    end
-    //--
-    else if IsMouseOver then begin
-      LDrawable := fBufUnCheckedHoveredDrawable;
-      LDrawableRect := fBufUnCheckedHoveredDrawableRect;
-      if ALIsDrawableNull(LDrawable) then begin
-        LDrawable := fBufUnCheckedDrawable;
-        LDrawableRect := fBufUnCheckedDrawableRect;
-      end;
-    end
-    //--
+  else
+    raise Exception.Create('Error #EA9B4064-F1D2-4E04-82FE-99FD3ED8B1F3');
+
+  if ALIsDrawableNull(LDrawable) then begin
+    if FStateTransitionAnimation.Enabled then _DrawCheckBox(FStateTransitionFrom, FStateTransitionTo)
+    else if LStateStyle <> nil then _DrawCheckBox(LStateStyle, LStateStyle)
     else begin
-      LDrawable := fBufUnCheckedDrawable;
-      LDrawableRect := fBufUnCheckedDrawableRect;
+      ALFreeAndNil(FCurrentAdjustedStateStyle);
+      inherited Paint;
     end;
-  end;
+    exit;
+  end
+  else
+    ALFreeAndNil(FCurrentAdjustedStateStyle);
 
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
@@ -3759,10 +4114,34 @@ end;
 
 {****************************************************}
 constructor TALRadioButton.Create(AOwner: TComponent);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure _UpdateCheckMark(const aCheckMark: TCheckMarkBrush);
+  begin
+    var LCheckMarkChanged: TNotifyEvent := ACheckMark.OnChanged;
+    ACheckMark.OnChanged := nil;
+    ACheckMark.Margins.DefaultValue := TRectF.Create(5,5,5,5);
+    ACheckMark.Margins.Rect := CheckMark.Margins.DefaultValue;
+    ACheckMark.OnChanged := LCheckMarkChanged;
+  end;
+
 begin
   inherited;
   FGroupName := '';
   fMandatory := false;
+  FXRadius := -50;
+  FYRadius := -50;
+  _UpdateCheckMark(CheckMark);
+  _UpdateCheckMark(StateStyles.Checked.Default.CheckMark);
+  _UpdateCheckMark(StateStyles.Checked.Disabled.CheckMark);
+  _UpdateCheckMark(StateStyles.Checked.Hovered.CheckMark);
+  _UpdateCheckMark(StateStyles.Checked.Pressed.CheckMark);
+  _UpdateCheckMark(StateStyles.Checked.Focused.CheckMark);
+  _UpdateCheckMark(StateStyles.UnChecked.Default.CheckMark);
+  _UpdateCheckMark(StateStyles.UnChecked.Disabled.CheckMark);
+  _UpdateCheckMark(StateStyles.UnChecked.Hovered.CheckMark);
+  _UpdateCheckMark(StateStyles.UnChecked.Pressed.CheckMark);
+  _UpdateCheckMark(StateStyles.UnChecked.Focused.CheckMark);
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
@@ -3775,20 +4154,24 @@ end;
 
 {********************************************************}
 procedure TALRadioButton.SetChecked(const Value: Boolean);
-var M: TRadioButtonGroupMessage;
 begin
   if FChecked <> Value then begin
-    if (csDesigning in ComponentState) and FChecked then FChecked := Value // allows check/uncheck in design-mode
+    if (csDesigning in ComponentState) and FChecked then inherited SetChecked(Value) // allows check/uncheck in design-mode
     else begin
       if (not value) and fMandatory then exit;
-      FChecked := Value;
+      inherited SetChecked(Value);
       if Value then begin
-        M := TRadioButtonGroupMessage.Create(GroupName);
+        var M := TRadioButtonGroupMessage.Create(GroupName);
         TMessageManager.DefaultManager.SendMessage(Self, M, True);
       end;
     end;
-    DoChanged;
   end;
+end;
+
+{******************************************}
+function TALRadioButton.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(20, 20);
 end;
 
 {*******************************************}
@@ -3799,11 +4182,10 @@ end;
 
 {**********************************************************************************}
 procedure TALRadioButton.GroupMessageCall(const Sender: TObject; const M: TMessage);
-var LOldMandatory: Boolean;
 begin
   if SameText(TRadioButtonGroupMessage(M).GroupName, GroupName) and (Sender <> Self) and (Scene <> nil) and
      (not (Sender is TControl) or ((Sender as TControl).Scene = Scene)) then begin
-    LOldMandatory := fMandatory;
+    var LOldMandatory := fMandatory;
     fMandatory := False;
     try
       Checked := False;
@@ -3815,24 +4197,116 @@ end;
 
 {***********************************************}
 function TALRadioButton.GroupNameStored: Boolean;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function _GroupNameIsSet(AGroupName: string): Boolean;
-  begin
-    AGroupName := AGroupName.Trim;
-    Result := (not AGroupName.IsEmpty) and (AGroupName <> '0') and (AGroupName <> '-1');
-  end;
-
 begin
-  Result := _GroupNameIsSet(FGroupName);
+  Result := FGroupName <> '';
 end;
 
 {*********************************************************}
 procedure TALRadioButton.SetGroupName(const Value: string);
-var S: string;
 begin
-  S := Value.Trim;
-  if FGroupName <> S then FGroupName := Value;
+  if FGroupName <> Value then
+    FGroupName := Value;
+end;
+
+{*************************}
+procedure TALRadioButton.DrawCheckMark(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const ADstRect: TrectF;
+            const AChecked: Boolean;
+            const ACheckMark: TALCheckBox.TCheckMarkBrush);
+begin
+
+  var LRect := ADstRect;
+  LRect.Top := LRect.Top * AScale;
+  LRect.right := LRect.right * AScale;
+  LRect.left := LRect.left * AScale;
+  LRect.bottom := LRect.bottom * AScale;
+  var LScaledMarginsRect := ACheckMark.Margins.Rect;
+  LScaledMarginsRect.Left := LScaledMarginsRect.Left * AScale;
+  LScaledMarginsRect.right := LScaledMarginsRect.right * AScale;
+  LScaledMarginsRect.top := LScaledMarginsRect.top * AScale;
+  LScaledMarginsRect.bottom := LScaledMarginsRect.bottom * AScale;
+  LRect.Top := LRect.Top + LScaledMarginsRect.top;
+  LRect.right := LRect.right - LScaledMarginsRect.right;
+  LRect.left := LRect.left + LScaledMarginsRect.left;
+  LRect.bottom := LRect.bottom - LScaledMarginsRect.bottom;
+  if LRect.IsEmpty then exit;
+
+  // Without ResourceName
+  if ACheckMark.ResourceName = '' then begin
+
+    // exit if not checked
+    if not AChecked then
+      exit;
+
+    ALDrawCircle(
+      ACanvas, // const ACanvas: TALCanvas;
+      1, // const AScale: Single;
+      LRect, // const ADstRect: TrectF;
+      1, // const AOpacity: Single;
+      ACheckMark.Color, // const AFillColor: TAlphaColor;
+      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
+      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      ACheckMark.ResourceName, // const AFillResourceName: String;
+      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
+      TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+      0, // const AStateLayerOpacity: Single;
+      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
+      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
+      0, // const AStateLayerXRadius: Single;
+      0, // const AStateLayerYRadius: Single;
+      False, // const ADrawStateLayerOnTop: Boolean;
+      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
+      0, // const AStrokeThickness: Single;
+      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+      0, // const AShadowBlur: Single;
+      0, // const AShadowOffsetX: Single;
+      0); // const AShadowOffsetY: Single;
+
+  end
+
+  // With ResourceName
+  else begin
+
+    ALDrawRectangle(
+      ACanvas, // const ACanvas: TALCanvas;
+      1, // const AScale: Single;
+      LRect, // const ADstRect: TrectF;
+      1, // const AOpacity: Single;
+      ACheckMark.Color, // const AFillColor: TAlphaColor;
+      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
+      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      ACheckMark.ResourceName, // const AFillResourceName: String;
+      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
+      TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+      0, // const AStateLayerOpacity: Single;
+      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
+      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
+      0, // const AStateLayerXRadius: Single;
+      0, // const AStateLayerYRadius: Single;
+      False, // const ADrawStateLayerOnTop: Boolean;
+      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
+      0, // const AStrokeThickness: Single;
+      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+      0, // const AShadowBlur: Single;
+      0, // const AShadowOffsetX: Single;
+      0, // const AShadowOffsetY: Single;
+      AllSides, // const ASides: TSides;
+      AllCorners, // const ACorners: TCorners;
+      0, // const AXRadius: Single;
+      0); // const AYRadius: Single)
+
+  end;
+
 end;
 
 {****************************************************}
@@ -4197,8 +4671,13 @@ begin
       TextSettings.Interpolate(ATo.TextSettings, ANormalizedTime);
     end
     else if StateStyleParent <> nil then begin
-      Text := StateStyleParent.Text;
-      TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime);
+      StateStyleParent.SupersedeNoChanges(true{ASaveState});
+      try
+        Text := StateStyleParent.Text;
+        TextSettings.Interpolate(StateStyleParent.TextSettings, ANormalizedTime);
+      finally
+        StateStyleParent.RestoreStateNoChanges;
+      end;
     end
     else if ControlParent <> nil then begin
       Text := ControlParent.Text;
@@ -4371,7 +4850,6 @@ begin
   result := TPressedStateTransition.Create(0{ADefaultDuration})
 end;
 
-
 {*************************************}
 constructor TALButton.TStateStyles.Create(const AParent: TALButton);
 begin
@@ -4501,33 +4979,43 @@ end;
 {***********************************************}
 constructor TALButton.Create(AOwner: TComponent);
 begin
-  inherited Create(AOwner);
-  //--
   {$IF defined(ALDPK)}
-  FPrevStateStyles := TStateStyles.Create(nil);
+  FPrevStateStyles := nil;
   {$ENDIF}
+  FStateStyles := nil;
   //--
-  FStateStyles := TStateStyles.Create(self);
-  FStateStyles.OnChanged := StateStylesChanged;
+  inherited Create(AOwner);
   //--
   CanFocus := True;
   HitTest := True;
   AutoSize := True;
   Cursor := crHandPoint;
   //--
+  var LFillChanged: TNotifyEvent := fill.OnChanged;
+  fill.OnChanged := nil;
   Fill.DefaultColor := $ffe1e1e1;
   Fill.Color := Fill.DefaultColor;
+  fill.OnChanged := LFillChanged;
   //--
+  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
+  stroke.OnChanged := Nil;
   Stroke.DefaultColor := $ffadadad;
   Stroke.Color := Stroke.DefaultColor;
+  stroke.OnChanged := LStrokeChanged;
   //--
+  var LTextSettingsChanged: TNotifyEvent := TextSettings.OnChanged;
+  TextSettings.OnChanged := nil;
   TextSettings.Font.DefaultWeight := TFontWeight.medium;
   TextSettings.Font.Weight := TextSettings.Font.DefaultWeight;
   TextSettings.DefaultHorzAlign := TALTextHorzAlign.center;
   TextSettings.HorzAlign := TextSettings.DefaultHorzAlign;
+  TextSettings.OnChanged := LTextSettingsChanged;
   //--
+  var LPaddingChange: TNotifyEvent := Padding.OnChange;
+  Padding.OnChange := nil;
   Padding.DefaultValue := TRectF.create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
   Padding.Rect := Padding.DefaultValue;
+  padding.OnChange := LPaddingChange;
   //--
   FStateTransitionAnimation := TALFloatAnimation.Create;
   FStateTransitionAnimation.OnProcess := StateTransitionAnimationProcess;
@@ -4545,6 +5033,13 @@ begin
   FStateTransitionClickDelayed := False;
   //--
   FCurrentAdjustedStateStyle := nil;
+  //--
+  {$IF defined(ALDPK)}
+  FPrevStateStyles := TStateStyles.Create(nil);
+  {$ENDIF}
+  //--
+  FStateStyles := TStateStyles.Create(self);
+  FStateStyles.OnChanged := StateStylesChanged;
 end;
 
 {***************************}
@@ -4675,10 +5170,12 @@ procedure TALButton.TextSettingsChanged(Sender: TObject);
 
 begin
   {$IF defined(ALDPK)}
-  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-  _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
   {$ENDIF}
   inherited;
 end;
@@ -4701,10 +5198,12 @@ procedure TALButton.SetXRadius(const Value: Single);
 begin
   inherited;
   {$IF defined(ALDPK)}
-  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-  _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
   {$ENDIF}
 end;
 
@@ -4726,10 +5225,12 @@ procedure TALButton.SetYRadius(const Value: Single);
 begin
   inherited;
   {$IF defined(ALDPK)}
-  _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
-  _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
-  _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
-  _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  if (StateStyles <> nil) and (FPrevStateStyles <> nil) then begin
+    _PropagateChanges(FPrevStateStyles.Disabled, StateStyles.Disabled);
+    _PropagateChanges(FPrevStateStyles.Hovered, StateStyles.Hovered);
+    _PropagateChanges(FPrevStateStyles.Pressed, StateStyles.Pressed);
+    _PropagateChanges(FPrevStateStyles.Focused, StateStyles.Focused);
+  end;
   {$ENDIF}
 end;
 
@@ -5014,13 +5515,12 @@ begin
     LStateStyle.BufDrawableRect.left := LStateStyle.BufDrawableRect.left * LScale;
     LStateStyle.BufDrawableRect.bottom := LStateStyle.BufDrawableRect.bottom * LScale;
 
-    // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.
-    // However, the fBufDrawableRect rectangle is offset by the shadow's dx and dy values,
-    // if a shadow is applied, to adjust for the visual shift caused by the shadow.
+    // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
+    // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
+    // within the main BufDrawableRect to ensure that all changes are visually centered.
     var LMainDrawableRect := BufDrawableRect;
     LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
     var LCenteredRect := LStateStyle.BufDrawableRect.CenterAt(LMainDrawableRect);
-    LStateStyle.BufDrawableRect.Offset(-2*LStateStyle.BufDrawableRect.Left, -2*LStateStyle.BufDrawableRect.Top);
     LStateStyle.BufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 
   finally
@@ -5084,7 +5584,7 @@ procedure TALButton.Paint;
     // shifts up or down with scale changes due to pixel alignment.
     var LCanvasSaveState: TCanvasSaveState := nil;
     if (not samevalue(FCurrentAdjustedStateStyle.Scale.X, 1, TEpsilon.Scale)) or
-       (not samevalue(FCurrentAdjustedStateStyle.Scale.X, 1, TEpsilon.Scale)) then begin
+       (not samevalue(FCurrentAdjustedStateStyle.Scale.Y, 1, TEpsilon.Scale)) then begin
       LCanvasSaveState := Canvas.SaveState;
       Var LAbsoluteRect := AbsoluteRect;
       var LMatrix := TMatrix.CreateTranslation(-LAbsoluteRect.Left, -LAbsoluteRect.Top);
@@ -5192,13 +5692,16 @@ procedure TALButton.Paint;
           FCurrentAdjustedStateStyle.Stroke, // const AStroke: TALStrokeBrush;
           FCurrentAdjustedStateStyle.Shadow); // const AShadow: TALShadow);
 
-        // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.
-        // However, the fBufDrawableRect rectangle is offset by the shadow's dx and dy values,
-        // if a shadow is applied, to adjust for the visual shift caused by the shadow.
+        // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+        // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+        LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+
+        // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
+        // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
+        // within the main BufDrawableRect to ensure that all changes are visually centered.
         var LMainDrawableRect := BufDrawableRect;
         LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
         var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
-        LRect.Offset(-2*LRect.Left, -2*LRect.Top);
         LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
 
         ALUpdateDrawableFromSurface(FStateTransitionBufSurface, FStateTransitionBufDrawable);

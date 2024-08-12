@@ -364,7 +364,7 @@ type
     property BufDrawableRect: TRectF read fBufDrawableRect;
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
-                var ABufDrawableRect: TRectF;
+                out ABufDrawableRect: TRectF;
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStateLayerContentColor: TAlphaColor;
@@ -482,7 +482,7 @@ type
     property BufDrawableRect: TRectF read fBufDrawableRect;
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
-                var ABufDrawableRect: TRectF;
+                out ABufDrawableRect: TRectF;
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStateLayerContentColor: TAlphaColor;
@@ -1940,7 +1940,7 @@ end;
 {***************************************}
 Procedure TALBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
-            var ABufDrawableRect: TRectF;
+            out ABufDrawableRect: TRectF;
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStateLayerContentColor: TAlphaColor;
@@ -1951,14 +1951,14 @@ begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  var LRect := LocalRect;
-  ABufDrawableRect := ALGetShapeSurfaceRect(
-                        LRect, // const ARect: TRectF;
+  ABufDrawableRect := LocalRect;
+  var LSurfaceRect := ALGetShapeSurfaceRect(
+                        ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
-  ABufDrawableRect := ALAlignDimensionToPixelCeil(ABufDrawableRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
-  LRect.Offset(-ABufDrawableRect.Left, -ABufDrawableRect.Top);
+  LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+  ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
   var LSurface: TALSurface;
   var LCanvas: TALCanvas;
@@ -1966,8 +1966,8 @@ begin
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
     ALGetScreenScale, // const AScale: Single;
-    ABufDrawableRect.Width, // const w: integer;
-    ABufDrawableRect.height);// const h: integer)
+    LSurfaceRect.Width, // const w: integer;
+    LSurfaceRect.height);// const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
@@ -1976,7 +1976,7 @@ begin
       ALDrawRectangle(
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
-        LRect, // const Rect: TrectF;
+        ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
         AStateLayer, // const StateLayer: TALStateLayer;
@@ -1994,6 +1994,9 @@ begin
     end;
 
     ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+    // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+    // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
 
   finally
     ALFreeAndNilSurface(LSurface, LCanvas);
@@ -2204,7 +2207,7 @@ end;
 {***************************************}
 Procedure TALCircle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
-            var ABufDrawableRect: TRectF;
+            out ABufDrawableRect: TRectF;
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStateLayerContentColor: TAlphaColor;
@@ -2215,14 +2218,14 @@ begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
 
-  var LRect := LocalRect;
-  ABufDrawableRect := ALGetShapeSurfaceRect(
-                        LRect, // const ARect: TRectF;
+  ABufDrawableRect := LocalRect;
+  var LSurfaceRect := ALGetShapeSurfaceRect(
+                        ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
-  ABufDrawableRect := ALAlignDimensionToPixelCeil(ABufDrawableRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
-  LRect.Offset(-ABufDrawableRect.Left, -ABufDrawableRect.Top);
+  LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+  ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
   var LSurface: TALSurface;
   var LCanvas: TALCanvas;
@@ -2230,8 +2233,8 @@ begin
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
     ALGetScreenScale, // const AScale: Single;
-    ABufDrawableRect.Width, // const w: integer;
-    ABufDrawableRect.Height); // const h: integer)
+    LSurfaceRect.Width, // const w: integer;
+    LSurfaceRect.Height); // const h: integer)
   try
 
     if ALCanvasBeginScene(LCanvas) then
@@ -2240,7 +2243,7 @@ begin
       ALDrawCircle(
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
-        LRect, // const Rect: TrectF;
+        ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
         AStateLayer, // const StateLayer: TALStateLayer;
@@ -2254,6 +2257,9 @@ begin
     end;
 
     ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+    // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+    // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
 
   finally
     ALFreeAndNilSurface(LSurface, LCanvas);
@@ -3372,6 +3378,9 @@ Procedure TALBaseText.DrawMultilineText(
             const AShadow: TALShadow);
 begin
 
+  if ALIsCanvasNull(ACanvas) then
+    Raise Exception.Create('Canvas cannot be null');
+
   var LMultiLineTextOptions := GetMultiLineTextOptions(
                                  AScale,
                                  AOpacity,
@@ -3397,8 +3406,6 @@ begin
 
     var LSurface: TALSurface := ALNullSurface;
     var LCanvas: TALCanvas := ACanvas;
-    if ALIsCanvasNull(LCanvas) then
-      Raise Exception.Create('Canvas cannot be null');
     ALDrawMultiLineText(
       LSurface,
       LCanvas,
@@ -3546,6 +3553,10 @@ begin
                       AElements,
                       LMultiLineTextOptions);
 
+    // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+    // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
+
   end;
 
   if (ALIsDrawableNull(ABufDrawable)) then begin
@@ -3556,25 +3567,25 @@ begin
       exit;
     end;
 
-    var LRect := LocalRect;
-    ABufDrawableRect := ALGetShapeSurfaceRect(
-                          LRect, // const ARect: TRectF;
+    ABufDrawableRect := LocalRect;
+    var LSurfaceRect := ALGetShapeSurfaceRect(
+                          ABufDrawableRect, // const ARect: TRectF;
                           AFill, // const AFill: TALBrush;
                           AStateLayer, // const AStateLayer: TALStateLayer;
                           AShadow); // const AShadow: TALShadow): TRectF;
-    ABufDrawableRect.Width := Min(MaxWidth, ABufDrawableRect.Width);
-    ABufDrawableRect.Height := Min(MaxHeight, ABufDrawableRect.Height);
-    ABufDrawableRect := ALAlignDimensionToPixelCeil(ABufDrawableRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
-    LRect.Offset(-ABufDrawableRect.Left, -ABufDrawableRect.Top);
+    LSurfaceRect.Width := Min(MaxWidth, LSurfaceRect.Width);
+    LSurfaceRect.Height := Min(MaxHeight, LSurfaceRect.Height);
+    LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
+    ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
-    Var LSurfaceSize := ABufDrawableRect.Size;
+    Var LSurfaceSize := LSurfaceRect.Size;
     DrawMultilineTextAdjustRect(
       ALNullCanvas, // const ACanvas: TALCanvas;
       LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
-      LRect, // var ARect: TrectF;
+      ABufDrawableRect, // var ARect: TrectF;
       LSurfaceSize); // var ASurfaceSize: TSizeF
-    ABufDrawableRect.Width := LSurfaceSize.Width;
-    ABufDrawableRect.Height := LSurfaceSize.Height;
+    LSurfaceRect.Width := LSurfaceSize.Width;
+    LSurfaceRect.Height := LSurfaceSize.Height;
 
     var LSurface: TALSurface;
     var LCanvas: TALCanvas;
@@ -3582,8 +3593,8 @@ begin
       LSurface, // out ASurface: TALSurface;
       LCanvas, // out ACanvas: TALCanvas;
       AScale, // const AScale: Single;
-      ABufDrawableRect.Width, // const w: integer;
-      ABufDrawableRect.height);// const h: integer)
+      LSurfaceRect.Width, // const w: integer;
+      LSurfaceRect.height);// const h: integer)
     try
 
       if ALCanvasBeginScene(LCanvas) then
@@ -3597,7 +3608,7 @@ begin
         ALDrawRectangle(
           LCanvas, // const ACanvas: TALCanvas;
           AScale, // const AScale: Single;
-          LRect, // const Rect: TrectF;
+          ABufDrawableRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           AFill, // const Fill: TALBrush;
           AStateLayer, // const StateLayer: TALStateLayer;
@@ -3620,6 +3631,9 @@ begin
       end;
 
       ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+      // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+      // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+      ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
 
     finally
       ALFreeAndNilSurface(LSurface, LCanvas);
@@ -3657,11 +3671,6 @@ begin
     nil, // const AStateLayer: TALStateLayer;
     Stroke, // const AStroke: TALStrokeBrush;
     Shadow); // const AShadow: TALShadow);
-
-  // The shadow effect is not included in the fBufDrawableRect rectangle's dimensions.
-  // However, the fBufDrawableRect rectangle is offset by the shadow's dx and dy values,
-  // if a shadow is applied, to adjust for the visual shift caused by the shadow.
-  fBufDrawableRect.Offset(-2*fBufDrawableRect.Left, -2*fBufDrawableRect.Top);
 
 end;
 

@@ -38,7 +38,7 @@ type
     FContextLostId: Integer;
     FContextResetId: Integer;
     {$ENDIF}
-    FMaterial: TMaterial; // https://quality.embarcadero.com/browse/RSP-23501
+    FMaterial: TMaterial; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
   end;
 
   {**************************}
@@ -273,7 +273,9 @@ constructor TALBiPlanarTexture.Create;
 begin
   inherited;
   FSecondTexture := TALTexture.Create;
+  {$IF not defined(ALDPK)}
   Material := ALGetDef420YpCbCr8BiPlanarVideoRangeMaterial;
+  {$ENDIF}
 end;
 
 {************************************}
@@ -289,7 +291,9 @@ begin
   inherited;
   FSecondTexture := TALTexture.Create;
   FThirdTexture := TALTexture.Create;
+  {$IF not defined(ALDPK)}
   Material := ALGetDef420YpCbCr8PlanarMaterial;
+  {$ENDIF}
 end;
 
 {**********************************}

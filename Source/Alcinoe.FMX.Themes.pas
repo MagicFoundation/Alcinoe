@@ -766,6 +766,7 @@ begin
     Stroke.Color := Talphacolors.Null;
     TextSettings.Font.Color := $FFFFFFFF; // md.sys.color.on-primary // md.ref.palette.primary100
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Fill.Assign(Fill);
@@ -781,15 +782,12 @@ begin
     StateStyles.Hovered.Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     StateStyles.Hovered.Shadow.blur := 2;
     StateStyles.Hovered.Shadow.OffsetY := 1;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -807,6 +805,7 @@ begin
     Stroke.Color := $FF79747E; // md.sys.color.outline / md.ref.palette.neutral-variant50
     TextSettings.Font.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Stroke.Assign(Stroke);
@@ -818,18 +817,15 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.UseContentColor := True;
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
     StateStyles.Focused.Stroke.assign(Stroke);
     StateStyles.Focused.Stroke.inherit := False;
     StateStyles.Focused.Stroke.Color := $FF6750A4;  // md.sys.color.primary / md.ref.palette.primary40
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -847,6 +843,7 @@ begin
     Stroke.Color := Talphacolors.Null;
     TextSettings.Font.Color := $FF6750A4; // md.sys.color.primary // md.ref.palette.primary40
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.TextSettings.Assign(TextSettings);
@@ -855,15 +852,12 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.UseContentColor := True;
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -884,6 +878,7 @@ begin
     Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     Shadow.blur := 2;
     Shadow.OffsetY := 1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Fill.Assign(Fill);
@@ -900,15 +895,12 @@ begin
     StateStyles.Hovered.Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     StateStyles.Hovered.Shadow.blur := 3;
     StateStyles.Hovered.Shadow.OffsetY := 1;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -926,6 +918,7 @@ begin
     Stroke.Color := Talphacolors.Null;
     TextSettings.Font.Color := $FF1D192B; // md.sys.color.on-secondary-container // md.ref.palette.secondary10
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Fill.Assign(Fill);
@@ -941,15 +934,12 @@ begin
     StateStyles.Hovered.Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     StateStyles.Hovered.Shadow.blur := 2;
     StateStyles.Hovered.Shadow.OffsetY := 1;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -971,6 +961,7 @@ begin
     Fill.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     Fill.ResourceName := LPrevResourceName;
     Stroke.Color := TALphaColors.Null;
+    StateStyles.Transition.Duration := 0.2;
     //Filled icon button icon color: $FFFFFFFF
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -982,17 +973,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FFFFFFFF; // md.sys.color.on-primary / md.ref.palette.primary100
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Filled icon button hover icon color: $FFFFFFFF
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FFFFFFFF; // md.sys.color.on-primary / md.ref.palette.primary100
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Filled icon button pressed icon color: $FFFFFFFF
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FFFFFFFF; // md.sys.color.on-primary / md.ref.palette.primary100
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Filled icon button focus icon color: $FFFFFFFF
   end;
 end;
@@ -1015,6 +1003,7 @@ begin
     Fill.Color := $FFE8DEF8; // md.sys.color.secondary-container / md.ref.palette.secondary90
     Fill.ResourceName := LPrevResourceName;
     Stroke.Color := TALphaColors.Null;
+    StateStyles.Transition.Duration := 0.2;
     //Filled tonal icon button icon color: $FF1D192B
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1026,17 +1015,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FF1D192B; // md.sys.color.on-secondary-container / md.ref.palette.secondary10
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Filled tonal icon button hover icon color: $FF1D192B
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FF1D192B; // md.sys.color.on-secondary-container / md.ref.palette.secondary10
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Filled tonal icon button pressed icon color: $FF1D192B
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FF1D192B; // md.sys.color.on-secondary-container / md.ref.palette.secondary10
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Filled tonal icon button focus icon color: $FF1D192B
   end;
 end;
@@ -1059,6 +1045,7 @@ begin
     Fill.Color := TalphaColorRec.Null;
     Fill.ResourceName := LPrevResourceName;
     Stroke.Color := $FF79747E; // md.sys.color.outline / md.ref.palette.neutral-variant50
+    StateStyles.Transition.Duration := 0.2;
     //Outlined icon button unselected icon color: $FF49454F
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1073,17 +1060,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Outlined icon button unselected hover icon color: $FF49454F
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Outlined icon button unselected pressed icon color: $FF49454F
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Outlined icon button focus icon color: $FF49454F
   end;
 end;
@@ -1106,6 +1090,7 @@ begin
     Fill.ResourceName := LPrevResourceName;
     Fill.Color := TalphaColors.Null;
     Stroke.Color := TALphaColors.Null;
+    StateStyles.Transition.Duration := 0.2;
     //Icon button unselected icon color: $FF49454F
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1118,17 +1103,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Icon button unselected hover icon color: $FF49454F
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Icon button unselected pressed icon color: $FF49454F
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Icon button unselected focus icon color: $FF49454F
   end;
 end;
@@ -1147,6 +1129,7 @@ begin
     Stroke.Color := Talphacolors.Null;
     TextSettings.Font.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Fill.Assign(Fill);
@@ -1162,15 +1145,12 @@ begin
     StateStyles.Hovered.Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     StateStyles.Hovered.Shadow.blur := 2;
     StateStyles.Hovered.Shadow.OffsetY := 1;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1188,6 +1168,7 @@ begin
     Stroke.Color := $FF938F99; // md.sys.color.outline / md.ref.palette.neutral-variant60
     TextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Stroke.Assign(Stroke);
@@ -1199,18 +1180,15 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.UseContentColor := True;
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
     StateStyles.Focused.Stroke.assign(Stroke);
     StateStyles.Focused.Stroke.inherit := False;
     StateStyles.Focused.Stroke.Color := $FFD0BCFF;  // md.sys.color.primary / md.ref.palette.primary80
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1228,6 +1206,7 @@ begin
     Stroke.Color := Talphacolors.Null;
     TextSettings.Font.Color := $FFD0BCFF; // md.sys.color.primary // md.ref.palette.primary80
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.TextSettings.Assign(TextSettings);
@@ -1236,15 +1215,12 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.UseContentColor := True;
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1265,6 +1241,7 @@ begin
     Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     Shadow.blur := 2;
     Shadow.OffsetY := 1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Fill.Assign(Fill);
@@ -1281,15 +1258,12 @@ begin
     StateStyles.Hovered.Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     StateStyles.Hovered.Shadow.blur := 3;
     StateStyles.Hovered.Shadow.OffsetY := 1;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1307,6 +1281,7 @@ begin
     Stroke.Color := Talphacolors.Null;
     TextSettings.Font.Color := $FFE8DEF8; // md.sys.color.on-secondary-container // md.ref.palette.secondary90
     TextSettings.LetterSpacing := 0.1;
+    StateStyles.Transition.Duration := 0.2;
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
     StateStyles.Disabled.Fill.Assign(Fill);
@@ -1322,15 +1297,12 @@ begin
     StateStyles.Hovered.Shadow.Color := ALSetColorAlpha($FF000000, 0.50); // md.sys.color.shadow / md.ref.palette.neutral0
     StateStyles.Hovered.Shadow.blur := 2;
     StateStyles.Hovered.Shadow.OffsetY := 1;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //--Pressed--
     StateStyles.Pressed.StateLayer.UseContentColor := True;
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //--Focused--
     StateStyles.Focused.StateLayer.UseContentColor := True;
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1352,6 +1324,7 @@ begin
     Fill.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     Fill.ResourceName := LPrevResourceName;
     Stroke.Color := TALphaColors.Null;
+    StateStyles.Transition.Duration := 0.2;
     //Filled icon button icon color: $FF381E72
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1363,17 +1336,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Filled icon button hover icon color: $FF381E72
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Filled icon button pressed icon color: $FF381E72
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Filled icon button focus icon color: $FF381E72
   end;
 end;
@@ -1396,6 +1366,7 @@ begin
     Fill.Color := $FF4A4458; // md.sys.color.secondary-container / md.ref.palette.secondary30
     Fill.ResourceName := LPrevResourceName;
     Stroke.Color := TALphaColors.Null;
+    StateStyles.Transition.Duration := 0.2;
     //Filled tonal icon button icon color: $FFE8DEF8
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1407,17 +1378,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FFE8DEF8; // md.sys.color.on-secondary-container / md.ref.palette.secondary90
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Filled tonal icon button hover icon color: $FFE8DEF8
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FFE8DEF8; // md.sys.color.on-secondary-container / md.ref.palette.secondary90
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Filled tonal icon button pressed icon color: $FFE8DEF8
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FFE8DEF8; // md.sys.color.on-secondary-container / md.ref.palette.secondary90
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Filled tonal icon button focus icon color: $FFE8DEF8
   end;
 end;
@@ -1440,6 +1408,7 @@ begin
     Fill.Color := TalphaColorRec.Null;
     Fill.ResourceName := LPrevResourceName;
     Stroke.Color := $FF938F99; // md.sys.color.outline / md.ref.palette.neutral-variant60
+    StateStyles.Transition.Duration := 0.2;
     //Outlined icon button unselected icon color: $FFCAC4D0
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1454,17 +1423,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Outlined icon button unselected hover icon color: $FFCAC4D0
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Outlined icon button unselected pressed icon color: $FFCAC4D0
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Outlined icon button focus icon color: $FFCAC4D0
   end;
 end;
@@ -1487,6 +1453,7 @@ begin
     Fill.ResourceName := LPrevResourceName;
     Fill.Color := TalphaColors.Null;
     Stroke.Color := TALphaColors.Null;
+    StateStyles.Transition.Duration := 0.2;
     //Icon button unselected icon color: $FFCAC4D0
     //--Disabled--
     StateStyles.Disabled.Opacity := 1;
@@ -1499,17 +1466,14 @@ begin
     //--Hovered--
     StateStyles.Hovered.StateLayer.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     StateStyles.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Hovered.Transition.Duration := 0.2;
     //Icon button unselected hover icon color: $FFCAC4D0
     //--Pressed--
     StateStyles.Pressed.StateLayer.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     StateStyles.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Pressed.Transition.Duration := 0.2;
     //Icon button unselected pressed icon color: $FFCAC4D0
     //--Focused--
     StateStyles.Focused.StateLayer.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     StateStyles.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
-    StateStyles.Focused.Transition.Duration := 0.2;
     //Icon button unselected focus icon color: $FFCAC4D0
   end;
 end;
@@ -1563,7 +1527,8 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     Stroke.Thickness := 2;
-    CheckMark.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+    CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
@@ -1597,29 +1562,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
-    StateStyles.UnChecked.Pressed.StateLayer.Color := $FF1D1B20; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1636,7 +1595,8 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     Stroke.Thickness := 2;
-    CheckMark.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
@@ -1670,29 +1630,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
     StateStyles.UnChecked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1709,7 +1663,8 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     Stroke.Thickness := 2;
-    CheckMark.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    CheckMark.Color := TAlphaColors.Null; // $FFE6E0E9 / md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
@@ -1743,29 +1698,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
-    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1782,7 +1731,8 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     Stroke.Thickness := 2;
-    CheckMark.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    CheckMark.Color := TAlphaColors.Null; // $FFF2B8B5 / md.sys.color.error / md.ref.palette.error80
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
@@ -1816,29 +1766,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
     StateStyles.UnChecked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1889,7 +1833,8 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
     Stroke.Thickness := 2;
-    CheckMark.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+    CheckMark.Color := TAlphaColors.Null; // $FF1D1B20 / md.sys.color.on-surface / md.ref.palette.neutral10
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
@@ -1920,29 +1865,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
-    StateStyles.UnChecked.Pressed.StateLayer.Color := $FF1D1B20; // md.sys.color.primary / md.ref.palette.primary40
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -1957,10 +1896,14 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     Stroke.Thickness := 2;
-    CheckMark.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
+    CheckMark.Color := TAlphaColors.Null; // $FFB3261E / md.sys.color.error / md.ref.palette.error40
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
 
     //--Disabled (UnChecked)--
     StateStyles.UnChecked.Disabled.Opacity := 1;
@@ -1982,29 +1925,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
     StateStyles.UnChecked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -2019,7 +1956,8 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
     Stroke.Thickness := 2;
-    CheckMark.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    CheckMark.Color := TAlphaColors.Null; // $FFE6E0E9 / md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
@@ -2050,29 +1988,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
-    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+    StateStyles.UnChecked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 
@@ -2087,10 +2019,14 @@ begin
     Fill.Color := TalphaColors.Null;
     Stroke.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     Stroke.Thickness := 2;
-    CheckMark.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
+    CheckMark.Color := TAlphaColors.Null; // $FFF2B8B5 / md.sys.color.error / md.ref.palette.error80
+    StateStyles.Transition.Duration := 0.2;
 
     //--Default (UnChecked)--
     //--Default (Checked)--
+    StateStyles.Checked.Default.CheckMark.Assign(CheckMark);
+    StateStyles.Checked.Default.CheckMark.Inherit := False;
+    StateStyles.Checked.Default.CheckMark.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
 
     //--Disabled (UnChecked)--
     StateStyles.UnChecked.Disabled.Opacity := 1;
@@ -2112,29 +2048,23 @@ begin
     //--Hovered (UnChecked)--
     StateStyles.UnChecked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.UnChecked.Hovered.Transition.Duration := 0.2;
     //--Hovered (Checked)--
     StateStyles.Checked.Hovered.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
-    StateStyles.Checked.Hovered.Transition.Duration := 0.2;
 
     //--Pressed (UnChecked)--
     StateStyles.UnChecked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Pressed.Transition.Duration := 0.2;
     //--Pressed (Checked)--
     StateStyles.Checked.Pressed.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Pressed.Transition.Duration := 0.2;
 
     //--Focused (UnChecked)--
     StateStyles.UnChecked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.UnChecked.Focused.Transition.Duration := 0.2;
     //--Focused (Checked)--
     StateStyles.Checked.Focused.StateLayer.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
     StateStyles.Checked.Focused.StateLayer.Opacity := 0.12;
-    StateStyles.Checked.Focused.Transition.Duration := 0.2;
   end;
 end;
 

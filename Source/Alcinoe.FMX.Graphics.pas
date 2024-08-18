@@ -35,6 +35,7 @@ uses
   Alcinoe.Common;
 
 Type
+  // !! Note: The declaration of TALSurface/TALCanvas/TALDrawable is duplicated in Alcinoe.FMX.Common to avoid a circular unit reference.
   TALSurface =  {$IF defined(ALSkiaEngine)}sk_surface_t{$ELSEIF defined(ANDROID)}Jbitmap{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tbitmap{$ENDIF};
   TALCanvas =   {$IF defined(ALSkiaEngine)}sk_canvas_t{$ELSEIF defined(ANDROID)}Jcanvas{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tcanvas{$ENDIF};
   TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
@@ -58,6 +59,12 @@ procedure ALEndTransparencyLayer(const aCanvas: TALCanvas);
 function  ALCreateDrawableFromSurface(const ASurface: TALSurface): TALDrawable;
 procedure ALUpdateDrawableFromSurface(const aSurface: TALSurface; const aDrawable: TALDrawable);
 function  ALGetDefaultPixelFormat: TPixelFormat; inline;
+function  ALScaleAndCenterCanvas(
+            Const ACanvas: TCanvas;
+            Const AAbsoluteRect: TRectF;
+            Const AScaleX: Single;
+            Const AScaleY: Single;
+            Const ASaveState: Boolean): TCanvasSaveState;
 
 {$IF defined(ALSkiaEngine)}
 // ALGlobalSkColorSpace represents the color space of the form's surface
@@ -13722,6 +13729,28 @@ begin
   {$ELSE}
   Result := TPixelFormat.RGBA;
   {$ENDIF}
+end;
+
+{*******************************}
+function  ALScaleAndCenterCanvas(
+            Const ACanvas: TCanvas;
+            Const AAbsoluteRect: TRectF;
+            Const AScaleX: Single;
+            Const AScaleY: Single;
+            Const ASaveState: Boolean): TCanvasSaveState;
+begin
+  Result := nil;
+  if (not samevalue(AScaleX, 1, TEpsilon.Scale)) or
+     (not samevalue(AScaleY, 1, TEpsilon.Scale)) then begin
+    if ASaveState then
+      Result := ACanvas.SaveState;
+    var LMatrix := TMatrix.CreateTranslation(-AAbsoluteRect.Left, -AAbsoluteRect.Top);
+    LMatrix := LMatrix * TMatrix.CreateScaling(AScalex, AScaley);
+    LMatrix := LMatrix * TMatrix.CreateTranslation(
+                           AAbsoluteRect.Left - (((AAbsoluteRect.Width * AScalex) - AAbsoluteRect.Width) / 2),
+                           AAbsoluteRect.Top - (((AAbsoluteRect.height * AScaley) - AAbsoluteRect.Height) / 2));
+    ACanvas.SetMatrix(ACanvas.Matrix * LMatrix);
+  end;
 end;
 
 {*************************}

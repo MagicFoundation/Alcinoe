@@ -33,6 +33,10 @@ uses
   {$IF defined(MSWINDOWS)}
   Alcinoe.FMX.NativeView.Win,
   {$ENDIF}
+  {$IF defined(ALSkiaEngine)}
+  System.Skia.API,
+  {$ENDIF}
+  Fmx.types3D,
   Fmx.types,
   FMX.TextLayout,
   FMX.graphics,
@@ -44,6 +48,11 @@ uses
   Alcinoe.FMX.ScrollEngine;
 
 type
+
+  // !! Workaround to avoid a circular unit reference. The declaration of TALSurface/TALCanvas/TALDrawable from Alcinoe.FMX.Graphics is duplicated here.
+  TALSurface =  {$IF defined(ALSkiaEngine)}sk_surface_t{$ELSEIF defined(ANDROID)}Jbitmap{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tbitmap{$ENDIF};
+  TALCanvas =   {$IF defined(ALSkiaEngine)}sk_canvas_t{$ELSEIF defined(ANDROID)}Jcanvas{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tcanvas{$ENDIF};
+  TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
 
   {~~~~~~~~~~~~~~~~~~}
   TALImageWrapMode = (
@@ -786,11 +795,11 @@ type
     property DefaultDuration: Single read FDefaultDuration write FDefaultDuration;
     property DefaultInterpolation: TALInterpolationType read FDefaultInterpolation write FDefaultInterpolation;
     property DefaultDelayClick: Boolean read FDefaultDelayClick write FDefaultDelayClick;
-    property DelayClick: Boolean read FDelayClick write SetDelayClick stored IsDelayClickStored;
   published
     property AnimationType: TAnimationType read FAnimationType write SetAnimationType stored IsAnimationTypeStored;
     property Duration: Single read FDuration write SetDuration stored IsDurationStored nodefault;
     property Interpolation: TALInterpolationType read FInterpolation write SetInterpolation stored IsInterpolationStored;
+    property DelayClick: Boolean read FDelayClick write SetDelayClick stored IsDelayClickStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -804,23 +813,21 @@ type
     FStroke: TALInheritStrokeBrush;
     FShadow: TALInheritShadow;
     FScale: TALPosition;
-    FTransition: TALStateTransition;
     fSuperseded: Boolean;
     procedure SetFill(const AValue: TALInheritBrush);
     procedure SetStateLayer(const AValue: TALStateLayer);
     procedure SetStroke(const AValue: TALInheritStrokeBrush);
     procedure SetShadow(const AValue: TALInheritShadow);
     procedure SetScale(const Value: TALPosition);
-    procedure SetTransition(const Value: TALStateTransition);
     procedure FillChanged(ASender: TObject);
     procedure StateLayerChanged(ASender: TObject);
     procedure StrokeChanged(ASender: TObject);
     procedure ShadowChanged(ASender: TObject);
     procedure ScaleChanged(ASender: TObject);
-    procedure TransitionChanged(ASender: TObject);
   protected
+    BufDrawable: TALDrawable;
+    BufDrawableRect: TRectF;
     function CreateSavedState: TALPersistentObserver; override;
-    function CreateTransition: TALStateTransition; virtual;
     function GetInherit: Boolean; virtual;
     procedure DoSupersede; virtual;
     property Fill: TALInheritBrush read FFill write SetFill;
@@ -828,12 +835,12 @@ type
     property StateLayer: TALStateLayer read FStateLayer write SetStateLayer;
     property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
     property Scale: TALPosition read FScale write SetScale;
-    property Transition: TALStateTransition read FTransition write SetTransition;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure ClearBufDrawable; virtual;
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
@@ -843,6 +850,71 @@ type
     property Parent: TObject read FParent;
     property StateStyleParent: TALBaseStateStyle read FStateStyleParent;
     property ControlParent: TALControl read FControlParent;
+  end;
+
+  {***********************************************}
+  TALBaseStateStyles = class(TALPersistentObserver)
+  private
+    FParent: TALControl;
+    FTransition: TALStateTransition;
+    FTransitionAnimation: TALfloatAnimation;
+    FTransitionFrom: TALBaseStateStyle;
+    FTransitionTo: TALBaseStateStyle;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    FTransitionBufSurface: TALSurface;
+    FTransitionBufCanvas: TALCanvas;
+    FTransitionBufDrawable: TALDrawable;
+    {$ENDIF}
+    FTransitionClickDelayed: Boolean;
+    FLastPaintedRawStyle: TALBaseStateStyle;
+    FCurrentAdjustedStyle: TALBaseStateStyle;
+    procedure SetTransition(const Value: TALStateTransition);
+    procedure TransitionChanged(ASender: TObject);
+  protected
+    function CreateSavedState: TALPersistentObserver; override;
+    function CreateTransition: TALStateTransition; virtual;
+    procedure StartTransition; virtual;
+    procedure TransitionAnimationProcess(Sender: TObject); virtual;
+    procedure TransitionAnimationFinish(Sender: TObject); virtual;
+    property Transition: TALStateTransition read FTransition write SetTransition;
+    {$IF NOT DEFINED(ALSkiaCanvas)}
+    /// <summary>
+    ///   When not using Skia, we cannot draw the component directly onto the main form.
+    ///   Instead, we must first draw it onto a buffer surface, which can then be drawn
+    ///   onto the main form. This function provides the buffer surface, canvas, and drawable
+    ///   necessary for rendering the transition.
+    /// </summary>
+    procedure GetTransitionBufSurface(
+                var ARect: TrectF;
+                out ABufSurface: TALSurface;
+                out ABufCanvas: TALCanvas;
+                out ABufDrawable: TALDrawable); virtual;
+    {$ENDIF}
+    property TransitionClickDelayed: Boolean read FTransitionClickDelayed write FTransitionClickDelayed;
+  public
+    constructor Create(const AParent: TALControl); reintroduce; virtual;
+    destructor Destroy; override;
+    procedure Assign(Source: TPersistent); override;
+    procedure Reset; override;
+    procedure ClearBufDrawable; virtual;
+    /// <summary>
+    ///   Determines and returns the current raw state style of the control
+    ///   based on its current state, such as Disabled, Pressed, Focused, or
+    ///   Hovered. This function does not apply any adjustments, animations,
+    ///   or transitions.
+    /// </summary>
+    function GetCurrentRawStyle: TALBaseStateStyle; virtual;
+    /// <summary>
+    ///   Determines and returns the current state style of the control,
+    ///   applying any necessary adjustments and handling state transition
+    ///   animations. This function provides the fully adjusted style that
+    ///   reflects the control's current visual appearance, including
+    ///   interpolations during transitions.
+    /// </summary>
+    function GetCurrentAdjustedStyle: TALBaseStateStyle; virtual;
+    function IsTransitionAnimationRunning: Boolean; virtual;
+    procedure UpdateLastPaintedRawStyle; virtual;
+    Property Parent: TALControl read FParent;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~}
@@ -1142,16 +1214,15 @@ uses
   Winapi.Windows,
   FMX.Helpers.Win,
   {$ENDIF}
-  {$IFDEF ALDPK}
+  {$IF defined(ALDPK)}
   System.Hash,
   ToolsAPI,
+  DesignEditors,
   {$ENDIF}
   {$IF not defined(ALDPK)}
   Alcinoe.Cipher,
   {$ENDIF}
-  {$IF defined(ALDPK)}
-  DesignEditors,
-  {$ENDIF}
+  Alcinoe.FMX.Types3D,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
@@ -4070,7 +4141,6 @@ begin
     FStroke := TALInheritStrokeBrush.Create(LShapeControl.GetStroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(LShapeControl.GetShadow);
     FScale := TALPosition.Create(TPointF.Create(1,1));
-    FTransition := CreateTransition;
   end
   else if (AParent is TALBaseStateStyle) then begin
     FStateStyleParent := TALBaseStateStyle(AParent);
@@ -4080,7 +4150,6 @@ begin
     FStroke := TALInheritStrokeBrush.Create(FStateStyleParent.Stroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(FStateStyleParent.Shadow);
     FScale := TALPosition.Create(TPointF.Create(1,1));
-    FTransition := CreateTransition;
   end
   else begin
     {$IF defined(debug)}
@@ -4094,27 +4163,28 @@ begin
     FStroke := TALInheritStrokeBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(nil);
     FScale := TALPosition.Create(TPointF.Create(1,1));
-    FTransition := CreateTransition;
   end;
   FFill.OnChanged := FillChanged;
   FStateLayer.OnChanged := StateLayerChanged;
   FStroke.OnChanged := StrokeChanged;
   FShadow.OnChanged := ShadowChanged;
   FScale.OnChange := ScaleChanged;
-  FTransition.OnChanged := TransitionChanged;
   //--
   fSuperseded := False;
+  //--
+  BufDrawable := ALNullDrawable;
+  //BufDisabledDrawableRect
 end;
 
 {*************************************}
 destructor TALBaseStateStyle.Destroy;
 begin
+  ClearBufDrawable;
   ALFreeAndNil(FFill);
   ALFreeAndNil(FStateLayer);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
   ALFreeAndNil(FScale);
-  ALFreeAndNil(FTransition);
   inherited Destroy;
 end;
 
@@ -4124,12 +4194,6 @@ type
   TALBaseStateStyleClass = class of TALBaseStateStyle;
 begin
   result := TALBaseStateStyleClass(classtype).Create(nil{AParent});
-end;
-
-{**************************************************************}
-function TALBaseStateStyle.CreateTransition: TALStateTransition;
-begin
-  result := TALStateTransition.Create(0{ADefaultDuration})
 end;
 
 {******************************************************}
@@ -4143,7 +4207,6 @@ begin
       Stroke.Assign(TALBaseStateStyle(Source).Stroke);
       Shadow.Assign(TALBaseStateStyle(Source).Shadow);
       Scale.Assign(TALBaseStateStyle(Source).Scale);
-      Transition.Assign(TALBaseStateStyle(Source).Transition);
       fSuperseded := TALBaseStateStyle(Source).fSuperseded;
     Finally
       EndUpdate;
@@ -4164,11 +4227,16 @@ begin
     Stroke.Reset;
     Shadow.Reset;
     Scale.Reset;
-    Transition.Reset;
     fSuperseded := False;
   finally
     EndUpdate;
   end;
+end;
+
+{*******************************************}
+procedure TALBaseStateStyle.ClearBufDrawable;
+begin
+  ALFreeAndNilDrawable(BufDrawable);
 end;
 
 {******************************************************}
@@ -4313,12 +4381,6 @@ begin
 end;
 
 {***********************************************}
-procedure TALBaseStateStyle.SetTransition(const Value: TALStateTransition);
-begin
-  FTransition.Assign(Value);
-end;
-
-{***********************************************}
 function TALBaseStateStyle.GetInherit: Boolean;
 begin
   Result := Fill.Inherit and
@@ -4359,8 +4421,347 @@ begin
   Change;
 end;
 
+{*************************************}
+constructor TALBaseStateStyles.Create(const AParent: TALControl);
+begin
+  inherited Create;
+  //--
+  FParent := AParent;
+  //--
+  FTransition := CreateTransition;
+  FTransition.OnChanged := TransitionChanged;
+  //--
+  FTransitionAnimation := TALFloatAnimation.Create;
+  FTransitionAnimation.OnProcess := TransitionAnimationProcess;
+  FTransitionAnimation.OnFinish := TransitionAnimationFinish;
+  //--
+  FTransitionFrom := nil;
+  FTransitionTo := nil;
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  FTransitionBufSurface := ALNullSurface;
+  FTransitionBufCanvas := ALNullCanvas;
+  FTransitionBufDrawable := ALNullDrawable;
+  {$ENDIF}
+  FTransitionClickDelayed := False;
+  //--
+  FLastPaintedRawStyle := nil;
+  FCurrentAdjustedStyle := nil;
+end;
+
+{*************************************}
+destructor TALBaseStateStyles.Destroy;
+begin
+  ALFreeAndNil(FTransitionAnimation);
+  ALfreeandNil(FTransitionFrom);
+  ALfreeandNil(FTransitionTo);
+  {$IF NOT DEFINED(ALSkiaCanvas)}
+  ALFreeAndNilDrawable(FTransitionBufDrawable);
+  ALFreeAndNilSurface(FTransitionBufSurface, FTransitionBufCanvas);
+  {$ENDIF}
+  //FLastPaintedRawStyle
+  ALfreeandNil(FCurrentAdjustedStyle);
+  ALFreeAndNil(FTransition);
+  inherited Destroy;
+end;
+
+{*********************************}
+function TALBaseStateStyles.CreateSavedState: TALPersistentObserver;
+type
+  TALBaseStateStylesClass = class of TALBaseStateStyles;
+begin
+  result := TALBaseStateStylesClass(classtype).Create(nil{AParent});
+end;
+
+{***************************************************************}
+function TALBaseStateStyles.CreateTransition: TALStateTransition;
+begin
+  result := TALStateTransition.Create(0{ADefaultDuration})
+end;
+
+{***************************************}
+procedure TALBaseStateStyles.StartTransition;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _IsSameStateStyleClass(const AStateStyleA, AStateStyleB: TALBaseStateStyle): boolean;
+  begin
+    result := AStateStyleA = AStateStyleB;
+    if (not result) and
+       (AStateStyleA <> nil) and
+       (AStateStyleB <> nil) then begin
+      result := AStateStyleA.ClassType = AStateStyleB.ClassType;
+    end;
+  end;
+
+type
+  TALBaseStateStyleClass = class of TALBaseStateStyle;
+
+begin
+
+  If CSLoading in FParent.componentState then Exit;
+  if SameValue(FTransition.Duration,0.0,TEpsilon.Scale) then Exit;
+  var LPrevTransitionClickDelayed := FTransitionClickDelayed;
+  FTransitionClickDelayed := False;
+  try
+
+    var LCurrentRawStyle := GetCurrentRawStyle;
+    //--
+    var LIsInReverseAnimation := False;
+    if (FTransitionAnimation.Enabled) then begin
+      if _IsSameStateStyleClass(FTransitionFrom, LCurrentRawStyle) then
+        LIsInReverseAnimation := True;
+      ALFreeAndNil(FTransitionFrom);
+      {$IF defined(debug)}
+      if FCurrentAdjustedStyle = nil then
+        Raise Exception.Create('Error D92ACB4F-F9FA-4245-B347-225978347708');
+      {$ENDIF}
+      FTransitionFrom := TALBaseStateStyleClass(FCurrentAdjustedStyle.classtype).Create(FCurrentAdjustedStyle.Parent{AParent});
+      FTransitionFrom.Assign(FCurrentAdjustedStyle);
+    end
+    else begin
+      ALFreeAndNil(FTransitionFrom);
+      if FLastPaintedRawStyle = nil then FTransitionFrom := nil
+      else begin
+        FTransitionFrom := TALBaseStateStyleClass(FLastPaintedRawStyle.classtype).Create(FLastPaintedRawStyle.Parent{AParent});
+        FTransitionFrom.Assign(FLastPaintedRawStyle);
+      end;
+    end;
+    //--
+    ALFreeAndNil(FTransitionTo);
+    if LCurrentRawStyle = nil then FTransitionTo := nil
+    else begin
+      FTransitionTo := TALBaseStateStyleClass(LCurrentRawStyle.classtype).Create(LCurrentRawStyle.parent{AParent});
+      FTransitionTo.Assign(LCurrentRawStyle);
+    end;
+    //--
+    if (FTransitionFrom = nil) and (FTransitionto = nil) then begin
+      FTransitionAnimation.Enabled := False;
+      FParent.Repaint;
+      exit;
+    end;
+    //--
+    if FTransitionFrom <> nil then FTransitionFrom.SupersedeNoChanges(false{ASaveState});
+    if FTransitionTo <> nil then FTransitionTo.SupersedeNoChanges(false{ASaveState});
+    //--
+    FTransitionAnimation.Enabled := False;
+    if LIsInReverseAnimation then FTransitionAnimation.Duration := FTransition.Duration * FTransitionAnimation.CurrentValue
+    else FTransitionAnimation.Duration := FTransition.Duration;
+    FTransitionAnimation.StartValue := 0;
+    FTransitionAnimation.StopValue := 1;
+    FTransitionAnimation.AnimationType := FTransition.animationType;
+    FTransitionAnimation.Interpolation := FTransition.Interpolation;
+    FTransitionAnimation.Start;
+    //--
+    // This is necessary in case StartTransition is called again immediately after
+    // (multiple simultaneous events).
+    GetCurrentAdjustedStyle;
+    //--
+    {$IF defined(debug)}
+    //var LTransitionFromClassName: String;
+    //if FTransitionFrom <> nil then LTransitionFromClassName := FTransitionFrom.ClassName
+    //else LTransitionFromClassName := 'nil';
+    //var LTransitionToClassName: String;
+    //if FTransitionTo <> nil then LTransitionToClassName := FTransitionTo.ClassName
+    //else LTransitionToClassName := 'nil';
+    //ALLog(
+    //  'TALBaseStateStyles.StartTransition',
+    //  'From: '+LTransitionFromClassName + ' | ' +
+    //  'To: '+LTransitionToClassName);
+    {$ENDIF}
+
+  finally
+    if FTransitionAnimation.Running then
+      FTransitionClickDelayed := LPrevTransitionClickDelayed
+    else if LPrevTransitionClickDelayed then
+      _TControlAccessProtected(FParent).click;
+  end;
+end;
+
 {**************************************************}
-procedure TALBaseStateStyle.TransitionChanged(ASender: TObject);
+procedure TALBaseStateStyles.TransitionAnimationProcess(Sender: TObject);
+begin
+  {$IF defined(debug)}
+  //ALLog('TALBaseStateStyles.TransitionAnimationProcess');
+  {$ENDIF}
+  FParent.Repaint;
+end;
+
+{**************************************************}
+procedure TALBaseStateStyles.TransitionAnimationFinish(Sender: TObject);
+begin
+  {$IF defined(debug)}
+  //ALLog('TALBaseStateStyles.TransitionAnimationFinish');
+  {$ENDIF}
+  FTransitionAnimation.Enabled := False;
+  if FTransitionClickDelayed then begin
+    FTransitionClickDelayed := False;
+    _TControlAccessProtected(FParent).Click;
+  end;
+  FParent.Repaint;
+end;
+
+{******************************************************}
+procedure TALBaseStateStyles.Assign(Source: TPersistent);
+begin
+  if Source is TALBaseStateStyles then begin
+    BeginUpdate;
+    Try
+      Transition.Assign(TALBaseStateStyles(Source).Transition);
+    Finally
+      EndUpdate;
+    End;
+  end
+  else
+    ALAssignError(Source{ASource}, Self{ADest});
+end;
+
+{******************************}
+procedure TALBaseStateStyles.Reset;
+begin
+  BeginUpdate;
+  Try
+    inherited Reset;
+    Transition.Reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALBaseStateStyles.ClearBufDrawable;
+begin
+  // Virtual
+end;
+
+{******************************}
+function TALBaseStateStyles.GetCurrentRawStyle: TALBaseStateStyle;
+begin
+  Raise Exception.Create('Not implemented')
+end;
+
+{******************************}
+function TALBaseStateStyles.GetCurrentAdjustedStyle: TALBaseStateStyle;
+type
+  TALBaseStateStyleClass = class of TALBaseStateStyle;
+begin
+  if FTransitionAnimation.Enabled then begin
+    var LStateStyle := FTransitionTo;
+    if LStateStyle = nil then LStateStyle := FTransitionFrom;
+    {$IF defined(debug)}
+    if LStateStyle = nil then
+      raise Exception.Create('Error 45CB6D22-AB78-4857-B03F-1636E5184C12');
+    {$ENDIF}
+    if (FCurrentAdjustedStyle = nil) or
+       (FCurrentAdjustedStyle.ClassType <> LStateStyle.ClassType) then begin
+      ALFreeAndNil(FCurrentAdjustedStyle);
+      FCurrentAdjustedStyle := TALBaseStateStyleClass(LStateStyle.classtype).Create(LStateStyle.parent{AParent});
+    end;
+    FCurrentAdjustedStyle.Assign(LStateStyle);
+    FCurrentAdjustedStyle.SupersedeNoChanges(false{ASaveState});
+    //--
+    if FTransitionTo = nil then FCurrentAdjustedStyle{AFromStateStyle}.InterpolateNoChanges(nil{AToStateStyle}, FTransitionAnimation.CurrentValue)
+    else if FTransitionFrom = nil then FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(nil{AFromStateStyle}, 1-FTransitionAnimation.CurrentValue)
+    else begin
+      {$IF defined(debug)}
+      if not FTransitionFrom.Superseded then
+        raise Exception.Create('Error 3A71A6B7-40C3-40A6-B678-D1FC6A0DD152');
+      {$ENDIF}
+      FCurrentAdjustedStyle{AToStateStyle}.InterpolateNoChanges(FTransitionFrom{AFromStateStyle}, 1-FTransitionAnimation.CurrentValue);
+    end;
+  end
+  else begin
+    var LStateStyle := GetCurrentRawStyle;
+    if LStateStyle = nil then ALFreeAndNil(FCurrentAdjustedStyle)
+    else begin
+      if (FCurrentAdjustedStyle = nil) or
+         (FCurrentAdjustedStyle.ClassType <> LStateStyle.ClassType) then begin
+        ALFreeAndNil(FCurrentAdjustedStyle);
+        FCurrentAdjustedStyle := TALBaseStateStyleClass(LStateStyle.classtype).Create(LStateStyle.parent{AParent});
+      end;
+      FCurrentAdjustedStyle.Assign(LStateStyle);
+      FCurrentAdjustedStyle.SupersedeNoChanges(false{ASaveState});
+    end;
+  end;
+  Result := FCurrentAdjustedStyle;
+end;
+
+{*****************************}
+function TALBaseStateStyles.IsTransitionAnimationRunning: Boolean;
+begin
+  Result := FTransitionAnimation.Enabled and
+            FTransitionAnimation.Running;
+end;
+
+{*****************************}
+procedure TALBaseStateStyles.UpdateLastPaintedRawStyle;
+begin
+  FLastPaintedRawStyle := GetCurrentRawStyle;
+end;
+
+{*****************************}
+{$IF NOT DEFINED(ALSkiaCanvas)}
+procedure TALBaseStateStyles.GetTransitionBufSurface(
+            var ARect: TrectF;
+            out ABufSurface: TALSurface;
+            out ABufCanvas: TALCanvas;
+            out ABufDrawable: TALDrawable);
+begin
+  var LSurfaceRect := ARect;
+  if FTransitionFrom <> nil then begin
+    var LFromSurfaceRect := ALGetShapeSurfaceRect(
+                              ARect, // const ARect: TRectF;
+                              FTransitionFrom.Fill, // const AFill: TALBrush;
+                              FTransitionFrom.StateLayer, // const AStateLayer: TALStateLayer;
+                              FTransitionFrom.Shadow); // const AShadow: TALShadow): TRectF;
+    LSurfaceRect := TRectF.Union(LSurfaceRect, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+  end;
+  if FTransitionTo <> nil then begin
+    var LToSurfaceRect := ALGetShapeSurfaceRect(
+                            ARect, // const ARect: TRectF;
+                            FTransitionTo.Fill, // const AFill: TALBrush;
+                            FTransitionTo.StateLayer, // const AStateLayer: TALStateLayer;
+                            FTransitionTo.Shadow); // const AShadow: TALShadow): TRectF;
+    LSurfaceRect := TRectF.Union(LSurfaceRect, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
+  end;
+  ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+
+  if (ALIsDrawableNull(FTransitionBufDrawable)) or
+     (CompareValue(ALGetDrawableWidth(FTransitionBufDrawable), LSurfaceRect.Width, TEpsilon.Position) < 0) or
+     (CompareValue(ALGetDrawableHeight(FTransitionBufDrawable), LSurfaceRect.Height, TEpsilon.Position) < 0) then begin
+    LSurfaceRect.Width := LSurfaceRect.Width * 1.5{to be on the safe side};
+    LSurfaceRect.height := LSurfaceRect.height * 1.5{to be on the safe side};
+    ALFreeAndNilDrawable(FTransitionBufDrawable);
+    ALFreeAndNilSurface(FTransitionBufSurface, FTransitionBufCanvas);
+    ALCreateSurface(
+      FTransitionBufSurface, // out ASurface: TALSurface;
+      FTransitionBufCanvas, // out ACanvas: TALCanvas;
+      ALGetScreenScale{Ascale},
+      LSurfaceRect.width, // const w: Single;
+      LSurfaceRect.height); // const h: Single);
+    {$IF defined(ALSkiaCanvas)}
+    Raise Exception.create('Error 71AD6B8B-AF32-468D-818A-168EFC96C368')
+    {$ELSEIF defined(ALGpuCanvas)}
+    FTransitionBufDrawable := TALTexture.Create;
+    FTransitionBufDrawable.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
+    FTransitionBufDrawable.SetSize(ALCeil(LSurfaceRect.width * ALGetScreenScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * ALGetScreenScale, TEpsilon.Position));
+    FTransitionBufDrawable.PixelFormat := ALGetDefaultPixelFormat;
+    {$ELSE}
+    FTransitionBufDrawable := FMX.Graphics.TBitmap.Create(ALCeil(LSurfaceRect.width, TEpsilon.Position), ALCeil(LSurfaceRect.height, TEpsilon.Position));
+    {$ENDIF};
+  end;
+  ABufSurface := FTransitionBufSurface;
+  ABufCanvas := FTransitionBufCanvas;
+  ABufDrawable := FTransitionBufDrawable;
+end;
+{$ENDIF}
+
+{***********************************************}
+procedure TALBaseStateStyles.SetTransition(const Value: TALStateTransition);
+begin
+  FTransition.Assign(Value);
+end;
+
+{**************************************************}
+procedure TALBaseStateStyles.TransitionChanged(ASender: TObject);
 begin
   Change;
 end;

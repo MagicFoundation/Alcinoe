@@ -667,15 +667,13 @@ type
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
-        BufDrawable: TALDrawable;
-        BufDrawableRect: TRectF;
         BufPromptTextDrawable: TALDrawable;
         BufPromptTextDrawableRect: TRectF;
         BufLabelTextDrawable: TALDrawable;
         BufLabelTextDrawableRect: TRectF;
         BufSupportingTextDrawable: TALDrawable;
         BufSupportingTextDrawableRect: TRectF;
-        procedure ClearBufDrawable;
+        procedure ClearBufDrawable; override;
         procedure ClearBufPromptTextDrawable;
         procedure ClearBufLabelTextDrawable;
         procedure ClearBufSupportingTextDrawable;
@@ -684,8 +682,7 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
-        procedure Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce; virtual;
-        procedure InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single); reintroduce;
+        procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseEdit read GetControlParent;
         property DefaultPromptTextColor: TalphaColor read FDefaultPromptTextColor write FDefaultPromptTextColor;
@@ -736,11 +733,12 @@ type
       end;
       // ------------
       // TStateStyles
-      TStateStyles = class(TALPersistentObserver)
+      TStateStyles = class(TALBaseStateStyles)
       private
         FDisabled: TDisabledStateStyle;
         FHovered: THoveredStateStyle;
         FFocused: TFocusedStateStyle;
+        function GetParent: TALBaseEdit;
         procedure SetDisabled(const AValue: TDisabledStateStyle);
         procedure SetHovered(const AValue: THoveredStateStyle);
         procedure SetFocused(const AValue: TFocusedStateStyle);
@@ -754,10 +752,12 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
-        procedure ClearBufDrawable;
+        procedure ClearBufDrawable; override;
         procedure ClearBufPromptTextDrawable;
         procedure ClearBufLabelTextDrawable;
         procedure ClearBufSupportingTextDrawable;
+        function GetCurrentRawStyle: TALBaseStateStyle; override;
+        Property Parent: TALBaseEdit read GetParent;
       published
         property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
         property Hovered: THoveredStateStyle read FHovered write SetHovered;
@@ -873,7 +873,6 @@ type
     procedure TextSettingsChanged(Sender: TObject); virtual;
     procedure LabelTextSettingsChanged(Sender: TObject); virtual;
     procedure SupportingTextSettingsChanged(Sender: TObject); virtual;
-    function GetCurrentStateStyle: TBaseStateStyle; virtual;
     procedure StateStylesChanged(Sender: TObject); virtual;
     procedure EnabledChanged; override;
     procedure PaddingChanged; override;
@@ -3487,8 +3486,6 @@ begin
   FLabelTextSettings.OnChanged := LabelTextSettingsChanged;
   FSupportingTextSettings.OnChanged := SupportingTextSettingsChanged;
   //--
-  BufDrawable := ALNullDrawable;
-  //BufDisabledDrawableRect
   BufPromptTextDrawable := ALNullDrawable;
   //BufPromptTextDrawableRect: TRectF;
   BufLabelTextDrawable := ALNullDrawable;
@@ -3503,7 +3500,6 @@ end;
 {*************************************}
 destructor TALBaseEdit.TBaseStateStyle.Destroy;
 begin
-  ClearBufDrawable;
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FLabelTextSettings);
   ALFreeAndNil(FSupportingTextSettings);
@@ -3550,7 +3546,7 @@ end;
 {******************************}
 procedure TALBaseEdit.TBaseStateStyle.ClearBufDrawable;
 begin
-  ALFreeAndNilDrawable(BufDrawable);
+  inherited;
   ClearBufPromptTextDrawable;
   ClearBufLabelTextDrawable;
   ClearBufSupportingTextDrawable
@@ -3575,15 +3571,19 @@ begin
 end;
 
 {**************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
+procedure TALBaseEdit.TBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
+  {$IF defined(debug)}
+  if (ATo <> nil) and (not (ATo is TBaseStateStyle)) then
+    Raise Exception.Create('Error 80F4A6FB-B9A3-4D69-B304-1E1DC2047851');
+  {$ENDIF}
   BeginUpdate;
   Try
     inherited Interpolate(ATo, ANormalizedTime);
     if ATo <> nil then begin
-      PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, ATo.PromptTextColor{Stop}, ANormalizedTime);
-      TextSettings.Interpolate(ATo.TextSettings, ANormalizedTime);
-      TintColor := ALInterpolateColor(TintColor{Start}, ATo.TintColor{Stop}, ANormalizedTime);
+      PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, TBaseStateStyle(ATo).PromptTextColor{Stop}, ANormalizedTime);
+      TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
+      TintColor := ALInterpolateColor(TintColor{Start}, TBaseStateStyle(ATo).TintColor{Stop}, ANormalizedTime);
     end
     else begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
@@ -3592,17 +3592,6 @@ begin
     end;
   finally
     EndUpdate;
-  end;
-end;
-
-{**************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.InterpolateNoChanges(const ATo: TBaseStateStyle; const ANormalizedTime: Single);
-begin
-  BeginUpdate;
-  Try
-    Interpolate(ATo, ANormalizedTime);
-  Finally
-    EndUpdateNoChanges;
   end;
 end;
 
@@ -3787,7 +3776,7 @@ end;
 {****************************************************************}
 constructor TALBaseEdit.TStateStyles.Create(const AParent: TALBaseEdit);
 begin
-  inherited Create;
+  inherited Create(AParent);
   //--
   FDisabled := TDisabledStateStyle.Create(AParent);
   FDisabled.OnChanged := DisabledChanged;
@@ -3850,6 +3839,7 @@ end;
 {******************************}
 procedure TALBaseEdit.TStateStyles.ClearBufDrawable;
 begin
+  inherited;
   Disabled.ClearBufDrawable;
   Hovered.ClearBufDrawable;
   Focused.ClearBufDrawable;
@@ -3877,6 +3867,21 @@ begin
   Disabled.ClearBufSupportingTextDrawable;
   Hovered.ClearBufSupportingTextDrawable;
   Focused.ClearBufSupportingTextDrawable;
+end;
+
+{*****************************************************************}
+function TALBaseEdit.TStateStyles.GetCurrentRawStyle: TALBaseStateStyle;
+begin
+  if Not Parent.Enabled then Result := Disabled
+  else if Parent.IsFocused then Result := Focused
+  else if Parent.IsMouseOver then Result := Hovered
+  else result := nil;
+end;
+
+{************************************************************************************}
+function TALBaseEdit.TStateStyles.GetParent: TALBaseEdit;
+begin
+  Result := TALBaseEdit(inherited Parent);
 end;
 
 {************************************************************************************}
@@ -4331,7 +4336,7 @@ begin
 
   if (csLoading in ComponentState) then exit;
 
-  var LStateStyle := GetCurrentStateStyle;
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
   if LStateStyle <> nil then
     LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
@@ -4632,15 +4637,6 @@ end;
 procedure TALBaseEdit.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
-end;
-
-{*****************************************************************}
-function TALBaseEdit.GetCurrentStateStyle: TBaseStateStyle;
-begin
-  if Not Enabled then Result := StateStyles.Disabled
-  else if IsFocused then Result := StateStyles.Focused
-  else if IsMouseOver then Result := StateStyles.Hovered
-  else result := nil;
 end;
 
 {****************************************************}
@@ -5377,7 +5373,7 @@ begin
   MakeBufLabelTextDrawable;
   MakeBufSupportingTextDrawable;
   //--
-  var LStateStyle := GetCurrentStateStyle;
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
   if LStateStyle = nil then exit;
   if LStateStyle.Fill.Inherit and
      (not LStateStyle.StateLayer.HasFill) and
@@ -5455,7 +5451,7 @@ begin
     end;
   end;
   //--
-  var LStateStyle := GetCurrentStateStyle;
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
   if LStateStyle = nil then exit;
   if (LStateStyle.TextSettings.Inherit) and
      ((not LUsePromptTextColor) or (LStateStyle.PromptTextColor = TalphaColors.Null)) then exit;
@@ -5508,7 +5504,7 @@ begin
       LabelTextSettings.font); // const AFont: TALFont;
   end;
   //--
-  var LStateStyle := GetCurrentStateStyle;
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
   if LStateStyle = nil then exit;
   if LStateStyle.LabelTextSettings.Inherit then exit;
   if (not ALIsDrawableNull(LStateStyle.BufLabelTextDrawable)) then exit;
@@ -5554,7 +5550,7 @@ begin
     end;
   end;
   //--
-  var LStateStyle := GetCurrentStateStyle;
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
   if LStateStyle = nil then exit;
   if LStateStyle.SupportingTextSettings.Inherit then exit;
   if (not ALIsDrawableNull(LStateStyle.BufSupportingTextDrawable)) then exit;
@@ -5627,7 +5623,7 @@ procedure TALBaseEdit.Paint;
 begin
 
   MakeBufDrawable;
-  var LStateStyle := GetCurrentStateStyle;
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
 
   {$REGION 'Background'}
   var LDrawable: TALDrawable;

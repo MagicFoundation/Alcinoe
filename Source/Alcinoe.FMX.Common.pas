@@ -852,6 +852,37 @@ type
     property ControlParent: TALControl read FControlParent;
   end;
 
+  // ---------------------------------------------------------------------------------------------------------------------------------- //
+  // CHECKBOX      |    BUTTON      |    TOGGLEBUTTON    |    EDIT        |   SWITCH           |    TRACKBAR         |    RANGETRACKBAR //
+  // --------------|----------------|--------------------|----------------|--------------------|---------------------|----------------- //
+  // Checked       |    Disabled    |    Checked         |    Disabled    |   Track            |    ActiveTrack      |    ActiveTrack   //
+  //   Default     |    Hovered     |      Default       |    Hovered     |     Checked        |      Disabled       |      Disabled    //
+  //   Disabled    |    Pressed     |      Disabled      |    Focused     |       default      |    InactiveTrack    |    InactiveTrack //
+  //   Hovered     |    Focused     |      Hovered       |                |       Disabled     |      Disabled       |      Disabled    //
+  //   Pressed     |    *dragged    |      Pressed       |                |       Hovered      |    Thumb            |    MinThumb      //
+  //   Focused     |                |      Focused       |                |       Pressed      |      Disabled       |      Disabled    //
+  // UnChecked     |                |    UnChecked       |                |       Focused      |      Hovered        |      Hovered     //
+  //   Default     |                |      Default       |                |     UnChecked      |      Pressed        |      Pressed     //
+  //   Disabled    |                |      Disabled      |                |       default      |      Focused        |      Focused     //
+  //   Hovered     |                |      Hovered       |                |       Disabled     |                     |    MaxThumb      //
+  //   Pressed     |                |      Pressed       |                |       Hovered      |                     |      Disabled    //
+  //   Focused     |                |      Focused       |                |       Pressed      |                     |      Hovered     //
+  //                                                                      |       Focused      |                     |      Pressed     //
+  //                                                                      |   Thumb            |                     |      Focused     //
+  //                                                                      |     Checked        |                                        //
+  //                                                                      |       Default      |                                        //
+  //                                                                      |       Disabled     |                                        //
+  //                                                                      |       Hovered      |                                        //
+  //                                                                      |       Pressed      |                                        //
+  //                                                                      |       Focused      |                                        //
+  //                                                                      |     UnChecked      |                                        //
+  //                                                                      |       Default      |                                        //
+  //                                                                      |       Disabled     |                                        //
+  //                                                                      |       Hovered      |                                        //
+  //                                                                      |       Pressed      |                                        //
+  //                                                                      |       Focused      |                                        //
+  //------------------------------------------------------------------------------------------------------------------------------------//
+
   {***********************************************}
   TALBaseStateStyles = class(TALPersistentObserver)
   private
@@ -4497,12 +4528,13 @@ type
 
 begin
 
-  If CSLoading in FParent.componentState then Exit;
-  if SameValue(FTransition.Duration,0.0,TEpsilon.Scale) then Exit;
+  If ([csLoading, csDestroying, csDesigning] * parent.ComponentState <> []) then Exit;
   var LPrevTransitionClickDelayed := FTransitionClickDelayed;
   FTransitionClickDelayed := False;
   try
 
+    if SameValue(FTransition.Duration,0.0,TEpsilon.Scale) then Exit;
+    //--
     var LCurrentRawStyle := GetCurrentRawStyle;
     //--
     var LIsInReverseAnimation := False;

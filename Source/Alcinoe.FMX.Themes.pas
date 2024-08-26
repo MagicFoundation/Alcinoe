@@ -14,6 +14,7 @@ Type
   TALApplyButtonThemeProc = Procedure(const AButton: TALButton);
   TALApplyCheckBoxThemeProc = Procedure(const ACheckBox: TALCheckBox);
   TALApplyRadioButtonThemeProc = Procedure(const ARadioButton: TALRadioButton);
+  TALApplySwitchThemeProc = Procedure(const ASwitch: TALSwitch; const AHeight: Single = 32);
 
 var
   ALEditThemes: TDictionary<String, TALApplyEditThemeProc>;
@@ -21,12 +22,14 @@ var
   ALButtonThemes: TDictionary<String, TALApplyButtonThemeProc>;
   ALCheckBoxThemes: TDictionary<String, TALApplyCheckBoxThemeProc>;
   ALRadioButtonThemes: TDictionary<String, TALApplyRadioButtonThemeProc>;
+  ALSwitchThemes: TDictionary<String, TALApplySwitchThemeProc>;
 
 procedure ALApplyEditTheme(const ATheme: String; const AEdit: TALBaseEdit);
 procedure ALApplyMemoTheme(const ATheme: String; const AMemo: TALBaseEdit);
 procedure ALApplyButtonTheme(const ATheme: String; const AButton: TALButton);
 procedure ALApplyCheckBoxTheme(const ATheme: String; const ACheckBox: TALCheckBox);
 procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALRadioButton);
+procedure ALApplySwitchTheme(const ATheme: String; const ASwitch: TALSwitch);
 
 implementation
 
@@ -35,8 +38,9 @@ uses
   System.Types,
   System.uitypes,
   FMX.types,
-  FMX.Controls,
-  FMX.Graphics,
+  {$IF defined(ALDPK)}
+  Vcl.Dialogs,
+  {$ENDIF}
   Alcinoe.Common,
   Alcinoe.StringUtils,
   Alcinoe.FMX.Memo,
@@ -50,7 +54,6 @@ uses
 procedure ALResetEditTheme(const AEdit: TALBaseEdit);
 begin
   With AEdit do begin
-    //--Enabled (default)--
     if AEdit is TALEdit then TALEdit(AEdit).AutoSize := True
     else if AEdit is TALMemo then TALMemo(AEdit).AutoSizeLineCount := 3;
     padding.Rect := padding.DefaultValue;
@@ -705,7 +708,6 @@ end;
 procedure ALResetButtonTheme(const AButton: TALButton);
 begin
   With AButton do begin
-    //--Enabled (default)--
     TouchTargetExpansion.Rect := TRectF.Empty;
     AutoSize := True;
     Padding.Rect := Padding.DefaultValue;
@@ -1500,7 +1502,6 @@ end;
 procedure ALResetCheckBoxTheme(const ACheckBox: TALCheckBox);
 begin
   With ACheckBox do begin
-    //--Enabled (default)--
     Width := 18;
     Height := 18;
     TouchTargetExpansion.Rect := TRectF.Empty;
@@ -1808,7 +1809,6 @@ end;
 procedure ALResetRadioButtonTheme(const ARadioButton: TALRadioButton);
 begin
   With ARadioButton do begin
-    //--Enabled (default)--
     Width := 20;
     Height := 20;
     TouchTargetExpansion.Rect := TRectF.Empty;
@@ -2082,12 +2082,342 @@ begin
   end;
 end;
 
+////////////
+// SWITCH //
+////////////
+
+{*****************************************************}
+procedure ALResetSwitchTheme(const ASwitch: TALSwitch; const AHeight: Single = 32);
+begin
+  With ASwitch do begin
+    BeginUpdate;
+    Try
+      var LDefaultSize := DefaultSize;
+      var LRatio: Single := AHeight / LDefaultSize.Height;
+      LDefaultSize.Height := LDefaultSize.Height * LRatio;
+      LDefaultSize.Width := LDefaultSize.Width * LRatio;
+      Size.Size := LDefaultSize;
+      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio);
+      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio);
+      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio);
+      //--
+      Track.Margins.Rect := ALScaleRect(Track.Margins.DefaultValue, LRatio);
+      Track.Padding.Rect := ALScaleRect(Track.Padding.DefaultValue, LRatio);
+      Track.TouchTargetExpansion.Rect := ALScaleRect(Track.TouchTargetExpansion.DefaultValue, LRatio);
+      Track.XRadius := -50;
+      Track.YRadius := -50;
+      Track.Fill.Reset;
+      Track.Stroke.Reset;
+      Track.Stroke.Thickness := Track.Stroke.DefaultThickness * LRatio;
+      Track.Shadow.Reset;
+      Track.StateStyles.Reset;
+      //--
+      Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, LRatio);
+      Thumb.Padding.Rect := ALScaleRect(Thumb.Padding.DefaultValue, LRatio);
+      Thumb.TouchTargetExpansion.Rect := ALScaleRect(Thumb.TouchTargetExpansion.DefaultValue, LRatio);
+      Thumb.XRadius := -50;
+      Thumb.YRadius := -50;
+      Thumb.Checkmark.Reset;
+      Thumb.Checkmark.Margins.Rect := ALScaleRect(Thumb.Checkmark.Margins.DefaultValue, LRatio);
+      Thumb.CheckMark.Thickness := Thumb.CheckMark.DefaultThickness * LRatio;
+      Thumb.Fill.Reset;
+      Thumb.Stroke.Reset;
+      Thumb.Stroke.Thickness := Thumb.Stroke.DefaultThickness * LRatio;
+      Thumb.Shadow.Reset;
+      Thumb.StateStyles.Reset;
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/switch/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
+procedure ALApplyMaterial3LightSwitchTheme(const ASwitch: TALSwitch; const AHeight: Single = 32);
+begin
+  var LHeight: Single := AHeight;
+  {$IF defined(ALDPK)}
+  While True do begin
+    var LValue := InputBox('Please enter the desired height for the switch', '', ALFloatToStrW(AHeight, ALDefaultFormatSettingsW));
+    if ALTryStrToFloat(LValue,LHeight,ALDefaultFormatSettingsW) then break;
+  end;
+  {$ENDIF}
+  var LRatio: Single := LHeight / 32;
+
+  With ASwitch do begin
+    BeginUpdate;
+    Try
+
+      //--Enabled (default)--
+      ALResetSwitchTheme(ASwitch, LHeight);
+
+      //--Default (UnChecked)--
+      Track.StateStyles.UnChecked.Default.Stroke.Assign(Track.Stroke);
+      Track.StateStyles.UnChecked.Default.Stroke.Inherit := False;
+      Track.StateStyles.UnChecked.Default.Stroke.Color := $FF79747E; // md.sys.color.outline / md.ref.palette.neutral-variant50
+      Track.StateStyles.UnChecked.Default.Stroke.Thickness := 2 * LRatio;
+      Track.StateStyles.UnChecked.Default.fill.Assign(Track.fill);
+      Track.StateStyles.UnChecked.Default.fill.Inherit := False;
+      Track.StateStyles.UnChecked.Default.fill.Color := $FFE6E0E9; // md.sys.color.surface-container-highest / md.ref.palette.neutral90
+      //--
+      Thumb.StateStyles.UnChecked.Default.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.UnChecked.Default.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Default.fill.Color := $FF79747E; // md.sys.color.outline / md.ref.palette.neutral-variant50
+      Thumb.StateStyles.UnChecked.Default.Fill.BackgroundMargins.Rect := TRectF.Create(4*LRatio,4*LRatio,4*LRatio,4*LRatio);
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Inherit := False;
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Color := TAlphacolors.Null; // $FFE6E0E9; // md.sys.color.surface-container-highest / md.ref.palette.neutral90
+      //--Default (Checked)--
+      Track.StateStyles.Checked.Default.fill.Assign(Track.fill);
+      Track.StateStyles.Checked.Default.fill.Inherit := False;
+      Track.StateStyles.Checked.Default.fill.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+      //--
+      Thumb.StateStyles.Checked.Default.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.Checked.Default.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Default.fill.Color := $FFFFFFFF; // md.sys.color.on-primary / md.ref.palette.primary100
+      Thumb.StateStyles.Checked.Default.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.Checked.Default.CheckMark.Inherit := False;
+      Thumb.StateStyles.Checked.Default.CheckMark.Color := $FF4F378B; // md.sys.color.on-primary-container / md.ref.palette.primary30
+
+      //--Disabled (UnChecked)--
+      Track.StateStyles.UnChecked.Disabled.Opacity := 1;
+      Track.StateStyles.UnChecked.Disabled.Stroke.Assign(Track.Stroke);
+      Track.StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+      Track.StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
+      Track.StateStyles.UnChecked.Disabled.Stroke.Thickness := 2 * LRatio;
+      Track.StateStyles.UnChecked.Disabled.fill.Assign(Track.fill);
+      Track.StateStyles.UnChecked.Disabled.fill.Inherit := False;
+      Track.StateStyles.UnChecked.Disabled.fill.Color := ALSetColorAlpha($FFE6E0E9, 0.12); // md.sys.color.surface-container-highest / md.ref.palette.neutral90
+      //--
+      Thumb.StateStyles.UnChecked.Disabled.Opacity := 1;
+      Thumb.StateStyles.UnChecked.Disabled.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.UnChecked.Disabled.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Disabled.fill.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+      Thumb.StateStyles.UnChecked.Disabled.Fill.BackgroundMargins.Rect := TRectF.Create(4*LRatio,4*LRatio,4*LRatio,4*LRatio);
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.surface-container-highest / md.ref.palette.neutral90
+      //--Disabled (Checked)--
+      Track.StateStyles.Checked.Disabled.Opacity := 1;
+      Track.StateStyles.Checked.Disabled.fill.Assign(Track.fill);
+      Track.StateStyles.Checked.Disabled.fill.Inherit := False;
+      Track.StateStyles.Checked.Disabled.fill.Color := ALSetColorAlpha($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
+      //--
+      Thumb.StateStyles.Checked.Disabled.Opacity := 1;
+      Thumb.StateStyles.Checked.Disabled.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.Checked.Disabled.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Disabled.fill.Color := $FFFEF7FF; // md.sys.color.surface / md.ref.palette.neutral98
+      Thumb.StateStyles.Checked.Disabled.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+      Thumb.StateStyles.Checked.Disabled.CheckMark.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+
+      //--Hovered (UnChecked)--
+      Thumb.StateStyles.UnChecked.Hovered.fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
+      Thumb.StateStyles.UnChecked.Hovered.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Hovered.fill.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+      //--Hovered (Checked)--
+      Thumb.StateStyles.Checked.Hovered.fill.Assign(Thumb.StateStyles.Checked.Default.fill);
+      Thumb.StateStyles.Checked.Hovered.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Hovered.fill.Color := $FFEADDFF; // md.sys.color.primary-container / md.ref.palette.primary90
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+
+      //--Pressed (UnChecked)--
+      Thumb.StateStyles.UnChecked.Pressed.Fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
+      Thumb.StateStyles.UnChecked.Pressed.Fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Pressed.fill.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      Thumb.StateStyles.UnChecked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*LRatio,-2*LRatio,-2*LRatio,-2*LRatio);
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      //--Pressed (Checked)--
+      Thumb.StateStyles.Checked.Pressed.Fill.Assign(Thumb.StateStyles.Checked.Default.fill);
+      Thumb.StateStyles.Checked.Pressed.Fill.Inherit := False;
+      Thumb.StateStyles.Checked.Pressed.fill.Color := $FFEADDFF; // md.sys.color.primary-container / md.ref.palette.primary90
+      Thumb.StateStyles.Checked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*LRatio,-2*LRatio,-2*LRatio,-2*LRatio);
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+
+      //--Focused (UnChecked)--
+      Thumb.StateStyles.UnChecked.Focused.fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
+      Thumb.StateStyles.UnChecked.Focused.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Focused.fill.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Color := $FF1D1B20; // md.sys.color.on-surface / md.ref.palette.neutral10
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      //--Focused (Checked)--
+      Thumb.StateStyles.Checked.Focused.fill.Assign(Thumb.StateStyles.Checked.Default.fill);
+      Thumb.StateStyles.Checked.Focused.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Focused.fill.Color := $FFEADDFF; // md.sys.color.primary-container / md.ref.palette.primary90
+      Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.Checked.Focused.StateLayer.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+      Thumb.StateStyles.Checked.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/switch/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
+procedure ALApplyMaterial3DarkSwitchTheme(const ASwitch: TALSwitch; const AHeight: Single = 32);
+begin
+  var LHeight: Single := AHeight;
+  {$IF defined(ALDPK)}
+  While True do begin
+    var LValue := InputBox('Please enter the desired height for the switch', '', ALFloatToStrW(AHeight, ALDefaultFormatSettingsW));
+    if ALTryStrToFloat(LValue,LHeight,ALDefaultFormatSettingsW) then break;
+  end;
+  {$ENDIF}
+  var LRatio: Single := LHeight / 32;
+
+  With ASwitch do begin
+    BeginUpdate;
+    Try
+
+      //--Enabled (default)--
+      ALResetSwitchTheme(ASwitch, LHeight);
+
+      //--Default (UnChecked)--
+      Track.StateStyles.UnChecked.Default.Stroke.Assign(Track.Stroke);
+      Track.StateStyles.UnChecked.Default.Stroke.Inherit := False;
+      Track.StateStyles.UnChecked.Default.Stroke.Color := $FF938F99; // md.sys.color.outline / md.ref.palette.neutral-variant60
+      Track.StateStyles.UnChecked.Default.Stroke.Thickness := 2 * LRatio;
+      Track.StateStyles.UnChecked.Default.fill.Assign(Track.fill);
+      Track.StateStyles.UnChecked.Default.fill.Inherit := False;
+      Track.StateStyles.UnChecked.Default.fill.Color := $FF36343B; // md.sys.color.surface-container-highest / md.ref.palette.neutral22
+      //--
+      Thumb.StateStyles.UnChecked.Default.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.UnChecked.Default.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Default.fill.Color := $FF938F99; // md.sys.color.outline / md.ref.palette.neutral-variant60
+      Thumb.StateStyles.UnChecked.Default.Fill.BackgroundMargins.Rect := TRectF.Create(4*LRatio,4*LRatio,4*LRatio,4*LRatio);
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Inherit := False;
+      Thumb.StateStyles.UnChecked.Default.CheckMark.Color := TAlphacolors.Null; // $FF36343B; // md.sys.color.surface-container-highest / md.ref.palette.neutral22
+      //--Default (Checked)--
+      Track.StateStyles.Checked.Default.fill.Assign(Track.fill);
+      Track.StateStyles.Checked.Default.fill.Inherit := False;
+      Track.StateStyles.Checked.Default.fill.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+      //--
+      Thumb.StateStyles.Checked.Default.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.Checked.Default.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Default.fill.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
+      Thumb.StateStyles.Checked.Default.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.Checked.Default.CheckMark.Inherit := False;
+      Thumb.StateStyles.Checked.Default.CheckMark.Color := $FFEADDFF; // md.sys.color.on-primary-container / md.ref.palette.primary90
+
+      //--Disabled (UnChecked)--
+      Track.StateStyles.UnChecked.Disabled.Opacity := 1;
+      Track.StateStyles.UnChecked.Disabled.Stroke.Assign(Track.Stroke);
+      Track.StateStyles.UnChecked.Disabled.Stroke.Inherit := False;
+      Track.StateStyles.UnChecked.Disabled.Stroke.Color := ALSetColorAlpha($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
+      Track.StateStyles.UnChecked.Disabled.Stroke.Thickness := 2 * LRatio;
+      Track.StateStyles.UnChecked.Disabled.fill.Assign(Track.fill);
+      Track.StateStyles.UnChecked.Disabled.fill.Inherit := False;
+      Track.StateStyles.UnChecked.Disabled.fill.Color := ALSetColorAlpha($FF36343B, 0.12); // md.sys.color.surface-container-highest / md.ref.palette.neutral22
+      //--
+      Thumb.StateStyles.UnChecked.Disabled.Opacity := 1;
+      Thumb.StateStyles.UnChecked.Disabled.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.UnChecked.Disabled.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Disabled.fill.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+      Thumb.StateStyles.UnChecked.Disabled.Fill.BackgroundMargins.Rect := TRectF.Create(4*LRatio,4*LRatio,4*LRatio,4*LRatio);
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.Inherit := False;
+      Thumb.StateStyles.UnChecked.Disabled.CheckMark.Color := ALSetColorAlpha($FF36343B, 0.38); // md.sys.color.surface-container-highest / md.ref.palette.neutral22
+      //--Disabled (Checked)--
+      Track.StateStyles.Checked.Disabled.Opacity := 1;
+      Track.StateStyles.Checked.Disabled.fill.Assign(Track.fill);
+      Track.StateStyles.Checked.Disabled.fill.Inherit := False;
+      Track.StateStyles.Checked.Disabled.fill.Color := ALSetColorAlpha($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
+      //--
+      Thumb.StateStyles.Checked.Disabled.Opacity := 1;
+      Thumb.StateStyles.Checked.Disabled.fill.Assign(Thumb.fill);
+      Thumb.StateStyles.Checked.Disabled.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Disabled.fill.Color := $FF141218; // md.sys.color.surface / md.ref.palette.neutral6
+      Thumb.StateStyles.Checked.Disabled.CheckMark.Assign(Thumb.CheckMark);
+      Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit := False;
+      Thumb.StateStyles.Checked.Disabled.CheckMark.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+
+      //--Hovered (UnChecked)--
+      Thumb.StateStyles.UnChecked.Hovered.fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
+      Thumb.StateStyles.UnChecked.Hovered.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Hovered.fill.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+      Thumb.StateStyles.UnChecked.Hovered.StateLayer.Opacity := 0.08;
+      //--Hovered (Checked)--
+      Thumb.StateStyles.Checked.Hovered.fill.Assign(Thumb.StateStyles.Checked.Default.fill);
+      Thumb.StateStyles.Checked.Hovered.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Hovered.fill.Color := $FF4F378B; // md.sys.color.primary-container / md.ref.palette.primary30
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+      Thumb.StateStyles.Checked.Hovered.StateLayer.Opacity := 0.08;
+
+      //--Pressed (UnChecked)--
+      Thumb.StateStyles.UnChecked.Pressed.Fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
+      Thumb.StateStyles.UnChecked.Pressed.Fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Pressed.fill.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      Thumb.StateStyles.UnChecked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*LRatio,-2*LRatio,-2*LRatio,-2*LRatio);
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+      Thumb.StateStyles.UnChecked.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      //--Pressed (Checked)--
+      Thumb.StateStyles.Checked.Pressed.Fill.Assign(Thumb.StateStyles.Checked.Default.fill);
+      Thumb.StateStyles.Checked.Pressed.Fill.Inherit := False;
+      Thumb.StateStyles.Checked.Pressed.fill.Color := $FF4F378B; // md.sys.color.primary-container / md.ref.palette.primary30
+      Thumb.StateStyles.Checked.Pressed.Fill.BackgroundMargins.Rect := TRectF.Create(-2*LRatio,-2*LRatio,-2*LRatio,-2*LRatio);
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+      Thumb.StateStyles.Checked.Pressed.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+
+      //--Focused (UnChecked)--
+      Thumb.StateStyles.UnChecked.Focused.fill.Assign(Thumb.StateStyles.UnChecked.Default.fill);
+      Thumb.StateStyles.UnChecked.Focused.fill.Inherit := False;
+      Thumb.StateStyles.UnChecked.Focused.fill.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Color := $FFE6E0E9; // md.sys.color.on-surface / md.ref.palette.neutral90
+      Thumb.StateStyles.UnChecked.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+      //--Focused (Checked)--
+      Thumb.StateStyles.Checked.Focused.fill.Assign(Thumb.StateStyles.Checked.Default.fill);
+      Thumb.StateStyles.Checked.Focused.fill.Inherit := False;
+      Thumb.StateStyles.Checked.Focused.fill.Color := $FF4F378B; // md.sys.color.primary-container / md.ref.palette.primary30
+      Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Rect := TRectF.Create(-8*LRatio,-8*LRatio,-8*LRatio,-8*LRatio);
+      Thumb.StateStyles.Checked.Focused.StateLayer.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+      Thumb.StateStyles.Checked.Focused.StateLayer.Opacity := 0.12; // Instead of 0.10, use a higher value for better contrast
+
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***************************************************************************}
+procedure ALApplySwitchTheme(const ATheme: String; const ASwitch: TALSwitch);
+begin
+  Var LApplySwitchThemeProc: TALApplySwitchThemeProc;
+  If not ALSwitchThemes.TryGetValue(Atheme,LApplySwitchThemeProc) then
+    Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
+  ASwitch.BeginUpdate;
+  try
+    LApplySwitchThemeProc(ASwitch);
+  finally
+    ASwitch.EndUpdate;
+  end;
+end;
+
 initialization
   ALEditThemes := TDictionary<String, TALApplyEditThemeProc>.Create;
   ALMemoThemes := TDictionary<String, TALApplyEditThemeProc>.Create;
   ALButtonThemes := TDictionary<String, TALApplyButtonThemeProc>.Create;
   ALCheckBoxThemes := TDictionary<String, TALApplyCheckBoxThemeProc>.Create;
   ALRadioButtonThemes := TDictionary<String, TALApplyRadioButtonThemeProc>.Create;
+  ALSwitchThemes := TDictionary<String, TALApplySwitchThemeProc>.Create;
 
   ALEditThemes.Add('Default', ALResetEditTheme);
   ALEditThemes.Add('Material3.Light.Filled', ALApplyMaterial3LightFilledEditTheme);
@@ -2146,6 +2476,10 @@ initialization
   ALRadioButtonThemes.Add('Material3.Dark', ALApplyMaterial3DarkRadioButtonTheme);
   ALRadioButtonThemes.Add('Material3.Dark.Error', ALApplyMaterial3DarkErrorRadioButtonTheme);
 
+  ALSwitchThemes.Add('Default', ALResetSwitchTheme);
+  ALSwitchThemes.Add('Material3.Light', ALApplyMaterial3LightSwitchTheme);
+  ALSwitchThemes.Add('Material3.Dark', ALApplyMaterial3DarkSwitchTheme);
+
 
 finalization
   ALFreeAndNil(ALEditThemes);
@@ -2153,5 +2487,6 @@ finalization
   ALFreeAndNil(ALButtonThemes);
   ALFreeAndNil(ALCheckBoxThemes);
   ALFreeAndNil(ALRadioButtonThemes);
+  ALFreeAndNil(ALSwitchThemes);
 
 end.

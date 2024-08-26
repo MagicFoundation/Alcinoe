@@ -26,6 +26,8 @@ type
     FControlAbsolutePosAtMouseDown: TpointF;
     FMouseDownAtLowVelocity: Boolean;
     FDisableDoubleClickHandling: Boolean;
+    function GetPressed: Boolean;
+    procedure SetPressed(const AValue: Boolean);
   protected
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
@@ -47,6 +49,10 @@ type
     function IsVisibleWithinFormBounds: Boolean;
     property Form: TCommonCustomForm read FForm;
     property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
+    {$IFNDEF ALCompilerVersionSupported120}
+      {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed property still does not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
+    {$ENDIF}
+    property Pressed: Boolean read GetPressed write SetPressed;
   end;
 
   {**************************************}
@@ -181,6 +187,21 @@ begin
 end;
 
 {*****************************}
+function TALControl.GetPressed: Boolean;
+begin
+  result := inherited Pressed;
+end;
+
+{*****************************}
+procedure TALControl.SetPressed(const AValue: Boolean);
+begin
+  if AValue <> GetPressed then begin
+    inherited Pressed := AValue;
+    pressedChanged;
+  end;
+end;
+
+{*****************************}
 procedure TALControl.DoEnter;
 begin
   var LPrevIsFocused := IsFocused;
@@ -210,7 +231,6 @@ end;
 {*****************************}
 procedure TALControl.DoMouseLeave;
 begin
-  var LPrevPressed := Pressed;
   var LPrevIsMouseOver := IsMouseOver;
   inherited;
   {$IF defined(ANDROID) or defined(IOS)}
@@ -218,7 +238,6 @@ begin
   {$ENDIF}
   if not AutoCapture then
     Pressed := False;
-  if LPrevPressed <> Pressed then PressedChanged;
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 

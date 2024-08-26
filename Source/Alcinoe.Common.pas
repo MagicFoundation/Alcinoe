@@ -462,6 +462,8 @@ function ALRectCenter(var R: TRectf; const Bounds: TRectf): TRectf; inline; over
 function ALRectCenter(var R: TALRectD; const Bounds: TALRectD): TALRectD; overload;
 function ALIntersectRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
 function ALUnionRect(out Rect: TALRectD; const R1, R2: TALRectD): Boolean;
+function ALScaleRect(const Rect: TRectF; const Ratio: Single): TRectF; inline; overload;
+function ALScaleRect(const Rect: TALRectD; const Ratio: Double): TALRectD; inline; overload;
 
 {**************************************************************************************************************************}
 function ALRectFitInto(const R: TRectf; const Bounds: TRectf; const CenterAt: TpointF; out Ratio: Single): TRectF; overload;
@@ -1244,6 +1246,26 @@ begin
     tmpRect.Right := 0.0;
   end;
   Rect := tmpRect;
+end;
+
+{********************************************************************}
+function ALScaleRect(const Rect: TRectF; const Ratio: Single): TRectF;
+begin
+  Result := Rect;
+  Result.Top := Result.Top * Ratio;
+  Result.Bottom := Result.Bottom * Ratio;
+  Result.Left := Result.Left * Ratio;
+  Result.Right := Result.Right * Ratio;
+end;
+
+{************************************************************************}
+function ALScaleRect(const Rect: TALRectD; const Ratio: Double): TALRectD;
+begin
+  Result := Rect;
+  Result.Top := Result.Top * Ratio;
+  Result.Bottom := Result.Bottom * Ratio;
+  Result.Left := Result.Left * Ratio;
+  Result.Right := Result.Right * Ratio;
 end;
 
 {***********************************************************************************************}

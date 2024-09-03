@@ -311,6 +311,7 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALFont; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
     property DefaultFamily: TFontName read FDefaultFamily write FDefaultFamily;
@@ -384,6 +385,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
     property DefaultInherit: Boolean read FDefaultInherit write FDefaultInherit;
@@ -444,6 +446,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
     //--
@@ -587,6 +590,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALBrush; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
     function HasFill: boolean; virtual;
@@ -648,6 +652,7 @@ type
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
     function HasStroke: boolean; virtual;
@@ -718,6 +723,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
     function HasFill: boolean; virtual;
@@ -840,6 +846,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure ClearBufDrawable; virtual;
     Property Inherit: Boolean read GetInherit;
     procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); virtual;
@@ -927,6 +934,7 @@ type
     destructor Destroy; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure ClearBufDrawable; virtual;
     /// <summary>
     ///   Determines and returns the current raw state style of the control
@@ -987,12 +995,18 @@ function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
 Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffered: Boolean = True);
 procedure ALAutoSize(const AControl: TControl);
-function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
-function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single; overload;
+function  ALAlignEdgesToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
+function  ALAlignDimensionToPixelRound(const Size: TSizeF; const Scale: single; const Epsilon: Single = 0): TSizeF; overload;
+function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
+function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
 function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
-function  ALAlignToPixelRound(const Point: TPointF; const Scale: single): TpointF; overload;
-function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single): TRectF; overload;
+function  ALAlignDimensionToPixelFloor(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
+function  ALAlignDimensionToPixelFloor(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
+function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Epsilon: Single = 0): TpointF; overload;
+function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Epsilon: Single = 0): TRectF; overload;
+function  ALAlignToPixelRound(const Point: TPointF; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
+function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 
 {$IF defined(ALAppleOS)}
 type
@@ -1038,10 +1052,10 @@ Type
   {$ENDIF}
   TALControlAccessPrivate = class(TFmxObject)
   {$IF CompilerVersion >= 32}  // Tokyo
-  private type
+  public type
     TDelayedEvent = (Resize, Resized);
   {$ENDIF}
-  private const
+  public const
     InitialControlsCapacity = 10;
   public const
     DefaultTouchTargetExpansion = 6;
@@ -1621,7 +1635,7 @@ begin
   if (FSuperseded) or
      (not inherit) or
      (FParent = nil) then exit;
-  beginUpdate;
+  BeginUpdate;
   try
     var LParentSuperseded := False;
     if FParent is TALInheritShadow then begin
@@ -1734,7 +1748,7 @@ procedure TALFont.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Family := DefaultFamily;
     Size := DefaultSize;
     Weight := DefaultWeight;
@@ -1742,6 +1756,18 @@ begin
     Stretch := DefaultStretch;
     Color := DefaultColor;
     AutoConvert := DefaultAutoConvert;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALFont.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    // I'm not sure if doing this will impact anything
+    Size := ALAlignDimensionToPixelRound(Size, ALGetScreenScale, TEpsilon.FontSize);
   finally
     EndUpdate;
   end;
@@ -1955,7 +1981,7 @@ procedure TALTextDecoration.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Kinds := DefaultKinds;
     Style := DefaultStyle;
     ThicknessMultiplier := DefaultThicknessMultiplier;
@@ -2119,10 +2145,22 @@ procedure TALEllipsisSettings.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Inherit := DefaultInherit;
     Font.reset;
     Decoration.reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALEllipsisSettings.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    // I'm not sure if doing this will impact anything
+    Font.AlignToPixel;
   finally
     EndUpdate;
   end;
@@ -2362,7 +2400,7 @@ procedure TALBaseTextSettings.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Font.reset;
     Decoration.reset;
     EllipsisSettings.reset;
@@ -2374,6 +2412,20 @@ begin
     LineHeightMultiplier := DefaultLineHeightMultiplier;
     LetterSpacing := DefaultLetterSpacing;
     IsHtml := DefaultIsHtml;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALBaseTextSettings.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    // I'm not sure if doing this will impact anything
+    Font.AlignToPixel;
+    EllipsisSettings.AlignToPixel;
+    LetterSpacing := ALAlignDimensionToPixelRound(LetterSpacing, ALGetScreenScale, TEpsilon.FontSize);
   finally
     EndUpdate;
   end;
@@ -2632,7 +2684,7 @@ procedure TALInheritBaseTextSettings.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Inherit := True;
     fSuperseded := False;
   finally
@@ -2653,7 +2705,7 @@ begin
   if (FSuperseded) or
      (not inherit) or
      (FParent = nil) then exit;
-  beginUpdate;
+  BeginUpdate;
   try
     var LParentSuperseded := False;
     if FParent is TALInheritBaseTextSettings then begin
@@ -2721,7 +2773,7 @@ procedure TALGradient.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Style := DefaultStyle;
     Colors := [];
     Offsets := [];
@@ -3185,13 +3237,25 @@ procedure TALBrush.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Color := DefaultColor;
     Gradient.Reset;
     ResourceName := DefaultResourceName;
     WrapMode := DefaultWrapMode;
     BackgroundMargins.Rect := BackgroundMargins.DefaultValue;
     ImageMargins.Rect := ImageMargins.DefaultValue;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALBrush.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    BackgroundMargins.Rect := ALAlignEdgesToPixelRound(BackgroundMargins.Rect, ALGetScreenScale, TEpsilon.Position);
+    ImageMargins.Rect := ALAlignEdgesToPixelRound(ImageMargins.Rect, ALGetScreenScale, TEpsilon.Position);
   finally
     EndUpdate;
   end;
@@ -3392,7 +3456,7 @@ procedure TALInheritBrush.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Inherit := True;
     fSuperseded := False;
   finally
@@ -3413,7 +3477,7 @@ begin
   if (FSuperseded) or
      (not inherit) or
      (FParent = nil) then exit;
-  beginUpdate;
+  BeginUpdate;
   try
     var LParentSuperseded := False;
     if FParent is TALInheritBrush then begin
@@ -3503,9 +3567,20 @@ procedure TALStrokeBrush.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Color := DefaultColor;
     Thickness := DefaultThickness;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALStrokeBrush.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    Thickness := ALAlignDimensionToPixelRound(Thickness, ALGetScreenScale, TEpsilon.Vector);
   finally
     EndUpdate;
   end;
@@ -3627,7 +3702,7 @@ procedure TALInheritStrokeBrush.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Inherit := True;
     fSuperseded := False;
   finally
@@ -3648,7 +3723,7 @@ begin
   if (FSuperseded) or
      (not inherit) or
      (FParent = nil) then exit;
-  beginUpdate;
+  BeginUpdate;
   try
     var LParentSuperseded := False;
     if FParent is TALInheritStrokeBrush then begin
@@ -3740,13 +3815,26 @@ procedure TALStateLayer.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Opacity := DefaultOpacity;
     Color := DefaultColor;
     UseContentColor := DefaultUseContentColor;
     Margins.Rect := Margins.DefaultValue;
     XRadius := DefaultXRadius;
     YRadius := DefaultYRadius;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALStateLayer.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
+    XRadius := ALAlignDimensionToPixelRound(XRadius, ALGetScreenScale, TEpsilon.Vector);
+    YRadius := ALAlignDimensionToPixelRound(YRadius, ALGetScreenScale, TEpsilon.Vector);
   finally
     EndUpdate;
   end;
@@ -4079,7 +4167,7 @@ procedure TALStateTransition.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     AnimationType := DefaultAnimationType;
     Duration := DefaultDuration;
     Interpolation := DefaultInterpolation;
@@ -4252,13 +4340,26 @@ procedure TALBaseStateStyle.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Fill.Reset;
     StateLayer.Reset;
     Stroke.Reset;
     Shadow.Reset;
     Scale.Reset;
     fSuperseded := False;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALBaseStateStyle.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    Fill.AlignToPixel;
+    StateLayer.AlignToPixel;
+    Stroke.AlignToPixel;
   finally
     EndUpdate;
   end;
@@ -4361,7 +4462,7 @@ procedure TALBaseStateStyle.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
   if (FSuperseded) then exit;
-  beginUpdate;
+  BeginUpdate;
   try
     DoSupersede;
     FSuperseded := True;
@@ -4651,11 +4752,17 @@ procedure TALBaseStateStyles.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Transition.Reset;
   finally
     EndUpdate;
   end;
+end;
+
+{**********************************}
+procedure TALBaseStateStyles.AlignToPixel;
+begin
+  // Virtual
 end;
 
 {******************************}
@@ -5284,6 +5391,10 @@ begin
           LSize.height := Max(LSize.Height, AControl.Height);
       End;
 
+      //--
+      else
+        raise Exception.Create('Error 431814A4-5A5F-462E-9491-88F1874210DC');
+
     end;
   end;
 
@@ -5293,17 +5404,33 @@ begin
 end;
 
 {**************************************************************************************}
-function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
+function  ALAlignEdgesToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
+begin
+  result.left := Round(Rect.left * Scale + Epsilon) / Scale;
+  result.right := Round(Rect.right * Scale + Epsilon) / Scale;
+  result.top := Round(Rect.top * Scale + Epsilon) / Scale;
+  result.bottom := Round(Rect.bottom * Scale + Epsilon) / Scale;
+end;
+
+{**************************************************************************************}
+function  ALAlignDimensionToPixelRound(const Size: TSizeF; const Scale: single; const Epsilon: Single = 0): TSizeF;
+begin
+  result.Width := Round(Size.Width * Scale + Epsilon) / Scale;
+  result.height := Round(Size.height * Scale + Epsilon) / Scale;
+end;
+
+{**************************************************************************************}
+function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
   result := Rect;
-  result.Width := Round(Rect.Width * Scale) / Scale;
-  result.height := Round(Rect.height * Scale) / Scale;
+  result.Width := Round(Rect.Width * Scale + Epsilon) / Scale;
+  result.height := Round(Rect.height * Scale + Epsilon) / Scale;
 end;
 
 {*******************************************************************************************}
-function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single): single;
+function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single;
 begin
-  result := Round(Dimension * Scale) / Scale;
+  result := Round(Dimension * Scale + Epsilon) / Scale;
 end;
 
 {****************************************************************************************************************}
@@ -5320,20 +5447,69 @@ begin
   result := ceil(Dimension * Scale - Epsilon) / Scale;
 end;
 
-{********************************************************************************}
-function  ALAlignToPixelRound(const Point: TPointF; const Scale: single): TpointF;
+{****************************************************************************************************************}
+function  ALAlignDimensionToPixelFloor(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
-  result.x := round(Point.x * Scale) / Scale;
-  result.y := round(Point.y * Scale) / Scale;
+  result := Rect;
+  result.Width := Floor(Rect.Width * Scale + Epsilon) / Scale;
+  result.height := Floor(Rect.height * Scale + Epsilon) / Scale;
+end;
+
+{******************************************************************************************}
+function  ALAlignDimensionToPixelFloor(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single;
+begin
+  result := Floor(Dimension * Scale + Epsilon) / Scale;
+end;
+
+{********************************************************************************}
+function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Epsilon: Single = 0): TpointF; overload;
+begin
+  // Detect Rotation
+  if not SameValue(Matrix.m12, 0, TEpsilon.Matrix) or
+     not SameValue(Matrix.m21, 0, TEpsilon.Matrix) then begin
+    result := Point;
+    Exit;
+  end;
+  // Taken from function TCanvas.AlignToPixelHorizontally(const Value: Single): Single;
+  result.x := Round((Matrix.m31 + Point.x) * Matrix.m11 + Epsilon) / Matrix.m11 - Matrix.m31;
+  // Taken from function TCanvas.AlignToPixelVertically(const Value: Single): Single;
+  result.y := Round((Matrix.m32 + Point.y) * Matrix.m22 + Epsilon) / Matrix.m22 - Matrix.m32;
+end;
+
+{********************************************************************************}
+function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Epsilon: Single = 0): TRectF; overload;
+begin
+  // Detect Rotation
+  if not SameValue(Matrix.m12, 0, TEpsilon.Matrix) or
+     not SameValue(Matrix.m21, 0, TEpsilon.Matrix) then begin
+    result := Rect;
+    Exit;
+  end;
+  // Taken from function TCanvas.AlignToPixelHorizontally(const Value: Single): Single;
+  Result.Left := Round((Matrix.m31 + Rect.Left) * Matrix.m11 + Epsilon) / Matrix.m11 - Matrix.m31;
+  // Taken from function TCanvas.AlignToPixelVertically(const Value: Single): Single;
+  Result.Top := Round((Matrix.m32 + Rect.Top) * Matrix.m22 + Epsilon) / Matrix.m22 - Matrix.m32;
+  // Taken from function TCanvas.AlignToPixel(const Rect: TRectF): TRectF;
+  Result.Right := Result.Left + Round(Rect.Width * Matrix.m11 + Epsilon) / Matrix.m11; // keep ratio horizontally
+  Result.Bottom := Result.Top + Round(Rect.Height * Matrix.m22 + Epsilon) / Matrix.m22; // keep ratio vertically
+end;
+
+{********************************************************************************}
+function  ALAlignToPixelRound(const Point: TPointF; const Scale: single; const Epsilon: Single = 0): TpointF;
+begin
+  var LMatrix := Tmatrix.Identity;
+  LMatrix.m11 := Scale;
+  LMatrix.m22 := Scale;
+  Result := ALAlignToPixelRound(Point, LMatrix, Epsilon);
 end;
 
 {*****************************************************************************}
-function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single): TRectF;
+function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
-  Result.Left := round(Rect.Left * Scale) / Scale;
-  Result.Top := round(Rect.Top * Scale) / Scale;
-  Result.Right := Result.Left + (Round(Rect.Width * Scale) / Scale); // keep ratio horizontally
-  Result.Bottom := Result.Top + (Round(Rect.Height * Scale) / Scale); // keep ratio vertically
+  var LMatrix := Tmatrix.Identity;
+  LMatrix.m11 := Scale;
+  LMatrix.m22 := Scale;
+  Result := ALAlignToPixelRound(Rect, LMatrix, Epsilon);
 end;
 
 {**********************}

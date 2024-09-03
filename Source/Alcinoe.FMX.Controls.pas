@@ -26,8 +26,11 @@ type
     FControlAbsolutePosAtMouseDown: TpointF;
     FMouseDownAtLowVelocity: Boolean;
     FDisableDoubleClickHandling: Boolean;
+    FEnablePixelAlignment: Boolean;
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
+    procedure DelayOnResize(Sender: TObject);
+    procedure DelayOnResized(Sender: TObject);
   protected
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
@@ -43,6 +46,7 @@ type
     procedure IsMouseOverChanged; virtual;
     procedure IsFocusedChanged; virtual;
     procedure PressedChanged; virtual;
+    procedure Loaded; override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetNewScene(AScene: IScene); override;
@@ -53,6 +57,8 @@ type
       {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed property still does not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
+    procedure AlignToPixel; virtual;
+    property EnablePixelAlignment: Boolean read FEnablePixelAlignment write FEnablePixelAlignment;
   end;
 
   {**************************************}
@@ -131,6 +137,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.Math.Vectors,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.StringUtils,
@@ -154,6 +161,84 @@ begin
   // desktops are handled by different gestures or interface elements in
   // mobile apps, leading to a more user-friendly experience.
   FDisableDoubleClickHandling := True;
+  FEnablePixelAlignment := True;
+end;
+
+{**************************}
+procedure TALControl.Loaded;
+begin
+  {$IF not DEFINED(ALDPK)}
+  if EnablePixelAlignment then
+    AlignToPixel;
+  {$ENDIF}
+  Inherited;
+end;
+
+{*****************************************************}
+procedure TALControl.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    // OnResize and OnResized will be called in loaded
+    var LOldOnResize := OnResize;
+    var LOldOnResized := OnResized;
+    if CSLoading in componentState then begin
+      OnResize := DelayOnResize;
+      OnResized := DelayOnResized;
+    end;
+    try
+      Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
+      Padding.Rect := ALAlignEdgesToPixelRound(Padding.Rect, ALGetScreenScale, TEpsilon.Position);
+      case Align of
+        TAlignLayout.None,
+        TAlignLayout.Center:
+          Size.Size := ALAlignDimensionToPixelRound(Size.Size, ALGetScreenScale, TEpsilon.Position);
+        //--
+        TAlignLayout.Top,
+        TAlignLayout.MostTop,
+        TAlignLayout.Bottom,
+        TAlignLayout.MostBottom,
+        TAlignLayout.Horizontal,
+        TAlignLayout.VertCenter:
+          Size.Height := ALAlignDimensionToPixelRound(Size.Height , ALGetScreenScale, TEpsilon.Position);
+        //--
+        TAlignLayout.Left,
+        TAlignLayout.MostLeft,
+        TAlignLayout.Right,
+        TAlignLayout.MostRight,
+        TAlignLayout.Vertical,
+        TAlignLayout.HorzCenter:
+          Size.Width := ALAlignDimensionToPixelRound(Size.Width , ALGetScreenScale, TEpsilon.Position);
+        //--
+        TAlignLayout.Client,
+        TAlignLayout.Contents,
+        TAlignLayout.Scale,
+        TAlignLayout.Fit,
+        TAlignLayout.FitLeft,
+        TAlignLayout.FitRight:;
+        //--
+        else
+          Raise Exception.Create('Error AC54DF90-F880-4BD5-8474-E62BD8D099FB')
+      end;
+    finally
+      OnResize := LOldOnResize;
+      OnResized := LOldOnResized;
+    end;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*****************************************************}
+procedure TALControl.DelayOnResize(Sender: TObject);
+begin
+  Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resize);
+end;
+
+{*****************************************************}
+procedure TALControl.DelayOnResized(Sender: TObject);
+begin
+  Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resized);
 end;
 
 {*****************************************************}

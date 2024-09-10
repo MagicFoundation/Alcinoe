@@ -61,6 +61,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure AlignToPixel; override;
     property Fill: TALBrush read GetFill write SetFill;
     property Stroke: TALStrokeBrush read GetStroke write SetStroke;
     property Shadow: TALShadow read GetShadow write SetShadow;
@@ -796,6 +797,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure AlignToPixel; override;
     procedure SetNewScene(AScene: IScene); override;
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
@@ -949,6 +951,20 @@ begin
   inherited;
 end;
 
+{******************************}
+procedure TALShape.AlignToPixel;
+begin
+  beginUpdate;
+  try
+    inherited;
+    Stroke.AlignToPixel;
+    Fill.AlignToPixel;
+    Shadow.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
 {**********************************************}
 procedure TALShape.FillChanged(Sender: TObject);
 begin
@@ -1057,12 +1073,12 @@ begin
                               TalExifOrientationInfo.ROTATE_90,
                               TalExifOrientationInfo.TRANSVERSE,
                               TalExifOrientationInfo.ROTATE_270] then fBufDrawableRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), ALGetScreenScale) // to have the pixel aligned width and height
+  // TalExifOrientationInfo.FLIP_HORIZONTAL
+  // TalExifOrientationInfo.FLIP_VERTICAL
+  // TalExifOrientationInfo.NORMAL
+  // TalExifOrientationInfo.ROTATE_180
+  // TalExifOrientationInfo.UNDEFINED
   else fBufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
-                                                                                      // TalExifOrientationInfo.FLIP_HORIZONTAL:;
-                                                                                      // TalExifOrientationInfo.FLIP_VERTICAL:;
-                                                                                      // TalExifOrientationInfo.NORMAL:;
-                                                                                      // TalExifOrientationInfo.ROTATE_180:;
-                                                                                      // TalExifOrientationInfo.UNDEFINED:;
 
   {$IFDEF ALDPK}
   try
@@ -1602,7 +1618,7 @@ begin
     else
       Raise Exception.Create('Error 822CE359-8404-40CE-91B9-1CFC3DBA259F')
   end;
-  ALAlignDimensionToPixelRound(FRenderRect, ALGetScreenScale); // to have the pixel aligned width and height
+  FRenderRect := ALAlignDimensionToPixelRound(FRenderRect, ALGetScreenScale); // to have the pixel aligned width and height
 
   {$IF not defined(ALSkiaCanvas)}
   var LBufRect: Trect;
@@ -1612,7 +1628,8 @@ begin
     FBufSurface, // out ASurface: TALSurface;
     FbufCanvas, // out ACanvas: TALCanvas;
     LBufRect.width, // const w: Single;
-    LBufRect.height); // const h: Single);
+    LBufRect.height, // const h: Single);
+    false); // const AAddPixelForAlignment: Boolean = true
   {$IF defined(ALGPUCanvas)}
   FbufTexture := TALTexture.Create;
   FbufTexture.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
@@ -1957,7 +1974,6 @@ begin
                         AFill, // const AFill: TALBrush;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
-  LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
   var LSurface: TALSurface;
@@ -1976,6 +1992,7 @@ begin
       ALDrawRectangle(
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
+        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
@@ -2051,11 +2068,11 @@ begin
 
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
-    var LRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
     ALDrawRectangle(
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
-      Canvas.AlignToPixel(LRect), // const Rect: TrectF;
+      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+      LocalRect, // const Rect: TrectF;
       AbsoluteOpacity, // const AOpacity: Single;
       Fill, // const Fill: TALBrush;
       nil, // const StateLayer: TALStateLayer;
@@ -2075,7 +2092,7 @@ begin
     If Fill.Styles = [TALBrushStyle.Solid] then begin
       Canvas.Fill.kind := TBrushKind.solid;
       Canvas.Fill.color := Fill.color;
-      Canvas.FillRect(Canvas.AlignToPixel(LocalRect), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
+      Canvas.FillRect(ALAlignToPixelRound(LocalRect, Canvas.Matrix, Canvas.Scale, TEpsilon.position), XRadius, YRadius, FCorners, AbsoluteOpacity, TCornerType.Round);
     end
     else if Fill.HasFill then raise Exception.Create('Error 87B5E7C8-55AF-41C7-88D4-B840C7D0F78F');
     {$ENDIF}
@@ -2224,7 +2241,6 @@ begin
                         AFill, // const AFill: TALBrush;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
-  LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
   var LSurface: TALSurface;
@@ -2243,6 +2259,7 @@ begin
       ALDrawCircle(
         LCanvas, // const ACanvas: TALCanvas;
         ALGetScreenScale, // const AScale: Single;
+        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
@@ -2301,11 +2318,11 @@ begin
 
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
-    var LRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), ALGetScreenScale); // to have the pixel aligned width and height
     ALDrawCircle(
       TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
-      Canvas.AlignToPixel(LRect), // const Rect: TrectF;
+      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+      TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), // const Rect: TrectF;
       AbsoluteOpacity, // const AOpacity: Single;
       Fill, // const Fill: TALBrush;
       nil, // const StateLayer: TALStateLayer;
@@ -2694,7 +2711,10 @@ begin
     Canvas.Stroke.Kind := TBrushKind.Solid;
     Canvas.Stroke.Color := Stroke.Color;
     Canvas.Stroke.Thickness := Stroke.Thickness;
-    Canvas.DrawLine(Canvas.AlignToPixel(LPt1), Canvas.AlignToPixel(LPt2), AbsoluteOpacity);
+    Canvas.DrawLine(
+      ALAlignToPixelRound(LPt1, Canvas.Matrix, Canvas.Scale, TEpsilon.position),
+      ALAlignToPixelRound(LPt2, Canvas.Matrix, Canvas.Scale, TEpsilon.position),
+      AbsoluteOpacity);
     exit;
   end;
 
@@ -2806,6 +2826,20 @@ begin
   inherited Loaded;
 
   AdjustSize;
+end;
+
+{******************************}
+procedure TALBaseText.AlignToPixel;
+begin
+  beginUpdate;
+  try
+    inherited;
+    MaxWidth := ALAlignDimensionToPixelRound(MaxWidth, ALGetScreenScale, Tepsilon.position);
+    MaxHeight := ALAlignDimensionToPixelRound(MaxHeight, ALGetScreenScale, Tepsilon.position);
+    TextSettings.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
 end;
 
 {************************************************}
@@ -3246,6 +3280,7 @@ function TALBaseText.GetMultiLineTextOptions(
 begin
   Result := FMultiLineTextOptions;
   Result.Scale := AScale;
+  Result.AlignToPixel := IsPixelAlignmentEnabled;
   Result.Opacity := AOpacity;
   //--
   Result.FontFamily := Afont.Family;
@@ -3437,6 +3472,7 @@ begin
     ALDrawRectangle(
       ACanvas, // const ACanvas: TALCanvas;
       AScale, // const AScale: Single;
+      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
       ARect, // const Rect: TrectF;
       AOpacity, // const AOpacity: Single;
       AFill, // const Fill: TALBrush;
@@ -3563,7 +3599,7 @@ begin
 
     if (AText <> '') or (LocalRect.IsEmpty) then begin
       ABufDrawable := ALCreateEmptyDrawable1x1;
-      ABufDrawableRect := TRectF.Create(0,0,1,1);
+      ABufDrawableRect := TRectF.Create(0,0,1/ALGetScreenScale,1/ALGetScreenScale);
       exit;
     end;
 
@@ -3575,7 +3611,6 @@ begin
                           AShadow); // const AShadow: TALShadow): TRectF;
     LSurfaceRect.Width := Min(MaxWidth, LSurfaceRect.Width);
     LSurfaceRect.Height := Min(MaxHeight, LSurfaceRect.Height);
-    LSurfaceRect := ALAlignDimensionToPixelCeil(LSurfaceRect, ALGetScreenScale, TEpsilon.Position); // To obtain a drawable with pixel-aligned width and height
     ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
     Var LSurfaceSize := LSurfaceRect.Size;
@@ -3608,6 +3643,7 @@ begin
         ALDrawRectangle(
           LCanvas, // const ACanvas: TALCanvas;
           AScale, // const AScale: Single;
+          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
           ABufDrawableRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           AFill, // const Fill: TALBrush;

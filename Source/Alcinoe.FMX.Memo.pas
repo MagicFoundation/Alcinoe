@@ -332,12 +332,12 @@ type
         property LineHeightMultiplier;
       end;
   private
-    FAutosizeLineCount: Single;
+    FAutosizeLineCount: Integer;
     function GetTextSettings: TMemoTextSettings;
     procedure SetTextSettings(const Value: TMemoTextSettings);
   protected
-    procedure SetAutosizeLineCount(const Value: Single); virtual;
-    function IsAutosizeLineCountStored: Boolean;
+    function GetDefaultSize: TSizeF; override;
+    procedure SetAutosizeLineCount(const Value: Integer); virtual;
     function CreateTextSettings: TALBaseEdit.TTextSettings; override;
     function CreateEditControl: TALBaseEditControl; override;
     procedure AdjustSize; override;
@@ -347,7 +347,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
   published
-    property AutoSizeLineCount: Single read FAutosizeLineCount write SetAutosizeLineCount Stored IsAutosizeLineCountStored nodefault;
+    property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
     property TextSettings: TMemoTextSettings read GetTextSettings write SetTextSettings;
   end;
 
@@ -1611,7 +1611,7 @@ end;
 {**************************************************}
 function TALMemo.HasUnconstrainedAutosizeY: Boolean;
 begin
-  result := (CompareValue(FAutoSizeLineCount, 0, TEpsilon.Scale) > 0) and
+  result := (FAutoSizeLineCount > 0) and
             (not (Align in [TAlignLayout.Client,
                             TAlignLayout.Contents,
                             TAlignLayout.Left,
@@ -1622,20 +1622,20 @@ begin
                             TAlignLayout.HorzCenter]));
 end;
 
-{**********************************************************}
-procedure TALMemo.SetAutosizeLineCount(const Value: Single);
+{***********************************************************}
+function TALMemo.GetDefaultSize: TSizeF;
 begin
-  if not SameValue(FAutoSizeLineCount, Value, TEpsilon.Scale) then begin
+  Result := TSizeF.Create(200, 75);
+end;
+
+{***********************************************************}
+procedure TALMemo.SetAutosizeLineCount(const Value: Integer);
+begin
+  if FAutoSizeLineCount <> Value then begin
     FAutoSizeLineCount := Max(0, Value);
     AdjustSize;
     repaint;
   end;
-end;
-
-{**************************************************}
-function TALMemo.IsAutosizeLineCountStored: Boolean;
-begin
-  Result := not SameValue(FAutoSizeLineCount, 0, TEpsilon.Scale);
 end;
 
 {*****************}

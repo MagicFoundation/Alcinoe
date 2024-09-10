@@ -26,12 +26,14 @@ type
     FControlAbsolutePosAtMouseDown: TpointF;
     FMouseDownAtLowVelocity: Boolean;
     FDisableDoubleClickHandling: Boolean;
-    FEnablePixelAlignment: Boolean;
+    FIsPixelAlignmentEnabled: Boolean;
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
   protected
+    function GetIsPixelAlignmentEnabled: Boolean; virtual;
+    procedure SetIsPixelAlignmentEnabled(const AValue: Boolean); Virtual;
     property FocusOnMouseDown: Boolean read FFocusOnMouseDown write FFocusOnMouseDown;
     property FocusOnMouseUp: Boolean read FFocusOnMouseUp write FFocusOnMouseUp;
     procedure DoEnter; override;
@@ -58,7 +60,7 @@ type
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
-    property EnablePixelAlignment: Boolean read FEnablePixelAlignment write FEnablePixelAlignment;
+    property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
   end;
 
   {**************************************}
@@ -161,14 +163,14 @@ begin
   // desktops are handled by different gestures or interface elements in
   // mobile apps, leading to a more user-friendly experience.
   FDisableDoubleClickHandling := True;
-  FEnablePixelAlignment := True;
+  FIsPixelAlignmentEnabled := True;
 end;
 
 {**************************}
 procedure TALControl.Loaded;
 begin
   {$IF not DEFINED(ALDPK)}
-  if EnablePixelAlignment then
+  if IsPixelAlignmentEnabled then
     AlignToPixel;
   {$ENDIF}
   Inherited;
@@ -177,6 +179,8 @@ end;
 {*****************************************************}
 procedure TALControl.AlignToPixel;
 begin
+  // Note: We do not align the position here. The position is aligned during
+  // the painting process (e.g., via ALDrawDrawable).
   BeginUpdate;
   Try
     // OnResize and OnResized will be called in loaded
@@ -239,6 +243,18 @@ end;
 procedure TALControl.DelayOnResized(Sender: TObject);
 begin
   Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resized);
+end;
+
+{*****************************************************}
+function TALControl.GetIsPixelAlignmentEnabled: Boolean;
+begin
+  Result := FIsPixelAlignmentEnabled;
+end;
+
+{*****************************************************}
+procedure TALControl.SetIsPixelAlignmentEnabled(const AValue: Boolean);
+begin
+  FIsPixelAlignmentEnabled := AValue;
 end;
 
 {*****************************************************}

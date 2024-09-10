@@ -559,7 +559,7 @@ begin
                                        LImageInfo.color_space, // color_space: sk_colorspace_t): sk_image_t; cdecl;
                                        nil, // proc: sk_image_texture_release_proc;
                                        nil); // proc_context: Pointer
-  end
+  end;
   {$ELSE}
   if (fVideoPlayerControl.fDrawable.Width <> fVideoPlayerControl.fVideoWidth) or
      (fVideoPlayerControl.fDrawable.Height <> fVideoPlayerControl.fVideoHeight) then begin
@@ -2592,7 +2592,8 @@ end;
 {****************************************************************}
 procedure TALVideoPlayerSurface.OnFrameAvailable(Sender: Tobject);
 begin
-  repaint;
+  if IsVisibleWithinFormBounds then
+    repaint;
 end;
 
 {************************************}
@@ -2607,9 +2608,8 @@ begin
   ALDrawDrawable(
     Canvas, // const ACanvas: Tcanvas;
     fVideoPlayer.Drawable, // const ADrawable: TALDrawable;
-    Canvas.AlignToPixel(
-      TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayer.Drawable), ALGetDrawableHeight(fVideoPlayer.Drawable)).
-        FitInto(LocalRect)), // const ADstRect: TrectF; // IN Virtual pixels !
+    TRectF.Create(0, 0, ALGetDrawableWidth(fVideoPlayer.Drawable), ALGetDrawableHeight(fVideoPlayer.Drawable)).
+      FitInto(LocalRect), // const ADstRect: TrectF; // IN Virtual pixels !
     AbsoluteOpacity); // const AOpacity: Single);
 
 end;

@@ -592,6 +592,7 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure AlignToPixel; override;
       published
         property Font;
         property Trimming;
@@ -621,6 +622,7 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure AlignToPixel; override;
       published
         property Font;
         property Trimming;
@@ -682,6 +684,7 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure AlignToPixel; override;
         procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseEdit read GetControlParent;
@@ -752,6 +755,7 @@ type
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
+        procedure AlignToPixel; override;
         procedure ClearBufDrawable; override;
         procedure ClearBufPromptTextDrawable;
         procedure ClearBufLabelTextDrawable;
@@ -849,6 +853,7 @@ type
     procedure SetControlType(const Value: TControlType);
   protected
     FIsAdjustingSize: Boolean;
+    function GetIsPixelAlignmentEnabled: Boolean; override;
     function CreateTextSettings: TTextSettings; virtual;
     function CreateEditControl: TALBaseEditControl; virtual;
     function GetEditControl: TALBaseEditControl; virtual;
@@ -906,6 +911,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
+    procedure AlignToPixel; override;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -3301,7 +3307,7 @@ end;
 constructor TALBaseEdit.TLabelTextSettings.Create;
 begin
   inherited create;
-  FMargins := TBounds.Create(TRectF.Create(0,0,0,-8));
+  FMargins := TBounds.Create(TRectF.Create(0,0,0,-4));
   FMargins.OnChange := MarginsChanged;
   FLayout := TLabelTextLayout.Floating;
   FAnimation := TLabelTextAnimation.Translation;
@@ -3337,10 +3343,22 @@ procedure TALBaseEdit.TLabelTextSettings.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Margins.Rect := Margins.DefaultValue;
     Layout := TLabelTextLayout.Floating;
     Animation := TLabelTextAnimation.Translation;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{***************************************}
+procedure TALBaseEdit.TLabelTextSettings.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
   finally
     EndUpdate;
   end;
@@ -3414,9 +3432,21 @@ procedure TALBaseEdit.TSupportingTextSettings.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Margins.Rect := Margins.DefaultValue;
     Layout := TSupportingTextLayout.Floating;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{********************************************}
+procedure TALBaseEdit.TSupportingTextSettings.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
   finally
     EndUpdate;
   end;
@@ -3532,12 +3562,26 @@ procedure TALBaseEdit.TBaseStateStyle.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     PromptTextColor := DefaultPromptTextColor;
     TintColor := DefaultTintColor;
     TextSettings.Reset;
     LabelTextSettings.Reset;
     SupportingTextSettings.Reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALBaseEdit.TBaseStateStyle.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    TextSettings.AlignToPixel;
+    LabelTextSettings.AlignToPixel;
+    SupportingTextSettings.AlignToPixel;
   finally
     EndUpdate;
   end;
@@ -3757,7 +3801,7 @@ procedure TALBaseEdit.TDisabledStateStyle.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Opacity := TControl.DefaultDisabledOpacity;
   finally
     EndUpdate;
@@ -3827,10 +3871,24 @@ procedure TALBaseEdit.TStateStyles.Reset;
 begin
   BeginUpdate;
   Try
-    inherited Reset;
+    inherited;
     Disabled.reset;
     Hovered.reset;
     Focused.reset;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{******************************}
+procedure TALBaseEdit.TStateStyles.AlignToPixel;
+begin
+  BeginUpdate;
+  Try
+    inherited;
+    Disabled.AlignToPixel;
+    Hovered.AlignToPixel;
+    Focused.AlignToPixel;
   finally
     EndUpdate;
   end;
@@ -3992,7 +4050,7 @@ begin
   //--
   var LPaddingChange: TNotifyEvent := Padding.OnChange;
   Padding.OnChange := nil;
-  Padding.DefaultValue := TRectF.create(16{Left}, 16{Top}, 16{Right}, 16{Bottom});
+  Padding.DefaultValue := TRectF.create(8{Left}, 8{Top}, 8{Right}, 8{Bottom});
   Padding.Rect := Padding.DefaultValue;
   padding.OnChange := LPaddingChange;
   //--
@@ -4035,6 +4093,28 @@ begin
   ALFreeAndNil(FStateStyles);
   ALFreeAndNil(fEditControl);
   inherited Destroy;
+end;
+
+{******************************}
+procedure TALBaseEdit.AlignToPixel;
+begin
+  beginUpdate;
+  try
+    inherited;
+    TextSettings.AlignToPixel;
+    LabelTextSettings.AlignToPixel;
+    SupportingTextSettings.AlignToPixel;
+    StateStyles.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{****************************************}
+function TALBaseEdit.GetIsPixelAlignmentEnabled: Boolean;
+begin
+  result := (inherited GetIsPixelAlignmentEnabled) and
+            (not StateStyles.IsTransitionAnimationRunning)
 end;
 
 {***********************************************************}
@@ -4341,7 +4421,19 @@ begin
     LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
     // FillColor
-    if LStateStyle <> nil then EditControl.FillColor := LStateStyle.Fill.Color
+    if LStateStyle <> nil then begin
+      var LStateLayerColor: TAlphaColor;
+      var LStateLayerOpacity: Single;
+      if LStateStyle.StateLayer.UseContentColor then begin
+        LStateLayerColor := LStateStyle.TextSettings.Font.Color;
+        LStateLayerOpacity := LStateStyle.StateLayer.Opacity;
+      end
+      else begin
+        LStateLayerColor := LStateStyle.StateLayer.Color;
+        LStateLayerOpacity := LStateStyle.StateLayer.Opacity;
+      end;
+      EditControl.FillColor := ALBlendColor(LStateStyle.Fill.Color, LStateLayerColor, LStateLayerOpacity);
+    end
     else EditControl.FillColor := Fill.Color;
     // PromptTextColor
     if LStateStyle <> nil then EditControl.PromptTextColor := LStateStyle.PromptTextColor
@@ -4968,7 +5060,8 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
-    LOptions.Opacity := 1;
+    LOptions.AlignToPixel := IsPixelAlignmentEnabled;
+    //LOptions.Opacity: Single; // Default = 1
     //--
     LOptions.FontFamily := Afont.Family;
     LOptions.FontSize := Afont.Size;
@@ -5062,21 +5155,8 @@ begin
     //To avoid to call again ALDrawMultiLineText on each paint
     //return a "blank" drawable.
     if (ALIsDrawableNull(ABufDrawable)) then begin
-      ABufDrawableRect := TrectF.Create(0,0,1,1);
-      ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale);
-      var LSurface: TALSurface;
-      var LCanvas: TALCanvas;
-      ALCreateSurface(
-        LSurface, // out ASurface: sk_surface_t;
-        LCanvas, // out ACanvas: sk_canvas_t;
-        ALGetScreenScale, // const AScale: Single;
-        ABufDrawableRect.Width, // const w: integer;
-        ABufDrawableRect.height);// const h: integer)
-      try
-        ABufDrawable := ALCreateDrawableFromSurface(LSurface);
-      finally
-        ALFreeAndNilSurface(LSurface, LCanvas);
-      end;
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      ABufDrawableRect := TRectF.Create(0,0,1/ALGetScreenScale,1/ALGetScreenScale);
     end;
 
   finally
@@ -5105,7 +5185,8 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
-    LOptions.Opacity := 1;
+    LOptions.AlignToPixel := IsPixelAlignmentEnabled;
+    //LOptions.Opacity: Single; // Default = 1
     //--
     LOptions.FontFamily := Afont.Family;
     LOptions.FontSize := Afont.Size;
@@ -5199,21 +5280,8 @@ begin
     //To avoid to call again ALDrawMultiLineText on each paint
     //return a "blank" drawable. 
     if (ALIsDrawableNull(ABufDrawable)) then begin
-      ABufDrawableRect := TrectF.Create(0,0,1,1);
-      ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale);
-      var LSurface: TALSurface;
-      var LCanvas: TALCanvas;
-      ALCreateSurface(
-        LSurface, // out ASurface: sk_surface_t;
-        LCanvas, // out ACanvas: sk_canvas_t;
-        ALGetScreenScale, // const AScale: Single;
-        ABufDrawableRect.Width, // const w: integer;
-        ABufDrawableRect.height);// const h: integer)
-      try
-        ABufDrawable := ALCreateDrawableFromSurface(LSurface);
-      finally
-        ALFreeAndNilSurface(LSurface, LCanvas);
-      end;
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      ABufDrawableRect := TRectF.Create(0,0,1/ALGetScreenScale,1/ALGetScreenScale);
     end;
 
   finally
@@ -5242,7 +5310,8 @@ begin
   Try
 
     LOptions.Scale := ALGetScreenScale;
-    LOptions.Opacity := 1;
+    LOptions.AlignToPixel := IsPixelAlignmentEnabled;
+    //LOptions.Opacity: Single; // Default = 1
     //--
     LOptions.FontFamily := Afont.Family;
     LOptions.FontSize := Afont.Size;
@@ -5336,21 +5405,8 @@ begin
     //To avoid to call again ALDrawMultiLineText on each paint
     //return a "blank" drawable.
     if (ALIsDrawableNull(ABufDrawable)) then begin
-      ABufDrawableRect := TrectF.Create(0,0,1,1);
-      ABufDrawableRect := ALAlignDimensionToPixelRound(ABufDrawableRect, ALGetScreenScale);
-      var LSurface: TALSurface;
-      var LCanvas: TALCanvas;
-      ALCreateSurface(
-        LSurface, // out ASurface: sk_surface_t;
-        LCanvas, // out ACanvas: sk_canvas_t;
-        ALGetScreenScale, // const AScale: Single;
-        ABufDrawableRect.Width, // const w: integer;
-        ABufDrawableRect.height);// const h: integer)
-      try
-        ABufDrawable := ALCreateDrawableFromSurface(LSurface);
-      finally
-        ALFreeAndNilSurface(LSurface, LCanvas);
-      end;
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      ABufDrawableRect := TRectF.Create(0,0,1/ALGetScreenScale,1/ALGetScreenScale);
     end;
 
   finally
@@ -5684,7 +5740,7 @@ begin
       LRect.Inflate(4{DL}, 4{DT}, 4{DR}, 4{DB});
       LRect.Intersect(LocalRect);
       if not LRect.IsEmpty then begin
-        LRect := Canvas.AlignToPixel(LRect);
+        LRect := ALAlignToPixelRound(LRect, Canvas.Matrix, Canvas.Scale, TEpsilon.position);
         Canvas.Fill.Kind := TBrushKind.Solid;
         Canvas.Fill.Color := EditControl.FillColor;
         Canvas.FillRect(LRect, ALIfThen(FLabelTextAnimation.Running, Min(AbsoluteOpacity,FlabelTextAnimation.CurrentValue*AbsoluteOpacity*2), AbsoluteOpacity));
@@ -5760,7 +5816,7 @@ begin
           LRect.Inflate(4{DL}, 4{DT}, 4{DR}, 4{DB});
           LRect.Intersect(LocalRect);
           if not LRect.IsEmpty then begin
-            LRect := Canvas.AlignToPixel(LRect);
+            LRect := ALAlignToPixelRound(LRect, Canvas.Matrix, Canvas.Scale, TEpsilon.position);
             Canvas.Fill.Kind := TBrushKind.Solid;
             Canvas.Fill.Color := EditControl.FillColor;
             Canvas.FillRect(LRect, 1);

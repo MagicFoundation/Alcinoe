@@ -26,6 +26,7 @@ uses
   Alcinoe.FMX.NativeView.iOS,
   {$ENDIF}
   {$IF defined(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNI.JavaTypes,
   Alcinoe.AndroidApi.Common,
   Alcinoe.FMX.NativeView.Android,
@@ -229,6 +230,7 @@ type
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
+    procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALShadow; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
     function HasShadow: boolean; virtual;
@@ -1003,10 +1005,8 @@ function  ALAlignDimensionToPixelCeil(const Rect: TRectF; const Scale: single; c
 function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
 function  ALAlignDimensionToPixelFloor(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 function  ALAlignDimensionToPixelFloor(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
-function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Epsilon: Single = 0): TpointF; overload;
-function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Epsilon: Single = 0): TRectF; overload;
-function  ALAlignToPixelRound(const Point: TPointF; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
-function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
+function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
+function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 
 {$IF defined(ALAppleOS)}
 type
@@ -1239,7 +1239,6 @@ uses
   FMX.Skia,
   {$ENDIF}
   {$IF defined(ANDROID)}
-  Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,
   Androidapi.Helpers,
   FMX.forms,
@@ -1459,6 +1458,19 @@ begin
     OffsetX := DefaultOffsetX;
     OffsetY := DefaultOffsetY;
     Color := DefaultColor;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{**********************************}
+procedure TALShadow.AlignToPixel;
+begin
+  BeginUpdate;
+  try
+    blur := ALAlignDimensionToPixelRound(blur, ALGetScreenScale, Tepsilon.Vector);
+    OffsetX := ALAlignDimensionToPixelRound(OffsetX, ALGetScreenScale, TEpsilon.Position);
+    OffsetY := ALAlignDimensionToPixelRound(OffsetY, ALGetScreenScale, TEpsilon.Position);
   finally
     EndUpdate;
   end;
@@ -3833,8 +3845,6 @@ begin
   BeginUpdate;
   try
     Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
-    XRadius := ALAlignDimensionToPixelRound(XRadius, ALGetScreenScale, TEpsilon.Vector);
-    YRadius := ALAlignDimensionToPixelRound(YRadius, ALGetScreenScale, TEpsilon.Vector);
   finally
     EndUpdate;
   end;
@@ -4360,6 +4370,7 @@ begin
     Fill.AlignToPixel;
     StateLayer.AlignToPixel;
     Stroke.AlignToPixel;
+    Shadow.AlignToPixel;
   finally
     EndUpdate;
   end;
@@ -4875,7 +4886,8 @@ begin
       FTransitionBufCanvas, // out ACanvas: TALCanvas;
       ALGetScreenScale{Ascale},
       LSurfaceRect.width, // const w: Single;
-      LSurfaceRect.height); // const h: Single);
+      LSurfaceRect.height, // const h: Single);
+      false); // const AAddPixelForAlignment: Boolean = true
     {$IF defined(ALSkiaCanvas)}
     Raise Exception.create('Error 71AD6B8B-AF32-468D-818A-168EFC96C368')
     {$ELSEIF defined(ALGpuCanvas)}
@@ -5461,55 +5473,54 @@ begin
   result := Floor(Dimension * Scale + Epsilon) / Scale;
 end;
 
-{********************************************************************************}
-function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Epsilon: Single = 0): TpointF; overload;
+{***********************************************************************************}
+// Note: The matrix must be in virtual pixels (i.e., without the scale applied to it)
+// This is what is returned by canvas.matrix by default.
+function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
 begin
-  // Detect Rotation
-  if not SameValue(Matrix.m12, 0, TEpsilon.Matrix) or
-     not SameValue(Matrix.m21, 0, TEpsilon.Matrix) then begin
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.SetMatrix was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelHorizontally was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelVertically was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  // Taken from TCanvas.SetMatrix
+  if (not SameValue(Matrix.m11, 1, TEpsilon.Matrix)) or
+     (not SameValue(Matrix.m22, 1, TEpsilon.Matrix)) or
+     (not SameValue(Matrix.m33, 1, TEpsilon.Matrix)) then begin
     result := Point;
     Exit;
   end;
   // Taken from function TCanvas.AlignToPixelHorizontally(const Value: Single): Single;
-  result.x := Round((Matrix.m31 + Point.x) * Matrix.m11 + Epsilon) / Matrix.m11 - Matrix.m31;
+  result.x := Round((Matrix.m31 + Point.x) * Scale + Epsilon) / Scale - Matrix.m31;
   // Taken from function TCanvas.AlignToPixelVertically(const Value: Single): Single;
-  result.y := Round((Matrix.m32 + Point.y) * Matrix.m22 + Epsilon) / Matrix.m22 - Matrix.m32;
+  result.y := Round((Matrix.m32 + Point.y) * Scale + Epsilon) / Scale - Matrix.m32;
 end;
 
-{********************************************************************************}
-function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Epsilon: Single = 0): TRectF; overload;
+{***********************************************************************************}
+// Note: The matrix must be in virtual pixels (i.e., without the scale applied to it)
+// This is what is returned by canvas.matrix by default.
+function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 begin
-  // Detect Rotation
-  if not SameValue(Matrix.m12, 0, TEpsilon.Matrix) or
-     not SameValue(Matrix.m21, 0, TEpsilon.Matrix) then begin
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.SetMatrix was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelHorizontally was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixelVertically was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if FMX.Graphics.TCanvas.AlignToPixel was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  // Taken from TCanvas.SetMatrix
+  if (not SameValue(Matrix.m11, 1, TEpsilon.Matrix)) or
+     (not SameValue(Matrix.m22, 1, TEpsilon.Matrix)) or
+     (not SameValue(Matrix.m33, 1, TEpsilon.Matrix)) then begin
     result := Rect;
     Exit;
   end;
   // Taken from function TCanvas.AlignToPixelHorizontally(const Value: Single): Single;
-  Result.Left := Round((Matrix.m31 + Rect.Left) * Matrix.m11 + Epsilon) / Matrix.m11 - Matrix.m31;
+  Result.Left := Round((Matrix.m31 + Rect.Left) * Scale + Epsilon) / Scale - Matrix.m31;
   // Taken from function TCanvas.AlignToPixelVertically(const Value: Single): Single;
-  Result.Top := Round((Matrix.m32 + Rect.Top) * Matrix.m22 + Epsilon) / Matrix.m22 - Matrix.m32;
+  Result.Top := Round((Matrix.m32 + Rect.Top) * Scale + Epsilon) / Scale - Matrix.m32;
   // Taken from function TCanvas.AlignToPixel(const Rect: TRectF): TRectF;
-  Result.Right := Result.Left + Round(Rect.Width * Matrix.m11 + Epsilon) / Matrix.m11; // keep ratio horizontally
-  Result.Bottom := Result.Top + Round(Rect.Height * Matrix.m22 + Epsilon) / Matrix.m22; // keep ratio vertically
-end;
-
-{********************************************************************************}
-function  ALAlignToPixelRound(const Point: TPointF; const Scale: single; const Epsilon: Single = 0): TpointF;
-begin
-  var LMatrix := Tmatrix.Identity;
-  LMatrix.m11 := Scale;
-  LMatrix.m22 := Scale;
-  Result := ALAlignToPixelRound(Point, LMatrix, Epsilon);
-end;
-
-{*****************************************************************************}
-function  ALAlignToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
-begin
-  var LMatrix := Tmatrix.Identity;
-  LMatrix.m11 := Scale;
-  LMatrix.m22 := Scale;
-  Result := ALAlignToPixelRound(Rect, LMatrix, Epsilon);
+  Result.Right := Result.Left + Round(Rect.Width * Scale + Epsilon) / Scale; // keep ratio horizontally
+  Result.Bottom := Result.Top + Round(Rect.Height * Scale + Epsilon) / Scale; // keep ratio vertically
 end;
 
 {**********************}
@@ -5815,6 +5826,15 @@ end;
 {********************************}
 function ALGetScreenScale: Single;
 begin
+  // The Alcinoe Framework assumes that the screen scale is fixed and uniform,
+  // meaning the scale is the same for both width and height, and consistent
+  // across all forms.
+  //
+  // On windows you can change screenscale via
+  //   FMX.Platform.Win.TWinWindowHandle.SetForcedScale
+  // --
+  // On Android you can change screenscale via
+  //   FMX.Platform.Screen.Android.SetScreenScaleOverrideHook
   result := ALScreenScale;
   if Result = 0 then begin
     ALInitScreenScale;

@@ -15,6 +15,7 @@ uses
   system.Generics.Collections,
   system.SyncObjs,
   system.sysutils,
+  system.math,
   system.types,
   System.UITypes;
 
@@ -179,6 +180,14 @@ type
 
 type
 
+  TALPointFHelper = record helper for TPointF
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
+  end;
+
+  TALRectFHelper = record helper for TRectF
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TRectF;
+  end;
+
   TALPointDType = array [0..1] of Double;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -232,6 +241,7 @@ type
     function Ceiling: TPoint;
     function Truncate: TPoint;
     function Round: TPoint;
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TALPointD;
     function ReducePrecision: TPointf;
     /// <summary> Rounds the current point to the specified scale value
     /// <param name="AScale"> The scale of scene </param>
@@ -281,6 +291,7 @@ type
     function Ceiling: TSize;
     function Truncate: TSize;
     function Round: TSize;
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TALSizeD;
     function ReducePrecision: TSizeF;
 
     // metods
@@ -421,6 +432,7 @@ type
     function Ceiling: TRect;
     function Truncate: TRect;
     function Round: TRect;
+    function RoundTo(const ADigit: TRoundToEXRangeExtended): TALRectD;
     function ReducePrecision: TRectF;
 
     function EqualsTo(const R: TALRectD; const Epsilon: Double = 0): Boolean;
@@ -656,7 +668,6 @@ const
 implementation
 
 uses
-  system.math,
   system.Rtti,
   System.RTLConsts,
   {$IF defined(MSWindows)}
@@ -1434,6 +1445,20 @@ begin
   Result := ALRectPlaceInto(R, Bounds, LRatio, AHorzAlign, AVertAlign);
 end;
 
+{*****************************************************************************}
+function TALPointFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
+begin
+  Result.X := System.math.RoundTo(X, ADigit);
+  Result.Y := System.math.RoundTo(Y, ADigit);
+end;
+
+{*****************************************************************************}
+function TALRectFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TRectF;
+begin
+  Result.TopLeft := TopLeft.RoundTo(ADigit);
+  Result.BottomRight := BottomRight.RoundTo(ADigit);
+end;
+
 {***************************************************************}
 class function TALPointD.Create(const AX, AY: Double): TALPointD;
 begin
@@ -1640,6 +1665,13 @@ function TALPointD.Round: TPoint;
 begin
   Result.X := System.Round(X);
   Result.Y := System.Round(Y);
+end;
+
+{*******************************}
+function TALPointD.RoundTo(const ADigit: TRoundToEXRangeExtended): TALPointD;
+begin
+  Result.X := System.Math.RoundTo(X, ADigit);
+  Result.Y := System.Math.RoundTo(Y, ADigit);
 end;
 
 {******************************************}
@@ -2195,6 +2227,13 @@ begin
   Result.BottomRight := BottomRight.Round;
 end;
 
+{*****************************}
+function TALRectD.RoundTo(const ADigit: TRoundToEXRangeExtended): TALRectD;
+begin
+  Result.TopLeft := TopLeft.RoundTo(ADigit);
+  Result.BottomRight := BottomRight.RoundTo(ADigit);
+end;
+
 {****************************************}
 function TALRectD.ReducePrecision: TRectF;
 begin
@@ -2360,6 +2399,13 @@ function TALSizeD.Round: TSize;
 begin
   Result.cx := Trunc(cx + 0.5);
   Result.cy := Trunc(cy + 0.5);
+end;
+
+{****************************************}
+function TALSizeD.RoundTo(const ADigit: TRoundToEXRangeExtended): TALSizeD;
+begin
+  Result.cx := system.math.RoundTo(cx, ADigit);
+  Result.cy := system.math.RoundTo(cy, ADigit);
 end;
 
 {****************************************}

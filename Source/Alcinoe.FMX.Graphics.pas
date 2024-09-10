@@ -9,6 +9,7 @@ uses
   system.sysutils,
   system.types,
   system.uitypes,
+  System.Math.Vectors,
   {$IF defined(ALSkiaEngine)}
   System.Skia.API,
   {$ENDIF}
@@ -54,11 +55,12 @@ function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
 function  ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean; inline;
 procedure ALCanvasEndScene(const aCanvas: TALCanvas); inline;
 procedure ALClearCanvas(const aCanvas: TALCanvas; const AColor: TAlphaColor);
-procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single);
+procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single; const AAddPixelForAlignment: Boolean = true);
 procedure ALEndTransparencyLayer(const aCanvas: TALCanvas);
 function  ALCreateDrawableFromSurface(const ASurface: TALSurface): TALDrawable;
 procedure ALUpdateDrawableFromSurface(const aSurface: TALSurface; const aDrawable: TALDrawable);
 function  ALGetDefaultPixelFormat: TPixelFormat; inline;
+procedure ALExtractMatrixFromCanvas(const ACanvas: TALCanvas; out ACanvasMatrix: TMatrix; out ACanvasScale: Single);
 function  ALScaleAndCenterCanvas(
             Const ACanvas: TCanvas;
             Const AAbsoluteRect: TRectF;
@@ -743,6 +745,7 @@ function ALLoadFromFileAndNormalizeOrientationToDrawable(const AFileName: String
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -774,6 +777,7 @@ procedure ALDrawRectangle(
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -804,6 +808,7 @@ procedure ALDrawRectangle(
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFill: TALBrush;
@@ -821,6 +826,7 @@ procedure ALDrawRectangle(
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -848,6 +854,7 @@ procedure ALDrawCircle(
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -874,6 +881,7 @@ procedure ALDrawCircle(
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFill: TALBrush;
@@ -889,12 +897,14 @@ Procedure ALCreateSurface(
             out ACanvas: TALCanvas;
             const AScale: Single;
             const w: Single;
-            const h: Single); overload;
+            const h: Single;
+            const AAddPixelForAlignment: Boolean = true); overload;
 Procedure ALCreateSurface(
             out ASurface: TALSurface;
             out ACanvas: TALCanvas;
             const w: Integer;
-            const h: Integer); overload;
+            const h: Integer;
+            const AAddPixelForAlignment: Boolean = true); overload;
 procedure ALFreeAndNilSurface(
             Var ASurface: TALSurface;
             Var ACanvas: TALCanvas);
@@ -961,7 +971,6 @@ implementation
 
 uses
   system.math,
-  System.Math.Vectors,
   {$IF defined(ALSkiaEngine)}
   System.Skia,
   FMX.Skia,
@@ -9398,7 +9407,8 @@ begin
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
     1, // const w: integer;
-    1);// const h: integer)
+    1, // const h: integer)
+    false); // const AAddPixelForAlignment: Boolean = true
   try
     ALClearCanvas(LCanvas, TAlphaColors.Null);
     Result := ALCreateDrawableFromSurface(LSurface);
@@ -9411,6 +9421,7 @@ end;
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -10478,6 +10489,7 @@ var
     ALDrawRectangle(
       ACanvas, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
+      AAlignToPixel, // const AAlignToPixel: Boolean;
       LScaledStateLayerDstRect, // const ADstRect: TrectF;
       AStateLayerOpacity, // const AOpacity: Single;
       LStateLayerColor, // const AFillColor: TAlphaColor;
@@ -10513,6 +10525,14 @@ begin
 
   if CompareValue(AOpacity, 0, TEpsilon.Scale) <= 0 then exit;
   //--
+  var LCanvasMatrix: TMatrix;
+  var LCanvasScale: Single;
+  if AAlignToPixel then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
+  else begin
+    LCanvasMatrix := TMatrix.Identity;
+    LCanvasScale := 1;
+  end;
+  //--
   {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
   var LGridHeight := CGBitmapContextGetHeight(ACanvas);
   {$ENDIF}
@@ -10522,13 +10542,22 @@ begin
   LScaledDstRect.right := LScaledDstRect.right * AScale;
   LScaledDstRect.left := LScaledDstRect.left * AScale;
   LScaledDstRect.bottom := LScaledDstRect.bottom * AScale;
+  if AAlignToPixel then
+    LScaledDstRect := ALAlignToPixelRound(LScaledDstRect, LCanvasMatrix, LCanvasScale, TEpsilon.Position);
   //--
   LScaledStrokeThickness := AStrokeThickness * AScale;
+  if AAlignToPixel then
+    LScaledStrokeThickness := ALAlignDimensionToPixelRound(LScaledStrokeThickness, LCanvasScale, TEpsilon.Position);
   //--
   {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
   LScaledShadowBlur := AShadowBlur * AScale;
   LScaledShadowOffsetX := AShadowOffsetX * AScale;
   LScaledShadowOffsetY := AShadowOffsetY * AScale;
+  if AAlignToPixel then begin
+    LScaledShadowBlur := ALAlignDimensionToPixelRound(LScaledShadowBlur, LCanvasScale, Tepsilon.Vector);
+    LScaledShadowOffsetX := ALAlignDimensionToPixelRound(LScaledShadowOffsetX, LCanvasScale, TEpsilon.Position);
+    LScaledShadowOffsetY := ALAlignDimensionToPixelRound(LScaledShadowOffsetY, LCanvasScale, TEpsilon.Position);
+  end;
   LShadowColor := AShadowColor;
   if CompareValue(LScaledShadowBlur, 0, TEpsilon.position) <= 0 then
     LShadowColor := TAlphaColors.Null;
@@ -10564,6 +10593,8 @@ begin
     LScaledFillBackgroundMarginsRect.right := LScaledFillBackgroundMarginsRect.right * AScale;
     LScaledFillBackgroundMarginsRect.left := LScaledFillBackgroundMarginsRect.left * AScale;
     LScaledFillBackgroundMarginsRect.bottom := LScaledFillBackgroundMarginsRect.bottom * AScale;
+    if AAlignToPixel then
+      LScaledFillBackgroundMarginsRect := ALAlignEdgesToPixelRound(LScaledFillBackgroundMarginsRect, LCanvasScale, TEpsilon.Position);
   end
   else
     LScaledFillBackgroundMarginsRect := TRectF.Empty;
@@ -10575,6 +10606,8 @@ begin
     LScaledFillImageMarginsRect.right := LScaledFillImageMarginsRect.right * AScale;
     LScaledFillImageMarginsRect.left := LScaledFillImageMarginsRect.left * AScale;
     LScaledFillImageMarginsRect.bottom := LScaledFillImageMarginsRect.bottom * AScale;
+    if AAlignToPixel then
+      LScaledFillImageMarginsRect := ALAlignEdgesToPixelRound(LScaledFillImageMarginsRect, LCanvasScale, TEpsilon.Position);
   end
   else
     LScaledFillImageMarginsRect := TRectF.Empty;
@@ -10610,6 +10643,8 @@ begin
     LScaledStateLayerMarginsRect.right := LScaledStateLayerMarginsRect.right * AScale;
     LScaledStateLayerMarginsRect.left := LScaledStateLayerMarginsRect.left * AScale;
     LScaledStateLayerMarginsRect.bottom := LScaledStateLayerMarginsRect.bottom * AScale;
+    if AAlignToPixel then
+      LScaledStateLayerMarginsRect := ALAlignEdgesToPixelRound(LScaledStateLayerMarginsRect, LCanvasScale, TEpsilon.Position);
   end
   else
     LScaledStateLayerMarginsRect := TRectF.Empty;
@@ -10650,6 +10685,7 @@ begin
     ALDrawCircle(
       ACanvas, // const ACanvas: TALCanvas;
       AScale, // const AScale: Single;
+      AAlignToPixel, // const AAlignToPixel: Boolean;
       ADstRect, // const ADstRect: TrectF;
       AOpacity, //const AOpacity: Single;
       AFillColor, // const AFillColor: TAlphaColor;
@@ -11545,6 +11581,7 @@ end;
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -11593,6 +11630,7 @@ begin
   ALDrawRectangle(
     ACanvas, // const ACanvas: TALCanvas;
     AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
     ADstRect, // const ADstRect: TrectF;
     AOpacity, //const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
@@ -11627,6 +11665,7 @@ end;
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFill: TALBrush;
@@ -11729,6 +11768,7 @@ begin
   ALDrawRectangle(
     ACanvas, // const ACanvas: TALCanvas;
     AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
     ADstRect, // const ADstRect: TrectF;
     AOpacity, //const AOpacity: Single;
     LFillColor, // const AFillColor: TAlphaColor;
@@ -11762,6 +11802,7 @@ end;
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -12057,6 +12098,7 @@ var
     ALDrawRectangle(
       ACanvas, // const ACanvas: TALCanvas;
       1, // const AScale: Single;
+      AAlignToPixel, // const AAlignToPixel: Boolean;
       LScaledStateLayerDstRect, // const ADstRect: TrectF;
       AStateLayerOpacity, // const AOpacity: Single;
       LStateLayerColor, // const AFillColor: TAlphaColor;
@@ -12092,6 +12134,14 @@ begin
 
   if CompareValue(AOpacity, 0, TEpsilon.Scale) <= 0 then exit;
   //--
+  var LCanvasMatrix: TMatrix;
+  var LCanvasScale: Single;
+  if AAlignToPixel then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
+  else begin
+    LCanvasMatrix := TMatrix.Identity;
+    LCanvasScale := 1;
+  end;
+  //--
   {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
   var LGridHeight := CGBitmapContextGetHeight(ACanvas);
   {$ENDIF}
@@ -12102,13 +12152,22 @@ begin
   LScaledDstRect.left := LScaledDstRect.left * AScale;
   LScaledDstRect.bottom := LScaledDstRect.bottom * AScale;
   LScaledDstRect := TRectF.Create(0, 0, 1, 1).FitInto(LScaledDstRect);
+  if AAlignToPixel then
+    LScaledDstRect := ALAlignToPixelRound(LScaledDstRect, LCanvasMatrix, LCanvasScale, TEpsilon.Position);
   //--
   LScaledStrokeThickness := AStrokeThickness * AScale;
+  if AAlignToPixel then
+    LScaledStrokeThickness := ALAlignDimensionToPixelRound(LScaledStrokeThickness, LCanvasScale, TEpsilon.Position);
   //--
   {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
   LScaledShadowBlur := AShadowBlur * AScale;
   LScaledShadowOffsetX := AShadowOffsetX * AScale;
   LScaledShadowOffsetY := AShadowOffsetY * AScale;
+  if AAlignToPixel then begin
+    LScaledShadowBlur := ALAlignDimensionToPixelRound(LScaledShadowBlur, LCanvasScale, Tepsilon.Vector);
+    LScaledShadowOffsetX := ALAlignDimensionToPixelRound(LScaledShadowOffsetX, LCanvasScale, TEpsilon.Position);
+    LScaledShadowOffsetY := ALAlignDimensionToPixelRound(LScaledShadowOffsetY, LCanvasScale, TEpsilon.Position);
+  end;
   LShadowColor := AShadowColor;
   if CompareValue(LScaledShadowBlur, 0, TEpsilon.position) <= 0 then
     LShadowColor := TAlphaColors.Null;
@@ -12144,6 +12203,8 @@ begin
     LScaledFillBackgroundMarginsRect.right := LScaledFillBackgroundMarginsRect.right * AScale;
     LScaledFillBackgroundMarginsRect.left := LScaledFillBackgroundMarginsRect.left * AScale;
     LScaledFillBackgroundMarginsRect.bottom := LScaledFillBackgroundMarginsRect.bottom * AScale;
+    if AAlignToPixel then
+      LScaledFillBackgroundMarginsRect := ALAlignEdgesToPixelRound(LScaledFillBackgroundMarginsRect, LCanvasScale, TEpsilon.Position);
   end
   else
     LScaledFillBackgroundMarginsRect := TRectF.Empty;
@@ -12155,6 +12216,8 @@ begin
     LScaledFillImageMarginsRect.right := LScaledFillImageMarginsRect.right * AScale;
     LScaledFillImageMarginsRect.left := LScaledFillImageMarginsRect.left * AScale;
     LScaledFillImageMarginsRect.bottom := LScaledFillImageMarginsRect.bottom * AScale;
+    if AAlignToPixel then
+      LScaledFillImageMarginsRect := ALAlignEdgesToPixelRound(LScaledFillImageMarginsRect, LCanvasScale, TEpsilon.Position);
   end
   else
     LScaledFillImageMarginsRect := TRectF.Empty;
@@ -12192,6 +12255,8 @@ begin
     LScaledStateLayerMarginsRect.right := LScaledStateLayerMarginsRect.right * AScale;
     LScaledStateLayerMarginsRect.left := LScaledStateLayerMarginsRect.left * AScale;
     LScaledStateLayerMarginsRect.bottom := LScaledStateLayerMarginsRect.bottom * AScale;
+    if AAlignToPixel then
+      LScaledStateLayerMarginsRect := ALAlignEdgesToPixelRound(LScaledStateLayerMarginsRect, LCanvasScale, TEpsilon.Position);
   end
   else
     LScaledStateLayerMarginsRect := TRectF.Empty;
@@ -12976,6 +13041,7 @@ end;
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
@@ -13020,6 +13086,7 @@ begin
   ALDrawCircle(
     ACanvas, // const ACanvas: TALCanvas;
     AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
     ADstRect, // const ADstRect: TrectF;
     AOpacity, //const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
@@ -13050,6 +13117,7 @@ end;
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
+            const AAlignToPixel: Boolean;
             const ADstRect: TrectF;
             const AOpacity: Single;
             const AFill: TALBrush;
@@ -13148,6 +13216,7 @@ begin
   ALDrawCircle(
     ACanvas, // const ACanvas: TALCanvas;
     AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
     ADstRect, // const ADstRect: TrectF;
     AOpacity, //const AOpacity: Single;
     LFillColor, // const AFillColor: TAlphaColor;
@@ -13179,13 +13248,16 @@ Procedure ALCreateSurface(
             out ACanvas: TALCanvas;
             const AScale: Single;
             const w: Single;
-            const h: Single);
+            const h: Single;
+            const AAddPixelForAlignment: Boolean = true);
 begin
 
   {$REGION 'SKIA'}
   {$IF defined(ALSkiaEngine)}
 
-  ASurface := ALCreateSkSurface(ALCeil(W * AScale, TEpsilon.Position), ALCeil(H * AScale, TEpsilon.Position));
+  ASurface := ALCreateSkSurface(
+                ALCeil(W * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0),
+                ALCeil(H * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0));
   ACanvas := ALSkCheckHandle(sk4d_surface_get_canvas(aSurface));
 
   {$ENDIF}
@@ -13194,7 +13266,12 @@ begin
   {$REGION 'ANDROID'}
   {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
 
-  ASurface := TJBitmap.JavaClass.createBitmap(ALCeil(W * AScale, TEpsilon.Position), ALCeil(H * AScale, TEpsilon.Position), TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
+  ASurface := TJBitmap.JavaClass.createBitmap(
+                ALCeil(W * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0),
+                ALCeil(H * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0),
+                TJBitmap_Config.JavaClass.ARGB_8888,
+                true{hasAlpha},
+                ALGetGlobalJColorSpace);
   ACanvas := TJCanvas.JavaClass.init(ASurface);
 
   {$ENDIF}
@@ -13203,7 +13280,9 @@ begin
   {$REGION 'APPLEOS'}
   {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  ASurface := ALCreateCGContextRef(ALCeil(W * AScale, TEpsilon.Position), ALCeil(H * AScale, TEpsilon.Position));
+  ASurface := ALCreateCGContextRef(
+                ALCeil(W * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0),
+                ALCeil(H * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0));
   ACanvas := ASurface;
 
   {$ENDIF}
@@ -13212,7 +13291,9 @@ begin
   {$REGION 'MSWINDOWS'}
   {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
 
-  ASurface := Tbitmap.Create(ALCeil(W * AScale, TEpsilon.Position), ALCeil(H * AScale, TEpsilon.Position));
+  ASurface := Tbitmap.Create(
+                ALCeil(W * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0),
+                ALCeil(H * AScale, TEpsilon.Position) + ALIfThen(AAddPixelForAlignment, 1, 0));
   ASurface.Clear(TAlphaColorRec.Null);
   ACanvas := ASurface.Canvas;
 
@@ -13226,14 +13307,16 @@ Procedure ALCreateSurface(
             out ASurface: TALSurface;
             out ACanvas: TALCanvas;
             const w: Integer;
-            const h: Integer);
+            const h: Integer;
+            const AAddPixelForAlignment: Boolean = true);
 begin
   ALCreateSurface(
     ASurface, // out ASurface: TALSurface;
     ACanvas, // out ACanvas: TALCanvas;
     1, // const AScale: Single;
     w, // const w: Single;
-    h); // const h: Single
+    h, // const h: Single
+    AAddPixelForAlignment); // const AAddPixelForAlignment: Boolean = true);
 end;
 
 {**********************}
@@ -13305,7 +13388,7 @@ begin
   LDstRect.Width := LDstRect.Width / ACanvas.Scale;
   LDstRect.height := LDstRect.height / ACanvas.Scale;
   LDstRect.SetLocation(ADstTopLeft);
-  LDstRect := ACanvas.AlignToPixel(LDstRect);
+  LDstRect := ALAlignToPixelRound(LDstRect, ACanvas.Matrix, ACanvas.Scale, TEpsilon.position);
 
   {$IF DEFINED(ALSkiaCanvas)}
 
@@ -13375,7 +13458,7 @@ begin
   if ALIsDrawableNull(ADrawable) then
     Exit;
 
-  var LDstRect := ACanvas.AlignToPixel(ADstRect);
+  var LDstRect := ALAlignToPixelRound(ADstRect, ACanvas.Matrix, ACanvas.Scale, TEpsilon.position);
 
   {$IF DEFINED(ALSkiaCanvas)}
 
@@ -13576,13 +13659,16 @@ begin
 end;
 
 {******************************************************************}
-procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single);
+procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single; const AAddPixelForAlignment: Boolean = true);
 begin
+
+  var LRect := Arect;
+  if AAddPixelForAlignment then LRect.Inflate(1,1,1,1);
 
   {$REGION 'SKIA'}
   {$IF defined(ALSkiaEngine)}
 
-  sk4d_canvas_save_layer_alpha(ACanvas, @ARect, round(255 * AOpacity));
+  sk4d_canvas_save_layer_alpha(ACanvas, @LRect, round(255 * AOpacity));
 
   {$ENDIF}
   {$ENDREGION}
@@ -13590,7 +13676,7 @@ begin
   {$REGION 'ANDROID'}
   {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
 
-  var LJRect := TJRectF.JavaClass.init(ARect.left, ARect.top, ARect.right, ARect.bottom);
+  var LJRect := TJRectF.JavaClass.init(LRect.left, LRect.top, LRect.right, LRect.bottom);
   aCanvas.saveLayerAlpha(LJRect, round(255 * AOpacity));
   LJRect := nil;
 
@@ -13605,9 +13691,9 @@ begin
   CGContextBeginTransparencyLayerWithRect(
     ACanvas,
     ALLowerLeftCGRect(
-      ARect.TopLeft,
-      ARect.Width,
-      ARect.Height,
+      LRect.TopLeft,
+      LRect.Width,
+      LRect.Height,
       CGBitmapContextGetHeight(ACanvas)),
       nil{auxiliaryInfo});
 
@@ -13708,7 +13794,13 @@ begin
     ALUpdateBitmapFromCGContextRef(ASurface, aDrawable);
     {$ENDIF}
   {$ELSE}
-  aDrawable.Assign(aSurface);
+  // To force CopyToNewReference
+  aSurface.Canvas.BeginScene;
+  try
+    aDrawable.Assign(aSurface);
+  finally
+    aSurface.Canvas.EndScene;
+  end;
   {$ENDIF}
 end;
 
@@ -13728,6 +13820,28 @@ begin
   Result := TPixelFormat.BGRA;
   {$ELSE}
   Result := TPixelFormat.RGBA;
+  {$ENDIF}
+end;
+
+{*******************************}
+procedure ALExtractMatrixFromCanvas(const ACanvas: TALCanvas; out ACanvasMatrix: TMatrix; out ACanvasScale: Single);
+begin
+  ACanvasMatrix := TMatrix.Identity;
+  ACanvasScale := 1;
+  {$IF defined(ALSkiaEngine)}
+  if not ALIsCanvasNull(ACanvas) then begin
+    sk4d_canvas_get_local_to_device_as_3x3(Acanvas, sk_matrix_t(ACanvasMatrix));
+    ACanvasScale := ACanvasMatrix.m11;
+    ACanvasMatrix.m11 := ACanvasMatrix.m11 / ACanvasScale;
+    ACanvasMatrix.m12 := ACanvasMatrix.m12 / ACanvasScale;
+    ACanvasMatrix.m13 := ACanvasMatrix.m13 / ACanvasScale;
+    ACanvasMatrix.m21 := ACanvasMatrix.m21 / ACanvasScale;
+    ACanvasMatrix.m22 := ACanvasMatrix.m22 / ACanvasScale;
+    ACanvasMatrix.m23 := ACanvasMatrix.m23 / ACanvasScale;
+    ACanvasMatrix.m31 := ACanvasMatrix.m31 / ACanvasScale;
+    ACanvasMatrix.m32 := ACanvasMatrix.m32 / ACanvasScale;
+    ACanvasMatrix.m33 := ACanvasMatrix.m33 / ACanvasScale;
+  end;
   {$ENDIF}
 end;
 

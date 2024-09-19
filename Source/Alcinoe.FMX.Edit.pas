@@ -59,7 +59,7 @@ Type
   {************************************}
   TALBaseEditControl = class(TALControl)
   strict private
-    fOnChangeTracking: TNotifyEvent;
+    fOnChange: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
     FTextSettings: TALBaseTextSettings;
   protected
@@ -104,7 +104,7 @@ Type
     procedure SetText(const Value: String); virtual; abstract;
     function GetMaxLength: integer; virtual; abstract;
     procedure SetMaxLength(const Value: integer); virtual; abstract;
-    procedure DoChangeTracking; virtual;
+    procedure DoChange; virtual;
     procedure DoReturnKey; virtual;
     procedure AncestorVisibleChanged(const Visible: Boolean); override;
     procedure AncestorParentChanged; override;
@@ -134,7 +134,7 @@ Type
     {$ELSEIF defined(MSWindows)}
     property NativeView: TALWinNativeView read GetNativeView;
     {$ENDIF}
-    property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property OnChange: TNotifyEvent read fOnChange write fOnChange;
     property OnReturnKey: TNotifyEvent read fOnReturnKey write fOnReturnKey;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType;
@@ -778,7 +778,7 @@ type
     fDefStyleAttr: String;
     fDefStyleRes: String;
     FAutoTranslate: Boolean;
-    fOnChangeTracking: TNotifyEvent;
+    fOnChange: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
     fOnEnter: TNotifyEvent;
     fOnExit: TNotifyEvent;
@@ -824,7 +824,7 @@ type
     function getText: String;
     procedure SetText(const Value: String);
     function GetIsTextEmpty: Boolean; inline;
-    procedure OnChangeTrackingImpl(Sender: TObject);
+    procedure OnChangeImpl(Sender: TObject);
     procedure OnReturnKeyImpl(Sender: TObject);
     procedure SetOnReturnKey(const Value: TNotifyEvent);
     procedure OnEnterImpl(Sender: TObject);
@@ -944,28 +944,53 @@ type
     // Android only - the name of a style resource that supplies default style values
     // NOTE: !!IMPORTANT!! This properties must be defined the very first because the stream system must load it the very first
     property DefStyleRes: String read fDefStyleRes write SetDefStyleRes;
+    //property Action;
+    property Align;
+    property Anchors;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType default TALAutoCapitalizationType.acNone;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // Just the PromptText
     property CanFocus default True;
     //property CanParentFocus;
     //property Caret;
     property CheckSpelling: Boolean read GetCheckSpelling write SetCheckSpelling default true;
+    property ClipChildren;
+    //property ClipParent;
+    property Corners;
     property Cursor default crIBeam;
     //property DisableFocusEffect;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Fill;
     //property FilterChar;
+    property Height;
     //property Hint;
     //property ParentShowHint;
     //property ShowHint;
+    property HitTest;
     property KeyboardType: TVirtualKeyboardType read GetKeyboardType write SetKeyboardType default TVirtualKeyboardType.Default;
     //property KillFocusByReturn; => always true
     property LabelText: String read FLabelText write SetLabelText;
     property LabelTextSettings: TLabelTextSettings read FLabelTextSettings write SetLabelTextSettings;
+    property Locked;
+    property Margins;
     property MaxLength: integer read GetMaxLength write SetMaxLength default 0;
+    property Opacity;
+    property Padding;
+    property PopupMenu;
+    property Position;
     property PromptText: String read GetPromptText write setPromptText;
     property PromptTextColor: TAlphaColor read GetPromptTextColor write setPromptTextColor default TalphaColors.null; // Null mean use the default PromptTextColor
     //property ReadOnly;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType default TReturnKeyType.Default;
+    //property RotationAngle;
+    //property RotationCenter;
+    //property Scale;
+    property Shadow;
+    property Sides;
+    property Size;
     property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
+    property Stroke;
     property SupportingText: String read FSupportingText write SetSupportingText;
     property SupportingTextSettings: TSupportingTextSettings read FSupportingTextSettings write SetSupportingTextSettings;
     property TabOrder;
@@ -974,12 +999,34 @@ type
     property TextSettings: TTextSettings read FTextSettings write SetTextSettings;
     property TintColor: TAlphaColor read GetTintColor write setTintColor default TalphaColors.null; // IOS only - the color of the cursor caret and the text selection handles. null mean use the default TintColor
     property TouchTargetExpansion;
+    property Visible;
+    property Width;
+    property XRadius;
+    property YRadius;
+    //property OnCanFocus;
     //property OnChange;
-    property OnChangeTracking: TNotifyEvent read fOnChangeTracking write fOnChangeTracking;
+    property OnChange: TNotifyEvent read fOnChange write fOnChange;
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
     property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
     property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
     //property OnKeyDown; // Not work under android - it's like this with their @{[^# virtual keyboard :(
     //property OnKeyUp; // Not work under android - it's like this with their @{[^# virtual keyboard :(
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnReturnKey: TNotifyEvent read fOnReturnKey write SetOnReturnKey;
     //property OnTyping;
     //property OnValidate;
@@ -1056,7 +1103,7 @@ constructor TALBaseEditControl.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   CanFocus := True;
-  fOnChangeTracking := nil;
+  fOnChange := nil;
   FOnReturnKey := nil;
   FTextSettings := TALBaseEdit.TTextSettings.Create;
   FTextSettings.OnChanged := TextSettingsChanged;
@@ -1109,11 +1156,11 @@ begin
   FTextSettings.Assign(Value);
 end;
 
-{********************************************}
-procedure TALBaseEditControl.DoChangeTracking;
+{************************************}
+procedure TALBaseEditControl.DoChange;
 begin
-  if assigned(fOnChangeTracking) then
-    fOnChangeTracking(self);
+  if assigned(fOnChange) then
+    fOnChange(self);
 end;
 
 {****************************************}
@@ -1360,7 +1407,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALAndroidEditText.TALTextWatcher.afterTextChanged', 'control.name: ' + FEditText.FEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
-  FEditText.fEditControl.DoChangeTracking;
+  FEditText.fEditControl.DoChange;
 end;
 
 {******************************************************************************************************************************}
@@ -2055,7 +2102,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosEditTextField.ControlEventEditingChanged', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
-  fEditControl.DoChangeTracking;
+  fEditControl.DoChange;
 end;
 
 {*****************************************************}
@@ -2537,7 +2584,7 @@ begin
       exit;
     end;
   end;
-  fEditControl.DoChangeTracking;
+  fEditControl.DoChange;
 end;
 
 {**************************************************************************************************************************}
@@ -2939,7 +2986,7 @@ begin
   end;
   inherited;
   if Message.CharCode = VK_RETURN then fEditControl.DoReturnKey
-  else if Message.CharCode = VK_DELETE then fEditControl.DoChangeTracking;
+  else if Message.CharCode = VK_DELETE then fEditControl.DoChange;
 end;
 
 {******************************************************************}
@@ -2968,7 +3015,7 @@ procedure TALWinEditView.WMChar(var Message: TWMChar);
 begin
   inherited;
   invalidate;
-  fEditControl.DoChangeTracking;
+  fEditControl.DoChange;
 end;
 
 {**************************************************************************}
@@ -3858,6 +3905,7 @@ begin
       Disabled.Assign(TStateStyles(Source).Disabled);
       Hovered.Assign(TStateStyles(Source).Hovered);
       Focused.Assign(TStateStyles(Source).Focused);
+      inherited Assign(Source);
     Finally
       EndUpdate;
     End;
@@ -3986,7 +4034,7 @@ begin
   fDefStyleAttr := '';
   fDefStyleRes := '';
   FAutoTranslate := true;
-  fOnChangeTracking := nil;
+  fOnChange := nil;
   FOnReturnKey := nil;
   fOnEnter := nil;
   fOnExit := nil;
@@ -4068,8 +4116,7 @@ begin
   // In Android we must first know the value of DefStyleAttr/DefStyleRes
   // before to create the fEditControl. I use this way to know that the compoment
   // will load it's properties from the dfm
-  if (aOwner = nil) or
-     (not (csloading in aOwner.ComponentState)) then begin
+  if not IsOwnerLoading then begin
     fEditControl := CreateEditControl;
     InitEditControl;
   end
@@ -4148,7 +4195,7 @@ begin
   FeditControl.Locked := True;
   FeditControl.OnReturnKey := nil; // noops operation
   fEditControl.Align := TAlignLayout.Client;
-  FeditControl.OnChangeTracking := OnChangeTrackingImpl;
+  FeditControl.OnChange := OnChangeImpl;
   FeditControl.OnEnter := OnEnterImpl;
   FeditControl.OnExit := OnExitImpl;
   fEditControl.Password := false; // noops operation
@@ -4937,7 +4984,7 @@ begin
 end;
 
 {******************************************************}
-procedure TALBaseEdit.OnChangeTrackingImpl(Sender: TObject);
+procedure TALBaseEdit.OnChangeImpl(Sender: TObject);
 begin
   if (csLoading in componentState) then exit;
   var LIsTextEmpty := GetText = '';
@@ -4953,8 +5000,8 @@ begin
   end
   else
     FIsTextEmpty := LIsTextEmpty;
-  if assigned(fOnChangeTracking) then
-    fOnChangeTracking(self);
+  if assigned(fOnChange) then
+    fOnChange(self);
 end;
 
 {*************************************************}
@@ -5441,6 +5488,7 @@ begin
     CreateBufDrawable(
       LStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
       LStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
+      ALGetScreenScale, // const AScale: Single;
       LStateStyle.Fill, // const AFill: TALBrush;
       LStateStyle.StateLayer, // const AStateLayer: TALStateLayer;
       LStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;

@@ -346,11 +346,16 @@ type
     FYRadius: Single;
     FCorners: TCorners;
     FSides: TSides;
+    FDefaultXRadius: Single;
+    FDefaultYRadius: Single;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
+    function IsXRadiusStored: Boolean;
+    function IsYRadiusStored: Boolean;
   protected
+    function HasCustomDraw: Boolean; virtual;
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
     procedure SetXRadius(const Value: Single); virtual;
@@ -366,6 +371,7 @@ type
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
                 out ABufDrawableRect: TRectF;
+                const AScale: Single;
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStateLayerContentColor: TAlphaColor;
@@ -379,17 +385,44 @@ type
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
+    property Sides: TSides read FSides write SetSides stored IsSidesStored;
+    property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
+    property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
+    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
+    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
+  TALRectangle = class(TALBaseRectangle, IALAutosizeControl)
+  private
+    FAutoSize: Boolean;
+  protected
+    function GetAutoSize: Boolean; virtual;
+    procedure SetAutoSize(const Value: Boolean); virtual;
+    procedure DoRealign; override;
+    procedure AdjustSize; virtual;
+    { IALAutosizeControl }
+    function HasUnconstrainedAutosizeX: Boolean; virtual;
+    function HasUnconstrainedAutosizeY: Boolean; virtual;
+  public
+    constructor Create(AOwner: TComponent); override;
   published
     //property Action;
     property Align;
     property Anchors;
+    // Dynamically adjusts the dimensions to accommodate child controls,
+    // considering their sizes, positions, margins, and alignments.
+    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property ClipChildren;
     //property ClipParent;
-    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
+    property Corners;
     property Cursor;
+    property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -409,7 +442,7 @@ type
     property RotationCenter;
     property Scale;
     property Shadow;
-    property Sides: TSides read FSides write SetSides stored IsSidesStored;
+    property Sides;
     property Size;
     property Stroke;
     //property TabOrder;
@@ -417,8 +450,8 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property XRadius: Single read FXRadius write SetXRadius;
-    property YRadius: Single read FYRadius write SetYRadius;
+    property XRadius;
+    property YRadius;
     //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
@@ -445,28 +478,6 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALRectangle = class(TALBaseRectangle, IALAutosizeControl)
-  private
-    FAutoSize: Boolean;
-  protected
-    function GetAutoSize: Boolean; virtual;
-    procedure SetAutoSize(const Value: Boolean); virtual;
-    procedure DoRealign; override;
-    procedure AdjustSize; virtual;
-    { IALAutosizeControl }
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
-  public
-    constructor Create(AOwner: TComponent); override;
-  published
-    // Dynamically adjusts the dimensions to accommodate child controls,
-    // considering their sizes, positions, margins, and alignments.
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
-    property DoubleBuffered;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
   TALCircle = class(TALShape, IALDoubleBufferedControl)
   private
     fDoubleBuffered: boolean;
@@ -484,6 +495,7 @@ type
     Procedure CreateBufDrawable(
                 var ABufDrawable: TALDrawable;
                 out ABufDrawableRect: TRectF;
+                const AScale: Single;
                 const AFill: TALBrush;
                 const AStateLayer: TALStateLayer;
                 const AStateLayerContentColor: TAlphaColor;
@@ -678,6 +690,8 @@ type
     FCorners: TCorners;
     FSides: TSides;
     FAutoSize: Boolean;
+    FDefaultXRadius: Single;
+    FDefaultYRadius: Single;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
     procedure SetText(const Value: string);
@@ -685,6 +699,8 @@ type
     procedure SetMaxHeight(const Value: Single);
     function IsMaxWidthStored: Boolean;
     function IsMaxHeightStored: Boolean;
+    function IsXRadiusStored: Boolean;
+    function IsYRadiusStored: Boolean;
   protected
     FIsAdjustingSize: Boolean;
     function GetDoubleBuffered: boolean;
@@ -802,20 +818,45 @@ type
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
     function TextBroken: Boolean;
+    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
+    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
+    property HitTest default False;
+    property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored nodefault;
+    property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored nodefault;
+    property Sides: TSides read FSides write SetSides stored IsSidesStored;
+    property Text: string read FText write SetText;
+    property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
+    property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
     property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
+    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
+  TALText = class(TALBaseText)
+  private
+    function GetTextSettings: TALTextSettings;
+  protected
+    procedure SetTextSettings(const Value: TALTextSettings); reintroduce;
+    function CreateTextSettings: TALBaseTextSettings; override;
+  public
+    property Elements;
   published
     //property Action;
     property Align;
     property Anchors;
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
-    property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
+    property AutoSize;
+    property AutoTranslate;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property ClipChildren;
     //property ClipParent;
-    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
+    property Corners;
     property Cursor;
+    property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -824,11 +865,11 @@ type
     //property Hint;
     //property ParentShowHint;
     //property ShowHint;
-    property HitTest default False;
+    property HitTest;
     property Locked;
     property Margins;
-    property MaxWidth: Single read fMaxWidth write SetMaxWidth stored IsMaxWidthStored nodefault;
-    property MaxHeight: Single read fMaxHeight write SetMaxHeight stored IsMaxHeightStored nodefault;
+    property MaxWidth;
+    property MaxHeight;
     property Opacity;
     property Padding;
     property PopupMenu;
@@ -837,23 +878,31 @@ type
     property RotationCenter;
     property Scale;
     property Shadow;
-    property Sides: TSides read FSides write SetSides stored IsSidesStored;
+    property Sides;
     property Size;
     property Stroke;
     //property TabOrder;
     //property TabStop;
-    property Text: string read FText write SetText;
+    property Text;
+    property TextSettings: TALTextSettings read GetTextSettings write SetTextSettings;
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property XRadius: Single read FXRadius write SetXRadius;
-    property YRadius: Single read FYRadius write SetYRadius;
+    property XRadius;
+    property YRadius;
     //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
+    property OnElementClick;
+    //property OnElementDblClick;
+    property OnElementMouseDown;
+    property OnElementMouseMove;
+    property OnElementMouseUp;
+    property OnElementMouseEnter;
+    property OnElementMouseLeave;
     //property OnEnter;
     //property OnExit;
     property OnMouseEnter;
@@ -870,28 +919,6 @@ type
     property OnPaint;
     //property OnResize;
     property OnResized;
-  end;
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
-  TALText = class(TALBaseText)
-  private
-    function GetTextSettings: TALTextSettings;
-  protected
-    procedure SetTextSettings(const Value: TALTextSettings); reintroduce;
-    function CreateTextSettings: TALBaseTextSettings; override;
-  public
-    property Elements;
-  published
-    property DoubleBuffered;
-    property TextSettings: TALTextSettings read GetTextSettings write SetTextSettings;
-    property OnElementClick;
-    //property OnElementDblClick;
-    property OnElementMouseDown;
-    property OnElementMouseMove;
-    property OnElementMouseUp;
-    property OnElementMouseEnter;
-    property OnElementMouseLeave;
   end;
 
 procedure ALLockTexts(const aParentControl: Tcontrol);
@@ -1824,8 +1851,10 @@ constructor TALBaseRectangle.Create(AOwner: TComponent);
 begin
   inherited;
   fDoubleBuffered := true;
-  FXRadius := 0;
-  FYRadius := 0;
+  FDefaultXRadius := 0;
+  FDefaultYRadius := 0;
+  FXRadius := FDefaultXRadius;
+  FYRadius := FDefaultYRadius;
   FCorners := AllCorners;
   FSides := AllSides;
   fBufDrawable := ALNullDrawable;
@@ -1866,6 +1895,24 @@ end;
 function TALBaseRectangle.IsSidesStored: Boolean;
 begin
   Result := FSides * AllSides <> AllSides
+end;
+
+{**************************************************}
+function TALBaseRectangle.IsXRadiusStored: Boolean;
+begin
+  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+end;
+
+{**************************************************}
+function TALBaseRectangle.IsYRadiusStored: Boolean;
+begin
+  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
+end;
+
+{***********************************************}
+function TALBaseRectangle.HasCustomDraw: Boolean;
+begin
+  Result := False;
 end;
 
 {***********************************************}
@@ -1958,6 +2005,7 @@ end;
 Procedure TALBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
+            const AScale: Single;
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStateLayerContentColor: TAlphaColor;
@@ -1981,7 +2029,7 @@ begin
   ALCreateSurface(
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
-    ALGetScreenScale, // const AScale: Single;
+    AScale, // const AScale: Single;
     LSurfaceRect.Width, // const w: integer;
     LSurfaceRect.height);// const h: integer)
   try
@@ -1991,7 +2039,7 @@ begin
 
       ALDrawRectangle(
         LCanvas, // const ACanvas: TALCanvas;
-        ALGetScreenScale, // const AScale: Single;
+        AScale, // const AScale: Single;
         IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
@@ -2030,7 +2078,9 @@ begin
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
      //--- Do not create BufDrawable if only fill with solid color
-     (((not Stroke.HasStroke) or
+     ((not HasCustomDraw)
+      and
+      ((not Stroke.HasStroke) or
        (sides = []))
       and
       ((SameValue(xRadius, 0, TEpsilon.Vector)) or
@@ -2051,6 +2101,7 @@ begin
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // var ABufDrawableRect: TRectF;
+    ALGetScreenScale, // const AScale: Single;
     Fill, // const AFill: TALBrush;
     nil, // const AStateLayer: TALStateLayer;
     TAlphaColors.null, // const AStateLayerContentColor: TAlphaColor;
@@ -2225,6 +2276,7 @@ end;
 Procedure TALCircle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
+            const AScale: Single;
             const AFill: TALBrush;
             const AStateLayer: TALStateLayer;
             const AStateLayerContentColor: TAlphaColor;
@@ -2248,7 +2300,7 @@ begin
   ALCreateSurface(
     LSurface, // out ASurface: TALSurface;
     LCanvas, // out ACanvas: TALCanvas;
-    ALGetScreenScale, // const AScale: Single;
+    AScale, // const AScale: Single;
     LSurfaceRect.Width, // const w: integer;
     LSurfaceRect.Height); // const h: integer)
   try
@@ -2258,7 +2310,7 @@ begin
 
       ALDrawCircle(
         LCanvas, // const ACanvas: TALCanvas;
-        ALGetScreenScale, // const AScale: Single;
+        AScale, // const AScale: Single;
         IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
@@ -2301,6 +2353,7 @@ begin
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
     FBufDrawableRect, // var ABufDrawableRect: TRectF;
+    ALGetScreenScale, // const AScale: Single;
     Fill, // const AFill: TALBrush;
     nil, // const AStateLayer: TALStateLayer;
     TAlphaColors.null, // const AStateLayerContentColor: TAlphaColor;
@@ -2779,8 +2832,10 @@ begin
   Stroke.Color := Stroke.DefaultColor;
   Stroke.OnChanged := LPrevStrokeOnchanged;
   FCorners := AllCorners;
-  FXRadius := 0;
-  FYRadius := 0;
+  FDefaultXRadius := 0;
+  FDefaultYRadius := 0;
+  FXRadius := FDefaultXRadius;
+  FYRadius := FDefaultYRadius;
   FSides := AllSides;
   //-----
   HitTest := False;
@@ -2846,6 +2901,9 @@ end;
 procedure TALBaseText.SetNewScene(AScene: IScene);
 begin
   inherited SetNewScene(AScene);
+  // At design time, when a new TALBaseText control with AutoSize=true
+  // is added to the form, the size will not adjust and will remain
+  // at its default (200x50). Calling AdjustSize here will correct this.
   AdjustSize;
 end;
 
@@ -3599,7 +3657,7 @@ begin
 
     if (AText <> '') or (LocalRect.IsEmpty) then begin
       ABufDrawable := ALCreateEmptyDrawable1x1;
-      ABufDrawableRect := TRectF.Create(0,0,1/ALGetScreenScale,1/ALGetScreenScale);
+      ABufDrawableRect := TRectF.Create(0,0,1/AScale,1/AScale);
       exit;
     end;
 
@@ -3746,6 +3804,18 @@ end;
 function TALBaseText.IsMaxHeightStored: Boolean;
 begin
   result := compareValue(fMaxHeight, 65535, Tepsilon.position) <> 0;
+end;
+
+{**************************************************}
+function TALBaseText.IsXRadiusStored: Boolean;
+begin
+  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+end;
+
+{**************************************************}
+function TALBaseText.IsYRadiusStored: Boolean;
+begin
+  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
 
 {*******************************************************}

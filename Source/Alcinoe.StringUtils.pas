@@ -332,9 +332,11 @@ function  ALFloatToStrFW(Value: Extended; Format: TFloatFormat; Precision, Digit
 function  ALCurrToStrA(Value: Currency; const AFormatSettings: TALFormatSettingsA): AnsiString;
 function  ALCurrToStrW(Value: Currency; const AFormatSettings: TALFormatSettingsW): string; inline;
 function  ALFormatFloatA(const Format: AnsiString; Value: Extended; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALFormatFloatW(const Format: string; Value: Extended; const AFormatSettings: TALFormatSettingsW): string; inline;
+function  ALFormatFloatW(const Format: string; Value: Extended; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
+function  ALFormatFloatW(const Format: string; Value: Extended): string; overload; inline;
 function  ALFormatCurrA(const Format: AnsiString; Value: Currency; const AFormatSettings: TALFormatSettingsA): AnsiString;
-function  ALFormatCurrW(const Format: string; Value: Currency; const AFormatSettings: TALFormatSettingsW): string; inline;
+function  ALFormatCurrW(const Format: string; Value: Currency; const AFormatSettings: TALFormatSettingsW): string; overload; inline;
+function  ALFormatCurrW(const Format: string; Value: Currency): string; overload; inline;
 function  ALStrToFloat(const S: AnsiString; const AFormatSettings: TALFormatSettingsA): Extended; overload;
 function  ALStrToFloat(const S: string; const AFormatSettings: TALFormatSettingsW): Extended; overload; inline;
 function  ALStrToFloatDef(const S: AnsiString; const Default: Extended; const AFormatSettings: TALFormatSettingsA): Extended; overload;
@@ -6959,6 +6961,14 @@ begin
   result := system.sysutils.FormatFloat(Format, Value, AFormatSettings);
 end;
 
+{***********************}
+function  ALFormatFloatW(
+            const Format: string;
+            Value: Extended): string;
+begin
+  result := system.sysutils.FormatFloat(Format, Value);
+end;
+
 {*************************************}
 {$IFNDEF ALCompilerVersionSupported120}
   {$MESSAGE WARN 'Check if system.sysUtils.FormatCurr is still the same and adjust the IFDEF'}
@@ -6990,6 +7000,14 @@ function  ALFormatCurrW(
             const AFormatSettings: TALFormatSettingsW): string;
 begin
   result := system.sysutils.FormatCurr(Format, Value, AFormatSettings);
+end;
+
+{**********************}
+function  ALFormatCurrW(
+            const Format: string;
+            Value: Currency): string;
+begin
+  result := system.sysutils.FormatCurr(Format, Value);
 end;
 
 {*************************************}

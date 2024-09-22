@@ -741,6 +741,10 @@ begin
   //  TalLogType.verbose);
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
+    {$IFDEF DEBUG}
+    if fScrollCapturedByMe then
+      raise Exception.Create('Error 9A590A21-139E-44EC-83F5-6813453329E4');
+    {$ENDIF}
     if fScrollEngine.down then begin
       fScrollEngine.Down := false; // instead of down := false to reposition the tabitem
       FMouseEvents := False;

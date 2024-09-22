@@ -143,6 +143,7 @@ type
   private
     FScrollBox: TALCustomScrollBox;
   protected
+    function GetDefaultSize: TSizeF; override;
     procedure DoChanged; override;
     procedure Resize; override;
   public
@@ -163,7 +164,6 @@ type
 
   {*******************************************************************************************************************************}
   TALScrollBoxPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
-  TALScrollBoxBarInit = procedure(const sender: TObject; const aScrollBar: TALScrollBoxBar) of object;
 
   {**********************************************************}
   TALCustomScrollBox = class(TALControl, IALScrollableControl)
@@ -179,7 +179,6 @@ type
     FAutoHide: Boolean;
     FMouseEvents: Boolean;
     FOnViewportPositionChange: TALScrollBoxPositionChangeEvent;
-    fOnScrollBarInit: TALScrollBoxBarInit;
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
     fMouseDownPos: TpointF;
@@ -199,7 +198,6 @@ type
     { IALScrollableControl }
     function GetScrollEngine: TALScrollEngine;
   protected
-    procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
     procedure DoRealign; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
@@ -234,7 +232,6 @@ type
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
     property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
     property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
@@ -307,7 +304,6 @@ type
     property OnPaint;
     //property OnResize;
     property OnResized;
-    property OnScrollBarInit;
     property OnViewportPositionChange;
   end;
 
@@ -381,7 +377,6 @@ type
     property OnPaint;
     //property OnResize;
     property OnResized;
-    property OnScrollBarInit;
     property OnViewportPositionChange;
   end;
 
@@ -455,7 +450,6 @@ type
     property OnPaint;
     //property OnResize;
     property OnResized;
-    property OnScrollBarInit;
     property OnViewportPositionChange;
   end;
 
@@ -666,6 +660,12 @@ begin
   HitTest := False;
 end;
 
+{**********************************************}
+function TALScrollBoxBar.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(150, 4);
+end;
+
 {**********************************}
 procedure TALScrollBoxBar.DoChanged;
 begin
@@ -705,7 +705,6 @@ begin
   FDisableMouseWheel := False;
   FMouseEvents := False;
   FOnViewportPositionChange := nil;
-  fOnScrollBarInit := nil;
   fOnAniStart := nil;
   fOnAniStop := nil;
   fScrollEngine := CreateScrollEngine;
@@ -787,13 +786,13 @@ procedure TALCustomScrollBox.DoRealign;
       fVScrollBar.Enabled := AContentRect.Height > Height;
       fVScrollBar.Visible := FShowScrollBars and
                              ((AContentRect.Height > Height) or (not FAutoHide));
-      fVScrollBar.ValueRange.BeginUpdate;
+      fVScrollBar.BeginUpdate;
       try
-        fVScrollBar.ValueRange.Min := 0;
-        fVScrollBar.ValueRange.Max := AContentRect.Height;
-        fVScrollBar.ValueRange.ViewportSize := height;
+        fVScrollBar.Min := 0;
+        fVScrollBar.Max := AContentRect.Height;
+        fVScrollBar.ViewportSize := height;
       finally
-        fVScrollBar.ValueRange.EndUpdate;
+        fVScrollBar.EndUpdate;
       end;
       fVScrollBar.SetBounds(
         width - fVScrollBar.Width - fVScrollBar.Margins.Right,
@@ -810,13 +809,13 @@ procedure TALCustomScrollBox.DoRealign;
       fHScrollBar.Enabled := AContentRect.Width > Width;
       fHScrollBar.Visible := FShowScrollBars and
                              ((AContentRect.Width > Width) or (not FAutoHide));
-      fHScrollBar.ValueRange.BeginUpdate;
+      fHScrollBar.BeginUpdate;
       try
-        fHScrollBar.ValueRange.Min := 0;
-        fHScrollBar.ValueRange.Max := AContentRect.Width;
-        fHScrollBar.ValueRange.ViewportSize := Width;
+        fHScrollBar.Min := 0;
+        fHScrollBar.Max := AContentRect.Width;
+        fHScrollBar.ViewportSize := Width;
       finally
-        fHScrollBar.ValueRange.EndUpdate;
+        fHScrollBar.EndUpdate;
       end;
       fHScrollBar.SetBounds(
         fHScrollBar.Margins.left,
@@ -879,10 +878,10 @@ begin
   Result.Beginupdate;
   try
     Result.Orientation := aOrientation;
-    result.Thumb.HitTest := not HasTouchScreen; // at design time (windows) will be always true = default value
-                                                // this mean that true will be never save in the dfm! only false
-                                                // can be stored in the dfm. so only false in the dfm can override
-                                                // this settings
+    // At design time (on Windows), this will always be True, which is the default value.
+    // This means that True will never be saved in the DFM; only False can be stored in the DFM.
+    // Therefore, only False in the DFM can override this setting.
+    result.Thumb.HitTest := not HasTouchScreen;
     if aOrientation = TOrientation.Vertical then Result.Name := 'VScrollBar'
     else Result.Name := 'HScrollBar';
     Result.Visible := False;
@@ -930,6 +929,10 @@ begin
   //  TalLogType.verbose);
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
+    {$IFDEF DEBUG}
+    if fScrollCapturedByMe then
+      raise Exception.Create('Error 8EA8C349-8441-4D2F-BC5A-872772A40513');
+    {$ENDIF}
     if fScrollEngine.down then begin
       fScrollEngine.Down := false;
       FMouseEvents := False;
@@ -1123,16 +1126,6 @@ begin
      (not (AObject is TAnimation)) and
      (not (AObject is TALScrollBoxBar)) then FContent.AddObject(AObject)
   else inherited;
-end;
-
-{**********************************}
-procedure TALCustomScrollBox.Loaded;
-begin
-  inherited Loaded;
-  if assigned(fOnScrollBarInit) then begin
-    if assigned(fVscrollBar) then fOnScrollBarInit(self, fVscrollBar);
-    if assigned(fHscrollBar) then fOnScrollBarInit(self, fHscrollBar);
-  end;
 end;
 
 {**********************************************************}

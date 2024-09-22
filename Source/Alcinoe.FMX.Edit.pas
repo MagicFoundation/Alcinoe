@@ -912,6 +912,7 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
+    procedure SetNewScene(AScene: IScene); override;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -4155,6 +4156,16 @@ begin
   finally
     EndUpdate;
   end;
+end;
+
+{************************************************}
+procedure TALBaseEdit.SetNewScene(AScene: IScene);
+begin
+  inherited SetNewScene(AScene);
+  // At design time, when a new TEdit/TMemo is added to the form,
+  // the size will not adjust and will remain at its default (200x50).
+  // Calling AdjustSize here will correct this.
+  AdjustSize;
 end;
 
 {****************************************}

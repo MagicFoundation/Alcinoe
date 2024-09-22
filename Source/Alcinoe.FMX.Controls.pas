@@ -27,10 +27,12 @@ type
     FMouseDownAtLowVelocity: Boolean;
     FDisableDoubleClickHandling: Boolean;
     FIsPixelAlignmentEnabled: Boolean;
+    FFormerMarginsChangedHandler: TNotifyEvent;
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
+    procedure MarginsChangedHandler(Sender: TObject);
   protected
     function GetIsPixelAlignmentEnabled: Boolean; virtual;
     procedure SetIsPixelAlignmentEnabled(const AValue: Boolean); Virtual;
@@ -48,7 +50,10 @@ type
     procedure IsMouseOverChanged; virtual;
     procedure IsFocusedChanged; virtual;
     procedure PressedChanged; virtual;
+    Procedure MarginsChanged; Virtual;
     procedure Loaded; override;
+    function IsOwnerLoading: Boolean;
+    function IsSizeStored: Boolean; override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetNewScene(AScene: IScene); override;
@@ -139,6 +144,7 @@ implementation
 
 uses
   System.SysUtils,
+  System.Math,
   System.Math.Vectors,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.ScrollEngine,
@@ -149,6 +155,11 @@ uses
 constructor TALControl.Create(AOwner: TComponent);
 begin
   inherited;
+  {$IFNDEF ALCompilerVersionSupported120}
+    {$MESSAGE WARN 'Check if MarginsChanged is not implemented in FMX.Controls.TControl and adjust the IFDEF'}
+  {$ENDIF}
+  FFormerMarginsChangedHandler := Margins.OnChange;
+  Margins.OnChange := MarginsChangedHandler;
   Size.SetPlatformDefaultWithoutNotification(False);
   FForm := nil;
   FFocusOnMouseDown := False;
@@ -174,6 +185,22 @@ begin
     AlignToPixel;
   {$ENDIF}
   Inherited;
+end;
+
+{******************************************}
+function TALControl.IsOwnerLoading: Boolean;
+begin
+  inherited;
+  result := (Owner <> nil) and
+            (csloading in Owner.ComponentState);
+end;
+
+{****************************************}
+function TALControl.IsSizeStored: Boolean;
+begin
+  var LDefaultSize := GetDefaultSize;
+  result := (not SameValue(LDefaultSize.cx, Size.Size.cx, TEpsilon.Position)) or
+            (not SameValue(LDefaultSize.cy, Size.Size.cy, TEpsilon.Position));
 end;
 
 {*****************************************************}
@@ -474,6 +501,20 @@ end;
 procedure TALControl.PressedChanged;
 begin
   // virtual
+end;
+
+{*********************************}
+Procedure TALControl.MarginsChanged;
+begin
+  // virtual
+end;
+
+{**********************************************************}
+procedure TALControl.MarginsChangedHandler(Sender: TObject);
+begin
+  if Assigned(FFormerMarginsChangedHandler) then
+    FFormerMarginsChangedHandler(Sender);
+  MarginsChanged;
 end;
 
 {**}

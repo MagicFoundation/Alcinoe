@@ -10,19 +10,75 @@ uses
   Alcinoe.FMX.StdCtrls;
 
 Type
-  TALApplyEditThemeProc = Procedure(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
-  TALApplyButtonThemeProc = Procedure(const AButton: TALButton; const AFontSize: Single = 14);
-  TALApplyCheckBoxThemeProc = Procedure(const ACheckBox: TALCheckBox; const AHeight: Single = 18);
-  TALApplyRadioButtonThemeProc = Procedure(const ARadioButton: TALRadioButton; const AHeight: Single = 20);
-  TALApplySwitchThemeProc = Procedure(const ASwitch: TALSwitch; const AHeight: Single = 32);
+  TALApplyEditThemeInfo = record
+  public
+    Type
+      TApplyThemeProc = Procedure(const AEdit: TALBaseEdit; const AFontSize: Single);
+  public
+    ApplyThemeProc: TApplyThemeProc;
+    DefaultFontSize: Single;
+    constructor create(const AApplyThemeProc: TApplyThemeProc; const ADefaultFontSize: Single);
+  end;
+  //--
+  TALApplyButtonThemeInfo = record
+  public
+    Type
+      TApplyThemeProc = Procedure(const AButton: TALButton; const AFontSize: Single);
+  public
+    ApplyThemeProc: TApplyThemeProc;
+    DefaultFontSize: Single;
+    constructor create(const AApplyThemeProc: TApplyThemeProc; const ADefaultFontSize: Single);
+  end;
+  //--
+  TALApplyCheckBoxThemeInfo = record
+  public
+    Type
+      TApplyThemeProc = Procedure(const ACheckBox: TALCheckBox; const AHeight: Single);
+  public
+    ApplyThemeProc: TApplyThemeProc;
+    DefaultHeight: Single;
+    constructor create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+  end;
+  //--
+  TALApplyRadioButtonThemeInfo = record
+  public
+    Type
+      TApplyThemeProc = Procedure(const ARadioButton: TALRadioButton; const AHeight: Single);
+  public
+    ApplyThemeProc: TApplyThemeProc;
+    DefaultHeight: Single;
+    constructor create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+  end;
+  //--
+  TALApplySwitchThemeInfo = record
+  public
+    Type
+      TApplyThemeProc = Procedure(const ASwitch: TALSwitch; const AHeight: Single);
+  public
+    ApplyThemeProc: TApplyThemeProc;
+    DefaultHeight: Single;
+    constructor create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+  end;
+  //--
+  TALApplyTrackBarThemeInfo = record
+  public
+    Type
+      TApplyThemeProc = Procedure(const ATrackBar: TALCustomTrack; const AHeight: Single);
+  public
+    ApplyThemeProc: TApplyThemeProc;
+    DefaultHeight: Single;
+    constructor create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+  end;
 
 var
-  ALEditThemes: TDictionary<String, TALApplyEditThemeProc>;
-  ALMemoThemes: TDictionary<String, TALApplyEditThemeProc>;
-  ALButtonThemes: TDictionary<String, TALApplyButtonThemeProc>;
-  ALCheckBoxThemes: TDictionary<String, TALApplyCheckBoxThemeProc>;
-  ALRadioButtonThemes: TDictionary<String, TALApplyRadioButtonThemeProc>;
-  ALSwitchThemes: TDictionary<String, TALApplySwitchThemeProc>;
+  ALEditThemes: TDictionary<String, TALApplyEditThemeInfo>;
+  ALMemoThemes: TDictionary<String, TALApplyEditThemeInfo>;
+  ALButtonThemes: TDictionary<String, TALApplyButtonThemeInfo>;
+  ALCheckBoxThemes: TDictionary<String, TALApplyCheckBoxThemeInfo>;
+  ALRadioButtonThemes: TDictionary<String, TALApplyRadioButtonThemeInfo>;
+  ALSwitchThemes: TDictionary<String, TALApplySwitchThemeInfo>;
+  ALTrackBarThemes: TDictionary<String, TALApplyTrackBarThemeInfo>;
+  ALRangeTrackBarThemes: TDictionary<String, TALApplyTrackBarThemeInfo>;
 
 procedure ALApplyEditTheme(const ATheme: String; const AEdit: TALBaseEdit);
 procedure ALApplyMemoTheme(const ATheme: String; const AMemo: TALBaseEdit);
@@ -30,6 +86,8 @@ procedure ALApplyButtonTheme(const ATheme: String; const AButton: TALButton);
 procedure ALApplyCheckBoxTheme(const ATheme: String; const ACheckBox: TALCheckBox);
 procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALRadioButton);
 procedure ALApplySwitchTheme(const ATheme: String; const ASwitch: TALSwitch);
+procedure ALApplyTrackBarTheme(const ATheme: String; const ATrackBar: TALCustomTrack);
+procedure ALApplyRangeTrackBarTheme(const ATheme: String; const ARangeTrackBar: TALCustomTrack);
 
 implementation
 
@@ -58,6 +116,48 @@ begin
   end;
   {$ENDIF}
   Result := LValueF / ADefaultValue;
+end;
+
+{**************************************************************************************}
+constructor TALApplyEditThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultFontSize: Single);
+begin
+  ApplyThemeProc := AApplyThemeProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
+{**************************************************************************************}
+constructor TALApplyButtonThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultFontSize: Single);
+begin
+  ApplyThemeProc := AApplyThemeProc;
+  DefaultFontSize := ADefaultFontSize;
+end;
+
+{**************************************************************************************}
+constructor TALApplyCheckBoxThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+begin
+  ApplyThemeProc := AApplyThemeProc;
+  DefaultHeight := ADefaultHeight;
+end;
+
+{**************************************************************************************}
+constructor TALApplyRadioButtonThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+begin
+  ApplyThemeProc := AApplyThemeProc;
+  DefaultHeight := ADefaultHeight;
+end;
+
+{**************************************************************************************}
+constructor TALApplySwitchThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+begin
+  ApplyThemeProc := AApplyThemeProc;
+  DefaultHeight := ADefaultHeight;
+end;
+
+{**************************************************************************************}
+constructor TALApplyTrackbarThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
+begin
+  ApplyThemeProc := AApplyThemeProc;
+  DefaultHeight := ADefaultHeight;
 end;
 
 //////////
@@ -745,12 +845,12 @@ end;
 {*************************************************************************}
 procedure ALApplyEditTheme(const ATheme: String; const AEdit: TALBaseEdit);
 begin
-  Var LApplyEditThemeProc: TALApplyEditThemeProc;
-  If not ALEditThemes.TryGetValue(Atheme,LApplyEditThemeProc) then
+  Var LApplyEditThemeInfo: TALApplyEditThemeInfo;
+  If not ALEditThemes.TryGetValue(Atheme,LApplyEditThemeInfo) then
     Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
   AEdit.BeginUpdate;
   try
-    LApplyEditThemeProc(AEdit);
+    LApplyEditThemeInfo.ApplyThemeProc(AEdit, LApplyEditThemeInfo.DefaultFontSize);
   finally
     AEdit.EndUpdate;
   end;
@@ -763,12 +863,12 @@ end;
 {*************************************************************************}
 procedure ALApplyMemoTheme(const ATheme: String; const AMemo: TALBaseEdit);
 begin
-  Var LApplyEditThemeProc: TALApplyEditThemeProc;
-  If not ALMemoThemes.TryGetValue(Atheme,LApplyEditThemeProc) then
+  Var LApplyEditThemeInfo: TALApplyEditThemeInfo;
+  If not ALMemoThemes.TryGetValue(Atheme,LApplyEditThemeInfo) then
     Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
   AMemo.BeginUpdate;
   try
-    LApplyEditThemeProc(AMemo);
+    LApplyEditThemeInfo.ApplyThemeProc(AMemo, LApplyEditThemeInfo.DefaultFontSize);
   finally
     AMemo.EndUpdate;
   end;
@@ -1728,12 +1828,12 @@ end;
 {***************************************************************************}
 procedure ALApplyButtonTheme(const ATheme: String; const AButton: TALButton);
 begin
-  Var LApplyButtonThemeProc: TALApplybuttonThemeProc;
-  If not ALButtonThemes.TryGetValue(Atheme,LApplyButtonThemeProc) then
+  Var LApplyButtonThemeInfo: TALApplybuttonThemeInfo;
+  If not ALButtonThemes.TryGetValue(Atheme,LApplyButtonThemeInfo) then
     Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
   AButton.BeginUpdate;
   try
-    LApplyButtonThemeProc(AButton);
+    LApplyButtonThemeInfo.ApplyThemeProc(AButton, LApplyButtonThemeInfo.DefaultFontSize);
   finally
     AButton.EndUpdate;
   end;
@@ -2092,12 +2192,12 @@ end;
 {*********************************************************************************}
 procedure ALApplyCheckBoxTheme(const ATheme: String; const ACheckBox: TALCheckBox);
 begin
-  Var LApplyCheckBoxThemeProc: TALApplyCheckBoxThemeProc;
-  If not ALCheckBoxThemes.TryGetValue(Atheme,LApplyCheckBoxThemeProc) then
+  Var LApplyCheckBoxThemeInfo: TALApplyCheckBoxThemeInfo;
+  If not ALCheckBoxThemes.TryGetValue(Atheme,LApplyCheckBoxThemeInfo) then
     Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
   ACheckBox.BeginUpdate;
   try
-    LApplyCheckBoxThemeProc(ACheckBox);
+    LApplyCheckBoxThemeInfo.ApplyThemeProc(ACheckBox, LApplyCheckBoxThemeInfo.DefaultHeight);
   finally
     ACheckBox.EndUpdate;
   end;
@@ -2430,12 +2530,12 @@ end;
 {******************************************************************************************}
 procedure ALApplyRadioButtonTheme(const ATheme: String; const ARadioButton: TALRadioButton);
 begin
-  Var LApplyRadioButtonThemeProc: TALApplyRadioButtonThemeProc;
-  If not ALRadioButtonThemes.TryGetValue(Atheme,LApplyRadioButtonThemeProc) then
+  Var LApplyRadioButtonThemeInfo: TALApplyRadioButtonThemeInfo;
+  If not ALRadioButtonThemes.TryGetValue(Atheme,LApplyRadioButtonThemeInfo) then
     Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
   ARadioButton.BeginUpdate;
   try
-    LApplyRadioButtonThemeProc(ARadioButton);
+    LApplyRadioButtonThemeInfo.ApplyThemeProc(ARadioButton, LApplyRadioButtonThemeInfo.DefaultHeight);
   finally
     ARadioButton.EndUpdate;
   end;
@@ -2760,86 +2860,422 @@ end;
 {***************************************************************************}
 procedure ALApplySwitchTheme(const ATheme: String; const ASwitch: TALSwitch);
 begin
-  Var LApplySwitchThemeProc: TALApplySwitchThemeProc;
-  If not ALSwitchThemes.TryGetValue(Atheme,LApplySwitchThemeProc) then
+  Var LApplySwitchThemeInfo: TALApplySwitchThemeInfo;
+  If not ALSwitchThemes.TryGetValue(Atheme,LApplySwitchThemeInfo) then
     Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
   ASwitch.BeginUpdate;
   try
-    LApplySwitchThemeProc(ASwitch);
+    LApplySwitchThemeInfo.ApplyThemeProc(ASwitch, LApplySwitchThemeInfo.DefaultHeight);
   finally
     ASwitch.EndUpdate;
   end;
 end;
 
+//////////////
+// TRACKBAR //
+//////////////
+
+type
+  _TALCustomTrackProtectedAccess = class(TALCustomTrack);
+
+{*****************************************************}
+procedure ALResetTrackBarTheme(const ATrackBar: TALCustomTrack; const AHeight: Single = 32);
+begin
+  With _TALCustomTrackProtectedAccess(ATrackBar) do begin
+    BeginUpdate;
+    Try
+      var LSize := DefaultSize;
+      var LRatio: Single := AHeight / LSize.Height;
+      LSize.Height := RoundTo(LSize.Height * LRatio, -2);
+      LSize.Width := RoundTo(LSize.Width * LRatio, -2);
+      Size.Size := LSize;
+      //Margins.Rect := ALScaleRect(Margins.DefaultValue, LRatio).RoundTo(-2);
+      Padding.Rect := ALScaleRect(Padding.DefaultValue, LRatio).RoundTo(-2);
+      TouchTargetExpansion.Rect := ALScaleRect(TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      //--
+      InactiveTrack.Margins.Rect := ALScaleRect(InactiveTrack.Margins.DefaultValue, LRatio).RoundTo(-2);
+      InactiveTrack.Padding.Rect := ALScaleRect(InactiveTrack.Padding.DefaultValue, LRatio).RoundTo(-2);
+      InactiveTrack.TouchTargetExpansion.Rect := ALScaleRect(InactiveTrack.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      InactiveTrack.XRadius := InactiveTrack.DefaultXRadius;
+      InactiveTrack.YRadius := InactiveTrack.DefaultYRadius;
+      if InactiveTrack.XRadius > 0 then InactiveTrack.XRadius := RoundTo(InactiveTrack.XRadius * LRatio, -2);
+      if InactiveTrack.YRadius > 0 then InactiveTrack.YRadius := RoundTo(InactiveTrack.YRadius * LRatio, -2);
+      InactiveTrack.Corners := AllCorners;
+      InactiveTrack.Opacity := 1;
+      InactiveTrack.Fill.Reset;
+      InactiveTrack.Stroke.Reset;
+      InactiveTrack.Stroke.Thickness := RoundTo(InactiveTrack.Stroke.DefaultThickness * LRatio, -2);
+      InactiveTrack.Shadow.Reset;
+      InactiveTrack.stopIndicator.Reset;
+      InactiveTrack.stopIndicator.Size := RoundTo(InactiveTrack.stopIndicator.DefaultSize * LRatio, -2);
+      //--
+      ActiveTrack.Margins.Rect := ALScaleRect(ActiveTrack.Margins.DefaultValue, LRatio).RoundTo(-2);
+      ActiveTrack.Padding.Rect := ALScaleRect(ActiveTrack.Padding.DefaultValue, LRatio).RoundTo(-2);
+      ActiveTrack.TouchTargetExpansion.Rect := ALScaleRect(ActiveTrack.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      ActiveTrack.XRadius := ActiveTrack.DefaultXRadius;
+      ActiveTrack.YRadius := ActiveTrack.DefaultYRadius;
+      if ActiveTrack.XRadius > 0 then ActiveTrack.XRadius := RoundTo(ActiveTrack.XRadius * LRatio, -2);
+      if ActiveTrack.YRadius > 0 then ActiveTrack.YRadius := RoundTo(ActiveTrack.YRadius * LRatio, -2);
+      ActiveTrack.Corners := AllCorners;
+      ActiveTrack.Opacity := 1;
+      ActiveTrack.Fill.Reset;
+      ActiveTrack.Stroke.Reset;
+      ActiveTrack.Stroke.Thickness := RoundTo(ActiveTrack.Stroke.DefaultThickness * LRatio, -2);
+      ActiveTrack.Shadow.Reset;
+      ActiveTrack.stopIndicator.Reset;
+      ActiveTrack.stopIndicator.Size := RoundTo(ActiveTrack.stopIndicator.DefaultSize * LRatio, -2);
+      //--
+      Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, LRatio).RoundTo(-2);
+      Thumb.Padding.Rect := ALScaleRect(Thumb.Padding.DefaultValue, LRatio).RoundTo(-2);
+      Thumb.TouchTargetExpansion.Rect := ALScaleRect(Thumb.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      Thumb.XRadius := Thumb.DefaultXRadius;
+      Thumb.YRadius := Thumb.DefaultYRadius;
+      if Thumb.XRadius > 0 then Thumb.XRadius := RoundTo(Thumb.XRadius * LRatio, -2);
+      if Thumb.YRadius > 0 then Thumb.YRadius := RoundTo(Thumb.YRadius * LRatio, -2);
+      Thumb.Corners := AllCorners;
+      Thumb.Opacity := 1;
+      Thumb.Fill.Reset;
+      Thumb.Stroke.Reset;
+      Thumb.Stroke.Thickness := RoundTo(Thumb.Stroke.DefaultThickness * LRatio, -2);
+      Thumb.Shadow.Reset;
+      Thumb.StateStyles.Reset;
+      Thumb.StateStyles.Hovered.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Hovered.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
+      Thumb.StateStyles.Pressed.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Pressed.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
+      Thumb.StateStyles.Focused.statelayer.margins.rect := ALScaleRect(Thumb.StateStyles.Focused.statelayer.margins.DefaultValue, LRatio).RoundTo(-2);
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+        Thumb.Width := ATrackBar.Height - ATrackBar.Padding.Top - ATrackBar.Padding.Bottom - Thumb.Margins.Top - Thumb.Margins.Bottom
+      else
+        Thumb.Height := ATrackBar.Width - ATrackBar.Padding.left - ATrackBar.Padding.right - Thumb.Margins.left - Thumb.Margins.right;
+      //--
+      //ValueIndicator.Margins.Rect := ALScaleRect(ValueIndicator.Margins.DefaultValue, LRatio).RoundTo(-2);
+      ValueIndicator.Padding.Rect := ALScaleRect(ValueIndicator.Padding.DefaultValue, LRatio).RoundTo(-2);
+      ValueIndicator.TouchTargetExpansion.Rect := ALScaleRect(ValueIndicator.TouchTargetExpansion.DefaultValue, LRatio).RoundTo(-2);
+      ValueIndicator.XRadius := ValueIndicator.DefaultXRadius;
+      ValueIndicator.YRadius := ValueIndicator.DefaultYRadius;
+      if ValueIndicator.XRadius > 0 then ValueIndicator.XRadius := RoundTo(ValueIndicator.XRadius * LRatio, -2);
+      if ValueIndicator.YRadius > 0 then ValueIndicator.YRadius := RoundTo(ValueIndicator.YRadius * LRatio, -2);
+      ValueIndicator.Animation := TValueIndicator.TAnimation.ScaleInOut;
+      ValueIndicator.AutoSize := true;
+      ValueIndicator.Corners := AllCorners;
+      ValueIndicator.Sides := AllSides;
+      ValueIndicator.Opacity := 1;
+      ValueIndicator.Fill.Reset;
+      ValueIndicator.Stroke.Reset;
+      ValueIndicator.Stroke.Thickness := RoundTo(ValueIndicator.Stroke.DefaultThickness * LRatio, -2);
+      ValueIndicator.Shadow.Reset;
+      ValueIndicator.TextSettings.Reset;
+    Finally
+      EndUpdate;
+    End;
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/TrackBar/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
+procedure ALApplyMaterial3LightTrackBarTheme(const ATrackBar: TALCustomTrack; const AHeight: Single = 44);
+begin
+  var LRatio: Single := ALGetThemeSizeRatio('Please enter the desired height for the TrackBar', AHeight);
+  With _TALCustomTrackProtectedAccess(ATrackBar) do begin
+    BeginUpdate;
+    Try
+
+      //--Enabled (default)--
+      ALResetTrackBarTheme(ATrackBar, AHeight * LRatio);
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+        InactiveTrack.Margins.Rect := TRectF.Create(0,14*LRatio,0,14*LRatio).RoundTo(-2);
+        ActiveTrack.Margins.Rect := TRectF.Create(0,14*LRatio,0,14*LRatio).RoundTo(-2);
+        InactiveTrack.Padding.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+        ActiveTrack.Padding.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+      end
+      else begin
+        InactiveTrack.Margins.Rect := TRectF.Create(14*LRatio,0,14*LRatio,0).RoundTo(-2);
+        ActiveTrack.Margins.Rect := TRectF.Create(14*LRatio,0,14*LRatio,0).RoundTo(-2);
+        InactiveTrack.Padding.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+        ActiveTrack.Padding.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+      end;
+      InactiveTrack.XRadius := -50;
+      InactiveTrack.YRadius := -50;
+      ActiveTrack.XRadius := -50;
+      ActiveTrack.YRadius := -50;
+      InactiveTrack.Fill.Color := $FFE8DEF8; // md.sys.color.secondary-container / md.ref.palette.secondary90
+      ActiveTrack.Fill.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+      InactiveTrack.StopIndicator.Size := RoundTo(4 * LRatio, -2);
+      ActiveTrack.StopIndicator.Size := RoundTo(4 * LRatio, -2);
+      InactiveTrack.StopIndicator.Color := $FF4A4458; // md.sys.color.on-secondary-container / md.ref.palette.secondary30
+      ActiveTrack.StopIndicator.Color := $FFFFFFFF; // md.sys.color.on-primary / md.ref.palette.primary100
+      ValueIndicator.TextSettings.Font.Color := $FFF5EFF7; // md.sys.color.inverse-on-surface / md.ref.palette.neutral95
+      ValueIndicator.TextSettings.Font.Size := RoundTo(14 * LRatio, -2);
+      ValueIndicator.padding.Rect := TRectF.create(16 * LRatio{Left}, 12 * LRatio{Top}, 16 * LRatio{Right}, 12 * LRatio{Bottom}).RoundTo(-2);
+      ValueIndicator.Fill.Color := $FF322F35; // md.sys.color.inverse-surface / md.ref.palette.neutral20
+      Thumb.Width := RoundTo(4 * LRatio, -2);
+      Thumb.Fill.Color := $FF6750A4; // md.sys.color.primary / md.ref.palette.primary40
+      Thumb.Stroke.Color := TalphaColors.Null;
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+        Thumb.Margins.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+        Thumb.TouchTargetExpansion.Rect := TRectF.Create(22*LRatio,2*LRatio,22*LRatio,2*LRatio).RoundTo(-2);
+      end
+      else begin
+        Thumb.Margins.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+        Thumb.TouchTargetExpansion.Rect := TRectF.Create(2*LRatio,22*LRatio,2*LRatio,22*LRatio).RoundTo(-2);
+      end;
+
+      //--Disabled--
+      InactiveTrack.StateStyles.Disabled.Opacity := 1;
+      ActiveTrack.StateStyles.Disabled.Opacity := 1;
+      //--
+      InactiveTrack.StateStyles.Disabled.fill.Assign(InactiveTrack.Fill);
+      InactiveTrack.StateStyles.Disabled.fill.Inherit := False;
+      InactiveTrack.StateStyles.Disabled.fill.Color := ALSetColorAlpha($FF1D1B20, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral10
+      //--
+      ActiveTrack.StateStyles.Disabled.fill.Assign(ActiveTrack.Fill);
+      ActiveTrack.StateStyles.Disabled.fill.Inherit := False;
+      ActiveTrack.StateStyles.Disabled.fill.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+      //--
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Assign(InactiveTrack.StopIndicator);
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit := False;
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+      //--
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Assign(ActiveTrack.StopIndicator);
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit := False;
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Color := ALSetColorAlpha($FFF5EFF7, 0.66); // md.sys.color.inverse-on-surface / md.ref.palette.neutral95
+      //--
+      Thumb.StateStyles.Disabled.Opacity := 1;
+      Thumb.StateStyles.Disabled.fill.Assign(Thumb.Fill);
+      Thumb.StateStyles.Disabled.fill.Inherit := False;
+      Thumb.StateStyles.Disabled.fill.Color := ALSetColorAlpha($FF1D1B20, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral10
+
+      //--Hovered--
+
+      //--Pressed--
+      Thumb.StateStyles.Pressed.fill.Assign(Thumb.Fill);
+      Thumb.StateStyles.Pressed.fill.Inherit := False;
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(1*LRatio,0,1*LRatio,0).RoundTo(-2)
+      else
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(0,1*LRatio,0,1*LRatio).RoundTo(-2);
+
+      //--Focused--
+      Thumb.StateStyles.Pressed.fill.Assign(Thumb.Fill);
+      Thumb.StateStyles.Pressed.fill.Inherit := False;
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(1*LRatio,0,1*LRatio,0).RoundTo(-2)
+      else
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(0,1*LRatio,0,1*LRatio).RoundTo(-2);
+
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{*************************************************************************************}
+//https://m3.material.io/components/TrackBar/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
+procedure ALApplyMaterial3DarkTrackBarTheme(const ATrackBar: TALCustomTrack; const AHeight: Single = 44);
+begin
+  var LRatio: Single := ALGetThemeSizeRatio('Please enter the desired height for the TrackBar', AHeight);
+  With _TALCustomTrackProtectedAccess(ATrackBar) do begin
+    BeginUpdate;
+    Try
+
+      //--Enabled (default)--
+      ALResetTrackBarTheme(ATrackBar, AHeight * LRatio);
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+        InactiveTrack.Margins.Rect := TRectF.Create(0,14*LRatio,0,14*LRatio).RoundTo(-2);
+        ActiveTrack.Margins.Rect := TRectF.Create(0,14*LRatio,0,14*LRatio).RoundTo(-2);
+        InactiveTrack.Padding.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+        ActiveTrack.Padding.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+      end
+      else begin
+        InactiveTrack.Margins.Rect := TRectF.Create(14*LRatio,0,14*LRatio,0).RoundTo(-2);
+        ActiveTrack.Margins.Rect := TRectF.Create(14*LRatio,0,14*LRatio,0).RoundTo(-2);
+        InactiveTrack.Padding.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+        ActiveTrack.Padding.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+      end;
+      InactiveTrack.XRadius := -50;
+      InactiveTrack.YRadius := -50;
+      ActiveTrack.XRadius := -50;
+      ActiveTrack.YRadius := -50;
+      InactiveTrack.Fill.Color := $FF4A4458; // md.sys.color.secondary-container / md.ref.palette.secondary30
+      ActiveTrack.Fill.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+      InactiveTrack.StopIndicator.Size := RoundTo(4 * LRatio, -2);
+      ActiveTrack.StopIndicator.Size := RoundTo(4 * LRatio, -2);
+      InactiveTrack.StopIndicator.Color := $FFE8DEF8; // md.sys.color.on-secondary-container / md.ref.palette.secondary90
+      ActiveTrack.StopIndicator.Color := $FF381E72; // md.sys.color.on-primary / md.ref.palette.primary20
+      ValueIndicator.TextSettings.Font.Color := $FF322F35; // md.sys.color.inverse-on-surface / md.ref.palette.neutral20
+      ValueIndicator.TextSettings.Font.Size := RoundTo(14 * LRatio, -2);
+      ValueIndicator.padding.Rect := TRectF.create(16 * LRatio{Left}, 12 * LRatio{Top}, 16 * LRatio{Right}, 12 * LRatio{Bottom}).RoundTo(-2);
+      ValueIndicator.Fill.Color := $FFE6E0E9; // md.sys.color.inverse-surface / md.ref.palette.neutral90
+      Thumb.Width := RoundTo(4 * LRatio, -2);
+      Thumb.Fill.Color := $FFD0BCFF; // md.sys.color.primary / md.ref.palette.primary80
+      Thumb.Stroke.Color := TalphaColors.Null;
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then begin
+        Thumb.Margins.Rect := TRectF.Create(6*LRatio,0,6*LRatio,0).RoundTo(-2);
+        Thumb.TouchTargetExpansion.Rect := TRectF.Create(22*LRatio,2*LRatio,22*LRatio,2*LRatio).RoundTo(-2);
+      end
+      else begin
+        Thumb.Margins.Rect := TRectF.Create(0,6*LRatio,0,6*LRatio).RoundTo(-2);
+        Thumb.TouchTargetExpansion.Rect := TRectF.Create(2*LRatio,22*LRatio,2*LRatio,22*LRatio).RoundTo(-2);
+      end;
+
+      //--Disabled--
+      InactiveTrack.StateStyles.Disabled.Opacity := 1;
+      ActiveTrack.StateStyles.Disabled.Opacity := 1;
+      //--
+      InactiveTrack.StateStyles.Disabled.fill.Assign(InactiveTrack.Fill);
+      InactiveTrack.StateStyles.Disabled.fill.Inherit := False;
+      InactiveTrack.StateStyles.Disabled.fill.Color := ALSetColorAlpha($FFE6E0E9, 0.12); // md.sys.color.on-surface / md.ref.palette.neutral90
+      //--
+      ActiveTrack.StateStyles.Disabled.fill.Assign(ActiveTrack.Fill);
+      ActiveTrack.StateStyles.Disabled.fill.Inherit := False;
+      ActiveTrack.StateStyles.Disabled.fill.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+      //--
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Assign(InactiveTrack.StopIndicator);
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Inherit := False;
+      InactiveTrack.StateStyles.Disabled.StopIndicator.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+      //--
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Assign(ActiveTrack.StopIndicator);
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Inherit := False;
+      ActiveTrack.StateStyles.Disabled.StopIndicator.Color := ALSetColorAlpha($FF322F35, 0.66); // md.sys.color.inverse-on-surface / md.ref.palette.neutral20
+      //--
+      Thumb.StateStyles.Disabled.Opacity := 1;
+      Thumb.StateStyles.Disabled.fill.Assign(Thumb.Fill);
+      Thumb.StateStyles.Disabled.fill.Inherit := False;
+      Thumb.StateStyles.Disabled.fill.Color := ALSetColorAlpha($FFE6E0E9, 0.38); // md.sys.color.on-surface / md.ref.palette.neutral90
+
+      //--Hovered--
+
+      //--Pressed--
+      Thumb.StateStyles.Pressed.fill.Assign(Thumb.Fill);
+      Thumb.StateStyles.Pressed.fill.Inherit := False;
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(1*LRatio,0,1*LRatio,0).RoundTo(-2)
+      else
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(0,1*LRatio,0,1*LRatio).RoundTo(-2);
+
+      //--Focused--
+      Thumb.StateStyles.Pressed.fill.Assign(Thumb.Fill);
+      Thumb.StateStyles.Pressed.fill.Inherit := False;
+      If ATrackBar.Orientation = FMX.Controls.TOrientation.Horizontal then
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(1*LRatio,0,1*LRatio,0).RoundTo(-2)
+      else
+        Thumb.StateStyles.Pressed.fill.BackgroundMargins.Rect := TRectF.Create(0,1*LRatio,0,1*LRatio).RoundTo(-2);
+
+    finally
+      EndUpdate;
+    end;
+  end;
+end;
+
+{***************************************************************************}
+procedure ALApplyTrackBarTheme(const ATheme: String; const ATrackBar: TALCustomTrack);
+begin
+  Var LApplyTrackBarThemeInfo: TALApplyTrackBarThemeInfo;
+  If not ALTrackBarThemes.TryGetValue(Atheme,LApplyTrackBarThemeInfo) then
+    Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
+  ATrackBar.BeginUpdate;
+  try
+    LApplyTrackBarThemeInfo.ApplyThemeProc(ATrackBar, LApplyTrackBarThemeInfo.DefaultHeight);
+  finally
+    ATrackBar.EndUpdate;
+  end;
+end;
+
+///////////////////
+// RANGETRACKBAR //
+///////////////////
+
+{***************************************************************************}
+procedure ALApplyRangeTrackBarTheme(const ATheme: String; const ARangeTrackBar: TALCustomTrack);
+begin
+  Var LApplyTrackBarThemeInfo: TALApplyTrackBarThemeInfo;
+  If not ALTrackBarThemes.TryGetValue(Atheme,LApplyTrackBarThemeInfo) then
+    Raise Exception.Createfmt('The theme "%s" could not be found', [ATheme]);
+  ARangeTrackBar.BeginUpdate;
+  try
+    LApplyTrackBarThemeInfo.ApplyThemeProc(ARangeTrackBar, LApplyTrackBarThemeInfo.DefaultHeight);
+  finally
+    ARangeTrackBar.EndUpdate;
+  end;
+end;
+
 initialization
-  ALEditThemes := TDictionary<String, TALApplyEditThemeProc>.Create;
-  ALMemoThemes := TDictionary<String, TALApplyEditThemeProc>.Create;
-  ALButtonThemes := TDictionary<String, TALApplyButtonThemeProc>.Create;
-  ALCheckBoxThemes := TDictionary<String, TALApplyCheckBoxThemeProc>.Create;
-  ALRadioButtonThemes := TDictionary<String, TALApplyRadioButtonThemeProc>.Create;
-  ALSwitchThemes := TDictionary<String, TALApplySwitchThemeProc>.Create;
+  ALEditThemes := TDictionary<String, TALApplyEditThemeInfo>.Create;
+  ALMemoThemes := TDictionary<String, TALApplyEditThemeInfo>.Create;
+  ALButtonThemes := TDictionary<String, TALApplyButtonThemeInfo>.Create;
+  ALCheckBoxThemes := TDictionary<String, TALApplyCheckBoxThemeInfo>.Create;
+  ALRadioButtonThemes := TDictionary<String, TALApplyRadioButtonThemeInfo>.Create;
+  ALSwitchThemes := TDictionary<String, TALApplySwitchThemeInfo>.Create;
+  ALTrackBarThemes := TDictionary<String, TALApplyTrackBarThemeInfo>.Create;
+  ALRangeTrackBarThemes := TDictionary<String, TALApplyTrackBarThemeInfo>.Create;
 
-  ALEditThemes.Add('Default', ALResetEditTheme);
-  ALEditThemes.Add('Material3.Light.Filled', ALApplyMaterial3LightFilledEditTheme);
-  ALEditThemes.Add('Material3.Light.Filled.Error', ALApplyMaterial3LightFilledErrorEditTheme);
-  ALEditThemes.Add('Material3.Light.Outlined', ALApplyMaterial3LightOutlinedEditTheme);
-  ALEditThemes.Add('Material3.Light.Outlined.Error', ALApplyMaterial3LightOutlinedErrorEditTheme);
-  ALEditThemes.Add('Material3.Dark.Filled', ALApplyMaterial3DarkFilledEditTheme);
-  ALEditThemes.Add('Material3.Dark.Filled.Error', ALApplyMaterial3DarkFilledErrorEditTheme);
-  ALEditThemes.Add('Material3.Dark.Outlined', ALApplyMaterial3DarkOutlinedEditTheme);
-  ALEditThemes.Add('Material3.Dark.Outlined.Error', ALApplyMaterial3DarkOutlinedErrorEditTheme);
-  ALEditThemes.Add('Facebook.Outlined', ALApplyFacebookOutlinedEditTheme);
-  ALEditThemes.Add('Facebook.Outlined.Error', ALApplyFacebookOutlinedErrorEditTheme);
+  ALEditThemes.Add('Default', TALApplyEditThemeInfo.create(ALResetEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Light.Filled', TALApplyEditThemeInfo.create(ALApplyMaterial3LightFilledEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Light.Filled.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3LightFilledErrorEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Light.Outlined', TALApplyEditThemeInfo.create(ALApplyMaterial3LightOutlinedEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Light.Outlined.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3LightOutlinedErrorEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Dark.Filled', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkFilledEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Dark.Filled.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkFilledErrorEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Dark.Outlined', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkOutlinedEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Material3.Dark.Outlined.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkOutlinedErrorEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Lama.Outlined', TALApplyEditThemeInfo.create(ALApplyFacebookOutlinedEditTheme, 16{ADefaultFontSize}));
+  ALEditThemes.Add('Lama.Outlined.Error', TALApplyEditThemeInfo.create(ALApplyFacebookOutlinedErrorEditTheme, 16{ADefaultFontSize}));
 
-  ALMemoThemes.Add('Default', ALResetEditTheme);
-  ALMemoThemes.Add('Material3.Light.Filled', ALApplyMaterial3LightFilledEditTheme);
-  ALMemoThemes.Add('Material3.Light.Filled.Error', ALApplyMaterial3LightFilledErrorEditTheme);
-  ALMemoThemes.Add('Material3.Light.Outlined', ALApplyMaterial3LightOutlinedEditTheme);
-  ALMemoThemes.Add('Material3.Light.Outlined.Error', ALApplyMaterial3LightOutlinedErrorEditTheme);
-  ALMemoThemes.Add('Material3.Dark.Filled', ALApplyMaterial3DarkFilledEditTheme);
-  ALMemoThemes.Add('Material3.Dark.Filled.Error', ALApplyMaterial3DarkFilledErrorEditTheme);
-  ALMemoThemes.Add('Material3.Dark.Outlined', ALApplyMaterial3DarkOutlinedEditTheme);
-  ALMemoThemes.Add('Material3.Dark.Outlined.Error', ALApplyMaterial3DarkOutlinedErrorEditTheme);
-  ALMemoThemes.Add('Facebook.Outlined', ALApplyFacebookOutlinedEditTheme);
-  ALMemoThemes.Add('Facebook.Outlined.Error', ALApplyFacebookOutlinedErrorEditTheme);
+  ALMemoThemes.Add('Default', TALApplyEditThemeInfo.create(ALResetEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Light.Filled', TALApplyEditThemeInfo.create(ALApplyMaterial3LightFilledEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Light.Filled.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3LightFilledErrorEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Light.Outlined', TALApplyEditThemeInfo.create(ALApplyMaterial3LightOutlinedEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Light.Outlined.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3LightOutlinedErrorEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Dark.Filled', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkFilledEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Dark.Filled.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkFilledErrorEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Dark.Outlined', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkOutlinedEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Material3.Dark.Outlined.Error', TALApplyEditThemeInfo.create(ALApplyMaterial3DarkOutlinedErrorEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Lama.Outlined', TALApplyEditThemeInfo.create(ALApplyFacebookOutlinedEditTheme, 16{ADefaultFontSize}));
+  ALMemoThemes.Add('Lama.Outlined.Error', TALApplyEditThemeInfo.create(ALApplyFacebookOutlinedErrorEditTheme, 16{ADefaultFontSize}));
 
-  ALButtonThemes.Add('Default', ALResetButtonTheme);
-  ALButtonThemes.Add('Windows', ALApplyWindowsButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Filled', ALApplyMaterial3LightFilledButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Outlined', ALApplyMaterial3LightOutlinedButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Text', ALApplyMaterial3LightTextButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Elevated', ALApplyMaterial3LightElevatedButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Tonal', ALApplyMaterial3LightTonalButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Icon.Filled', ALApplyMaterial3LightFilledIconButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Icon.Outlined', ALApplyMaterial3LightOutlinedIconButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Icon.Standard', ALApplyMaterial3LightStandardIconButtonTheme);
-  ALButtonThemes.Add('Material3.Light.Icon.Tonal', ALApplyMaterial3LightTonalIconButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Filled', ALApplyMaterial3DarkFilledButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Outlined', ALApplyMaterial3DarkOutlinedButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Text', ALApplyMaterial3DarkTextButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Elevated', ALApplyMaterial3DarkElevatedButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Tonal', ALApplyMaterial3DarkTonalButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Icon.Filled', ALApplyMaterial3DarkFilledIconButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Icon.Outlined', ALApplyMaterial3DarkOutlinedIconButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Icon.Standard', ALApplyMaterial3DarkStandardIconButtonTheme);
-  ALButtonThemes.Add('Material3.Dark.Icon.Tonal', ALApplyMaterial3DarkTonalIconButtonTheme);
+  ALButtonThemes.Add('Default', TALApplyButtonThemeInfo.create(ALResetButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Windows', TALApplyButtonThemeInfo.create(ALApplyWindowsButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Filled', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightFilledButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Outlined', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightOutlinedButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Text', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightTextButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Elevated', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightElevatedButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Tonal', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightTonalButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Icon.Filled', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightFilledIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Icon.Outlined', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightOutlinedIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Icon.Standard', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightStandardIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Light.Icon.Tonal', TALApplyButtonThemeInfo.create(ALApplyMaterial3LightTonalIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Filled', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkFilledButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Outlined', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkOutlinedButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Text', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkTextButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Elevated', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkElevatedButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Tonal', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkTonalButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Icon.Filled', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkFilledIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Icon.Outlined', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkOutlinedIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Icon.Standard', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkStandardIconButtonTheme, 14{ADefaultFontSize}));
+  ALButtonThemes.Add('Material3.Dark.Icon.Tonal', TALApplyButtonThemeInfo.create(ALApplyMaterial3DarkTonalIconButtonTheme, 14{ADefaultFontSize}));
 
-  ALCheckBoxThemes.Add('Default', ALResetCheckBoxTheme);
-  ALCheckBoxThemes.Add('Material3.Light', ALApplyMaterial3LightCheckBoxTheme);
-  ALCheckBoxThemes.Add('Material3.Light.Error', ALApplyMaterial3LightErrorCheckBoxTheme);
-  ALCheckBoxThemes.Add('Material3.Dark', ALApplyMaterial3DarkCheckBoxTheme);
-  ALCheckBoxThemes.Add('Material3.Dark.Error', ALApplyMaterial3DarkErrorCheckBoxTheme);
+  ALCheckBoxThemes.Add('Default', TALApplyCheckBoxThemeInfo.create(ALResetCheckBoxTheme, 18{ADefaultHeight}));
+  ALCheckBoxThemes.Add('Material3.Light', TALApplyCheckBoxThemeInfo.create(ALApplyMaterial3LightCheckBoxTheme, 18{ADefaultHeight}));
+  ALCheckBoxThemes.Add('Material3.Light.Error', TALApplyCheckBoxThemeInfo.create(ALApplyMaterial3LightErrorCheckBoxTheme, 18{ADefaultHeight}));
+  ALCheckBoxThemes.Add('Material3.Dark', TALApplyCheckBoxThemeInfo.create(ALApplyMaterial3DarkCheckBoxTheme, 18{ADefaultHeight}));
+  ALCheckBoxThemes.Add('Material3.Dark.Error', TALApplyCheckBoxThemeInfo.create(ALApplyMaterial3DarkErrorCheckBoxTheme, 18{ADefaultHeight}));
 
-  ALRadioButtonThemes.Add('Default', ALResetRadioButtonTheme);
-  ALRadioButtonThemes.Add('Material3.Light', ALApplyMaterial3LightRadioButtonTheme);
-  ALRadioButtonThemes.Add('Material3.Light.Error', ALApplyMaterial3LightErrorRadioButtonTheme);
-  ALRadioButtonThemes.Add('Material3.Dark', ALApplyMaterial3DarkRadioButtonTheme);
-  ALRadioButtonThemes.Add('Material3.Dark.Error', ALApplyMaterial3DarkErrorRadioButtonTheme);
+  ALRadioButtonThemes.Add('Default', TALApplyRadioButtonThemeInfo.create(ALResetRadioButtonTheme, 20{ADefaultHeight}));
+  ALRadioButtonThemes.Add('Material3.Light', TALApplyRadioButtonThemeInfo.create(ALApplyMaterial3LightRadioButtonTheme, 20{ADefaultHeight}));
+  ALRadioButtonThemes.Add('Material3.Light.Error', TALApplyRadioButtonThemeInfo.create(ALApplyMaterial3LightErrorRadioButtonTheme, 20{ADefaultHeight}));
+  ALRadioButtonThemes.Add('Material3.Dark', TALApplyRadioButtonThemeInfo.create(ALApplyMaterial3DarkRadioButtonTheme, 20{ADefaultHeight}));
+  ALRadioButtonThemes.Add('Material3.Dark.Error', TALApplyRadioButtonThemeInfo.create(ALApplyMaterial3DarkErrorRadioButtonTheme, 20{ADefaultHeight}));
 
-  ALSwitchThemes.Add('Default', ALResetSwitchTheme);
-  ALSwitchThemes.Add('Material3.Light', ALApplyMaterial3LightSwitchTheme);
-  ALSwitchThemes.Add('Material3.Dark', ALApplyMaterial3DarkSwitchTheme);
+  ALSwitchThemes.Add('Default', TALApplySwitchThemeInfo.create(ALResetSwitchTheme, 32{ADefaultHeight}));
+  ALSwitchThemes.Add('Material3.Light', TALApplySwitchThemeInfo.create(ALApplyMaterial3LightSwitchTheme, 32{ADefaultHeight}));
+  ALSwitchThemes.Add('Material3.Dark', TALApplySwitchThemeInfo.create(ALApplyMaterial3DarkSwitchTheme, 32{ADefaultHeight}));
 
+  ALTrackBarThemes.Add('Default', TALApplyTrackBarThemeInfo.create(ALResetTrackBarTheme, 32{ADefaultHeight}));
+  ALTrackBarThemes.Add('Material3.Light', TALApplyTrackBarThemeInfo.create(ALApplyMaterial3LightTrackBarTheme, 44{ADefaultHeight}));
+  ALTrackBarThemes.Add('Material3.Dark', TALApplyTrackBarThemeInfo.create(ALApplyMaterial3DarkTrackBarTheme, 44{ADefaultHeight}));
+
+  ALRangeTrackBarThemes.Add('Default', TALApplyTrackBarThemeInfo.create(ALResetTrackBarTheme, 32{ADefaultHeight}));
+  ALRangeTrackBarThemes.Add('Material3.Light', TALApplyTrackBarThemeInfo.create(ALApplyMaterial3LightTrackBarTheme, 44{ADefaultHeight}));
+  ALRangeTrackBarThemes.Add('Material3.Dark', TALApplyTrackBarThemeInfo.create(ALApplyMaterial3DarkTrackBarTheme, 44{ADefaultHeight}));
 
 finalization
   ALFreeAndNil(ALEditThemes);
@@ -2848,5 +3284,7 @@ finalization
   ALFreeAndNil(ALCheckBoxThemes);
   ALFreeAndNil(ALRadioButtonThemes);
   ALFreeAndNil(ALSwitchThemes);
+  ALFreeAndNil(ALTrackBarThemes);
+  ALFreeAndNil(ALRangeTrackBarThemes);
 
 end.

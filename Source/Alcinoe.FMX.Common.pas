@@ -748,32 +748,6 @@ type
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALPosition = class(TPosition)
-  private
-    FUpdateCount: Integer;
-    FIsChanged: Boolean;
-    FOnChanged: TNotifyEvent;
-    FSavedStates: TObjectQueue<TALPosition>;
-    procedure DoChanged; virtual;
-  protected
-    function CreateSavedState: TALPosition; virtual;
-  public
-    constructor Create(const ADefaultValue: TPointF); override;
-    destructor Destroy; override;
-    procedure Reset; virtual;
-    procedure Interpolate(const ATo: TPosition; const ANormalizedTime: Single); virtual;
-    procedure InterpolateNoChanges(const ATo: TPosition; const ANormalizedTime: Single);
-    procedure BeginUpdate; virtual;
-    procedure EndUpdate; virtual;
-    procedure EndUpdateNoChanges; virtual;
-    procedure SaveState; virtual;
-    procedure RestoreState; virtual;
-    procedure RestoreStateNoChanges; virtual;
-    property OnChanged: TNotifyEvent read FOnChanged write FOnChanged;
-    property IsChanged: Boolean read FIsChanged write FIsChanged;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALStateTransition = class(TALPersistentObserver)
   private
@@ -820,18 +794,19 @@ type
     FStateLayer: TALStateLayer;
     FStroke: TALInheritStrokeBrush;
     FShadow: TALInheritShadow;
-    FScale: TALPosition;
+    FScale: Single;
+    FDefaultScale: Single;
     fSuperseded: Boolean;
     procedure SetFill(const AValue: TALInheritBrush);
     procedure SetStateLayer(const AValue: TALStateLayer);
     procedure SetStroke(const AValue: TALInheritStrokeBrush);
     procedure SetShadow(const AValue: TALInheritShadow);
-    procedure SetScale(const Value: TALPosition);
+    procedure SetScale(const Value: Single);
     procedure FillChanged(ASender: TObject);
     procedure StateLayerChanged(ASender: TObject);
     procedure StrokeChanged(ASender: TObject);
     procedure ShadowChanged(ASender: TObject);
-    procedure ScaleChanged(ASender: TObject);
+    function IsScaleStored: Boolean;
   protected
     BufDrawable: TALDrawable;
     BufDrawableRect: TRectF;
@@ -842,7 +817,7 @@ type
     property Shadow: TALInheritShadow read FShadow write SetShadow;
     property StateLayer: TALStateLayer read FStateLayer write SetStateLayer;
     property Stroke: TALInheritStrokeBrush read FStroke write SetStroke;
-    property Scale: TALPosition read FScale write SetScale;
+    property Scale: Single read FScale write SetScale stored IsScaleStored nodefault;
   public
     constructor Create(const AParent: TObject); reintroduce; virtual;
     destructor Destroy; override;
@@ -859,6 +834,7 @@ type
     property Parent: TObject read FParent;
     property StateStyleParent: TALBaseStateStyle read FStateStyleParent;
     property ControlParent: TALControl read FControlParent;
+    property DefaultScale: Single read FDefaultScale write FDefaultScale;
   end;
 
   // ---------------------------------------------------------------------------------------------------------------------------------- //
@@ -926,6 +902,7 @@ type
     /// </summary>
     procedure GetTransitionBufSurface(
                 var ARect: TrectF;
+                const AScale: Single;
                 out ABufSurface: TALSurface;
                 out ABufCanvas: TALCanvas;
                 out ABufDrawable: TALDrawable); virtual;
@@ -3987,149 +3964,6 @@ begin
   change;
 end;
 
-{***************************************}
-constructor TALPosition.Create(const ADefaultValue: TPointF);
-begin
-  inherited create(ADefaultValue);
-  FUpdateCount := 0;
-  FIsChanged := False;
-  FOnChanged := nil;
-  FSavedStates := nil;
-end;
-
-{************************************}
-destructor TALPosition.Destroy;
-begin
-  ALFreeAndNil(FSavedStates);
-  Inherited;
-end;
-
-{************************************}
-function TALPosition.CreateSavedState: TALPosition;
-begin
-  result := TALPosition(classtype.Create);
-end;
-
-{************************************}
-procedure TALPosition.Reset;
-begin
-  Point := DefaultValue;
-end;
-
-{***************************************}
-procedure TALPosition.BeginUpdate;
-begin
-  Inc(FUpdateCount);
-end;
-
-{***************************************}
-procedure TALPosition.EndUpdate;
-begin
-  if FUpdateCount > 0 then
-  begin
-    Dec(FUpdateCount);
-    if (FUpdateCount = 0) and (FIsChanged) then
-      try
-        DoChanged;
-      finally
-        FIsChanged := False;
-      end;
-  end;
-end;
-
-{***************************************}
-procedure TALPosition.EndUpdateNoChanges;
-begin
-  if FUpdateCount > 0 then
-  begin
-    Dec(FUpdateCount);
-    if (FUpdateCount = 0) and (FIsChanged) then
-      // If execution reaches this point, it means there was no previously unclosed
-      // beginUpdate since FUpdateCount is 0. Therefore, ignoring the doChanged
-      // call here will not affect any prior beginUpdate operations.
-      FIsChanged := False;
-  end;
-end;
-
-{***************************************}
-procedure TALPosition.SaveState;
-begin
-  if FSavedStates = nil then
-    FSavedStates := TObjectQueue<TALPosition>.Create(True{AOwnsObjects});
-  var LSavedState := CreateSavedState;
-  if LSavedState.classtype <> classtype then
-    Raise Exception.create('The saved state type returned by "CreateSavedState" does not match the current object type');
-  LSavedState.Assign(self);
-  FSavedStates.Enqueue(LSavedState);
-end;
-
-{***************************************}
-procedure TALPosition.RestoreState;
-begin
-  if (FSavedStates = nil) or
-     (FSavedStates.Count = 0) then
-    raise Exception.Create('No saved state available');
-  var LSavedState := FSavedStates.extract;
-  try
-    Assign(LSavedState);
-  finally
-    ALFreeAndNil(LSavedState);
-  end;
-end;
-
-{***************************************}
-procedure TALPosition.RestoreStateNoChanges;
-begin
-  BeginUpdate;
-  try
-    RestoreState;
-  finally
-    EndUpdateNoChanges;
-  end;
-end;
-
-{***************************************}
-procedure TALPosition.DoChanged;
-begin
-  FIsChanged := True;
-  if (FUpdateCount = 0) then
-  begin
-    try
-      inherited;
-    finally
-      FIsChanged := False;
-    end;
-  end;
-end;
-
-{*********************************************************************************}
-procedure TALPosition.Interpolate(const ATo: TPosition; const ANormalizedTime: Single);
-begin
-  if ATo <> nil then
-    Point := TpointF.Create(
-               InterpolateSingle(X{Start}, ATo.X{Stop}, ANormalizedTime),
-               InterpolateSingle(Y{Start}, ATo.Y{Stop}, ANormalizedTime))
-  else
-    Point := TpointF.Create(
-               InterpolateSingle(X{Start}, DefaultValue.X{Stop}, ANormalizedTime),
-               InterpolateSingle(Y{Start}, DefaultValue.Y{Stop}, ANormalizedTime));
-end;
-
-{*********************************************************************************}
-procedure TALPosition.InterpolateNoChanges(const ATo: TPosition; const ANormalizedTime: Single);
-begin
-  if ATo <> nil then
-    SetPointNoChange(
-      TpointF.Create(
-        InterpolateSingle(X{Start}, ATo.X{Stop}, ANormalizedTime),
-        InterpolateSingle(Y{Start}, ATo.Y{Stop}, ANormalizedTime)))
-  else
-    SetPointNoChange(
-      TpointF.Create(
-        InterpolateSingle(X{Start}, DefaultValue.X{Stop}, ANormalizedTime),
-        InterpolateSingle(Y{Start}, DefaultValue.Y{Stop}, ANormalizedTime)));
-end;
-
 {**********************************************************************************************}
 constructor TALStateTransition.Create(const ADefaultDuration: Single);
 begin
@@ -4269,7 +4103,6 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(LShapeControl.GetStroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(LShapeControl.GetShadow);
-    FScale := TALPosition.Create(TPointF.Create(1,1));
   end
   else if (AParent is TALBaseStateStyle) then begin
     FStateStyleParent := TALBaseStateStyle(AParent);
@@ -4278,7 +4111,6 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(FStateStyleParent.Stroke, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(FStateStyleParent.Shadow);
-    FScale := TALPosition.Create(TPointF.Create(1,1));
   end
   else begin
     {$IF defined(debug)}
@@ -4291,13 +4123,14 @@ begin
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
     FStroke := TALInheritStrokeBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
     FShadow := TALInheritShadow.Create(nil);
-    FScale := TALPosition.Create(TPointF.Create(1,1));
   end;
   FFill.OnChanged := FillChanged;
   FStateLayer.OnChanged := StateLayerChanged;
   FStroke.OnChanged := StrokeChanged;
   FShadow.OnChanged := ShadowChanged;
-  FScale.OnChange := ScaleChanged;
+  //--
+  FDefaultScale := 1;
+  FScale := FDefaultScale;
   //--
   fSuperseded := False;
   //--
@@ -4313,7 +4146,6 @@ begin
   ALFreeAndNil(FStateLayer);
   ALFreeAndNil(FStroke);
   ALFreeAndNil(FShadow);
-  ALFreeAndNil(FScale);
   inherited Destroy;
 end;
 
@@ -4335,7 +4167,7 @@ begin
       StateLayer.Assign(TALBaseStateStyle(Source).StateLayer);
       Stroke.Assign(TALBaseStateStyle(Source).Stroke);
       Shadow.Assign(TALBaseStateStyle(Source).Shadow);
-      Scale.Assign(TALBaseStateStyle(Source).Scale);
+      Scale := TALBaseStateStyle(Source).Scale;
       fSuperseded := TALBaseStateStyle(Source).fSuperseded;
     Finally
       EndUpdate;
@@ -4355,7 +4187,7 @@ begin
     StateLayer.Reset;
     Stroke.Reset;
     Shadow.Reset;
-    Scale.Reset;
+    Scale := DefaultScale;
     fSuperseded := False;
   finally
     EndUpdate;
@@ -4398,7 +4230,7 @@ begin
       StateLayer.Interpolate(ATo.StateLayer, ANormalizedTime);
       Stroke.Interpolate(ATo.Stroke, ANormalizedTime);
       Shadow.Interpolate(ATo.Shadow, ANormalizedTime);
-      Scale.Interpolate(ATo.Scale, ANormalizedTime);
+      Scale := InterpolateSingle(Scale{Start}, ATo.Scale{Stop}, ANormalizedTime);
       //Transition
     end
     else if FStateStyleParent <> nil then begin
@@ -4408,7 +4240,7 @@ begin
         StateLayer.Interpolate(FStateStyleParent.StateLayer, ANormalizedTime);
         Stroke.Interpolate(FStateStyleParent.Stroke, ANormalizedTime);
         Shadow.Interpolate(FStateStyleParent.Shadow, ANormalizedTime);
-        Scale.Interpolate(FStateStyleParent.Scale, ANormalizedTime);
+        Scale := InterpolateSingle(Scale{Start}, FStateStyleParent.Scale{Stop}, ANormalizedTime);
         //Transition
       finally
         FStateStyleParent.RestoreStateNoChanges;
@@ -4419,7 +4251,7 @@ begin
       StateLayer.Interpolate(nil, ANormalizedTime);
       Stroke.Interpolate(LShapeControl.GetStroke, ANormalizedTime);
       Shadow.Interpolate(LShapeControl.GetShadow, ANormalizedTime);
-      Scale.Interpolate(_TControlAccessProtected(FControlParent).Scale, ANormalizedTime);
+      Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end
     else begin
@@ -4427,7 +4259,7 @@ begin
       StateLayer.Interpolate(nil, ANormalizedTime);
       Stroke.Interpolate(nil, ANormalizedTime);
       Shadow.Interpolate(nil, ANormalizedTime);
-      Scale.Interpolate(nil, ANormalizedTime);
+      Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end;
 
@@ -4466,6 +4298,7 @@ begin
   Fill.Supersede;
   Stroke.Supersede;
   Shadow.Supersede;
+  // Do not supersede the scale
 end;
 
 {******************}
@@ -4493,6 +4326,12 @@ begin
   end;
 end;
 
+{***************************************}
+function TALBaseStateStyle.IsScaleStored: Boolean;
+begin
+  result := not SameValue(fScale, FDefaultScale, Tepsilon.Scale);
+end;
+
 {****************************************************************************}
 procedure TALBaseStateStyle.SetFill(const AValue: TALInheritBrush);
 begin
@@ -4518,9 +4357,12 @@ begin
 end;
 
 {***********************************************}
-procedure TALBaseStateStyle.SetScale(const Value: TALPosition);
+procedure TALBaseStateStyle.SetScale(const Value: Single);
 begin
-  FScale.Assign(Value);
+  if not SameValue(FScale, Value, TEpsilon.Scale) then begin
+    FScale := Value;
+    Change;
+  end;
 end;
 
 {***********************************************}
@@ -4530,8 +4372,7 @@ begin
             (not StateLayer.HasFill) and
             Stroke.Inherit and
             Shadow.Inherit and
-            Samevalue(Scale.X, 1, TEpsilon.Scale) and
-            Samevalue(Scale.X, 1, TEpsilon.Scale);
+            Samevalue(Scale, DefaultScale, TEpsilon.Scale);
 end;
 
 {**********************************************************}
@@ -4554,12 +4395,6 @@ end;
 
 {************************************************************}
 procedure TALBaseStateStyle.ShadowChanged(ASender: TObject);
-begin
-  Change;
-end;
-
-{*********************************************************}
-procedure TALBaseStateStyle.ScaleChanged(ASender: TObject);
 begin
   Change;
 end;
@@ -4851,6 +4686,7 @@ end;
 {$IF NOT DEFINED(ALSkiaCanvas)}
 procedure TALBaseStateStyles.GetTransitionBufSurface(
             var ARect: TrectF;
+            const AScale: Single;
             out ABufSurface: TALSurface;
             out ABufCanvas: TALCanvas;
             out ABufDrawable: TALDrawable);
@@ -4875,8 +4711,8 @@ begin
   ARect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
 
   if (ALIsDrawableNull(FTransitionBufDrawable)) or
-     (CompareValue(ALGetDrawableWidth(FTransitionBufDrawable), LSurfaceRect.Width, TEpsilon.Position) < 0) or
-     (CompareValue(ALGetDrawableHeight(FTransitionBufDrawable), LSurfaceRect.Height, TEpsilon.Position) < 0) then begin
+     (CompareValue(ALGetDrawableWidth(FTransitionBufDrawable), LSurfaceRect.Width * AScale, TEpsilon.Position) < 0) or
+     (CompareValue(ALGetDrawableHeight(FTransitionBufDrawable), LSurfaceRect.Height * AScale, TEpsilon.Position) < 0) then begin
     LSurfaceRect.Width := LSurfaceRect.Width * 1.5{to be on the safe side};
     LSurfaceRect.height := LSurfaceRect.height * 1.5{to be on the safe side};
     ALFreeAndNilDrawable(FTransitionBufDrawable);
@@ -4884,7 +4720,7 @@ begin
     ALCreateSurface(
       FTransitionBufSurface, // out ASurface: TALSurface;
       FTransitionBufCanvas, // out ACanvas: TALCanvas;
-      ALGetScreenScale{Ascale},
+      AScale{Ascale},
       LSurfaceRect.width, // const w: Single;
       LSurfaceRect.height, // const h: Single);
       false); // const AAddPixelForAlignment: Boolean = true
@@ -4893,10 +4729,10 @@ begin
     {$ELSEIF defined(ALGpuCanvas)}
     FTransitionBufDrawable := TALTexture.Create;
     FTransitionBufDrawable.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
-    FTransitionBufDrawable.SetSize(ALCeil(LSurfaceRect.width * ALGetScreenScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * ALGetScreenScale, TEpsilon.Position));
+    FTransitionBufDrawable.SetSize(ALCeil(LSurfaceRect.width * AScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * AScale, TEpsilon.Position));
     FTransitionBufDrawable.PixelFormat := ALGetDefaultPixelFormat;
     {$ELSE}
-    FTransitionBufDrawable := FMX.Graphics.TBitmap.Create(ALCeil(LSurfaceRect.width, TEpsilon.Position), ALCeil(LSurfaceRect.height, TEpsilon.Position));
+    FTransitionBufDrawable := FMX.Graphics.TBitmap.Create(ALCeil(LSurfaceRect.width * AScale, TEpsilon.Position), ALCeil(LSurfaceRect.height * AScale, TEpsilon.Position));
     {$ENDIF};
   end;
   ABufSurface := FTransitionBufSurface;

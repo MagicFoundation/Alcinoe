@@ -96,6 +96,26 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
+  {********************************************}
+  TALTrackBarEditor = class(TComponentEditor)
+  protected
+    procedure ApplyThemeClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
+  {********************************************}
+  TALRangeTrackBarEditor = class(TComponentEditor)
+  protected
+    procedure ApplyThemeClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
   {***********************}
   TALItemClassDesc = record
     ItemClass: TFmxObjectClass;
@@ -423,6 +443,82 @@ begin
   var LKeys := TALStringListW.create;
   try
     for var LKeyValue in ALSwitchThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
+end;
+
+{*******************************************************}
+function TALTrackBarEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Theme';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{*********************************************}
+function TALTrackBarEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{****************************************************}
+procedure TALTrackBarEditor.ApplyThemeClick(Sender: TObject);
+begin
+  var LTheme := TmenuItem(Sender).Caption;
+  LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
+  ALApplyTrackBarTheme(LTheme, TALTrackBar(Component));
+end;
+
+{****************************************************************************}
+procedure TALTrackBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALTrackBarThemes do
+      LKeys.Add(LKeyValue.Key);
+    LKeys.Sort;
+    for var I := 0 to LKeys.Count - 1 do
+      AItem.AddItem(LKeys[i]{ACaption}, 0{AShortCut}, false{AChecked}, true{AEnabled}, ApplyThemeClick{AOnClick}, 0{hCtx}, ''{AName});
+  finally
+    ALFreeAndNil(LKeys);
+  end;
+end;
+
+{*******************************************************}
+function TALRangeTrackBarEditor.GetVerb(Index: Integer): string;
+begin
+  case Index of
+    0: result := 'Theme';
+    else Result := Format(SItems + ' %d', [Index]);
+  end;
+end;
+
+{*********************************************}
+function TALRangeTrackBarEditor.GetVerbCount: Integer;
+begin
+  result := 1;
+end;
+
+{****************************************************}
+procedure TALRangeTrackBarEditor.ApplyThemeClick(Sender: TObject);
+begin
+  var LTheme := TmenuItem(Sender).Caption;
+  LTheme := StringReplace(LTheme, '&','',[rfReplaceALL]);
+  ALApplyRangeTrackBarTheme(LTheme, TALRangeTrackBar(Component));
+end;
+
+{****************************************************************************}
+procedure TALRangeTrackBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
+begin
+  var LKeys := TALStringListW.create;
+  try
+    for var LKeyValue in ALRangeTrackBarThemes do
       LKeys.Add(LKeyValue.Key);
     LKeys.Sort;
     for var I := 0 to LKeys.Count - 1 do
@@ -802,6 +898,8 @@ begin
   RegisterComponentEditor(TALCheckBox, TALCheckBoxEditor);
   RegisterComponentEditor(TALRadioButton, TALRadioButtonEditor);
   RegisterComponentEditor(TALSwitch, TALSwitchEditor);
+  RegisterComponentEditor(TALTrackBar, TALTrackBarEditor);
+  RegisterComponentEditor(TALRangeTrackBar, TALRangeTrackBarEditor);
   RegisterComponentEditor(TALTabControl, TALTabControlEditor);
   RegisterComponentEditor(TALTabItem, TALTabItemEditor);
   RegisterPropertyEditor(TypeInfo(string), TALText, 'Text', TALTextTextPropertyEditor);

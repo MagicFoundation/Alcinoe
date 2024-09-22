@@ -1,13 +1,18 @@
 ﻿unit UnitMain;
 
+{$I Alcinoe.inc}
+
 interface
 
 uses
+  System.Messaging,
+  System.Generics.Collections,
   System.SysUtils,
   System.Types,
   System.UITypes,
   System.Classes,
   System.Variants,
+  System.ImageList,
   FMX.Types,
   FMX.Controls,
   FMX.Forms,
@@ -16,283 +21,505 @@ uses
   FMX.StdCtrls,
   FMX.Controls.Presentation,
   FMX.Objects,
-  Alcinoe.FMX.Objects,
   FMX.Layouts,
-  Alcinoe.FMX.Layouts,
-  fmx.types3D,
-  Alcinoe.FMX.Common,
-  System.ImageList,
+  FMX.types3D,
   FMX.ImgList,
-  Alcinoe.FMX.StdCtrls,
-  Alcinoe.FMX.TabControl,
   FMX.ScrollBox,
   FMX.Edit,
+  FMX.Effects,
+  FMX.Filter.Effects,
+  Alcinoe.FMX.Themes,
+  Alcinoe.FMX.Objects,
+  Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.Common,
+  Alcinoe.FMX.StdCtrls,
+  Alcinoe.FMX.TabControl,
   Alcinoe.FMX.Edit,
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.FMX.DatePickerDialog,
-  FMX.Effects,
   Alcinoe.FMX.ErrorReporting,
-  FMX.Filter.Effects,
-  system.Messaging,
+  Alcinoe.FMX.BreakText,
+  Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Ani,
-  Alcinoe.FMX.Memo;
+  Alcinoe.FMX.Memo,
+  Alcinoe.FMX.Controls;
 
 type
 
+  {*****************************************}
   TALRectangleStopWatch = Class(TALRectangle)
   protected
-     bufPaintMs: double;
-     bufCreatePaintMs: double;
+     PaintMs: double;
+     MakeBufDrawableMs: double;
      procedure Paint; override;
   public
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     function MakeBufBitmap: TTexture; override;
-    {$ELSE}
-     function MakeBufBitmap: Tbitmap; override;
-    {$ENDIF}
+    procedure MakeBufDrawable; override;
   End;
+
+  {*************************************}
   TRectangleStopWatch = Class(TRectangle)
   public
      PaintMs: double;
      procedure Paint; override;
   End;
 
+  {***********************************}
   TALCircleStopWatch = Class(TALCircle)
   protected
-     bufPaintMs: double;
-     bufCreatePaintMs: double;
+     PaintMs: double;
+     MakeBufDrawableMs: double;
      procedure Paint; override;
   public
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     function MakeBufBitmap: TTexture; override;
-    {$ELSE}
-     function MakeBufBitmap: Tbitmap; override;
-    {$ENDIF}
+     procedure MakeBufDrawable; override;
   End;
+
+  {*******************************}
   TCircleStopWatch = Class(TCircle)
   public
      PaintMs: double;
      procedure Paint; override;
   End;
 
+  {*******************************}
   TALTextStopWatch = Class(TalText)
   protected
-     bufPaintMs: double;
-     bufCreatePaintMs: double;
+     PaintMs: double;
+     MakeBufDrawableMs: double;
      procedure Paint; override;
   public
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     function MakeBufBitmap: TTexture; override;
-    {$ELSE}
-     function MakeBufBitmap: Tbitmap; override;
-    {$ENDIF}
+     procedure MakeBufDrawable; override;
   End;
+
+  {***************************}
   TTextStopWatch = Class(TText)
   public
      PaintMs: double;
      procedure Paint; override;
   End;
 
-  TALCheckBoxStopWatch = Class(TALCheckBox)
-  protected
-     bufPaintMs: double;
-     bufCreatePaintMs: double;
-     procedure Paint; override;
-  public
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     function MakeBufBitmap: TTexture; override;
-    {$ELSE}
-     function MakeBufBitmap: Tbitmap; override;
-    {$ENDIF}
-  End;
-  TCheckBoxStopWatch = Class(TCheckBox)
-  public
-     PaintMs: double;
-     procedure PaintChildren; override;
-  End;
-
+  {***************************}
   TLineStopWatch = Class(TLine)
   public
      PaintMs: double;
      procedure Paint; override;
   End;
+
+  {*******************************}
   TALLineStopWatch = Class(TALLine)
   protected
-     bufPaintMs: double;
-     bufCreatePaintMs: double;
+     PaintMs: double;
+     MakeBufDrawableMs: double;
   public
-    {$IF DEFINED(IOS) or DEFINED(ANDROID)}
-     function MakeBufBitmap: TTexture; override;
-    {$ELSE}
-     function MakeBufBitmap: Tbitmap; override;
-    {$ENDIF}
+     procedure MakeBufDrawable; override;
      procedure Paint; override;
   End;
 
-  TALRangeTrackBarStopWatch = Class(TALRangeTrackBar)
-  public
-     PaintMs: double;
-     procedure PaintChildren; override;
-  End;
-
-  TForm1 = class(TForm)
-    ButtonLaunchScrollBoxDemoDelphi: TButton;
-    ButtonLaunchScrollBoxDemoAlcinoe: TButton;
-    Button15: TButton;
+  {**********************}
+  TMainForm = class(TForm)
     ALVertScrollBox1: TALVertScrollBox;
-    Button4: TButton;
-    Text1: TText;
-    Button5: TButton;
-    Button3: TButton;
-    Text4: TText;
-    Button6: TButton;
-    Button7: TButton;
-    Text2: TText;
-    Button8: TButton;
-    Button9: TButton;
-    Text5: TText;
-    Button13: TButton;
-    Text10: TText;
-    Button16: TButton;
-    Button17: TButton;
-    Button18: TButton;
-    Text3: TText;
-    Button20: TButton;
-    Text7: TText;
-    Text9: TText;
-    Button21: TButton;
-    Button22: TButton;
+    ButtonLaunchScrollBoxDemoDelphi: TALButton;
+    ButtonLaunchScrollBoxDemoAlcinoe: TALButton;
+    ButtonBenchTALText: TALButton;
+    ButtonBenchTRectangle: TALButton;
+    Text1: TALText;
+    ButtonBenchTALRectangle: TALButton;
+    ButtonBenchTText: TALButton;
+    Text4: TALText;
+    ButtonBenchTLine: TALButton;
+    Text10: TALText;
+    ButtonBenchTALLine: TALButton;
+    Text7: TALText;
+    Text9: TALText;
+    ButtonBenchTCircle: TALButton;
+    ButtonBenchTALCircle: TALButton;
+    ALRectangle9: TALRectangle;
     ALTabControl1: TALTabControl;
     ALTabItem1: TALTabItem;
-    ALTabItem2: TALTabItem;
-    Image2: TALImage;
-    ALText1: TALText;
-    ALText2: TALText;
-    ALTabItem3: TALTabItem;
-    Image3: TALImage;
-    ALTabItem4: TALTabItem;
-    image4: TalImage;
     ALText3: TALText;
     ALText4: TALText;
+    alImage1: TALImage;
+    ALTabItem2: TALTabItem;
+    ALText1: TALText;
+    ALText2: TALText;
+    Image2: TALImage;
+    ALTabItem3: TALTabItem;
     ALText5: TALText;
     ALText6: TALText;
+    Image3: TALImage;
+    ALTabItem4: TALTabItem;
     ALText7: TALText;
     ALText8: TALText;
-    ALRectangle9: TALRectangle;
+    Image4: TALImage;
     ALRangeTrackBar1: TALRangeTrackBar;
     ALTrackBar1: TALTrackBar;
-    Button14: TButton;
-    Layout3: TLayout;
-    Layout4: TLayout;
     Text11: TALText;
-    Button12: TButton;
-    ALText9: TALText;
     Text8: TALText;
     ALVideoPlayerSurface1: TALVideoPlayerSurface;
-    Text12: TText;
     MonochromeEffect1: TMonochromeEffect;
-    RippleEffect1: TRippleEffect;
+    BandedSwirlEffect1: TBandedSwirlEffect;
     MagnifyEffect1: TMagnifyEffect;
+    RippleEffect1: TRippleEffect;
     SmoothMagnifyEffect1: TSmoothMagnifyEffect;
     WaveEffect1: TWaveEffect;
-    BandedSwirlEffect1: TBandedSwirlEffect;
-    PencilStrokeEffect1: TPencilStrokeEffect;
     PaperSketchEffect1: TPaperSketchEffect;
+    PencilStrokeEffect1: TPencilStrokeEffect;
     PixelateEffect1: TPixelateEffect;
-    ALText10: TALText;
     ContrastEffect1: TContrastEffect;
     TilerEffect1: TTilerEffect;
     MaskToAlphaEffect1: TMaskToAlphaEffect;
     EmbossEffect1: TEmbossEffect;
     PinchEffect1: TPinchEffect;
-    alImage1: TalImage;
-    ALLayout1: TALLayout;
-    ALAniIndicator1: TALAniIndicator;
-    Button19: TButton;
+    ALText10: TALText;
     ALRectangle1: TALRectangle;
-    Button10: TButton;
-    Text6: TText;
-    ALRectangle3: TALRectangle;
+    ButtonShowTALDatePickerDialog: TALButton;
+    ButtonApplyEffectToVideo: TALButton;
+    ALLayout7: TALLayout;
+    ALLayout8: TALLayout;
+    ALButton6: TALButton;
+    ALLayout9: TALLayout;
+    ALButton7: TALButton;
+    ALLayout14: TALLayout;
+    ALLayout15: TALLayout;
+    ALButton9: TALButton;
+    ALLayout16: TALLayout;
+    ALButton10: TALButton;
+    ALLayout17: TALLayout;
+    ALLayout18: TALLayout;
+    ALButton11: TALButton;
+    ALLayout19: TALLayout;
+    ALButton12: TALButton;
+    ALLayout20: TALLayout;
+    ALLayout21: TALLayout;
+    ALButton13: TALButton;
+    ALLayout22: TALLayout;
+    ALButton14: TALButton;
+    ALLayout26: TALLayout;
+    ALLayout27: TALLayout;
+    ALButton17: TALButton;
+    ALLayout28: TALLayout;
+    ALButton18: TALButton;
+    ALRectangle2: TALRectangle;
+    ALLayout2: TALLayout;
+    ALLayout3: TALLayout;
+    ALButton1: TALButton;
+    ALLayout4: TALLayout;
+    ALButton2: TALButton;
+    ALLayout5: TALLayout;
+    ALLayout6: TALLayout;
+    ALButton3: TALButton;
+    ALLayout10: TALLayout;
+    ALButton4: TALButton;
+    ALLayout11: TALLayout;
+    ALLayout12: TALLayout;
+    ALButton5: TALButton;
+    ALLayout13: TALLayout;
+    ALButton8: TALButton;
+    ALLayout23: TALLayout;
+    ALLayout24: TALLayout;
+    ALButton15: TALButton;
+    ALLayout25: TALLayout;
+    ALButton16: TALButton;
+    ALLayout29: TALLayout;
+    ALLayout30: TALLayout;
+    ALButton19: TALButton;
+    ALLayout31: TALLayout;
+    ALButton20: TALButton;
+    ALText29: TALText;
+    ALLayout41: TALLayout;
+    ALLayout42: TALLayout;
+    ALButton23: TALButton;
+    ALLayout43: TALLayout;
+    ALButton24: TALButton;
+    ALText17: TALText;
+    MainTitle: TALText;
+    SubTitle: TALText;
+    ALText18: TALText;
+    ALText21: TALText;
+    ALText23: TALText;
+    ALText19: TALText;
+    ALTextDemo: TALText;
+    ALText9: TALText;
+    ALText24: TALText;
+    ALText11: TALText;
+    ALText15: TALText;
+    ALLayout32: TALLayout;
+    ALLayout33: TALLayout;
+    ALLayout34: TALLayout;
+    ALText25: TALText;
+    ALLayout35: TALLayout;
+    ALAniIndicator1: TALAniIndicator;
+    ALText26: TALText;
+    ALText28: TALText;
+    ALText16: TALText;
+    ALText12: TALText;
+    ALText13: TALText;
+    ALText14: TALText;
+    ALText30: TALText;
+    ALText31: TALText;
+    ALText32: TALText;
+    ALLayout1: TALLayout;
+    ALLayout36: TALLayout;
+    ALLayout37: TALLayout;
+    ALText33: TALText;
+    ALText34: TALText;
+    ALText35: TALText;
+    ALText36: TALText;
+    ALText37: TALText;
     ALEdit1: TALEdit;
-    Layout1: TLayout;
-    Image1: TImage;
-    Layout2: TLayout;
-    Image5: TImage;
+    ALLayout38: TALLayout;
+    ALLayout39: TALLayout;
+    ALButton21: TALButton;
+    ALLayout40: TALLayout;
+    ALButton22: TALButton;
     ALMemo1: TALMemo;
-    Button11: TButton;
+    ALLayout46: TALLayout;
+    ALLayout47: TALLayout;
+    ALLayout48: TALLayout;
+    ALEdit6: TALEdit;
+    ALEdit7: TALEdit;
+    ALImage2: TALImage;
+    ALImage3: TALImage;
+    ALEdit2: TALEdit;
+    ALImage4: TALImage;
+    ALLayout45: TALLayout;
+    ALLayout49: TALLayout;
+    ALEdit3: TALEdit;
+    ALImage5: TALImage;
+    ALLayout50: TALLayout;
+    ALEdit4: TALEdit;
+    ALMemo2: TALMemo;
+    ALRectangle3: TALRectangle;
+    ALText20: TALText;
+    ALEdit5: TALEdit;
+    ALImage6: TALImage;
+    ALLayout51: TALLayout;
+    ALLayout52: TALLayout;
+    ALEdit8: TALEdit;
+    ALImage7: TALImage;
+    ALLayout53: TALLayout;
+    ALEdit9: TALEdit;
+    ALMemo3: TALMemo;
+    ALEdit10: TALEdit;
+    ALImage8: TALImage;
+    ALLayout54: TALLayout;
+    ALLayout55: TALLayout;
+    ALEdit11: TALEdit;
+    ALImage9: TALImage;
+    ALLayout56: TALLayout;
+    ALEdit12: TALEdit;
+    ALMemo4: TALMemo;
+    ALText38: TALText;
+    ALText39: TALText;
+    ALEdit14: TALEdit;
+    ALImage10: TALImage;
+    ALEdit15: TALEdit;
+    ALImage11: TALImage;
+    ALText42: TALText;
+    ALText43: TALText;
+    ALLayout57: TALLayout;
+    ALLayout58: TALLayout;
+    ALText45: TALText;
+    ALLayout59: TALLayout;
+    ALImage12: TALImage;
+    ALRectangle4: TALRectangle;
+    ALText51: TALText;
+    ALText52: TALText;
+    ALRectangle5: TALRectangle;
+    ALRectangle6: TALRectangle;
+    ALText54: TALText;
+    ALText41: TALText;
+    ALLayout67: TALLayout;
+    ALAnimatedImage1: TALAnimatedImage;
+    ALAnimatedImage3: TALAnimatedImage;
+    ALText56: TALText;
+    ALText57: TALText;
+    ALLayout68: TALLayout;
+    ALAnimatedImage2: TALAnimatedImage;
+    ALText59: TALText;
+    ALLayout69: TALLayout;
+    ALText58: TALText;
+    ALImage13: TALImage;
+    ALText60: TALText;
+    ALText61: TALText;
+    ALText62: TALText;
+    ALLayout72: TALLayout;
+    ALLayout73: TALLayout;
+    ALText63: TALText;
+    ALLayout74: TALLayout;
+    Image1: TImage;
+    ALLayout75: TALLayout;
+    ALLayout76: TALLayout;
+    ALLayout77: TALLayout;
+    ALLayout70: TALLayout;
+    ALLayout71: TALLayout;
+    ALLayout78: TALLayout;
+    Text2: TALText;
+    ALText64: TALText;
+    ALImage14: TALImage;
+    ALImage15: TALImage;
+    ALText65: TALText;
+    ALText66: TALText;
+    ALLayout79: TALLayout;
+    ALAnimatedImage4: TALAnimatedImage;
+    ALLayout80: TALLayout;
+    ALButton25: TALButton;
+    ALButton26: TALButton;
+    ALButton27: TALButton;
+    ALButton28: TALButton;
+    ALLayout81: TALLayout;
+    ALButton29: TALButton;
+    ALButton30: TALButton;
+    ALButton31: TALButton;
+    ALButton32: TALButton;
+    ALText67: TALText;
+    ALLayout82: TALLayout;
+    ALLayout83: TALLayout;
+    ALButton33: TALButton;
+    ALLayout84: TALLayout;
+    ALLayout85: TALLayout;
+    ALCheckBox3: TALCheckBox;
+    ALText40: TALText;
+    ALLayout86: TALLayout;
+    ALLayout87: TALLayout;
+    ALCheckBox4: TALCheckBox;
+    ALText50: TALText;
+    ALRectangle7: TALRectangle;
+    ALText68: TALText;
+    ALLayout94: TALLayout;
+    ALLayout95: TALLayout;
+    ALCheckBox5: TALCheckBox;
+    ALText69: TALText;
+    ALLayout96: TALLayout;
+    ALLayout97: TALLayout;
+    ALCheckBox6: TALCheckBox;
+    ALText70: TALText;
+    ALLayout88: TALLayout;
+    ALLayout89: TALLayout;
+    ALText71: TALText;
+    ALLayout44: TALLayout;
+    ALLayout60: TALLayout;
+    ALText47: TALText;
+    ALLayout90: TALLayout;
+    ALLayout91: TALLayout;
+    ALText48: TALText;
+    ALRadioButton1: TALRadioButton;
+    ALRadioButton2: TALRadioButton;
+    ALRectangle8: TALRectangle;
+    ALText72: TALText;
+    ALLayout92: TALLayout;
+    ALLayout93: TALLayout;
+    ALText73: TALText;
+    ALLayout98: TALLayout;
+    ALLayout99: TALLayout;
+    ALText74: TALText;
+    ALRadioButton3: TALRadioButton;
+    ALRadioButton4: TALRadioButton;
+    RadioButton1: TRadioButton;
+    ALRectangle10: TALRectangle;
+    ALText75: TALText;
+    ALLayout100: TALLayout;
+    ALLayout101: TALLayout;
+    ALText76: TALText;
+    ALSwitch2: TALSwitch;
+    ALLayout104: TALLayout;
+    ALLayout105: TALLayout;
     ALSwitch1: TALSwitch;
-    Layout5: TLayout;
-    Button23: TButton;
-    Button24: TButton;
+    ALText78: TALText;
+    ALLayout102: TALLayout;
+    ALLayout103: TALLayout;
+    ALSwitch3: TALSwitch;
+    ALText77: TALText;
+    ALLayout106: TALLayout;
+    ALLayout107: TALLayout;
+    ALSwitch4: TALSwitch;
+    ALText79: TALText;
+    ALLayout108: TALLayout;
+    ALLayout109: TALLayout;
+    ALSwitch5: TALSwitch;
+    ALText80: TALText;
+    ALLayout110: TALLayout;
+    ALLayout111: TALLayout;
+    ALText81: TALText;
+    Switch1: TSwitch;
+    ALTrackBar2: TALTrackBar;
+    TrackBar1: TTrackBar;
+    ALTrackBar3: TALTrackBar;
+    ALText82: TALText;
+    ALText83: TALText;
+    ALText84: TALText;
+    ALText85: TALText;
+    ALTrackBar4: TALTrackBar;
+    ALText86: TALText;
+    ALRectangle11: TALRectangle;
+    ALText87: TALText;
+    ALTrackBar5: TALTrackBar;
+    ALText88: TALText;
+    ALTrackBar6: TALTrackBar;
+    ALText89: TALText;
+    ALText90: TALText;
+    ALRangeTrackBar2: TALRangeTrackBar;
+    ALText91: TALText;
+    ALRangeTrackBar3: TALRangeTrackBar;
+    ALText92: TALText;
+    ALEdit13: TALEdit;
+    ALImage16: TALImage;
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
-    procedure Button255Click(Sender: TObject);
-    procedure Button4Click(Sender: TObject);
-    procedure Button15Click(Sender: TObject);
+    procedure ButtonBenchTALRectangleClick(Sender: TObject);
+    procedure ButtonBenchTRectangleClick(Sender: TObject);
+    procedure ButtonBenchTALTextClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure Button3Click(Sender: TObject);
-    procedure Button6Click(Sender: TObject);
-    procedure Button7Click(Sender: TObject);
-    procedure Button8Click(Sender: TObject);
-    procedure Button9Click(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure ButtonBenchTTextClick(Sender: TObject);
     procedure ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
-    procedure Button13Click(Sender: TObject);
-    procedure Button16Click(Sender: TObject);
-    procedure Button17Click(Sender: TObject);
-    procedure Button18Click(Sender: TObject);
-    procedure Button22Click(Sender: TObject);
-    procedure Button21Click(Sender: TObject);
+    procedure ButtonBenchTLineClick(Sender: TObject);
+    procedure ButtonBenchTALLineClick(Sender: TObject);
+    procedure ButtonBenchTALCircleClick(Sender: TObject);
+    procedure ButtonBenchTCircleClick(Sender: TObject);
     procedure ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure ALTabControl1AniTransitionInit(
                 const sender: TObject;
                 const ATransition: TALTabTransition;
                 const aVelocity: Single;
                 const aAnimation: TALFloatPropertyAnimation);
-    procedure ALTabControl1Resize(Sender: TObject);
-    procedure ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
-    procedure VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
-    procedure VScrollBarThumbMouseLeave(Sender: TObject);
-    procedure VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-    procedure VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+    procedure ALTabControl1Resized(Sender: TObject);
     procedure FormVirtualKeyboardHidden(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure FormVirtualKeyboardShown(Sender: TObject; KeyboardVisible: Boolean; const Bounds: TRect);
     procedure ALVertScrollBox1Click(Sender: TObject);
-    procedure Button24Click(Sender: TObject);
+    procedure ButtonApplyEffectToVideoClick(Sender: TObject);
     procedure ALVertScrollBox1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
     procedure FormResize(Sender: TObject);
-    procedure ALEditEnter(Sender: TObject);
-    procedure ALEditExit(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
-    procedure ALMemo1Exit(Sender: TObject);
     procedure ALVideoPlayerSurface1VideoSizeChanged(
                 const Sender: TObject;
                 const width, height: Integer);
     procedure Button11Click(Sender: TObject);
-    procedure ALSwitch1Change(Sender: TObject);
-    procedure Button23Click(Sender: TObject);
-    procedure ALTabControl1AniStart(Sender: TObject);
-    procedure ALTabControl1AniStop(Sender: TObject);
+    procedure ButtonShowTALDatePickerDialogClick(Sender: TObject);
+    procedure ALTextDemoElementClick(Sender: TObject; const Element: TALTextElement);
+    procedure ALTextDemoElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+    procedure ALTextDemoElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+    procedure ALTextDemoElementMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single; const Element: TALTextElement);
+    procedure ALTextDemoPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
+    procedure ALTextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
+    procedure ALTextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+    procedure ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+    procedure ALAnimatedImage4Click(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
-    fALcheckbox2: TALcheckboxStopWatch;
-    fcheckbox2: TcheckboxStopWatch;
     fLine: TLineStopWatch;
     fALLine: TALLineStopWatch;
     fText: TTextStopWatch;
     fALText: TALTextStopWatch;
-    fALRectangle1: TALRectangleStopWatch;
-    fRectangle1: TRectangleStopWatch;
-    fALRectangle2: TALRectangleStopWatch;
-    fRectangle2: TRectangleStopWatch;
-    fALRectangle3: TALRectangleStopWatch;
-    fRectangle3: TRectangleStopWatch;
-    fALCircle1: TALCircleStopWatch;
-    fCircle1: TCircleStopWatch;
-    FVKKeyboardOpen: boolean;
+    fALRectangle: TALRectangleStopWatch;
+    fRectangle: TRectangleStopWatch;
+    fALCircle: TALCircleStopWatch;
+    fCircle: TCircleStopWatch;
+    FVirtualKeyboardOpen: boolean;
+    FCurrentTextElements: TDictionary<TObject, TALTextElement>;
   public
+    constructor Create(AOwner: TComponent); override;
   end;
 
 var
-  Form1: TForm1;
+  MainForm: TMainForm;
 
 implementation
 
@@ -300,247 +527,237 @@ uses
   system.Diagnostics,
   system.threading,
   system.Math,
-  UnitScrollBoxDemo,
   system.DateUtils,
+  fmx.DialogService,
   Alcinoe.FMX.ScrollEngine,
-  Alcinoe.Common;
+  Alcinoe.Common,
+  UnitScrollBoxDemo;
 
 {$R *.fmx}
 
 {*******************************************}
-procedure TForm1.FormCreate(Sender: TObject);
+constructor TMainForm.Create(AOwner: TComponent);
 begin
+  TALFontManager.RegisterTypefaceFromResource('GoodDogPlain');
+  TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular');
+  inherited;
+end;
 
+{*********************************************}
+procedure TMainForm.FormCreate(Sender: TObject);
+begin
   //ALVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
-
+  //special case for windows
+  if not ALVertScrollBox1.HasTouchScreen then begin
+    ALVertScrollBox1.VScrollBar.Width := 8;
+    ALVertScrollBox1.VScrollBar.Margins.Right := 3;
+    ALVertScrollBox1.VScrollBar.Thumb.XRadius := -50;
+    ALVertScrollBox1.VScrollBar.Thumb.yRadius := -50;
+  end;
+  FCurrentTextElements := TDictionary<TObject, TALTextElement>.Create;
   TALErrorReporting.Instance;
-
   fDatePickerDialog := nil;
-
-  FVKKeyboardOpen := False;
+  FVirtualKeyboardOpen := False;
   beginupdate;
+  try
+    var LTitle: String := MainForm.Canvas.ClassName;
+    {$IF defined(Android) and defined(SKIA)}
+    if GlobalUseVulkan then LTitle := LTitle + ' - Vulkan'
+    else LTitle := LTitle + ' - OpenGL';
+    {$ELSEIF defined(Android)}
+    LTitle := LTitle + ' - OpenGL';
+    {$ELSEIF defined(AlAppleOS)}
+    if GlobalUseMetal then LTitle := LTitle + ' - Metal'
+    else LTitle := LTitle + ' - OpenGL';
+    {$ENDIF}
+    MainTitle.Text := LTitle;
 
-  //-----
-  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
-  //-----
-  fALRectangle1 := TALRectangleStopWatch.Create(self);
-  fALRectangle1.Parent := ALVertScrollBox1;
-  fALRectangle1.doubleBuffered := True;
-  fALRectangle1.Align := TalignLayout.Top;
-  fALRectangle1.Margins.Left := 15;
-  fALRectangle1.Margins.Top := 15;
-  fALRectangle1.Margins.Right := 15;
-  fALRectangle1.Margins.Bottom := 15;
-  fALRectangle1.Position.Y := Button5.Position.Y - Button5.Margins.Top;
-  fALRectangle1.Size.Height := 50;
-  fALRectangle1.XRadius := 12;
-  fALRectangle1.YRadius := 12;
-  //-----
-  fRectangle1 := TRectangleStopWatch.Create(self);
-  fRectangle1.Parent := ALVertScrollBox1;
-  fRectangle1.Align := TalignLayout.Top;
-  fRectangle1.Margins.Left := 15;
-  fRectangle1.Margins.Top := 15;
-  fRectangle1.Margins.Right := 15;
-  fRectangle1.Margins.Bottom := 15;
-  fRectangle1.Position.Y := Button5.Position.Y - Button5.Margins.Top;
-  fRectangle1.Size.Height := 50;
-  fRectangle1.XRadius := 12;
-  fRectangle1.YRadius := 12;
-
-  //-----
-  fALRectangle2 := TALRectangleStopWatch.Create(self);
-  fALRectangle2.Parent := ALVertScrollBox1;
-  fALRectangle2.doubleBuffered := True;
-  fALRectangle2.Align := TalignLayout.Top;
-  fALRectangle2.Margins.Left := 15;
-  fALRectangle2.Margins.Top := 15;
-  fALRectangle2.Margins.Right := 15;
-  fALRectangle2.Margins.Bottom := 15;
-  fALRectangle2.Position.Y := button6.Position.Y- Button6.Margins.Top;
-  fALRectangle2.Size.Height := 50;
-  fALRectangle2.XRadius := 0;
-  fALRectangle2.YRadius := 0;
-  //-----
-  fRectangle2 := TRectangleStopWatch.Create(self);
-  fRectangle2.Parent := ALVertScrollBox1;
-  fRectangle2.Align := TalignLayout.Top;
-  fRectangle2.Margins.Left := 15;
-  fRectangle2.Margins.Top := 15;
-  fRectangle2.Margins.Right := 15;
-  fRectangle2.Margins.Bottom := 15;
-  fRectangle2.Position.Y := button6.Position.Y- Button6.Margins.Top;
-  fRectangle2.Size.Height := 50;
-  fRectangle2.XRadius := 0;
-  fRectangle2.YRadius := 0;
-
-  //-----
-  fALRectangle3 := TALRectangleStopWatch.Create(self);
-  fALRectangle3.Parent := ALVertScrollBox1;
-  fALRectangle3.doubleBuffered := True;
-  fALRectangle3.Align := TalignLayout.Top;
-  fALRectangle3.Margins.Left := 15;
-  fALRectangle3.Margins.Top := 15;
-  fALRectangle3.Margins.Right := 15;
-  fALRectangle3.Margins.Bottom := 15;
-  fALRectangle3.Position.Y := button8.Position.Y- Button8.Margins.Top;
-  fALRectangle3.Size.Height := 50;
-  fALRectangle3.Stroke.Kind := TbrushKind.None;
-  fALRectangle3.XRadius := 0;
-  fALRectangle3.YRadius := 0;
-  //-----
-  fRectangle3 := TRectangleStopWatch.Create(self);
-  fRectangle3.Parent := ALVertScrollBox1;
-  fRectangle3.Align := TalignLayout.Top;
-  fRectangle3.Margins.Left := 15;
-  fRectangle3.Margins.Top := 15;
-  fRectangle3.Margins.Right := 15;
-  fRectangle3.Margins.Bottom := 15;
-  fRectangle3.Position.Y := button8.Position.Y- Button8.Margins.Top;
-  fRectangle3.Size.Height := 50;
-  fRectangle3.Stroke.Kind := TbrushKind.None;
-  fRectangle3.XRadius := 0;
-  fRectangle3.YRadius := 0;
-
-  //-----
-  fALCircle1 := TALCircleStopWatch.Create(self);
-  fALCircle1.Parent := ALVertScrollBox1;
-  fALCircle1.doubleBuffered := True;
-  fALCircle1.Align := TalignLayout.Top;
-  fALCircle1.Margins.Left := 15;
-  fALCircle1.Margins.Top := 15;
-  fALCircle1.Margins.Right := 15;
-  fALCircle1.Margins.Bottom := 15;
-  fALCircle1.Position.Y := button22.Position.Y- Button22.Margins.Top;
-  fALCircle1.Size.Height := 50;
-  //-----
-  fCircle1 := TCircleStopWatch.Create(self);
-  fCircle1.Parent := ALVertScrollBox1;
-  fCircle1.Align := TalignLayout.Top;
-  fCircle1.Margins.Left := 15;
-  fCircle1.Margins.Top := 15;
-  fCircle1.Margins.Right := 15;
-  fCircle1.Margins.Bottom := 15;
-  fCircle1.Position.Y := button22.Position.Y- Button22.Margins.Top;
-  fCircle1.Size.Height := 50;
-
-  //-----
-  fALText := TALTextStopWatch.Create(self);
-  fALText.Parent := ALVertScrollBox1;
-  fALText.TextSettings.WordWrap := True;
-  fALText.TextSettings.HorzAlign := TTextAlign.Center;
-  fALText.Align := TalignLayout.Top;
-  fALText.Margins.Top := 8;
-  fALText.Position.Y := button15.Position.Y - button15.Margins.Top;
-  fALText.Size.Height := 80;
-  fALText.Text := 'TALText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
-                  ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
-  //-----
-  fText := TTextStopWatch.Create(self);
-  fText.Parent := ALVertScrollBox1;
-  fText.TextSettings.WordWrap := True;
-  fText.TextSettings.HorzAlign := TTextAlign.Center;
-  fText.Align := TalignLayout.Top;
-  fText.Margins.Top := 8;
-  fText.Position.Y := button15.Position.Y - button15.Margins.Top;
-  fText.Size.Height := 80;
-  fText.Text := 'TText Random 😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 azert yuio p qs dfg jhk lm wxvcn bkn ,;/'#167'  123 098 4756 '#168#163' * AZE' +
-                ' RUTY IOP LK QJSH DFU AZZE F WBX CN';
-
-  //-----
-  fALcheckbox2 := TALcheckboxStopWatch.Create(layout3);
-  fALcheckbox2.Parent := layout3;
-  fALcheckbox2.Height := 22;
-  fALcheckbox2.width := 22;
-  fALcheckbox2.Position.Point := TpointF.Create(0,0);
-  //-----
-  fcheckbox2 := TcheckboxStopWatch.Create(layout4);
-  fcheckbox2.Parent := layout4;
-  fcheckbox2.Text := '';
-  fcheckbox2.Height := 22;
-  fcheckbox2.width := 22;
-  fcheckbox2.Position.Point := TpointF.Create(0,0);
-
-  //-----
-  fALline := TALLineStopWatch.Create(self);
-  fALline.Parent := ALVertScrollBox1;
-  fALline.doubleBuffered := true;
-  fALline.Align := TalignLayout.Top;
-  fALline.Margins.Top := 8;
-  fALline.Margins.right := 24;
-  fALline.Margins.left := 24;
-  fALline.Height := 1;
-  fALline.Position.Y := button16.Position.Y - button16.Margins.Top;
-  fALline.LineType := TLineType.Top;
-  //-----
-  fline := TLineStopWatch.Create(self);
-  fline.Parent := ALVertScrollBox1;
-  fline.Align := TalignLayout.Top;
-  fline.Margins.Top := 8;
-  fline.Margins.right := 24;
-  fline.Margins.left := 24;
-  fline.Height := 1;
-  fline.Position.Y := button16.Position.Y - button16.Margins.Top;
-  fline.LineType := TLineType.Top;
-  //-----
-  ALFmxMakeBufBitmaps(ALVertScrollBox1);
-  endupdate;
-  ALTabControl1Resize(nil);
+    {$IF defined(ALSkiaCanvas)}
+    SubTitle.Text := 'sk_surface_t (ALSkiaCanvas)';
+    {$ELSEIF defined(ALSkiaEngine)}
+    SubTitle.Text := 'sk_surface_t (ALSkiaEngine)';
+    {$ELSEIF defined(Android)}
+    SubTitle.Text := 'Jbitmap';
+    {$ELSEIF defined(AlAppleOS)}
+    SubTitle.Text := 'CGContextRef';
+    {$ELSE}
+    SubTitle.Text := 'Tbitmap';
+    {$ENDIF}
+    //-----
+    ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+    //-----
+    fALRectangle := TALRectangleStopWatch.Create(self);
+    fALRectangle.Parent := ALVertScrollBox1;
+    //fALRectangle.DoubleBuffered := False;
+    fALRectangle.Fill.Color := $FFf1ecff;
+    fALRectangle.Stroke.Color := $FFbea7fb;
+    fALRectangle.Align := TalignLayout.Top;
+    fALRectangle.Margins.Left := 16;
+    fALRectangle.Margins.Top := 8;
+    fALRectangle.Margins.Right := 16;
+    fALRectangle.Position.Y := ButtonBenchTALRectangle.Position.Y - ButtonBenchTALRectangle.Margins.Top;
+    fALRectangle.Size.Height := 50;
+    fALRectangle.XRadius := 12;
+    fALRectangle.YRadius := 12;
+    fALRectangle.HitTest := False;
+    var LText := TalText.Create(fALRectangle);
+    LText.Parent := fALRectangle;
+    LText.AutoSize := true;
+    LText.Align := TAlignLayout.Center;
+    LText.TextSettings.Font.Size := 16;
+    LText.Text := 'TALRectangle';
+    LText.HitTest := false;
+    //-----
+    fRectangle := TRectangleStopWatch.Create(self);
+    fRectangle.Parent := ALVertScrollBox1;
+    fRectangle.Align := TalignLayout.Top;
+    fRectangle.Fill.Color := $FFf1ecff;
+    fRectangle.Stroke.Color := $FFbea7fb;
+    fRectangle.Margins.Left := 16;
+    fRectangle.Margins.Top := 12;
+    fRectangle.Margins.Right := 16;
+    fRectangle.Margins.Bottom := 8;
+    fRectangle.Position.Y := ButtonBenchTALRectangle.Position.Y - ButtonBenchTALRectangle.Margins.Top;
+    fRectangle.Size.Height := 50;
+    fRectangle.XRadius := 12;
+    fRectangle.YRadius := 12;
+    fRectangle.HitTest := false;
+    LText := TalText.Create(fRectangle);
+    LText.Parent := fRectangle;
+    LText.AutoSize := true;
+    LText.Align := TAlignLayout.Center;
+    LText.TextSettings.Font.Size := 16;
+    LText.Text := 'TRectangle';
+    LText.HitTest := false;
+    //-----
+    fALCircle := TALCircleStopWatch.Create(ALLayout33);
+    fALCircle.Parent := ALLayout33;
+    //fALCircle.DoubleBuffered := False;
+    fALCircle.Fill.Color := $FFf1ecff;
+    fALCircle.Stroke.Color := $FFbea7fb;
+    fALCircle.Margins.Left := 15;
+    fALCircle.Margins.Right := 15;
+    fALCircle.Size.Height := 100;
+    fALCircle.Size.Width := 100;
+    fALCircle.HitTest := False;
+    LText := TalText.Create(fALCircle);
+    LText.Parent := fALCircle;
+    LText.AutoSize := true;
+    LText.Align := TAlignLayout.Center;
+    LText.TextSettings.Font.Size := 16;
+    LText.Text := 'TALCircle';
+    LText.HitTest := False;
+    //-----
+    fCircle := TCircleStopWatch.Create(ALLayout34);
+    fCircle.Parent := ALLayout34;
+    fCircle.Fill.Color := $FFf1ecff;
+    fCircle.Stroke.Color := $FFbea7fb;
+    fCircle.Margins.Left := 15;
+    fCircle.Margins.Right := 15;
+    fCircle.Size.Height := 100;
+    fCircle.Size.Width := 100;
+    fCircle.HitTest := False;
+    LText := TalText.Create(fCircle);
+    LText.Parent := fCircle;
+    LText.AutoSize := true;
+    LText.Align := TAlignLayout.Center;
+    LText.TextSettings.Font.Size := 16;
+    LText.Text := 'TCircle';
+    LText.HitTest := False;
+    //-----
+    fALText := TALTextStopWatch.Create(self);
+    fALText.Parent := ALVertScrollBox1;
+    //fALText.DoubleBuffered := False;
+    fALText.TextSettings.HorzAlign := TALTextHorzAlign.Center;
+    fALText.TextSettings.Font.Size := 18;
+    fALText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
+    fALText.Align := TalignLayout.Top;
+    fALText.Margins.Top := 12;
+    fALText.Margins.left := 16;
+    fALText.Margins.Right := 16;
+    fALText.Position.Y := ButtonBenchTALText.Position.Y - ButtonBenchTALText.Margins.Top;
+    fALText.Size.Height := 80;
+    fALText.Text := '😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 Discover new adventures every day.';
+    fALText.HitTest := False;
+    //-----
+    fText := TTextStopWatch.Create(self);
+    fText.Parent := ALVertScrollBox1;
+    fText.TextSettings.WordWrap := True;
+    fText.TextSettings.HorzAlign := TTextAlign.Center;
+    fText.TextSettings.Font.Size := 18;
+    fText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
+    fText.Align := TalignLayout.Top;
+    fText.Margins.Top := 8;
+    fText.Margins.left := 16;
+    fText.Margins.Right := 16;
+    fText.Position.Y := ButtonBenchTALText.Position.Y - ButtonBenchTALText.Margins.Top;
+    fText.Size.Height := 80;
+    fText.Text := '😂 😉 😐 🙉 🙇 💑 👨‍👨‍👧‍👦 💪 💥 🐇 🌼 🍡 🌋 🗽 🚚 🎁 🎶 📫 Discover new adventures every day.';
+    FText.HitTest := False;
+    //-----
+    fALline := TALLineStopWatch.Create(ALLayout36);
+    fALline.Parent := ALLayout36;
+    //fALline.DoubleBuffered := False;
+    fALline.Margins.right := 15;
+    fALline.Margins.left := 15;
+    fALline.Size.Height := 100;
+    fALline.Size.Width := 100;
+    fALline.Stroke.Thickness := 3;
+    fALline.LineType := TALLineType.TopLeftToBottomRight;
+    fALline.HitTest := False;
+    //-----
+    fline := TLineStopWatch.Create(ALLayout37);
+    fline.Parent := ALLayout37;
+    fline.Margins.right := 15;
+    fline.Margins.left := 15;
+    fline.Size.Height := 100;
+    fline.Size.Width := 100;
+    fline.Stroke.Thickness := 3;
+    fline.LineType := TLineType.Diagonal;
+    fline.HitTest := False;
+    //-----
+    ALMakeBufDrawables(ALVertScrollBox1, False{AEnsureDoubleBuffered});
+  finally
+    endupdate;
+  end;
+  ALTabControl1Resized(nil);
 end;
 
 {********************************************}
-procedure TForm1.ALEditEnter(Sender: TObject);
+procedure TMainForm.FormDestroy(Sender: TObject);
 begin
-  ALLog('ALEditEnter');
+  ALFreeAndNil(FCurrentTextElements);
+  ALLog('FormDestroy');
 end;
 
-{*******************************************}
-procedure TForm1.ALEditExit(Sender: TObject);
+{***************************************************}
+procedure TMainForm.ALAnimatedImage4Click(Sender: TObject);
 begin
-  ALLog('ALEditExit');
-end;
-
-{********************************************}
-procedure TForm1.ALMemo1Exit(Sender: TObject);
-begin
- //
-end;
-
-{************************************************}
-procedure TForm1.ALSwitch1Change(Sender: TObject);
-begin
-  if ALSwitch1.IsChecked then begin
-    ALSwitch1.BackGround.Fill.Color := $fffbd7d7;
-    ALSwitch1.Thumb.Stroke.Color := $ffec6262;
-    ALSwitch1.Thumb.Fill.Color := $ffec6262;
-  end
-  else begin
-    ALSwitch1.BackGround.Fill.Color := $ffc5c5c5;
-    ALSwitch1.Thumb.Stroke.Color := $ffd5d5d5;
-    ALSwitch1.Thumb.Fill.Color := $ffffffff;
+  with TALAnimatedImage(Sender) do begin
+    Animation.Stop;
+    if Tag = integer(true) then begin
+      Tag := integer(false);
+      Animation.StartProgress := 0.5;
+      Animation.StopProgress := 1;
+      Animation.Start;
+    end
+    else begin
+      Tag := integer(true);
+      Animation.StartProgress := 0;
+      Animation.StopProgress := 0.5;
+      Animation.Start;
+    end;
   end;
 end;
 
-{******************************************************}
-procedure TForm1.ALVertScrollBox1Click(Sender: TObject);
+{*********************************************************}
+procedure TMainForm.ALVertScrollBox1Click(Sender: TObject);
 begin
   SetFocused(nil);
 end;
 
-{******************************************************}
-procedure TForm1.ALTabControl1AniStart(Sender: TObject);
-begin
-  ALLog('TForm1.ALTabControl1AniStart', TALLogType.VERBOSE);
-end;
-
-{*****************************************************}
-procedure TForm1.ALTabControl1AniStop(Sender: TObject);
-begin
-  ALLog('TForm1.ALTabControl1AniStop', TALLogType.VERBOSE);
-end;
-
-{**********************************************}
-procedure TForm1.ALTabControl1AniTransitionInit(
+{*************************************************}
+procedure TMainForm.ALTabControl1AniTransitionInit(
             const sender: TObject;
             const ATransition: TALTabTransition;
             const aVelocity: Single;
@@ -557,8 +774,8 @@ begin
   aAnimation.Interpolation := TALInterpolationType.circular;
 end;
 
-{****************************************************}
-procedure TForm1.ALTabControl1Resize(Sender: TObject);
+{*******************************************************}
+procedure TMainForm.ALTabControl1Resized(Sender: TObject);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _updateLabels(const aTab: TalTabItem);
@@ -582,27 +799,80 @@ begin
 end;
 
 {*****************************************************************************************************************************}
-procedure TForm1.ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
+procedure TMainForm.ALTabControl1ViewportPositionChange(Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF);
 begin
-  ALTabControl1Resize(nil);
+  ALTabControl1Resized(nil);
 end;
 
-{*******************************************************************************************************}
-procedure TForm1.ALVertScrollBox1ScrollBarInit(const sender: TObject; const aScrollBar: TALScrollBoxBar);
+{*****************************************************************************************}
+procedure TMainForm.ALTextEllipsisElementClick(Sender: TObject; const Element: TALTextElement);
 begin
-  //special case for windows
-  if not ALVertScrollBox1.HasTouchScreen then begin
-    if aScrollBar.Orientation = Torientation.Vertical then begin
-      aScrollBar.Width := 8;
-      aScrollBar.Margins.Right := 3;
-      aScrollBar.Thumb.XRadius := 4;
-      aScrollBar.Thumb.yRadius := 4;
+  If Element.Id = 'ellipsis' then begin
+    TALText(Sender).TextSettings.MaxLines := 65535;
+    TALText(Sender).MaxHeight := 65535;
+    Invalidate;
+  end;
+end;
+
+{*****************************************************************************************}
+procedure TMainForm.ALTextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+begin
+  If Element.Id = 'ellipsis' then
+    TALText(Sender).Cursor := crHandPoint;
+end;
+
+{*****************************************************************************************}
+procedure TMainForm.ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+begin
+  If Element.Id = 'ellipsis' then
+    TALText(Sender).Cursor := crDefault;
+end;
+
+{*****************************************************************************************}
+procedure TMainForm.ALTextDemoElementClick(Sender: TObject; const Element: TALTextElement);
+begin
+  TDialogService.ShowMessage('You clicked on the span with ID: ' + Element.Id);
+end;
+
+{**********************************************************************************************}
+procedure TMainForm.ALTextDemoElementMouseEnter(Sender: TObject; const Element: TALTextElement);
+begin
+  ALTextDemo.Cursor := crHandPoint;
+  FCurrentTextElements.AddOrSetValue(Sender, Element);
+  Invalidate;
+end;
+
+{**********************************************************************************************}
+procedure TMainForm.ALTextDemoElementMouseLeave(Sender: TObject; const Element: TALTextElement);
+begin
+  ALTextDemo.Cursor := crDefault;
+  FCurrentTextElements.Remove(Sender);
+  Invalidate;
+end;
+
+{*******************************************************************************************************************************}
+procedure TMainForm.ALTextDemoElementMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single; const Element: TALTextElement);
+begin
+  ALTextDemo.Cursor := crHandPoint;
+  FCurrentTextElements.AddOrSetValue(Sender, Element);
+  Invalidate;
+end;
+
+{*****************************************************************************************}
+procedure TMainForm.ALTextDemoPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
+begin
+  Var LTextElement: TalTextElement;
+  If FCurrentTextElements.TryGetValue(Sender, LTextElement) then begin
+    var LtextElements := ALGetTextElementsByID(TALText(Sender).elements, LTextElement.id);
+    For var I := low(LtextElements) to high (LtextElements) do begin
+      Canvas.Fill.Color := TalphaColors.Red;
+      Canvas.FillRect(LtextElements[i].Rect, 0.3);
     end;
   end;
 end;
 
 {*******************************************************************************************************************************}
-procedure TForm1.ALVertScrollBox1ViewportPositionChange(Sender: TObject;const OldViewportPosition, NewViewportPosition: TPointF);
+procedure TMainForm.ALVertScrollBox1ViewportPositionChange(Sender: TObject;const OldViewportPosition, NewViewportPosition: TPointF);
 begin
 
   if (ALVideoPlayerSurface1.Position.y + ALVideoPlayerSurface1.Height >= NewViewportPosition.Y) and
@@ -682,25 +952,10 @@ begin
     if ALVideoPlayerSurface1.VideoPlayer.state in [vpsStarted] then ALVideoPlayerSurface1.VideoPlayer.Pause
     else ALVideoPlayerSurface1.VideoPlayer.AutoStartWhenPrepared := False;
   end;
-
-  if (ALLayout1.Position.y + ALLayout1.Height >= NewViewportPosition.Y) and
-     (ALLayout1.Position.y < NewViewportPosition.Y + height) then begin
-    ALAniIndicator1.enabled := true;
-  end
-  else begin
-    ALAniIndicator1.enabled := False;
-  end;
-
-  if ALMemo1.Position.Y - NewViewportPosition.Y > clientHeight then ALMemo1.RemoveNativeView
-  else ALMemo1.AddNativeView;
-
-  if ALRectangle3.Position.Y - NewViewportPosition.Y > clientHeight then ALEdit1.RemoveNativeView
-  else ALEdit1.AddNativeView;
-
 end;
 
-{**********************************************}
-procedure TForm1.Button24Click(Sender: TObject);
+{*****************************************************************}
+procedure TMainForm.ButtonApplyEffectToVideoClick(Sender: TObject);
 begin
   BandedSwirlEffect1.Enabled := false;
   ContrastEffect1.Enabled := false;
@@ -716,117 +971,51 @@ begin
   MaskToAlphaEffect1.Enabled := false;
   EmbossEffect1.Enabled := false;
   PinchEffect1.Enabled := false;
-  Text12.Text := 'Z-order work !';
 
   ALVideoPlayerSurface1.Tag := ALVideoPlayerSurface1.Tag + 1;
   if ALVideoPlayerSurface1.Tag > 15 then ALVideoPlayerSurface1.Tag := 0;
 
   case ALVideoPlayerSurface1.Tag of
-    1: begin BandedSwirlEffect1.Enabled := true; Text12.Text := 'BandedSwirlEffect'; end;
-    2: begin ContrastEffect1.Enabled := true; Text12.Text := 'ContrastEffect'; end;
-    3: begin MagnifyEffect1.Enabled := true; Text12.Text := 'MagnifyEffect'; end;
-    4: begin MonochromeEffect1.Enabled := true; Text12.Text := 'MonochromeEffect'; end;
-    5: begin RippleEffect1.Enabled := true; Text12.Text := 'RippleEffect'; end;
-    6: begin SmoothMagnifyEffect1.Enabled := true; Text12.Text := 'SmoothMagnifyEffect'; end;
-    7: begin WaveEffect1.Enabled := true; Text12.Text := 'WaveEffect'; end;
-    8: begin PencilStrokeEffect1.Enabled := true; Text12.Text := 'PencilStrokeEffect'; end;
-    9: begin PaperSketchEffect1.Enabled := true; Text12.Text := 'PaperSketchEffect'; end;
-    10: begin PixelateEffect1.Enabled := true; Text12.Text := 'PixelateEffect'; end;
-    11: begin TilerEffect1.Enabled := true; Text12.Text := 'TilerEffect'; end;
-    12: begin MaskToAlphaEffect1.Enabled := true; Text12.Text := 'MaskToAlphaEffect'; end;
-    13: begin EmbossEffect1.Enabled := true; Text12.Text := 'EmbossEffect'; end;
-    14: begin PinchEffect1.Enabled := true; Text12.Text := 'PinchEffect'; end;
+    1: BandedSwirlEffect1.Enabled := true;
+    2: ContrastEffect1.Enabled := true;
+    3: MagnifyEffect1.Enabled := true;
+    4: MonochromeEffect1.Enabled := true;
+    5: RippleEffect1.Enabled := true;
+    6: SmoothMagnifyEffect1.Enabled := true;
+    7: WaveEffect1.Enabled := true;
+    8: PencilStrokeEffect1.Enabled := true;
+    9: PaperSketchEffect1.Enabled := true;
+    10: PixelateEffect1.Enabled := true;
+    11: TilerEffect1.Enabled := true;
+    12: MaskToAlphaEffect1.Enabled := true;
+    13: EmbossEffect1.Enabled := true;
+    14: PinchEffect1.Enabled := true;
   end;
 end;
 
 {**********************************************************************************************************}
-procedure TForm1.ALVideoPlayerSurface1VideoSizeChanged(const Sender: TObject; const width, height: Integer);
+procedure TMainForm.ALVideoPlayerSurface1VideoSizeChanged(const Sender: TObject; const width, height: Integer);
 begin
   ALVideoPlayerSurface1.Height := height * (ClientWidth/Width)
 end;
 
-{*******************************************************************************************}
-procedure TForm1.VScrollBarThumbMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
+{*************************************************}
+procedure TMainForm.Button11Click(Sender: TObject);
 begin
-  if not ALVertScrollBox1.HasTouchScreen then begin
-    with (sender as TALTrackThumb) do begin
-      if tag = 0 then begin // 0 = out and not down
-        tag := 1; // 1 = in and not down
-        Fill.Color := $64000000;
-        (sender as TALTrackThumb).InvalidateRect(localrect);
-      end
-      else if tag = 10 then  // 10 = out and down
-        tag := 11; // 11 = in and down
-    end;
-  end;
+  ALSwitch1.Checked := not ALSwitch1.Checked;
 end;
 
-{**********************************************************}
-procedure TForm1.VScrollBarThumbMouseLeave(Sender: TObject);
-begin
-  if not ALVertScrollBox1.HasTouchScreen then begin
-    with (sender as TALTrackThumb) do begin
-      if tag = 1 then begin // 1 = in and not down
-        tag := 0; // 0 = out and not down
-        Fill.Color := $47000000;
-        (sender as TALTrackThumb).InvalidateRect(localrect);
-      end
-      else if tag = 11 then // 11 = in and down
-        tag := 10; // 10 = out and down
-    end;
-  end;
-end;
-
-{*****************************************************************************************************************}
-procedure TForm1.VScrollBarThumbMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if not ALVertScrollBox1.HasTouchScreen then begin
-    with (sender as TALTrackThumb) do begin
-      if tag = 1 then // 1 = in and not down
-        tag := 11 // 11 = in and down
-      else
-        tag := 10; // 10 = out and down
-      Fill.Color := $96000000;
-      (sender as TALTrackThumb).InvalidateRect(localrect);
-    end;
-  end;
-end;
-
-{***************************************************************************************************************}
-procedure TForm1.VScrollBarThumbMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-begin
-  if not ALVertScrollBox1.HasTouchScreen then begin
-    with (sender as TALTrackThumb) do begin
-      if tag = 11 then begin // 11 = in and down
-        tag := 1; // 1 = in and not down
-        Fill.Color := $64000000;
-      end
-      else if tag = 10 then begin // 10 = out and down
-        tag := 0; // 0 = out and not down
-        Fill.Color := $47000000;
-      end;
-      (sender as TALTrackThumb).InvalidateRect(localrect);
-    end;
-  end;
-end;
-
-{**********************************************}
-procedure TForm1.Button11Click(Sender: TObject);
-begin
-  ALSwitch1.IsChecked := not ALSwitch1.IsChecked;
-end;
-
-{**********************************************}
-procedure TForm1.Button13Click(Sender: TObject);
+{*************************************************}
+procedure TMainForm.ButtonBenchTLineClick(Sender: TObject);
 begin
   fline.Repaint;
   Text10.Text := 'Paint: ' + FormatFloat('0.#####',fline.PaintMs) + ' ms';
 end;
 
-{**********************************************}
-procedure TForm1.Button15Click(Sender: TObject);
+{*************************************************}
+procedure TMainForm.ButtonBenchTALTextClick(Sender: TObject);
 begin
-  fALText.clearBufBitmap;
+  fALText.clearBufDrawable;
   fALText.repaint;
   TTask.Create (procedure ()
     begin
@@ -834,16 +1023,16 @@ begin
       TThread.Synchronize(nil,
         procedure
         begin
-          Text4.Text := 'buffer creation: ' + FormatFloat('0.#####',fALText.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALText.bufPaintMs) + ' ms';
+          Text4.Text := 'buffer creation: ' + FormatFloat('0.#####',fALText.MakeBufDrawableMs) + ' ms - ' +
+                        'Paint: ' + FormatFloat('0.#####',fALText.PaintMs) + ' ms';
         end);
     end).Start;
 end;
 
-{**********************************************}
-procedure TForm1.Button16Click(Sender: TObject);
+{*************************************************}
+procedure TMainForm.ButtonBenchTALLineClick(Sender: TObject);
 begin
-  fALLine.clearBufBitmap;
+  fALLine.clearBufDrawable;
   fALLine.repaint;
   TTask.Create (procedure ()
     begin
@@ -851,38 +1040,14 @@ begin
       TThread.Synchronize(nil,
         procedure
         begin
-          Text10.Text := 'buffer creation: ' + FormatFloat('0.#####',fALLine.bufCreatePaintMs) + ' ms - ' +
-                         'Paint: ' + FormatFloat('0.#####',fALLine.bufPaintMs) + ' ms';
+          Text10.Text := 'buffer creation: ' + FormatFloat('0.#####',fALLine.MakeBufDrawableMs) + ' ms - ' +
+                         'Paint: ' + FormatFloat('0.#####',fALLine.PaintMs) + ' ms';
         end);
     end).Start;
-end;
-
-{**********************************************}
-procedure TForm1.Button17Click(Sender: TObject);
-begin
-  fALcheckbox2.clearBufBitmap;
-  fALcheckbox2.repaint;
-  TTask.Create (procedure ()
-    begin
-      sleep(250);
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Text3.Text := 'buffer creation: ' + FormatFloat('0.#####',fALcheckbox2.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALcheckbox2.bufPaintMs) + ' ms';
-        end);
-    end).Start;
-end;
-
-{**********************************************}
-procedure TForm1.Button18Click(Sender: TObject);
-begin
-  fcheckbox2.Repaint;
-  Text3.Text := 'Paint: ' + FormatFloat('0.#####',fcheckbox2.PaintMs) + ' ms';
 end;
 
 {**********************************************************************}
-procedure TForm1.ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
+procedure TMainForm.ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
 begin
   var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
   var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxDemoForm);
@@ -896,12 +1061,13 @@ begin
   for var I := 1 to 150 do begin
     var LRectangle := TALRectangle.Create(LVertScrollBox);
     LRectangle.Parent := LVertScrollBox;
-    LRectangle.doubleBuffered := True;
     LRectangle.Align := TalignLayout.Top;
+    Lrectangle.Fill.Color := $FFf7f2fa;
+    LRectangle.Stroke.Color := $FFe4e1e7;
     LRectangle.Margins.Left := 15;
-    LRectangle.Margins.Top := 10;
+    LRectangle.Margins.Top := 5;
     LRectangle.Margins.Right := 15;
-    LRectangle.Margins.Bottom := 10;
+    LRectangle.Margins.Bottom := 5;
     LRectangle.Position.Y := 0;
     LRectangle.Size.Height := 50;
     LRectangle.XRadius := 12;
@@ -912,12 +1078,11 @@ begin
     LText.Align := TalignLayout.left;
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;
-    LText.WordWrap := False;
+    LText.TextSettings.MaxLines := 1;
     LText.autosize := True;
     //-----
     var LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -927,11 +1092,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.red;
+    LChildRectangle.Fill.Color := $FF6750a4;
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -941,11 +1105,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.green;
+    LChildRectangle.Fill.Color := $FF625b71;
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -955,11 +1118,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.blue;
+    LChildRectangle.Fill.Color := $FF7d5260;
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -969,11 +1131,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.yellow;
+    LChildRectangle.Fill.Color := $FFb3261e;
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -983,11 +1144,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.Orange;
+    LChildRectangle.Fill.Color := $FFeaddff;
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -997,11 +1157,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.Aliceblue;
+    LChildRectangle.Fill.Color := $FFe8def8;
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1011,34 +1170,34 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
+    LChildRectangle.Fill.Color := $FFffd8e4;
   end;
   LVertScrollBox.endUpdate;
   LScrollBoxDemoForm.Show;
-  ALFmxMakeBufBitmaps(LVertScrollBox);
+  ALMakeBufDrawables(LVertScrollBox);
 end;
 
 {*********************************************************************}
-procedure TForm1.ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
+procedure TMainForm.ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
 begin
   var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
   var LVertScrollBox := TVertScrollBox.Create(LScrollBoxDemoForm);
   LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
   LVertScrollBox.Align := TalignLayout.Client;
-  //LVertScrollBox.AniCalculations.VelocityFactor := 2;
   LVertScrollBox.AniCalculations.BoundsAnimation := False;
   LScrollBoxDemoForm.fAniCalculations := LVertScrollBox.AniCalculations;
   LScrollBoxDemoForm.fvertScrollBox := LVertScrollBox;
   for var I := 1 to 150 do begin
     var LRectangle := TRectangle.Create(LVertScrollBox);
     LRectangle.Parent := LVertScrollBox;
-    //LRectangle.doubleBuffered := True;
     LRectangle.Align := TalignLayout.Top;
+    Lrectangle.Fill.Color := $FFf7f2fa;
+    LRectangle.Stroke.Color := $FFe4e1e7;
     LRectangle.Margins.Left := 15;
-    LRectangle.Margins.Top := 10;
+    LRectangle.Margins.Top := 5;
     LRectangle.Margins.Right := 15;
-    LRectangle.Margins.Bottom := 10;
+    LRectangle.Margins.Bottom := 5;
     LRectangle.Position.Y := 0;
     LRectangle.Size.Height := 50;
     LRectangle.XRadius := 12;
@@ -1046,7 +1205,6 @@ begin
     //-----
     var LText := TText.Create(self);
     LText.Parent := LRectangle;
-    //LText.doubleBuffered := True;
     LText.Align := TalignLayout.left;
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;
@@ -1055,7 +1213,6 @@ begin
     //-----
     var LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1065,11 +1222,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.red;
+    LChildRectangle.Fill.Color := $FF6750a4;
     //-----
     LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1079,11 +1235,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.green;
+    LChildRectangle.Fill.Color := $FF625b71;
     //-----
     LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1093,11 +1248,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.blue;
+    LChildRectangle.Fill.Color := $FF7d5260;
     //-----
     LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1107,11 +1261,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.yellow;
+    LChildRectangle.Fill.Color := $FFb3261e;
     //-----
     LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1121,11 +1274,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.Orange;
+    LChildRectangle.Fill.Color := $FFeaddff;
     //-----
     LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1135,11 +1287,10 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.Aliceblue;
+    LChildRectangle.Fill.Color := $FFe8def8;
     //-----
     LChildRectangle := TRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    //LChildRectangle.doubleBuffered := True;
     LChildRectangle.Align := TalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
@@ -1149,67 +1300,59 @@ begin
     LChildRectangle.Size.width := 25;
     LChildRectangle.XRadius := 5;
     LChildRectangle.YRadius := 5;
-    LChildRectangle.Fill.Color := TAlphaColorRec.Darkgoldenrod;
+    LChildRectangle.Fill.Color := $FFffd8e4;
   end;
   LVertScrollBox.endUpdate;
   LScrollBoxDemoForm.Show;
-  //ALFmxMakeBufBitmaps(LVertScrollBox);
 end;
 
 {*********************************************}
-procedure TForm1.Button3Click(Sender: TObject);
+procedure TMainForm.ButtonBenchTTextClick(Sender: TObject);
 begin
   fText.Repaint;
-  Text4.Text := 'Paint: ' + FormatFloat('0.#####',fText.PaintMs) + ' ms';
+  var LStopWatch := TstopWatch.StartNew;
+  fText.Layout.WordWrap := not fText.Layout.WordWrap;
+  fText.Layout.WordWrap := not fText.Layout.WordWrap;
+  LStopWatch.stop;
+  Text4.Text := 'RenderLayout: '+ FormatFloat('0.#####',LStopWatch.Elapsed.TotalMilliseconds) + ' ms - Paint: ' + FormatFloat('0.#####',fText.PaintMs) + ' ms'+#13#10+
+                #13#10+
+                'Note: Actually, at least under Skia, the TText also uses a "buffer" (a sk_paragraph_t object) that '+
+                'consumes more memory than the picture snapshot. The RenderLayout represents the time needed to create this object.'
 end;
 
 {*********************************************}
-procedure TForm1.Button4Click(Sender: TObject);
+procedure TMainForm.ButtonBenchTRectangleClick(Sender: TObject);
 begin
-  fRectangle1.Repaint;
-  Text1.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle1.PaintMs) + ' ms';
-end;
-
-{*********************************************}
-procedure TForm1.Button7Click(Sender: TObject);
-begin
-  fRectangle2.Repaint;
-  Text2.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle2.PaintMs) + ' ms';
-end;
-
-{*********************************************}
-procedure TForm1.Button9Click(Sender: TObject);
-begin
-  fRectangle3.Repaint;
-  Text5.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle3.PaintMs) + ' ms';
+  fRectangle.Repaint;
+  Text1.Text := 'Paint: ' + FormatFloat('0.#####',fRectangle.PaintMs) + ' ms';
 end;
 
 {**********************************************}
-procedure TForm1.Button21Click(Sender: TObject);
+procedure TMainForm.ButtonBenchTCircleClick(Sender: TObject);
 begin
-  fCircle1.Repaint;
-  Text9.Text := 'Paint: ' + FormatFloat('0.#####',fCircle1.PaintMs) + ' ms';
+  fCircle.Repaint;
+  Text9.Text := 'Paint: ' + FormatFloat('0.#####',fCircle.PaintMs) + ' ms';
 end;
 
 {**********************************************}
-procedure TForm1.Button22Click(Sender: TObject);
+procedure TMainForm.ButtonBenchTALCircleClick(Sender: TObject);
 begin
-  fALCircle1.clearBufBitmap;
-  fALCircle1.repaint;
+  fALCircle.clearBufDrawable;
+  fALCircle.repaint;
   TTask.Create (procedure ()
     begin
       sleep(250);
       TThread.Synchronize(nil,
         procedure
         begin
-          Text9.Text := 'buffer creation: ' + FormatFloat('0.#####',fALCircle1.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALCircle1.bufPaintMs) + ' ms';
+          Text9.Text := 'buffer creation: ' + FormatFloat('0.#####',fALCircle.MakeBufDrawableMs) + ' ms - ' +
+                        'Paint: ' + FormatFloat('0.#####',fALCircle.PaintMs) + ' ms';
         end);
     end).Start;
 end;
 
 {**********************************************}
-procedure TForm1.Button23Click(Sender: TObject);
+procedure TMainForm.ButtonShowTALDatePickerDialogClick(Sender: TObject);
 begin
   ALFreeAndNil(fDatePickerDialog);
   fDatePickerDialog := TALDatePickerDialog.create(
@@ -1224,138 +1367,88 @@ begin
 
 end;
 
-{***********************************************}
-procedure TForm1.Button255Click(Sender: TObject);
+{*******************************************}
+procedure TMainForm.ButtonBenchTALRectangleClick(Sender: TObject);
 begin
-  fALRectangle1.clearBufBitmap;
-  fALRectangle1.repaint;
+  fALRectangle.clearBufDrawable;
+  fALRectangle.repaint;
   TTask.Create (procedure ()
     begin
       sleep(250);
       TThread.Synchronize(nil,
         procedure
         begin
-          Text1.Text := 'buffer creation: ' + FormatFloat('0.#####',fALRectangle1.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALRectangle1.bufPaintMs) + ' ms';
+          Text1.Text := 'buffer creation: ' + FormatFloat('0.#####',fALRectangle.MakeBufDrawableMs) + ' ms - ' +
+                        'Paint: ' + FormatFloat('0.#####',fALRectangle.PaintMs) + ' ms';
         end);
     end).Start;
-end;
-
-{*********************************************}
-procedure TForm1.Button6Click(Sender: TObject);
-begin
-  fALRectangle2.clearBufBitmap;
-  fALRectangle2.repaint;
-  TTask.Create (procedure ()
-    begin
-      sleep(250);
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Text2.Text := 'buffer creation: ' + FormatFloat('0.#####',fALRectangle2.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALRectangle2.bufPaintMs) + ' ms';
-        end);
-    end).Start;
-end;
-
-{*********************************************}
-procedure TForm1.Button8Click(Sender: TObject);
-begin
-  fALRectangle3.clearBufBitmap;
-  fALRectangle3.repaint;
-  TTask.Create (procedure ()
-    begin
-      sleep(250);
-      TThread.Synchronize(nil,
-        procedure
-        begin
-          Text5.Text := 'buffer creation: ' + FormatFloat('0.#####',fALRectangle3.bufCreatePaintMs) + ' ms - ' +
-                        'Paint: ' + FormatFloat('0.#####',fALRectangle3.bufPaintMs) + ' ms';
-        end);
-    end).Start;
-end;
-
-{********************************************}
-procedure TForm1.FormDestroy(Sender: TObject);
-begin
-  ALLog('FormDestroy');
 end;
 
 {*******************************************}
-procedure TForm1.FormResize(Sender: TObject);
+procedure TMainForm.FormResize(Sender: TObject);
 begin
   ALLog('FormResize', 'width: ' + FloatToStr(width) + ' | ' + FloatToStr(height));
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
 
   {$IF Defined(ANDROID)}
   //handle the action bar under lollipop
-  if FVKKeyboardOpen then
+  if FVirtualKeyboardOpen then
     AlVertScrollBox1.ScrollEngine.ViewportPosition := AlVertScrollBox1.ScrollEngine.MaxScrollLimit;
   {$ENDIF}
 end;
 
 {*****************************************}
-procedure TForm1.FormVirtualKeyboardHidden(
+procedure TMainForm.FormVirtualKeyboardHidden(
             Sender: TObject;
             KeyboardVisible: Boolean; const Bounds: TRect);
 begin
   ALLog('FormVirtualKeyboardHidden');
-  FVKKeyboardOpen := False;
+  FVirtualKeyboardOpen := False;
   AlVertScrollBox1.margins.Bottom := 0;
-  AlVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
 end;
 
 {****************************************}
-procedure TForm1.FormVirtualKeyboardShown(
+procedure TMainForm.FormVirtualKeyboardShown(
             Sender: TObject;
             KeyboardVisible: Boolean; const Bounds: TRect);
 begin
   ALLog('FormVirtualKeyboardShown');
-  FVKKeyboardOpen := True;
+  FVirtualKeyboardOpen := True;
   AlVertScrollBox1.margins.Bottom := Bounds.height;
-  AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.VScrollBar.Max;
-  AlVertScrollBox1.ScrollEngine.TouchTracking := [];
+  if (Self.Focused <> nil) and
+     (AlVertScrollBox1.ScreenToLocal(Self.Focused.LocalToScreen(TPointF.Create(0,0))).y > AlVertScrollBox1.Height - Tcontrol(Self.Focused.GetObject).Height - 16) then
+    AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.Content.ScreenToLocal(Self.Focused.LocalToScreen(TPointF.Create(0,0))).y - AlVertScrollBox1.Height + Tcontrol(Self.Focused.GetObject).Height + Tcontrol(Self.Focused.GetObject).Margins.Bottom + 16;
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-function TALTextStopWatch.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALTextStopWatch.MakeBufBitmap: Tbitmap;
-{$ENDIF}
-var LStopWatch: TstopWatch;
+{*****************************************}
+procedure TALTextStopWatch.MakeBufDrawable;
 begin
-  if (BufBitmap = nil) then begin
-    LStopWatch := TstopWatch.StartNew;
-    result := inherited MakeBufBitmap;
+  if ALIsDrawableNull(BufDrawable) then begin
+    var LStopWatch := TstopWatch.StartNew;
+    inherited MakeBufDrawable;
     LStopWatch.stop;
-    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+    MakeBufDrawableMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
-  else result := inherited MakeBufBitmap;
+  else inherited MakeBufDrawable;
 end;
 
 {*******************************}
 procedure TALTextStopWatch.Paint;
-var LStopWatch: TstopWatch;
-    LRemovebufCreatePaintMs: boolean;
 begin
-  clearbufBitmap;
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LRemovebufCreatePaintMs := (BufBitmap = nil);
-  LStopWatch := TstopWatch.StartNew;
-  MakeBufBitmap;
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
-  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemoveMakeBufDrawableMs then PaintMs := PaintMs - MakeBufDrawableMs;
 end;
 
 {*****************************}
 procedure TTextStopWatch.Paint;
-var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
   PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
@@ -1363,178 +1456,101 @@ end;
 
 {**********************************}
 procedure TRectangleStopWatch.Paint;
-var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
   PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-function TALRectangleStopWatch.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALRectangleStopWatch.MakeBufBitmap: Tbitmap;
-{$ENDIF}
-var LStopWatch: TstopWatch;
+{**********************************************}
+procedure TALRectangleStopWatch.MakeBufDrawable;
 begin
-  if (BufBitmap = nil) then begin
-    LStopWatch := TstopWatch.StartNew;
-    result := inherited MakeBufBitmap;
+  if ALIsDrawableNull(BufDrawable) then begin
+    var LStopWatch := TstopWatch.StartNew;
+    inherited MakeBufDrawable;
     LStopWatch.stop;
-    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+    MakeBufDrawableMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
-  else result := inherited MakeBufBitmap;
+  else inherited MakeBufDrawable;
 end;
 
 {************************************}
 procedure TALRectangleStopWatch.Paint;
-var LStopWatch: TstopWatch;
-    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LRemovebufCreatePaintMs := (BufBitmap = nil);
-  LStopWatch := TstopWatch.StartNew;
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
-  LStopWatch.stop;
-  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
-end;
-
-{*****************************************}
-procedure TCheckBoxStopWatch.PaintChildren;
-var LStopWatch: TstopWatch;
-begin
-  canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LStopWatch := TstopWatch.StartNew;
-  inherited PaintChildren;
   LStopWatch.stop;
   PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-end;
-
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
- function TALCheckBoxStopWatch.MakeBufBitmap: TTexture;
-{$ELSE}
- function TALCheckBoxStopWatch.MakeBufBitmap: Tbitmap;
-{$ENDIF}
-var LStopWatch: TstopWatch;
-begin
-  if (BufBitmap = nil) then begin
-    LStopWatch := TstopWatch.StartNew;
-    result := inherited MakeBufBitmap;
-    LStopWatch.stop;
-    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-  end
-  else result := inherited MakeBufBitmap;
-end;
-
-{***********************************}
-procedure TALCheckBoxStopWatch.Paint;
-var LStopWatch: TstopWatch;
-    LRemovebufCreatePaintMs: boolean;
-begin
-  canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LRemovebufCreatePaintMs := (BufBitmap = nil);
-  LStopWatch := TstopWatch.StartNew;
-  inherited paint;
-  LStopWatch.stop;
-  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  if LRemoveMakeBufDrawableMs then PaintMs := PaintMs - MakeBufDrawableMs;
 end;
 
 {*****************************}
 procedure TLineStopWatch.Paint;
-var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
   PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
- function TALLineStopWatch.MakeBufBitmap: TTexture;
-{$ELSE}
- function TALLineStopWatch.MakeBufBitmap: Tbitmap;
-{$ENDIF}
-var LStopWatch: TstopWatch;
+{*****************************************}
+procedure TALLineStopWatch.MakeBufDrawable;
 begin
-  if (BufBitmap = nil) then begin
-    LStopWatch := TstopWatch.StartNew;
-    result := inherited MakeBufBitmap;
+  if ALIsDrawableNull(BufDrawable) then begin
+    var LStopWatch := TstopWatch.StartNew;
+    inherited MakeBufDrawable;
     LStopWatch.stop;
-    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+    MakeBufDrawableMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
-  else result := inherited MakeBufBitmap;
+  else inherited MakeBufDrawable;
 end;
 
 {*******************************}
 procedure TALLineStopWatch.Paint;
-var LStopWatch: TstopWatch;
-    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LRemovebufCreatePaintMs := (BufBitmap = nil);
-  LStopWatch := TstopWatch.StartNew;
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
-  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
-end;
-
-{************************************************}
-procedure TALRangeTrackBarStopWatch.PaintChildren;
-var LStopWatch: TstopWatch;
-begin
-  canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LStopWatch := TstopWatch.StartNew;
-  inherited PaintChildren;
-  LStopWatch.stop;
   PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemoveMakeBufDrawableMs then PaintMs := PaintMs - MakeBufDrawableMs;
 end;
 
-{************************************}
-{$IF DEFINED(IOS) or DEFINED(ANDROID)}
-function TALCircleStopWatch.MakeBufBitmap: TTexture;
-{$ELSE}
-function TALCircleStopWatch.MakeBufBitmap: Tbitmap;
-{$ENDIF}
-var LStopWatch: TstopWatch;
+{*******************************************}
+procedure TALCircleStopWatch.MakeBufDrawable;
 begin
-  if (BufBitmap = nil) then begin
-    LStopWatch := TstopWatch.StartNew;
-    result := inherited MakeBufBitmap;
+  if ALIsDrawableNull(BufDrawable) then begin
+    var LStopWatch := TstopWatch.StartNew;
+    inherited MakeBufDrawable;
     LStopWatch.stop;
-    bufCreatePaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+    MakeBufDrawableMs := LStopWatch.Elapsed.TotalMilliseconds;
   end
-  else result := inherited MakeBufBitmap;
+  else inherited MakeBufDrawable;
 end;
 
 {*********************************}
 procedure TALCircleStopWatch.Paint;
-var LStopWatch: TstopWatch;
-    LRemovebufCreatePaintMs: boolean;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LRemovebufCreatePaintMs := (BufBitmap = nil);
-  LStopWatch := TstopWatch.StartNew;
+  var LRemoveMakeBufDrawableMs := ALIsDrawableNull(BufDrawable);
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
-  bufPaintMs := LStopWatch.Elapsed.TotalMilliseconds;
-  if LRemovebufCreatePaintMs then bufPaintMs := bufPaintMs - bufCreatePaintMs;
+  PaintMs := LStopWatch.Elapsed.TotalMilliseconds;
+  if LRemoveMakeBufDrawableMs then PaintMs := PaintMs - MakeBufDrawableMs;
 end;
 
 {*******************************}
 procedure TCircleStopWatch.Paint;
-var LStopWatch: TstopWatch;
 begin
   canvas.ClearRect(TrectF.Create(0,0,0,0)); // it's just to flush what is inside the canvas
-  LStopWatch := TstopWatch.StartNew;
+  var LStopWatch := TstopWatch.StartNew;
   inherited paint;
   LStopWatch.stop;
   PaintMs := LStopWatch.Elapsed.TotalMilliseconds;

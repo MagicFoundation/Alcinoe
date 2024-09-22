@@ -6,14 +6,17 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, Alcinoe.FMX.Layouts,
   System.Diagnostics, fmx.layouts, Alcinoe.FMX.Objects, FMX.Controls.Presentation,
-  FMX.StdCtrls;
+  FMX.StdCtrls, Alcinoe.FMX.StdCtrls, Alcinoe.FMX.ScrollEngine,
+  Alcinoe.FMX.Controls;
 
 type
   TScrollBoxDemoForm = class(TForm)
     ALText1: TALText;
+    ButtonLaunchScrollBoxDemoAlcinoe: TALButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
     procedure FormCreate(Sender: TObject);
+    procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
   private
     fDebugFpsStarted: Boolean;
     fDebugFpsCount: integer;
@@ -22,7 +25,7 @@ type
     fDebugAverageFpsCount: integer;
     fDebugAverageFps: double;
   public
-    fScrollEngine: TALScrollBoxScrollEngine;
+    fScrollEngine: TALScrollEngine;
     fAniCalculations: TScrollCalculations;
     fvertScrollBox: Tcontrol;
   end;
@@ -39,6 +42,12 @@ uses
 {$R *.fmx}
 
 {********************************************************************************}
+procedure TScrollBoxDemoForm.ButtonLaunchScrollBoxDemoAlcinoeClick(
+  Sender: TObject);
+begin
+  Close;
+end;
+
 procedure TScrollBoxDemoForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   action := TcloseAction.caFree;

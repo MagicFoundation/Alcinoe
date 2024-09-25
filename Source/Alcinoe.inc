@@ -43,11 +43,17 @@
   {$MESSAGE ERROR 'Unknown Extended type'}
 {$ENDIF}
 
-{$IF Defined(SKIA) or Defined(ALDPK)}
+{$IF Defined(SKIA)}
   {$DEFINE ALSkiaEngine}
   {$DEFINE ALSkiaCanvas}
+{$ELSEIF Defined(ALDPK)}
+  {$DEFINE ALSkiaEngine}
 {$ELSEIF Defined(ANDROID) or defined(IOS)}
   {$DEFINE ALGpuCanvas}
+{$ENDIF}
+
+{$IF Defined(ALSkiaEngine)}
+  {$DEFINE ALSkiaAvailable}
 {$ENDIF}
 
 {$IF defined(MACOS) and not defined(IOS)}
@@ -63,3 +69,7 @@
 {$ENDIF}
 
 {$SCOPEDENUMS ON}
+
+{$IF Defined(ALDPK)}
+  {$DEFINE ALBackwardCompatible}
+{$ENDIF}

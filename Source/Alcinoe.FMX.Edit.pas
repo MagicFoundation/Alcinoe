@@ -750,6 +750,9 @@ type
         procedure FocusedChanged(ASender: TObject);
       protected
         function CreateSavedState: TALPersistentObserver; override;
+        procedure StartTransition; override;
+        procedure TransitionAnimationProcess(Sender: TObject); override;
+        procedure TransitionAnimationFinish(Sender: TObject); override;
       public
         constructor Create(const AParent: TALBaseEdit); reintroduce; virtual;
         destructor Destroy; override;
@@ -766,6 +769,7 @@ type
         property Disabled: TDisabledStateStyle read FDisabled write SetDisabled;
         property Hovered: THoveredStateStyle read FHovered write SetHovered;
         property Focused: TFocusedStateStyle read FFocused write SetFocused;
+        property Transition;
       end;
       // -------------
       // TTextSettings
@@ -853,7 +857,6 @@ type
     procedure SetControlType(const Value: TControlType);
   protected
     FIsAdjustingSize: Boolean;
-    function GetIsPixelAlignmentEnabled: Boolean; override;
     function CreateTextSettings: TTextSettings; virtual;
     function CreateEditControl: TALBaseEditControl; virtual;
     function GetEditControl: TALBaseEditControl; virtual;
@@ -1091,6 +1094,7 @@ uses
   {$endif}
   {$IF defined(ALSkiaCanvas)}
   System.Skia.API,
+  FMX.Skia.Canvas,
   {$endif}
   {$IFDEF ALDPK}
   DesignIntf,
@@ -3677,6 +3681,14 @@ begin
       TextSettings.Interpolate(TBaseStateStyle(ATo).TextSettings, ANormalizedTime);
       TintColor := ALInterpolateColor(TintColor{Start}, TBaseStateStyle(ATo).TintColor{Stop}, ANormalizedTime);
     end
+    {$IF defined(debug)}
+    else if StateStyleParent <> nil then Raise Exception.Create('Error FE80E1DC-6F9F-42BF-825B-C72A12A704B8')
+    {$ENDIF}
+    else if ControlParent <> nil then begin
+      PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, ControlParent.PromptTextColor{Stop}, ANormalizedTime);
+      TextSettings.Interpolate(ControlParent.TextSettings, ANormalizedTime);
+      TintColor := ALInterpolateColor(TintColor{Start}, ControlParent.TintColor{Stop}, ANormalizedTime);
+    end
     else begin
       PromptTextColor := ALInterpolateColor(PromptTextColor{Start}, DefaultPromptTextColor{Stop}, ANormalizedTime);
       TextSettings.Interpolate(nil, ANormalizedTime);
@@ -3895,6 +3907,27 @@ type
   TStateStylesClass = class of TStateStyles;
 begin
   result := TStateStylesClass(classtype).Create(nil{AParent});
+end;
+
+{****************************}
+procedure TALBaseEdit.TStateStyles.StartTransition;
+begin
+  inherited;
+  Parent.UpdateEditControlStyle;
+end;
+
+{****************************}
+procedure TALBaseEdit.TStateStyles.TransitionAnimationProcess(Sender: TObject);
+begin
+  inherited;
+  Parent.UpdateEditControlStyle;
+end;
+
+{****************************}
+procedure TALBaseEdit.TStateStyles.TransitionAnimationFinish(Sender: TObject);
+begin
+  inherited;
+  Parent.UpdateEditControlStyle;
 end;
 
 {******************************************************}
@@ -4168,13 +4201,6 @@ begin
   AdjustSize;
 end;
 
-{****************************************}
-function TALBaseEdit.GetIsPixelAlignmentEnabled: Boolean;
-begin
-  result := (inherited GetIsPixelAlignmentEnabled) and
-            (not StateStyles.IsTransitionAnimationRunning)
-end;
-
 {***********************************************************}
 function TALBaseEdit.CreateTextSettings: TTextSettings;
 begin
@@ -4408,7 +4434,7 @@ begin
   ALLog('TALBaseEdit.DoEnter', 'control.name: ' + Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoEnter;
-  UpdateEditControlStyle;
+  StateStyles.startTransition;
   //--
   if (GetIsTextEmpty) and
      (HasTranslationLabelTextAnimation) then begin
@@ -4439,7 +4465,7 @@ begin
   ALLog('TALBaseEdit.DoExit', 'control.name: ' + Name, TalLogType.VERBOSE);
   {$ENDIF}
   inherited DoExit;
-  UpdateEditControlStyle;
+  StateStyles.startTransition;
   UpdateNativeViewVisibility;
   //--
   if (GetIsTextEmpty) and
@@ -4474,38 +4500,32 @@ begin
 
   if (csLoading in ComponentState) then exit;
 
-  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
-  if LStateStyle <> nil then
-    LStateStyle.SupersedeNoChanges(true{ASaveState});
-  try
-    // FillColor
-    if LStateStyle <> nil then begin
-      var LStateLayerColor: TAlphaColor;
-      var LStateLayerOpacity: Single;
-      if LStateStyle.StateLayer.UseContentColor then begin
-        LStateLayerColor := LStateStyle.TextSettings.Font.Color;
-        LStateLayerOpacity := LStateStyle.StateLayer.Opacity;
-      end
-      else begin
-        LStateLayerColor := LStateStyle.StateLayer.Color;
-        LStateLayerOpacity := LStateStyle.StateLayer.Opacity;
-      end;
-      EditControl.FillColor := ALBlendColor(LStateStyle.Fill.Color, LStateLayerColor, LStateLayerOpacity);
+  var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentAdjustedStyle);
+
+  // FillColor
+  if LStateStyle <> nil then begin
+    var LStateLayerColor: TAlphaColor;
+    var LStateLayerOpacity: Single;
+    if LStateStyle.StateLayer.UseContentColor then begin
+      LStateLayerColor := LStateStyle.TextSettings.Font.Color;
+      LStateLayerOpacity := LStateStyle.StateLayer.Opacity;
     end
-    else EditControl.FillColor := Fill.Color;
-    // PromptTextColor
-    if LStateStyle <> nil then EditControl.PromptTextColor := LStateStyle.PromptTextColor
-    else EditControl.PromptTextColor := PromptTextColor;
-    // TintColor
-    if LStateStyle <> nil then EditControl.TintColor := LStateStyle.TintColor
-    else EditControl.TintColor := TintColor;
-    // TextSettings
-    if LStateStyle <> nil then EditControl.TextSettings.Assign(LStateStyle.TextSettings)
-    else EditControl.TextSettings.Assign(TextSettings)
-  finally
-    if LStateStyle <> nil then
-      LStateStyle.RestorestateNoChanges;
-  end;
+    else begin
+      LStateLayerColor := LStateStyle.StateLayer.Color;
+      LStateLayerOpacity := LStateStyle.StateLayer.Opacity;
+    end;
+    EditControl.FillColor := ALBlendColor(LStateStyle.Fill.Color, LStateLayerColor, LStateLayerOpacity);
+  end
+  else EditControl.FillColor := Fill.Color;
+  // PromptTextColor
+  if LStateStyle <> nil then EditControl.PromptTextColor := LStateStyle.PromptTextColor
+  else EditControl.PromptTextColor := PromptTextColor;
+  // TintColor
+  if LStateStyle <> nil then EditControl.TintColor := LStateStyle.TintColor
+  else EditControl.TintColor := TintColor;
+  // TextSettings
+  if LStateStyle <> nil then EditControl.TextSettings.Assign(LStateStyle.TextSettings)
+  else EditControl.TextSettings.Assign(TextSettings);
 
   repaint;
 
@@ -4571,7 +4591,7 @@ begin
     end;
     {$ENDIF}
   end;
-  UpdateEditControlStyle;
+  StateStyles.startTransition;
 end;
 
 {************************************************************}
@@ -5737,26 +5757,166 @@ end;
 procedure TALBaseEdit.Paint;
 begin
 
+  StateStyles.UpdateLastPaintedRawStyle;
   MakeBufDrawable;
   var LStateStyle := TBaseStateStyle(StateStyles.GetCurrentRawStyle);
 
   {$REGION 'Background'}
   var LDrawable: TALDrawable;
   var LDrawableRect: TRectF;
-  if LStateStyle <> nil then begin
-    LDrawable := LStateStyle.BufDrawable;
-    LDrawableRect := LStateStyle.BufDrawableRect;
-    if ALIsDrawableNull(LDrawable) then begin
+  if StateStyles.IsTransitionAnimationRunning then begin
+    LDrawable := ALNullDrawable;
+    LDrawableRect := TRectF.Empty;
+  end
+  else begin
+    if LStateStyle <> nil then begin
+      LDrawable := LStateStyle.BufDrawable;
+      LDrawableRect := LStateStyle.BufDrawableRect;
+      if ALIsDrawableNull(LDrawable) then begin
+        LDrawable := BufDrawable;
+        LDrawableRect := BufDrawableRect;
+      end;
+    end
+    else begin
       LDrawable := BufDrawable;
       LDrawableRect := BufDrawableRect;
     end;
-  end
-  else begin
-    LDrawable := BufDrawable;
-    LDrawableRect := BufDrawableRect;
   end;
   //--
-  if ALIsDrawableNull(LDrawable) then inherited Paint
+  if ALIsDrawableNull(LDrawable) then begin
+
+    var LCurrentAdjustedStateStyle := TBaseStateStyle(StateStyles.GetCurrentAdjustedStyle);
+    if LCurrentAdjustedStateStyle = nil then inherited Paint
+    else begin
+
+      {$IF DEFINED(ALSkiaCanvas)}
+
+      // Using a matrix on the canvas results in smoother animations compared to using
+      // Ascale with DrawMultilineText. This is because changes in scale affect the font size,
+      // leading to rounding issues (I spent many hours looking for a way to avoid this).
+      // If there is an animation, it appears jerky because the text position
+      // shifts up or down with scale changes due to pixel alignment.
+      var LCanvasSaveState: TCanvasSaveState := ALScaleAndCenterCanvas(
+                                                  Canvas, // Const ACanvas: TCanvas;
+                                                  AbsoluteRect, // Const AAbsoluteRect: TRectF;
+                                                  LCurrentAdjustedStateStyle.Scale, // Const AScaleX: Single;
+                                                  LCurrentAdjustedStateStyle.Scale, // Const AScaleY: Single;
+                                                  true); // Const ASaveState: Boolean);
+      try
+
+        ALDrawRectangle(
+          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
+          1, // const AScale: Single;
+          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+          LocalRect, // const Rect: TrectF;
+          AbsoluteOpacity, // const AOpacity: Single;
+          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
+          LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
+          True, // const ADrawStateLayerOnTop: Boolean;
+          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
+          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
+          Sides, // const Sides: TSides;
+          Corners, // const Corners: TCorners;
+          XRadius, // const XRadius: Single = 0;
+          YRadius); // const YRadius: Single = 0);
+
+      finally
+        if LCanvasSaveState <> nil then
+          Canvas.RestoreState(LCanvasSaveState);
+      end;
+
+      {$ELSE}
+
+      if StateStyles.IsTransitionAnimationRunning then begin
+
+        var LRect := LocalRect;
+        var LBufSurface: TALSurface;
+        var LBufCanvas: TALCanvas;
+        var LBufDrawable: TALDrawable;
+        StateStyles.GetTransitionBufSurface(
+            LRect, // var ARect: TrectF;
+            ALGetScreenScale, // const AScale: Single;
+            LBufSurface, // out ABufSurface: TALSurface;
+            LBufCanvas, // out ABufCanvas: TALCanvas;
+            LBufDrawable); // out ABufDrawable: TALDrawable);
+
+        if ALCanvasBeginScene(LBufCanvas) then
+        try
+
+          ALClearCanvas(LBufCanvas, TAlphaColors.Null);
+
+          ALDrawRectangle(
+            LBufCanvas, // const ACanvas: TALCanvas;
+            ALGetScreenScale, // const AScale: Single;
+            IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+            LocalRect, // const Rect: TrectF;
+            1, // const AOpacity: Single;
+            LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+            LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
+            LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
+            True, // const ADrawStateLayerOnTop: Boolean;
+            LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
+            LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
+            Sides, // const Sides: TSides;
+            Corners, // const Corners: TCorners;
+            XRadius, // const XRadius: Single = 0;
+            YRadius); // const YRadius: Single = 0);
+
+        finally
+          ALCanvasEndScene(LBufCanvas)
+        end;
+
+        ALUpdateDrawableFromSurface(LBufSurface, LBufDrawable);
+
+        // The Shadow or Statelayer are not included in the dimensions of the LRect rectangle.
+        // However, the LRect rectangle is offset by the dimensions of the shadow/Statelayer.
+        LRect.Offset(-2*LRect.Left, -2*LRect.Top);
+
+        // LRect must include the LScale
+        LRect.Top := LRect.Top * LCurrentAdjustedStateStyle.Scale;
+        LRect.right := LRect.right * LCurrentAdjustedStateStyle.Scale;
+        LRect.left := LRect.left * LCurrentAdjustedStateStyle.Scale;
+        LRect.bottom := LRect.bottom * LCurrentAdjustedStateStyle.Scale;
+
+        // Since LStateStyle.BufDrawableRect can have different dimensions than the main BufDrawableRect
+        // (due to autosizing with different font sizes), we must center LStateStyle.BufDrawableRect
+        // within the main BufDrawableRect to ensure that all changes are visually centered.
+        var LMainDrawableRect := BufDrawableRect;
+        LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
+        var LCenteredRect := LRect.CenterAt(LMainDrawableRect);
+        LRect.Offset(LCenteredRect.Left, LCenteredRect.top);
+
+        // We cannot use the matrix because, if we do, ALAlignToPixelRound in ALDrawDrawable
+        // will be ineffective since the matrix will no longer be a simple translation matrix.
+        // In such a case, TCustomCanvasGpu(ACanvas).DrawTexture may produce border artifacts
+        // if the texture is not perfectly pixel-aligned.
+        var LDstRect := TRectF.Create(0, 0, ALGetDrawableWidth(LBufDrawable), ALGetDrawableHeight(LBufDrawable));
+        LDstRect.Width := (LDstRect.Width / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+        LDstRect.height := (LDstRect.height / ALGetScreenScale) * LCurrentAdjustedStateStyle.Scale;
+        LDstRect.SetLocation(
+          LRect.Left,
+          LRect.Top);
+        ALDrawDrawable(
+          Canvas, // const ACanvas: Tcanvas;
+          LBufDrawable, // const ADrawable: TALDrawable;
+          LDstRect, // const ADstRect: TrectF; // IN Virtual pixels !
+          AbsoluteOpacity); // const AOpacity: Single)
+
+      end
+
+      {$IF defined(DEBUG)}
+      else if not doublebuffered then begin
+        ALLog('TALBaseEdit.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+        exit;
+      end
+      {$ENDIF};
+
+      {$ENDIF}
+
+    end;
+
+  end
   else
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;

@@ -1175,14 +1175,17 @@ procedure ALDrawMultiLineText(
     _CurrLetterSpacing := ALetterSpacing;
 
     var LFontFamily := _getFontFamily(AFontFamily);
-    var LFontStyles: TFontStyles := [];
-    if AFontWeight in [TFontWeight.Bold,
-                       TFontWeight.UltraBold,
-                       TFontWeight.Black,
-                       TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
-    if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
-    var LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
-    if TOSVersion.Check(28, 0) then begin
+    var LTypeface: JTypeFace := TALFontManager.GetCustomTypeFace(LFontFamily);
+    if LTypeface = nil then begin
+      var LFontStyles: TFontStyles := [];
+      if AFontWeight in [TFontWeight.Bold,
+                         TFontWeight.UltraBold,
+                         TFontWeight.Black,
+                         TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
+      if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
+      LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
+    end;
+    if TOSVersion.Check(9, 0) then begin
       var LfontWeightInt: Integer;
       case AFontWeight of
         TFontWeight.Thin: LfontWeightInt := 100; //	Thin;
@@ -3949,6 +3952,16 @@ begin
             else begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
+              if LExtendedTextElement.BackgroundColor <> TAlphaColors.Null then begin
+                _CurrFontColor := LExtendedTextElement.BackgroundColor;
+                _Paint.setColor(integer(LExtendedTextElement.BackgroundColor));
+                ACanvas.drawRect(
+                  LDstRect.left, // left: Single;
+                  LDstRect.top, // top: Single;
+                  LDstRect.right, // right: Single;
+                  LDstRect.bottom, // bottom: Single,
+                  _Paint);
+              end;
               _UpdatePaint(
                 LExtendedTextElement.FontFamily,
                 LExtendedTextElement.FontSize,

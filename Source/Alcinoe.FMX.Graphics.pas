@@ -10,7 +10,7 @@ uses
   system.types,
   system.uitypes,
   System.Math.Vectors,
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   System.Skia.API,
   {$ENDIF}
   {$IF defined(ios)}
@@ -68,8 +68,8 @@ function  ALScaleAndCenterCanvas(
             Const AScaleY: Single;
             Const ASaveState: Boolean): TCanvasSaveState;
 
-{$IF defined(ALSkiaEngine)}
-// ALGlobalSkColorSpace represents the color space of the form's surface
+{$IF defined(ALSkiaAvailable)}
+// ALGlobalSkColorSpace represents the color space used in all drawing operations
 var ALGlobalSkColorSpace: sk_colorspace_t;
 var ALGlobalSkColorSpaceInitialized: Boolean;
 function ALGetGlobalSkColorSpace: sk_colorspace_t;
@@ -141,6 +141,7 @@ Type
 
 // ALGlobalCGColorSpace represents the color space used in all drawing operations
 var ALGlobalCGColorSpace: CGColorSpaceRef;
+var ALGlobalCGColorSpaceInitialized: Boolean;
 function ALGetGlobalCGColorSpace: CGColorSpaceRef;
 
 function ALCreateCGContextRef(const W, H: integer; const AData: Pointer = nil; const ABytesPerRow: Integer = -1): CGContextRef;
@@ -206,7 +207,7 @@ function ALCreateEmptyDrawable1x1: TALDrawable;
 
 {$REGION ' Load and FitInto'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or lower than w or h
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 function ALLoadFromResourceAndFitIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
@@ -247,7 +248,7 @@ function ALLoadFromFileAndFitIntoToDrawable(const AFileName: String; const W, H:
 
 {$REGION ' Load and FitInto and Crop'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropToSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -288,7 +289,7 @@ function ALLoadFromFileAndFitIntoAndCropToDrawable(const AFileName: String; cons
 
 {$REGION ' Load and FitInto and Crop to RoundRect'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as round rect
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -329,7 +330,7 @@ function ALLoadFromFileAndFitIntoAndCropToRoundRectDrawable(const AFileName: Str
 
 {$REGION ' Load and FitInto and Crop to Circle'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -370,7 +371,7 @@ function ALLoadFromFileAndFitIntoAndCropToCircleDrawable(const AFileName: String
 
 {$REGION ' Load and FitInto and Crop and Blur'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -411,7 +412,7 @@ function ALLoadFromFileAndFitIntoAndCropAndBlurToDrawable(const AFileName: Strin
 
 {$REGION ' Load and FitInto and Crop and Blur to Circle'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -452,7 +453,7 @@ function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleDrawable(const AFileName:
 
 {$REGION ' Load and FitInto and Crop and Mask'}
 // https://i.stack.imgur.com/CcESX.png - transparent pixel in the mask are removed from the resulting image
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -493,7 +494,7 @@ function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: Strin
 
 {$REGION ' Load and FitInto and Crop and Mask and Blur'}
 // https://i.stack.imgur.com/CcESX.png - transparent pixel in the mask are removed from the resulting image
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -534,7 +535,7 @@ function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName
 
 {$REGION ' Load and PlaceInto'}
 // If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 function ALLoadFromResourceAndPlaceIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
@@ -575,7 +576,7 @@ function ALLoadFromFileAndPlaceIntoToDrawable(const AFileName: String; const W, 
 
 {$REGION ' Load and PlaceInto and Blur'}
 // If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
@@ -616,7 +617,7 @@ function ALLoadFromFileAndPlaceIntoAndBlurToDrawable(const AFileName: String; co
 
 {$REGION ' Load and Stretch'}
 // Resize the src image to make that width = w and height = h
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndStretchToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndStretchToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 function ALLoadFromResourceAndStretchToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
@@ -657,7 +658,7 @@ function ALLoadFromFileAndStretchToDrawable(const AFileName: String; const W, H:
 
 {$REGION ' Load and Wrap'}
 // Wrap the image inside w and h
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
@@ -698,7 +699,7 @@ function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMod
 
 {$REGION ' Load and NormalizeOrientation'}
 // Normalize the orientation
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndNormalizeOrientationToSkSurface(const AImage: sk_image_t; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 function ALLoadFromStreamAndNormalizeOrientationToSkSurface(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 function ALLoadFromResourceAndNormalizeOrientationToSkSurface(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
@@ -971,7 +972,7 @@ implementation
 
 uses
   system.math,
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   System.Skia,
   FMX.Skia,
   fmx.Skia.Canvas,
@@ -1140,7 +1141,7 @@ end;
 ////////////////////////////////////////////////////////////////////////////////
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -1152,7 +1153,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -1176,7 +1177,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1189,7 +1190,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -1202,7 +1203,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -1231,7 +1232,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1244,7 +1245,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -1641,7 +1642,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -1673,7 +1674,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -1697,7 +1698,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1710,7 +1711,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -1723,7 +1724,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -1752,7 +1753,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1765,7 +1766,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToSkImage(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -2191,7 +2192,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -2242,7 +2243,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -2266,7 +2267,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2279,7 +2280,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectSkSurface(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -2292,7 +2293,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -2321,7 +2322,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkImage(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2334,7 +2335,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectSkImage(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -2861,7 +2862,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -2910,7 +2911,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -2934,7 +2935,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2947,7 +2948,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToCircleSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -2960,7 +2961,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -2989,7 +2990,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3002,7 +3003,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToCircleSkImage(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -3464,7 +3465,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -3511,7 +3512,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -3535,7 +3536,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3548,7 +3549,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -3561,7 +3562,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -3590,7 +3591,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3603,7 +3604,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -4182,7 +4183,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -4246,7 +4247,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -4270,7 +4271,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4283,7 +4284,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -4296,7 +4297,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -4325,7 +4326,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4338,7 +4339,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -4862,7 +4863,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, sk4d_image_get_width(AMask), sk4d_image_get_Height(AMask)).Round;
@@ -4912,7 +4913,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -4936,7 +4937,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4949,7 +4950,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToSkSurface(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -4962,7 +4963,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -4991,7 +4992,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkImage(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5004,7 +5005,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToSkImage(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -5479,7 +5480,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LDestRect := TrectF.Create(0, 0, sk4d_image_get_width(AMask), sk4d_image_get_Height(AMask)).Round;
@@ -5543,7 +5544,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -5567,7 +5568,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5580,7 +5581,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -5593,7 +5594,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -5622,7 +5623,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkImage(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5635,7 +5636,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkImage(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -6171,7 +6172,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -6181,7 +6182,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -6205,7 +6206,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6218,7 +6219,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -6231,7 +6232,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -6260,7 +6261,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6273,7 +6274,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -6664,7 +6665,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -6674,7 +6675,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -6698,7 +6699,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6711,7 +6712,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -6724,7 +6725,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -6753,7 +6754,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6766,7 +6767,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoAndBlurToSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -7157,7 +7158,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndStretchToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -7189,7 +7190,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndStretchToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -7213,7 +7214,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndStretchToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -7226,7 +7227,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndStretchToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -7239,7 +7240,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndStretchToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -7268,7 +7269,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndStretchToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -7281,7 +7282,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndStretchToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -7703,7 +7704,7 @@ begin
 end;
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
   case AWrapMode of
@@ -7717,7 +7718,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -7741,7 +7742,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -7754,7 +7755,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -7767,7 +7768,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -7796,7 +7797,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -7809,7 +7810,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -8212,7 +8213,7 @@ begin
 end;
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndNormalizeOrientationToSkSurface(const AImage: sk_image_t; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
   //No need to care about AExifOrientationInfo with skimage
@@ -8245,7 +8246,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndNormalizeOrientationToSkSurface(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -8269,7 +8270,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndNormalizeOrientationToSkSurface(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -8282,7 +8283,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndNormalizeOrientationToSkSurface(const AFileName: String): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -8295,7 +8296,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndNormalizeOrientationToSkImage(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
@@ -8324,7 +8325,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndNormalizeOrientationToSkImage(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -8337,7 +8338,7 @@ end;
 {$ENDIF}
 
 {*****************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndNormalizeOrientationToSkImage(const AFileName: String): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
@@ -13868,125 +13869,7 @@ begin
 end;
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
-function ALCreateDisplayP3SkColorSpace: sk_colorspace_t;
-begin
-  //Taken from SkColorSpace.h
-  //static constexpr skcms_TransferFunction kSRGB = { 2.4f, (float)(1/1.055), (float)(0.055/1.055), (float)(1/12.92), 0.04045f, 0.0f, 0.0f };
-  var LSkColorSpaceTransferFn: sk_colorspacetransferfn_t;
-  LSkColorSpaceTransferFn.G := 2.4;
-  LSkColorSpaceTransferFn.A := 1/1.055;
-  LSkColorSpaceTransferFn.B := 0.055/1.055;
-  LSkColorSpaceTransferFn.C := 1/12.92;
-  LSkColorSpaceTransferFn.D := 0.04045;
-  LSkColorSpaceTransferFn.E := 0.0;
-  LSkColorSpaceTransferFn.F := 0.0;
-
-  //Taken from SkColorSpace.h
-  //static constexpr skcms_Matrix3x3 kDisplayP3 = {{
-  //    {  0.515102f,   0.291965f,  0.157153f  },
-  //    {  0.241182f,   0.692236f,  0.0665819f },
-  //    { -0.00104941f, 0.0418818f, 0.784378f  },
-  //}};
-  //Taken from SkNDKConversions.h
-  //static constexpr skcms_Matrix3x3 kDCIP3 = {{
-  //        {0.486143, 0.323835, 0.154234},
-  //        {0.226676, 0.710327, 0.0629966},
-  //        {0.000800549, 0.0432385, 0.78275},
-  //}};
-  var LSkColorSpaceXYZ: sk_colorspacexyz_t;
-  LSkColorSpaceXYZ.M_11 := 0.515102;
-  LSkColorSpaceXYZ.M_12 := 0.291965;
-  LSkColorSpaceXYZ.M_13 := 0.157153;
-  LSkColorSpaceXYZ.M_21 := 0.241182;
-  LSkColorSpaceXYZ.M_22 := 0.692236;
-  LSkColorSpaceXYZ.M_23 := 0.0665819;
-  LSkColorSpaceXYZ.M_31 := -0.00104941;
-  LSkColorSpaceXYZ.M_32 := 0.0418818;
-  LSkColorSpaceXYZ.M_33 := 0.784378;
-
-  // Display P3
-  Result := ALSkCheckHandle(sk4d_colorspace_make_rgb(@LSkColorSpaceTransferFn, @LSkColorSpaceXYZ));
-end;
-{$ENDIF}
-
-{*************************}
-{$IF defined(ALSkiaEngine)}
-function ALGetGlobalSkColorSpace: sk_colorspace_t;
-begin
-  if not ALGlobalSkColorSpaceInitialized then begin
-
-    var LSkColorSpace: sk_colorspace_t;
-
-    {$IF defined(ANDROID)}
-
-    if TOSVersion.Check(10, 0) and
-       TAndroidHelper.Display.isWideColorGamut then begin
-      LSKColorSpace := ALCreateDisplayP3SkColorSpace;
-      {$IF defined(debug)}
-      ALLog('GlobalSkColorSpace', 'Display P3');
-      {$ENDIF}
-    end
-    else begin
-      LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
-      {$IF defined(debug)}
-      ALLog('GlobalSkColorSpace', 'sRGB');
-      {$ENDIF}
-    end;
-
-    {$ELSEIF defined(IOS)}
-
-    var LUITraitEnvironment := TUITraitEnvironment.Wrap(NSObjectToId(TiOSHelper.MainScreen));
-    case LUITraitEnvironment.traitCollection.displayGamut of
-      UIDisplayGamutSRGB: begin
-        LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
-        {$IF defined(debug)}
-        ALLog('GlobalSkColorSpace', 'sRGB');
-        {$ENDIF}
-      end;
-      UIDisplayGamutP3: begin
-        LSKColorSpace := ALCreateDisplayP3SkColorSpace;
-        {$IF defined(debug)}
-        ALLog('GlobalSkColorSpace', 'Display P3');
-        {$ENDIF}
-      end;
-      UIDisplayGamutUnspecified: begin
-        LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
-        {$IF defined(debug)}
-        ALLog('GlobalSkColorSpace', 'Unspecified (Default to sRGB)');
-        {$ENDIF}
-      end;
-      else
-        raise Exception.Create('Unknown UITraitEnvironment.displayGamut');
-    end;
-
-    {$ELSEIF defined(ALMacOS)}
-
-    LSkColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
-    {$IF defined(debug)}
-    ALLog('GlobalSkColorSpace', 'sRGB');
-    {$ENDIF}
-
-    {$ELSE}
-
-    LSkColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
-    {$IF defined(debug)}
-    ALLog('GlobalSkColorSpace', 'sRGB');
-    {$ENDIF}
-
-    {$ENDIF}
-
-    if AtomicCmpExchange(ALGlobalSkColorSpace, LSkColorSpace, 0) <> 0 then
-      sk4d_colorspace_unref(LSkColorSpace);
-    ALGlobalSkColorSpaceInitialized := true;
-
-  end;
-  result := ALGlobalSkColorSpace;
-end;
-{$ENDIF}
-
-{*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALGetGlobalSkPaint(const AOpacity: Single): sk_paint_t;
 begin
   {$IF defined(DEBUG)}
@@ -14008,7 +13891,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALSkCheckHandle(const AHandle: sk_handle_t): sk_handle_t;
 begin
   If AHandle = 0 then
@@ -14018,7 +13901,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALSkCheckCanvas(const ACanvas: TCanvas);
 begin
   if not (ACanvas is TSkCanvasCustom) then begin
@@ -14040,7 +13923,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterGetLengthProc(context: Pointer): size_t;
 begin
   Result := TStream(context).Size;
@@ -14048,7 +13931,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterGetPositionProc(context: Pointer): size_t;
 begin
   Result := TStream(context).Position;
@@ -14056,7 +13939,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterReadProc(context: Pointer; buffer: Pointer; size: size_t): size_t;
 begin
   Result := TStream(context).Read(buffer^, size);
@@ -14064,7 +13947,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterSeekProc(context: Pointer; position: size_t): _bool;
 begin
   TStream(context).Position := position;
@@ -14073,7 +13956,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
@@ -14092,7 +13975,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALCreateSkSurface(Const W, H: integer): sk_surface_t;
 begin
 
@@ -14155,7 +14038,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
 begin
   var LWidth := sk4d_pixmap_get_width(APixmap);
@@ -14171,7 +14054,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
@@ -14184,7 +14067,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
@@ -14197,7 +14080,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALUpdateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
 begin
   var LBitmapData: TBitmapData;
@@ -14234,7 +14117,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALUpdateBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
@@ -14247,7 +14130,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALUpdateBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
@@ -14260,25 +14143,42 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALCreateSkImageFromSkSurface(Const ASurface: sk_surface_t): sk_image_t;
 begin
-  Result := ALSkCheckHandle(sk4d_surface_make_image_snapshot(ASurface));
-  if (not ALGlobalUseRasterSkImage) and
-     (not sk4d_image_is_texture_backed(Result)) then begin
+  if (not ALGlobalUseRasterSkImage) then begin
     if not TGrCanvas.Initialized then
       Raise exception.Create('The shared context has not been initialized');
-    Result := ALSkCheckHandle(
-                sk4d_image_make_texture_image(
-                  Result, // const self: sk_image_t;
-                  TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
-                  false)); //is_mipmapped: _bool
+    var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
+    try
+      Result := ALSkCheckHandle(
+                  sk4d_image_make_cross_context(
+                    TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
+                    LPixmap, // const pixmap: sk_pixmap_t;
+                    false, // build_mips,
+                    false)); // limit_to_max_texture_size
+    finally
+      sk4d_pixmap_destroy(LPixmap);
+    end;
+  end
+  else begin
+    Result := ALSkCheckHandle(sk4d_surface_make_image_snapshot(ASurface));
+    //if (not ALGlobalUseRasterSkImage) and
+    //   (not sk4d_image_is_texture_backed(Result)) then begin
+    //  if not TGrCanvas.Initialized then
+    //    Raise exception.Create('The shared context has not been initialized');
+    //  Result := ALSkCheckHandle(
+    //              sk4d_image_make_texture_image(
+    //                Result, // const self: sk_image_t;
+    //                TGrCanvas.SharedContext.GrDirectContext.handle, // context: gr_directcontext_t;
+    //                false)); //is_mipmapped: _bool
+    //end;
   end;
 end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALCreateTextureFromSkSurface(Const ASurface: sk_surface_t): TTexture;
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
@@ -14300,7 +14200,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALCreateTextureFromSkImage(Const AImage: sk_image_t): TTexture;
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
@@ -14322,7 +14222,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALUpdateTextureFromSkPixmap(Const APixmap: sk_pixmap_t; const ATexture: TTexture);
 begin
   {$IF defined(DEBUG)}
@@ -14337,7 +14237,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALUpdateTextureFromSkSurface(Const ASurface: sk_surface_t; const ATexture: TTexture);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
@@ -14350,7 +14250,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 procedure ALUpdateTextureFromSkImage(Const AImage: sk_image_t; const ATexture: TTexture);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
@@ -14363,7 +14263,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
@@ -14381,7 +14281,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
@@ -14397,7 +14297,7 @@ end;
 {$ENDIF}
 
 {*************************}
-{$IF defined(ALSkiaEngine)}
+{$IF defined(ALSkiaAvailable)}
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 begin
   {$IFNDEF ALCompilerVersionSupported120}
@@ -14412,33 +14312,163 @@ begin
 end;
 {$ENDIF}
 
+{*************************}
+{$IF defined(ALSkiaAvailable)}
+function ALCreateDisplayP3SkColorSpace: sk_colorspace_t;
+begin
+  //Taken from SkColorSpace.h
+  //static constexpr skcms_TransferFunction kSRGB = { 2.4f, (float)(1/1.055), (float)(0.055/1.055), (float)(1/12.92), 0.04045f, 0.0f, 0.0f };
+  var LSkColorSpaceTransferFn: sk_colorspacetransferfn_t;
+  LSkColorSpaceTransferFn.G := 2.4;
+  LSkColorSpaceTransferFn.A := 1/1.055;
+  LSkColorSpaceTransferFn.B := 0.055/1.055;
+  LSkColorSpaceTransferFn.C := 1/12.92;
+  LSkColorSpaceTransferFn.D := 0.04045;
+  LSkColorSpaceTransferFn.E := 0.0;
+  LSkColorSpaceTransferFn.F := 0.0;
+
+  //Taken from SkColorSpace.h
+  //static constexpr skcms_Matrix3x3 kDisplayP3 = {{
+  //    {  0.515102f,   0.291965f,  0.157153f  },
+  //    {  0.241182f,   0.692236f,  0.0665819f },
+  //    { -0.00104941f, 0.0418818f, 0.784378f  },
+  //}};
+  //Taken from SkNDKConversions.h
+  //static constexpr skcms_Matrix3x3 kDCIP3 = {{
+  //        {0.486143, 0.323835, 0.154234},
+  //        {0.226676, 0.710327, 0.0629966},
+  //        {0.000800549, 0.0432385, 0.78275},
+  //}};
+  var LSkColorSpaceXYZ: sk_colorspacexyz_t;
+  LSkColorSpaceXYZ.M_11 := 0.515102;
+  LSkColorSpaceXYZ.M_12 := 0.291965;
+  LSkColorSpaceXYZ.M_13 := 0.157153;
+  LSkColorSpaceXYZ.M_21 := 0.241182;
+  LSkColorSpaceXYZ.M_22 := 0.692236;
+  LSkColorSpaceXYZ.M_23 := 0.0665819;
+  LSkColorSpaceXYZ.M_31 := -0.00104941;
+  LSkColorSpaceXYZ.M_32 := 0.0418818;
+  LSkColorSpaceXYZ.M_33 := 0.784378;
+
+  // Display P3
+  Result := ALSkCheckHandle(sk4d_colorspace_make_rgb(@LSkColorSpaceTransferFn, @LSkColorSpaceXYZ));
+end;
+{$ENDIF}
+
+{*************************}
+{$IF defined(ALSkiaAvailable)}
+function ALGetGlobalSkColorSpace: sk_colorspace_t;
+begin
+  if not ALGlobalSkColorSpaceInitialized then begin
+
+    // https://stackoverflow.com/questions/79021609/handling-mixed-color-spaces-drawing-srgb-and-display-p3-images-correctly-in-and
+    // It seems that the OS automatically converts sRGB colors to their Display P3 equivalents (e.g., #FF0000 becomes #EA3323)
+    // when rendering the surface on the screen. However, in the IDE, such as in the Object Inspector, all colors are specified
+    // in sRGB (e.g., red is #FF0000, not its Display P3 equivalent #EA3323), which creates an issue! If I decode an image with
+    // an sRGB color profile, red #FF0000 will be converted to #EA3323, and when it’s displayed on the screen, #EA3323 will
+    // be converted to #D84532, which is not the desired outcome! There may be a way to prevent the OS from converting sRGB or
+    // Display P3 colors, but there’s no way to apply this selectively to parts of the screen. As a result, the entire app must
+    // either define colors in Display P3 or stick with sRGB :(
+
+    var LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+
+    //var LSkColorSpace: sk_colorspace_t;
+    //
+    //{$IF defined(ANDROID)}
+    //
+    //if TOSVersion.Check(10, 0) and
+    //   TAndroidHelper.Display.isWideColorGamut then begin
+    //  LSKColorSpace := ALCreateDisplayP3SkColorSpace;
+    //  {$IF defined(debug)}
+    //  ALLog('GlobalSkColorSpace', 'Display P3');
+    //  {$ENDIF}
+    //end
+    //else begin
+    //  LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+    //  {$IF defined(debug)}
+    //  ALLog('GlobalSkColorSpace', 'sRGB');
+    //  {$ENDIF}
+    //end;
+    //
+    //{$ELSEIF defined(IOS)}
+    //
+    //var LUITraitEnvironment := TUITraitEnvironment.Wrap(NSObjectToId(TiOSHelper.MainScreen));
+    //case LUITraitEnvironment.traitCollection.displayGamut of
+    //  UIDisplayGamutSRGB: begin
+    //    LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+    //    {$IF defined(debug)}
+    //    ALLog('GlobalSkColorSpace', 'sRGB');
+    //    {$ENDIF}
+    //  end;
+    //  UIDisplayGamutP3: begin
+    //    LSKColorSpace := ALCreateDisplayP3SkColorSpace;
+    //    {$IF defined(debug)}
+    //    ALLog('GlobalSkColorSpace', 'Display P3');
+    //    {$ENDIF}
+    //  end;
+    //  UIDisplayGamutUnspecified: begin
+    //    LSKColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+    //    {$IF defined(debug)}
+    //    ALLog('GlobalSkColorSpace', 'Unspecified (Default to sRGB)');
+    //    {$ENDIF}
+    //  end;
+    //  else
+    //    raise Exception.Create('Unknown UITraitEnvironment.displayGamut');
+    //end;
+    //
+    //{$ELSEIF defined(ALMacOS)}
+    //
+    //LSkColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+    //{$IF defined(debug)}
+    //ALLog('GlobalSkColorSpace', 'sRGB');
+    //{$ENDIF}
+    //
+    //{$ELSE}
+    //
+    //LSkColorSpace := ALSkCheckHandle(sk4d_colorspace_make_srgb);
+    //{$IF defined(debug)}
+    //ALLog('GlobalSkColorSpace', 'sRGB');
+    //{$ENDIF}
+    //
+    //{$ENDIF}
+
+    if AtomicCmpExchange(ALGlobalSkColorSpace, LSkColorSpace, 0) <> 0 then sk4d_colorspace_unref(LSkColorSpace);
+    ALGlobalSkColorSpaceInitialized := true;
+
+  end;
+  result := ALGlobalSkColorSpace;
+end;
+{$ENDIF}
+
 {****************}
 {$IF defined(ANDROID)}
 function ALGetGlobalJColorSpace: JColorSpace;
 begin
   if not ALGlobalJColorSpaceInitialized then begin
-    if TOSVersion.Check(10, 0) then begin
-      var LColorSpace := TAndroidHelper.Display.getPreferredWideGamutColorSpace;
-      if LColorSpace <> nil then begin
-        if AtomicCmpExchange(Pointer(ALGlobalJColorSpace), Pointer(LColorSpace), nil) <> nil then
-          LColorSpace := nil
-        else begin
-          ALGlobalJColorSpace._AddRef;
-          {$IF defined(debug)}
-          ALLog('GlobalJColorSpace', JStringToString(ALGlobalJColorSpace.getName));
-          {$ENDIF}
-        end;
-      end
-      else begin
-        ALGlobalJColorSpace := nil;
-        {$IF defined(debug)}
-        ALLog('GlobalJColorSpace', 'nil');
-        {$ENDIF}
-      end;
-    end
-    else
-      ALGlobalJColorSpace := nil;
+
+    // https://stackoverflow.com/questions/79021609/handling-mixed-color-spaces-drawing-srgb-and-display-p3-images-correctly-in-and
+    // It seems that the OS automatically converts sRGB colors to their Display P3 equivalents (e.g., #FF0000 becomes #EA3323)
+    // when rendering the surface on the screen. However, in the IDE, such as in the Object Inspector, all colors are specified
+    // in sRGB (e.g., red is #FF0000, not its Display P3 equivalent #EA3323), which creates an issue! If I decode an image with
+    // an sRGB color profile, red #FF0000 will be converted to #EA3323, and when it’s displayed on the screen, #EA3323 will
+    // be converted to #D84532, which is not the desired outcome! There may be a way to prevent the OS from converting sRGB or
+    // Display P3 colors, but there’s no way to apply this selectively to parts of the screen. As a result, the entire app must
+    // either define colors in Display P3 or stick with sRGB :(
+
+    var LColorSpace := TJColorSpace.JavaClass.get(TJColorSpace_Named.JavaClass.SRGB);
+
+    //var LColorSpace: JColorSpace.;
+    //if TOSVersion.Check(10, 0) then LColorSpace := TAndroidHelper.Display.getPreferredWideGamutColorSpace;
+    //if LColorSpace = nil then LColorSpace := TJColorSpace.JavaClass.get(TJColorSpace_Named.JavaClass.SRGB);
+
+    if LColorSpace = nil then raise Exception.Create('Failed to create JColorSpace');
+    if AtomicCmpExchange(Pointer(ALGlobalJColorSpace), Pointer(LColorSpace), nil) <> nil then LColorSpace := nil
+    else ALGlobalJColorSpace._AddRef;
     ALGlobalJColorSpaceInitialized := true;
+    {$IF defined(debug)}
+    ALLog('GlobalJColorSpace', JStringToString(ALGlobalJColorSpace.getName));
+    {$ENDIF}
+
   end;
   result := ALGlobalJColorSpace;
 end;
@@ -14448,12 +14478,61 @@ end;
 {$IF defined(ALAppleOS)}
 function ALGetGlobalCGColorSpace: CGColorSpaceRef;
 begin
-  if ALGlobalCGColorSpace = nil then begin
+  if not ALGlobalCGColorSpaceInitialized then begin
+
+    // https://stackoverflow.com/questions/79021609/handling-mixed-color-spaces-drawing-srgb-and-display-p3-images-correctly-in-and
+    // https://stackoverflow.com/questions/79019697/why-does-using-cgcolorspacecreatewithnamekcgcolorspacedisplayp3-in-cgbitmapcon
+    // It seems that the OS automatically converts sRGB colors to their Display P3 equivalents (e.g., #FF0000 becomes #EA3323)
+    // when rendering the surface on the screen. However, in the IDE, such as in the Object Inspector, all colors are specified
+    // in sRGB (e.g., red is #FF0000, not its Display P3 equivalent #EA3323), which creates an issue! If I decode an image with
+    // an sRGB color profile, red #FF0000 will be converted to #EA3323, and when it’s displayed on the screen, #EA3323 will
+    // be converted to #D84532, which is not the desired outcome! There may be a way to prevent the OS from converting sRGB or
+    // Display P3 colors, but there’s no way to apply this selectively to parts of the screen. As a result, the entire app must
+    // either define colors in Display P3 or stick with sRGB :(
+
     var LCGColorSpace := CGColorSpaceCreateDeviceRGB;
-    if LCGColorSpace = nil then
-      raise Exception.Create('Failed to create CGColorSpace using DeviceRGB');
-    if AtomicCmpExchange(ALGlobalCGColorSpace, LCGColorSpace, nil) <> nil then
-      CGColorSpaceRelease(LCGColorSpace);
+
+    //var LCGColorSpace: CGColorSpaceRef;
+    //
+    //{$IF defined(IOS)}
+    //
+    //var LUITraitEnvironment := TUITraitEnvironment.Wrap(NSObjectToId(TiOSHelper.MainScreen));
+    //case LUITraitEnvironment.traitCollection.displayGamut of
+    //  UIDisplayGamutSRGB: begin
+    //    LCGColorSpace := CGColorSpaceCreateDeviceRGB;
+    //    {$IF defined(debug)}
+    //    ALLog('ALGetGlobalCGColorSpace', 'sRGB');
+    //    {$ENDIF}
+    //  end;
+    //  UIDisplayGamutP3: begin
+    //    LCGColorSpace := CGColorSpaceCreateWithName(CFStringRef(CocoaObjectIdConst(libCoreGraphics, 'kCGColorSpaceDisplayP3')));
+    //    {$IF defined(debug)}
+    //    ALLog('ALGetGlobalCGColorSpace', 'Display P3');
+    //    {$ENDIF}
+    //  end;
+    //  UIDisplayGamutUnspecified: begin
+    //    LCGColorSpace := CGColorSpaceCreateDeviceRGB;
+    //    {$IF defined(debug)}
+    //    ALLog('ALGetGlobalCGColorSpace', 'Unspecified (Default to sRGB)');
+    //    {$ENDIF}
+    //  end;
+    //  else
+    //    raise Exception.Create('Unknown UITraitEnvironment.displayGamut');
+    //end;
+    //
+    //{$ELSE}
+    //
+    //LCGColorSpace := CGColorSpaceCreateDeviceRGB;
+    //{$IF defined(debug)}
+    //ALLog('ALGetGlobalCGColorSpace', 'sRGB');
+    //{$ENDIF}
+    //
+    //{$ENDIF}
+
+    if LCGColorSpace = nil then raise Exception.Create('Failed to create CGColorSpace');
+    if AtomicCmpExchange(ALGlobalCGColorSpace, LCGColorSpace, nil) <> nil then CGColorSpaceRelease(LCGColorSpace);
+    ALGlobalCGColorSpaceInitialized := True;
+
   end;
   result := ALGlobalCGColorSpace;
 end;
@@ -14751,7 +14830,7 @@ begin
 end;
 
 initialization
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   ALGlobalUseRasterSkSurface := True;
   ALGlobalUseRasterSkImage := True;
   ALGlobalSkColorSpace := 0;
@@ -14764,13 +14843,14 @@ initialization
   {$ENDIF}
   {$IF defined(ALAppleOS)}
   ALGlobalCGColorSpace := nil;
+  ALGlobalCGColorSpaceInitialized := False;
   {$ENDIF}
   TALGraphicThreadPool.FInstance := nil;
   TALGraphicThreadPool.CreateInstanceFunc := @TALGraphicThreadPool.CreateInstance;
 
 finalization
   ALFreeAndNil(TALGraphicThreadPool.FInstance);
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   if ALGlobalSkColorSpace <> 0 then begin
     sk4d_colorspace_unref(ALGlobalSkColorSpace);
     ALGlobalSkColorSpace := 0;

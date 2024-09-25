@@ -244,6 +244,7 @@ begin
       SupportingTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
@@ -310,6 +311,7 @@ begin
       SupportingTextSettings.Font.Color := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
@@ -374,6 +376,7 @@ begin
       SupportingTextSettings.Font.Color := $FF465a69;
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FF465a69;
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
@@ -429,6 +432,7 @@ begin
       SupportingTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
@@ -495,6 +499,7 @@ begin
       SupportingTextSettings.Font.Color := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
@@ -562,6 +567,7 @@ begin
       SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
@@ -628,6 +634,7 @@ begin
       SupportingTextSettings.Font.Color := $FFB3261E; // md.sys.color.error / md.ref.palette.error40
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FF49454F; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant30
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
@@ -689,6 +696,7 @@ begin
       SupportingTextSettings.Font.Color := $FFc80a28;
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FF465a69;
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);
@@ -741,6 +749,7 @@ begin
       SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Fill.Assign(Fill);
@@ -807,6 +816,7 @@ begin
       SupportingTextSettings.Font.Color := $FFF2B8B5; // md.sys.color.error / md.ref.palette.error80
       SupportingTextSettings.Margins.Rect := TRectF.Create(0,4*LRatio,0,0).RoundTo(-2);
       PromptTextcolor := $FFCAC4D0; // md.sys.color.on-surface-variant / md.ref.palette.neutral-variant80
+      StateStyles.Transition.Duration := 0.2;
       //--Disabled--
       StateStyles.Disabled.Opacity := 1;
       StateStyles.Disabled.Stroke.assign(Stroke);

@@ -26,7 +26,7 @@ uses
   FMX.TextLayout.GPU,
   FMX.types3D,
   {$ENDIF}
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   System.Skia.API,
   {$ENDIF}
   FMX.controls,
@@ -241,13 +241,13 @@ type
       end;
   private
     fAnimation: TAnimation;
-    {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaAvailable)}
       fSkottieAnimation: sk_skottieanimation_t;
       fAnimcodecplayer: sk_animcodecplayer_t;
       FRenderRect: TRectF;
       {$IF not defined(ALSkiaCanvas)}
-        FBufSurface: TALSurface;
-        FBufCanvas: TALCanvas;
+        FBufSurface: sk_surface_t;
+        FBufCanvas: sk_canvas_t;
         {$IF defined(ALGPUCanvas)}
         FbufTexture: TALTexture;
         {$ELSE}
@@ -933,7 +933,7 @@ uses
   system.Math,
   system.Math.Vectors,
   FMX.platform,
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   FMX.Skia,
   FMX.Skia.Canvas,
   {$ENDIF}
@@ -1499,13 +1499,13 @@ constructor TALAnimatedImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   fAnimation := TAnimation.create(Self);
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
     fSkottieAnimation := 0;
     fAnimcodecplayer := 0;
     //FRenderRect := TrectF.Empty;
     {$IF not defined(ALSkiaCanvas)}
-      FBufSurface := ALNullSurface;
-      FBufCanvas := ALNullCanvas;
+      FBufSurface := 0;
+      FBufCanvas := 0;
       {$IF defined(ALGPUCanvas)}
       FbufTexture := nil;
       {$ELSE}
@@ -1532,7 +1532,7 @@ end;
 {*************************************}
 procedure TALAnimatedImage.CreateCodec;
 begin
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
 
   if //--- Do not create Codec if the size is 0
      (Size.Size.IsZero) or
@@ -1651,12 +1651,10 @@ begin
   var LBufRect: Trect;
   if fSkottieAnimation <> 0 then LBufRect := TRectf.Create(0,0,FRenderRect.width * ALGetScreenScale, FRenderRect.height * ALGetScreenScale).Round
   else LBufRect := TRect.Create(0,0,Round(LSize.width), round(LSize.height));
-  ALCreateSurface(
-    FBufSurface, // out ASurface: TALSurface;
-    FbufCanvas, // out ACanvas: TALCanvas;
-    LBufRect.width, // const w: Single;
-    LBufRect.height, // const h: Single);
-    false); // const AAddPixelForAlignment: Boolean = true
+  FBufSurface := ALCreateSkSurface(
+                   ALCeil(LBufRect.width, TEpsilon.Position),
+                   ALCeil(LBufRect.height, TEpsilon.Position));
+  FbufCanvas := ALSkCheckHandle(sk4d_surface_get_canvas(FBufSurface));
   {$IF defined(ALGPUCanvas)}
   FbufTexture := TALTexture.Create;
   FbufTexture.Style := [TTextureStyle.Dynamic, TTextureStyle.Volatile];
@@ -1690,7 +1688,7 @@ end;
 {**************************************}
 procedure TALAnimatedImage.ReleaseCodec;
 begin
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
     if fSkottieAnimation <> 0 then begin
       sk4d_skottieanimation_unref(fSkottieAnimation);
       fSkottieAnimation := 0;
@@ -1701,7 +1699,11 @@ begin
     end;
     FAnimation.SetDuration(0.0);
     {$IF (not defined(ALSkiaCanvas))}
-      ALFreeAndNilSurface(FBufSurface, FBufCanvas);
+      FBufCanvas := 0; // ACanvas is linked inside ASurface
+      if FBufSurface <> 0 then begin
+        sk4d_refcnt_unref(FBufSurface);
+        FBufSurface := 0;
+      end;
       {$IF defined(ALGPUCanvas)}
       ALFreeAndNil(FbufTexture);
       {$ELSE}
@@ -1731,7 +1733,7 @@ begin
 
   CreateCodec;
 
-  {$IF defined(ALSkiaEngine)}
+  {$IF defined(ALSkiaAvailable)}
   if fSkottieAnimation <> 0 then begin
     sk4d_skottieanimation_seek_frame_time(fSkottieAnimation, fAnimation.CurrentTime);
     {$IF defined(ALSkiaCanvas)}
@@ -1809,13 +1811,16 @@ begin
     {$ENDIF}
   end;
   {$ELSE}
-  Raise Exception.create('''
-    The Skia Engine is required to use AnimatedImage.
-    First, enable Skia for the project. Then, if you prefer not to
-    use a Skia canvas for the main form, go to the project options
-    and replace the "SKIA" definition with "ALSkiaEngine." Additionally,
-    add the line "GlobalUseSkia := False" to the DPR file.
-  ''');
+  ALLog(
+    'TALAnimatedImage.Paint',
+    '''
+      The Skia Engine is required to use AnimatedImage.
+      First, enable Skia for the project. Then, if you prefer not to
+      use a Skia canvas for the main form, go to the project options
+      and replace the "SKIA" definition with "ALSkiaAvailable." Additionally,
+      add the line "GlobalUseSkia := False" to the DPR file.
+    ''',
+    TALLogType.ERROR);
   {$ENDIF}
 
 end;
@@ -2137,8 +2142,10 @@ begin
       YRadius); // const YRadius: Single = 0);
     {$ELSE}
     {$IF defined(DEBUG)}
-    if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
+    if not doublebuffered then begin
+      ALLog('TALBaseRectangle.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end;
     {$ENDIF}
     If Fill.Styles = [TALBrushStyle.Solid] then begin
       Canvas.Fill.kind := TBrushKind.solid;
@@ -2385,8 +2392,10 @@ begin
       Shadow); // const Shadow: TALShadow
     {$ELSE}
     {$IF defined(DEBUG)}
-    if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
+    if not doublebuffered then begin
+      ALLog('TALCircle.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end;
     {$ENDIF}
     {$ENDIF}
     exit;
@@ -3215,8 +3224,10 @@ begin
       Shadow); // const AShadow: TALShadow);
     {$ELSE}
     {$IF defined(DEBUG)}
-    if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.');
+    if not doublebuffered then begin
+      ALLog('TALBaseText.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end;
     {$ENDIF}
     {$ENDIF}
     exit;

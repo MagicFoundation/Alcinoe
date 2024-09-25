@@ -117,7 +117,7 @@ type
     fMaxLength: integer;
     fPromptTextColor: TalphaColor;
   protected
-    procedure DoChangeTracking; override;
+    procedure DoChange; override;
     Function CreateNativeView: TALIosNativeView; override;
     function GetNativeView: TALIosMemoTextView; reintroduce; virtual;
     function GetKeyboardType: TVirtualKeyboardType; override;
@@ -256,7 +256,7 @@ type
     fPromptTextColor: TalphaColor;
     fTintColor: TalphaColor;
   protected
-    procedure DoChangeTracking; override;
+    procedure DoChange; override;
     Function CreateNativeView: TALMacNativeView; override;
     function GetNativeView: TALMacMemoScrollView; reintroduce; virtual;
     function GetKeyboardType: TVirtualKeyboardType; override;
@@ -544,7 +544,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosMemoTextViewDelegate.textViewDidChange', TalLogType.VERBOSE);
   {$ENDIF}
-  fMemoControl.DoChangeTracking;
+  fMemoControl.DoChange;
 end;
 
 {********************************************************************************}
@@ -784,7 +784,7 @@ begin
 end;
 
 {********************************************}
-procedure TALIosMemoControl.DoChangeTracking;
+procedure TALIosMemoControl.DoChange;
 begin
   FPlaceholderLabel.setHidden((not Text.IsEmpty) or (PromptText.IsEmpty));
   inherited;
@@ -1060,7 +1060,7 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacMemoTextViewDelegate.textDidChange', TalLogType.VERBOSE);
   {$ENDIF}
-  fMemoControl.DoChangeTracking;
+  fMemoControl.DoChange;
 end;
 
 {*******************************************************************************}
@@ -1278,7 +1278,7 @@ begin
 end;
 
 {********************************************}
-procedure TALMacMemoControl.DoChangeTracking;
+procedure TALMacMemoControl.DoChange;
 begin
   FPlaceholderLabel.view.setHidden((not Text.IsEmpty) or (PromptText.IsEmpty));
   inherited;

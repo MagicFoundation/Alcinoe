@@ -641,7 +641,7 @@ begin
     if (ANotification.FLargeIconStream <> nil) and (ANotification.FLargeIconStream.Size > 0)  then begin
       try
 
-        LLargeIconBitmap := ALFitIntoAndCropImageV2(
+        LLargeIconBitmap := ALLoadStreamAndFitIntoAndCropToSurface(
                               ANotification.FLargeIconStream,
                               function(const aOriginalSize: TPointF): TpointF
                               begin

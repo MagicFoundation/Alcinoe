@@ -307,6 +307,12 @@ type
     function IsStretchStored: Boolean;
     function IsColorStored: Boolean;
     function IsAutoConvertStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadStyleExt(AStream: TStream);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
   protected
     procedure AssignTo(Dest: TPersistent); override;
   public
@@ -441,6 +447,13 @@ type
     function IsLineHeightMultiplierStored: Boolean;
     function IsLetterSpacingStored: Boolean;
     function IsIsHtmlStored: Boolean;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadFontColor(Reader: TReader);
+    procedure ReadWordWrap(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
   protected
     procedure AssignTo(Dest: TPersistent); override;
   public
@@ -947,8 +960,14 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~}
   TALFontManager = class
+  {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
+  private
+    class var FCustomTypeFaces: TDictionary<String, JTypeFace>;
   public
-    class procedure RegisterTypefaceFromResource(const AResourceName: string); static;
+    class function GetCustomTypeFace(const AFamilyName: string): JTypeFace; static;
+  {$ENDIF}
+  public
+    class procedure RegisterTypefaceFromResource(const AResourceName: string; const AFamilyName: string); static;
   end;
 
 type
@@ -1677,6 +1696,27 @@ begin
   FAutoConvert := FDefaultAutoConvert;
 end;
 
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALFont.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineBinaryProperty('StyleExt', ReadStyleExt, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALFont.ReadStyleExt(AStream: TStream);
+begin
+  var LFontStyles: TFontStyles; // fsBold, fsItalic, fsUnderline, fsStrikeOut
+  AStream.Read(LFontStyles, SizeOf(TFontStyles));
+  AStream.Read(FWeight, SizeOf(TFontWeight)); // fsBold
+  AStream.Read(FSlant, SizeOf(TFontSlant)); // fsItalic
+  AStream.Read(FStretch, SizeOf(TFontStretch));
+end;
+{$ENDIF}
+
 {********************************************}
 procedure TALFont.AssignTo(Dest: TPersistent);
 begin
@@ -1768,6 +1808,7 @@ begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
+      AutoConvert := ATo.AutoConvert;
       Family := ATo.Family;
       Size := InterpolateSingle(Size{Start}, ATo.Size{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
@@ -1776,10 +1817,11 @@ begin
       //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(ATo.Stretch), ANormalizedTime)));
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
-      AutoConvert := ATo.AutoConvert;
     end
     else begin
-      Family := DefaultFamily;
+      AutoConvert := DefaultAutoConvert;
+      if AutoConvert then Family := ALConvertFontFamily(DefaultFamily)
+      else Family := DefaultFamily;
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
       Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(DefaultWeight), ANormalizedTime)));
@@ -1787,7 +1829,6 @@ begin
       //TFontStretch = (UltraCondensed, ExtraCondensed, Condensed, SemiCondensed, Regular, SemiExpanded, Expanded, ExtraExpanded, UltraExpanded)
       Stretch := TFontStretch(round(InterpolateSingle(integer(Stretch), integer(DefaultStretch), ANormalizedTime)));
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
-      AutoConvert := DefaultAutoConvert;
     end;
   finally
     EndUpdate;
@@ -2278,6 +2319,33 @@ begin
   ALFreeAndNil(FEllipsisSettings);
   inherited Destroy;
 end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBaseTextSettings.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('FontColor', ReadFontColor{ReadData}, nil{WriteData}, false{hasdata});
+  Filer.DefineProperty('WordWrap', ReadWordWrap{ReadData}, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBaseTextSettings.ReadFontColor(Reader: TReader);
+begin
+  Var LColor: Integer;
+  if IdentToAlphaColor(Reader.ReadIdent, Lcolor) then Font.Color := LColor;
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBaseTextSettings.ReadWordWrap(Reader: TReader);
+begin
+  if not Reader.ReadBoolean then MaxLines := 1;
+end;
+{$ENDIF}
 
 {********************************************************}
 procedure TALBaseTextSettings.AssignTo(Dest: TPersistent);
@@ -4754,7 +4822,7 @@ begin
 end;
 
 {***************************************************************************************}
-class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName: string);
+class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName: string; const AFamilyName: string);
 begin
 
   {$IF defined(ALSkiaEngine)}
@@ -4766,7 +4834,24 @@ begin
   end;
   {$ENDIF}
 
-  {$IF not defined(ALSkiaEngine) and (defined(AppleOS))}
+  {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
+  var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
+  try
+    Var LfileName := TPath.GetTempFileName;
+    Lstream.SaveToFile(LfileName);
+    try
+      var LtypeFace := TJtypeFace.JavaClass.createFromFile(StringToJstring(Lfilename));
+      If LtypeFace = nil then raise Exception.CreateFmt('Failed to create Typeface from the resource: %s', [AResourceName]);
+      FCustomTypefaces.Add(AFamilyName.ToLower, LtypeFace);
+    finally
+      TFile.Delete(LfileName);
+    end;
+  finally
+    ALfreeandNil(LStream);
+  end;
+  {$ENDIF}
+
+  {$IF (not defined(ALSkiaEngine)) and (defined(ALAppleOS))}
   var LStream := TResourceStream.Create(HInstance, AResourceName, RT_RCDATA);
   try
     var LDataProviderRef := CGDataProviderCreateWithData(nil, LStream.Memory, LStream.Size, nil);
@@ -4798,6 +4883,14 @@ begin
   {$ENDIF}
 
 end;
+
+{****************************************************}
+{$IF (not defined(ALSkiaEngine)) and (defined(Android))}
+class function TALFontManager.GetCustomTypeFace(const AFamilyName: string): JTypeFace;
+begin
+  if not FCustomTypefaces.TryGetValue(AFamilyName.ToLower, Result) then result := Nil;
+end;
+{$ENDIF}
 
 {********************************************************************}
 function ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
@@ -4923,7 +5016,7 @@ begin
                      TFontWeight.UltraBlack] then LFontStyles := LFontStyles + [TFontStyle.fsBold];
   if AFontSlant in [TFontSlant.Italic, TFontSlant.Oblique] then LFontStyles := LFontStyles + [TFontStyle.fsItalic];
   var LTypeface := TJTypeface.JavaClass.create(StringToJString(LFontFamily), ALfontStyleToAndroidStyle(LFontStyles));
-  if TOSVersion.Check(28, 0) then begin
+  if TOSVersion.Check(9, 0) then begin
     var LfontWeightInt: Integer;
     case AFontWeight of
       TFontWeight.Thin: LfontWeightInt := 100; //	Thin;
@@ -5690,8 +5783,14 @@ initialization
   {$ENDIF}
   ALFontMetricsCache := TDictionary<TALFontMetricsKey, TALFontMetrics>.Create;
   //ALFontMetricsCacheLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
+  {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
+  TALFontManager.FCustomTypeFaces := TDictionary<String, JTypeFace>.Create;
+  {$ENDIF}
 
 finalization
   AlFreeAndNil(ALFontMetricsCache);
+  {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
+  ALFreeAndNil(TALFontManager.FCustomTypeFaces);
+  {$ENDIF}
 
 end.

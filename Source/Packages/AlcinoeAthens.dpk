@@ -38,6 +38,7 @@ requires
   Skia.Package.FMX;
 
 contains
+  Alcinoe.FMX.Materials.Canvas in 'Alcinoe.FMX.Materials.Canvas.pas',
   Alcinoe.FMX.Layouts in 'Alcinoe.FMX.Layouts.pas',
   Alcinoe.FMX.Objects in 'Alcinoe.FMX.Objects.pas',
   Alcinoe.FMX.StdCtrls in 'Alcinoe.FMX.StdCtrls.pas',

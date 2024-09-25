@@ -340,7 +340,6 @@ type
     function IsXRadiusStored: Boolean;
     function IsYRadiusStored: Boolean;
   protected
-    function GetIsPixelAlignmentEnabled: Boolean; override;
     function CreateStateStyles: TStateStyles; virtual;
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
@@ -639,7 +638,6 @@ type
         function IsXRadiusStored: Boolean;
         function IsYRadiusStored: Boolean;
       protected
-        function GetIsPixelAlignmentEnabled: Boolean; override;
         function GetDefaultSize: TSizeF; override;
         function GetDoubleBuffered: boolean;
         procedure SetDoubleBuffered(const AValue: Boolean);
@@ -1066,7 +1064,6 @@ type
     function GetTextSettings: TTextSettings;
     procedure SetStateStyles(const AValue: TStateStyles);
   protected
-    function GetIsPixelAlignmentEnabled: Boolean; override;
     function CreateTextSettings: TALBaseTextSettings; override;
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
     procedure SetName(const Value: TComponentName); override;
@@ -1520,7 +1517,6 @@ type
       protected
         procedure DoBeginUpdate; override;
         procedure DoEndUpdate; override;
-        function GetIsPixelAlignmentEnabled: Boolean; override;
         procedure SetXRadius(const Value: Single); override;
         procedure SetYRadius(const Value: Single); override;
         procedure StateStylesChanged(Sender: TObject); virtual;
@@ -2638,13 +2634,6 @@ begin
 end;
 
 {****************************************}
-function TALCustomTrack.TThumb.GetIsPixelAlignmentEnabled: Boolean;
-begin
-  result := (inherited GetIsPixelAlignmentEnabled) and
-            (not StateStyles.IsTransitionAnimationRunning)
-end;
-
-{****************************************}
 function TALCustomTrack.TThumb.GetValue: Double;
 begin
   Result := FValueRange.Value;
@@ -2905,9 +2894,6 @@ end;
 {**********************************}
 procedure TALCustomTrack.TThumb.MakeBufDrawable;
 begin
-  //--- Do not create BufDrawable if we are in the middle of a transition
-  if StateStyles.IsTransitionAnimationRunning then
-    exit;
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
     clearBufDrawable;
@@ -3108,8 +3094,10 @@ begin
     end
 
     {$IF defined(DEBUG)}
-    else if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.')
+    else if not doublebuffered then begin
+      ALLog('TALCustomTrack.TThumb.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end
     {$ENDIF};
 
     {$ENDIF}
@@ -4297,9 +4285,11 @@ begin
     {$ELSE}
 
     {$IF defined(DEBUG)}
-    if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.')
-    {$ENDIF};
+    if not doublebuffered then begin
+      ALLog('TALCustomTrack.TTrack.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end;
+    {$ENDIF}
 
     {$ENDIF}
 
@@ -6396,13 +6386,6 @@ begin
   end;
 end;
 
-{****************************************}
-function TALBaseCheckBox.GetIsPixelAlignmentEnabled: Boolean;
-begin
-  result := (inherited GetIsPixelAlignmentEnabled) and
-            (not StateStyles.IsTransitionAnimationRunning)
-end;
-
 {*******************************************************}
 function TALBaseCheckBox.CreateStateStyles: TStateStyles;
 begin
@@ -6652,9 +6635,6 @@ procedure TALBaseCheckBox.MakeBufDrawable;
   end;
 
 begin
-  //--- Do not create BufDrawable if we are in the middle of a transition
-  if StateStyles.IsTransitionAnimationRunning then
-    exit;
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
     clearBufDrawable;
@@ -7168,8 +7148,10 @@ begin
     end
 
     {$IF defined(DEBUG)}
-    else if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.')
+    else if not doublebuffered then begin
+      ALLog('TALBaseCheckBox.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end
     {$ENDIF};
 
     {$ENDIF}
@@ -7815,13 +7797,6 @@ begin
   end;
 end;
 
-{****************************************}
-function TALSwitch.TTrack.GetIsPixelAlignmentEnabled: Boolean;
-begin
-  result := (inherited GetIsPixelAlignmentEnabled) and
-            (not StateStyles.IsTransitionAnimationRunning)
-end;
-
 {***********************************************}
 function TALSwitch.TTrack.GetDefaultSize: TSizeF;
 begin
@@ -8032,9 +8007,6 @@ procedure TALSwitch.TTrack.MakeBufDrawable;
   end;
 
 begin
-  //--- Do not create BufDrawable if we are in the middle of a transition
-  if StateStyles.IsTransitionAnimationRunning then
-    exit;
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
     clearBufDrawable;
@@ -8299,8 +8271,10 @@ begin
     end
 
     {$IF defined(DEBUG)}
-    else if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.')
+    else if not doublebuffered then begin
+      ALLog('TALSwitch.TTrack.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end
     {$ENDIF};
 
     {$ENDIF}
@@ -9228,13 +9202,6 @@ begin
   end;
 end;
 
-{****************************************}
-function TALButton.GetIsPixelAlignmentEnabled: Boolean;
-begin
-  result := (inherited GetIsPixelAlignmentEnabled) and
-            (not StateStyles.IsTransitionAnimationRunning)
-end;
-
 {*********************************************************}
 function TALButton.CreateTextSettings: TALBaseTextSettings;
 begin
@@ -9439,9 +9406,6 @@ end;
 {**********************************}
 procedure TALButton.MakeBufDrawable;
 begin
-  //--- Do not create BufDrawable if we are in the middle of a transition
-  if StateStyles.IsTransitionAnimationRunning then
-    exit;
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
     clearBufDrawable;
@@ -9678,8 +9642,10 @@ begin
     end
 
     {$IF defined(DEBUG)}
-    else if not doublebuffered then
-      raise Exception.Create('Controls that are not double-buffered only work when SKIA is enabled.')
+    else if not doublebuffered then begin
+      ALLog('TALButton.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end
     {$ENDIF};
 
     {$ENDIF}

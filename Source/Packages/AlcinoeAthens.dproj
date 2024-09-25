@@ -248,6 +248,7 @@
         <DCCReference Include="DesignIDE.dcp"/>
         <DCCReference Include="Skia.Package.RTL.dcp"/>
         <DCCReference Include="Skia.Package.FMX.dcp"/>
+        <DCCReference Include="Alcinoe.FMX.Materials.Canvas.pas"/>
         <DCCReference Include="Alcinoe.FMX.Layouts.pas"/>
         <DCCReference Include="Alcinoe.FMX.Objects.pas"/>
         <DCCReference Include="Alcinoe.FMX.StdCtrls.pas"/>

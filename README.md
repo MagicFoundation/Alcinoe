@@ -124,7 +124,6 @@ please follow these steps:
    ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
 <br/>
   
-
 About Skia
 ==========
 

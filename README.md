@@ -23,7 +23,7 @@ Example of app made with Alcinoe
 Embarcadero Quality Reports
 ---------------------------
 
-Please vote for the resolution of these quality reports. The 
+Please ask for the resolution of these quality reports. The 
 lack of resolution on these issues from Embarcadero has compelled 
 us to patch the original Delphi source files:
 
@@ -33,14 +33,14 @@ us to patch the original Delphi source files:
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
-* [The width and height of a TContext3D object must be defined as single-precision, not as integers](https://quality.embarcadero.com/browse/RSP-41516)
+* [The width and height of a TContext3D object must be defined as single-precision, not as integers](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723)
 * [TTextLayout.PositionAtPoint / TTextLayoutD2D.DoPositionAtPoint totally broken in Alexandria](https://quality.embarcadero.com/browse/RSP-39734)
 * [Regression in Alexandria: FMX.StrokeBuilder.pas Revamp Leads to TARC Drawing Issues](https://quality.embarcadero.com/browse/RSP-41618)
 * [Multi-Threading for TBitmap, TCanvas, and TContext3D is not working !](https://quality.embarcadero.com/browse/RSP-19673)
 * [Allow linking of Swift compatibility frameworks](https://quality.embarcadero.com/browse/RSP-38700)
-* [GL_TEXTURE_EXTERNAL_OES not supported](https://quality.embarcadero.com/browse/RSP-16830)
+* [Allow TTexture to Define a GL_TEXTURE_EXTERNAL_OES Target](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1550)
 * [Make CanvasHelper of TCanvasGpu public](https://quality.embarcadero.com/browse/RSP-18797)
-* [Make that TTexture can define a material (GLSL shader) to use](https://quality.embarcadero.com/browse/RSP-23501)
+* [Allow TTexture to Define a Material (GLSL Shader) to Use](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549)
 * [dorealign implemented badly](https://quality.embarcadero.com/browse/RSP-15768)
 * [On iOS we need to pass options: PNSDictionary with the message TApplicationEvent.FinishedLaunching](https://quality.embarcadero.com/browse/RSP-40351)
 * [AVPlayerItem miss the function addOutput](https://quality.embarcadero.com/browse/RSP-16853)
@@ -59,6 +59,8 @@ us to patch the original Delphi source files:
 * [Add Missing drawBitmap functions to JRecordingCanvas Interface](https://quality.embarcadero.com/browse/RSP-44102)
 * [Miss kCIFormatRGBA8 and kCIFormatBGRA8 in iOSapi.CoreImage.pas](https://quality.embarcadero.com/browse/RSP-44130)
 * [Miss UITraitCollection.displayGamut in iOSapi.UIKit.pas](https://quality.embarcadero.com/browse/RSP-44208)
+* [Update Pressed Property Setter in TControl to Enhance State Change Tracking](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323)
+* [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541=
 
 
 Install Alcinoe
@@ -122,6 +124,89 @@ please follow these steps:
    ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
 <br/>
   
+
+About Skia
+==========
+
+Skia is an open-source 2D graphics library that powers 
+the graphics engine used by Flutter and the Android 
+operating system. The implementation of Skia in Delphi 
+marked a significant advancement for the FireMonkey 
+framework, as it greatly surpasses the legacy Delphi 
+TCanvasGPU graphics engine in nearly every aspect.
+
+#### Key Advantages of Skia: ####
+
+* <b>Solid Graphics Foundation</b>: Since Skia is the 
+  same graphics engine used by Flutter, apps built 
+  with Flutter or Delphi + Skia share the same 
+  foundational graphics technology.
+* <b>Performance</b>: The Skia algorithms are optimized 
+  to the extent that they can often render directly 
+  onto the form surface without requiring an 
+  internal buffer.
+* <b>Cross-Platform Consistency</b>: Skia offers a 
+  consistent graphics engine across all platforms 
+  (Windows, iOS, macOS, Android).
+* <b>Rich Features</b>: Skia provides powerful capabilities 
+  typical of a robust graphics engine, including 
+  advanced text formatting and shadow rendering.
+
+#### Drawbacks of Skia: ####
+
+* <b>Increased Package Size</b>: Adding Skia increases 
+  the package size by approximately 25 MB.
+* <b>Dependency on Google</b>: Skia is a Google product, 
+  and while Embarcadero has traditionally focused on 
+  offering an independent product free from GAFA domination, 
+  using Skia introduces a dependency on Google's technology.
+* <b>OpenGL Limitations</b>: Under OpenGL, only raster 
+  images (CPU) can be shared across different threads. 
+  This means that GPU textures cannot be created in 
+  background threads and later drawn on the main form 
+  surface. Interestingly, there seems to be no noticeable 
+  speed improvement when drawing GPU images compared to 
+  raster images.
+* <b>Image Rendering Performance</b>: While Skia excels 
+  at drawing shapes directly on the form surface, it is 
+  notably slower (4x more slower) than the legacy Delphi 
+  canvas (TCanvasGPU) when rendering images onto the form.
+
+#### Performance Challenges with Skia: ####
+
+The slower image rendering is particularly problematic in 
+scenarios where we paint everything first onto an internal 
+buffer and then render that buffer to the form surface on 
+each paint loop—a technique often used to avoid flickering 
+and improve performance. Unfortunately, Skia can be up to 
+4 times slower at drawing images onto the form surface 
+compared to the legacy Delphi TCanvasGPU, which uses 
+OpenGL textures.
+
+For example, on a Google Pixel 7, I can render 2000 textures 
+simultaneously at 90 FPS using TCanvasGPU. However, with 
+Skia, I can only render 500 images at the same frame rate. 
+You can verify this using the demo app located at 
+[{alcinoe}/Demos/ALFmxGraphics](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxGraphics).
+
+#### The Chosen Approach: ####
+
+Given these limitations, I’ve decided to use Skia as the 
+backend graphics engine in Alcinoe while continuing to 
+use the legacy Delphi canvas (TCanvasGPU) for rendering 
+on the main form surface. The exception is on Windows, 
+where we use Skia for both the backend and the main 
+form surface.
+
+#### Platform-Specific Considerations: ####
+
+On Android and iOS, the operating systems already provide 
+powerful graphics APIs, and in many cases, these native APIs 
+outperform Skia—often by as much as 2x. While the performance 
+of the OS graphics APIs is superior, Skia still offers the 
+benefit of a unified graphics engine across all platforms, 
+along with additional features like animated images.
+
 
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================

@@ -1463,7 +1463,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{***********************************************************************************************}
 function ALLoadFromBitmapAndFitIntoToBitmap(const ABitmap: TBitmap; const W, H: single): TBitmap;
 begin
   var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
@@ -1473,7 +1473,7 @@ begin
   Result := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, LDestRect.Width, LDestRect.Height);
 end;
 
-{*****************}
+{***********************************************************************************************}
 function ALLoadFromStreamAndFitIntoToBitmap(const AStream: TStream; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -1484,7 +1484,7 @@ begin
   end;
 end;
 
-{*****************}
+{*************************************************************************************************}
 function ALLoadFromResourceAndFitIntoToBitmap(const AResName: String; const W, H: single): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -1495,7 +1495,7 @@ begin
   end;
 end;
 
-{*****************}
+{**********************************************************************************************}
 function ALLoadFromFileAndFitIntoToBitmap(const AFileName: String; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -1506,7 +1506,7 @@ begin
   end;
 end;
 
-{*****************}
+{*****************************************************************************************************}
 function ALLoadFromStreamAndFitIntoToDrawable(const AStream: TStream; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -1551,7 +1551,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*******************************************************************************************************}
 function ALLoadFromResourceAndFitIntoToDrawable(const AResName: String; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -1596,7 +1596,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************************************************************************************}
 function ALLoadFromFileAndFitIntoToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -1996,7 +1996,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropToBitmap(const ABitmap: TBitmap; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -2023,7 +2023,7 @@ begin
   end;
 end;
 
-{*****************}
+{************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropToBitmap(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -2034,7 +2034,7 @@ begin
   end;
 end;
 
-{*****************}
+{**************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropToBitmap(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2045,7 +2045,7 @@ begin
   end;
 end;
 
-{*****************}
+{***********************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropToBitmap(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -2056,7 +2056,7 @@ begin
   end;
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropToDrawable(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -2101,7 +2101,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{********************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropToDrawable(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -2146,7 +2146,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*****************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropToDrawable(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -2658,7 +2658,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{*****************************************************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropToRoundRectBitmap(const ABitmap: TBitmap; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := ALLoadFromBitmapAndFitIntoAndCropToBitmap(aBitmap, W, H, XCropCenter, YCropCenter);
@@ -2693,7 +2693,7 @@ begin
   end;
 end;
 
-{*****************}
+{*****************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectBitmap(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -2704,7 +2704,7 @@ begin
   end;
 end;
 
-{*****************}
+{*******************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectBitmap(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -2715,7 +2715,7 @@ begin
   end;
 end;
 
-{*****************}
+{****************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -2726,7 +2726,7 @@ begin
   end;
 end;
 
-{*****************}
+{***********************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectDrawable(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -2771,7 +2771,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*************************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectDrawable(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -2816,7 +2816,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{**********************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectDrawable(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -3266,7 +3266,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{******************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropToCircleBitmap(const ABitmap: TBitmap; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, W, H, XCropCenter, YCropCenter);
@@ -3296,7 +3296,7 @@ begin
   end;
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropToCircleBitmap(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -3307,7 +3307,7 @@ begin
   end;
 end;
 
-{*****************}
+{********************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropToCircleBitmap(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -3318,7 +3318,7 @@ begin
   end;
 end;
 
-{*****************}
+{*****************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropToCircleBitmap(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -3329,7 +3329,7 @@ begin
   end;
 end;
 
-{*****************}
+{************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropToCircleDrawable(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -3374,7 +3374,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{**************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropToCircleDrawable(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -3419,7 +3419,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{***********************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropToCircleDrawable(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -3637,12 +3637,12 @@ begin
 
     if TOSVersion.Check(12, 0) and
        TJHardwareBuffer.javaclass.isSupported(
-          LBitmap.getWidth, // width: Integer;
-          LBitmap.getHeight, // height: Integer;
-          TJPixelFormat.JavaClass.RGBA_8888, // format: Integer;
-          1, // layers: Integer;
-          TJHardwareBuffer.javaclass.USAGE_GPU_SAMPLED_IMAGE or
-          TJHardwareBuffer.javaclass.USAGE_GPU_COLOR_OUTPUT) then begin //usage: Int64
+         LBitmap.getWidth, // width: Integer;
+         LBitmap.getHeight, // height: Integer;
+         TJPixelFormat.JavaClass.RGBA_8888, // format: Integer;
+         1, // layers: Integer;
+         TJHardwareBuffer.javaclass.USAGE_GPU_SAMPLED_IMAGE or
+         TJHardwareBuffer.javaclass.USAGE_GPU_COLOR_OUTPUT) then begin //usage: Int64
       Var LImageReader := TJImageReader.JavaClass.newInstance(
                             LBitmap.getWidth, // width: Integer;
                             LBitmap.getHeight,// height: Integer;
@@ -3974,7 +3974,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************************************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropAndBlurToBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LDestRect := TrectF.Create(0, 0, W, H).Round;
@@ -4014,7 +4014,7 @@ begin
   end;
 end;
 
-{*****************}
+{**********************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -4025,7 +4025,7 @@ begin
   end;
 end;
 
-{*****************}
+{************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4036,7 +4036,7 @@ begin
   end;
 end;
 
-{*****************}
+{*********************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -4047,7 +4047,7 @@ begin
   end;
 end;
 
-{*****************}
+{****************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -4092,7 +4092,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToDrawable(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -4137,7 +4137,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{***************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -4664,7 +4664,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************************************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropAndBlurToCircleBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := ALLoadFromBitmapAndFitIntoAndCropAndBlurToBitmap(abitmap, W, H, aBlurRadius, XCropCenter, YCropCenter);
@@ -4694,7 +4694,7 @@ begin
   end;
 end;
 
-{*****************}
+{****************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -4705,7 +4705,7 @@ begin
   end;
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -4716,7 +4716,7 @@ begin
   end;
 end;
 
-{*****************}
+{***************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -4727,7 +4727,7 @@ begin
   end;
 end;
 
-{*****************}
+{**********************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -4772,7 +4772,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{************************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleDrawable(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -4817,7 +4817,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*********************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -5262,7 +5262,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{*********************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropAndMaskToBitmap(const ABitmap: TBitmap; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := ALLoadFromBitmapAndFitIntoAndCropToBitmap(aBitmap, aMask.Width, aMask.height, XCropCenter, YCropCenter);
@@ -5311,7 +5311,7 @@ begin
   end;
 end;
 
-{*****************}
+{*********************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToBitmap(const AStream: TStream; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -5322,7 +5322,7 @@ begin
   end;
 end;
 
-{*****************}
+{***********************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToBitmap(const AResName: String; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -5333,7 +5333,7 @@ begin
   end;
 end;
 
-{*****************}
+{********************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToBitmap(const AFileName: String; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -5344,7 +5344,7 @@ begin
   end;
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -5389,7 +5389,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{********************************************************************************************************************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -5434,7 +5434,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*****************************************************************************************************************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -5954,7 +5954,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{*******************************************************************************************************************************************************************************************************************}
 function ALLoadFromBitmapAndFitIntoAndCropAndMaskAndBlurToBitmap(const ABitmap: TBitmap; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := ALLoadFromBitmapAndFitIntoAndCropAndBlurToBitmap(aBitmap, aMask.Width, aMask.height, ABlurRadius, XCropCenter, YCropCenter);
@@ -6003,7 +6003,7 @@ begin
   end;
 end;
 
-{*****************}
+{*******************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToBitmap(const AStream: TStream; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -6014,7 +6014,7 @@ begin
   end;
 end;
 
-{*****************}
+{*********************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToBitmap(const AResName: String; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6025,7 +6025,7 @@ begin
   end;
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToBitmap(const AFileName: String; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -6036,7 +6036,7 @@ begin
   end;
 end;
 
-{*****************}
+{****************************************************************************************************************************************************************************************************************************************************************************************************************************************************}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6081,7 +6081,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{******************************************************************************************************************************************************************************************************************************************************************************************************************************************************}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6126,7 +6126,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{***************************************************************************************************************************************************************************************************************************************************************************************************************************************************}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6488,7 +6488,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{*************************************************************************************************}
 function ALLoadFromBitmapAndPlaceIntoToBitmap(const ABitmap: TBitmap; const W, H: single): TBitmap;
 begin
   var LSrcRect := TrectF.Create(0, 0, ABitmap.Width, ABitmap.height);
@@ -6496,7 +6496,7 @@ begin
   Result := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, LDestRect.Width, LDestRect.Height);
 end;
 
-{*****************}
+{*************************************************************************************************}
 function ALLoadFromStreamAndPlaceIntoToBitmap(const AStream: TStream; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -6507,7 +6507,7 @@ begin
   end;
 end;
 
-{*****************}
+{***************************************************************************************************}
 function ALLoadFromResourceAndPlaceIntoToBitmap(const AResName: String; const W, H: single): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -6518,7 +6518,7 @@ begin
   end;
 end;
 
-{*****************}
+{************************************************************************************************}
 function ALLoadFromFileAndPlaceIntoToBitmap(const AFileName: String; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -6529,7 +6529,7 @@ begin
   end;
 end;
 
-{*****************}
+{*******************************************************************************************************}
 function ALLoadFromStreamAndPlaceIntoToDrawable(const AStream: TStream; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6574,7 +6574,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*********************************************************************************************************}
 function ALLoadFromResourceAndPlaceIntoToDrawable(const AResName: String; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6619,7 +6619,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{******************************************************************************************************}
 function ALLoadFromFileAndPlaceIntoToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6981,7 +6981,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{***********************************************************************************************************************************}
 function ALLoadFromBitmapAndPlaceIntoAndBlurToBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single): TBitmap;
 begin
   var LSrcRect := TrectF.Create(0, 0, ABitmap.Width, ABitmap.height);
@@ -6989,7 +6989,7 @@ begin
   Result := ALLoadFromBitmapAndFitIntoAndCropAndBlurToBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius);
 end;
 
-{*****************}
+{***********************************************************************************************************************************}
 function ALLoadFromStreamAndPlaceIntoAndBlurToBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -7000,7 +7000,7 @@ begin
   end;
 end;
 
-{*****************}
+{*************************************************************************************************************************************}
 function ALLoadFromResourceAndPlaceIntoAndBlurToBitmap(const AResName: String; const W, H: single; const ABlurRadius: single): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -7011,7 +7011,7 @@ begin
   end;
 end;
 
-{*****************}
+{**********************************************************************************************************************************}
 function ALLoadFromFileAndPlaceIntoAndBlurToBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -7022,7 +7022,7 @@ begin
   end;
 end;
 
-{*****************}
+{*****************************************************************************************************************************************}
 function ALLoadFromStreamAndPlaceIntoAndBlurToDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -7067,7 +7067,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*******************************************************************************************************************************************}
 function ALLoadFromResourceAndPlaceIntoAndBlurToDrawable(const AResName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -7112,7 +7112,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************************************************************************************************************************}
 function ALLoadFromFileAndPlaceIntoAndBlurToDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -7508,7 +7508,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{***********************************************************************************************}
 function ALLoadFromBitmapAndStretchToBitmap(const ABitmap: TBitmap; const W, H: single): TBitmap;
 begin
   var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
@@ -7535,7 +7535,7 @@ begin
   end;
 end;
 
-{*****************}
+{***********************************************************************************************}
 function ALLoadFromStreamAndStretchToBitmap(const AStream: TStream; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -7546,7 +7546,7 @@ begin
   end;
 end;
 
-{*****************}
+{*************************************************************************************************}
 function ALLoadFromResourceAndStretchToBitmap(const AResName: String; const W, H: single): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -7557,7 +7557,7 @@ begin
   end;
 end;
 
-{*****************}
+{**********************************************************************************************}
 function ALLoadFromFileAndStretchToBitmap(const AFileName: String; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -7568,7 +7568,7 @@ begin
   end;
 end;
 
-{*****************}
+{*****************************************************************************************************}
 function ALLoadFromStreamAndStretchToDrawable(const AStream: TStream; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -7613,7 +7613,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*******************************************************************************************************}
 function ALLoadFromResourceAndStretchToDrawable(const AResName: String; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -7658,7 +7658,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************************************************************************************}
 function ALLoadFromFileAndStretchToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -8032,7 +8032,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{*******************************************************************************************************************************}
 function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
 begin
   case AWrapMode of
@@ -8044,7 +8044,7 @@ begin
   end;
 end;
 
-{*****************}
+{*******************************************************************************************************************************}
 function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
@@ -8055,7 +8055,7 @@ begin
   end;
 end;
 
-{*****************}
+{*********************************************************************************************************************************}
 function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -8066,7 +8066,7 @@ begin
   end;
 end;
 
-{*****************}
+{******************************************************************************************************************************}
 function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
@@ -8077,7 +8077,7 @@ begin
   end;
 end;
 
-{*****************}
+{*************************************************************************************************************************************}
 function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -8122,7 +8122,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{***************************************************************************************************************************************}
 function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -8167,7 +8167,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{************************************************************************************************************************************}
 function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -8671,7 +8671,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************************************************************************************************************************************}
 function ALLoadFromStreamAndNormalizeOrientationToBitmap(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): TBitmap;
 begin
   Result := Tbitmap.CreateFromStream(aStream);
@@ -8696,7 +8696,7 @@ begin
   end;
 end;
 
-{*****************}
+{**********************************************************************************************************************************************}
 function ALLoadFromResourceAndNormalizeOrientationToBitmap(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
@@ -8707,7 +8707,7 @@ begin
   end;
 end;
 
-{*****************}
+{***************************************************************************************}
 function ALLoadFromFileAndNormalizeOrientationToBitmap(const AFileName: String): TBitmap;
 begin
   Result := Tbitmap.CreateFromFile(AFileName);
@@ -8732,7 +8732,7 @@ begin
   end;
 end;
 
-{*****************}
+{**************************************************************************************************************************************************}
 function ALLoadFromStreamAndNormalizeOrientationToDrawable(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -8777,7 +8777,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************************************************************************************************************************************}
 function ALLoadFromResourceAndNormalizeOrientationToDrawable(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -8822,7 +8822,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{*********************************************************************************************}
 function ALLoadFromFileAndNormalizeOrientationToDrawable(const AFileName: String): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -9155,7 +9155,7 @@ begin
   end;
 end;
 
-{***************************************************************************************}
+{****************************************************************************************}
 function ALModulateColor(const SrcColor: TAlphaColor; const Opacity: Single): TAlphaColor;
 begin
   if Opacity < 1 then
@@ -9192,7 +9192,7 @@ begin
     Result := TAlphacolors.Null;
 end;
 
-{*************************************************************************************************************************}
+{**************************************************************************************************************}
 function ALBlendColor(const ABaseColor, AOverlayColor: TAlphaColor; const AOverlayOpacity: Single): TAlphaColor;
 begin
   var LOverlayColorRec := TAlphaColorRec(AOverlayColor);
@@ -9209,7 +9209,7 @@ begin
   TAlphaColorRec(Result).A := Round(Max(Min(AOpacity, 1), 0) * 255);
 end;
 
-{*****************************************************************************************}
+{********************************************************************************************}
 function ALMultiplyColorAlpha(const AColor: TAlphaColor; const AOpacity: Single): TAlphaColor;
 begin
   TAlphaColorRec(Result).R := TAlphaColorRec(AColor).R;
@@ -9241,7 +9241,7 @@ begin
   Result := AShadowBlur * 2;
 end;
 
-{*************************************************************************************************************************************************************************}
+{*******************************************************************************************************************************************************************************}
 procedure ALGetLinearGradientCoordinates(const ASize: TSizeF; const AAngle: Single; out AStartPoint: TPointF; out AEndPoint: TPointF; const ACssAngleConvention: Boolean = True);
 begin
 
@@ -9269,7 +9269,7 @@ begin
 
 end;
 
-{***********************}
+{*****************************}
 function ALGetShapeSurfaceRect(
            const ARect: TRectF;
            const AFillColor: TAlphaColor;
@@ -9318,7 +9318,7 @@ begin
   end;
 end;
 
-{***********************}
+{*****************************}
 function ALGetShapeSurfaceRect(
            var ARect: TrectF;
            const AFill: TALBrush;
@@ -13320,7 +13320,7 @@ begin
     AAddPixelForAlignment); // const AAddPixelForAlignment: Boolean = true);
 end;
 
-{**********************}
+{****************************}
 procedure ALFreeAndNilSurface(
             Var ASurface: TALSurface;
             Var ACanvas: TALCanvas);
@@ -13659,7 +13659,7 @@ begin
   {$ENDIF};
 end;
 
-{******************************************************************}
+{*****************************************************************************************************************************************************}
 procedure ALBeginTransparencyLayer(const aCanvas: TALCanvas; const ARect: TRectF; const AOpacity: Single; const AAddPixelForAlignment: Boolean = true);
 begin
 
@@ -13711,7 +13711,7 @@ begin
 
 end;
 
-{******************************************************************}
+{*********************************************************}
 procedure ALEndTransparencyLayer(const aCanvas: TALCanvas);
 begin
 
@@ -13750,7 +13750,7 @@ begin
 
 end;
 
-{******************************************************************}
+{****************************************************************************}
 function ALCreateDrawableFromSurface(const ASurface: TALSurface): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -13775,7 +13775,7 @@ begin
   {$ENDIF}
 end;
 
-{************************************************}
+{**********************************************************************************************}
 procedure ALUpdateDrawableFromSurface(const aSurface: TALSurface; const aDrawable: TALDrawable);
 begin
   {$IF defined(ALSkiaEngine)}
@@ -13824,7 +13824,7 @@ begin
   {$ENDIF}
 end;
 
-{*******************************}
+{******************************************************************************************************************}
 procedure ALExtractMatrixFromCanvas(const ACanvas: TALCanvas; out ACanvasMatrix: TMatrix; out ACanvasScale: Single);
 begin
   ACanvasMatrix := TMatrix.Identity;
@@ -14733,8 +14733,9 @@ procedure ALGradientEvaluateCallback(info: Pointer; inData: PCGFloat; outData: P
         else if (I = length(AGradient.Offsets) - 2) and (AOffset > AGradient.Offsets[High(AGradient.Offsets)]) then // last
           Result := AGradient.Colors[High(AGradient.Offsets)]
         else
-          Result := FMX.Utils.InterpolateColor(AGradient.Colors[I], AGradient.Colors[I + 1],
-            (AOffset - AGradient.Offsets[I]) / (AGradient.Offsets[I + 1] - AGradient.Offsets[I]));
+          Result := FMX.Utils.InterpolateColor(
+                      AGradient.Colors[I], AGradient.Colors[I + 1],
+                      (AOffset - AGradient.Offsets[I]) / (AGradient.Offsets[I + 1] - AGradient.Offsets[I]));
       end;
     end;
   end;

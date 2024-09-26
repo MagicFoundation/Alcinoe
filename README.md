@@ -60,7 +60,7 @@ us to patch the original Delphi source files:
 * [Miss kCIFormatRGBA8 and kCIFormatBGRA8 in iOSapi.CoreImage.pas](https://quality.embarcadero.com/browse/RSP-44130)
 * [Miss UITraitCollection.displayGamut in iOSapi.UIKit.pas](https://quality.embarcadero.com/browse/RSP-44208)
 * [Update Pressed Property Setter in TControl to Enhance State Change Tracking](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323)
-* [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541=
+* [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
 
 
 Install Alcinoe

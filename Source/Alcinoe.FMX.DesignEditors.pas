@@ -224,7 +224,7 @@ uses
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.TabControl;
 
-{*******************************************************}
+{*****************************************************}
 function TALEditEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -233,7 +233,7 @@ begin
   end;
 end;
 
-{*********************************************}
+{*******************************************}
 function TALEditEditor.GetVerbCount: Integer;
 begin
   result := 1;
@@ -247,7 +247,7 @@ begin
   ALApplyEditTheme(LTheme, TALEdit(Component));
 end;
 
-{****************************************************************************}
+{**************************************************************************}
 procedure TALEditEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LKeys := TALStringListW.create;
@@ -262,7 +262,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{*****************************************************}
 function TALMemoEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -271,7 +271,7 @@ begin
   end;
 end;
 
-{*********************************************}
+{*******************************************}
 function TALMemoEditor.GetVerbCount: Integer;
 begin
   result := 1;
@@ -285,7 +285,7 @@ begin
   ALApplyMemoTheme(LTheme, TALMemo(Component));
 end;
 
-{****************************************************************************}
+{**************************************************************************}
 procedure TALMemoEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LKeys := TALStringListW.create;
@@ -315,7 +315,7 @@ begin
   result := 1;
 end;
 
-{****************************************************}
+{*********************************************************}
 procedure TALButtonEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
@@ -338,7 +338,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{*********************************************************}
 function TALCheckBoxEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -347,13 +347,13 @@ begin
   end;
 end;
 
-{*********************************************}
+{***********************************************}
 function TALCheckBoxEditor.GetVerbCount: Integer;
 begin
   result := 1;
 end;
 
-{****************************************************}
+{***********************************************************}
 procedure TALCheckBoxEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
@@ -361,7 +361,7 @@ begin
   ALApplyCheckBoxTheme(LTheme, TALCheckBox(Component));
 end;
 
-{****************************************************************************}
+{******************************************************************************}
 procedure TALCheckBoxEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LKeys := TALStringListW.create;
@@ -376,7 +376,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{************************************************************}
 function TALRadioButtonEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -385,13 +385,13 @@ begin
   end;
 end;
 
-{*********************************************}
+{**************************************************}
 function TALRadioButtonEditor.GetVerbCount: Integer;
 begin
   result := 1;
 end;
 
-{****************************************************}
+{**************************************************************}
 procedure TALRadioButtonEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
@@ -399,7 +399,7 @@ begin
   ALApplyRadioButtonTheme(LTheme, TALRadioButton(Component));
 end;
 
-{****************************************************************************}
+{*********************************************************************************}
 procedure TALRadioButtonEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LKeys := TALStringListW.create;
@@ -429,7 +429,7 @@ begin
   result := 1;
 end;
 
-{****************************************************}
+{*********************************************************}
 procedure TALSwitchEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
@@ -452,7 +452,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{*********************************************************}
 function TALTrackBarEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -461,13 +461,13 @@ begin
   end;
 end;
 
-{*********************************************}
+{***********************************************}
 function TALTrackBarEditor.GetVerbCount: Integer;
 begin
   result := 1;
 end;
 
-{****************************************************}
+{***********************************************************}
 procedure TALTrackBarEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
@@ -475,7 +475,7 @@ begin
   ALApplyTrackBarTheme(LTheme, TALTrackBar(Component));
 end;
 
-{****************************************************************************}
+{******************************************************************************}
 procedure TALTrackBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LKeys := TALStringListW.create;
@@ -490,7 +490,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{**************************************************************}
 function TALRangeTrackBarEditor.GetVerb(Index: Integer): string;
 begin
   case Index of
@@ -499,13 +499,13 @@ begin
   end;
 end;
 
-{*********************************************}
+{****************************************************}
 function TALRangeTrackBarEditor.GetVerbCount: Integer;
 begin
   result := 1;
 end;
 
-{****************************************************}
+{****************************************************************}
 procedure TALRangeTrackBarEditor.ApplyThemeClick(Sender: TObject);
 begin
   var LTheme := TmenuItem(Sender).Caption;
@@ -513,7 +513,7 @@ begin
   ALApplyRangeTrackBarTheme(LTheme, TALRangeTrackBar(Component));
 end;
 
-{****************************************************************************}
+{***********************************************************************************}
 procedure TALRangeTrackBarEditor.PrepareItem(Index: Integer; const AItem: IMenuItem);
 begin
   var LKeys := TALStringListW.create;

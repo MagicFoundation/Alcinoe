@@ -203,7 +203,7 @@ begin
             (not SameValue(LDefaultSize.cy, Size.Size.cy, TEpsilon.Position));
 end;
 
-{*****************************************************}
+{********************************}
 procedure TALControl.AlignToPixel;
 begin
   // Note: We do not align the position here. The position is aligned during
@@ -260,25 +260,25 @@ begin
   end;
 end;
 
-{*****************************************************}
+{**************************************************}
 procedure TALControl.DelayOnResize(Sender: TObject);
 begin
   Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resize);
 end;
 
-{*****************************************************}
+{***************************************************}
 procedure TALControl.DelayOnResized(Sender: TObject);
 begin
   Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resized);
 end;
 
-{*****************************************************}
+{******************************************************}
 function TALControl.GetIsPixelAlignmentEnabled: Boolean;
 begin
   Result := FIsPixelAlignmentEnabled;
 end;
 
-{*****************************************************}
+{*********************************************************************}
 procedure TALControl.SetIsPixelAlignmentEnabled(const AValue: Boolean);
 begin
   FIsPixelAlignmentEnabled := AValue;
@@ -314,13 +314,13 @@ begin
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
-{*****************************}
+{**************************************}
 function TALControl.GetPressed: Boolean;
 begin
   result := inherited Pressed;
 end;
 
-{*****************************}
+{*****************************************************}
 procedure TALControl.SetPressed(const AValue: Boolean);
 begin
   if AValue <> GetPressed then begin
@@ -329,7 +329,7 @@ begin
   end;
 end;
 
-{*****************************}
+{***************************}
 procedure TALControl.DoEnter;
 begin
   var LPrevIsFocused := IsFocused;
@@ -337,7 +337,7 @@ begin
   if LPrevIsFocused <> IsFocused then IsFocusedChanged;
 end;
 
-{*****************************}
+{**************************}
 procedure TALControl.DoExit;
 begin
   var LPrevIsFocused := IsFocused;
@@ -345,7 +345,7 @@ begin
   if LPrevIsFocused <> IsFocused then IsFocusedChanged;
 end;
 
-{*****************************}
+{********************************}
 procedure TALControl.DoMouseEnter;
 begin
   var LPrevIsMouseOver := IsMouseOver;
@@ -356,7 +356,7 @@ begin
   if LPrevIsMouseOver <> IsMouseOver then IsMouseOverChanged;
 end;
 
-{*****************************}
+{********************************}
 procedure TALControl.DoMouseLeave;
 begin
   var LPrevIsMouseOver := IsMouseOver;
@@ -491,19 +491,19 @@ begin
   // virtual
 end;
 
-{**********************************}
+{************************************}
 procedure TALControl.IsFocusedChanged;
 begin
   // virtual
 end;
 
-{*********************************}
+{**********************************}
 procedure TALControl.PressedChanged;
 begin
   // virtual
 end;
 
-{*********************************}
+{**********************************}
 Procedure TALControl.MarginsChanged;
 begin
   // virtual

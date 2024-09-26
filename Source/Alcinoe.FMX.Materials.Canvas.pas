@@ -101,7 +101,7 @@ var
   ALDef420YpCbCr8BiPlanarVideoRangeMaterial: TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial;
   ALDef420YpCbCr8PlanarMaterial: TALCanvas420YpCbCr8PlanarTextureMaterial;
 
-{**********************************************************************}
+{************************************************************************}
 function ALGetDefExternalOESMaterial: TALCanvasExternalOESTextureMaterial;
 begin
   if ALDefExternalOESMaterial = nil then begin
@@ -115,7 +115,7 @@ begin
   Result := ALDefExternalOESMaterial;
 end;
 
-{********************************************************************************************************}
+{**********************************************************************************************************}
 function ALGetDef420YpCbCr8BiPlanarVideoRangeMaterial: TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial;
 begin
   if ALDef420YpCbCr8BiPlanarVideoRangeMaterial = nil then begin
@@ -129,7 +129,7 @@ begin
   Result := ALDef420YpCbCr8BiPlanarVideoRangeMaterial;
 end;
 
-{********************************************************************************}
+{**********************************************************************************}
 function ALGetDef420YpCbCr8PlanarMaterial: TALCanvas420YpCbCr8PlanarTextureMaterial;
 begin
   if ALDef420YpCbCr8PlanarMaterial = nil then begin

@@ -105,7 +105,7 @@ uses
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.Graphics;
 
-{**************************************************************************************}
+{****************************************************************************************}
 function ALGetThemeSizeRatio(const ACaption: String; const ADefaultValue: Single): Single;
 begin
   var LValueF: Single := ADefaultValue;
@@ -118,42 +118,42 @@ begin
   Result := LValueF / ADefaultValue;
 end;
 
-{**************************************************************************************}
+{***************************************************************************************************************}
 constructor TALApplyEditThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultFontSize: Single);
 begin
   ApplyThemeProc := AApplyThemeProc;
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{**************************************************************************************}
+{*****************************************************************************************************************}
 constructor TALApplyButtonThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultFontSize: Single);
 begin
   ApplyThemeProc := AApplyThemeProc;
   DefaultFontSize := ADefaultFontSize;
 end;
 
-{**************************************************************************************}
+{*****************************************************************************************************************}
 constructor TALApplyCheckBoxThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
 begin
   ApplyThemeProc := AApplyThemeProc;
   DefaultHeight := ADefaultHeight;
 end;
 
-{**************************************************************************************}
+{********************************************************************************************************************}
 constructor TALApplyRadioButtonThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
 begin
   ApplyThemeProc := AApplyThemeProc;
   DefaultHeight := ADefaultHeight;
 end;
 
-{**************************************************************************************}
+{***************************************************************************************************************}
 constructor TALApplySwitchThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
 begin
   ApplyThemeProc := AApplyThemeProc;
   DefaultHeight := ADefaultHeight;
 end;
 
-{**************************************************************************************}
+{*****************************************************************************************************************}
 constructor TALApplyTrackbarThemeInfo.create(const AApplyThemeProc: TApplyThemeProc; const ADefaultHeight: Single);
 begin
   ApplyThemeProc := AApplyThemeProc;
@@ -164,7 +164,7 @@ end;
 // EDIT //
 //////////
 
-{***************************************************}
+{*********************************************************************************}
 procedure ALResetEditTheme(const AEdit: TALBaseEdit; const AFontSize: Single = 16);
 begin
   With AEdit do begin
@@ -889,7 +889,7 @@ end;
 // BUTTON //
 ////////////
 
-{*****************************************************}
+{***********************************************************************************}
 procedure ALResetButtonTheme(const AButton: TALButton; const AFontSize: Single = 14);
 begin
   With AButton do begin
@@ -920,7 +920,7 @@ begin
   end;
 end;
 
-{************************************************************}
+{******************************************************************************************}
 procedure ALApplyWindowsButtonTheme(const AButton: TALButton; const AFontSize: Single = 14);
 begin
   var LRatio: Single := ALGetThemeSizeRatio('Please enter the desired font size for the button', AFontSize);
@@ -2555,7 +2555,7 @@ end;
 // SWITCH //
 ////////////
 
-{*****************************************************}
+{*********************************************************************************}
 procedure ALResetSwitchTheme(const ASwitch: TALSwitch; const AHeight: Single = 32);
 begin
   With ASwitch do begin
@@ -2888,7 +2888,7 @@ end;
 type
   _TALCustomTrackProtectedAccess = class(TALCustomTrack);
 
-{*****************************************************}
+{******************************************************************************************}
 procedure ALResetTrackBarTheme(const ATrackBar: TALCustomTrack; const AHeight: Single = 32);
 begin
   With _TALCustomTrackProtectedAccess(ATrackBar) do begin
@@ -3176,7 +3176,7 @@ begin
   end;
 end;
 
-{***************************************************************************}
+{************************************************************************************}
 procedure ALApplyTrackBarTheme(const ATheme: String; const ATrackBar: TALCustomTrack);
 begin
   Var LApplyTrackBarThemeInfo: TALApplyTrackBarThemeInfo;
@@ -3194,7 +3194,7 @@ end;
 // RANGETRACKBAR //
 ///////////////////
 
-{***************************************************************************}
+{**********************************************************************************************}
 procedure ALApplyRangeTrackBarTheme(const ATheme: String; const ARangeTrackBar: TALCustomTrack);
 begin
   Var LApplyTrackBarThemeInfo: TALApplyTrackBarThemeInfo;

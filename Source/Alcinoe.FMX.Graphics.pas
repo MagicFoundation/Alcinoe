@@ -737,6 +737,45 @@ function ALLoadFromResourceAndNormalizeOrientationToDrawable(const AResName: Str
 function ALLoadFromFileAndNormalizeOrientationToDrawable(const AFileName: String): TALDrawable;
 {$ENDREGION}
 
+{$REGION ' Load'}
+// Do not resize anything
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageToSkSurface(const AImage: sk_image_t): sk_surface_t;
+function ALLoadFromStreamToSkSurface(const AStream: TStream): sk_surface_t;
+function ALLoadFromResourceToSkSurface(const AResName: String): sk_surface_t;
+function ALLoadFromFileToSkSurface(const AFileName: String): sk_surface_t;
+//--
+function ALLoadFromStreamToSkImage(const AStream: TStream): sk_image_t;
+function ALLoadFromResourceToSkImage(const AResName: String): sk_image_t;
+function ALLoadFromFileToSkImage(const AFileName: String): sk_image_t;
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+function ALLoadFromStreamToJBitmap(const AStream: TStream): JBitmap;
+function ALLoadFromResourceToJBitmap(const AResName: String): JBitmap;
+function ALLoadFromFileToJBitmap(const AFileName: String): JBitmap;
+{$ENDIF}
+
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageToCGContextRef(const AImage: ALOSImage): CGContextRef;
+function ALLoadFromStreamToCGContextRef(const AStream: TStream): CGContextRef;
+function ALLoadFromResourceToCGContextRef(const AResName: String): CGContextRef;
+function ALLoadFromFileToCGContextRef(const AFileName: String): CGContextRef;
+//--
+function ALLoadFromStreamToCGImageRef(const AStream: TStream): CGImageRef;
+function ALLoadFromResourceToCGImageRef(const AResName: String): CGImageRef;
+function ALLoadFromFileToCGImageRef(const AFileName: String): CGImageRef;
+{$ENDIF}
+
+function ALLoadFromStreamToBitmap(const AStream: TStream): TBitmap;
+function ALLoadFromResourceToBitmap(const AResName: String): TBitmap;
+function ALLoadFromFileToBitmap(const AFileName: String): TBitmap;
+//--
+function ALLoadFromStreamToDrawable(const AStream: TStream): TALDrawable;
+function ALLoadFromResourceToDrawable(const AResName: String): TALDrawable;
+function ALLoadFromFileToDrawable(const AFileName: String): TALDrawable;
+{$ENDREGION}
+
 ////////////////////////////////////////////////////////////////////////////////
 /// THE CODE ABOVE (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
 /// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
@@ -1140,7 +1179,7 @@ end;
 /// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
 ////////////////////////////////////////////////////////////////////////////////
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
@@ -1152,7 +1191,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 begin
@@ -1176,7 +1215,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
 begin
@@ -1189,7 +1228,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 begin
@@ -1202,7 +1241,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
@@ -1231,7 +1270,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
@@ -1244,7 +1283,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
@@ -1262,7 +1301,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoToJBitmap(const ABitmap: JBitmap; const W, H: single): JBitmap;
 begin
@@ -1274,7 +1313,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoToJBitmap(const AStream: TStream; const W, H: single): JBitmap;
 begin
@@ -1299,7 +1338,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoToJBitmap(const AResName: String; const W, H: single): JBitmap;
 begin
@@ -1312,7 +1351,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoToJBitmap(const AFileName: String; const W, H: single): JBitmap;
 begin
@@ -1330,7 +1369,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 begin
@@ -1342,7 +1381,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 begin
@@ -1383,7 +1422,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 begin
@@ -1396,7 +1435,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
 begin
@@ -1410,7 +1449,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoToCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
 begin
@@ -1430,7 +1469,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoToCGImageRef(const AResName: String; const W, H: single): CGImageRef;
 begin
@@ -1443,7 +1482,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoToCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
 begin
@@ -1641,7 +1680,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -1673,7 +1712,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -1697,7 +1736,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -1710,7 +1749,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -1723,7 +1762,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -1752,7 +1791,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -1765,7 +1804,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToSkImage(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -1783,7 +1822,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(const ABitmap: JBitmap; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -1797,7 +1836,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropToJBitmap(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -1822,7 +1861,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropToJBitmap(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -1835,7 +1874,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropToJBitmap(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -1853,7 +1892,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(const AImage: ALOSImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -1875,7 +1914,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCGContextRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -1916,7 +1955,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCGContextRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -1929,7 +1968,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCGContextRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -1943,7 +1982,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCGImageRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -1963,7 +2002,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCGImageRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -1976,7 +2015,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCGImageRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -2191,7 +2230,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2242,7 +2281,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2266,7 +2305,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2279,7 +2318,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectSkSurface(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2292,7 +2331,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -2321,7 +2360,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectSkImage(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -2334,7 +2373,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectSkImage(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -2352,7 +2391,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropToRoundRectJBitmap(const ABitmap: JBitmap; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -2392,7 +2431,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectJBitmap(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -2417,7 +2456,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectJBitmap(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -2430,7 +2469,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectJBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -2448,7 +2487,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 
@@ -2537,7 +2576,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -2578,7 +2617,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectCGContextRef(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -2591,7 +2630,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectCGContextRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -2605,7 +2644,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectCGImageRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -2625,7 +2664,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToRoundRectCGImageRef(const AResName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -2638,7 +2677,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToRoundRectCGImageRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -2861,7 +2900,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2910,7 +2949,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2934,7 +2973,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkSurface(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2947,7 +2986,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToCircleSkSurface(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -2960,7 +2999,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -2989,7 +3028,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleSkImage(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -3002,7 +3041,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropToCircleSkImage(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -3020,7 +3059,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropToCircleJBitmap(const ABitmap: JBitmap; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3053,7 +3092,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleJBitmap(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3078,7 +3117,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleJBitmap(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3091,7 +3130,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropToCircleJBitmap(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3109,7 +3148,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3145,7 +3184,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleCGContextRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3186,7 +3225,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleCGContextRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3199,7 +3238,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCircleCGContextRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3213,7 +3252,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropToCircleCGImageRef(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -3233,7 +3272,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropToCircleCGImageRef(const AResName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -3246,7 +3285,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropToCircleCGImageRef(const AFileName: String; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -3464,7 +3503,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -3511,7 +3550,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -3535,7 +3574,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -3548,7 +3587,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -3561,7 +3600,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -3590,7 +3629,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -3603,7 +3642,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -3621,7 +3660,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropAndBlurToJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3726,7 +3765,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3751,7 +3790,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3764,7 +3803,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -3782,7 +3821,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropAndBlurToCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3853,7 +3892,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3894,7 +3933,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3907,7 +3946,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -3921,7 +3960,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -3941,7 +3980,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -3954,7 +3993,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -4182,7 +4221,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4246,7 +4285,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4270,7 +4309,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4283,7 +4322,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4296,7 +4335,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -4325,7 +4364,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -4338,7 +4377,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -4356,7 +4395,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropAndBlurToCircleJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -4394,7 +4433,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -4419,7 +4458,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -4432,7 +4471,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -4450,7 +4489,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropAndBlurToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -4543,7 +4582,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -4584,7 +4623,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -4597,7 +4636,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -4611,7 +4650,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -4631,7 +4670,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -4644,7 +4683,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndBlurToCircleCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -4862,7 +4901,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4912,7 +4951,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4936,7 +4975,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkSurface(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4949,7 +4988,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToSkSurface(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -4962,7 +5001,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(const AStream: TStream; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -4991,7 +5030,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToSkImage(const AResName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -5004,7 +5043,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToSkImage(const AFileName: String; const AMask: sk_image_t; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -5022,7 +5061,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropAndMaskToJBitmap(const ABitmap: JBitmap; const AMask: JBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5055,7 +5094,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToJBitmap(const AStream: TStream; const AMask: JBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5080,7 +5119,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToJBitmap(const AResName: String; const AMask: JBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5093,7 +5132,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToJBitmap(const AFileName: String; const AMask: JBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5111,7 +5150,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropAndMaskToCGContextRef(const AImage: ALOSImage; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5141,7 +5180,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToCGContextRef(const AStream: TStream; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5182,7 +5221,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToCGContextRef(const AResName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5195,7 +5234,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToCGContextRef(const AFileName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5209,7 +5248,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskToCGImageRef(const AStream: TStream; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -5229,7 +5268,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToCGImageRef(const AResName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -5242,7 +5281,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskToCGImageRef(const AFileName: String; const AMask: CGImageRef; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -5479,7 +5518,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AImage: sk_image_t; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -5543,7 +5582,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -5567,7 +5606,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -5580,7 +5619,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
@@ -5593,7 +5632,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(const AStream: TStream; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -5622,7 +5661,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToSkImage(const AResName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -5635,7 +5674,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToSkImage(const AFileName: String; const AMask: sk_image_t; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
@@ -5653,7 +5692,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndFitIntoAndCropAndMaskAndBlurToJBitmap(const ABitmap: JBitmap; const AMask: JBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5689,7 +5728,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToJBitmap(const AStream: TStream; const AMask: JBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5714,7 +5753,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToJBitmap(const AResName: String; const AMask: JBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5727,7 +5766,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToJBitmap(const AFileName: String; const AMask: JBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
@@ -5745,7 +5784,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AImage: ALOSImage; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5833,7 +5872,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AStream: TStream; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5874,7 +5913,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AResName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5887,7 +5926,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGContextRef(const AFileName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
@@ -5901,7 +5940,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToCGImageRef(const AStream: TStream; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -5921,7 +5960,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToCGImageRef(const AResName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -5934,7 +5973,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToCGImageRef(const AFileName: String; const AMask: CGImageRef; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
@@ -6171,7 +6210,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
@@ -6181,7 +6220,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 begin
@@ -6205,7 +6244,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
 begin
@@ -6218,7 +6257,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 begin
@@ -6231,7 +6270,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
@@ -6260,7 +6299,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
@@ -6273,7 +6312,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
@@ -6291,7 +6330,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndPlaceIntoToJBitmap(const ABitmap: JBitmap; const W, H: single): JBitmap;
 begin
@@ -6301,7 +6340,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndPlaceIntoToJBitmap(const AStream: TStream; const W, H: single): JBitmap;
 begin
@@ -6326,7 +6365,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndPlaceIntoToJBitmap(const AResName: String; const W, H: single): JBitmap;
 begin
@@ -6339,7 +6378,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndPlaceIntoToJBitmap(const AFileName: String; const W, H: single): JBitmap;
 begin
@@ -6357,7 +6396,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndPlaceIntoToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 begin
@@ -6367,7 +6406,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 begin
@@ -6408,7 +6447,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 begin
@@ -6421,7 +6460,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
 begin
@@ -6435,7 +6474,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoToCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
 begin
@@ -6455,7 +6494,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoToCGImageRef(const AResName: String; const W, H: single): CGImageRef;
 begin
@@ -6468,7 +6507,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoToCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
 begin
@@ -6664,7 +6703,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
@@ -6674,7 +6713,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
@@ -6698,7 +6737,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
@@ -6711,7 +6750,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoAndBlurToSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
@@ -6724,7 +6763,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
@@ -6753,7 +6792,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToSkImage(const AResName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
@@ -6766,7 +6805,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndPlaceIntoAndBlurToSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
 begin
@@ -6784,7 +6823,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndPlaceIntoAndBlurToJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single): JBitmap;
 begin
@@ -6794,7 +6833,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single): JBitmap;
 begin
@@ -6819,7 +6858,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single): JBitmap;
 begin
@@ -6832,7 +6871,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndPlaceIntoAndBlurToJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): JBitmap;
 begin
@@ -6850,7 +6889,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndPlaceIntoAndBlurToCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
@@ -6860,7 +6899,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
@@ -6901,7 +6940,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
@@ -6914,7 +6953,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoAndBlurToCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
 begin
@@ -6928,7 +6967,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndPlaceIntoAndBlurToCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGImageRef;
 begin
@@ -6948,7 +6987,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndPlaceIntoAndBlurToCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
 begin
@@ -6961,7 +7000,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndPlaceIntoAndBlurToCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
 begin
@@ -7157,7 +7196,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndStretchToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 begin
@@ -7189,7 +7228,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndStretchToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
 begin
@@ -7213,7 +7252,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndStretchToSkSurface(const AResName: String; const W, H: single): sk_surface_t;
 begin
@@ -7226,7 +7265,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndStretchToSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
 begin
@@ -7239,7 +7278,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndStretchToSkImage(const AStream: TStream; const W, H: single): sk_image_t;
 begin
@@ -7268,7 +7307,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndStretchToSkImage(const AResName: String; const W, H: single): sk_image_t;
 begin
@@ -7281,7 +7320,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndStretchToSkImage(const AFileName: String; const W, H: single): sk_image_t;
 begin
@@ -7299,7 +7338,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndStretchToJBitmap(const ABitmap: JBitmap; const W, H: single): JBitmap;
 begin
@@ -7313,7 +7352,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndStretchToJBitmap(const AStream: TStream; const W, H: single): JBitmap;
 begin
@@ -7338,7 +7377,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndStretchToJBitmap(const AResName: String; const W, H: single): JBitmap;
 begin
@@ -7351,7 +7390,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndStretchToJBitmap(const AFileName: String; const W, H: single): JBitmap;
 begin
@@ -7369,7 +7408,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndStretchToCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
 begin
@@ -7387,7 +7426,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndStretchToCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
 begin
@@ -7428,7 +7467,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndStretchToCGContextRef(const AResName: String; const W, H: single): CGContextRef;
 begin
@@ -7441,7 +7480,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndStretchToCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
 begin
@@ -7455,7 +7494,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndStretchToCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
 begin
@@ -7475,7 +7514,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndStretchToCGImageRef(const AResName: String; const W, H: single): CGImageRef;
 begin
@@ -7488,7 +7527,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndStretchToCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
 begin
@@ -7703,7 +7742,7 @@ begin
   {$ENDIF}
 end;
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
@@ -7717,7 +7756,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
@@ -7741,7 +7780,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
@@ -7754,7 +7793,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
 begin
@@ -7767,7 +7806,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
 begin
@@ -7796,7 +7835,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
 begin
@@ -7809,7 +7848,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
 begin
@@ -7827,7 +7866,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
 begin
@@ -7841,7 +7880,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
 begin
@@ -7866,7 +7905,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
 begin
@@ -7879,7 +7918,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
 begin
@@ -7897,7 +7936,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
 begin
@@ -7911,7 +7950,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
 begin
@@ -7952,7 +7991,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
 begin
@@ -7965,7 +8004,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
 begin
@@ -7979,7 +8018,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
 begin
@@ -7999,7 +8038,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
 begin
@@ -8012,7 +8051,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
 begin
@@ -8212,7 +8251,7 @@ begin
   {$ENDIF}
 end;
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndNormalizeOrientationToSkSurface(const AImage: sk_image_t; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
@@ -8245,7 +8284,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndNormalizeOrientationToSkSurface(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
@@ -8269,7 +8308,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndNormalizeOrientationToSkSurface(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_surface_t;
 begin
@@ -8282,7 +8321,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndNormalizeOrientationToSkSurface(const AFileName: String): sk_surface_t;
 begin
@@ -8295,7 +8334,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromStreamAndNormalizeOrientationToSkImage(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 begin
@@ -8324,7 +8363,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromResourceAndNormalizeOrientationToSkImage(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): sk_image_t;
 begin
@@ -8337,7 +8376,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromFileAndNormalizeOrientationToSkImage(const AFileName: String): sk_image_t;
 begin
@@ -8355,7 +8394,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndNormalizeOrientationToJBitmap(const ABitmap: JBitmap; const AExifOrientationInfo: TALExifOrientationInfo): JBitmap;
 begin
@@ -8387,7 +8426,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromStreamAndNormalizeOrientationToJBitmap(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): JBitmap;
 begin
@@ -8412,7 +8451,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromResourceAndNormalizeOrientationToJBitmap(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): JBitmap;
 begin
@@ -8425,7 +8464,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALLoadFromFileAndNormalizeOrientationToJBitmap(const AFileName: String): JBitmap;
 begin
@@ -8443,7 +8482,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromOSImageAndNormalizeOrientationToCGContextRef(const AImage: ALOSImage; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 begin
@@ -8550,7 +8589,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndNormalizeOrientationToCGContextRef(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 begin
@@ -8591,7 +8630,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndNormalizeOrientationToCGContextRef(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): CGContextRef;
 begin
@@ -8604,7 +8643,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndNormalizeOrientationToCGContextRef(const AFileName: String): CGContextRef;
 begin
@@ -8618,7 +8657,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromStreamAndNormalizeOrientationToCGImageRef(const AStream: TStream; const AExifOrientationInfo: TALExifOrientationInfo): CGImageRef;
 begin
@@ -8638,7 +8677,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromResourceAndNormalizeOrientationToCGImageRef(const AResName: String; const AExifOrientationInfo: TALExifOrientationInfo): CGImageRef;
 begin
@@ -8651,7 +8690,7 @@ begin
 end;
 {$ENDIF}
 
-{*****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALLoadFromFileAndNormalizeOrientationToCGImageRef(const AFileName: String): CGImageRef;
 begin
@@ -8864,6 +8903,465 @@ begin
   end;
   {$ELSE}
   Result := ALLoadFromFileAndNormalizeOrientationToBitmap(AFileName);
+  {$ENDIF}
+end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageToSkSurface(const AImage: sk_image_t): sk_surface_t;
+begin
+  var LRect := Trect.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
+  var LRectF := TRectF.Create(LRect);
+
+  Result := ALCreateSkSurface(LRect.Width, LRect.Height);
+
+  var LPaint := ALSkCheckHandle(sk4d_paint_create);
+  try
+    sk4d_paint_set_antialias(LPaint, true);
+    sk4d_paint_set_dither(LPaint, true);
+
+    var LCanvas := ALSkCheckHandle(sk4d_surface_get_canvas(Result));
+
+    var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
+    sk4d_canvas_draw_image_rect(
+      LCanvas, // self: sk_canvas_t;
+      AImage, // const image: sk_image_t;
+      @LRectF, // const src: psk_rect_t;
+      @LRectF,  // const dest: psk_rect_t;
+      @LSamplingoptions, // const sampling: psk_samplingoptions_t;
+      LPaint, // const paint: sk_paint_t;
+      FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
+  finally
+    sk4d_paint_destroy(LPaint);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamToSkSurface(const AStream: TStream): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageToSkSurface(LImage);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceToSkSurface(const AResName: String): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamToSkSurface(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileToSkSurface(const AFileName: String): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageToSkSurface(LImage);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamToSkImage(const AStream: TStream): sk_image_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    Result := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceToSkImage(const AResName: String): sk_image_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamToSkImage(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileToSkImage(const AFileName: String): sk_image_t;
+begin
+  Result := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromStreamToJBitmap(const AStream: TStream): JBitmap;
+begin
+  var LLength := AStream.Size-AStream.Position;
+  var LArray := TJavaArray<Byte>.Create(LLength);
+  try
+    AStream.ReadBuffer(LArray.Data^, LLength);
+    var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    Result := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    if Result = nil then raise Exception.create('Failed to decode bitmap from stream');
+    LOptions := nil;
+  finally
+    ALfreeandNil(LArray);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromResourceToJBitmap(const AResName: String): JBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamToJBitmap(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromFileToJBitmap(const AFileName: String): JBitmap;
+begin
+  var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+  if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+  Result := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+  if Result = nil then raise Exception.create('Failed to load bitmap from file');
+  LOptions := nil;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageToCGContextRef(const AImage: ALOSImage): CGContextRef;
+begin
+  var LRect := Trect.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
+  var LRectF := TRectF.Create(LRect);
+  //-----
+  Result := ALCreateCGContextRef(LRect.Width, LRect.Height);
+  CGContextDrawImage(
+    Result, // c: The graphics context in which to draw the image.
+    CGRectMake(LRectF), // rect The location and dimensions in user space of the bounding box in which to draw the image.
+    ALOSImageGetCgImage(AImage)); // image The image to draw.
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamToCGContextRef(const AStream: TStream): CGContextRef;
+begin
+  var LBuffer: Pointer := nil;
+  var LLength: Int64 := 0;
+  var LMemoryStream: TCustomMemoryStream := nil;
+  if (AStream is TCustomMemoryStream) and (AStream.Position = 0) then begin
+    LBuffer := TCustomMemoryStream(AStream).Memory;
+    LLength := AStream.Size;
+    AStream.Position := AStream.Size;
+  end
+  else LMemoryStream := TMemoryStream.Create;
+  try
+    if LMemoryStream <> nil then begin
+      LMemoryStream.CopyFrom(AStream, AStream.Size - AStream.Position);
+      LBuffer := LMemoryStream.Memory;
+      LLength := LMemoryStream.Size;
+    end;
+    var LData := TNSData.Wrap(
+                   TNSData.alloc.initWithBytesNoCopy(
+                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    try
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
+      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      try
+        result := ALLoadFromOSImageToCGContextRef(LImage);
+      finally
+        LImage.release;
+      end;
+    finally
+      LData.release;
+    end;
+  finally
+    ALFreeAndNil(LMemoryStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceToCGContextRef(const AResName: String): CGContextRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamToCGContextRef(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileToCGContextRef(const AFileName: String): CGContextRef;
+begin
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
+  if LImage = nil then raise Exception.create('Failed to load image from file');
+  try
+    result := ALLoadFromOSImageToCGContextRef(LImage);
+  finally
+    LImage.release;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamToCGImageRef(const AStream: TStream): CGImageRef;
+begin
+  var LContextRef := ALLoadFromStreamToCGContextRef(AStream);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceToCGImageRef(const AResName: String): CGImageRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamToCGImageRef(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileToCGImageRef(const AFileName: String): CGImageRef;
+begin
+  var LContextRef := ALLoadFromFileToCGContextRef(AFileName);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{*****************************************************************}
+function ALLoadFromStreamToBitmap(const AStream: TStream): TBitmap;
+begin
+  Result := Tbitmap.CreateFromStream(aStream);
+end;
+
+{*******************************************************************}
+function ALLoadFromResourceToBitmap(const AResName: String): TBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamToBitmap(LStream);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{****************************************************************}
+function ALLoadFromFileToBitmap(const AFileName: String): TBitmap;
+begin
+  Result := Tbitmap.CreateFromFile(AFileName);
+end;
+
+{***********************************************************************}
+function ALLoadFromStreamToDrawable(const AStream: TStream): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamToSkImage(AStream);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamToSkSurface(AStream);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamToSkSurface(AStream);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromStreamToJBitmap(AStream);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromStreamToCGContextRef(AStream);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromStreamToBitmap(AStream);
+  {$ENDIF}
+end;
+
+{*************************************************************************}
+function ALLoadFromResourceToDrawable(const AResName: String): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceToSkImage(AResName);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceToSkSurface(AResName);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceToSkSurface(AResName);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromResourceToJBitmap(AResName);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromResourceToCGContextRef(AResName);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromResourceToBitmap(AResName);
+  {$ENDIF}
+end;
+
+{**********************************************************************}
+function ALLoadFromFileToDrawable(const AFileName: String): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileToSkImage(AFileName);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileToSkSurface(AFileName);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileToSkSurface(AFileName);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromFileToJBitmap(AFileName);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromFileToCGContextRef(AFileName);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromFileToBitmap(AFileName);
   {$ENDIF}
 end;
 

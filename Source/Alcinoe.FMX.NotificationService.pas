@@ -641,14 +641,17 @@ begin
     if (ANotification.FLargeIconStream <> nil) and (ANotification.FLargeIconStream.Size > 0)  then begin
       try
 
-        LLargeIconBitmap := ALLoadStreamAndFitIntoAndCropToSurface(
-                              ANotification.FLargeIconStream,
-                              function(const aOriginalSize: TPointF): TpointF
-                              begin
-                                if aOriginalSize.x > aOriginalSize.y then result := TpointF.create(aOriginalSize.Y, aOriginalSize.Y)
-                                else result := TpointF.create(aOriginalSize.x, aOriginalSize.x);
-                              end,
-                              TpointF.create(-50, -50));
+        var LtmpBitmap := ALLoadFromStreamToJBitmap(ANotification.FLargeIconStream);
+        try
+          var W := LtmpBitmap.getWidth;
+          var H := LtmpBitmap.getHeight;
+          if W > H then W := H
+          else H := W;
+          LLargeIconBitmap := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(LtmpBitmap, W, H);
+        finally
+          if not LtmpBitmap.equals(LLargeIconBitmap) then LtmpBitmap.recycle;
+          LtmpBitmap := nil;
+        end;
 
       except
         on E: Exception do begin

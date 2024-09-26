@@ -491,7 +491,7 @@ begin
   TextIsHtml := Source.TextIsHtml;
 end;
 
-{********************************************************}
+{************************************************************************************}
 procedure TALMultiLineTextOptions.ScaleAndAlignProperties(const ACanvasScale: Single);
 begin
   if Scale <> 1 then begin
@@ -1016,9 +1016,9 @@ procedure ALDrawMultiLineText(
   {$REGION '_GetSkFontStyle'}
   {$IF defined(ALSkiaEngine)}
   Function _GetSkFontStyle(
-              const AFontWeight: TFontWeight;
-              const AFontSlant: TFontSlant;
-              const AFontStretch: TFontStretch): sk_fontstyle_t;
+             const AFontWeight: TFontWeight;
+             const AFontSlant: TFontSlant;
+             const AFontStretch: TFontStretch): sk_fontstyle_t;
   begin
     {$IFNDEF ALCompilerVersionSupported120}
       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_fontstyle_t didn''t changed'}
@@ -4170,7 +4170,7 @@ begin
   end;
 end;
 
-{*************************************}
+{****************************}
 procedure ALDrawMultiLineText(
             var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
             var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
@@ -4197,7 +4197,7 @@ begin
     AOnlyMeasure);
 end;
 
-{*************************************}
+{****************************}
 procedure ALDrawMultiLineText(
             var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
             var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
@@ -4224,7 +4224,7 @@ begin
     AOnlyMeasure);
 end;
 
-{*************************************}
+{****************************}
 procedure ALDrawMultiLineText(
             var ASurface: TALSurface; // If nil and AOnlyMeasure is false, a new surface will be created
             var ACanvas: TALCanvas; // If nil and AOnlyMeasure is false, a new canvas will be created
@@ -4251,7 +4251,7 @@ begin
     AOnlyMeasure);
 end;
 
-{*************************************}
+{*******************************}
 procedure ALMeasureMultiLineText(
             const AText: String; // When AOptions.TextIsHtml is set to true, the HTML tags supported are described in the TALMultiLineTextOptions.TextIsHtml field declaration.
             var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
@@ -4277,7 +4277,7 @@ begin
     true{AOnlyMeasure});
 end;
 
-{*************************************}
+{*******************************}
 procedure ALMeasureMultiLineText(
             const AText: String;
             var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
@@ -4298,7 +4298,7 @@ begin
     AOptions);
 end;
 
-{*************************************}
+{*******************************}
 procedure ALMeasureMultiLineText(
             const AText: String;
             var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.
@@ -4319,7 +4319,7 @@ begin
     AOptions);
 end;
 
-{*************************************}
+{*******************************}
 procedure ALMeasureMultiLineText(
             const AText: String;
             var ARect: TRectF; // In: Defines the constraint boundaries in real pixels within which the text must fit.

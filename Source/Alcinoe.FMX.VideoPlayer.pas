@@ -1669,77 +1669,77 @@ begin
   //-----
   //https://stackoverflow.com/questions/30363502/maintaining-good-scroll-performance-when-using-avplayer
   fPrepareThread := TThread.CreateAnonymousThread(
-    procedure
-    begin
+                      procedure
+                      begin
 
-      try
+                        try
 
-        {$IFDEF DEBUG}
-        var LStopWatch := TstopWatch.StartNew;
-        {$ENDIF}
+                          {$IFDEF DEBUG}
+                          var LStopWatch := TstopWatch.StartNew;
+                          {$ENDIF}
 
-        var P: Pointer;
-        var LLowerDataSource := AlLowerCase(aDataSource);
-        if (ALPosW('http://',LLowerDataSource) = 1) or
-           (ALPosW('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
-        else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
-        if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
-        var LURL := TNSUrl.Wrap(P);
-        // return A new player item, prepared to use URL.
-        // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
-        // Associating the player item with an AVPlayer immediately begins enqueuing its media
-        // and preparing it for playback. If the URL contains valid data that can be used by
-        // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
-        // URL contains no valid data or otherwise can't be used by the player item, its status
-        // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
-        // by querying the player item’s error property.
-        FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
-        FPlayerItem.retain;
-        //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
-        //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
+                          var P: Pointer;
+                          var LLowerDataSource := AlLowerCase(aDataSource);
+                          if (ALPosW('http://',LLowerDataSource) = 1) or
+                             (ALPosW('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+                          else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
+                          if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
+                          var LURL := TNSUrl.Wrap(P);
+                          // return A new player item, prepared to use URL.
+                          // This method immediately returns the item, but with the status AVPlayerItemStatusUnknown.
+                          // Associating the player item with an AVPlayer immediately begins enqueuing its media
+                          // and preparing it for playback. If the URL contains valid data that can be used by
+                          // the player item, its status later changes to AVPlayerItemStatusReadyToPlay. If the
+                          // URL contains no valid data or otherwise can't be used by the player item, its status
+                          // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
+                          // by querying the player item’s error property.
+                          FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
+                          FPlayerItem.retain;
+                          //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
+                          //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field
 
-        //-----
-        FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
-        FPlayer.retain;
+                          //-----
+                          FPlayer := TAVPlayer.Wrap(TAVPlayer.OCClass.playerWithPlayerItem(FPlayerItem)); // Returns a new player initialized to play the specified player item.
+                          FPlayer.retain;
 
-        //-----
-        fNotificationsDelegate := TNotificationsDelegate.Create(self);
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), NSObjectToID(FPlayerItem));
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(FPlayerItem));
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(FPlayerItem));
-        TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(FPlayerItem));
+                          //-----
+                          fNotificationsDelegate := TNotificationsDelegate.Create(self);
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemDidPlayToEndTime'), StringToID('AVPlayerItemDidPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemFailedToPlayToEndTime'), StringToID('AVPlayerItemFailedToPlayToEndTimeNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemTimeJumped'), StringToID('AVPlayerItemTimeJumpedNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemPlaybackStalled'), StringToID('AVPlayerItemPlaybackStalledNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewAccessLogEntry'), StringToID('AVPlayerItemNewAccessLogEntryNotification'), NSObjectToID(FPlayerItem));
+                          TNSNotificationCenter.Wrap(TNSNotificationCenter.OCClass.defaultCenter).addObserver(fNotificationsDelegate.GetObjectID, sel_getUid('ItemNewErrorLogEntry'), StringToID('AVPlayerItemNewErrorLogEntryNotification'), NSObjectToID(FPlayerItem));
 
-        //-----
-        FKVODelegate := TKVODelegate.Create(self);
-        FPlayer.addObserver(
-          TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
-          StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
-          NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
-          nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
-        FPlayerItem.addObserver(
-          TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
-          StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
-          NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
-          nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
+                          //-----
+                          FKVODelegate := TKVODelegate.Create(self);
+                          FPlayer.addObserver(
+                            TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
+                            StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
+                            NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
+                            nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
+                          FPlayerItem.addObserver(
+                            TNSObject.Wrap(FKVODelegate.GetObjectID), // observer: The object to register for KVO notifications. The observer must implement the key-value observing method observeValue(forKeyPath:of:change:context:).
+                            StrToNSStr('status'), // keyPath: The key path, relative to the object receiving this message, of the property to observe. This value must not be nil.
+                            NSKeyValueObservingOptionNew, // options: A combination of the NSKeyValueObservingOptions values that specifies what is included in observation notifications. For possible values, see NSKeyValueObservingOptions.
+                            nil); // context: Arbitrary data that is passed to observer in observeValue(forKeyPath:of:change:context:).
 
-        //-----
-        {$IFDEF DEBUG}
-        LStopWatch.Stop;
-        ALLog(
-          'TALIOSVideoPlayer.prepare',
-          'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
-          'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
-          'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status),
-          TalLogType.VERBOSE);
-        {$ENDIF}
+                          //-----
+                          {$IFDEF DEBUG}
+                          LStopWatch.Stop;
+                          ALLog(
+                            'TALIOSVideoPlayer.prepare',
+                            'timeTaken: ' + ALFormatFloatW('0.00', LStopWatch.Elapsed.TotalMilliseconds, ALDefaultFormatSettingsW) + ' | ' +
+                            'FPlayer.status: ' + ALIntToStrW(FPlayer.status) + ' | ' +
+                            'FPlayerItem.status: ' + ALIntToStrW(FPlayerItem.status),
+                            TalLogType.VERBOSE);
+                          {$ENDIF}
 
-      except
-        // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
-      end;
+                        except
+                          // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
+                        end;
 
-    end);
+                      end);
     fPrepareThread.FreeOnTerminate := False;
     fPrepareThread.Start;
 
@@ -2501,7 +2501,7 @@ begin
   result := fVideoPlayerControl.getDuration;
 end;
 
-{*********************************************}
+{***********************************************}
 function TALVideoPlayer.GetDrawable: TALDrawable;
 begin
   result := fVideoPlayerControl.Drawable;

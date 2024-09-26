@@ -1281,14 +1281,14 @@ begin
   FSavedStates := nil;
 end;
 
-{************************************}
+{***************************************}
 destructor TALPersistentObserver.Destroy;
 begin
   ALFreeAndNil(FSavedStates);
   Inherited;
 end;
 
-{************************************}
+{*********************************************************************}
 function TALPersistentObserver.CreateSavedState: TALPersistentObserver;
 begin
   result := TALPersistentObserver(classtype.Create);
@@ -1300,13 +1300,13 @@ begin
   // Virtual
 end;
 
-{***************************************}
+{******************************************}
 procedure TALPersistentObserver.BeginUpdate;
 begin
   Inc(FUpdateCount);
 end;
 
-{***************************************}
+{****************************************}
 procedure TALPersistentObserver.EndUpdate;
 begin
   if FUpdateCount > 0 then
@@ -1321,7 +1321,7 @@ begin
   end;
 end;
 
-{***************************************}
+{*************************************************}
 procedure TALPersistentObserver.EndUpdateNoChanges;
 begin
   if FUpdateCount > 0 then
@@ -1335,7 +1335,7 @@ begin
   end;
 end;
 
-{***************************************}
+{****************************************}
 procedure TALPersistentObserver.SaveState;
 begin
   if FSavedStates = nil then
@@ -1347,7 +1347,7 @@ begin
   FSavedStates.Enqueue(LSavedState);
 end;
 
-{***************************************}
+{*******************************************}
 procedure TALPersistentObserver.RestoreState;
 begin
   if (FSavedStates = nil) or
@@ -1361,7 +1361,7 @@ begin
   end;
 end;
 
-{***************************************}
+{****************************************************}
 procedure TALPersistentObserver.RestoreStateNoChanges;
 begin
   BeginUpdate;
@@ -1372,14 +1372,14 @@ begin
   end;
 end;
 
-{***************************************}
+{****************************************}
 procedure TALPersistentObserver.DoChanged;
 begin
   if Assigned(OnChanged) then
     OnChanged(Self);
 end;
 
-{***************************************}
+{*************************************}
 procedure TALPersistentObserver.Change;
 begin
   FIsChanged := True;
@@ -1459,7 +1459,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*******************************}
 procedure TALShadow.AlignToPixel;
 begin
   BeginUpdate;
@@ -1472,7 +1472,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{***********************************************************************************}
 procedure TALShadow.Interpolate(const ATo: TALShadow; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -1494,7 +1494,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{********************************************************************************************}
 procedure TALShadow.InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -1572,7 +1572,7 @@ begin
   end;
 end;
 
-{*************************************}
+{************************************************************}
 constructor TALInheritShadow.Create(const AParent: TALShadow);
 begin
   inherited create;
@@ -1581,7 +1581,7 @@ begin
   fSuperseded := False;
 end;
 
-{*********************************}
+{****************************************************************}
 function TALInheritShadow.CreateSavedState: TALPersistentObserver;
 type
   TALInheritShadowClass = class of TALInheritShadow;
@@ -1589,7 +1589,7 @@ begin
   result := TALInheritShadowClass(classtype).Create(nil{AParent});
 end;
 
-{**********************************************************}
+{***********************************************************}
 procedure TALInheritShadow.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
@@ -1598,7 +1598,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{*****************************************************}
 procedure TALInheritShadow.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -1617,7 +1617,7 @@ begin
   End;
 end;
 
-{******************************}
+{*******************************}
 procedure TALInheritShadow.Reset;
 begin
   BeginUpdate;
@@ -1630,13 +1630,13 @@ begin
   end;
 end;
 
-{******************}
+{*************************************}
 procedure TALInheritShadow.DoSupersede;
 begin
   Assign(FParent);
 end;
 
-{******************}
+{**********************************************************************}
 procedure TALInheritShadow.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -1663,7 +1663,7 @@ begin
   end;
 end;
 
-{*************************}
+{*******************************************************************************}
 procedure TALInheritShadow.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -1790,7 +1790,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*****************************}
 procedure TALFont.AlignToPixel;
 begin
   BeginUpdate;
@@ -1835,7 +1835,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{****************************************************************************************}
 procedure TALFont.InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -1891,6 +1891,7 @@ end;
 {***************************************************}
 procedure TALFont.SetFamily(const AValue: TFontName);
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function NormalizeFamily(const AValue: string): string;
   var
     LSplitted: TArray<string>;
@@ -2051,7 +2052,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{************************************************************************************************************}
 procedure TALTextDecoration.InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2184,7 +2185,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*****************************************}
 procedure TALEllipsisSettings.AlignToPixel;
 begin
   BeginUpdate;
@@ -2230,7 +2231,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{****************************************************************************************************************}
 procedure TALEllipsisSettings.InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2474,7 +2475,7 @@ begin
   end;
 end;
 
-{**********************************}
+{*****************************************}
 procedure TALBaseTextSettings.AlignToPixel;
 begin
   BeginUpdate;
@@ -2488,7 +2489,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{*******************************************************************************************************}
 procedure TALBaseTextSettings.Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2524,7 +2525,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{****************************************************************************************************************}
 procedure TALBaseTextSettings.InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2547,13 +2548,13 @@ begin
   Change;
 end;
 
-{******************************************************************}
+{**********************************************************************}
 procedure TALBaseTextSettings.EllipsisSettingsChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{*************************************************}
+{*****************************************************}
 function TALBaseTextSettings.IsEllipsisStored: Boolean;
 begin
   Result := FEllipsis <> FDefaultEllipsis;
@@ -2613,7 +2614,7 @@ begin
   FDecoration.Assign(AValue);
 end;
 
-{*******************************************************************************}
+{***********************************************************************************}
 procedure TALBaseTextSettings.SetEllipsisSettings(const AValue: TALEllipsisSettings);
 begin
   FEllipsisSettings.Assign(AValue);
@@ -2691,7 +2692,7 @@ begin
   end;
 end;
 
-{*************************************}
+{********************************************************************************}
 constructor TALInheritBaseTextSettings.Create(const AParent: TALBaseTextSettings);
 begin
   inherited create;
@@ -2700,7 +2701,7 @@ begin
   fSuperseded := False;
 end;
 
-{*********************************}
+{**************************************************************************}
 function TALInheritBaseTextSettings.CreateSavedState: TALPersistentObserver;
 type
   TALInheritBaseTextSettingsClass = class of TALInheritBaseTextSettings;
@@ -2708,7 +2709,7 @@ begin
   result := TALInheritBaseTextSettingsClass(classtype).Create(nil{AParent});
 end;
 
-{**********************************************************}
+{*********************************************************************}
 procedure TALInheritBaseTextSettings.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
@@ -2717,7 +2718,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{***************************************************************}
 procedure TALInheritBaseTextSettings.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -2736,7 +2737,7 @@ begin
   End;
 end;
 
-{******************************}
+{*****************************************}
 procedure TALInheritBaseTextSettings.Reset;
 begin
   BeginUpdate;
@@ -2749,13 +2750,13 @@ begin
   end;
 end;
 
-{******************}
+{***********************************************}
 procedure TALInheritBaseTextSettings.DoSupersede;
 begin
   Assign(FParent);
 end;
 
-{******************}
+{********************************************************************************}
 procedure TALInheritBaseTextSettings.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -2782,7 +2783,7 @@ begin
   end;
 end;
 
-{*************************}
+{*****************************************************************************************}
 procedure TALInheritBaseTextSettings.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -2807,7 +2808,7 @@ begin
   FAngle := FDefaultAngle;
 end;
 
-{**********************************************}
+{************************************************}
 procedure TALGradient.Assign(Source: TPersistent);
 begin
   if Source is TALGradient then begin
@@ -2840,7 +2841,7 @@ begin
   end;
 end;
 
-{**************************}
+{***************************************************************************************}
 procedure TALGradient.Interpolate(const ATo: TALGradient; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2874,7 +2875,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{************************************************************************************************}
 procedure TALGradient.InterpolateNoChanges(const ATo: TALGradient; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -2935,7 +2936,7 @@ begin
   end;
 end;
 
-{*************************************************}
+{**************************************************}
 procedure TALGradient.WriteOffsets(Writer: TWriter);
 begin
   Writer.WriteListBegin;
@@ -2947,7 +2948,7 @@ begin
   end;
 end;
 
-{*****************************************}
+{******************************************}
 function TALGradient.IsStyleStored: Boolean;
 begin
   result := FStyle <> FDefaultStyle;
@@ -3002,7 +3003,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{****************************************************************}
 procedure TALGradient.SetColors(const Value: TArray<TAlphaColor>);
 begin
   if fColors <> Value then begin
@@ -3211,7 +3212,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{************************************************************}
 constructor TALBrush.Create(const ADefaultColor: TAlphaColor);
 begin
   inherited Create;
@@ -3243,7 +3244,7 @@ begin
   inherited;
 end;
 
-{*********************************}
+{********************************************************}
 function TALBrush.CreateSavedState: TALPersistentObserver;
 type
   TALBrushClass = class of TALBrush;
@@ -3269,7 +3270,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************************************}
+{*********************************************}
 procedure TALBrush.Assign(Source: TPersistent);
 begin
   if Source is TALBrush then begin
@@ -3289,7 +3290,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{************************}
+{***********************}
 procedure TALBrush.Reset;
 begin
   BeginUpdate;
@@ -3306,7 +3307,7 @@ begin
   end;
 end;
 
-{**********************************}
+{******************************}
 procedure TALBrush.AlignToPixel;
 begin
   BeginUpdate;
@@ -3356,7 +3357,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{******************************************************************************************}
 procedure TALBrush.InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -3394,7 +3395,7 @@ begin
   result := FResourceName <> FDefaultResourceName;
 end;
 
-{**********************************************}
+{******************************************}
 function TALBrush.IsWrapModeStored: Boolean;
 begin
   result := FWrapMode <> FDefaultWrapMode;
@@ -3409,7 +3410,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{*******************************************************}
 procedure TALBrush.SetGradient(const Value: TAlGradient);
 begin
   FGradient.Assign(Value);
@@ -3424,7 +3425,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{************************************************************}
 procedure TALBrush.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if fWrapMode <> Value then begin
@@ -3433,13 +3434,13 @@ begin
   end;
 end;
 
-{**************************************************}
+{************************************************************}
 procedure TALBrush.SetBackgroundMargins(const Value: TBounds);
 begin
   FBackgroundMargins.Assign(Value);
 end;
 
-{**************************************************}
+{*******************************************************}
 procedure TALBrush.SetImageMargins(const Value: TBounds);
 begin
   FImageMargins.Assign(Value);
@@ -3451,19 +3452,19 @@ begin
   change;
 end;
 
-{*************************************************}
+{***********************************************************}
 procedure TALBrush.BackgroundMarginsChanged(Sender: TObject);
 begin
   change;
 end;
 
-{*************************************************}
+{******************************************************}
 procedure TALBrush.ImageMarginsChanged(Sender: TObject);
 begin
   change;
 end;
 
-{***************************************************************************************************}
+{********************************************************************************************}
 constructor TALInheritBrush.Create(const AParent: TALBrush; const ADefaultColor: TAlphaColor);
 begin
   inherited create(ADefaultColor);
@@ -3472,7 +3473,7 @@ begin
   fSuperseded := False;
 end;
 
-{*********************************}
+{***************************************************************}
 function TALInheritBrush.CreateSavedState: TALPersistentObserver;
 type
   TALInheritBrushClass = class of TALInheritBrush;
@@ -3521,13 +3522,13 @@ begin
   end;
 end;
 
-{******************}
+{************************************}
 procedure TALInheritBrush.DoSupersede;
 begin
   Assign(FParent);
 end;
 
-{******************}
+{*********************************************************************}
 procedure TALInheritBrush.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -3554,7 +3555,7 @@ begin
   end;
 end;
 
-{*************************}
+{******************************************************************************}
 procedure TALInheritBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -3565,7 +3566,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{******************************************************************}
 constructor TALStrokeBrush.Create(const ADefaultColor: TAlphaColor);
 begin
   inherited Create;
@@ -3577,7 +3578,7 @@ begin
   FThickness := FDefaultThickness;
 end;
 
-{*********************************}
+{**************************************************************}
 function TALStrokeBrush.CreateSavedState: TALPersistentObserver;
 type
   TALStrokeBrushClass = class of TALStrokeBrush;
@@ -3603,7 +3604,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************************************}
+{***************************************************}
 procedure TALStrokeBrush.Assign(Source: TPersistent);
 begin
   if Source is TALStrokeBrush then begin
@@ -3619,7 +3620,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{************************}
+{*****************************}
 procedure TALStrokeBrush.Reset;
 begin
   BeginUpdate;
@@ -3632,7 +3633,7 @@ begin
   end;
 end;
 
-{**********************************}
+{************************************}
 procedure TALStrokeBrush.AlignToPixel;
 begin
   BeginUpdate;
@@ -3643,7 +3644,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{*********************************************************************************************}
 procedure TALStrokeBrush.Interpolate(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -3661,7 +3662,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{******************************************************************************************************}
 procedure TALStrokeBrush.InterpolateNoChanges(const ATo: TALStrokeBrush; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -3672,26 +3673,26 @@ begin
   end;
 end;
 
-{************************}
+{*****************************************}
 function TALStrokeBrush.HasStroke: boolean;
 begin
   result := (Color <> TalphaColors.Null) and
             (CompareValue(Thickness, 0, TEpsilon.Vector) > 0);
 end;
 
-{***************************************}
+{*********************************************}
 function TALStrokeBrush.IsColorStored: Boolean;
 begin
   result := FColor <> FDefaultColor;
 end;
 
-{**********************************************}
+{*************************************************}
 function TALStrokeBrush.IsThicknessStored: Boolean;
 begin
   result := not SameValue(FThickness, FDefaultThickness, TEpsilon.Vector);
 end;
 
-{****************************************************}
+{**********************************************************}
 procedure TALStrokeBrush.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
@@ -3709,7 +3710,7 @@ begin
   end;
 end;
 
-{*************************************}
+{********************************************************************************************************}
 constructor TALInheritStrokeBrush.Create(const AParent: TALStrokeBrush; const ADefaultColor: TAlphaColor);
 begin
   inherited create(ADefaultColor);
@@ -3718,7 +3719,7 @@ begin
   fSuperseded := False;
 end;
 
-{*********************************}
+{*********************************************************************}
 function TALInheritStrokeBrush.CreateSavedState: TALPersistentObserver;
 type
   TALInheritStrokeBrushClass = class of TALInheritStrokeBrush;
@@ -3726,7 +3727,7 @@ begin
   result := TALInheritStrokeBrushClass(classtype).Create(nil{AParent}, DefaultColor);
 end;
 
-{**********************************************************}
+{****************************************************************}
 procedure TALInheritStrokeBrush.SetInherit(const AValue: Boolean);
 begin
   If FInherit <> AValue then begin
@@ -3735,7 +3736,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{**********************************************************}
 procedure TALInheritStrokeBrush.Assign(Source: TPersistent);
 begin
   BeginUpdate;
@@ -3754,7 +3755,7 @@ begin
   End;
 end;
 
-{******************************}
+{************************************}
 procedure TALInheritStrokeBrush.Reset;
 begin
   BeginUpdate;
@@ -3767,13 +3768,13 @@ begin
   end;
 end;
 
-{******************}
+{******************************************}
 procedure TALInheritStrokeBrush.DoSupersede;
 begin
   Assign(FParent);
 end;
 
-{******************}
+{***************************************************************************}
 procedure TALInheritStrokeBrush.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -3800,7 +3801,7 @@ begin
   end;
 end;
 
-{*************************}
+{************************************************************************************}
 procedure TALInheritStrokeBrush.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -3811,7 +3812,7 @@ begin
   end;
 end;
 
-{**********************************************************************************************}
+{*****************************************************************}
 constructor TALStateLayer.Create(const ADefaultColor: TAlphaColor);
 begin
   inherited Create;
@@ -3832,14 +3833,14 @@ begin
   FMargins.OnChange := MarginsChanged;
 end;
 
-{**************************}
+{*******************************}
 destructor TALStateLayer.Destroy;
 begin
   ALFreeAndNil(FMargins);
   inherited;
 end;
 
-{*********************************}
+{*************************************************************}
 function TALStateLayer.CreateSavedState: TALPersistentObserver;
 type
   TALStateLayerClass = class of TALStateLayer;
@@ -3847,7 +3848,7 @@ begin
   result := TALStateLayerClass(classtype).Create(DefaultColor);
 end;
 
-{**********************************************}
+{**************************************************}
 procedure TALStateLayer.Assign(Source: TPersistent);
 begin
   if Source is TALStateLayer then begin
@@ -3867,7 +3868,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{************************}
+{****************************}
 procedure TALStateLayer.Reset;
 begin
   BeginUpdate;
@@ -3884,7 +3885,7 @@ begin
   end;
 end;
 
-{**********************************}
+{***********************************}
 procedure TALStateLayer.AlignToPixel;
 begin
   BeginUpdate;
@@ -3895,7 +3896,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{*******************************************************************************************}
 procedure TALStateLayer.Interpolate(const ATo: TALStateLayer; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -3927,7 +3928,7 @@ begin
   end;
 end;
 
-{*********************************************************************************}
+{****************************************************************************************************}
 procedure TALStateLayer.InterpolateNoChanges(const ATo: TALStateLayer; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -3938,44 +3939,44 @@ begin
   end;
 end;
 
-{*********************************}
+{**************************************}
 function TALStateLayer.HasFill: boolean;
 begin
   result := ((Color <> TalphaColors.Null) or (UseContentColor)) and
             (CompareValue(Opacity, 0, TEpsilon.Scale) > 0);
 end;
 
-{**************************************************}
+{**********************************************}
 function TALStateLayer.IsOpacityStored: Boolean;
 begin
   Result := not SameValue(FOpacity, FDefaultOpacity, TEpsilon.Scale);
 end;
 
-{***************************************}
+{********************************************}
 function TALStateLayer.IsColorStored: Boolean;
 begin
   result := FColor <> FDefaultColor;
 end;
 
-{**************************************************}
+{******************************************************}
 function TALStateLayer.IsUseContentColorStored: Boolean;
 begin
   Result := FUseContentColor <> FDefaultUseContentColor;
 end;
 
-{**************************************************}
+{**********************************************}
 function TALStateLayer.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
 end;
 
-{**************************************************}
+{**********************************************}
 function TALStateLayer.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
 
-{**************************************************}
+{******************************************************}
 procedure TALStateLayer.SetOpacity(const Value: Single);
 begin
   if not SameValue(FOpacity, Value, TEpsilon.Scale) then begin
@@ -3984,7 +3985,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{*********************************************************}
 procedure TALStateLayer.SetColor(const Value: TAlphaColor);
 begin
   if fColor <> Value then begin
@@ -3993,7 +3994,7 @@ begin
   end;
 end;
 
-{**************************************************}
+{***************************************************************}
 procedure TALStateLayer.SetUseContentColor(const Value: Boolean);
 begin
   if FUseContentColor <> Value then begin
@@ -4002,13 +4003,13 @@ begin
   end;
 end;
 
-{**************************************************}
+{*******************************************************}
 procedure TALStateLayer.SetMargins(const Value: TBounds);
 begin
   FMargins.Assign(Value);
 end;
 
-{**************************************************}
+{******************************************************}
 procedure TALStateLayer.SetXRadius(const Value: Single);
 begin
   if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
@@ -4017,7 +4018,7 @@ begin
   end;
 end;
 
-{**************************************************}
+{******************************************************}
 procedure TALStateLayer.SetYRadius(const Value: Single);
 begin
   if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
@@ -4026,13 +4027,13 @@ begin
   end;
 end;
 
-{*************************************************}
+{******************************************************}
 procedure TALStateLayer.MarginsChanged(Sender: TObject);
 begin
   change;
 end;
 
-{**********************************************************************************************}
+{********************************************************************}
 constructor TALStateTransition.Create(const ADefaultDuration: Single);
 begin
   inherited Create;
@@ -4048,7 +4049,7 @@ begin
   FDelayClick := FDefaultDelayClick;
 end;
 
-{**********************************************}
+{******************************************************************}
 function TALStateTransition.CreateSavedState: TALPersistentObserver;
 type
   TALStateTransitionClass = class of TALStateTransition;
@@ -4056,7 +4057,7 @@ begin
   result := TALStateTransitionClass(classtype).Create(0{ADefaultDuration});
 end;
 
-{**********************************************}
+{*******************************************************}
 procedure TALStateTransition.Assign(Source: TPersistent);
 begin
   if Source is TALStateTransition then begin
@@ -4074,7 +4075,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{************************}
+{*********************************}
 procedure TALStateTransition.Reset;
 begin
   BeginUpdate;
@@ -4089,31 +4090,31 @@ begin
   end;
 end;
 
-{**********************************************}
+{*********************************************************}
 function TALStateTransition.IsAnimationTypeStored: Boolean;
 begin
   result := FAnimationType <> FDefaultAnimationType;
 end;
 
-{***************************************}
+{****************************************************}
 function TALStateTransition.IsDurationStored: Boolean;
 begin
   result := not SameValue(fDuration, fDefaultDuration, Tepsilon.Scale);
 end;
 
-{**********************************************}
+{*********************************************************}
 function TALStateTransition.IsInterpolationStored: Boolean;
 begin
   result := FInterpolation <> FDefaultInterpolation;
 end;
 
-{**********************************************}
+{******************************************************}
 function TALStateTransition.IsDelayClickStored: Boolean;
 begin
   result := FDelayClick <> FDefaultDelayClick;
 end;
 
-{******************************************************}
+{*************************************************************************}
 procedure TALStateTransition.SetAnimationType(const Value: TAnimationType);
 begin
   if fAnimationType <> Value then begin
@@ -4122,7 +4123,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{************************************************************}
 procedure TALStateTransition.SetDuration(const Value: Single);
 begin
   if Not SameValue(fDuration, Value, Tepsilon.Scale) then begin
@@ -4131,7 +4132,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{*******************************************************************************}
 procedure TALStateTransition.SetInterpolation(const Value: TALInterpolationType);
 begin
   if fInterpolation <> Value then begin
@@ -4140,7 +4141,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{***************************************************************}
 procedure TALStateTransition.SetDelayClick(const Value: Boolean);
 begin
   if fDelayClick <> Value then begin
@@ -4153,7 +4154,7 @@ end;
 Type
   _TControlAccessProtected = class(Tcontrol);
 
-{***********************************}
+{***********************************************************}
 constructor TALBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create;
@@ -4206,7 +4207,7 @@ begin
   //BufDisabledDrawableRect
 end;
 
-{*************************************}
+{***********************************}
 destructor TALBaseStateStyle.Destroy;
 begin
   ClearBufDrawable;
@@ -4217,7 +4218,7 @@ begin
   inherited Destroy;
 end;
 
-{*********************************}
+{*****************************************************************}
 function TALBaseStateStyle.CreateSavedState: TALPersistentObserver;
 type
   TALBaseStateStyleClass = class of TALBaseStateStyle;
@@ -4245,7 +4246,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{******************************}
+{********************************}
 procedure TALBaseStateStyle.Reset;
 begin
   BeginUpdate;
@@ -4262,7 +4263,7 @@ begin
   end;
 end;
 
-{**********************************}
+{***************************************}
 procedure TALBaseStateStyle.AlignToPixel;
 begin
   BeginUpdate;
@@ -4282,7 +4283,7 @@ begin
   ALFreeAndNilDrawable(BufDrawable);
 end;
 
-{******************************************************}
+{***************************************************************************************************}
 procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -4349,7 +4350,7 @@ begin
   End;
 end;
 
-{*********************************************************************************}
+{************************************************************************************************************}
 procedure TALBaseStateStyle.InterpolateNoChanges(const ATo: TALBaseStateStyle; const ANormalizedTime: Single);
 begin
   BeginUpdate;
@@ -4360,7 +4361,7 @@ begin
   end;
 end;
 
-{******************}
+{**************************************}
 procedure TALBaseStateStyle.DoSupersede;
 begin
   Fill.Supersede;
@@ -4369,7 +4370,7 @@ begin
   // Do not supersede the scale
 end;
 
-{******************}
+{***********************************************************************}
 procedure TALBaseStateStyle.Supersede(Const ASaveState: Boolean = False);
 begin
   if ASaveState then SaveState;
@@ -4383,7 +4384,7 @@ begin
   end;
 end;
 
-{*************************}
+{********************************************************************************}
 procedure TALBaseStateStyle.SupersedeNoChanges(Const ASaveState: Boolean = False);
 begin
   BeginUpdate;
@@ -4394,37 +4395,37 @@ begin
   end;
 end;
 
-{***************************************}
+{************************************************}
 function TALBaseStateStyle.IsScaleStored: Boolean;
 begin
   result := not SameValue(fScale, FDefaultScale, Tepsilon.Scale);
 end;
 
-{****************************************************************************}
+{*****************************************************************}
 procedure TALBaseStateStyle.SetFill(const AValue: TALInheritBrush);
 begin
   FFill.Assign(AValue);
 end;
 
-{********************************************************************}
+{*********************************************************************}
 procedure TALBaseStateStyle.SetStateLayer(const AValue: TALStateLayer);
 begin
   FStateLayer.Assign(AValue);
 end;
 
-{************************************************************************************}
+{*************************************************************************}
 procedure TALBaseStateStyle.SetStroke(const AValue: TALInheritStrokeBrush);
 begin
   FStroke.Assign(AValue);
 end;
 
-{*******************************************************************************}
+{********************************************************************}
 procedure TALBaseStateStyle.SetShadow(const AValue: TALInheritShadow);
 begin
   FShadow.Assign(AValue);
 end;
 
-{***********************************************}
+{********************************************************}
 procedure TALBaseStateStyle.SetScale(const Value: Single);
 begin
   if not SameValue(FScale, Value, TEpsilon.Scale) then begin
@@ -4433,7 +4434,7 @@ begin
   end;
 end;
 
-{***********************************************}
+{*********************************************}
 function TALBaseStateStyle.GetInherit: Boolean;
 begin
   Result := Fill.Inherit and
@@ -4443,31 +4444,31 @@ begin
             Samevalue(Scale, DefaultScale, TEpsilon.Scale);
 end;
 
-{**********************************************************}
+{********************************************************}
 procedure TALBaseStateStyle.FillChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{**********************************************************}
+{**************************************************************}
 procedure TALBaseStateStyle.StateLayerChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{************************************************************}
+{**********************************************************}
 procedure TALBaseStateStyle.StrokeChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{************************************************************}
+{**********************************************************}
 procedure TALBaseStateStyle.ShadowChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{*************************************}
+{***************************************************************}
 constructor TALBaseStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create;
@@ -4494,7 +4495,7 @@ begin
   FCurrentAdjustedStyle := nil;
 end;
 
-{*************************************}
+{************************************}
 destructor TALBaseStateStyles.Destroy;
 begin
   ALFreeAndNil(FTransitionAnimation);
@@ -4510,7 +4511,7 @@ begin
   inherited Destroy;
 end;
 
-{*********************************}
+{******************************************************************}
 function TALBaseStateStyles.CreateSavedState: TALPersistentObserver;
 type
   TALBaseStateStylesClass = class of TALBaseStateStyles;
@@ -4524,10 +4525,10 @@ begin
   result := TALStateTransition.Create(0{ADefaultDuration})
 end;
 
-{***************************************}
+{*******************************************}
 procedure TALBaseStateStyles.StartTransition;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   function _IsSameStateStyleClass(const AStateStyleA, AStateStyleB: TALBaseStateStyle): boolean;
   begin
     result := AStateStyleA = AStateStyleB;
@@ -4623,7 +4624,7 @@ begin
   end;
 end;
 
-{**************************************************}
+{***********************************************************************}
 procedure TALBaseStateStyles.TransitionAnimationProcess(Sender: TObject);
 begin
   {$IF defined(debug)}
@@ -4632,7 +4633,7 @@ begin
   FParent.Repaint;
 end;
 
-{**************************************************}
+{**********************************************************************}
 procedure TALBaseStateStyles.TransitionAnimationFinish(Sender: TObject);
 begin
   {$IF defined(debug)}
@@ -4646,7 +4647,7 @@ begin
   FParent.Repaint;
 end;
 
-{******************************************************}
+{*******************************************************}
 procedure TALBaseStateStyles.Assign(Source: TPersistent);
 begin
   if Source is TALBaseStateStyles then begin
@@ -4661,7 +4662,7 @@ begin
     ALAssignError(Source{ASource}, Self{ADest});
 end;
 
-{******************************}
+{*********************************}
 procedure TALBaseStateStyles.Reset;
 begin
   BeginUpdate;
@@ -4673,25 +4674,25 @@ begin
   end;
 end;
 
-{**********************************}
+{****************************************}
 procedure TALBaseStateStyles.AlignToPixel;
 begin
   // Virtual
 end;
 
-{******************************}
+{********************************************}
 procedure TALBaseStateStyles.ClearBufDrawable;
 begin
   // Virtual
 end;
 
-{******************************}
+{****************************************************************}
 function TALBaseStateStyles.GetCurrentRawStyle: TALBaseStateStyle;
 begin
   Raise Exception.Create('Not implemented')
 end;
 
-{******************************}
+{*********************************************************************}
 function TALBaseStateStyles.GetCurrentAdjustedStyle: TALBaseStateStyle;
 type
   TALBaseStateStyleClass = class of TALBaseStateStyle;
@@ -4737,14 +4738,14 @@ begin
   Result := FCurrentAdjustedStyle;
 end;
 
-{*****************************}
+{****************************************************************}
 function TALBaseStateStyles.IsTransitionAnimationRunning: Boolean;
 begin
   Result := FTransitionAnimation.Enabled and
             FTransitionAnimation.Running;
 end;
 
-{*****************************}
+{*****************************************************}
 procedure TALBaseStateStyles.UpdateLastPaintedRawStyle;
 begin
   FLastPaintedRawStyle := GetCurrentRawStyle;
@@ -4809,19 +4810,19 @@ begin
 end;
 {$ENDIF}
 
-{***********************************************}
+{**************************************************************************}
 procedure TALBaseStateStyles.SetTransition(const Value: TALStateTransition);
 begin
   FTransition.Assign(Value);
 end;
 
-{**************************************************}
+{***************************************************************}
 procedure TALBaseStateStyles.TransitionChanged(ASender: TObject);
 begin
   Change;
 end;
 
-{***************************************************************************************}
+{******************************************************************************************************************}
 class procedure TALFontManager.RegisterTypefaceFromResource(const AResourceName: string; const AFamilyName: string);
 begin
 
@@ -5227,7 +5228,7 @@ begin
   Result := translate(AText);
 end;
 
-{*************************************************************************************************}
+{**************************************************************************************************}
 Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffered: Boolean = True);
 begin
   // This ensures the style is retained when the control exits the visible area.
@@ -5344,7 +5345,7 @@ begin
   AControl.SetBounds(AControl.Position.X, AControl.Position.Y, LSize.Width, LSize.Height);
 end;
 
-{**************************************************************************************}
+{*************************************************************************************************************}
 function  ALAlignEdgesToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
   result.left := Round(Rect.left * Scale + Epsilon) / Scale;
@@ -5353,14 +5354,14 @@ begin
   result.bottom := Round(Rect.bottom * Scale + Epsilon) / Scale;
 end;
 
-{**************************************************************************************}
+{*****************************************************************************************************************}
 function  ALAlignDimensionToPixelRound(const Size: TSizeF; const Scale: single; const Epsilon: Single = 0): TSizeF;
 begin
   result.Width := Round(Size.Width * Scale + Epsilon) / Scale;
   result.height := Round(Size.height * Scale + Epsilon) / Scale;
 end;
 
-{**************************************************************************************}
+{*****************************************************************************************************************}
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
   result := Rect;
@@ -5368,7 +5369,7 @@ begin
   result.height := Round(Rect.height * Scale + Epsilon) / Scale;
 end;
 
-{*******************************************************************************************}
+{**********************************************************************************************************************}
 function  ALAlignDimensionToPixelRound(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single;
 begin
   result := Round(Dimension * Scale + Epsilon) / Scale;
@@ -5382,13 +5383,13 @@ begin
   result.height := ceil(Rect.height * Scale - Epsilon) / Scale;
 end;
 
-{******************************************************************************************}
+{*********************************************************************************************************************}
 function  ALAlignDimensionToPixelCeil(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single;
 begin
   result := ceil(Dimension * Scale - Epsilon) / Scale;
 end;
 
-{****************************************************************************************************************}
+{*****************************************************************************************************************}
 function  ALAlignDimensionToPixelFloor(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF;
 begin
   result := Rect;
@@ -5396,7 +5397,7 @@ begin
   result.height := Floor(Rect.height * Scale + Epsilon) / Scale;
 end;
 
-{******************************************************************************************}
+{**********************************************************************************************************************}
 function  ALAlignDimensionToPixelFloor(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single;
 begin
   result := Floor(Dimension * Scale + Epsilon) / Scale;

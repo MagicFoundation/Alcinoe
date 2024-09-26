@@ -1112,7 +1112,7 @@ begin
   ALFreeAndNil(FAniThread);
 end;
 
-{******************************************************************************}
+{*************************************************************************}
 procedure TALDisplayAnimation.ProcessTick(const ATime, ADeltaTime: Double);
 begin
   if (not FRunning) or FPause then
@@ -1147,7 +1147,7 @@ begin
   // Nothing to do
 end;
 
-{***************************************}
+{**********************************}
 procedure TALDisplayAnimation.Start;
 begin
   if (FRunning) then
@@ -1170,13 +1170,13 @@ begin
     Stop;
 end;
 
-{**************************************}
+{*********************************}
 procedure TALDisplayAnimation.Stop;
 begin
   StopAtCurrent;
 end;
 
-{***********************************************}
+{******************************************}
 procedure TALDisplayAnimation.StopAtCurrent;
 begin
   if not FRunning then

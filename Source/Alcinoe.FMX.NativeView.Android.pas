@@ -198,10 +198,10 @@ begin
   var LBounds := Control.AbsoluteRect;
   var LScreenScale: Single := FForm.Handle.Scale;
   var R := TRectF.Create(
-              LBounds.Left * LScreenScale,
-              LBounds.Top * LScreenScale,
-              LBounds.Right * LScreenScale,
-              LBounds.Bottom * LScreenScale).Round;
+             LBounds.Left * LScreenScale,
+             LBounds.Top * LScreenScale,
+             LBounds.Right * LScreenScale,
+             LBounds.Bottom * LScreenScale).Round;
   If (R.Width <> Layout.getWidth) or (R.Height <> Layout.getHeight) then begin
     var LParam: JRelativeLayout_LayoutParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
     LParam.width := R.Width;

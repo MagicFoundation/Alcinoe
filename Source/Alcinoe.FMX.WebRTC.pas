@@ -34,6 +34,7 @@ uses
   FMX.Types3D,
   Alcinoe.AndroidApi.WebRTC,
   Alcinoe.FMX.Types3D,
+  Alcinoe.FMX.Materials.Canvas,
   {$ELSEIF defined(IOS)}
   System.syncObjs,
   System.generics.collections,
@@ -534,7 +535,7 @@ var LJListIceServers: JList;
   var Tex: GLuint;
   begin
     aTexture.Style := aTexture.Style - [TTextureStyle.MipMaps];
-    if TALCustomContextIOSAccess.valid then
+    if TCustomContextIOS.valid then
     begin
       glActiveTexture(GL_TEXTURE0);
       glGenTextures(1, @Tex);
@@ -565,7 +566,7 @@ var LJListIceServers: JList;
       //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
       glBindTexture(GL_TEXTURE_2D, 0);
       ITextureAccess(aTexture).Handle := Tex;
-      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TALCustomContextIOSAccess.ClassName]);
+      TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [TCustomContextIOS.ClassName]);
     end;
   end;
 
@@ -592,11 +593,11 @@ begin
 
 
     fLocalbitmap := TALTexture.Create;
-    fLocalbitmap.Material := TalTexture.DefExternalOESMaterial;
+    fLocalbitmap.Material := ALGetDefExternalOESMaterial;
     fLocalbitmap.Style := fLocalbitmap.Style - [TTextureStyle.MipMaps];
     //-----
     fRemotebitmap := TALTexture.Create;
-    fRemotebitmap.Material := TalTexture.DefExternalOESMaterial;
+    fRemotebitmap.Material := ALGetDefExternalOESMaterial;
     fRemotebitmap.Style := fRemotebitmap.Style - [TTextureStyle.MipMaps];
     //-----
     fAndroidWebRTC := nil;

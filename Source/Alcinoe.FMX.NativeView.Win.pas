@@ -158,9 +158,10 @@ begin
     if Winapi.Windows.RegisterClass(WindowClass) = 0 then
       RaiseLastOSError;
 
-    FContainerHandle := CreateWindowEx(WS_EX_TOOLWINDOW, WindowClass.lpszClassName, nil, WS_POPUP or WS_CAPTION or
-      WS_CLIPSIBLINGS or WS_SYSMENU or WS_MINIMIZEBOX, GetSystemMetrics(SM_CXSCREEN) div 2,
-      GetSystemMetrics(SM_CYSCREEN) div 2, 0, 0, 0, 0, HInstance, nil);
+    FContainerHandle := CreateWindowEx(
+                          WS_EX_TOOLWINDOW, WindowClass.lpszClassName, nil, WS_POPUP or WS_CAPTION or
+                          WS_CLIPSIBLINGS or WS_SYSMENU or WS_MINIMIZEBOX, GetSystemMetrics(SM_CXSCREEN) div 2,
+                          GetSystemMetrics(SM_CYSCREEN) div 2, 0, 0, 0, 0, HInstance, nil);
   end;
 end;
 
@@ -255,8 +256,9 @@ begin
           RaiseLastOSError;
       end;
       FCreationControl := Self;
-      FHandle := CreateWindowEx(ExStyle, WinClassName, Caption, Style, X, Y, Width, Height, WndParent, 0,
-        WindowClass.hInstance, Param);
+      FHandle := CreateWindowEx(
+                   ExStyle, WinClassName, Caption, Style, X, Y, Width, Height, WndParent, 0,
+                   WindowClass.hInstance, Param);
     end;
     if FHandle = NullHWnd then
       RaiseLastOSError;
@@ -376,8 +378,9 @@ end;
 procedure TALWinNativeView.DefaultHandler(var Message);
 begin
   if (FHandle <> NullHWnd) then
-    TMessage(Message).Result := CallWindowProc(FDefWndProc, FHandle, TMessage(Message).Msg, TMessage(Message).WParam,
-      TMessage(Message).LParam)
+    TMessage(Message).Result := CallWindowProc(
+                                  FDefWndProc, FHandle, TMessage(Message).Msg, TMessage(Message).WParam,
+                                  TMessage(Message).LParam)
   else
     inherited DefaultHandler(Message);
 end;

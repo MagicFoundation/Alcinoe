@@ -969,7 +969,7 @@ begin
   fShadow.OnChanged := ShadowChanged;
 end;
 
-{**********************************************}
+{**************************}
 destructor TALShape.Destroy;
 begin
   ALFreeAndNil(FStroke);
@@ -998,7 +998,7 @@ begin
   Repaint;
 end;
 
-{**********************************************}
+{************************************************}
 procedure TALShape.StrokeChanged(Sender: TObject);
 begin
   Repaint;
@@ -1016,7 +1016,7 @@ begin
   Result := FFill;
 end;
 
-{**********************************************}
+{************************************************}
 procedure TALShape.SetFill(const Value: TALBrush);
 begin
   FFill.Assign(Value);
@@ -1028,7 +1028,7 @@ begin
   Result := FStroke;
 end;
 
-{******************************************************}
+{********************************************************}
 procedure TALShape.SetStroke(const Value: TALStrokeBrush);
 begin
   FStroke.Assign(Value);
@@ -1065,7 +1065,7 @@ begin
   inherited;
 end;
 
-{********************************}
+{**********************************}
 procedure TALImage.clearBufDrawable;
 begin
   {$IFDEF debug}
@@ -1237,19 +1237,19 @@ begin
   inherited;
 end;
 
-{***********************************************}
+{*******************************************}
 function TALImage.GetDoubleBuffered: boolean;
 begin
   result := True;
 end;
 
-{**************************************************************}
+{**********************************************************}
 procedure TALImage.SetDoubleBuffered(const AValue: Boolean);
 begin
   // Not yet supported
 end;
 
-{****************************************************}
+{***********************************************************************}
 constructor TALAnimatedImage.TAnimation.Create(AOwner: TALAnimatedImage);
 begin
   inherited create;
@@ -1265,14 +1265,14 @@ begin
   FDuration := 0.0;
 end;
 
-{****************************************************}
+{*********************************************}
 destructor TALAnimatedImage.TAnimation.Destroy;
 begin
   ALFreeAndNil(fFloatAnimation);
   inherited;
 end;
 
-{****************************************************}
+{*****************************************************************}
 procedure TALAnimatedImage.TAnimation.UpdateFloatAnimationDuration;
 begin
   if not SameValue(FSpeed, 0.0, Single.Epsilon) then
@@ -1288,7 +1288,7 @@ begin
     Fowner.Repaint;
 end;
 
-{****************************************************}
+{***********************************************************}
 function TALAnimatedImage.TAnimation.GetAutoReverse: Boolean;
 begin
   Result := FFloatAnimation.AutoReverse;
@@ -1300,13 +1300,13 @@ begin
   Result := FFloatAnimation.Delay;
 end;
 
-{****************************************************}
+{*******************************************************}
 function TALAnimatedImage.TAnimation.GetDuration: Single;
 begin
   Result := FDuration;
 end;
 
-{****************************************************}
+{*******************************************************}
 function TALAnimatedImage.TAnimation.GetInverse: Boolean;
 begin
   Result := FFloatAnimation.Inverse;
@@ -1318,7 +1318,7 @@ begin
   Result := FFloatAnimation.Loop;
 end;
 
-{****************************************************}
+{**********************************************************}
 function TALAnimatedImage.TAnimation.GetCurrentTime: Single;
 begin
   if not Enabled then begin
@@ -1329,31 +1329,31 @@ begin
     Result := CurrentProgress * Duration
 end;
 
-{****************************************************}
+{*****************************************************}
 function TALAnimatedImage.TAnimation.GetPause: Boolean;
 begin
   Result := FFloatAnimation.Pause;
 end;
 
-{****************************************************}
+{*******************************************************}
 function TALAnimatedImage.TAnimation.GetRunning: Boolean;
 begin
   Result := FFloatAnimation.Running;
 end;
 
-{****************************************************}
+{************************************************************}
 function TALAnimatedImage.TAnimation.GetStartProgress: Single;
 begin
   Result := FFloatAnimation.StartValue;
 end;
 
-{****************************************************}
+{***********************************************************}
 function TALAnimatedImage.TAnimation.GetStopProgress: Single;
 begin
   Result := FFloatAnimation.StopValue;
 end;
 
-{****************************************************}
+{**************************************************************}
 function TALAnimatedImage.TAnimation.GetCurrentProgress: Single;
 begin
   Result := FFloatAnimation.CurrentValue;
@@ -1365,45 +1365,45 @@ begin
   Result := FSpeed;
 end;
 
-{****************************************************}
+{*************************************************************************}
 procedure TALAnimatedImage.TAnimation.SetAutoReverse(const Value: Boolean);
 begin
   FFloatAnimation.AutoReverse := Value;
 end;
 
-{****************************************************}
+{******************************************************************}
 procedure TALAnimatedImage.TAnimation.SetDelay(const Value: Single);
 begin
   FFloatAnimation.Delay := Value;
 end;
 
-{****************************************************}
+{*********************************************************************}
 procedure TALAnimatedImage.TAnimation.SetDuration(const Value: Single);
 begin
   FDuration := Value;
   UpdateFloatAnimationDuration;
 end;
 
-{****************************************************}
+{*********************************************************************}
 procedure TALAnimatedImage.TAnimation.SetInverse(const Value: Boolean);
 begin
   FFloatAnimation.Inverse := Value;
   Repaint;
 end;
 
-{****************************************************}
+{******************************************************************}
 procedure TALAnimatedImage.TAnimation.SetLoop(const Value: Boolean);
 begin
   FFloatAnimation.Loop := Value;
 end;
 
-{****************************************************}
+{*******************************************************************}
 procedure TALAnimatedImage.TAnimation.SetPause(const Value: Boolean);
 begin
   FFloatAnimation.Pause := Value;
 end;
 
-{****************************************************}
+{**************************************************************************}
 procedure TALAnimatedImage.TAnimation.SetStartProgress(const Value: Single);
 begin
   FFloatAnimation.StartValue := Min(Max(Value, 0), 1);
@@ -1411,7 +1411,7 @@ begin
   Repaint;
 end;
 
-{****************************************************}
+{*************************************************************************}
 procedure TALAnimatedImage.TAnimation.SetStopProgress(const Value: Single);
 begin
   FFloatAnimation.StopValue := Min(Max(Value, 0), 1);
@@ -1419,7 +1419,7 @@ begin
   Repaint;
 end;
 
-{****************************************************}
+{******************************************************************}
 procedure TALAnimatedImage.TAnimation.SetSpeed(const Value: Single);
 begin
   if not SameValue(FSpeed, Value, Single.Epsilon) then begin
@@ -1428,31 +1428,31 @@ begin
   end;
 end;
 
-{****************************************************}
+{*****************************************************************}
 function TALAnimatedImage.TAnimation.IsStopProgressStored: Boolean;
 begin
   Result := Not SameValue(FFloatAnimation.StopValue, 1.0, Single.Epsilon);
 end;
 
-{****************************************************}
+{**********************************************************}
 function TALAnimatedImage.TAnimation.IsSpeedStored: Boolean;
 begin
   Result := Not SameValue(FSpeed, 1.0, Single.Epsilon);
 end;
 
-{****************************************************}
+{*******************************************************}
 function TALAnimatedImage.TAnimation.getEnabled: Boolean;
 begin
   Result := FFloatAnimation.Enabled;
 end;
 
-{****************************************************}
+{*********************************************************************}
 procedure TALAnimatedImage.TAnimation.SetEnabled(const Value: Boolean);
 begin
   FFloatAnimation.Enabled := Value;
 end;
 
-{****************************************************}
+{******************************************************************}
 procedure TALAnimatedImage.TAnimation.doFirstFrame(Sender: TObject);
 begin
   if assigned(FOwner.FOnAnimationFirstFrame) then
@@ -1460,7 +1460,7 @@ begin
   Repaint;
 end;
 
-{****************************************************}
+{***************************************************************}
 procedure TALAnimatedImage.TAnimation.doProcess(Sender: TObject);
 begin
   if assigned(FOwner.FOnAnimationProcess) then
@@ -1468,7 +1468,7 @@ begin
   Repaint;
 end;
 
-{****************************************************}
+{**************************************************************}
 procedure TALAnimatedImage.TAnimation.doFinish(Sender: TObject);
 begin
   if assigned(FOwner.FOnAnimationFinish) then
@@ -1476,25 +1476,25 @@ begin
   Repaint;
 end;
 
-{****************************************************}
+{******************************************}
 procedure TALAnimatedImage.TAnimation.Start;
 begin
   FFloatAnimation.Start;
 end;
 
-{****************************************************}
+{*****************************************}
 procedure TALAnimatedImage.TAnimation.Stop;
 begin
   FFloatAnimation.Stop;
 end;
 
-{****************************************************}
+{**************************************************}
 procedure TALAnimatedImage.TAnimation.StopAtCurrent;
 begin
   FFloatAnimation.StopAtCurrent;
 end;
 
-{**********************************************}
+{******************************************************}
 constructor TALAnimatedImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
@@ -1521,7 +1521,7 @@ begin
   SetAcceptsControls(False);
 end;
 
-{**************************}
+{**********************************}
 destructor TALAnimatedImage.Destroy;
 begin
   ReleaseCodec;
@@ -1713,14 +1713,14 @@ begin
   {$ENDIF}
 end;
 
-{**********************************}
+{***********************************}
 procedure TALAnimatedImage.DoResized;
 begin
   releaseCodec;
   inherited;
 end;
 
-{***********************}
+{*******************************}
 procedure TALAnimatedImage.Paint;
 begin
 
@@ -1835,7 +1835,7 @@ begin
   end;
 end;
 
-{******************************************************}
+{**************************************************************}
 procedure TALAnimatedImage.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
@@ -1851,7 +1851,7 @@ begin
   FAnimation.Assign(Value);
 end;
 
-{**************************************************}
+{******************************************************}
 constructor TALBaseRectangle.Create(AOwner: TComponent);
 begin
   inherited;
@@ -1865,21 +1865,21 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-{******************************}
+{**********************************}
 destructor TALBaseRectangle.Destroy;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-{***************************}
+{***********************************}
 procedure TALBaseRectangle.DoResized;
 begin
   ClearBufDrawable;
   inherited;
 end;
 
-{************************************}
+{******************************************}
 procedure TALBaseRectangle.clearBufDrawable;
 begin
   {$IFDEF debug}
@@ -1890,25 +1890,25 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-{************************************}
+{*************************************************}
 function TALBaseRectangle.IsCornersStored: Boolean;
 begin
   Result := FCorners <> AllCorners;
 end;
 
-{************************************}
+{***********************************************}
 function TALBaseRectangle.IsSidesStored: Boolean;
 begin
   Result := FSides * AllSides <> AllSides
 end;
 
-{**************************************************}
+{*************************************************}
 function TALBaseRectangle.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
 end;
 
-{**************************************************}
+{*************************************************}
 function TALBaseRectangle.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
@@ -1920,13 +1920,13 @@ begin
   Result := False;
 end;
 
-{***********************************************}
+{***************************************************}
 function TALBaseRectangle.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-{**************************************************************}
+{******************************************************************}
 procedure TALBaseRectangle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -1935,7 +1935,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{*********************************************************}
 procedure TALBaseRectangle.SetXRadius(const Value: Single);
 var
   NewValue: Single;
@@ -1949,7 +1949,7 @@ begin
   end;
 end;
 
-{****************************************************}
+{*********************************************************}
 procedure TALBaseRectangle.SetYRadius(const Value: Single);
 var
   NewValue: Single;
@@ -1963,7 +1963,7 @@ begin
   end;
 end;
 
-{*******************************************************}
+{***********************************************************}
 procedure TALBaseRectangle.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then
@@ -1974,7 +1974,7 @@ begin
   end;
 end;
 
-{***************************************************}
+{*******************************************************}
 procedure TALBaseRectangle.SetSides(const Value: TSides);
 begin
   if FSides <> Value then
@@ -1985,28 +1985,28 @@ begin
   end;
 end;
 
-{**************************************************}
+{******************************************************}
 procedure TALBaseRectangle.FillChanged(Sender: TObject);
 begin
   clearBufDrawable;
   inherited;
 end;
 
-{****************************************************}
+{********************************************************}
 procedure TALBaseRectangle.StrokeChanged(Sender: TObject);
 begin
   clearBufDrawable;
   inherited;
 end;
 
-{****************************************************}
+{********************************************************}
 procedure TALBaseRectangle.ShadowChanged(Sender: TObject);
 begin
   clearBufDrawable;
   inherited;
 end;
 
-{***************************************}
+{*******************************************}
 Procedure TALBaseRectangle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -2074,7 +2074,7 @@ begin
 
 end;
 
-{*************************************}
+{*****************************************}
 procedure TALBaseRectangle.MakeBufDrawable;
 begin
 
@@ -2116,7 +2116,7 @@ begin
 
 end;
 
-{***************************}
+{*******************************}
 procedure TALBaseRectangle.Paint;
 begin
 
@@ -2190,7 +2190,7 @@ begin
   result := GetAutoSize;
 end;
 
-{****************************************************}
+{*******************************************************}
 procedure TALRectangle.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
@@ -2201,14 +2201,14 @@ begin
   end;
 end;
 
-{****************************}
+{*******************************}
 procedure TALRectangle.DoRealign;
 begin
   inherited DoRealign;
   AdjustSize;
 end;
 
-{*****************************}
+{********************************}
 procedure TALRectangle.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
@@ -2232,7 +2232,7 @@ begin
   inherited;
 end;
 
-{*********************************}
+{***********************************}
 procedure TALCircle.clearBufDrawable;
 begin
   {$IFDEF debug}
@@ -2243,13 +2243,13 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-{***********************************************}
+{********************************************}
 function TALCircle.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-{**************************************************************}
+{***********************************************************}
 procedure TALCircle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -2279,7 +2279,7 @@ begin
   inherited;
 end;
 
-{***************************************}
+{************************************}
 Procedure TALCircle.CreateBufDrawable(
             var ABufDrawable: TALDrawable;
             out ABufDrawableRect: TRectF;
@@ -2409,7 +2409,7 @@ begin
 
 end;
 
-{************************************************************}
+{***********************************************************}
 function TALCircle.PointInObjectLocal(X, Y: Single): Boolean;
 begin
   var LRect := TRectF.Create(0, 0, 1, 1).FitInto(LocalRect);
@@ -2417,7 +2417,7 @@ begin
   else Result := (Sqr((X * 2 - LRect.Width) / LRect.Width) + Sqr((Y * 2 - LRect.Height) / LRect.Height) <= 1);
 end;
 
-{***************************}
+{****************************}
 procedure TALCircle.DoResized;
 begin
   ClearBufDrawable;
@@ -2440,7 +2440,7 @@ begin
   inherited;
 end;
 
-{*******************************}
+{*********************************}
 procedure TALLine.clearBufDrawable;
 begin
   {$IFDEF debug}
@@ -2451,13 +2451,13 @@ begin
   ALFreeAndNilDrawable(fBufDrawable);
 end;
 
-{***********************************************}
+{******************************************}
 function TALLine.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-{**************************************************************}
+{*********************************************************}
 procedure TALLine.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -2892,7 +2892,7 @@ begin
   AdjustSize;
 end;
 
-{******************************}
+{*********************************}
 procedure TALBaseText.AlignToPixel;
 begin
   beginUpdate;
@@ -3244,13 +3244,13 @@ begin
 
 end;
 
-{***********************************************}
+{**********************************************}
 function TALBaseText.GetDoubleBuffered: boolean;
 begin
   result := fDoubleBuffered;
 end;
 
-{**************************************************************}
+{*************************************************************}
 procedure TALBaseText.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
@@ -3444,19 +3444,19 @@ begin
   Result.OnBeforeDrawParagraph := DrawMultilineTextBeforeDrawParagraph;
 end;
 
-{**************************************}
+{****************************************************************************************************************************************************************}
 Procedure TALBaseText.DrawMultilineTextAdjustRect(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; var ARect: TrectF; var ASurfaceSize: TSizeF);
 begin
   // Virtual
 end;
 
-{**************************************}
+{**************************************************************************************************************************************************}
 Procedure TALBaseText.DrawMultilineTextBeforeDrawBackground(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF);
 begin
   // Virtual
 end;
 
-{**************************************}
+{*************************************************************************************************************************************************}
 Procedure TALBaseText.DrawMultilineTextBeforeDrawParagraph(const ACanvas: TALCanvas; const AOptions: TALMultiLineTextOptions; Const ARect: TrectF);
 begin
   // Virtual
@@ -3610,21 +3610,21 @@ end;
 
 {**************************************}
 Procedure TALBaseText.CreateBufDrawable(
-           var ABufDrawable: TALDrawable;
-           out ABufDrawableRect: TRectF;
-           out ATextBroken: Boolean;
-           out AAllTextDrawn: Boolean;
-           out AElements: TALTextElements;
-           const AScale: Single;
-           const AText: String;
-           const AFont: TALFont;
-           const ADecoration: TALTextDecoration;
-           const AEllipsisFont: TALFont;
-           const AEllipsisDecoration: TALTextDecoration;
-           const AFill: TALBrush;
-           const AStateLayer: TALStateLayer;
-           const AStroke: TALStrokeBrush;
-           const AShadow: TALShadow);
+            var ABufDrawable: TALDrawable;
+            out ABufDrawableRect: TRectF;
+            out ATextBroken: Boolean;
+            out AAllTextDrawn: Boolean;
+            out AElements: TALTextElements;
+            const AScale: Single;
+            const AText: String;
+            const AFont: TALFont;
+            const ADecoration: TALTextDecoration;
+            const AEllipsisFont: TALFont;
+            const AEllipsisDecoration: TALTextDecoration;
+            const AFill: TALBrush;
+            const AStateLayer: TALStateLayer;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow);
 begin
 
   if (not ALIsDrawableNull(ABufDrawable)) then exit;
@@ -3817,13 +3817,13 @@ begin
   result := compareValue(fMaxHeight, 65535, Tepsilon.position) <> 0;
 end;
 
-{**************************************************}
+{********************************************}
 function TALBaseText.IsXRadiusStored: Boolean;
 begin
   Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
 end;
 
-{**************************************************}
+{********************************************}
 function TALBaseText.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
@@ -3841,7 +3841,7 @@ begin
   Result := TALTextSettings(Inherited TextSettings);
 end;
 
-{*************************************************************}
+{**************************************************************}
 procedure TALText.SetTextSettings(const Value: TALTextSettings);
 begin
   Inherited SetTextSettings(Value);

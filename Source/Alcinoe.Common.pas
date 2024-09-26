@@ -1445,7 +1445,7 @@ begin
   Result := ALRectPlaceInto(R, Bounds, LRatio, AHorzAlign, AVertAlign);
 end;
 
-{*****************************************************************************}
+{*******************************************************************************}
 function TALPointFHelper.RoundTo(const ADigit: TRoundToEXRangeExtended): TPointF;
 begin
   Result.X := System.math.RoundTo(X, ADigit);
@@ -1667,7 +1667,7 @@ begin
   Result.Y := System.Round(Y);
 end;
 
-{*******************************}
+{***************************************************************************}
 function TALPointD.RoundTo(const ADigit: TRoundToEXRangeExtended): TALPointD;
 begin
   Result.X := System.Math.RoundTo(X, ADigit);
@@ -2227,7 +2227,7 @@ begin
   Result.BottomRight := BottomRight.Round;
 end;
 
-{*****************************}
+{*************************************************************************}
 function TALRectD.RoundTo(const ADigit: TRoundToEXRangeExtended): TALRectD;
 begin
   Result.TopLeft := TopLeft.RoundTo(ADigit);
@@ -2401,7 +2401,7 @@ begin
   Result.cy := Trunc(cy + 0.5);
 end;
 
-{****************************************}
+{*************************************************************************}
 function TALSizeD.RoundTo(const ADigit: TRoundToEXRangeExtended): TALSizeD;
 begin
   Result.cx := system.math.RoundTo(cx, ADigit);
@@ -2768,25 +2768,25 @@ begin
   Result := ceil(X - Epsilon);
 end;
 
-{*******************************************************************}
+{***********************************************************************}
 function ALCeil(const X: Extended; const Epsilon: Extended = 0): Integer;
 begin
   Result := ceil(X - Epsilon);
 end;
 
-{*******************************************************************}
+{********************************************************************}
 function ALFloor(const X: Single; const Epsilon: Single = 0): Integer;
 begin
   Result := Floor(X + Epsilon);
 end;
 
-{*******************************************************************}
+{********************************************************************}
 function ALFloor(const X: Double; const Epsilon: Double = 0): Integer;
 begin
   Result := Floor(X + Epsilon);
 end;
 
-{*******************************************************************}
+{************************************************************************}
 function ALFloor(const X: Extended; const Epsilon: Extended = 0): Integer;
 begin
   Result := Floor(X + Epsilon);

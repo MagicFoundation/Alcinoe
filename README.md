@@ -61,7 +61,15 @@ us to patch the original Delphi source files:
 * [Miss UITraitCollection.displayGamut in iOSapi.UIKit.pas](https://quality.embarcadero.com/browse/RSP-44208)
 * [Update Pressed Property Setter in TControl to Enhance State Change Tracking](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323)
 * [Architectural Issues in FMX.Skia.Canvas.GL](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541)
-
+* [Missing Declaration of CTFontManagerRegisterGraphicsFont in Macapi.CoreText.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1929)
+* [Request to Add Interfaces and Methods in Macapi.AppKit.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1933)
+* [Missing Functions in Macapi.CoreText.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1934)
+* [Missing &string Method in NSAttributedString Interface in Macapi.Foundation.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1935)
+* [Modify libImageIO Constant in Macapi.ImageIO.pas to Include iOS Support](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1936)
+* [Missing Functions in Macapi.QuartzCore.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1937)
+* [Missing CoreText Constant Functions in iOSapi.CoreText.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1938)
+* [Missing CVMetalTexture and CVMetalTextureCache Declarations in iOSapi.CoreVideo.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939)
+* [Missing Method Declarations in UITextView and UITextField Interfaces in iOSapi.UIKit.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941)
 
 Install Alcinoe
 ---------------

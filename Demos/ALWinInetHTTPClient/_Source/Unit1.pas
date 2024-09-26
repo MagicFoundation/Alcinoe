@@ -42,7 +42,9 @@ uses
   cxClasses,
   dxBarBuiltInMenu,
   Alcinoe.StringUtils,
-  system.AnsiStrings, dxCore;
+  system.AnsiStrings,
+  dxCore,
+  dxUIAClasses;
 
 type
   TForm1 = class(TForm)
@@ -236,11 +238,11 @@ end;
 
 {****************************************************************}
 function TForm1.AnsiStrTo8bitUnicodeString(s: AnsiString): String;
-var i: integer;
+var I: integer;
 begin
   Setlength(Result, length(s));
   for I := 1 to length(s) do
-    result[I] := Char(s[i]);
+    result[I] := Char(s[I]);
 end;
 
 {**********************************}
@@ -312,7 +314,7 @@ end;
 
 {**************************************************}
 procedure TForm1.ButtonDeleteClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -320,26 +322,26 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
   try
     fHTTPResponseStream.Size := 0;
     try
-      FWinInetHttpClient.Delete(AnsiString(editURL.Text), FHTTPResponseStream, AHTTPResponseHeader);
+      FWinInetHttpClient.Delete(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
+    LHTTPResponseHeader.Free;
   end;
 end;
 
 {***********************************************}
 procedure TForm1.ButtonGetClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -347,20 +349,20 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
   try
     fHTTPResponseStream.Size := 0;
     try
-      FWinInetHttpClient.Get(AnsiString(editURL.Text), FHTTPResponseStream, AHTTPResponseHeader);
+      FWinInetHttpClient.Get(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
+    LHTTPResponseHeader.Free;
   end;
 end;
 
@@ -373,7 +375,7 @@ end;
 
 {************************************************}
 procedure TForm1.ButtonHeadClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -381,26 +383,26 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
   try
     fHTTPResponseStream.Size := 0;
     try
-      FWinInetHttpClient.Head(AnsiString(editURL.Text), FHTTPResponseStream, AHTTPResponseHeader);
+      FWinInetHttpClient.Head(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
+    LHTTPResponseHeader.Free;
   end;
 end;
 
 {***************************************************}
 procedure TForm1.ButtonOptionsClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -408,26 +410,26 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
   try
     fHTTPResponseStream.Size := 0;
     try
-      FWinInetHttpClient.Options(AnsiString(editURL.Text), FHTTPResponseStream, AHTTPResponseHeader);
+      FWinInetHttpClient.Options(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
+    LHTTPResponseHeader.Free;
   end;
 end;
 
 {*************************************************}
 procedure TForm1.ButtonTraceClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -435,20 +437,20 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
   try
     fHTTPResponseStream.Size := 0;
     try
-      FWinInetHttpClient.Trace(AnsiString(editURL.Text), FHTTPResponseStream, AHTTPResponseHeader);
+      FWinInetHttpClient.Trace(AnsiString(editURL.Text), FHTTPResponseStream, LHTTPResponseHeader);
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
+    LHTTPResponseHeader.Free;
   end;
 end;
 
@@ -466,12 +468,12 @@ end;
 
 {************************************************}
 procedure TForm1.ButtonPostClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
-    ARawPostDatastream: TALStringStreamA;
-    AMultiPartFormDataFile: TALMultiPartFormDataContent;
-    AMultiPartFormDataFiles: TALMultiPartFormDataContents;
-    aTmpPostDataString: TALStringsA;
-    i: Integer;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
+    LRawPostDatastream: TALStringStreamA;
+    LMultiPartFormDataFile: TALMultiPartFormDataContent;
+    LMultiPartFormDataFiles: TALMultiPartFormDataContents;
+    LTmpPostDataString: TALStringsA;
+    I: Integer;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -479,64 +481,64 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
-  AMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
-  aTmpPostDataString := TALStringListA.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
+  LTmpPostDataString := TALStringListA.Create;
   try
     fHTTPResponseStream.Size := 0;
     Try
 
-      aTmpPostDataString.Assign(MemoPostDataStrings.lines);
-      aTmpPostDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
+      LTmpPostDataString.Assign(MemoPostDataStrings.lines);
+      LTmpPostDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
 
       For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
-        if MemoPostDataFiles.Lines[i] <> '' then begin
-          AMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
-          TMemoryStream(AMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[i]);
-          AMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[i])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[i])+'"';
-          AMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[i])));
-          AMultiPartFormDataFiles.Add(AMultiPartFormDataFile);
+        if MemoPostDataFiles.Lines[I] <> '' then begin
+          LMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
+          TMemoryStream(LMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[I]);
+          LMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[I])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])+'"';
+          LMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
+          LMultiPartFormDataFiles.Add(LMultiPartFormDataFile);
         end;
 
-      if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
+      if (LMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
         FWinInetHttpClient.PostMultiPartFormData(
           AnsiString(editURL.Text),
-          aTmpPostDataString,
-          AMultiPartFormDataFiles,
+          LTmpPostDataString,
+          LMultiPartFormDataFiles,
           FHTTPResponseStream,
-          AHTTPResponseHeader)
+          LHTTPResponseHeader)
 
-      else if (AMultiPartFormDataFiles.Count > 0) then begin
+      else if (LMultiPartFormDataFiles.Count > 0) then begin
 
         FWinInetHttpClient.post(
           AnsiString(editURL.Text),
-          AMultiPartFormDataFiles.Items[0].DataStream,
+          LMultiPartFormDataFiles.Items[0].DataStream,
           FHTTPResponseStream,
-          AHTTPResponseHeader);
+          LHTTPResponseHeader);
 
       end
 
-      else if aTmpPostDataString.Count > 0 then begin
+      else if LTmpPostDataString.Count > 0 then begin
         if CheckBoxURLEncodePostData.Checked then FWinInetHttpClient.PostURLEncoded(
                                                     AnsiString(editURL.Text),
-                                                    aTmpPostDataString,
+                                                    LTmpPostDataString,
                                                     FHTTPResponseStream,
-                                                    AHTTPResponseHeader,
+                                                    LHTTPResponseHeader,
                                                     TALNameValueArray.Create(),
                                                     True)
         else begin
 
-          ARawPostDatastream := TALStringStreamA.create(aTmpPostDataString.text);
+          LRawPostDatastream := TALStringStreamA.create(LTmpPostDataString.text);
           try
 
             FWinInetHttpClient.post(
               AnsiString(editURL.Text),
-              ARawPostDatastream,
+              LRawPostDatastream,
               FHTTPResponseStream,
-              AHTTPResponseHeader);
+              LHTTPResponseHeader);
 
           finally
-            ARawPostDatastream.free;
+            LRawPostDatastream.free;
           end;
 
         end
@@ -545,30 +547,30 @@ begin
       else FWinInetHttpClient.Post(
              AnsiString(editURL.Text),
              FHTTPResponseStream,
-             AHTTPResponseHeader);
+             LHTTPResponseHeader);
 
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     Except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
-    AMultiPartFormDataFiles.Free;
-    aTmpPostDataString.free;
+    LHTTPResponseHeader.Free;
+    LMultiPartFormDataFiles.Free;
+    LTmpPostDataString.free;
   end;
 end;
 
 {***********************************************}
 procedure TForm1.ButtonPutClick(Sender: TObject);
-Var AHTTPResponseHeader: TALHTTPResponseHeader;
-    ARawPutDatastream: TALStringStreamA;
-    AMultiPartFormDataFile: TALMultiPartFormDataContent;
-    AMultiPartFormDataFiles: TALMultiPartFormDataContents;
-    aTmpPutDataString: TALStringsA;
-    i: Integer;
+Var LHTTPResponseHeader: TALHTTPResponseHeader;
+    LRawPutDatastream: TALStringStreamA;
+    LMultiPartFormDataFile: TALMultiPartFormDataContent;
+    LMultiPartFormDataFiles: TALMultiPartFormDataContents;
+    LTmpPutDataString: TALStringsA;
+    I: Integer;
 begin
   MainStatusBar.Panels[0].Text := '';
   MainStatusBar.Panels[1].Text := '';
@@ -576,23 +578,23 @@ begin
   initWinInetHTTPClient;
   MemoContentBody.Lines.Clear;
   MemoResponseRawHeader.Lines.Clear;
-  AHTTPResponseHeader := TALHTTPResponseHeader.Create;
-  AMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
-  aTmpPutDataString := TALStringListA.Create;
+  LHTTPResponseHeader := TALHTTPResponseHeader.Create;
+  LMultiPartFormDataFiles := TALMultiPartFormDataContents.Create(true);
+  LTmpPutDataString := TALStringListA.Create;
   try
     fHTTPResponseStream.Size := 0;
     Try
 
-      aTmpPutDataString.Assign(MemoPostDataStrings.lines);
-      aTmpPutDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
+      LTmpPutDataString.Assign(MemoPostDataStrings.lines);
+      LTmpPutDataString.Text := ansiString(MemoPostDataStrings.Text); // << I don't know yet why but MemoPostDataStrings.lines.count split very long line in severals lines of around 1000 chars
 
       For I := 0 To MemoPostDataFiles.Lines.Count - 1 do
-        if MemoPostDataFiles.Lines[i] <> '' then begin
-          AMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
-          TMemoryStream(AMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[i]);
-          AMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[i])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[i])+'"';
-          AMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[i])));
-          AMultiPartFormDataFiles.Add(AMultiPartFormDataFile);
+        if MemoPostDataFiles.Lines[I] <> '' then begin
+          LMultiPartFormDataFile := TALMultiPartFormDataContent.Create;
+          TMemoryStream(LMultiPartFormDataFile.DataStream).LoadFromFile(MemoPostDataFiles.Lines.ValueFromIndex[I]);
+          LMultiPartFormDataFile.ContentDisposition := 'form-data; name="'+AnsiString(MemoPostDataFiles.Lines.Names[I])+'"; filename="'+AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])+'"';
+          LMultiPartFormDataFile.ContentType := ALGetDefaultMIMEContentTypeFromExt(ALExtractFileExt(AnsiString(MemoPostDataFiles.Lines.ValueFromIndex[I])));
+          LMultiPartFormDataFiles.Add(LMultiPartFormDataFile);
         end;
 
       //if (AMultiPartFormDataFiles.Count > 0) and (CheckBoxURLEncodePostData.Checked) then
@@ -602,17 +604,17 @@ begin
       //                                          FHTTPResponseStream,
       //                                          AHTTPResponseHeader)
 
-      if (AMultiPartFormDataFiles.Count > 0) then begin
+      if (LMultiPartFormDataFiles.Count > 0) then begin
 
         FWinInetHttpClient.Put(
           AnsiString(editURL.Text),
-          AMultiPartFormDataFiles.Items[0].DataStream,
+          LMultiPartFormDataFiles.Items[0].DataStream,
           FHTTPResponseStream,
-          AHTTPResponseHeader);
+          LHTTPResponseHeader);
 
       end
 
-      else if aTmpPutDataString.Count > 0 then begin
+      else if LTmpPutDataString.Count > 0 then begin
         //if CheckBoxURLEncodePostData.Checked then FWinInetHttpClient.PutURLEncoded(AnsiString(editURL.Text),
         //                                                                           aTmpPutDataString,
         //                                                                           FHTTPResponseStream,
@@ -621,17 +623,17 @@ begin
         //                                                                           True)
         //else begin
 
-          ARawPutDatastream := TALStringStreamA.create(aTmpPutDataString.text);
+          LRawPutDatastream := TALStringStreamA.create(LTmpPutDataString.text);
           try
 
             FWinInetHttpClient.Put(
               AnsiString(editURL.Text),
-              ARawPutDatastream,
+              LRawPutDatastream,
               FHTTPResponseStream,
-              AHTTPResponseHeader);
+              LHTTPResponseHeader);
 
           finally
-            ARawPutDatastream.free;
+            LRawPutDatastream.free;
           end;
 
         //end
@@ -641,32 +643,32 @@ begin
              AnsiString(editURL.Text),
              nil,
              FHTTPResponseStream,
-             AHTTPResponseHeader);
+             LHTTPResponseHeader);
 
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
     Except
       MemoContentBody.Lines.Text := AnsiStrTo8bitUnicodeString(FHTTPResponseStream.DataString);
-      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(AHTTPResponseHeader.RawHeaderText);
+      MemoResponseRawHeader.Lines.Text := AnsiStrTo8bitUnicodeString(LHTTPResponseHeader.RawHeaderText);
       Raise;
     end;
   finally
-    AHTTPResponseHeader.Free;
-    AMultiPartFormDataFiles.Free;
-    aTmpPutDataString.free;
+    LHTTPResponseHeader.Free;
+    LMultiPartFormDataFiles.Free;
+    LTmpPutDataString.free;
   end;
 end;
 
 {******************************************************}
 procedure TForm1.ButtonSaveToFileClick(Sender: TObject);
-Var LsaveDialog: TSaveDialog;
+Var LSaveDialog: TSaveDialog;
 begin
-  LsaveDialog := TSaveDialog.Create(self);
+  LSaveDialog := TSaveDialog.Create(self);
   Try
-    if LsaveDialog.Execute then
-      ALSaveStringToFile(fHTTPResponseStream.DataString, AnsiString(LsaveDialog.FileName));
+    if LSaveDialog.Execute then
+      ALSaveStringToFile(fHTTPResponseStream.DataString, AnsiString(LSaveDialog.FileName));
   Finally
-    LsaveDialog.Free;
+    LSaveDialog.Free;
   End;
 end;
 

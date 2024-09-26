@@ -70,7 +70,6 @@ type
     procedure RcptToButtonClick(Sender: TObject);
     procedure DataButtonClick(Sender: TObject);
     procedure QuitButtonClick(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure EhloButtonClick(Sender: TObject);
     procedure AuthButtonClick(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -99,16 +98,10 @@ begin
   FSMTPCLient.Free;
 end;
 
-{*****************************************}
-procedure TForm1.FormShow(Sender: TObject);
-begin
-
-end;
-
 {********************************************************}
 procedure TForm1.ClearDisplayButtonClick(Sender: TObject);
 begin
-    DisplayMemo.Clear;
+  DisplayMemo.Clear;
 end;
 
 {***************************************************}
@@ -143,67 +136,67 @@ end;
 
 {**************************************************}
 procedure TForm1.RcptToButtonClick(Sender: TObject);
-Var ALst: TALStringListA;
+Var LLst: TALStringListA;
     Str: AnsiString;
-    i: integer;
+    I: integer;
 begin
-  aLst := TALStringListA.Create;
+  LLst := TALStringListA.Create;
   Try
 
     Str := AnsiString(ToEdit.Text) + #13#10 + AnsiString(CcEdit.Text) + #13#10 + AnsiString(BccEdit.text);
     Str := ALStringReplaceA(Str,',',#13#10,[RfReplaceall]);
     Str := ALStringReplaceA(Str,';',#13#10,[RfReplaceall]);
-    aLst.Text := ALTrim(Str);
-    i := 0;
-    While i <= aLst.Count - 1 do begin
-      aLst[i] := ALTrim(aLst[i]);
-      If aLst[i] = '' then aLst.Delete(i)
-      else inc(i);
+    LLst.Text := ALTrim(Str);
+    I := 0;
+    While I <= LLst.Count - 1 do begin
+      LLst[I] := ALTrim(LLst[I]);
+      If LLst[I] = '' then LLst.Delete(I)
+      else inc(I);
     end;
 
-    DisplayMemo.Lines.Add(String(ALTrim(AnsiString(FSmtpClient.RcptTo(Alst)))));
+    DisplayMemo.Lines.Add(String(ALTrim(AnsiString(FSmtpClient.RcptTo(LLst)))));
 
   finally
-    aLst.free;
+    LLst.free;
   end;
 end;
 
 {************************************************}
 procedure TForm1.DataButtonClick(Sender: TObject);
-Var aEmailHeader: TALEmailHeader;
-    AMultiPartMixedAttachments : TALMultiPartMixedContents;
-    i : integer;
+Var LEmailHeader: TALEmailHeader;
+    LMultiPartMixedAttachments : TALMultiPartMixedContents;
+    I : integer;
     Str: AnsiString;
 begin
-  aEmailHeader := TALEmailHeader.Create;
+  LEmailHeader := TALEmailHeader.Create;
   Try
 
-    aEmailHeader.From := AnsiString(FromEdit.Text);
-    aEmailHeader.SendTo := AnsiString(ToEdit.Text);
-    aEmailHeader.cc := AnsiString(ccEdit.Text);
-    aEmailHeader.Subject := AnsiString(SubjectEdit.Text);
-    If ConfirmCheckBox.Checked then aEmailHeader.DispositionNotificationTo := AnsiString(FromEdit.Text);
-    aEmailHeader.Priority := AnsiString(PriorityComboBox.Text);
+    LEmailHeader.From := AnsiString(FromEdit.Text);
+    LEmailHeader.SendTo := AnsiString(ToEdit.Text);
+    LEmailHeader.cc := AnsiString(ccEdit.Text);
+    LEmailHeader.Subject := AnsiString(SubjectEdit.Text);
+    If ConfirmCheckBox.Checked then LEmailHeader.DispositionNotificationTo := AnsiString(FromEdit.Text);
+    LEmailHeader.Priority := AnsiString(PriorityComboBox.Text);
     If PriorityComboBox.ItemIndex = 1 then str := 'High'
     else If PriorityComboBox.ItemIndex = 2 then str := 'Normal'
     else str := 'Low';
-    aEmailHeader.CustomHeaders.Add('X-MSMail-Priority: ' + str);
+    LEmailHeader.CustomHeaders.Add('X-MSMail-Priority: ' + str);
     If Trim(FileAttachMemo.Lines.text) <> '' then begin
-      AMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
+      LMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
       Try
-        For i := 0 to FileAttachMemo.Lines.Count - 1 do
-          If FileAttachMemo.Lines[i] <> '' then
-            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
-          DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.DataMultipartMixed(aEmailHeader, AnsiString(MsgMemo.Lines.Text), 'text/plain', AMultiPartMixedAttachments))));
+        For I := 0 to FileAttachMemo.Lines.Count - 1 do
+          If FileAttachMemo.Lines[I] <> '' then
+            LMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[I])));
+          DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.DataMultipartMixed(LEmailHeader, AnsiString(MsgMemo.Lines.Text), 'text/plain', LMultiPartMixedAttachments))));
       finally
-        AMultiPartMixedAttachments.Free;
+        LMultiPartMixedAttachments.Free;
       end;
     end
-    else DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.Data(AnsiString(aEmailHeader.RawHeaderText), AnsiString(MsgMemo.Lines.Text)))));
+    else DisplayMemo.Lines.Add(String(ALTrim(FSmtpClient.Data(AnsiString(LEmailHeader.RawHeaderText), AnsiString(MsgMemo.Lines.Text)))));
 
 
   finally
-    aEmailHeader.Free;
+    LEmailHeader.Free;
   end;
 end;
 
@@ -215,78 +208,78 @@ end;
 
 {****************************************************}
 procedure TForm1.AllInOneButtonClick(Sender: TObject);
-Var aEmailHeader: TALEmailHeader;
-    AMultiPartMixedAttachments : TALMultiPartMixedContents;
-    aLst: TALStringListA;
+Var LEmailHeader: TALEmailHeader;
+    LMultiPartMixedAttachments : TALMultiPartMixedContents;
+    LLst: TALStringListA;
     Str: AnsiString;
-    i : integer;
+    I : integer;
 begin
 
-  aLst := TALStringListA.Create;
-  aEmailHeader := TALEmailHeader.Create;
+  LLst := TALStringListA.Create;
+  LEmailHeader := TALEmailHeader.Create;
   Try
 
     Str := AnsiString(ToEdit.Text) + #13#10 + AnsiString(CcEdit.Text) + #13#10 + AnsiString(BccEdit.text);
     Str := ALStringReplaceA(Str,',',#13#10,[RfReplaceall]);
     Str := ALStringReplaceA(Str,';',#13#10,[RfReplaceall]);
-    aLst.Text := ALTrim(Str);
-    i := 0;
-    While i <= aLst.Count - 1 do begin
-      aLst[i] := ALTrim(aLst[i]);
-      If aLst[i] = '' then aLst.Delete(i)
-      else inc(i);
+    LLst.Text := ALTrim(Str);
+    I := 0;
+    While I <= LLst.Count - 1 do begin
+      LLst[I] := ALTrim(LLst[I]);
+      If LLst[I] = '' then LLst.Delete(I)
+      else inc(I);
     end;
 
-    aEmailHeader.From := AnsiString(FromEdit.Text);
-    aEmailHeader.SendTo := AnsiString(ToEdit.Text);
-    aEmailHeader.cc := AnsiString(ccEdit.Text);
-    aEmailHeader.Subject := AnsiString(SubjectEdit.Text);
-    If ConfirmCheckBox.Checked then aEmailHeader.DispositionNotificationTo := AnsiString(FromEdit.Text);
-    aEmailHeader.Priority := AnsiString(PriorityComboBox.Text);
+    LEmailHeader.From := AnsiString(FromEdit.Text);
+    LEmailHeader.SendTo := AnsiString(ToEdit.Text);
+    LEmailHeader.cc := AnsiString(ccEdit.Text);
+    LEmailHeader.Subject := AnsiString(SubjectEdit.Text);
+    If ConfirmCheckBox.Checked then LEmailHeader.DispositionNotificationTo := AnsiString(FromEdit.Text);
+    LEmailHeader.Priority := AnsiString(PriorityComboBox.Text);
     If PriorityComboBox.ItemIndex = 1 then str := 'High'
     else If PriorityComboBox.ItemIndex = 2 then str := 'Normal'
     else str := 'Low';
-    aEmailHeader.CustomHeaders.Add('X-MSMail-Priority: ' + str);
+    LEmailHeader.CustomHeaders.Add('X-MSMail-Priority: ' + str);
     If Trim(FileAttachMemo.Lines.text) <> '' then begin
-      AMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
+      LMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
       Try
-        For i := 0 to FileAttachMemo.Lines.Count - 1 do
-          If FileAttachMemo.Lines[i] <> '' then
-            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
+        For I := 0 to FileAttachMemo.Lines.Count - 1 do
+          If FileAttachMemo.Lines[I] <> '' then
+            LMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[I])));
 
           FSmtpClient.SendMailMultipartMixed(
             AnsiString(HostEdit.Text),
             StrToInt(PortEdit.Text),
             AnsiString(FromEdit.Text),
-            aLst,
+            LLst,
             AnsiString(UsernameEdit.Text),
             AnsiString(PasswordEdit.Text),
             TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
-            aEmailHeader,
+            LEmailHeader,
             AnsiString(MsgMemo.Lines.Text),
             'text/plain',
-            AMultiPartMixedAttachments);
+            LMultiPartMixedAttachments);
 
       finally
-        AMultiPartMixedAttachments.Free;
+        LMultiPartMixedAttachments.Free;
       end;
     end
     else FSmtpClient.SendMail(
            AnsiString(HostEdit.Text),
            StrToInt(PortEdit.Text),
            AnsiString(FromEdit.Text),
-           aLst,
+           LLst,
            AnsiString(UsernameEdit.Text),
            AnsiString(PasswordEdit.Text),
            TAlSmtpClientAuthType(AuthComboBox.ItemIndex),
-           aEmailHeader.RawHeaderText,
+           LEmailHeader.RawHeaderText,
            AnsiString(MsgMemo.Lines.Text));
 
     DisplayMemo.Lines.Add('Success');
 
   finally
-    aEmailHeader.Free;
-    aLst.free;
+    LEmailHeader.Free;
+    LLst.free;
   end;
 end;
 

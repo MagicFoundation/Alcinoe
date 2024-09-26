@@ -12,7 +12,7 @@ uses
   cxLookAndFeels, cxLookAndFeelPainters, cxContainer, Menus, dxSkinsForm,
   cxRadioGroup, cxGroupBox, cxButtons, cxTextEdit, cxMaskEdit, cxCheckBox,
   cxMemo, cxLabel, cxPC, uiTypes, cxNavigator, dxBarBuiltInMenu, dxDateRanges, dxScrollbarAnnotations,
-  dxCore;
+  dxCore, dxUIAClasses;
 
 Const
   WM_UpdateGUI = WM_User + 1;
@@ -322,9 +322,9 @@ procedure TForm1.WMUpdateGUI(var Msg: TMessage);
     else result := null;
   end;
 
-Var aTimeElapsed: int64;
-    aTotalRequestCount: Integer;
-    i: integer;
+Var LTimeElapsed: int64;
+    LTotalRequestCount: Integer;
+    I: integer;
 
 begin
   with TStressHttpThreadVarContainer(pointer(Msg.WParam)) do begin
@@ -381,12 +381,12 @@ begin
 
       if GetTickCount64 - LastUpdateStatusBar > 1000  then begin
         LastUpdateStatusBar := GetTickCount64;
-        aTimeElapsed := GetTickCount64 - StartTime;
-        aTotalRequestCount := 0;
+        LTimeElapsed := GetTickCount64 - StartTime;
+        LTotalRequestCount := 0;
         for I := 0 to TableViewThread.DataController.RecordCount - 1 do
-          aTotalRequestCount := aTotalRequestCount + TableViewThread.DataController.GetValue(I,TableViewThreadRequestCount.Index);
-          StatusBar1.Panels[1].Text := IntToStr(aTotalRequestCount) + ' Requests in ' + IntToStr(round(aTimeElapsed / 1000)) + ' seconds (' + FormatFloat('0.##',aTotalRequestCount / (Max(aTimeElapsed,1) / 1000)) + ' Request/s | '+
-                                       FormatFloat('0.##',((ToTalBytesRead / 1024) / (max(1,aTimeElapsed) / 1000)))+' KB/s)';
+          LTotalRequestCount := LTotalRequestCount + TableViewThread.DataController.GetValue(I,TableViewThreadRequestCount.Index);
+          StatusBar1.Panels[1].Text := IntToStr(LTotalRequestCount) + ' Requests in ' + IntToStr(round(LTimeElapsed / 1000)) + ' seconds (' + FormatFloat('0.##',LTotalRequestCount / (Max(LTimeElapsed,1) / 1000)) + ' Request/s | '+
+                                       FormatFloat('0.##',((ToTalBytesRead / 1024) / (max(1,LTimeElapsed) / 1000)))+' KB/s)';
       end;
 
     finally
@@ -401,9 +401,9 @@ end;
 
 {*************************************************}
 procedure TForm1.ButtonStartClick(Sender: TObject);
-Var i: integer;
-    j: integer;
-    aStressHttpThread: TStressHttpThread;
+Var I: integer;
+    J: integer;
+    LStressHttpThread: TStressHttpThread;
 begin
   If ButtonStart.tag = 0 then begin
     if NBActiveThread > 0 then begin
@@ -441,24 +441,24 @@ begin
   TotalReceiveTimeTaken := 0;
 
   StatusBar1.Panels[1].Text := '';
-  for i := 1 to StrToInt(EditNbThread.Text) do begin
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadNumber.Index,ALIntToStrA(i) + ' (on)');
-    TableViewThread.DataController.SetValue(i-1,TableViewThreadRequestCount.Index,0);
-    aStressHttpThread := TStressHttpThread.Create(True, i);
-    aStressHttpThread.lstUrl.NameValueSeparator := #1;
+  for I := 1 to StrToInt(EditNbThread.Text) do begin
+    TableViewThread.DataController.SetValue(I-1,TableViewThreadNumber.Index,ALIntToStrA(I) + ' (on)');
+    TableViewThread.DataController.SetValue(I-1,TableViewThreadRequestCount.Index,0);
+    LStressHttpThread := TStressHttpThread.Create(True, I);
+    LStressHttpThread.lstUrl.NameValueSeparator := #1;
     for J := 0 to MemoLstUrl.Lines.Count - 1 do
-      if Trim(MemoLstUrl.Lines[j]) <> '' then
-        aStressHttpThread.LstUrl.Add(AnsiString(MemoLstUrl.Lines[j]));
-    aStressHttpThread.MaxHttpRequest := StrToInt(EditMaxHttpRequest.Text);
-    aStressHttpThread.FreeOnTerminate := True;
-    aStressHttpThread.DoLikeaSpider := CheckBoxDoLikeSpider.Checked;
-    aStressHttpThread.DelayBetweenEachCall := StrToInt(EditSendDelayBetweenEachSend.text);
-    aStressHttpThread.StopOnError := CheckBoxStopOnError.Checked;
+      if Trim(MemoLstUrl.Lines[J]) <> '' then
+        LStressHttpThread.LstUrl.Add(AnsiString(MemoLstUrl.Lines[J]));
+    LStressHttpThread.MaxHttpRequest := StrToInt(EditMaxHttpRequest.Text);
+    LStressHttpThread.FreeOnTerminate := True;
+    LStressHttpThread.DoLikeaSpider := CheckBoxDoLikeSpider.Checked;
+    LStressHttpThread.DelayBetweenEachCall := StrToInt(EditSendDelayBetweenEachSend.text);
+    LStressHttpThread.StopOnError := CheckBoxStopOnError.Checked;
     inc(NBActiveThread);
     StatusBar1.Panels[0].Text := '# Threads: ' + IntToStr(NBActiveThread);
     StatusBar1.Repaint;
     {$IF CompilerVersion >= 23} {Delphi XE2}
-    aStressHttpThread.Start;
+    LStressHttpThread.Start;
     {$ELSE}
     aStressHttpThread.Resume;
     {$IFEND}
@@ -491,10 +491,10 @@ end;
 
 {***********************************}
 destructor TStressHttpThread.Destroy;
-var aVarContainer: TStressHttpThreadVarContainer;
+var LVarContainer: TStressHttpThreadVarContainer;
 begin
-  aVarContainer := TStressHttpThreadVarContainer.Create;
-  With aVarContainer do begin
+  LVarContainer := TStressHttpThreadVarContainer.Create;
+  With LVarContainer do begin
     On := False;
     Rank := Self.Rank;
     Url := fUrl;
@@ -507,7 +507,7 @@ begin
     WaitTimeTaken := fWaitTimeTaken;
     ReceiveTimeTaken := fReceiveTimeTaken;
   end;
-  PostMessage(Form1.Handle,WM_UpdateGUI, integer(aVarContainer), 0);
+  PostMessage(Form1.Handle,WM_UpdateGUI, integer(LVarContainer), 0);
   LstUrl.free;
   inherited;
 end;
@@ -515,16 +515,16 @@ end;
 {**********************************}
 procedure TStressHttpThread.Execute;
 
-Var atmpUrl: AnsiString;
-    aBody: AnsiString;
-    aHostName: AnsiString;
-    aLowerCaseBody: AnsiString;
-    aResponseContentStream: TStream;
-    aResponseContentHeader: TALHTTPResponseHeader;
-    aHttpClient: TALWinHttpClient;
-    aVarContainer: TStressHttpThreadVarContainer;
+Var LtmpUrl: AnsiString;
+    LBody: AnsiString;
+    LHostName: AnsiString;
+    LLowerCaseBody: AnsiString;
+    LResponseContentStream: TStream;
+    LResponseContentHeader: TALHTTPResponseHeader;
+    LHttpClient: TALWinHttpClient;
+    LVarContainer: TStressHttpThreadVarContainer;
     P1, P2: integer;
-    i: integer;
+    I: integer;
 
 begin
 
@@ -542,10 +542,10 @@ begin
     FHttpStatusStartTime := GetTickCount64;
     try
 
-      aHttpClient := TaLWinHttpClient.Create;
+      LHttpClient := TaLWinHttpClient.Create;
       try
 
-        with aHttpClient do begin
+        with LHttpClient do begin
           OnDownloadProgress := OnHttpDownloadProgress;
           OnStatus := OnHttpStatus;
           UserName := Form1.HttpClientUserName;
@@ -565,67 +565,67 @@ begin
           RequestHeader.RawHeaderText := Form1.HttpClientRawHeaderText;
         end;
 
-        aResponseContentStream:= TALStringStreamA.create('');
-        aResponseContentHeader := TALHTTPResponseHeader.Create;
+        LResponseContentStream:= TALStringStreamA.create('');
+        LResponseContentHeader := TALHTTPResponseHeader.Create;
         try
-          aHttpClient.Get(fUrl, aResponseContentStream, aResponseContentHeader);
-          aBody := TALStringStreamA(aResponseContentStream).datastring;
-          FRequestStatus := aResponseContentHeader.StatusCode;
+          LHttpClient.Get(fUrl, LResponseContentStream, LResponseContentHeader);
+          LBody := TALStringStreamA(LResponseContentStream).datastring;
+          FRequestStatus := LResponseContentHeader.StatusCode;
         finally
-          aResponseContentStream.free;
-          aResponseContentHeader.free;
+          LResponseContentStream.free;
+          LResponseContentHeader.free;
         end;
 
         if DelayBetweenEachCall > 0 then sleep(DelayBetweenEachCall);
 
         if dolikeaspider then begin
-          aLowerCaseBody := AlLowerCase(aBody);
-          aHostName := 'http://' + AlLowerCase(AlExtractHostNameFromUrl(fUrl));
+          LLowerCaseBody := AlLowerCase(LBody);
+          LHostName := 'http://' + AlLowerCase(AlExtractHostNameFromUrl(fUrl));
 
-          P1 := ALPosA('href=''http://',aLowerCaseBody);
+          P1 := ALPosA('href=''http://',LLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := ALPosA('''',aLowerCaseBody, P1 + 1);
-            if P2 > P1 then atmpurl := ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            P2 := ALPosA('''',LLowerCaseBody, P1 + 1);
+            if P2 > P1 then LtmpUrl := ALHTMLDecode(AlCopyStr(LBody, P1+1, P2 - P1 - 1))
             else break;
-            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := ALPosA('href=''http://',aLowerCaseBody, P2+ 1);
+            if (ALPosA(LHostName, alLowerCase(LtmpUrl))=1) then LstUrl.Add(LtmpUrl);
+            P1 := ALPosA('href=''http://',LLowerCaseBody, P2+ 1);
           end;
 
-          P1 := ALPosA('href="http://',aLowerCaseBody);
+          P1 := ALPosA('href="http://',LLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := ALPosA('"',aLowerCaseBody, P1 + 1);
-            if P2 > P1 then atmpurl := ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            P2 := ALPosA('"',LLowerCaseBody, P1 + 1);
+            if P2 > P1 then LtmpUrl := ALHTMLDecode(AlCopyStr(LBody, P1+1, P2 - P1 - 1))
             else break;
-            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := ALPosA('href="http://',aLowerCaseBody, P2+ 1);
+            if (ALPosA(LHostName, alLowerCase(LtmpUrl))=1) then LstUrl.Add(LtmpUrl);
+            P1 := ALPosA('href="http://',LLowerCaseBody, P2+ 1);
           end;
 
-          P1 := ALPosA('href=''/',aLowerCaseBody);
+          P1 := ALPosA('href=''/',LLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := ALPosA('''',aLowerCaseBody, P1 + 1);
-            if P2 > P1+2 then atmpurl := aHostName + ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            P2 := ALPosA('''',LLowerCaseBody, P1 + 1);
+            if P2 > P1+2 then LtmpUrl := LHostName + ALHTMLDecode(AlCopyStr(LBody, P1+1, P2 - P1 - 1))
             else break;
-            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := ALPosA('href=''/',aLowerCaseBody, P2+ 1);
+            if (ALPosA(LHostName, alLowerCase(LtmpUrl))=1) then LstUrl.Add(LtmpUrl);
+            P1 := ALPosA('href=''/',LLowerCaseBody, P2+ 1);
           end;
 
-          P1 := ALPosA('href="/',aLowerCaseBody);
+          P1 := ALPosA('href="/',LLowerCaseBody);
           while P1 > 0 do begin
             inc(p1,5);
-            P2 := ALPosA('"',aLowerCaseBody, P1 + 1);
-            if P2 > P1+2 then atmpurl := aHostName + ALHTMLDecode(AlCopyStr(aBody, P1+1, P2 - P1 - 1))
+            P2 := ALPosA('"',LLowerCaseBody, P1 + 1);
+            if P2 > P1+2 then LtmpUrl := LHostName + ALHTMLDecode(AlCopyStr(LBody, P1+1, P2 - P1 - 1))
             else break;
-            if (ALPosA(aHostName, alLowerCase(atmpUrl))=1) then LstUrl.Add(atmpUrl);
-            P1 := ALPosA('href="/',aLowerCaseBody, P2+ 1);
+            if (ALPosA(LHostName, alLowerCase(LtmpUrl))=1) then LstUrl.Add(LtmpUrl);
+            P1 := ALPosA('href="/',LLowerCaseBody, P2+ 1);
           end;
 
         end;
 
       finally
-        aHttpClient.free;
+        LHttpClient.free;
       end;
 
     Except
@@ -644,8 +644,8 @@ begin
       FReceiveTimeTaken := -1;
     end;
 
-    aVarContainer := TStressHttpThreadVarContainer.Create;
-    With aVarContainer do begin
+    LVarContainer := TStressHttpThreadVarContainer.Create;
+    With LVarContainer do begin
       On := True;
       Rank := Self.Rank;
       Url := fUrl;
@@ -658,7 +658,7 @@ begin
       WaitTimeTaken := fWaitTimeTaken;
       ReceiveTimeTaken := fReceiveTimeTaken;
     end;
-    PostMessage(Form1.Handle,WM_UpdateGUI, Integer(aVarContainer), 0);
+    PostMessage(Form1.Handle,WM_UpdateGUI, Integer(LVarContainer), 0);
     If Form1.ButtonStart.tag = 0 then Break;
   end;
 

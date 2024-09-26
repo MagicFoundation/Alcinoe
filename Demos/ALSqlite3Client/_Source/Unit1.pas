@@ -70,87 +70,87 @@ end;
 
 {***********************************************************}
 procedure TForm1.ALButtonSqlite3UpdateClick(Sender: TObject);
-Var aSqlite3Client: TalSqlite3Client;
-    aStartDate: int64;
-    aEndDate: int64;
-    aStartCommitDate: int64;
-    aEndCommitDate: int64;
+Var LSqlite3Client: TalSqlite3Client;
+    LStartDate: int64;
+    LEndDate: int64;
+    LStartCommitDate: int64;
+    LEndCommitDate: int64;
     LstSql: TALStringListA;
     S1: AnsiString;
-    i: integer;
+    I: integer;
 begin
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
+    LSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
     LstSql := TALStringListA.Create;
     Try
 
       //enable or disable the shared cache
-      aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
+      LSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
+      LSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
-      aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
-      aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
-      aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
+      LSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
+      LSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
+      LSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
+      LSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
+      LSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
-        1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
-        2: aSqlite3Client.UpdateData('PRAGMA journal_mode = PERSIST');
-        3: aSqlite3Client.UpdateData('PRAGMA journal_mode = MEMORY');
-        4: aSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
-        5: aSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
+        0: LSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
+        1: LSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
+        2: LSqlite3Client.UpdateData('PRAGMA journal_mode = PERSIST');
+        3: LSqlite3Client.UpdateData('PRAGMA journal_mode = MEMORY');
+        4: LSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
+        5: LSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
       end;
-      aSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
-      If ALCheckBoxSqlite3ReadUncommited.Checked then aSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
+      LSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
+      If ALCheckBoxSqlite3ReadUncommited.Checked then LSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
       case RadioGroupSqlite3Synhcronous.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
-        1: aSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
-        2: aSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
+        0: LSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
+        1: LSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
+        2: LSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
       end;
       case RadioGroupSQLite3Temp_Store.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
-        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
-        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
+        0: LSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
+        1: LSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
+        2: LSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
       end;
 
       //the sql
       S1 := AnsiString(AlMemoSQLite3Query.Lines.Text);
       while ALPosA('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomchar>',ALRandomStrA(1),[rfIgnoreCase]);
       while ALPosA('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomnumber>',ALIntToStrA(random(10)),[rfIgnoreCase]);
-      for i := 1 to maxint do begin
-        if ALPosA('<#randomnumber'+ALIntToStrA(i)+'>', AlLowerCase(S1)) > 0 then S1 := ALStringReplaceA(S1, '<#randomnumber'+ALIntToStrA(i)+'>',ALIntToStrA(random(10)),[rfIgnoreCase, rfReplaceAll])
+      for I := 1 to maxint do begin
+        if ALPosA('<#randomnumber'+ALIntToStrA(I)+'>', AlLowerCase(S1)) > 0 then S1 := ALStringReplaceA(S1, '<#randomnumber'+ALIntToStrA(I)+'>',ALIntToStrA(random(10)),[rfIgnoreCase, rfReplaceAll])
         else break;
       end;
       S1 := ALStringReplaceA(S1,#13#10,' ',[RfReplaceALL]);
       LstSql.Text := ALTrim(ALStringReplaceA(S1,';',#13#10,[RfReplaceALL]));
 
       //do the job
-      aStartDate := GetTickCount64;
-      aSqlite3Client.TransactionStart;
+      LStartDate := GetTickCount64;
+      LSqlite3Client.TransactionStart;
       try
-        aSqlite3Client.UpdateData(LstSql);
-        aEndDate := GetTickCount64;
-        aStartCommitDate := GetTickCount64;
-        aSqlite3Client.TransactionCommit;
-        aendCommitDate := GetTickCount64;
+        LSqlite3Client.UpdateData(LstSql);
+        LEndDate := GetTickCount64;
+        LStartCommitDate := GetTickCount64;
+        LSqlite3Client.TransactionCommit;
+        LEndCommitDate := GetTickCount64;
       Except
-        aSqlite3Client.TransactionRollBack;
+        LSqlite3Client.TransactionRollBack;
         raise;
       end;
 
       ALMemoResult.Lines.clear;
-      ALMemoResult.Lines.add('Time Taken to Update the data: ' + IntToStr(aEndDate - aStartDate) + ' ms');
-      ALMemoResult.Lines.add('Time Taken to commit the modifications: ' + IntToStr(aendCommitDate - aStartCommitDate) + ' ms');
+      ALMemoResult.Lines.add('Time Taken to Update the data: ' + IntToStr(LEndDate - LStartDate) + ' ms');
+      ALMemoResult.Lines.add('Time Taken to commit the modifications: ' + IntToStr(LEndCommitDate - LStartCommitDate) + ' ms');
 
     Finally
-      aSqlite3Client.disconnect;
-      aSqlite3Client.free;
+      LSqlite3Client.disconnect;
+      LSqlite3Client.free;
       LstSql.free;
     End;
 
@@ -161,59 +161,59 @@ end;
 
 {************************************************************}
 procedure TForm1.ALButtonSqlLite3SelectClick(Sender: TObject);
-Var aSqlite3Client: TalSqlite3Client;
-    aXMLDATA: TalXmlDocument;
-    aStartDate: int64;
-    aEndDate: int64;
-    aFormatSettings: TALFormatSettingsA;
+Var LSqlite3Client: TalSqlite3Client;
+    LXMLDATA: TalXmlDocument;
+    LStartDate: int64;
+    LEndDate: int64;
+    LFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
-    i: integer;
+    I: integer;
 begin
-  aFormatSettings := ALDefaultFormatSettingsA;
+  LFormatSettings := ALDefaultFormatSettingsA;
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
+    LSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
     Try
 
       //enable or disable the shared cache
-      aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
+      LSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
+      LSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
-      aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
-      aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
-      aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
+      LSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
+      LSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
+      LSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
+      LSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
+      LSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
-        1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
-        2: aSqlite3Client.UpdateData('PRAGMA journal_mode = PERSIST');
-        3: aSqlite3Client.UpdateData('PRAGMA journal_mode = MEMORY');
-        4: aSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
-        5: aSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
+        0: LSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
+        1: LSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
+        2: LSqlite3Client.UpdateData('PRAGMA journal_mode = PERSIST');
+        3: LSqlite3Client.UpdateData('PRAGMA journal_mode = MEMORY');
+        4: LSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
+        5: LSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
       end;
-      aSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
-      If ALCheckBoxSqlite3ReadUncommited.Checked then aSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
+      LSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
+      If ALCheckBoxSqlite3ReadUncommited.Checked then LSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
       case RadioGroupSqlite3Synhcronous.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
-        1: aSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
-        2: aSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
+        0: LSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
+        1: LSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
+        2: LSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
       end;
       case RadioGroupSQLite3Temp_Store.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
-        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
-        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
+        0: LSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
+        1: LSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
+        2: LSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
       end;
 
       //the sql
-      aXMLDATA := TALXmlDocument.create('root');
+      LXMLDATA := TALXmlDocument.create('root');
       Try
 
-        With aXMLDATA Do Begin
+        With LXMLDATA Do Begin
           Options := [doNodeAutoIndent];
           ParseOptions := [poPreserveWhiteSpace];
         end;
@@ -221,32 +221,32 @@ begin
         S1 := AnsiString(AlMemoSQLite3Query.Lines.Text);
         while ALPosA('<#randomchar>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomchar>',ALRandomStrA(1),[rfIgnoreCase]);
         while ALPosA('<#randomnumber>', AlLowerCase(S1)) > 0 do S1 := ALStringReplaceA(S1, '<#randomnumber>',ALIntToStrA(random(10)),[rfIgnoreCase]);
-        for i := 1 to maxint do begin
-          if ALPosA('<#randomnumber'+ALIntToStrA(i)+'>', AlLowerCase(S1)) > 0 then S1 := ALStringReplaceA(S1, '<#randomnumber'+ALIntToStrA(i)+'>',ALIntToStrA(random(10)),[rfIgnoreCase, rfReplaceAll])
+        for I := 1 to maxint do begin
+          if ALPosA('<#randomnumber'+ALIntToStrA(I)+'>', AlLowerCase(S1)) > 0 then S1 := ALStringReplaceA(S1, '<#randomnumber'+ALIntToStrA(I)+'>',ALIntToStrA(random(10)),[rfIgnoreCase, rfReplaceAll])
           else break;
         end;
 
-        aStartDate := GetTickCount64;
-        aSqlite3Client.SelectData(
+        LStartDate := GetTickCount64;
+        LSqlite3Client.SelectData(
           S1,
           'rec',
            0,
            200,
-          aXMLDATA.DocumentElement,
-          aFormatSettings);
-        aEndDate := GetTickCount64;
+          LXMLDATA.DocumentElement,
+          LFormatSettings);
+        LEndDate := GetTickCount64;
 
-        ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + IntToStr(aEndDate - aStartDate) + ' ms' + #13#10 +
+        ALMemoResult.Lines.Text := 'Time Taken to select the data: ' + IntToStr(LEndDate - LStartDate) + ' ms' + #13#10 +
                                    #13#10 +
-                                   String(ALTrim(aXMLDATA.XML));
+                                   String(ALTrim(LXMLDATA.XML));
 
       Finally
-        aXMLDATA.free;
+        LXMLDATA.free;
       End;
 
     Finally
-      aSqlite3Client.disconnect;
-      aSqlite3Client.free;
+      LSqlite3Client.disconnect;
+      LSqlite3Client.free;
     End;
 
   Finally
@@ -256,60 +256,60 @@ end;
 
 {************************************************************}
 procedure TForm1.ALButtonSqlLite3VacuumClick(Sender: TObject);
-Var aSqlite3Client: TalSqlite3Client;
-    aStartDate: int64;
-    aEndDate: int64;
+Var LSqlite3Client: TalSqlite3Client;
+    LStartDate: int64;
+    LEndDate: int64;
 begin
   Screen.Cursor := CrHourGlass;
   try
 
-    aSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
+    LSqlite3Client := TalSqlite3Client.Create(AnsiString(ALEditSqlite3lib.Text));
     Try
 
       //enable or disable the shared cache
-      aSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
+      LSqlite3Client.enable_shared_cache(ALCheckBoxSqlite3SharedCache.Checked);
 
       //connect
-      aSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
+      LSqlite3Client.connect(AnsiString(ALEditSqlite3Database.text));
 
       //the pragma
-      aSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
-      aSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
-      aSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
-      aSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
-      aSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
+      LSqlite3Client.UpdateData('PRAGMA page_size = '+AnsiString(ALEditSqlite3Page_Size.Text));
+      LSqlite3Client.UpdateData('PRAGMA encoding = "UTF-8"');
+      LSqlite3Client.UpdateData('PRAGMA legacy_file_format = 0');
+      LSqlite3Client.UpdateData('PRAGMA auto_vacuum = NONE');
+      LSqlite3Client.UpdateData('PRAGMA cache_size = '+AnsiString(ALEditSqlite3Cache_Size.Text));
       case RadioGroupSqlite3Journal_Mode.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
-        1: aSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
-        2: aSqlite3Client.UpdateData('PRAGMA journal_mode = PERSIST');
-        3: aSqlite3Client.UpdateData('PRAGMA journal_mode = MEMORY');
-        4: aSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
-        5: aSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
+        0: LSqlite3Client.UpdateData('PRAGMA journal_mode = DELETE');
+        1: LSqlite3Client.UpdateData('PRAGMA journal_mode = TRUNCATE');
+        2: LSqlite3Client.UpdateData('PRAGMA journal_mode = PERSIST');
+        3: LSqlite3Client.UpdateData('PRAGMA journal_mode = MEMORY');
+        4: LSqlite3Client.UpdateData('PRAGMA journal_mode = WAL');
+        5: LSqlite3Client.UpdateData('PRAGMA journal_mode = OFF');
       end;
-      aSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
-      If ALCheckBoxSqlite3ReadUncommited.Checked then aSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
+      LSqlite3Client.UpdateData('PRAGMA locking_mode = NORMAL');
+      If ALCheckBoxSqlite3ReadUncommited.Checked then LSqlite3Client.UpdateData('PRAGMA read_uncommitted = 1');
       case RadioGroupSqlite3Synhcronous.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
-        1: aSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
-        2: aSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
+        0: LSqlite3Client.UpdateData('PRAGMA synchronous = OFF');
+        1: LSqlite3Client.UpdateData('PRAGMA synchronous = NORMAL');
+        2: LSqlite3Client.UpdateData('PRAGMA synchronous = FULL');
       end;
       case RadioGroupSQLite3Temp_Store.ItemIndex of
-        0: aSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
-        1: aSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
-        2: aSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
+        0: LSqlite3Client.UpdateData('PRAGMA temp_store = DEFAULT');
+        1: LSqlite3Client.UpdateData('PRAGMA temp_store = FILE');
+        2: LSqlite3Client.UpdateData('PRAGMA temp_store = MEMORY');
       end;
 
       //do the job
-      aStartDate := GetTickCount64;
-      aSqlite3Client.UpdateData('VACUUM');
-      aEndDate := GetTickCount64;
+      LStartDate := GetTickCount64;
+      LSqlite3Client.UpdateData('VACUUM');
+      LEndDate := GetTickCount64;
 
       ALMemoResult.Lines.clear;
-      ALMemoResult.Lines.add('Time Taken to VACUUM the database: ' + IntToStr(aEndDate - aStartDate) + ' ms');
+      ALMemoResult.Lines.add('Time Taken to VACUUM the database: ' + IntToStr(LEndDate - LStartDate) + ' ms');
 
     Finally
-      aSqlite3Client.disconnect;
-      aSqlite3Client.free;
+      LSqlite3Client.disconnect;
+      LSqlite3Client.free;
     End;
 
   Finally

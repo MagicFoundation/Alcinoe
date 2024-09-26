@@ -4986,8 +4986,90 @@
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;"/>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin64\sk4d.dll">
+      <DeployClass>Skia</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALConfettiDemo\</RemoteDir>
+      <RemoteName>sk4d.dll</RemoteName>
+      <Required>True</Required>
+    </DeployFile>
+  </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;">
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>

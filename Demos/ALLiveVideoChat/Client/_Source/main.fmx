@@ -36,12 +36,13 @@ object Form1: TForm1
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
     Position.X = 15.000000000000000000
-    Position.Y = 86.000000000000000000
+    Position.Y = 87.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 35.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Connect'
+    TextSettings.Trimming = None
     OnClick = ButtonCallClick
   end
   object ButtonHangUp: TButton
@@ -51,12 +52,13 @@ object Form1: TForm1
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
     Position.X = 15.000000000000000000
-    Position.Y = 136.000000000000000000
+    Position.Y = 137.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 35.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Hang-up'
+    TextSettings.Trimming = None
     OnClick = ButtonHangUpClick
   end
   object ServerUrlEdit: TEdit
@@ -65,7 +67,7 @@ object Form1: TForm1
     TabOrder = 4
     Text = 'http://192.168.0.1:3030'
     Position.X = 15.000000000000000000
-    Position.Y = 186.000000000000000000
+    Position.Y = 187.000000000000000000
     Margins.Left = 15.000000000000000000
     Margins.Top = 15.000000000000000000
     Margins.Right = 15.000000000000000000
@@ -83,15 +85,13 @@ object Form1: TForm1
     Position.X = 15.000000000000000000
     Position.Y = 15.000000000000000000
     Size.Width = 489.000000000000000000
-    Size.Height = 56.000000000000000000
+    Size.Height = 57.000000000000000000
     Size.PlatformDefault = False
     Text = 
       'You must also run '#13#10'Alcinoe\embarcadero\<yourDelphiVersion>\upda' +
       'te.bat'#13#10' to retrieve and patch the original delphi source code'
-    TextSettings.Font.Size = 14.000000000000000000
-    TextSettings.Font.StyleExt = {00070000000000000004000000}
-    TextSettings.FontColor = claCrimson
-    TextSettings.WordWrap = True
+    TextSettings.Font.Weight = Bold
+    TextSettings.Font.Color = claCrimson
     TextSettings.HorzAlign = Center
   end
 end

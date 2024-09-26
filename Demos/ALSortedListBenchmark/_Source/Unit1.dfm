@@ -10,8 +10,6 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object Label2: TLabel
     Left = 775
@@ -54,6 +52,7 @@ object Form1: TForm1
       24)
     ColorPaletteIndex = 7
     object Series1: TBarSeries
+      HoverElement = []
       Legend.Text = 'TALAVLStringList'
       LegendTitle = 'TALAVLStringList'
       Marks.Visible = False
@@ -66,6 +65,7 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series2: TBarSeries
+      HoverElement = []
       Legend.Text = 'TALHashedStringList'
       LegendTitle = 'TALHashedStringList'
       Marks.Visible = False
@@ -78,6 +78,7 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series3: TBarSeries
+      HoverElement = []
       Legend.Text = 'TALStringList'
       LegendTitle = 'TALStringList'
       Marks.Visible = False
@@ -90,6 +91,7 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series4: TBarSeries
+      HoverElement = []
       Legend.Text = 'TStringList'
       LegendTitle = 'TStringList'
       Marks.Visible = False
@@ -102,6 +104,7 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series5: TBarSeries
+      HoverElement = []
       Legend.Text = 'TALIntegerList'
       LegendTitle = 'TALIntegerList'
       Marks.Visible = False
@@ -114,6 +117,7 @@ object Form1: TForm1
       YValues.Order = loNone
     end
     object Series6: TBarSeries
+      HoverElement = []
       Legend.Text = 'TALNvStringList'
       LegendTitle = 'TALNvStringList'
       Marks.Visible = False

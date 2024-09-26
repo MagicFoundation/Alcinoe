@@ -19,8 +19,6 @@ object Form1: TForm1
     ActivePage = TabSheet1
     Align = alClient
     TabOrder = 0
-    ExplicitWidth = 1004
-    ExplicitHeight = 723
     object TabSheet1: TTabSheet
       Caption = 'Main'
       object Label1: TLabel
@@ -256,8 +254,8 @@ object Form1: TForm1
         end
         object Series2: TBarSeries
           HoverElement = []
-          Legend.Text = 'TALJsonDocU (Unicode)'
-          LegendTitle = 'TALJsonDocU (Unicode)'
+          Legend.Text = 'TALJsonDocW (Unicode)'
+          LegendTitle = 'TALJsonDocW (Unicode)'
           Marks.Visible = False
           Marks.Angle = 90
           Emboss.Color = 8684676
@@ -323,7 +321,7 @@ object Form1: TForm1
         State = cbChecked
         TabOrder = 3
       end
-      object CheckBoxTALJsonDocUJSON: TCheckBox
+      object CheckBoxTALJsonDocWJSON: TCheckBox
         Left = 184
         Top = 20
         Width = 153

@@ -4,8 +4,8 @@
     <ProjectVersion>20.1</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
     <Base>True</Base>
-    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">iOSDevice64</Platform>
+    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
     <MainSource>ALConfettiDemo.dpr</MainSource>
@@ -326,188 +326,126 @@
     </DelphiCompile>
     <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.2.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.code.findbugs-jsr305-3.0.2.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.code.findbugs-jsr305-3.0.2.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.guava-guava-32.1.3-android.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.guava-guava-32.1.3-android.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.checkerframework-checker-qual-3.37.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.checkerframework-checker-qual-3.37.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\r.jar">
       <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\r.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <BuildConfiguration Include="Base">
@@ -548,7 +486,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Release" LocalName="Android64\Release\splash_image_def.xml">
+        <DeployFile Class="AndroidSplashImageDef" Configuration="Release" LocalName="..\Android64\Release\splash_image_def.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -558,34 +496,6 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android64\Debug\splash_image_def-v21.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_image_def.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android\Debug\splash_image_def-v21.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_image_def.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android64\Release\splash_image_def-v21.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_image_def.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android\Release\splash_image_def-v21.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_image_def.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android64\Debug\styles.xml">
@@ -600,7 +510,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Release" LocalName="Android64\Release\styles.xml">
+        <DeployFile Class="AndroidSplashStyles" Configuration="Release" LocalName="..\Android64\Release\styles.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -626,7 +536,7 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV21" Configuration="Release" LocalName="Android64\Release\styles-v21.xml">
+        <DeployFile Class="AndroidSplashStylesV21" Configuration="Release" LocalName="..\Android64\Release\styles-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -638,170 +548,6 @@
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
             <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android64\Debug\styles-v31.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android\Debug\styles-v31.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android64\Release\styles-v31.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android\Release\styles-v31.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>styles.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android64\Debug\ic_launcher.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android\Debug\ic_launcher.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android64\Release\ic_launcher.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android\Release\ic_launcher.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_background.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_background.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_background.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_background.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_foreground.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_foreground.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_foreground.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_foreground.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android64\Debug\ic_launcher-v33.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android\Debug\ic_launcher-v33.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android64\Release\ic_launcher-v33.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android\Release\ic_launcher-v33.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_launcher.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="Android64\Debug\colors.xml">
@@ -816,7 +562,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Colors" Configuration="Release" LocalName="Android64\Release\colors.xml">
+        <DeployFile Class="Android_Colors" Configuration="Release" LocalName="..\Android64\Release\colors.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -842,7 +588,7 @@
             <RemoteName>colors.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_ColorsDark" Configuration="Release" LocalName="Android64\Release\colors-night-v21.xml">
+        <DeployFile Class="Android_ColorsDark" Configuration="Release" LocalName="..\Android64\Release\colors-night-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -1288,7 +1034,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Strings" Configuration="Release" LocalName="Android64\Release\strings.xml">
+        <DeployFile Class="Android_Strings" Configuration="Release" LocalName="..\Android64\Release\strings.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -1298,146 +1044,6 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_notification.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_notification.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_notification.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>ic_notification.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
-          <Platform Name="Android">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>splash_vector.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi-v4\notification_bg_low_normal.9.png">
@@ -4440,6 +4046,230 @@
             <RemoteName>values.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\Android\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\Android\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\Android\libsk4d.so" Required="true">
+          <Platform Name="Android">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib" Required="true">
+          <Platform Name="OSX64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib" Required="true">
+          <Platform Name="OSXARM64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll" Required="true">
+          <Platform Name="Win32">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Debug" LocalName="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll" Required="true">
+          <Platform Name="Win64">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\Android\libsk4d.so" Required="true">
+          <Platform Name="Android">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib" Required="true">
+          <Platform Name="OSX64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib" Required="true">
+          <Platform Name="OSXARM64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll" Required="true">
+          <Platform Name="Win32">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;!=&#39;&#39;" Configuration="Release" LocalName="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll" Required="true">
+          <Platform Name="Win64">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Configuration="Debug" LocalName="$(BDS)\binandroid32\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Configuration="Release" LocalName="$(BDS)\binandroid32\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Debug" LocalName="$(BDS)\bin64\sk4d.dll" Required="true">
+          <Platform Name="Win64">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Debug" LocalName="$(BDS)\bin\sk4d.dll" Required="true">
+          <Platform Name="Win32">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Debug" LocalName="$(BDS)\binandroid32\libsk4d.so" Required="true">
+          <Platform Name="Android">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Debug" LocalName="$(BDS)\binandroid64\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Debug" LocalName="$(BDS)\binosx64\libsk4d.dylib" Required="true">
+          <Platform Name="OSX64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Debug" LocalName="$(BDS)\binosxarm64\libsk4d.dylib" Required="true">
+          <Platform Name="OSXARM64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Release" LocalName="$(BDS)\bin64\sk4d.dll" Required="true">
+          <Platform Name="Win64">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Release" LocalName="$(BDS)\bin\sk4d.dll" Required="true">
+          <Platform Name="Win32">
+            <Operation>0</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>.\</RemoteDir>
+            <RemoteName>sk4d.dll</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Release" LocalName="$(BDS)\binandroid32\libsk4d.so" Required="true">
+          <Platform Name="Android">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\armeabi-v7a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Release" LocalName="$(BDS)\binandroid64\libsk4d.so" Required="true">
+          <Platform Name="Android64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>library\lib\arm64-v8a\</RemoteDir>
+            <RemoteName>libsk4d.so</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Release" LocalName="$(BDS)\binosx64\libsk4d.dylib" Required="true">
+          <Platform Name="OSX64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Skia" Condition="&#39;$(SKIADIR)&#39;==&#39;&#39;" Configuration="Release" LocalName="$(BDS)\binosxarm64\libsk4d.dylib" Required="true">
+          <Platform Name="OSXARM64">
+            <Operation>1</Operation>
+            <Overwrite>true</Overwrite>
+            <RemoteDir>Contents\MacOS\</RemoteDir>
+            <RemoteName>libsk4d.dylib</RemoteName>
+          </Platform>
+        </DeployFile>
       </Deployment>
       <Platforms>
         <Platform value="Android">True</Platform>
@@ -4457,4 +4287,36 @@
   <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists(&#39;$(BDS)\Bin\CodeGear.Delphi.Targets&#39;)"/>
   <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists(&#39;$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj&#39;)"/>
   <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists(&#39;$(MSBuildProjectName).deployproj&#39;)"/>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(Platform)&#39;==&#39;Android&#39;">
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
+    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+    <PreLinkEvent/>
+    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+    <PostBuildEvent/>
+    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
+    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+    <PreLinkEvent/>
+    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+    <PostBuildEvent/>
+    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(Platform)&#39;==&#39;Android&#39;">
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
+    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+    <PreLinkEvent/>
+    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+    <PostBuildEvent/>
+    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">
+    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
+    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
+    <PreLinkEvent/>
+    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
+    <PostBuildEvent/>
+    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
+  </PropertyGroup>
 </Project>

@@ -9,104 +9,9 @@ object TMainForm: TTMainForm
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
+  OnCreate = FormCreate
   OnPaint = FormPaint
   DesignerMasterStyle = 0
-  object BtnFireCustomConfig: TButton
-    Align = Top
-    Margins.Left = 12.000000000000000000
-    Margins.Right = 12.000000000000000000
-    Margins.Bottom = 12.000000000000000000
-    Position.X = 12.000000000000000000
-    Position.Y = 239.000000000000000000
-    Size.Width = 489.000000000000000000
-    Size.Height = 39.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 6
-    Text = 'Fire (Custom Config)'
-    TextSettings.Trimming = None
-    OnClick = BtnFireCustomConfigClick
-  end
-  object ConfigMemo: TMemo
-    Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-    DataDetectorTypes = []
-    Lines.Strings = (
-      
-        ';The x position on the page where to start firing confetti from,' +
-        ' '
-      ';with 0 being the left edge and 1 being the right edge.'
-      'OriginX=0.5'
-      ''
-      
-        ';The y position on the page where to start firing confetti from,' +
-        ' '
-      ';with 0 being the top edge and 1 being the bottom edge.'
-      'OriginY=1'
-      ''
-      ';The number of confetti to launch. More is always fun... '
-      ';but be cool, there'#39's a lot of math involved.'
-      'ParticleCount=50'
-      ''
-      ';The angle in which to launch the confetti, in degrees. '
-      ';90 is straight up.'
-      'Angle=90'
-      ''
-      ';How far off center the confetti can go, in degrees. '
-      ';45 means the confetti will launch at the defined angle '
-      ';plus or minus 22.5 degrees.'
-      'Spread=45'
-      ''
-      ';How fast the confetti will start going, in pixels.'
-      'StartVelocity=45'
-      ''
-      ';An array of color strings, in the HEX format... '
-      ';you know, like #bada55.'
-      'Colors=[]'
-      ''
-      ';An array of shapes for the confetti. The possible values '
-      ';are square and circle. The default is to use both shapes '
-      ';in an even mix. You can even change the mix by providing '
-      ';a value such as ['#39'circle'#39', '#39'circle'#39', '#39'square'#39'] to use two '
-      ';third circles and one third squares.'
-      'Shapes=[]'
-      ''
-      ';How many times the confetti will move. This is abstract... '
-      ';but play with it if the confetti disappear too quickly '
-      ';for you.'
-      'Ticks=200'
-      ''
-      ';How quickly the confetti will lose speed. Keep this number '
-      ';between 0 and 1, otherwise the confetti will gain speed. '
-      ';Better yet, just never change it.'
-      'Decay=0.9'
-      ''
-      ';How quickly the particles are pulled down. 1 is full '
-      ';gravity, 0.5 is half gravity, etc., but there are no '
-      ';limits. You can even make particles go up if you'#39'd like.'
-      'Gravity=1'
-      ''
-      ';How much to the side the confetti will drift. The default '
-      ';is 0, meaning that they will fall straight down. Use a '
-      ';negative number for left and positive number for right.'
-      'Drift=0'
-      ''
-      ';Scale factor for each confetti particle. Use decimals '
-      ';to make the confetti smaller. Go on, try teeny tiny '
-      ';confetti, they are adorable!'
-      'Scalar=1')
-    Align = Top
-    Margins.Left = 12.000000000000000000
-    Margins.Top = 12.000000000000000000
-    Margins.Right = 12.000000000000000000
-    Margins.Bottom = 12.000000000000000000
-    Position.X = 12.000000000000000000
-    Position.Y = 41.000000000000000000
-    Size.Width = 489.000000000000000000
-    Size.Height = 186.000000000000000000
-    Size.PlatformDefault = False
-    TabOrder = 7
-    Viewport.Width = 469.000000000000000000
-    Viewport.Height = 182.000000000000000000
-  end
   object Confetti: TALConfetti
     OnFinish = ConfettiFinish
     Left = 104
@@ -118,7 +23,7 @@ object TMainForm: TTMainForm
     Margins.Right = 12.000000000000000000
     Margins.Bottom = 12.000000000000000000
     Position.X = 12.000000000000000000
-    Position.Y = 494.000000000000000000
+    Position.Y = 257.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 39.000000000000000000
     Size.PlatformDefault = False
@@ -133,7 +38,7 @@ object TMainForm: TTMainForm
     Margins.Right = 12.000000000000000000
     Margins.Bottom = 12.000000000000000000
     Position.X = 12.000000000000000000
-    Position.Y = 443.000000000000000000
+    Position.Y = 206.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 39.000000000000000000
     Size.PlatformDefault = False
@@ -148,7 +53,7 @@ object TMainForm: TTMainForm
     Margins.Right = 12.000000000000000000
     Margins.Bottom = 12.000000000000000000
     Position.X = 12.000000000000000000
-    Position.Y = 392.000000000000000000
+    Position.Y = 155.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 39.000000000000000000
     Size.PlatformDefault = False
@@ -163,7 +68,7 @@ object TMainForm: TTMainForm
     Margins.Right = 12.000000000000000000
     Margins.Bottom = 12.000000000000000000
     Position.X = 12.000000000000000000
-    Position.Y = 341.000000000000000000
+    Position.Y = 104.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 39.000000000000000000
     Size.PlatformDefault = False
@@ -192,7 +97,7 @@ object TMainForm: TTMainForm
     Margins.Right = 12.000000000000000000
     Margins.Bottom = 12.000000000000000000
     Position.X = 12.000000000000000000
-    Position.Y = 290.000000000000000000
+    Position.Y = 53.000000000000000000
     Size.Width = 489.000000000000000000
     Size.Height = 39.000000000000000000
     Size.PlatformDefault = False
@@ -214,6 +119,7 @@ object TMainForm: TTMainForm
     Margins.Left = 6.000000000000000000
     Margins.Top = 12.000000000000000000
     Margins.Right = 6.000000000000000000
+    Margins.Bottom = 24.000000000000000000
     Position.X = 6.000000000000000000
     Position.Y = 12.000000000000000000
     Size.Width = 501.000000000000000000
@@ -225,7 +131,7 @@ object TMainForm: TTMainForm
     TextSettings.HorzAlign = Center
     TextSettings.Trimming = None
     Text = 'TALConfetti Demo'
-    TabOrder = 13
+    TabOrder = 11
   end
   object StatusBar: TStatusBar
     Position.Y = 592.000000000000000000
@@ -233,7 +139,7 @@ object TMainForm: TTMainForm
     Size.Width = 513.000000000000000000
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
-    TabOrder = 18
+    TabOrder = 16
     object StatusBarLabel: TLabel
       Align = Client
       Margins.Left = 6.000000000000000000

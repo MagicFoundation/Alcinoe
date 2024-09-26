@@ -102,8 +102,6 @@ object Form1: TForm1
       item
         Width = 100
       end>
-    ExplicitTop = 770
-    ExplicitWidth = 1030
   end
   object ALButton3: TButton
     Left = 24
@@ -288,7 +286,6 @@ object Form1: TForm1
     ParentFont = False
     ScrollBars = ssBoth
     TabOrder = 20
-    OnChange = ALMemoCollisionsChange
   end
   object Button4: TButton
     Left = 651

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="exo_download_completed">Transferência concluída</string>
+    <string name="exo_download_description">Transferir</string>
+    <string name="exo_download_downloading">A transferir…</string>
+    <string name="exo_download_failed">Falha na transferência</string>
+    <string name="exo_download_notification_channel_name">Transferências</string>
+    <string name="exo_download_paused">Transferências colocadas em pausa</string>
+    <string name="exo_download_paused_for_network">Transferências a aguardar uma rede</string>
+    <string name="exo_download_paused_for_wifi">Transferências a aguardar Wi-Fi</string>
+    <string name="exo_download_removing">A remover as transferências…</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

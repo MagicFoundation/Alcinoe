@@ -7,8 +7,8 @@ uses
   FMX.Forms,
   FMX.Types,
   FMX.Skia,
-  UnitMain in 'UnitMain.pas' {MainForm},
-  UnitScrollBoxDemo in 'UnitScrollBoxDemo.pas' {ScrollBoxDemoForm};
+  Main in 'Main.pas' {MainForm},
+  ScrollBox in 'ScrollBox.pas' {ScrollBoxForm};
 
 {$R *.res}
 
@@ -26,4 +26,3 @@ begin
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;
 end.
-

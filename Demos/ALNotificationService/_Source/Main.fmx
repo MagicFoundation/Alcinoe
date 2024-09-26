@@ -16,20 +16,21 @@ object Form1: TForm1
     TextSettings.WordWrap = True
     Align = Client
     Size.Width = 360.000000000000000000
-    Size.Height = 227.000000000000000000
+    Size.Height = 224.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 6
     Viewport.Width = 356.000000000000000000
-    Viewport.Height = 223.000000000000000000
+    Viewport.Height = 220.000000000000000000
   end
   object ButtonGetToken: TButton
     Align = Top
-    Position.Y = 217.000000000000000000
+    Position.Y = 220.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'Get Token'
+    TextSettings.Trimming = None
     OnClick = ButtonGetTokenClick
   end
   object TextIntro: TALText
@@ -42,26 +43,24 @@ object Form1: TForm1
     Position.X = 15.000000000000000000
     Position.Y = 15.000000000000000000
     Size.Width = 330.000000000000000000
-    Size.Height = 187.000000000000000000
+    Size.Height = 190.000000000000000000
     Size.PlatformDefault = False
     Text = 
-      'The instructions how to setup Firebase Cloud Messaging are writt' +
-      'en in ALFmxFirebaseMessaging.pas. Regarding this demo you will n' +
-      'eed to replace android\GoogleServices\google-services.json and i' +
-      'os\GoogleServices\GoogleService-Info.plist by your own and then ' +
-      'execute android\MergeLibraries.bat. You will also need to update' +
-      ' the const FirebaseMessaging** declared in Main.pas'
-    TextSettings.Font.Size = 14.000000000000000000
-    TextSettings.Font.StyleExt = {00070000000000000004000000}
-    TextSettings.FontColor = claCrimson
-    TextSettings.WordWrap = True
+      'The instructions for setting up '#13#10'Firebase Cloud Messaging are '#13 +
+      #10'provided in <b>ALFmxFirebaseMessaging.pas</b>.'#13#10'For this demo, ' +
+      'you will need to replace '#13#10'<b>android\GoogleServices\google-serv' +
+      'ices.json</b> and '#13#10'<b>ios\GoogleServices\GoogleService-Info.pli' +
+      'st</b> '#13#10'with your own files, and then run '#13#10'<b>android\MergeLib' +
+      'raries.bat</b>.'#13#10'Additionally, you will need to update the '#13#10'con' +
+      'stant <b>FirebaseMessaging**</b> declared '#13#10'in Main.pas.'
     TextSettings.HorzAlign = Center
+    TextSettings.IsHtml = True
   end
   object EditToken: TEdit
     Touch.InteractiveGestures = [LongTap, DoubleTap]
     Align = Top
     TabOrder = 7
-    Position.Y = 457.000000000000000000
+    Position.Y = 460.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 34.000000000000000000
     Size.PlatformDefault = False
@@ -69,52 +68,57 @@ object Form1: TForm1
   end
   object ButtonSendAlertNotificationViaHttpV1: TButton
     Align = Top
-    Position.Y = 337.000000000000000000
+    Position.Y = 340.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Send Alert Notification (Http V1)'
+    TextSettings.Trimming = None
     OnClick = ButtonSendAlertNotificationViaHttpV1Click
   end
   object ButtonSendDataNotificationViaHttpV1: TButton
     Align = Top
-    Position.Y = 297.000000000000000000
+    Position.Y = 300.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Send Data Notification (Http V1)'
+    TextSettings.Trimming = None
     OnClick = ButtonSendDataNotificationViaHttpV1Click
   end
   object ButtonSendAlertDataNotificationViaHttpV1: TButton
     Align = Top
-    Position.Y = 377.000000000000000000
+    Position.Y = 380.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Send Alert + Data Notification (Http V1)'
+    TextSettings.Trimming = None
     OnClick = ButtonSendAlertDataNotificationViaHttpV1Click
   end
   object ButtonShowNotification: TButton
     Align = Top
-    Position.Y = 417.000000000000000000
+    Position.Y = 420.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 0
     Text = 'Show Alert Notification'
+    TextSettings.Trimming = None
     OnClick = ButtonShowNotificationClick
   end
   object ButtonDeleteToken: TButton
     Align = Top
-    Position.Y = 257.000000000000000000
+    Position.Y = 260.000000000000000000
     Size.Width = 360.000000000000000000
     Size.Height = 40.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Delete Token'
+    TextSettings.Trimming = None
     OnClick = ButtonDeleteTokenClick
   end
 end

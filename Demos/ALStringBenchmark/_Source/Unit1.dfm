@@ -10,9 +10,7 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
   OnClick = FormClick
-  PixelsPerInch = 96
   TextHeight = 13
   object ALButton1: TButton
     Left = 16

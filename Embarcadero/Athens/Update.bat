@@ -19,6 +19,11 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
 
+SET FileName=%ALBaseDir%\Embarcadero\Athens\internet
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+IF EXIST "%FileName%" goto ERROR
+mkdir "%FileName%"
+
 SET FileName=%ALBaseDir%\Embarcadero\Athens\rtl
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
@@ -26,10 +31,15 @@ mkdir "%FileName%"
 mkdir "%FileName%\ios"
 mkdir "%FileName%\osx"
 mkdir "%FileName%\android"
+mkdir "%FileName%\common"
 mkdir "%FileName%\net"
 
 echo Copy "%EmbSourceDir%\fmx"
 xcopy /Q "%EmbSourceDir%\fmx" "%ALBaseDir%\Embarcadero\Athens\fmx"
+IF ERRORLEVEL 1 goto ERROR
+
+echo Copy "%EmbSourceDir%\internet"
+xcopy /Q "%EmbSourceDir%\internet" "%ALBaseDir%\Embarcadero\Athens\internet"
 IF ERRORLEVEL 1 goto ERROR
 
 IF EXIST "%EmbSourceDir%\rtl\ios" (
@@ -50,12 +60,18 @@ IF EXIST "%EmbSourceDir%\rtl\android" (
   IF ERRORLEVEL 1 goto ERROR
 )
 
+IF EXIST "%EmbSourceDir%\rtl\common" (
+  echo Copy "%EmbSourceDir%\rtl\common"
+  xcopy /Q "%EmbSourceDir%\rtl\common" "%ALBaseDir%\Embarcadero\Athens\rtl\common"
+  IF ERRORLEVEL 1 goto ERROR
+)
+
 echo Copy "%EmbSourceDir%\rtl\net"
 xcopy /Q "%EmbSourceDir%\rtl\net" "%ALBaseDir%\Embarcadero\Athens\rtl\net"
 IF ERRORLEVEL 1 goto ERROR
 
 echo Patch the locally copied source code
-git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace .\Embarcadero\Athens\Athens.patch -v
+git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace --whitespace=nowarn .\Embarcadero\Athens\Athens.patch -v
 
 echo Remove warnings from the copied files
 for /f "delims=" %%a IN ('dir /b /s %ALBaseDir%\Embarcadero\Athens\*.pas') do Call :ADD_HINTS_OFF "%%a"

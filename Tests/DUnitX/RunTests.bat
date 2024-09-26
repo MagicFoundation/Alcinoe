@@ -14,7 +14,7 @@ if "%ALBaseDir%"=="" (
   echo.
   
   Set Standalone=1
-  call "%~dp0\..\InitEnvironment.bat"
+  call "%~dp0\..\..\InitEnvironment.bat"
   IF ERRORLEVEL 1 goto ERROR
   echo.
   
@@ -28,21 +28,21 @@ REM --------------
 if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 
-REM ---------------------
-REM Build ALTests Project
-REM ---------------------
+REM ---------------------------
+REM Build ALDUnitXTests Project
+REM ---------------------------
 
 :BUILD_TESTS
 
 echo ---------------------
-echo Build ALTests Project
+echo Build ALDUnitXTests Project
 echo ---------------------
 echo.
 
 if NOT "%Standalone%"=="1" GOTO DO_BUILD_TESTS
 
 set BuildTests=
-set /P BuildTests=Build ALTests (Y/N, default=Y)?: %=%
+set /P BuildTests=Build ALDUnitXTests (Y/N, default=Y)?: %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 echo.
 
@@ -55,91 +55,91 @@ goto BUILD_TESTS
 
 :DO_BUILD_TESTS
 
-SET FileName=%ALBaseDir%\Tests\*.identcache
+SET FileName=%ALBaseDir%\Tests\DUnitX\*.identcache
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ALBaseDir%\Tests\*.dproj.local
+SET FileName=%ALBaseDir%\Tests\DUnitX\*.dproj.local
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ALBaseDir%\Tests\*.groupproj.local
+SET FileName=%ALBaseDir%\Tests\DUnitX\*.groupproj.local
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ALBaseDir%\Tests\*.deployproj.local
+SET FileName=%ALBaseDir%\Tests\DUnitX\*.deployproj.local
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR
 
-SET FileName=%ALBaseDir%\Tests\_Source\Dcu
+SET FileName=%ALBaseDir%\Tests\DUnitX\_Source\Dcu
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-SET FileName=%ALBaseDir%\Tests\Win32
+SET FileName=%ALBaseDir%\Tests\DUnitX\Win32
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-SET FileName=%ALBaseDir%\Tests\Win64
+SET FileName=%ALBaseDir%\Tests\DUnitX\Win64
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\_Source" -CreateBackup="false" -NoInteraction=true
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\DUnitX\_Source" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
 
-call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%ALBaseDir%\Tests\_Source\ALTests.dproj" -CreateBackup="false"
-IF ERRORLEVEL 1 goto ERROR
-
-echo.
-echo [36mMSBuild ALTests.dproj /p:config=Debug /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
+call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Debug /p:Platform=Win64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win32 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Android[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Android /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Debug /p:Platform=Win64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Debug;DCC_MapFile=3 /p:Platform=Win64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Android64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Android64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Android[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Android /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=iOSDevice64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=iOSDevice64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Android64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Android64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=iOSSimARM64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=iOSDevice64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=iOSDevice64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=OSX64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=OSX64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=iOSSimARM64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=iOSSimARM64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=OSXARM64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=OSXARM64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=OSX64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=OSX64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Win32[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Win32 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=OSXARM64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=OSXARM64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
-echo [36mMSBuild ALTests.dproj /p:config=Release /p:Platform=Win64[0m
-msbuild "%ALBaseDir%\Tests\_Source\ALTests.dproj" /p:config=Release /p:Platform=Win64 /t:build /verbosity:minimal
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Win32[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Win32 /t:build /verbosity:minimal
+IF ERRORLEVEL 1 goto ERROR
+
+echo.
+echo [36mMSBuild ALDUnitXTests.dproj /p:config=Release /p:Platform=Win64[0m
+msbuild "%ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj" /p:config=Release /p:Platform=Win64 /t:build /verbosity:minimal
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -196,15 +196,15 @@ REM ----------------------------------
 echo.
 echo Run Win32 tests
 call "%DelphiCodeCoverageDir%"\build\Win32\CodeCoverage.exe ^
--e %ALBaseDir%\Tests\Win32\Debug\ALTests.exe ^
--m %ALBaseDir%\Tests\Win32\Debug\ALTests.map ^
+-e %ALBaseDir%\Tests\DUnitX\Win32\Debug\ALDUnitXTests.exe ^
+-m %ALBaseDir%\Tests\DUnitX\Win32\Debug\ALDUnitXTests.map ^
 -a ^^-^^-hidebanner ^^-^^-exitbehavior:Continue ^^-^^-consolemode:Quiet ^
--sd %ALBaseDir%\Tests\_Source\ ^
+-sd %ALBaseDir%\Tests\DUnitX\_Source\ ^
 -u ALString ^
 -ife ^
 -html ^
--od %ALBaseDir%\Tests\Win32\Debug\ ^
--dproj %ALBaseDir%\Tests\_Source\ALTests.dproj
+-od %ALBaseDir%\Tests\DUnitX\Win32\Debug\ ^
+-dproj %ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj
 IF ERRORLEVEL 1 goto ERROR
 
 
@@ -215,15 +215,15 @@ REM ----------------------------------
 echo.
 echo Run Win64 tests
 call "%DelphiCodeCoverageDir%"\build\Win64\CodeCoverage.exe ^
--e %ALBaseDir%\Tests\Win64\Debug\ALTests.exe ^
--m %ALBaseDir%\Tests\Win64\Debug\ALTests.map ^
+-e %ALBaseDir%\Tests\DUnitX\Win64\Debug\ALDUnitXTests.exe ^
+-m %ALBaseDir%\Tests\DUnitX\Win64\Debug\ALDUnitXTests.map ^
 -a ^^-^^-hidebanner ^^-^^-exitbehavior:Continue ^^-^^-consolemode:Quiet ^
--sd %ALBaseDir%\Tests\_Source\ ^
+-sd %ALBaseDir%\Tests\DUnitX\_Source\ ^
 -u ALString ^
 -ife ^
 -html ^
--od %ALBaseDir%\Tests\Win64\Debug\ ^
--dproj %ALBaseDir%\Tests\_Source\ALTests.dproj
+-od %ALBaseDir%\Tests\DUnitX\Win64\Debug\ ^
+-dproj %ALBaseDir%\Tests\DUnitX\_Source\ALDUnitXTests.dproj
 IF ERRORLEVEL 1 goto ERROR
 
 goto FINISHED 
@@ -261,7 +261,7 @@ REM -------------------------------------
 
 echo.
 echo Run Win32 tests
-call %ALBaseDir%\Tests\Win32\Release\ALTests.exe --exitbehavior:Continue --hidebanner
+call %ALBaseDir%\Tests\DUnitX\Win32\Release\ALDUnitXTests.exe --exitbehavior:Continue --hidebanner
 IF ERRORLEVEL 1 goto ERROR
 
 goto FINISHED 
@@ -275,7 +275,7 @@ REM -------------------------------------
 
 echo.
 echo Run Win64 tests
-call %ALBaseDir%\Tests\Win64\Release\ALTests.exe --exitbehavior:Continue --hidebanner
+call %ALBaseDir%\Tests\DUnitX\Win64\Release\ALDUnitXTests.exe --exitbehavior:Continue --hidebanner
 IF ERRORLEVEL 1 goto ERROR
 
 goto FINISHED 
@@ -289,12 +289,12 @@ REM -----------------------------------------------
 
 echo.
 echo Run Win32 tests
-call %ALBaseDir%\Tests\Win32\Release\ALTests.exe --exitbehavior:Continue --consolemode:Quiet --hidebanner
+call %ALBaseDir%\Tests\DUnitX\Win32\Release\ALDUnitXTests.exe --exitbehavior:Continue --consolemode:Quiet --hidebanner
 IF ERRORLEVEL 1 goto ERROR
 
 echo.
 echo Run Win64 tests
-call %ALBaseDir%\Tests\Win64\Release\ALTests.exe --exitbehavior:Continue --consolemode:Quiet --hidebanner
+call %ALBaseDir%\Tests\DUnitX\Win64\Release\ALDUnitXTests.exe --exitbehavior:Continue --consolemode:Quiet --hidebanner
 IF ERRORLEVEL 1 goto ERROR
 
 goto FINISHED 

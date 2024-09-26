@@ -1,4 +1,4 @@
-﻿unit ALTestStrings;
+unit ALDUnitXTestStrings;
 
 interface
 
@@ -15,7 +15,7 @@ uses
 type
 
   [TestFixture]
-  TALTestStrings = class
+  TALDUnitXTestStrings = class
   strict private
     fFullAsciiCharsetA: TArray<AnsiChar>;
     fFullAsciiCharsetW: TArray<Char>;
@@ -93,8 +93,8 @@ uses
   System.StrUtils,
   Alcinoe.StringList;
 
-{********************************}
-constructor TALTestStrings.create;
+{**************************************}
+constructor TALDUnitXTestStrings.create;
 begin
   Setlength(fFullAsciiCharsetA, 255);
   for var I := Low(fFullAsciiCharsetA) to High(fFullAsciiCharsetA) do
@@ -112,20 +112,20 @@ begin
     end;
 end;
 
-{*****************************}
-procedure TALTestStrings.Setup;
+{***********************************}
+procedure TALDUnitXTestStrings.Setup;
 begin
   fStopWatchAlcinoe := TStopwatch.Create;
   fStopWatchDELPHI := TStopwatch.Create;
 end;
 
 {**********************************}
-//procedure TALTestStrings.TearDown;
+//procedure TALDUnitXTestStrings.TearDown;
 //begin
 //end;
 
-{**********************************************************************}
-procedure TALTestStrings.CheckExecutionTime(const ARatio: single = 1.2);
+{****************************************************************************}
+procedure TALDUnitXTestStrings.CheckExecutionTime(const ARatio: single = 1.2);
 begin
   {$IF defined(debug) or defined(Win32)}
   //In debug we have overflow checking and range checking so that mean
@@ -142,8 +142,8 @@ begin
   {$ENDIF}
 end;
 
-{***********************************************************************}
-function TALTestStrings.UnicodeRandomStr(const aLength: Longint): String;
+{*****************************************************************************}
+function TALDUnitXTestStrings.UnicodeRandomStr(const aLength: Longint): String;
 begin
   result := '';
   for var i := 0 to aLength - 1 do begin
@@ -156,8 +156,8 @@ begin
   end;
 end;
 
-{*************************************************}
-procedure TALTestStrings.TestALBase64EncodeStringA;
+{*******************************************************}
+procedure TALDUnitXTestStrings.TestALBase64EncodeStringA;
 begin
   for var I := 0 to 10000 do begin
     var LStrIn := ALRandomStrA(ALRandom32(16384), fFullAsciiCharsetA);
@@ -177,8 +177,8 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{********************************************}
-procedure TALTestStrings.TestAlposIgnoreCaseA;
+{**************************************************}
+procedure TALDUnitXTestStrings.TestAlposIgnoreCaseA;
 begin
   //full random substr
   for var I := 0 to 100000 do begin
@@ -206,8 +206,8 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{********************************************}
-procedure TALTestStrings.TestAlposIgnoreCaseW;
+{**************************************************}
+procedure TALDUnitXTestStrings.TestAlposIgnoreCaseW;
 begin
   //full random substr
   for var I := 0 to 100000 do begin
@@ -235,8 +235,8 @@ begin
   CheckExecutionTime(0.4{ARatio});
 end;
 
-{*******************************************}
-procedure TALTestStrings.TestALTryStrToDateA;
+{*************************************************}
+procedure TALDUnitXTestStrings.TestALTryStrToDateA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -278,8 +278,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*******************************************}
-procedure TALTestStrings.TestALTryStrToTimeA;
+{*************************************************}
+procedure TALDUnitXTestStrings.TestALTryStrToTimeA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -321,8 +321,8 @@ begin
   CheckExecutionTime(0.8{ARatio});
 end;
 
-{***********************************************}
-procedure TALTestStrings.TestALTryStrToDateTimeA;
+{*****************************************************}
+procedure TALDUnitXTestStrings.TestALTryStrToDateTimeA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -364,8 +364,8 @@ begin
   CheckExecutionTime(0.8{ARatio});
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALDateToStrA;
+{**********************************************}
+procedure TALDUnitXTestStrings.TestALDateToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -420,8 +420,8 @@ begin
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALTimeToStrA;
+{**********************************************}
+procedure TALDUnitXTestStrings.TestALTimeToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -476,8 +476,8 @@ begin
   CheckExecutionTime;
 end;
 
-{********************************************}
-procedure TALTestStrings.TestALDateTimeToStrA;
+{**************************************************}
+procedure TALDUnitXTestStrings.TestALDateTimeToStrA;
 begin
   for var I := 0 to 100000 do begin
 
@@ -533,8 +533,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*********************************************}
-procedure TALTestStrings.TestALFormatDateTimeA;
+{***************************************************}
+procedure TALDUnitXTestStrings.TestALFormatDateTimeA;
 begin
 
   Var LSpecifiers := TalStringListW.create;
@@ -632,8 +632,8 @@ begin
 
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALIntToStrA;
+{*********************************************}
+procedure TALDUnitXTestStrings.TestALIntToStrA;
 begin
   //int32
   for var I := 0 to 1000000 do begin
@@ -655,8 +655,8 @@ begin
   CheckExecutionTime;
 end;
 
-{***************************************}
-procedure TALTestStrings.TestALStrToIntA;
+{*********************************************}
+procedure TALDUnitXTestStrings.TestALStrToIntA;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: Integer := ALRandom32(ALMaxInt);
@@ -675,8 +675,8 @@ begin
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALStrToUIntA;
+{**********************************************}
+procedure TALDUnitXTestStrings.TestALStrToUIntA;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: cardinal := ALRandom32(ALMaxUInt);
@@ -694,8 +694,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALStrToInt64A;
+{***********************************************}
+procedure TALDUnitXTestStrings.TestALStrToInt64A;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: int64 := ALRandom64(ALMaxInt64);
@@ -714,8 +714,8 @@ begin
   CheckExecutionTime;
 end;
 
-{******************************************}
-procedure TALTestStrings.TestALStrToUInt64A;
+{************************************************}
+procedure TALDUnitXTestStrings.TestALStrToUInt64A;
 begin
   for var I := 0 to 1000000 do begin
     Var LIntegerIn: UInt64 := ALRandom64(ALMaxUInt64);
@@ -733,8 +733,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALFloatToStrA;
+{***********************************************}
+procedure TALDUnitXTestStrings.TestALFloatToStrA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -755,8 +755,8 @@ begin
   CheckExecutionTime;
 end;
 
-{******************************************}
-procedure TALTestStrings.TestALFloatToStrFA;
+{************************************************}
+procedure TALDUnitXTestStrings.TestALFloatToStrFA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -789,8 +789,8 @@ begin
   CheckExecutionTime;
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALStrToFloatA;
+{***********************************************}
+procedure TALDUnitXTestStrings.TestALStrToFloatA;
 begin
   for var I := 0 to 100000 do begin
     Var LExtendedIn: Extended := ALRandom64(ALMaxInt64) / ALRandom64(ALMaxInt64);
@@ -817,8 +817,8 @@ begin
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALCurrToStrA;
+{**********************************************}
+procedure TALDUnitXTestStrings.TestALCurrToStrA;
 begin
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -839,8 +839,8 @@ begin
   CheckExecutionTime;
 end;
 
-{****************************************}
-procedure TALTestStrings.TestALStrToCurrA;
+{**********************************************}
+procedure TALDUnitXTestStrings.TestALStrToCurrA;
 begin
   for var I := 0 to 100000 do begin
     Var LCurrencyIn: Currency := ALRandom32(ALMaxInt) / ALRandom32(ALMaxInt);
@@ -867,8 +867,8 @@ begin
   CheckExecutionTime;
 end;
 
-{******************************************}
-procedure TALTestStrings.TestALFormatFloatA;
+{************************************************}
+procedure TALDUnitXTestStrings.TestALFormatFloatA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
   //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
@@ -949,8 +949,8 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************}
-procedure TALTestStrings.TestALFormatCurrA;
+{***********************************************}
+procedure TALDUnitXTestStrings.TestALFormatCurrA;
 begin
   //In Win32, delphi RTL use the fastcode ASM that we abandon in alcinoe so
   //the result given by FormatFloat is often <> from the one given by ALFormatFloatA
@@ -1031,8 +1031,8 @@ begin
   {$ENDIF}
 end;
 
-{*************************************}
-procedure TALTestStrings.TestALFormatA;
+{*******************************************}
+procedure TALDUnitXTestStrings.TestALFormatA;
 begin
   for var I := 0 to 10000 do begin
 
@@ -1227,8 +1227,8 @@ begin
   CheckExecutionTime;
 end;
 
-{******************************************}
-procedure TALTestStrings.TestALUTF8CharSize;
+{************************************************}
+procedure TALDUnitXTestStrings.TestALUTF8CharSize;
 begin
   for var LUCS4Char := Low(UCS4Char) to High(UCS4Char) do begin
     //In the version 6.0, Unicode has 1,114,112 code points (U+0000—U+10FFFF)
@@ -1252,8 +1252,8 @@ begin
   end;
 end;
 
-{*********************************************}
-procedure TALTestStrings.TestALUTF8CharToUtf16;
+{***************************************************}
+procedure TALDUnitXTestStrings.TestALUTF8CharToUtf16;
 begin
   for var LUCS4Char := Low(UCS4Char) to High(UCS4Char) do begin
     //In the version 6.0, Unicode has 1,114,112 code points (U+0000—U+10FFFF)
@@ -1308,6 +1308,6 @@ begin
 end;
 
 initialization
-  TDUnitX.RegisterTestFixture(TALTestStrings);
+  TDUnitX.RegisterTestFixture(TALDUnitXTestStrings);
 
 end.

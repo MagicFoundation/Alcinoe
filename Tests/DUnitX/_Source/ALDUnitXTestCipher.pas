@@ -1,4 +1,4 @@
-unit ALTestCipher;
+unit ALDUnitXTestCipher;
 
 interface
 
@@ -11,7 +11,7 @@ uses
 type
 
   [TestFixture]
-  TALTestCipher = class
+  TALDUnitXTestCipher = class
   strict private
     fFullAsciiCharset: TArray<AnsiChar>;
     fStopWatchAlcinoe: TStopwatch;
@@ -34,23 +34,23 @@ uses
   IDGlobal,
   Alcinoe.Cipher;
 
-{*******************************}
-constructor TALTestCipher.create;
+{*************************************}
+constructor TALDUnitXTestCipher.create;
 begin
   Setlength(fFullAsciiCharset, 255);
   for var I := Low(fFullAsciiCharset) to High(fFullAsciiCharset) do
     fFullAsciiCharset[i] := AnsiChar(i); // will contain some invalid UTF-8 chars
 end;
 
-{****************************}
-procedure TALTestCipher.Setup;
+{**********************************}
+procedure TALDUnitXTestCipher.Setup;
 begin
   fStopWatchAlcinoe := TStopwatch.Create;
   fStopWatchDELPHI := TStopwatch.Create;
 end;
 
-{*********************************************************************}
-procedure TALTestCipher.CheckExecutionTime(const ARatio: single = 1.2);
+{***************************************************************************}
+procedure TALDUnitXTestCipher.CheckExecutionTime(const ARatio: single = 1.2);
 begin
   {$IF defined(debug) or defined(Win32)}
   //In debug we have overflow checking and range checking so that mean
@@ -67,8 +67,8 @@ begin
   {$ENDIF}
 end;
 
-{********************************************}
-procedure TALTestCipher.TestALStringHashCrc32;
+{**************************************************}
+procedure TALDUnitXTestCipher.TestALStringHashCrc32;
 var LArrayOfByte: TIdBytes;
 begin
   if not ALTestCrc32cImplementation then

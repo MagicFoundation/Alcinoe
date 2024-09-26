@@ -1,4 +1,4 @@
-unit ALTestRtti;
+unit ALDUnitXTestRtti;
 
 interface
 
@@ -18,7 +18,7 @@ uses
 type
 
   [TestFixture]
-  TALTestRtti = class
+  TALDUnitXTestRtti = class
   strict private
     fStopWatchAlcinoe: TStopwatch;
     fStopWatchDELPHI: TStopwatch;
@@ -56,8 +56,8 @@ type
     FBooleanValue2: Boolean;
     FInt32Value2: Int32;
     FAnsiCharValue2: ansiChar;
-    fOwner2: TALTestRtti;
-    fOwner3: TALTestRtti;
+    fOwner2: TALDUnitXTestRtti;
+    fOwner3: TALDUnitXTestRtti;
     FDateTimeValue3: TDateTime;
     FAlignValues3: TAlignSet;
     FInt64Value3: Int64;
@@ -88,12 +88,12 @@ type
     procedure SetSingleValue2(const Value: Single);
     procedure SetStringList2(const Value: TStringList);
     procedure SetStringValue2(const Value: String);
-    function GetOwner2: TALTestRtti;
+    function GetOwner2: TALDUnitXTestRtti;
   public
     AutoInit: Boolean;
-    Owner: TALTestRtti;
-    property Owner2: TALTestRtti read GetOwner2;
-    property Owner3: TALTestRtti read fOwner3;
+    Owner: TALDUnitXTestRtti;
+    property Owner2: TALDUnitXTestRtti read GetOwner2;
+    property Owner3: TALDUnitXTestRtti read fOwner3;
   public
     //----
     //auto init of member fields
@@ -199,7 +199,7 @@ type
     [TALInit('')]
     property ChildObject3: TALAutoInitChildObject read FChildObject3 write fChildObject3;
   public
-    constructor Create(const aOwner: TALTestRtti; const AAutoInit: Boolean); virtual;
+    constructor Create(const aOwner: TALDUnitXTestRtti; const AAutoInit: Boolean); virtual;
     destructor Destroy; override;
   End;
 
@@ -210,7 +210,7 @@ type
     [TALInit('alLeft')]
     property AlignValue2;
    public
-    constructor Create(const aOwner: TALTestRtti; const AAutoInit: Boolean); override;
+    constructor Create(const aOwner: TALDUnitXTestRtti; const AAutoInit: Boolean); override;
   End;
 
   [TALInit('Int32Value:75')]
@@ -220,7 +220,7 @@ type
     [TALInit('altop')]
     property AlignValue2;
    public
-    constructor Create(const aOwner: TALTestRtti; const AAutoInit: Boolean); override;
+    constructor Create(const aOwner: TALDUnitXTestRtti; const AAutoInit: Boolean); override;
   End;
 
   TALAutoInitChildObject = class(TObject)
@@ -237,15 +237,15 @@ uses
   system.DateUtils,
   System.Math;
 
-{**************************}
-procedure TALTestRtti.Setup;
+{********************************}
+procedure TALDUnitXTestRtti.Setup;
 begin
   fStopWatchAlcinoe := TStopwatch.Create;
   fStopWatchDELPHI := TStopwatch.Create;
 end;
 
-{*******************************************************************}
-procedure TALTestRtti.CheckExecutionTime(const ARatio: single = 1.2);
+{*************************************************************************}
+procedure TALDUnitXTestRtti.CheckExecutionTime(const ARatio: single = 1.2);
 begin
   {$IF defined(debug) or defined(Win32)}
   //In debug we have overflow checking and range checking so that mean
@@ -262,8 +262,8 @@ begin
   {$ENDIF}
 end;
 
-{***************************************}
-procedure TALTestRtti.TestALRttiAutoInit;
+{*********************************************}
+procedure TALDUnitXTestRtti.TestALRttiAutoInit;
 begin
   //--
   for var I := 0 to 100000 do begin
@@ -291,14 +291,14 @@ begin
   CheckExecutionTime(1.40{ARatio});
 end;
 
-{*********************************************}
-procedure TALTestRtti.onClick(Sender: TObject);
+{***************************************************}
+procedure TALDUnitXTestRtti.onClick(Sender: TObject);
 begin
  //nothing to do here
 end;
 
-{****************************************************************************************}
-constructor TALAutoInitObject.create(const aOwner: TALTestRtti; const AAutoInit: Boolean);
+{**********************************************************************************************}
+constructor TALAutoInitObject.create(const aOwner: TALDUnitXTestRtti; const AAutoInit: Boolean);
 begin
   Owner := aOwner;
   FOwner2 := aOwner;
@@ -443,8 +443,8 @@ begin
   inherited;
 end;
 
-{************************************************}
-function TALAutoInitObject.GetOwner2: TALTestRtti;
+{******************************************************}
+function TALAutoInitObject.GetOwner2: TALDUnitXTestRtti;
 begin
   result := FOwner2;
 end;
@@ -539,8 +539,8 @@ begin
   FStringValue2 := Value;
 end;
 
-{*****************************************************************************************}
-constructor TALAutoInitObject2.Create(const aOwner: TALTestRtti; const AAutoInit: Boolean);
+{***********************************************************************************************}
+constructor TALAutoInitObject2.Create(const aOwner: TALDUnitXTestRtti; const AAutoInit: Boolean);
 begin
   inherited create(aOwner, AAutoInit);
   if not AAutoInit then begin
@@ -556,8 +556,8 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
-constructor TALAutoInitObject3.Create(const aOwner: TALTestRtti; const AAutoInit: Boolean);
+{***********************************************************************************************}
+constructor TALAutoInitObject3.Create(const aOwner: TALDUnitXTestRtti; const AAutoInit: Boolean);
 begin
   inherited create(aOwner, AAutoInit);
   if not AAutoInit then begin
@@ -581,7 +581,7 @@ end;
 
 initialization
   ALRttiInitialization(
-    ['ALTestRtti.*',
+    ['ALDUnitXTestRtti.*',
      'DUnitX.TestFramework.TLogLevel',
      'System.AnsiChar',
      'System.AnsiString',

@@ -1,4 +1,4 @@
-program ALTests;
+program ALDUnitXTests;
 
 {$I Alcinoe.inc}
 
@@ -25,11 +25,7 @@ uses
   {$IFDEF MSWINDOWS}
   Alcinoe.CGI,
   Alcinoe.Execute,
-  Alcinoe.FBX.Base,
-  Alcinoe.FBX.Client,
-  Alcinoe.FBX.Consts,
-  Alcinoe.FBX.Error,
-  Alcinoe.FBX.Lib,
+  Alcinoe.FMX.NativeView.Win,
   Alcinoe.FMX.Trayicon,
   Alcinoe.FTP.Client,
   Alcinoe.FTP.Client.WinINet,
@@ -53,7 +49,6 @@ uses
   Alcinoe.Sqlite3.Wrapper,
   //Alcinoe.TbbMM,
   Alcinoe.WebSocket.Client.WinHTTP,
-  Alcinoe.WebSpider,
   Alcinoe.WinApi.Common,
   Alcinoe.WinSock,
   Alcinoe.ZLibEx,
@@ -77,7 +72,6 @@ uses
   {$ENDIF}
   {$IFDEF iOS}
   Alcinoe.FMX.NativeView.iOS,
-  Alcinoe.FMX.ScrollBox.iOS,
   Alcinoe.iOSApi.AdSupport,
   Alcinoe.iOSApi.AudioToolbox,
   Alcinoe.iOSApi.AuthenticationServices,
@@ -87,7 +81,6 @@ uses
   Alcinoe.iOSApi.FacebookShareKit,
   Alcinoe.iOSApi.FirebaseCore,
   Alcinoe.iOSApi.FirebaseMessaging,
-  Alcinoe.iOSApi.ImageIO,
   Alcinoe.iOSApi.MessageUI,
   Alcinoe.iOSApi.Photos,
   {$IFNDEF IOSSIMULATOR}
@@ -109,6 +102,9 @@ uses
   Alcinoe.FMX.VKontakte,
   Alcinoe.FMX.WebRTC,
   {$ENDIF}
+  {$IFDEF ALMacOS}
+  Alcinoe.FMX.NativeView.Mac,
+  {$ENDIF}
   Alcinoe.AVLBinaryTree,
   Alcinoe.ExprEval,
   Alcinoe.InternetMessages,
@@ -122,9 +118,12 @@ uses
   Alcinoe.FMX.BreakText,
   Alcinoe.FMX.Common,
   Alcinoe.FMX.Confetti,
+  Alcinoe.FMX.Controls,
+  Alcinoe.FMX.CustomThemes,
   Alcinoe.FMX.DatePickerDialog,
   //Alcinoe.FMX.DesignEditors,
   Alcinoe.FMX.Edit,
+  Alcinoe.FMX.ErrorReporting,
   Alcinoe.FMX.Facebook.Core,
   Alcinoe.FMX.Facebook.Login,
   Alcinoe.FMX.Facebook.Share,
@@ -134,12 +133,14 @@ uses
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.Materials.Canvas,
   Alcinoe.FMX.GeoPosition.Sensor,
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.NotificationService,
   Alcinoe.FMX.Objects,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.TabControl,
+  Alcinoe.FMX.Themes,
   Alcinoe.FMX.Types3D,
   Alcinoe.FMX.VideoPlayer,
   Alcinoe.Files,
@@ -156,9 +157,9 @@ uses
   Grijjy.SymbolTranslator,
   //---------------------
   {$IFDEF MSWINDOWS}
-  ALTestStrings in 'ALTestStrings.pas',
-  ALTestCipher in 'ALTestCipher.pas',
-  ALTestRtti in 'ALTestRtti.pas',
+  ALDUnitXTestStrings in 'ALDUnitXTestStrings.pas',
+  ALDUnitXTestCipher in 'ALDUnitXTestCipher.pas',
+  ALDUnitXTestRtti in 'ALDUnitXTestRtti.pas',
   {$ENDIF}
   System.SysUtils;
 

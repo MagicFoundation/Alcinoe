@@ -416,7 +416,7 @@
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
-    <VerInfo_Build>7</VerInfo_Build>
+    <VerInfo_Build>8</VerInfo_Build>
     <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>

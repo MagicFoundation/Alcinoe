@@ -1,5 +1,5 @@
 @echo off
-SETLOCAL
+setlocal enabledelayedexpansion
 
 if "%ALBaseDir%"=="" (
   cls  
@@ -108,11 +108,15 @@ IF EXIST "%TmpFileName%" del "%TmpFileName%"
 IF EXIST "%TmpFileName%" goto ERROR
 certutil -dump "%~1" | findstr /C:"ef bb bf" > nul
 if %errorlevel% equ 0 (
-  echo ﻿{$HINTS OFF}{$WARNINGS OFF}{>"%TmpFileName%"
+  set /p firstLine=<"%~1"
+  set first3=!firstLine:~0,3!
+  set restOfLine=!firstLine:~3!
+  echo ﻿{$HINTS OFF}{$WARNINGS OFF}{!first3!^}!restOfLine!>"%TmpFileName%"
+  more +1 "%~1" >> "%TmpFileName%"
 ) else (
   echo {$HINTS OFF}{$WARNINGS OFF}>"%TmpFileName%"
+  type "%~1">>"%TmpFileName%"
 )
-type "%~1">>"%TmpFileName%"
 del "%~1"
 move "%TmpFileName%" "%~1" >nul
 

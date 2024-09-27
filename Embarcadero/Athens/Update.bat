@@ -24,6 +24,14 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
 
+SET FileName=%ALBaseDir%\Embarcadero\Athens\Indy10
+IF EXIST "%FileName%" rmdir /s /q "%FileName%"
+IF EXIST "%FileName%" goto ERROR
+mkdir "%FileName%"
+mkdir "%FileName%\Core"
+mkdir "%FileName%\Protocols"
+mkdir "%FileName%\System"
+
 SET FileName=%ALBaseDir%\Embarcadero\Athens\rtl
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
@@ -40,6 +48,18 @@ IF ERRORLEVEL 1 goto ERROR
 
 echo Copy "%EmbSourceDir%\internet"
 xcopy /Q "%EmbSourceDir%\internet" "%ALBaseDir%\Embarcadero\Athens\internet"
+IF ERRORLEVEL 1 goto ERROR
+
+echo Copy "%EmbSourceDir%\Indy10\Core"
+xcopy /Q "%EmbSourceDir%\Indy10\Core" "%ALBaseDir%\Embarcadero\Athens\Indy10\Core"
+IF ERRORLEVEL 1 goto ERROR
+
+echo Copy "%EmbSourceDir%\Indy10\Protocols"
+xcopy /Q "%EmbSourceDir%\Indy10\Protocols" "%ALBaseDir%\Embarcadero\Athens\Indy10\Protocols"
+IF ERRORLEVEL 1 goto ERROR
+
+echo Copy "%EmbSourceDir%\Indy10\System"
+xcopy /Q "%EmbSourceDir%\Indy10\System" "%ALBaseDir%\Embarcadero\Athens\Indy10\System"
 IF ERRORLEVEL 1 goto ERROR
 
 IF EXIST "%EmbSourceDir%\rtl\ios" (

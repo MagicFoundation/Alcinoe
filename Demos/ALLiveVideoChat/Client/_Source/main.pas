@@ -555,7 +555,7 @@ begin
       0,
       fWebRTC.RemoteBitmap.Width,
       fWebRTC.RemoteBitmap.Height), // ARect
-    ALPrepareColor(TCustomCanvasGpu.ModulateColor, RemoteCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    ALModulateColor(TCustomCanvasGpu.ModulateColor, RemoteCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
     fWebRTC.RemoteBitmap);
   {$ENDIF}
 end;
@@ -578,7 +578,7 @@ begin
       0,
       fWebRTC.LocalBitmap.Width,
       fWebRTC.LocalBitmap.Height), // ARect
-    ALPrepareColor(TCustomCanvasGpu.ModulateColor, LocalCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    ALModulateColor(TCustomCanvasGpu.ModulateColor, LocalCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
     fWebRTC.LocalBitmap);
   {$ENDIF}
 end;

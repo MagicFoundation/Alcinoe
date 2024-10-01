@@ -28,5 +28,4 @@ set Libraries=%Libraries%;com.google.guava:guava:32.1.3-android
  -DProj="%ALBaseDir%\..\ALFmxControls.dproj"^
  -AndroidManifest="%ALBaseDir%\..\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\..\..\..\..\Tools\DProjNormalizer\DProjNormalizer.exe"^
- -RJarSwapper="%ALBaseDir%\..\..\..\..\Tools\RJarSwapper\RJarSwapper.bat"^
  -UseGradle=true

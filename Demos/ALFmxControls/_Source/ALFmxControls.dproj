@@ -342,7 +342,6 @@
     <DCC_DebugInformation>1</DCC_DebugInformation>
     <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -356,7 +355,6 @@
     <VerInfo_Build>1</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -407,7 +405,6 @@
   <PropertyGroup Condition="&#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -417,7 +414,6 @@
     <Cfg_2>true</Cfg_2>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <VerInfo_Build>8</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <PF_AliasKey>alfmxcontrols</PF_AliasKey>
@@ -7178,36 +7174,4 @@
   <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists(&#39;$(BDS)\Bin\CodeGear.Delphi.Targets&#39;)"/>
   <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists(&#39;$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj&#39;)"/>
   <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists(&#39;$(MSBuildProjectName).deployproj&#39;)"/>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(Platform)&#39;==&#39;Android&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(Platform)&#39;==&#39;Android&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
 </Project>

@@ -1379,15 +1379,6 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.dSYM">
-      <DeployClass>ProjectOSXDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
@@ -1463,15 +1454,6 @@
       <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.dSYM">
-      <DeployClass>ProjectOSXDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
@@ -1814,15 +1796,6 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.dSYM">
-      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
@@ -2259,15 +2232,6 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.dSYM">
-      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>

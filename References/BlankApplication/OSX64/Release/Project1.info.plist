@@ -62,7 +62,7 @@
 		<string>MacOSX</string>
 	</array>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.9</string>
+	<string>10.14</string>
 
 </dict>
 </plist>

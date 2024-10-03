@@ -332,7 +332,7 @@ using Delphi can now leverage Material 3 principles to create
 stunning, cohesive interfaces across platforms like Android, iOS, 
 Windows, and macOS.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.png?raw=true" style="max-width: 100%;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.png?raw=true" />
 
 ## Key Alcinoe Controls for Material 3 Design
 
@@ -344,7 +344,7 @@ font to match Material 3’s bold, clear design principles. It
 supports HTML content, enabling you to easily include icons or 
 rich text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" style="max-width: 100%;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3buttons.png?raw=true" style="max-width: 100%;"/>
 
 ### 2. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 

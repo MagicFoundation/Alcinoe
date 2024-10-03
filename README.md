@@ -219,7 +219,7 @@ along with additional features like animated images.
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
                                  
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" alt="video player for FireMonkey" width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" width="540" style="width:540px;"/>
 
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 
@@ -332,7 +332,7 @@ using Delphi can now leverage Material 3 principles to create
 stunning, cohesive interfaces across platforms like Android, iOS, 
 Windows, and macOS.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.jps?raw=true" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.jpg?raw=true" />
 
 ## Key Alcinoe Controls for Material 3 Design
 
@@ -344,7 +344,7 @@ font to match Material 3’s bold, clear design principles. It
 supports HTML content, enabling you to easily include icons or 
 rich text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" width="540" style="width:540px;"/>
 
 ### 2. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 

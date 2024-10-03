@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
     <item name="report_drawn" type="id"/>
-    <item name="view_tree_on_back_pressed_dispatcher_owner" type="id"/>
+    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
     <attr format="reference" name="nestedScrollViewStyle"/>
     <color name="androidx_core_ripple_material_light">#1f000000</color>
     <color name="androidx_core_secondary_text_default_material_light">#8a000000</color>
@@ -206,8 +206,8 @@
         
         <attr name="android:color"/>
     </declare-styleable>
-    <item name="view_tree_lifecycle_owner" type="id"/>
-    <item name="view_tree_view_model_store_owner" type="id"/>
+    <id name="view_tree_lifecycle_owner"/>
+    <id name="view_tree_view_model_store_owner"/>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
-    <item name="view_tree_saved_state_registry_owner" type="id"/>
+    <id name="view_tree_saved_state_registry_owner"/>
 </resources>

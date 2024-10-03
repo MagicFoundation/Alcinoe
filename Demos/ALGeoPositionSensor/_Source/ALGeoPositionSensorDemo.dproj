@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{D28FE0B6-A6FA-42C8-BF91-BD2D4F7FE7FC}</ProjectGuid>
-        <ProjectVersion>20.1</ProjectVersion>
+        <ProjectVersion>20.2</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>ALGeoPositionSensorDemo.dpr</MainSource>
         <Base>True</Base>
@@ -9,6 +9,7 @@
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>693267</TargetedPlatforms>
         <AppType>Application</AppType>
+        <ProjectName Condition="'$(ProjectName)'==''">ALGeoPositionSensorDemo</ProjectName>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
@@ -187,7 +188,7 @@
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
         <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
-        <VerInfo_Keys>package=com.ALGeoPositionSensorDemo.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=com.ALGeoPositionSensorDemo.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_Build>1</VerInfo_Build>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -205,7 +206,7 @@
         <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android64)'!=''">
-        <VerInfo_Keys>package=com.ALGeoPositionSensorDemo.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+        <VerInfo_Keys>package=com.ALGeoPositionSensorDemo.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
         <BT_BuildType>Debug</BT_BuildType>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <Base_Android>true</Base_Android>
@@ -340,7 +341,6 @@
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <VerInfo_Build>1</VerInfo_Build>
         <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
-        <PreBuildEvent><![CDATA["..\..\..\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="false"]]></PreBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Android64)'!=''">
         <Cfg_1_Android>true</Cfg_1_Android>
@@ -348,7 +348,6 @@
         <Cfg_1>true</Cfg_1>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <VerInfo_Build>1</VerInfo_Build>
-        <PreBuildEvent><![CDATA["..\..\..\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="false"]]></PreBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_iOSDevice64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -395,7 +394,6 @@
         <VerInfo_Build>1</VerInfo_Build>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
         <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
-        <PreBuildEvent><![CDATA["..\..\..\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="true"]]></PreBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Android64)'!=''">
         <Cfg_2_Android>true</Cfg_2_Android>
@@ -403,7 +401,6 @@
         <Cfg_2>true</Cfg_2>
         <VerInfo_Build>1</VerInfo_Build>
         <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
-        <PreBuildEvent><![CDATA["..\..\..\Tools\RJarSwapper\RJarSwapper.bat" -RJarDir="Android\Merged\libs\" -IsAabPackage="true"]]></PreBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_iOSDevice64)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -732,7 +729,7 @@
                     <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
-            <Deployment Version="4">
+            <Deployment Version="5">
                 <DeployFile LocalName="$(BDS)\Redist\iossimulator\libcgunwind.1.0.dylib" Class="DependencyModule">
                     <Platform Name="iOSSimulator">
                         <Overwrite>true</Overwrite>
@@ -748,866 +745,85 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Debug" Class="Android_AdaptiveIconBackground">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_background.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Debug" Class="Android_AdaptiveIconBackground">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_background.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Release" Class="Android_AdaptiveIconBackground">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_background.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Release" Class="Android_AdaptiveIconBackground">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_background.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Debug" Class="Android_AdaptiveIconForeground">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_foreground.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Debug" Class="Android_AdaptiveIconForeground">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_foreground.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Release" Class="Android_AdaptiveIconForeground">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_foreground.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Release" Class="Android_AdaptiveIconForeground">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_foreground.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Debug" Class="Android_AdaptiveIconMonochrome">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Debug" Class="Android_AdaptiveIconMonochrome">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Release" Class="Android_AdaptiveIconMonochrome">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Release" Class="Android_AdaptiveIconMonochrome">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher_monochrome.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Release" Class="Android_LauncherIcon144">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Release" Class="Android_LauncherIcon144">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Debug" Class="Android_LauncherIcon192">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Debug" Class="Android_LauncherIcon192">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Release" Class="Android_LauncherIcon192">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Release" Class="Android_LauncherIcon192">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Debug" Class="Android_LauncherIcon36">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Debug" Class="Android_LauncherIcon36">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Release" Class="Android_LauncherIcon36">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Release" Class="Android_LauncherIcon36">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Debug" Class="Android_LauncherIcon48">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Debug" Class="Android_LauncherIcon48">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Release" Class="Android_LauncherIcon48">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Release" Class="Android_LauncherIcon48">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Debug" Class="Android_LauncherIcon72">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Debug" Class="Android_LauncherIcon72">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Release" Class="Android_LauncherIcon72">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Release" Class="Android_LauncherIcon72">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Debug" Class="Android_LauncherIcon96">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Debug" Class="Android_LauncherIcon96">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Release" Class="Android_LauncherIcon96">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Release" Class="Android_LauncherIcon96">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Debug" Class="Android_NotificationIcon24">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Debug" Class="Android_NotificationIcon24">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Release" Class="Android_NotificationIcon24">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Release" Class="Android_NotificationIcon24">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Debug" Class="Android_NotificationIcon36">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Debug" Class="Android_NotificationIcon36">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Release" Class="Android_NotificationIcon36">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Release" Class="Android_NotificationIcon36">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Debug" Class="Android_NotificationIcon48">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Debug" Class="Android_NotificationIcon48">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Release" Class="Android_NotificationIcon48">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Release" Class="Android_NotificationIcon48">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Debug" Class="Android_NotificationIcon72">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Debug" Class="Android_NotificationIcon72">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Release" Class="Android_NotificationIcon72">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Release" Class="Android_NotificationIcon72">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Debug" Class="Android_NotificationIcon96">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Debug" Class="Android_NotificationIcon96">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Release" Class="Android_NotificationIcon96">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Release" Class="Android_NotificationIcon96">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Release" Class="Android_SplashImage426">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Release" Class="Android_SplashImage426">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Debug" Class="Android_SplashImage470">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Debug" Class="Android_SplashImage470">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Release" Class="Android_SplashImage470">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Release" Class="Android_SplashImage470">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Debug" Class="Android_SplashImage640">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Debug" Class="Android_SplashImage640">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Debug" Class="Android_SplashImage960">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Debug" Class="Android_SplashImage960">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Release" Class="Android_SplashImage960">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Release" Class="Android_SplashImage960">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image.png</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Debug" Class="Android_VectorizedNotificationIcon">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Debug" Class="Android_VectorizedNotificationIcon">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Release" Class="Android_VectorizedNotificationIcon">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Release" Class="Android_VectorizedNotificationIcon">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_notification.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Debug" Class="Android_VectorizedSplash">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Debug" Class="Android_VectorizedSplash">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Release" Class="Android_VectorizedSplash">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Release" Class="Android_VectorizedSplash">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Debug" Class="Android_VectorizedSplashDark">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Debug" Class="Android_VectorizedSplashDark">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Release" Class="Android_VectorizedSplashDark">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Release" Class="Android_VectorizedSplashDark">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Debug" Class="Android_VectorizedSplashV31">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Debug" Class="Android_VectorizedSplashV31">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Release" Class="Android_VectorizedSplashV31">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Release" Class="Android_VectorizedSplashV31">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Debug" Class="Android_VectorizedSplashV31Dark">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Debug" Class="Android_VectorizedSplashV31Dark">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Release" Class="Android_VectorizedSplashV31Dark">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Release" Class="Android_VectorizedSplashV31Dark">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_vector.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>libALGeoPositionSensorDemo.so</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiFile">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>libALGeoPositionSensorDemo.so</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeMipsFile">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>libALGeoPositionSensorDemo.so</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\colors-night-v21.xml" Configuration="Debug" Class="Android_ColorsDark">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>colors.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\colors.xml" Configuration="Debug" Class="Android_Colors">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\ic_launcher-v33.xml" Configuration="Debug" Class="Android_AdaptiveIconV33">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\ic_launcher.xml" Configuration="Debug" Class="Android_AdaptiveIcon">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\splash_image_def-v21.xml" Configuration="Debug" Class="AndroidSplashImageDefV21">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image_def.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\strings.xml" Configuration="Debug" Class="Android_Strings">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\styles-v21.xml" Configuration="Debug" Class="AndroidSplashStylesV21">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\styles-v31.xml" Configuration="Debug" Class="AndroidSplashStylesV31">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Debug\styles.xml" Configuration="Debug" Class="AndroidSplashStyles">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\colors-night-v21.xml" Configuration="Release" Class="Android_ColorsDark">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>colors.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\colors.xml" Configuration="Release" Class="Android_Colors">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\ic_launcher-v33.xml" Configuration="Release" Class="Android_AdaptiveIconV33">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\ic_launcher.xml" Configuration="Release" Class="Android_AdaptiveIcon">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\splash_image_def-v21.xml" Configuration="Release" Class="AndroidSplashImageDefV21">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image_def.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\splash_image_def.xml" Configuration="Release" Class="AndroidSplashImageDef">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\strings.xml" Configuration="Release" Class="Android_Strings">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\styles-v21.xml" Configuration="Release" Class="AndroidSplashStylesV21">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\styles-v31.xml" Configuration="Release" Class="AndroidSplashStylesV31">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android64\Release\styles.xml" Configuration="Release" Class="AndroidSplashStyles">
-                    <Platform Name="Android64">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\colors-night-v21.xml" Configuration="Debug" Class="Android_ColorsDark">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>colors.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\colors.xml" Configuration="Debug" Class="Android_Colors">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\ic_launcher-v33.xml" Configuration="Debug" Class="Android_AdaptiveIconV33">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\ic_launcher.xml" Configuration="Debug" Class="Android_AdaptiveIcon">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\splash_image_def-v21.xml" Configuration="Debug" Class="AndroidSplashImageDefV21">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image_def.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\strings.xml" Configuration="Debug" Class="Android_Strings">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\styles-v21.xml" Configuration="Debug" Class="AndroidSplashStylesV21">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\styles-v31.xml" Configuration="Debug" Class="AndroidSplashStylesV31">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Debug\styles.xml" Configuration="Debug" Class="AndroidSplashStyles">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Debug" Class="Android_AdaptiveIconBackground"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml" Configuration="Release" Class="Android_AdaptiveIconBackground"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Debug" Class="Android_AdaptiveIconForeground"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml" Configuration="Release" Class="Android_AdaptiveIconForeground"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Debug" Class="Android_AdaptiveIconMonochrome"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml" Configuration="Release" Class="Android_AdaptiveIconMonochrome"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Debug" Class="Android_LauncherIcon144"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png" Configuration="Release" Class="Android_LauncherIcon144"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Debug" Class="Android_LauncherIcon192"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png" Configuration="Release" Class="Android_LauncherIcon192"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Debug" Class="Android_LauncherIcon36"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png" Configuration="Release" Class="Android_LauncherIcon36"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Debug" Class="Android_LauncherIcon48"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_48x48.png" Configuration="Release" Class="Android_LauncherIcon48"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Debug" Class="Android_LauncherIcon72"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_72x72.png" Configuration="Release" Class="Android_LauncherIcon72"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Debug" Class="Android_LauncherIcon96"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_96x96.png" Configuration="Release" Class="Android_LauncherIcon96"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Debug" Class="Android_NotificationIcon24"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_24x24.png" Configuration="Release" Class="Android_NotificationIcon24"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Debug" Class="Android_NotificationIcon36"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_36x36.png" Configuration="Release" Class="Android_NotificationIcon36"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Debug" Class="Android_NotificationIcon48"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_48x48.png" Configuration="Release" Class="Android_NotificationIcon48"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Debug" Class="Android_NotificationIcon72"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_72x72.png" Configuration="Release" Class="Android_NotificationIcon72"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Debug" Class="Android_NotificationIcon96"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png" Configuration="Release" Class="Android_NotificationIcon96"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Debug" Class="Android_SplashImage426"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_426x320.png" Configuration="Release" Class="Android_SplashImage426"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Debug" Class="Android_SplashImage470"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_470x320.png" Configuration="Release" Class="Android_SplashImage470"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Debug" Class="Android_SplashImage640"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_640x480.png" Configuration="Release" Class="Android_SplashImage640"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Debug" Class="Android_SplashImage960"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_SplashImage_960x720.png" Configuration="Release" Class="Android_SplashImage960"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Debug" Class="Android_VectorizedNotificationIcon"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml" Configuration="Release" Class="Android_VectorizedNotificationIcon"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Debug" Class="Android_VectorizedSplash"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml" Configuration="Release" Class="Android_VectorizedSplash"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Debug" Class="Android_VectorizedSplashDark"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml" Configuration="Release" Class="Android_VectorizedSplashDark"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Debug" Class="Android_VectorizedSplashV31"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml" Configuration="Release" Class="Android_VectorizedSplashV31"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Debug" Class="Android_VectorizedSplashV31Dark"/>
+                <DeployFile LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml" Configuration="Release" Class="Android_VectorizedSplashV31Dark"/>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiv7aFile"/>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeArmeabiFile"/>
+                <DeployFile LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so" Configuration="Release" Class="AndroidLibnativeMipsFile"/>
+                <DeployFile LocalName="Android64\Debug\colors-night-v21.xml" Configuration="Debug" Class="Android_ColorsDark"/>
+                <DeployFile LocalName="Android64\Debug\colors.xml" Configuration="Debug" Class="Android_Colors"/>
+                <DeployFile LocalName="Android64\Debug\ic_launcher-v33.xml" Configuration="Debug" Class="Android_AdaptiveIconV33"/>
+                <DeployFile LocalName="Android64\Debug\ic_launcher.xml" Configuration="Debug" Class="Android_AdaptiveIcon"/>
+                <DeployFile LocalName="Android64\Debug\splash_image_def-v21.xml" Configuration="Debug" Class="AndroidSplashImageDefV21"/>
+                <DeployFile LocalName="Android64\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef"/>
+                <DeployFile LocalName="Android64\Debug\strings.xml" Configuration="Debug" Class="Android_Strings"/>
+                <DeployFile LocalName="Android64\Debug\styles-v21.xml" Configuration="Debug" Class="AndroidSplashStylesV21"/>
+                <DeployFile LocalName="Android64\Debug\styles-v31.xml" Configuration="Debug" Class="AndroidSplashStylesV31"/>
+                <DeployFile LocalName="Android64\Debug\styles.xml" Configuration="Debug" Class="AndroidSplashStyles"/>
+                <DeployFile LocalName="Android64\Release\colors-night-v21.xml" Configuration="Release" Class="Android_ColorsDark"/>
+                <DeployFile LocalName="Android64\Release\colors.xml" Configuration="Release" Class="Android_Colors"/>
+                <DeployFile LocalName="Android64\Release\ic_launcher-v33.xml" Configuration="Release" Class="Android_AdaptiveIconV33"/>
+                <DeployFile LocalName="Android64\Release\ic_launcher.xml" Configuration="Release" Class="Android_AdaptiveIcon"/>
+                <DeployFile LocalName="Android64\Release\splash_image_def-v21.xml" Configuration="Release" Class="AndroidSplashImageDefV21"/>
+                <DeployFile LocalName="Android64\Release\splash_image_def.xml" Configuration="Release" Class="AndroidSplashImageDef"/>
+                <DeployFile LocalName="Android64\Release\strings.xml" Configuration="Release" Class="Android_Strings"/>
+                <DeployFile LocalName="Android64\Release\styles-v21.xml" Configuration="Release" Class="AndroidSplashStylesV21"/>
+                <DeployFile LocalName="Android64\Release\styles-v31.xml" Configuration="Release" Class="AndroidSplashStylesV31"/>
+                <DeployFile LocalName="Android64\Release\styles.xml" Configuration="Release" Class="AndroidSplashStyles"/>
+                <DeployFile LocalName="Android\Debug\colors-night-v21.xml" Configuration="Debug" Class="Android_ColorsDark"/>
+                <DeployFile LocalName="Android\Debug\colors.xml" Configuration="Debug" Class="Android_Colors"/>
+                <DeployFile LocalName="Android\Debug\ic_launcher-v33.xml" Configuration="Debug" Class="Android_AdaptiveIconV33"/>
+                <DeployFile LocalName="Android\Debug\ic_launcher.xml" Configuration="Debug" Class="Android_AdaptiveIcon"/>
+                <DeployFile LocalName="Android\Debug\splash_image_def-v21.xml" Configuration="Debug" Class="AndroidSplashImageDefV21"/>
+                <DeployFile LocalName="Android\Debug\splash_image_def.xml" Configuration="Debug" Class="AndroidSplashImageDef"/>
+                <DeployFile LocalName="Android\Debug\strings.xml" Configuration="Debug" Class="Android_Strings"/>
+                <DeployFile LocalName="Android\Debug\styles-v21.xml" Configuration="Debug" Class="AndroidSplashStylesV21"/>
+                <DeployFile LocalName="Android\Debug\styles-v31.xml" Configuration="Debug" Class="AndroidSplashStylesV31"/>
+                <DeployFile LocalName="Android\Debug\styles.xml" Configuration="Debug" Class="AndroidSplashStyles"/>
                 <DeployFile LocalName="Android\Merged\res\color\common_google_signin_btn_text_dark.xml" Configuration="Debug" Class="File">
                     <Platform Name="Android">
                         <RemoteDir>res\color</RemoteDir>
@@ -7560,71 +6776,16 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="Android\Release\colors-night-v21.xml" Configuration="Release" Class="Android_ColorsDark">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>colors.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\colors.xml" Configuration="Release" Class="Android_Colors">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\ic_launcher-v33.xml" Configuration="Release" Class="Android_AdaptiveIconV33">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>ic_launcher.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\ic_launcher.xml" Configuration="Release" Class="Android_AdaptiveIcon">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\splash_image_def-v21.xml" Configuration="Release" Class="AndroidSplashImageDefV21">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>splash_image_def.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\splash_image_def.xml" Configuration="Release" Class="AndroidSplashImageDef">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\strings.xml" Configuration="Release" Class="Android_Strings">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\styles-v21.xml" Configuration="Release" Class="AndroidSplashStylesV21">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\styles-v31.xml" Configuration="Release" Class="AndroidSplashStylesV31">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <RemoteName>styles.xml</RemoteName>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
-                <DeployFile LocalName="Android\Release\styles.xml" Configuration="Release" Class="AndroidSplashStyles">
-                    <Platform Name="Android">
-                        <Enabled>false</Enabled>
-                        <Overwrite>true</Overwrite>
-                    </Platform>
-                </DeployFile>
+                <DeployFile LocalName="Android\Release\colors-night-v21.xml" Configuration="Release" Class="Android_ColorsDark"/>
+                <DeployFile LocalName="Android\Release\colors.xml" Configuration="Release" Class="Android_Colors"/>
+                <DeployFile LocalName="Android\Release\ic_launcher-v33.xml" Configuration="Release" Class="Android_AdaptiveIconV33"/>
+                <DeployFile LocalName="Android\Release\ic_launcher.xml" Configuration="Release" Class="Android_AdaptiveIcon"/>
+                <DeployFile LocalName="Android\Release\splash_image_def-v21.xml" Configuration="Release" Class="AndroidSplashImageDefV21"/>
+                <DeployFile LocalName="Android\Release\splash_image_def.xml" Configuration="Release" Class="AndroidSplashImageDef"/>
+                <DeployFile LocalName="Android\Release\strings.xml" Configuration="Release" Class="Android_Strings"/>
+                <DeployFile LocalName="Android\Release\styles-v21.xml" Configuration="Release" Class="AndroidSplashStylesV21"/>
+                <DeployFile LocalName="Android\Release\styles-v31.xml" Configuration="Release" Class="AndroidSplashStylesV31"/>
+                <DeployFile LocalName="Android\Release\styles.xml" Configuration="Release" Class="AndroidSplashStyles"/>
                 <DeployClass Name="AdditionalDebugSymbols">
                     <Platform Name="iOSSimulator">
                         <Operation>1</Operation>
@@ -7635,16 +6796,6 @@
                     </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
-                    </Platform>
-                </DeployClass>
-                <DeployClass Name="AndroidClasses">
-                    <Platform Name="Android">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
-                    </Platform>
-                    <Platform Name="Android64">
-                        <RemoteDir>classes</RemoteDir>
-                        <Operation>64</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
@@ -8279,6 +7430,9 @@
                     <Platform Name="Win64">
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Win64x">
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="ProjectiOSDeviceDebug">
                     <Platform Name="iOSDevice32">
@@ -8571,6 +7725,7 @@
                 <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64x" Name="$(PROJECTNAME)"/>
             </Deployment>
             <Platforms>
                 <Platform value="Android">True</Platform>
@@ -8588,36 +7743,4 @@
     <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')"/>
     <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')"/>
     <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists('$(MSBuildProjectName).deployproj')"/>
-    <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Android'">
-        <PreBuildEvent>&quot;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&quot; -RJarDir=&quot;Android\Merged\libs\&quot; -IsAabPackage=&quot;false&quot;</PreBuildEvent>
-        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-        <PreLinkEvent/>
-        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent/>
-        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Debug' And '$(Platform)'=='Android64'">
-        <PreBuildEvent>&quot;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&quot; -RJarDir=&quot;Android\Merged\libs\&quot; -IsAabPackage=&quot;false&quot;</PreBuildEvent>
-        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-        <PreLinkEvent/>
-        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent/>
-        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Android'">
-        <PreBuildEvent>&quot;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&quot; -RJarDir=&quot;Android\Merged\libs\&quot; -IsAabPackage=&quot;true&quot;</PreBuildEvent>
-        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-        <PreLinkEvent/>
-        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent/>
-        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='Release' And '$(Platform)'=='Android64'">
-        <PreBuildEvent>&quot;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&quot; -RJarDir=&quot;Android\Merged\libs\&quot; -IsAabPackage=&quot;true&quot;</PreBuildEvent>
-        <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-        <PreLinkEvent/>
-        <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-        <PostBuildEvent/>
-        <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-    </PropertyGroup>
 </Project>

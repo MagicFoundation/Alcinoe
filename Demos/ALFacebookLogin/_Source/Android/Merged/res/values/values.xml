@@ -59,7 +59,7 @@
         <attr format="boolean" name="com_facebook_is_cropped"/>
     </declare-styleable>
     <item name="report_drawn" type="id"/>
-    <item name="view_tree_on_back_pressed_dispatcher_owner" type="id"/>
+    <id name="view_tree_on_back_pressed_dispatcher_owner"/>
     <color name="com_facebook_blue">#1877F2</color>
     <color name="com_facebook_button_background_color">@color/com_facebook_blue</color>
     <color name="com_facebook_button_background_color_disabled">#EBEDF0</color>
@@ -352,8 +352,8 @@
         
         <attr name="android:color"/>
     </declare-styleable>
-    <item name="view_tree_lifecycle_owner" type="id"/>
-    <item name="view_tree_view_model_store_owner" type="id"/>
+    <id name="view_tree_lifecycle_owner"/>
+    <id name="view_tree_view_model_store_owner"/>
     <string name="androidx_startup" translatable="false">androidx.startup</string>
     <color name="notification_material_background_media_default_color">#ff424242</color>
     <color name="primary_text_default_material_dark">#ffffffff</color>
@@ -483,7 +483,7 @@
         <attr name="android:name"/>
         <attr name="android:tag"/>
     </declare-styleable>
-    <item name="view_tree_saved_state_registry_owner" type="id"/>
+    <id name="view_tree_saved_state_registry_owner"/>
     <attr format="reference" name="drawerArrowStyle"/>
     <attr format="dimension" name="height"/>
     <attr format="boolean" name="isLightTheme"/>

@@ -1,12 +1,12 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{EBF8CE24-4BA3-4695-BD61-09DE88EECCC7}</ProjectGuid>
-    <ProjectVersion>20.1</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
     <MainSource>ALFacebookLogin.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">iOSDevice64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
   </PropertyGroup>
@@ -187,7 +187,7 @@
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_Build>1</VerInfo_Build>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -205,7 +205,7 @@
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_Android>true</Base_Android>
@@ -340,7 +340,6 @@
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
     <Cfg_1_Android>true</Cfg_1_Android>
@@ -348,7 +347,6 @@
     <Cfg_1>true</Cfg_1>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -397,7 +395,6 @@
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
     <Cfg_2_Android>true</Cfg_2_Android>
@@ -405,7 +402,6 @@
     <Cfg_2>true</Cfg_2>
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -447,255 +443,192 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.appcompat-appcompat-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.appcompat-appcompat-resources-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.asynclayoutinflater-asynclayoutinflater-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.browser-browser-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.cardview-cardview-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.coordinatorlayout-coordinatorlayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.3.2.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.customview-customview-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.documentfile-documentfile-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.fragment-fragment-1.3.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.interpolator-interpolator-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-core-ui-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-v4-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.loader-loader-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.media-media-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.print-print-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.slidingpanelayout-slidingpanelayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-facebook-share-1.0.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.android.installreferrer-installreferrer-1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-bolts-16.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
+    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-bolts-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-common-16.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
+    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-common-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-core-16.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
+    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-core-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-login-15.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.code.findbugs-jsr305-3.0.2.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.guava-guava-32.1.3-android.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.zxing-core-3.3.3.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.checkerframework-checker-qual-3.37.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\r.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <BuildConfiguration Include="Base">
@@ -723,29 +656,8 @@
           <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
-      <Deployment Version="4">
-        <DeployFile Class="AndroidLibnativeArmeabiFile" Configuration="Release" LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>libALFacebookLogin.so</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidLibnativeArmeabiv7aFile" Configuration="Release" LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>libALFacebookLogin.so</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidLibnativeMipsFile" Configuration="Release" LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>libALFacebookLogin.so</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="..\Android64\Debug\splash_image_def.xml">
+      <Deployment Version="5">
+        <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="Android64\Debug\splash_image_def.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -769,7 +681,35 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="..\Android64\Debug\styles.xml">
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android64\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android64\Release\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android\Release\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android64\Debug\styles.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -793,7 +733,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="AndroidSplashStylesV21" Configuration="Debug" LocalName="..\Android64\Debug\styles-v21.xml">
+        <DeployFile Class="AndroidSplashStylesV21" Configuration="Debug" LocalName="Android64\Debug\styles-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -821,7 +761,171 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="..\Android64\Debug\colors.xml">
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android64\Debug\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android\Debug\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android64\Release\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android\Release\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android64\Debug\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android\Debug\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android64\Release\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android\Release\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android64\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android64\Release\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android\Release\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="Android64\Debug\colors.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -845,7 +949,7 @@
             <Overwrite>true</Overwrite>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="..\Android64\Debug\colors-night-v21.xml">
+        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="Android64\Debug\colors-night-v21.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -1293,7 +1397,7 @@
             <RemoteName>splash_image.png</RemoteName>
           </Platform>
         </DeployFile>
-        <DeployFile Class="Android_Strings" Configuration="Debug" LocalName="..\Android64\Debug\strings.xml">
+        <DeployFile Class="Android_Strings" Configuration="Debug" LocalName="Android64\Debug\strings.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
@@ -1315,6 +1419,146 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\anim-v21\fragment_fast_out_extra_slow_in.xml">
@@ -15566,36 +15810,4 @@
   <Import Project="$(BDS)\Bin\CodeGear.Delphi.Targets" Condition="Exists(&#39;$(BDS)\Bin\CodeGear.Delphi.Targets&#39;)"/>
   <Import Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj" Condition="Exists(&#39;$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj&#39;)"/>
   <Import Project="$(MSBuildProjectName).deployproj" Condition="Exists(&#39;$(MSBuildProjectName).deployproj&#39;)"/>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(Platform)&#39;==&#39;Android&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(Platform)&#39;==&#39;Android&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
-  <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
-    <PreBuildEventIgnoreExitCode>False</PreBuildEventIgnoreExitCode>
-    <PreLinkEvent/>
-    <PreLinkEventIgnoreExitCode>False</PreLinkEventIgnoreExitCode>
-    <PostBuildEvent/>
-    <PostBuildEventIgnoreExitCode>False</PostBuildEventIgnoreExitCode>
-  </PropertyGroup>
 </Project>

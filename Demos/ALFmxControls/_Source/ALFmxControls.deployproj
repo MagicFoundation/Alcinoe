@@ -1,35 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALFmxControls.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\classes\</RemoteDir>
-      <RemoteName>ALFmxControls.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -2478,35 +2449,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
       <RemoteName>thumb_144x144.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALFmxControls.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\classes\</RemoteDir>
-      <RemoteName>ALFmxControls.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -4959,55 +4901,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\ALFmxControls.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\classes\</RemoteDir>
-      <RemoteName>ALFmxControls.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -7456,55 +7349,6 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControls\assets\internal\</RemoteDir>
       <RemoteName>thumb_144x144.png</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALFmxControls.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\classes\</RemoteDir>
-      <RemoteName>ALFmxControls.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -9966,26 +9810,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosx64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -10383,26 +10207,6 @@
       <RemoteDir>ALFmxControls.app\Contents\Resources\StartUp\</RemoteDir>
       <RemoteName>thumb_144x144.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosx64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -10793,26 +10597,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosxarm64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -11210,26 +10994,6 @@
       <RemoteDir>ALFmxControls.app\Contents\Resources\StartUp\</RemoteDir>
       <RemoteName>thumb_144x144.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosxarm64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -11619,90 +11383,8 @@
       <RemoteName>thumb_144x144.png</RemoteName>
     </DeployFile>
   </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win32\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-  </ItemGroup>
-  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Win64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\bin64\sk4d.dll">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>0</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControls\</RemoteDir>
-      <RemoteName>sk4d.dll</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-  </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win32&#39;"/>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64&#39;"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;">
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>

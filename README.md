@@ -355,12 +355,29 @@ and radio button components that align with Material 3’s aesthetic.
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" />
 
-### 3. **TALTrackBar and TALSwitch**
-These controls utilize TALRectangle components for tracks and 
-thumbs, offering high flexibility in design. You can easily 
-customize fill, stroke, and shadow properties to achieve the sleek, 
-modern look of Material 3 sliders and switches. Smooth animations 
-and transitions provide the fluid feedback that Material 3 emphasizes.
+### 4. **TALSwitch**
+TALSwitch is designed for easy customization, allowing you to 
+control the design of the switch in states such as **Enabled**, 
+**Hovered**, **Focused**, **Pressed**, and **Disabled**. The 
+control provides smooth, responsive transitions between on and 
+off states, reflecting the fluid, adaptable nature of 
+Material 3’s switches. The customizable design ensures that 
+TALSwitch fits seamlessly into a modern, minimalistic interface, 
+offering both visual appeal and optimized performance for 
+Delphi applications.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3switch.gif?raw=true" />
+
+### 3. **TALTrackBar and TALRangeTrackBar**
+TALTrackBar allows for extensive customization of its appearance 
+and behavior, making it an ideal choice for implementing Material 3’s 
+clean and modern slider design. You can easily customize the track and 
+thumb with properties such as **fill**, **stroke**, and **shadow** to 
+achieve the sleek, minimalistic look that defines Material 3. The 
+slider's interactions, including value indicators and stop indicators, 
+are smooth, ensuring responsive feedback as the user interacts with the 
+control. Its transitions between states like **Enabled**, **Focused**, 
+and **Pressed** contribute to a polished, fluid user experience.
 
 ### 4. **TALEdit and TALMemo**
 Alcinoe’s native TALEdit and TALMemo controls are designed to 

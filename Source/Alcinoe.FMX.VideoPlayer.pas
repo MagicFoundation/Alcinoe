@@ -624,7 +624,7 @@ begin
   {$ELSE}
   if (fVideoPlayerControl.fDrawable.Width <> fVideoPlayerControl.fVideoWidth) or
      (fVideoPlayerControl.fDrawable.Height <> fVideoPlayerControl.fVideoHeight) then begin
-    {$IFNDEF ALCompilerVersionSupported120}
+    {$IFNDEF ALCompilerVersionSupported122}
       {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
     {$ENDIF}
     // we can't use setsize because it's will finalise the texture
@@ -2030,7 +2030,7 @@ begin
         end;
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        {$IFNDEF ALCompilerVersionSupported120}
+        {$IFNDEF ALCompilerVersionSupported122}
           {$MESSAGE WARN 'Check if FMX.Types3D.TTexture.SetSize is still the same and adjust the IFDEF'}
         {$ENDIF}
         // we can't use setsize because it's will finalise the texture

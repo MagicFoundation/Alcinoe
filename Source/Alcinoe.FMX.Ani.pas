@@ -40,7 +40,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Ani.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -488,7 +488,7 @@ type
   // (i.e. under-damped), the mass tends to overshoot, and return, and overshoot again. Without any
   // damping (i.e. damping ratio := 0), the mass will oscillate forever.
   // Taken from Android SpringForce
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if android SpringForce.java was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\SpringForce.java with https://android.googlesource.com/platform/frameworks/support/dynamicanimation/dynamicanimation/src/main/java/androidx/dynamicanimation/animation/SpringForce.java
   {$ENDIF}
@@ -815,7 +815,7 @@ end;
 
 {************************************************************}
 // Taken from android.widget.Scroller.ViscousFluidInterpolator
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if android.widget.Scroller.ViscousFluidInterpolator was not updated and adjust the IFDEF'}
   //Compare <Alcinoe>\References\Android\Scroller.java with <SDKs>c:\SDKs\android\sources\android-33\android\widget\Scroller.java
 {$ENDIF}

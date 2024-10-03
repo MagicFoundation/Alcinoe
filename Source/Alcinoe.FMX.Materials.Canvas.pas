@@ -144,7 +144,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESTextureMaterial.DoInitialize;
@@ -418,7 +418,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvasExternalOESColorAdjustEffectTextureMaterial.DoInitialize;
@@ -695,7 +695,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial.DoInitialize;
@@ -987,7 +987,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8BiPlanarVideoRangeColorAdjustEffectTextureMaterial.DoInitialize;
@@ -1290,7 +1290,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarTextureMaterial.DoInitialize;
@@ -1585,7 +1585,7 @@ begin
 end;
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Materials.Canvas.TCanvasTextureMaterial.DoInitialize is still having the same implementation as in previous version and adjust the IFDEF'}
 {$ENDIF}
 procedure TALCanvas420YpCbCr8PlanarColorAdjustEffectTextureMaterial.DoInitialize;

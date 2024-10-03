@@ -29,8 +29,10 @@ Setup (IOS)
    <Alcinoe>\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64
    <Alcinoe>\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64
 
-3) Under Tools, Options, SDK Manager you will need to add the following
-   frameworks for ios64 and Ios64 simulator:
+3) Under Tools, Options, SDK Manager you will need to add the following frameworks
+
+   for ios64:
+   ----------
 
    Path on remote machine                                                                    |  File mask |  Path Type     |  Include subdirectories
    $(SDKROOT)/usr/lib/swift                                                                  |  *         |  Library path  |  no
@@ -40,9 +42,23 @@ Setup (IOS)
 
    https://quality.embarcadero.com/browse/RSP-38700
    You will need to manually copy the content of (assuming c:\SDKs is your BDSPLATFORMSDKSDIR)
-   c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift
-   c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.0  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.0
-   c:\SDKs\iPhoneOS16.1.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.5  to  c:\SDKs\iPhoneOS16.1.sdk\usr\lib\swift-5.5
+   c:\SDKs\iPhoneOSXXX.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift  to  c:\SDKs\iPhoneOSXXX.sdk\usr\lib\swift
+   c:\SDKs\iPhoneOSXXX.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.0  to  c:\SDKs\iPhoneOSXXX.sdk\usr\lib\swift-5.0
+   c:\SDKs\iPhoneOSXXX.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.5  to  c:\SDKs\iPhoneOSXXX.sdk\usr\lib\swift-5.5
+
+   for Ios64 simulator:
+   --------------------
+
+   $(SDKROOT)/usr/lib/swift                                                                         |  *         |  Library path  |  no
+   $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphonesimulator      |  *         |  Library path  |  no
+   $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphonesimulator  |  *         |  Library path  |  no
+   $(SDKROOT)/../../../../../Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.5/iphonesimulator  |  *         |  Library path  |  no
+
+   https://quality.embarcadero.com/browse/RSP-38700
+   You will need to manually copy the content of (assuming c:\SDKs is your BDSPLATFORMSDKSDIR)
+   c:\SDKs\iPhoneSimulatorXXX.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift  to  c:\SDKs\iPhoneOSXXX.sdk\usr\lib\swift
+   c:\SDKs\iPhoneSimulatorXXX.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.0  to  c:\SDKs\iPhoneOSXXX.sdk\usr\lib\swift-5.0
+   c:\SDKs\iPhoneSimulatorXXX.sdk\Applications\Xcode.app\Contents\Developer\Toolchains\XcodeDefault.xctoolchain\usr\lib\swift-5.5  to  c:\SDKs\iPhoneOSXXX.sdk\usr\lib\swift-5.5
 
 4) In the Project > Option > Building > Delphi Compiler > Linking >
    Options passed to the LD linker add -rpath /usr/lib/swift
@@ -233,9 +249,9 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes update the previous documentation regarding "Setup (IOS)"'}
-{$IFEND}
+{$ENDIF}
 
 uses
   system.Classes,
@@ -910,13 +926,6 @@ end;
 
 {$REGION ' IOS'}
 {$IF defined(IOS)}
-
-{$IFNDEF ALCompilerVersionSupported120}
-  {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-43500 is corrected and if yes remove the declaration below'}
-{$ENDIF}
-const
-  UNNotificationPresentationOptionList = (1 shl 3);
-  UNNotificationPresentationOptionBanner = (1 shl 4);
 
 {**********************************************************************************************************************}
 constructor TALFirebaseMessaging.TUserNotificationCenterDelegate.Create(const aFirebaseMessaging: TALFirebaseMessaging);

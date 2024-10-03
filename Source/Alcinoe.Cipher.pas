@@ -4305,7 +4305,7 @@ end;
 // http://mormot.net
 //
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
 {$ENDIF}
 
@@ -5453,7 +5453,7 @@ begin
   // http://mormot.net
   //
 
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://github.com/synopse/mORMot.git SynCommons.pas was not updated from References\mORMot\SynCommons.pas and adjust the IFDEF'}
   {$ENDIF}
 

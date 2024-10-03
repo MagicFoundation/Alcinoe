@@ -15,7 +15,7 @@ uses
 type
 
   {**************************}
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALControl = class(TControl)
@@ -60,8 +60,8 @@ type
     function IsVisibleWithinFormBounds: Boolean;
     property Form: TCommonCustomForm read FForm;
     property DisableDoubleClickHandling: Boolean read FDisableDoubleClickHandling write FDisableDoubleClickHandling;
-    {$IFNDEF ALCompilerVersionSupported120}
-      {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed property still does not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
+    {$IFNDEF ALCompilerVersionSupported122}
+      {$MESSAGE WARN 'Check if property FMX.Controls.TControl.Pressed still not fire a PressChanged event when it gets updated, and adjust the IFDEF'}
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
@@ -69,7 +69,7 @@ type
   end;
 
   {**************************************}
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALContent = class(TALControl, IContent)
@@ -155,7 +155,7 @@ uses
 constructor TALControl.Create(AOwner: TComponent);
 begin
   inherited;
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if MarginsChanged is not implemented in FMX.Controls.TControl and adjust the IFDEF'}
   {$ENDIF}
   FFormerMarginsChangedHandler := Margins.OnChange;
@@ -296,11 +296,11 @@ end;
 {***********************************************}
 procedure TALControl.SetNewScene(AScene: IScene);
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
-    {$MESSAGE WARN 'Check if Pressed is still changed only SetNewScene/DoMouseLeave/MouseDown/MouseUp/MouseClick'}
-    {$MESSAGE WARN 'Check if IsFocused is still changed only SetNewScene/DoEnter/DoExit'}
-    {$MESSAGE WARN 'Check if IsMouseOver is still changed only SetNewScene/DoMouseEnter/DoMouseLeave'}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.Pressed is still changed only in SetNewScene/DoMouseLeave/MouseDown/MouseUp/MouseClick'}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsFocused is still changed only in SetNewScene/DoEnter/DoExit'}
+    {$MESSAGE WARN 'Check if FMX.Controls.TControl.IsMouseOver is still changed only in SetNewScene/DoMouseEnter/DoMouseLeave'}
   {$ENDIF}
   var LPrevPressed := Pressed;
   var LPrevIsFocused := IsFocused;
@@ -372,7 +372,7 @@ end;
 {*************************************************************************************}
 procedure TALControl.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -413,7 +413,7 @@ end;
 {***********************************************************************************}
 procedure TALControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -448,7 +448,7 @@ begin
     {$ENDIF}
     exit;
   end;
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1323 have been implemented and adjust the IFDEF'}
   {$ENDIF}
   var LPrevPressed := Pressed;
@@ -523,7 +523,7 @@ Type
   _TStyledControlAccessProtected = class(TStyledControl);
 
 {*************************************}
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Controls.TContentTabList was not updated and adjust the IFDEF'}
 {$ENDIF}
 type

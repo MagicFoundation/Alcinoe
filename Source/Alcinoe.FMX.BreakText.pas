@@ -1020,7 +1020,7 @@ procedure ALDrawMultiLineText(
              const AFontSlant: TFontSlant;
              const AFontStretch: TFontStretch): sk_fontstyle_t;
   begin
-    {$IFNDEF ALCompilerVersionSupported120}
+    {$IFNDEF ALCompilerVersionSupported122}
       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_fontstyle_t didn''t changed'}
     {$ENDIF}
     //--
@@ -2255,8 +2255,8 @@ begin
                   // Set decoration kinds
                   // https://api.flutter.dev/flutter/painting/TextStyle/decoration.html
                   // The decorations to paint near the text (e.g., an underline).
-                  {$IFNDEF ALCompilerVersionSupported120}
-                    {$MESSAGE WARN 'Check if declaration of System.Skia.API.TSkTextDecoration didn''t changed'}
+                  {$IFNDEF ALCompilerVersionSupported122}
+                    {$MESSAGE WARN 'Check if declaration of System.Skia.TSkTextDecoration didn''t changed'}
                   {$ENDIF}
                   sk4d_textstyle_set_decorations(LTextStyle, Byte(LDecorationKind));
 
@@ -2336,7 +2336,7 @@ begin
 
                   // Add the text or PlaceHolder
                   if LCurrImgSrc <> '' then begin
-                    {$IFNDEF ALCompilerVersionSupported120}
+                    {$IFNDEF ALCompilerVersionSupported122}
                       {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_placeholderstyle_t didn''t changed'}
                     {$ENDIF}
                     var LPlaceholderStyle: sk_placeholderstyle_t;

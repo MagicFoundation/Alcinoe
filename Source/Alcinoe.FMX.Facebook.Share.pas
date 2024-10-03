@@ -34,11 +34,6 @@ https://developers.facebook.com/docs/sharing/android/
       ...
     </queries>
 
-   NOTE: because of https://quality.embarcadero.com/browse/RSP-27606 you can not
-   add right now a <provider> tag inside <queries> tag. So before to add
-   <provider android:authorities="com.facebook.katana.provider.PlatformProvider" />
-   check if https://quality.embarcadero.com/browse/RSP-27606 have been corrected
-
 
 Setup (IOS)
 -----------

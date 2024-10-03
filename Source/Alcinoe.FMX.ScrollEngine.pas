@@ -64,7 +64,7 @@ type
   {********************************************************}
   // Calculates the velocity of pointer movements over time.
   // Taken from Android VelocityTracker
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if android VelocityTracker was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\VelocityTracker.java with <SDKs>\android\sources\android-33\android\view\VelocityTracker.java
     //Compare <Alcinoe>\References\Android\VelocityTracker.cpp with https://android.googlesource.com/platform/frameworks/native/libs/input/VelocityTracker.cpp
@@ -406,7 +406,7 @@ type
   // ability to overshoot the bounds of a scrolling operation.
   // Taken from Android OverScroller
   // https://www.sobyte.net/post/2022-02/android-over-scroller/
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if android OverScroller was not updated and adjust the IFDEF'}
     //Compare <Alcinoe>\References\Android\OverScroller.java with <SDKs>\android\sources\android-33\android\widget\OverScroller.java
   {$ENDIF}

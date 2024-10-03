@@ -14457,7 +14457,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_imageinfo_t didn''t changed'}
   {$ENDIF}
   Result.width := W;
@@ -14764,7 +14764,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -14782,7 +14782,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -14798,7 +14798,7 @@ end;
 {$IF defined(ALSkiaAvailable)}
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 begin
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_samplingoptions_t didn''t changed'}
   {$ENDIF}
   Result.max_anisotropic := 0;
@@ -15272,7 +15272,7 @@ begin
   // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
   // and with Skia, we use platform API functions to draw images. However,
   // on other platforms, we resort to using TCanvas. :(
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,
@@ -15306,7 +15306,7 @@ begin
   // TCanvas/TBitmap do not work from a background thread. On Android/iOS,
   // and with Skia, we use platform API functions to draw images. However,
   // on other platforms, we resort to using TCanvas. :(
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-19673 is corrected and if yes remove the Synchronize'}
   {$ENDIF}
   TThread.Synchronize(nil,

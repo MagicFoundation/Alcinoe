@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if Web.Win.IsapiHTTP / Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 
@@ -473,25 +473,38 @@ end;
 
 {**************************************************************************}
 function TALISAPIRequest.GetFieldByName(const Name: AnsiString): AnsiString;
-var Buffer: array[0..4095] of AnsiChar;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function GetVar(const Name: AnsiString; var Value: AnsiString): Boolean;
+  var
+    PName: PAnsiChar;
+    PBuff: PAnsiChar;
+    Buffer: array[0..4095] of AnsiChar;
+    DynBuff: TBytes;
     Size: DWORD;
+  begin
+    PName := PAnsiChar(Name);
+    PBuff := @Buffer[0];
+    Size := SizeOf(Buffer);
+    Result := ECB.GetServerVariable(ECB.ConnID, PName, PBuff, Size);
+    if not Result and (GetLastError = ERROR_INSUFFICIENT_BUFFER) then
+    begin
+      SetLength(DynBuff, Size);
+      PBuff := @DynBuff[0];
+      Result := ECB.GetServerVariable(ECB.ConnID, PName, PBuff, Size);
+    end;
+    if Result then
+    begin
+      if Size > 0 then Dec(Size);
+      SetString(Value, PBuff, Size);
+    end
+    else
+      Value := '';
+  end;
+
 begin
-  Size := SizeOf(Buffer);
-  if ECB.GetServerVariable(
-       ECB.ConnID,
-       PAnsiChar(Name),
-       @Buffer,
-       Size) or
-     ECB.GetServerVariable(
-       ECB.ConnID,
-       PAnsiChar(AnsiString('HTTP_') + Name),
-       @Buffer,
-       Size)
-  then begin
-    if Size > 0 then Dec(Size);
-    SetString(Result, Buffer, Size);
-  end
-  else Result := '';
+  if not GetVar(Name, Result) then
+    GetVar('HTTP_' + Name, Result); { do not localize }
 end;
 
 {*********************************************************************}

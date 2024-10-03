@@ -23,7 +23,7 @@ AndroidMerger will:
 * Merge the resources of all AARs inside a single directory.
 * Merge the AndroidManifest files of all AARs inside AndroidManifest.template.xml.
 * Merge google-services.json in the resources of the project.
-* Create the R.jar with all resource IDs using aapt or aapt2.
+* Create the R.jar with all resource IDs using aapt2.
 * Update the project file (.dproj) to include all resources.
 * Generate the Delphi native bridge file from the Java libraries.
    
@@ -76,7 +76,6 @@ Usage
     -Platforms: Default Android;Android64. Separate Platforms with ';'.
     -GoogleServicesJson: Path to the google-services.json
     -DProjNormalizer: Path to the Alcinoe DProjNormalizer tool.
-    -RJarSwapper: Path to the Alcinoe RJarSwapper tool.
     -UseGradle: Use Gradle build tool to retrieve the dependencies. default false
     -GenerateNativeBridgeFile: Generate in OutputDir the Delphi native bridge file from the Java libraries.
     -NoInteraction: Non-interactive mode.
@@ -93,7 +92,6 @@ Example
     -DProj=c:\MyProject\MyProject.dproj^
     -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^
     -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^
-    -RJarSwapper=c:\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat
     -UseGradle=true
 ```
  

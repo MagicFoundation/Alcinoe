@@ -1,14 +1,15 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{A6AFB891-F444-4AD1-9289-11E85AA4DCEA}</ProjectGuid>
-    <ProjectVersion>20.1</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <MainSource>DeployProjNormalizer.dpr</MainSource>
     <Base>True</Base>
-    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
+    <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Release</Config>
     <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
     <TargetedPlatforms>1</TargetedPlatforms>
     <AppType>Console</AppType>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">DeployProjNormalizer</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>
@@ -234,7 +235,7 @@
           <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
-      <Deployment Version="4"/>
+      <Deployment Version="5"/>
       <Platforms>
         <Platform value="Android">False</Platform>
         <Platform value="Android64">False</Platform>

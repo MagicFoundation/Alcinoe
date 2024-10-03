@@ -104,7 +104,7 @@ uses
 //   * Do NOT add any Win64 files
 //
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if the structure of the *.deployproj didn''t changed by following the instructions in References\BlankApplication\README.md'}
 {$IFEND}
 
@@ -1217,7 +1217,7 @@ begin
           //Skia: The compiled skia library
           if (LSkiaEnabled) and
              (ALSameTextA(LplatFormName, 'Android')) and
-             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+             (compareValue(LProjectVersion, 20.1{Athens}) = 0) then begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1253,7 +1253,7 @@ begin
           //Skia: The compiled skia library
           if (LSkiaEnabled) and
              (ALSameTextA(LplatFormName, 'Android64')) and
-             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+             (compareValue(LProjectVersion, 20.1{Athens}) = 0) then begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1337,7 +1337,8 @@ begin
           //The classes.dex file is a Dalvik Executable file that all Android applications must have. This file contains
           //the Java libraries that the application uses.
           if (ALSameTextA(LplatFormName, 'Android') or ALSameTextA(LplatFormName, 'Android64')) and
-             (compareValue(LProjectVersion, 19.5{Alexandria}) >= 0) then
+             (compareValue(LProjectVersion, 19.5{Alexandria}) >= 0) and
+             (compareValue(LProjectVersion, 20.2{Athens 12.2}) <= 0) then
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1399,7 +1400,7 @@ begin
           //Skia: The compiled skia library
           if (LSkiaEnabled) and
              (ALSameTextA(LplatFormName, 'OSX64')) and
-             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+             (compareValue(LProjectVersion, 20.1{Athens}) = 0) then begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;
@@ -1435,7 +1436,7 @@ begin
           //Skia: The compiled skia library
           if (LSkiaEnabled) and
              (ALSameTextA(LplatFormName, 'OSXARM64')) and
-             (compareValue(LProjectVersion, 20.1{Athens}) >= 0) then begin
+             (compareValue(LProjectVersion, 20.1{Athens}) = 0) then begin
             _addDeployFile(
               LAlreadyDeployedFiles, // const aAlreadyDeployedFiles: TALStringListA;
               TalXmlNode(LplatForms.Objects[I]), // const aItemGroupNode: TalXmlNode;

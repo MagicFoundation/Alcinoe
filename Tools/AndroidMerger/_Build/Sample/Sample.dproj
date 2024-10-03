@@ -327,7 +327,6 @@
   <PropertyGroup Condition="&#39;$(Cfg_1_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
     <Cfg_1_Android>true</Cfg_1_Android>
@@ -335,7 +334,6 @@
     <Cfg_1>true</Cfg_1>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -384,7 +382,6 @@
   <PropertyGroup Condition="&#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
-    <PreBuildEvent>&#34;..\..\..\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
     <Cfg_2_Android>true</Cfg_2_Android>
@@ -392,7 +389,6 @@
     <Cfg_2>true</Cfg_2>
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
-    <PreBuildEvent>&#34;..\..\..\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -438,79 +434,420 @@
     <DelphiCompile Include="$(MainSource)">
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
-    <DCCReference Include="Main.pas">
-      <Form>Form1</Form>
-      <FormType>fmx</FormType>
-    </DCCReference>
-    <JavaReference Include="Merged\libs\androidx.activity-activity-1.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.annotation-annotation-1.3.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.appcompat-appcompat-1.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.appcompat-appcompat-resources-1.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.arch.core-core-common-2.1.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.arch.core-core-runtime-2.1.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.collection-collection-1.1.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.concurrent-concurrent-futures-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.core-core-1.8.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.core-core-ktx-1.8.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.customview-customview-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.documentfile-documentfile-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-1.2.0-repackaged.jar"/>
-    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-1.2.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-views-helper-1.2.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.fragment-fragment-1.3.6.jar"/>
-    <JavaReference Include="Merged\libs\androidx.interpolator-interpolator-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-common-2.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-livedata-2.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-process-2.4.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-runtime-2.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.5.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.loader-loader-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.print-print-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.resourceinspection-resourceinspection-annotation-1.0.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.savedstate-savedstate-1.2.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.startup-startup-runtime-1.1.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.tracing-tracing-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar"/>
-    <JavaReference Include="Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar"/>
-    <JavaReference Include="Merged\libs\androidx.viewpager-viewpager-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.alcinoe-alcinoe-firebase-messaging-1.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-api-3.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-backend-cct-3.1.8.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-runtime-3.1.8.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-base-18.0.1.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-basement-18.1.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-cloud-messaging-17.0.1.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-stats-17.0.2.jar"/>
-    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-tasks-18.0.1.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-annotations-16.1.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-common-20.2.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-components-17.0.1.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-datatransport-18.1.7.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-17.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-json-18.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-proto-16.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-iid-interop-17.1.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-17.1.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-interop-17.1.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-measurement-connector-19.0.0.jar"/>
-    <JavaReference Include="Merged\libs\com.google.firebase-firebase-messaging-23.1.0.jar"/>
-    <JavaReference Include="Merged\libs\javax.inject-javax.inject-1.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains-annotations-13.0.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.7.10.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.7.10.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.6.0.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.6.0.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.1.jar"/>
-    <JavaReference Include="Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.1.jar"/>
-    <JavaReference Include="Merged\libs\r.jar"/>
+    <JavaReference Include="Merged\libs\androidx.activity-activity-1.6.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.activity-activity-1.6.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.annotation-annotation-1.5.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.annotation-annotation-1.5.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.annotation-annotation-experimental-1.3.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.annotation-annotation-experimental-1.3.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.appcompat-appcompat-1.6.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.appcompat-appcompat-1.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.appcompat-appcompat-resources-1.6.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.appcompat-appcompat-resources-1.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.arch.core-core-common-2.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.arch.core-core-common-2.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.arch.core-core-runtime-2.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.arch.core-core-runtime-2.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.collection-collection-1.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.collection-collection-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.core-core-1.9.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.core-core-1.9.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.core-core-ktx-1.9.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.core-core-ktx-1.9.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.customview-customview-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.customview-customview-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.documentfile-documentfile-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.documentfile-documentfile-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-1.2.0-repackaged.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-1.2.0-repackaged.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-1.2.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-1.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-views-helper-1.2.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.emoji2-emoji2-views-helper-1.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.fragment-fragment-1.3.6.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.fragment-fragment-1.3.6.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.interpolator-interpolator-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.interpolator-interpolator-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-common-2.5.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-common-2.5.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-livedata-2.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-livedata-2.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.5.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.5.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-process-2.4.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-process-2.4.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-runtime-2.5.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-runtime-2.5.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.5.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.5.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.5.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.5.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.loader-loader-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.loader-loader-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.print-print-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.print-print-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.resourceinspection-resourceinspection-annotation-1.0.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.resourceinspection-resourceinspection-annotation-1.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.savedstate-savedstate-1.2.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.savedstate-savedstate-1.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.tracing-tracing-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.tracing-tracing-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.alcinoe-alcinoe-firebase-messaging-1.0.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.alcinoe-alcinoe-firebase-messaging-1.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-api-3.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-api-3.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-backend-cct-3.1.8.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-backend-cct-3.1.8.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-runtime-3.1.8.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.datatransport-transport-runtime-3.1.8.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-base-18.0.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-base-18.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-basement-18.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-basement-18.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-cloud-messaging-17.0.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-cloud-messaging-17.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-stats-17.0.2.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-stats-17.0.2.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-tasks-18.0.2.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.android.gms-play-services-tasks-18.0.2.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-annotations-16.2.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-annotations-16.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-common-20.3.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-common-20.3.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-components-17.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-components-17.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-datatransport-18.1.7.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-datatransport-18.1.7.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-17.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-17.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-json-18.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-json-18.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-proto-16.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-encoders-proto-16.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-iid-interop-17.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-iid-interop-17.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-17.1.3.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-17.1.3.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-interop-17.1.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-installations-interop-17.1.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-measurement-connector-19.0.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-measurement-connector-19.0.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-messaging-23.2.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\com.google.firebase-firebase-messaging-23.2.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\javax.inject-javax.inject-1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\javax.inject-javax.inject-1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains-annotations-13.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains-annotations-13.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.7.10.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.7.10.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.7.10.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.7.10.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.6.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.6.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.6.0.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.6.0.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.1.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\r.jar">
+      <ContainerId>ClassesdexFile64</ContainerId>
+    </JavaReference>
+    <JavaReference Include="Merged\libs\r.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
+    </JavaReference>
     <BuildConfiguration Include="Base">
       <Key>Base</Key>
     </BuildConfiguration>
@@ -559,6 +896,34 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android64\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Debug" LocalName="Android\Debug\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android64\Release\splash_image_def-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashImageDefV21" Configuration="Release" LocalName="Android\Release\splash_image_def-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_image_def.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="AndroidSplashStyles" Configuration="Debug" LocalName="Android64\Debug\styles.xml">
@@ -613,6 +978,170 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android64\Debug\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Debug" LocalName="Android\Debug\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android64\Release\styles-v31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="AndroidSplashStylesV31" Configuration="Release" LocalName="Android\Release\styles-v31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android64\Debug\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Debug" LocalName="Android\Debug\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android64\Release\ic_launcher.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIcon" Configuration="Release" LocalName="Android\Release\ic_launcher.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconBackground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_background.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconForeground" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Foreground.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_foreground.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconMonochrome" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Monochrome.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher_monochrome.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android64\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Debug" LocalName="Android\Debug\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android64\Release\ic_launcher-v33.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_AdaptiveIconV33" Configuration="Release" LocalName="Android\Release\ic_launcher-v33.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="Android_Colors" Configuration="Debug" LocalName="Android64\Debug\colors.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>
@@ -635,6 +1164,34 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="Android64\Debug\colors-night-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Debug" LocalName="Android\Debug\colors-night-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Release" LocalName="Android64\Release\colors-night-v21.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_ColorsDark" Configuration="Release" LocalName="Android\Release\colors-night-v21.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>colors.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="Android_LauncherIcon144" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_LauncherIcon_144x144.png">
@@ -1079,6 +1636,146 @@
           <Platform Name="Android">
             <Enabled>false</Enabled>
             <Overwrite>true</Overwrite>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedNotificationIcon" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedNotificationIcon.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>ic_notification.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplash" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplash.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashDark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashDark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Debug" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="Android_VectorizedSplashV31Dark" Configuration="Release" LocalName="$(BDS)\bin\Artwork\Android\FM_VectorizedSplashV31Dark.xml">
+          <Platform Name="Android64">
+            <Enabled>false</Enabled>
+            <Overwrite>true</Overwrite>
+            <RemoteName>splash_vector.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Merged\res\anim-v21\fragment_fast_out_extra_slow_in.xml">

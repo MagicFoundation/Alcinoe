@@ -4,7 +4,7 @@ Alcinoe
 Alcinoe is a library of visual and non-visual components for 
 Delphi. These components can be used in commercial, shareware, 
 freeware, and open-source projects at no cost. Alcinoe is 
-compatible with Delphi Athens 12.0. If you find 
+compatible with <b>Delphi Athens 12.2</b>. If you find 
 this project useful, please consider giving it a 'star' on 
 GitHub. It doesn't cost anything, but it helps to promote 
 the code.
@@ -29,7 +29,6 @@ us to patch the original Delphi source files:
 
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
 * [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
-* [for android compilation, need to use aapt2 instead of aapt](https://quality.embarcadero.com/browse/RSP-27606)
 * [Their is no propagation of mouse event under Firemonkey](https://quality.embarcadero.com/browse/RSP-24397)
 * [Performance Issue - Comparing Equality Between Two Strings](https://quality.embarcadero.com/browse/RSP-42011)
 * [Introduce IsVisibleObject function for improved optimization on TScrollBox](https://quality.embarcadero.com/browse/RSP-42357)
@@ -70,6 +69,7 @@ us to patch the original Delphi source files:
 * [Missing CoreText Constant Functions in iOSapi.CoreText.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1938)
 * [Missing CVMetalTexture and CVMetalTextureCache Declarations in iOSapi.CoreVideo.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939)
 * [Missing Method Declarations in UITextView and UITextField Interfaces in iOSapi.UIKit.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941)
+* [Incorrect External Declarations in System.Skia.API for Android Linking in Athens 12.2](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997)
 
 Install Alcinoe
 ---------------
@@ -131,7 +131,8 @@ please follow these steps:
    
    ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
 <br/>
-  
+
+
 About Skia
 ==========
 
@@ -319,122 +320,75 @@ interactive and immersive experience! Learn more at
 <br/>
 
 
-Firemonkey native iOS/Android/MacOs/Windows TEdit and TMemo
-===========================================================
+Material 3 Controls for Delphi: A Modern UI Approach
+====================================================
 
-TALEdit and TALMemo are native controls, so they are 
-created and managed by the platform API with all the 
-functionalities offered by the platform. You can fully 
-customize their styles (<b>fill, border, shadow, font</b>) 
-across various states such as <b>Enabled, Hovered, 
-Focused, Disabled, Error</b>, and they support prompt text, 
-label text, and supporting text. They also have a 
-useful <b>autosize</b> property to perfectly fit their font 
-size across all platforms. Predefined themes can be applied
-directly within the IDE by right-clicking on the control 
-and selecting from a list of predefined styles.
+In recent years, Material Design has emerged as a guiding design 
+language for developers creating modern, user-friendly, and 
+visually appealing applications. With the release of Material You 
+(Material Design 3), Google has taken a step further by allowing 
+greater personalization and a more dynamic appearance. Developers 
+using Delphi can now leverage Material 3 principles to create 
+stunning, cohesive interfaces across platforms like Android, iOS, 
+Windows, and macOS.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.png?raw=true" style="max-width: 100%;"/>
+
+## Key Alcinoe Controls for Material 3 Design
+
+### 1. **TALButton**
+TALButton offers full customization for states such as Enabled, 
+Pressed, and Disabled, allowing for modern Material 3 button 
+styles. You can adjust properties like fill, border, shadow, and 
+font to match Material 3’s bold, clear design principles. It 
+supports HTML content, enabling you to easily include icons or 
+rich text.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" style="max-width: 100%;"/>
+
+### 2. **TALCheckBox and TALRadioButton**
+Both controls follow Material 3’s minimalistic and responsive 
+design. They include customizable properties for checkmark, 
+border, and shadow and utilize smooth transitions between states. 
+Their highly customizable nature allows you to create checkbox 
+and radio button components that align with Material 3’s aesthetic.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" style="max-width: 100%;"/>
+
+### 3. **TALTrackBar and TALSwitch**
+These controls utilize TALRectangle components for tracks and 
+thumbs, offering high flexibility in design. You can easily 
+customize fill, stroke, and shadow properties to achieve the sleek, 
+modern look of Material 3 sliders and switches. Smooth animations 
+and transitions provide the fluid feedback that Material 3 emphasizes.
+
+### 4. **TALEdit and TALMemo**
+Alcinoe’s native TALEdit and TALMemo controls are designed to 
+match Material 3’s input fields, offering customizable border, 
+shadow, and font properties. These controls adapt across platforms 
+while maintaining a consistent, clean interface for text input, 
+with features like autosizing and prompt text.
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material-design-form-input-text-fields.webp?raw=true" style="max-width: 100%;"/>
 
-Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-<br/>
-<br/>
-  
+## Why Alcinoe for Material 3?
+While Material 3 focuses on responsive and adaptive design, 
+performance is equally important. Alcinoe’s double-buffered 
+rendering ensures that your controls are fast and fluid, 
+even during complex UI interactions like scrolling. This 
+performance boost aligns perfectly with Material 3’s goal 
+of seamless, responsive user interfaces.
 
-Fast/double-buffered FireMonkey controls with native draw
-=========================================================
-
-* Rectangle
-* Circle
-* Text (Can also draw html text on iOS/android/win/macOS)
-* Glyph
-* etc.
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-23.png?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-8.jpg?raw=true" alt="TALRectangle" width="600" style="width:600px;" />
-
-#### The fact ####
-
-Painting FireMonkey controls can be slow at times, which 
-can affect the scrolling fluidity. For instance, the basic 
-TRectangle with round corners takes approximately 3ms to 
-paint. If you have 20 visible TRectangles on your screen, 
-it would take around 60ms to repaint the entire screen 
-(assuming you only have TRectangles and not other controls 
-like TLabel or TCheckbox). Doing the math, if it takes 
-100ms to repaint the screen, you can only achieve around 10 
-frames per second (in reality, it would be much less). As a 
-result, scrolling can't be smooth.
-
-#### The solution #### 
- 
-I didn't want to rebuild the FireMonkey controls, which 
-would have been a huge job for me. Instead, I tried to find 
-an intermediate solution by adding a "double-buffered" 
-property to the FireMonkey controls. This approach involves 
-painting the control on a buffer stored directly in the GPU 
-memory (through TTexture) instead of repainting the controls 
-for every single pixel move of the scrollbox. When the 
-system asks me to repaint the controls, I simply redraw the 
-buffer TTexture, rather than calling the paint algorithm 
-again.
-
-#### The results ####  
-
-As I mentioned before, it used to take 3ms just to paint a 
-simple TRectangle with round corners. With my 
-double-buffered property, it now takes around 0.1ms! As a 
-result, the scrolling looks much more fluid now!
-
-#### OpenGL draw => Replaced by native iOS/android draw ####
-
-Most of the basic shapes in FireMonkey, such as TRectangle 
-and TCircle, use OpenGL for drawing. However, this is not 
-very efficient - for example, to draw a circle under 
-OpenGL, you actually need to draw 50 triangles. This often 
-results in poor quality. Drawing a round rectangle is even 
-worse because it requires calculating the path and then 
-drawing it, which is much slower than drawing a circle.
-
-Another problem is that all of these shapes depend on the 
-Form.quality setting. If you set form.quality to high 
-quality, then everything you draw on the canvas will be 
-anti-aliased, which can be problematic - for example, an 
-image may be anti-aliased even if you don't want it to be. 
-On the other hand, if you set form.quality to high 
-performance, then the draw will be very rough, with no 
-anti-aliasing.
-
-To resolve these issues, I built the buffer of my control 
-using the native Android/iOS API. In this way, we can have 
-high-quality drawing at high speed without being dependent 
-on the form.quality setting.
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-9.jpg?raw=true" alt="TALCircle" />
-  
-You can start exploring this feature with the demo located 
-at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-<br/>
-<br/>
-  
-
-Improved FireMonkey controls
-============================
-
-* ScrollBox
-* TabControl
-* RangeTrackBar
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-5.jpg?raw=true" alt="RangeTrackBar" width="600" style="width:600px;"  />
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/tabcontrol.gif?raw=true" alt="tabcontrol" width="360" style="width:360px;"/>
+Incorporating Alcinoe in your Delphi projects allows you to 
+create modern, high-performance apps with a polished 
+Material 3 appearance, without compromising on speed or 
+cross-platform compatibility.
 
 Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 <br/>
 <br/>
-    
-
+  
+  
 Confetti Falling Animation
 ==========================
 
@@ -601,90 +555,7 @@ Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFound
 </p>
 <br/>
   
-
-Streamlining Object Initialization with TALInit
-===============================================
-
-In the constant evolution of software development, we often find ourselves
-seeking ways to reduce boilerplate code and enhance the maintainability of our
-projects. One such instance where boilerplate can become cumbersome is in the
-initialization of class fields. The traditional method involves explicitly
-setting each field's value in the constructor, which can be tedious, especially
-for classes with numerous fields. Enter TALInit—a feature that allows
-automatic initialization of object fields based on their attributes.
-
-#### The Traditional Way ####
-
-In the typical approach, developers manually initialize object fields in the
-constructor. Take the following class as an example:
-
-```
-    TAutoInitObject = class(TObject)
-    public
-      CharValue: Char;
-      ChildObject: TChildObject;
-    public
-      constructor Create; virtual;
-      destructor Destroy; override;
-    End;
-```
-
-Here, each field is initialized in the Create constructor:
-
-```
-  constructor TAutoInitObject.create(const aOwner: Tform1; const AAutoInit: Boolean);
-  begin
-    CharValue := 'A';
-    ChildObject := TChildObject.create;
-    ChildObject.Name := 'AnObject';
-    ChildObject.Value := 12.2;
-  end;
-
-  destructor TAutoInitObject.Destroy;
-  begin
-    ALFreeandNil(ChildObject);
-    inherited;
-  end;
-```
-
-While this method offers precise control, it can become tedious for large
-classes with numerous fields.
-
-#### The TALInit Way ####
-
-Imagine having a mechanism that not only automates this but is also as fast as
-the traditional way - yes, you read that right. TALInit achieves this
-remarkable feat.
-
-```
-  TAutoInitObject = class(TObject)
-  public
-    [TALInit('A')]
-    CharValue: Char;
-    [TALInit('Name:AnObject;Value:12.2')]
-    ChildObject: TChildObject;
-  End;
-```
-
-By using custom attributes, every field within the object can be automatically
-initialized based on its corresponding attribute. This eliminates the need for
-manually setting each field within the constructor. The above snippet showcases
-just how concise and readable object field initialization can become with
-TALInit.
-
-#### Performance - A Game Changer: ####
-
-One of the strongest advantages of using TALInit is its performance. When
-introducing automation, a natural concern is the overhead that might come with
-it. However, TALInit is designed to be as efficient as the traditional way
-of initializing fields. This means developers can enjoy the convenience
-without having to worry about any hidden costs in execution time.
-
-Learn more at [{alcinoe}/Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
-<br/>
-<br/>
   
-
 Json Parser
 ===========
 
@@ -787,6 +658,89 @@ Learn more at [{alcinoe}/Source/Alcinoe.ImageMagick.pas](https://github.com/Magi
 <br/>
 <br/>
   
+
+Streamlining Object Initialization with TALInit
+===============================================
+
+In the constant evolution of software development, we often find ourselves
+seeking ways to reduce boilerplate code and enhance the maintainability of our
+projects. One such instance where boilerplate can become cumbersome is in the
+initialization of class fields. The traditional method involves explicitly
+setting each field's value in the constructor, which can be tedious, especially
+for classes with numerous fields. Enter TALInit—a feature that allows
+automatic initialization of object fields based on their attributes.
+
+#### The Traditional Way ####
+
+In the typical approach, developers manually initialize object fields in the
+constructor. Take the following class as an example:
+
+```
+    TAutoInitObject = class(TObject)
+    public
+      CharValue: Char;
+      ChildObject: TChildObject;
+    public
+      constructor Create; virtual;
+      destructor Destroy; override;
+    End;
+```
+
+Here, each field is initialized in the Create constructor:
+
+```
+  constructor TAutoInitObject.create(const aOwner: Tform1; const AAutoInit: Boolean);
+  begin
+    CharValue := 'A';
+    ChildObject := TChildObject.create;
+    ChildObject.Name := 'AnObject';
+    ChildObject.Value := 12.2;
+  end;
+
+  destructor TAutoInitObject.Destroy;
+  begin
+    ALFreeandNil(ChildObject);
+    inherited;
+  end;
+```
+
+While this method offers precise control, it can become tedious for large
+classes with numerous fields.
+
+#### The TALInit Way ####
+
+Imagine having a mechanism that not only automates this but is also as fast as
+the traditional way - yes, you read that right. TALInit achieves this
+remarkable feat.
+
+```
+  TAutoInitObject = class(TObject)
+  public
+    [TALInit('A')]
+    CharValue: Char;
+    [TALInit('Name:AnObject;Value:12.2')]
+    ChildObject: TChildObject;
+  End;
+```
+
+By using custom attributes, every field within the object can be automatically
+initialized based on its corresponding attribute. This eliminates the need for
+manually setting each field within the constructor. The above snippet showcases
+just how concise and readable object field initialization can become with
+TALInit.
+
+#### Performance - A Game Changer: ####
+
+One of the strongest advantages of using TALInit is its performance. When
+introducing automation, a natural concern is the overhead that might come with
+it. However, TALInit is designed to be as efficient as the traditional way
+of initializing fields. This means developers can enjoy the convenience
+without having to worry about any hidden costs in execution time.
+
+Learn more at [{alcinoe}/Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
+<br/>
+<br/>
+
 
 MongoDb client
 ==============

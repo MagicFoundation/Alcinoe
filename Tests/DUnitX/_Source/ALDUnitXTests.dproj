@@ -1,14 +1,15 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{A71306CE-ED42-498D-A1CD-107EEF3E99CE}</ProjectGuid>
-    <ProjectVersion>20.1</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <FrameworkType>None</FrameworkType>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">OSX64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win64</Platform>
     <TargetedPlatforms>693395</TargetedPlatforms>
     <AppType>Console</AppType>
     <MainSource>ALDUnitXTests.dpr</MainSource>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">ALDUnitXTests</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>
@@ -81,6 +82,12 @@
     <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
+    <Cfg_1_iOSSimARM64>true</Cfg_1_iOSSimARM64>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
   <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;OSX64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <Cfg_1_OSX64>true</Cfg_1_OSX64>
     <CfgParent>Cfg_1</CfgParent>
@@ -130,7 +137,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
     <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;ibxbindings;FireDACCommon;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;ibxpress;dsnap;DataSnapNativeClient;FireDACCommonDriver;IndyIPClient;bindcompfmx;ibmonitor;fmxFireDAC;DataSnapCommon;fmxase;dbrtl;DBXInterBaseDriver;bindcomp;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
@@ -157,7 +164,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
     <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;ibxbindings;FireDACCommon;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;ibxpress;dsnap;DataSnapNativeClient;FireDACCommonDriver;IndyIPClient;bindcompfmx;ibmonitor;fmxFireDAC;DataSnapCommon;dbrtl;DBXInterBaseDriver;bindcomp;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Android_LauncherIcon36>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_36x36.png</Android_LauncherIcon36>
@@ -211,6 +218,7 @@
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
     <DCC_FrameworkPath>..\..\..\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;..\..\..\Libraries\ios\webrtc\;..\..\..\Libraries\ios\vkontakte\;$(DCC_FrameworkPath)</DCC_FrameworkPath>
     <DCC_UnitSearchPath>..\..\..\Embarcadero\Athens\rtl\common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_iOSMinimumVersion>12.0</DCC_iOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_iOSSimARM64)&#39;!=&#39;&#39;">
     <DCC_UsePackage>fmx;DbxCommonDriver;bindengine;IndyIPCommon;emsclient;IndyProtocols;dbxcds;FmxTeeUI;FireDACSqliteDriver;DbxClientDriver;soapmidas;dbexpress;inet;FireDACDBXDriver;CustomIPTransport;IndySystem;ibxbindings;FireDACCommon;bindcompdbx;rtl;DBXSqliteDriver;DataSnapFireDAC;FireDAC;xmlrtl;ibxpress;dsnap;DataSnapNativeClient;FireDACCommonDriver;IndyIPClient;bindcompfmx;ibmonitor;fmxFireDAC;DataSnapCommon;fmxase;dbrtl;DBXInterBaseDriver;bindcomp;IndyCore;RESTBackendComponents;RESTComponents;IndyIPServer;dsnapxml;DataSnapClient;DataSnapProviderClient;emsclientfiredac;FireDACDSDriver;tethering;CloudService;FMXTee;soaprtl;soapserver;FireDACIBDriver;$(DCC_UsePackage)</DCC_UsePackage>
@@ -238,7 +246,8 @@
     <iPad_Setting58>$(BDS)\bin\Artwork\iOS\iPad\FM_SettingIcon_58x58.png</iPad_Setting58>
     <iPad_Notification40>$(BDS)\bin\Artwork\iOS\iPad\FM_NotificationIcon_40x40.png</iPad_Notification40>
     <DCC_UnitSearchPath>..\..\..\Embarcadero\Athens\rtl\common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-    <DCC_FrameworkPath>..\..\..\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64;..\..\..\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64;..\..\..\Libraries\ios\webrtc\;..\..\..\Libraries\ios\vkontakte\;$(DCC_FrameworkPath)</DCC_FrameworkPath>
+    <DCC_FrameworkPath>..\..\..\Libraries\ios\firebase\FirebaseAnalytics\GoogleUtilities.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseInstallations.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FBLPromises.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCore.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\FirebaseCoreInternal.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseMessaging\FirebaseMessaging.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseAnalytics\nanopb.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\firebase\FirebaseMessaging\GoogleDataTransport.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKLoginKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKShareKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKCoreKit_Basics.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBSDKCoreKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\facebook\FBAEMKit.xcframework\ios-arm64_x86_64-simulator;..\..\..\Libraries\ios\webrtc\;..\..\..\Libraries\ios\vkontakte\;$(DCC_FrameworkPath)</DCC_FrameworkPath>
+    <DCC_iOSMinimumVersion>14.0</DCC_iOSMinimumVersion>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Linux64)&#39;!=&#39;&#39;">
     <Debugger_Launcher>/usr/bin/gnome-terminal -- &#34;%debuggee%&#34;</Debugger_Launcher>
@@ -290,13 +299,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android)&#39;!=&#39;&#39;">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
     <VerInfo_Build>1</VerInfo_Build>
-    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -306,6 +315,11 @@
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
   </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_iOSSimARM64)&#39;!=&#39;&#39;">
+    <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundleShortVersionString=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSCameraUsageDescription=The reason for accessing the camera;NSFaceIDUsageDescription=The reason for accessing the face id;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
+  </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <Debugger_Launcher>/usr/X11/bin/xterm -e &#34;%debuggee%&#34;</Debugger_Launcher>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -313,10 +327,10 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
-    <Debugger_RunParams>--run:ALDUnitXTestStrings.TALDUnitXTestStrings.TestALFloatToStrFA</Debugger_RunParams>
+    <Debugger_RunParams>--run:ALDUnitXTestStrings.TALDUnitXTestStrings.TestALFormatA</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
-    <Debugger_RunParams>--run:ALDUnitXTestCipher.TALDUnitXTestCipher.TestALStringHashCrc32</Debugger_RunParams>
+    <Debugger_RunParams>--run:ALDUnitXTestStrings.TALDUnitXTestStrings.TestALFormatA --ExitBehavior:Pause</Debugger_RunParams>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -359,7 +373,7 @@
           <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
-      <Deployment Version="4"/>
+      <Deployment Version="5"/>
       <Platforms>
         <Platform value="Android">True</Platform>
         <Platform value="Android64">True</Platform>

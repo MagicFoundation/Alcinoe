@@ -409,6 +409,14 @@ REM %~2 the source directory relative to the base directory
 REM %~3 the dproj filename without path
 REM %~4 the platform
 
+SET FileName=%~1\%~2\dbgout.log
+if exist "%FileName%" del "%FileName%" /s
+if exist "%FileName%" goto ERROR
+
+SET FileName=%~1\*.skincfg
+if exist "%FileName%" del "%FileName%" /s
+if exist "%FileName%" goto ERROR
+
 SET FileName=%~1\*.rsm
 if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
@@ -433,6 +441,12 @@ SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
+
+if "%~4"=="Android" (
+  echo [36mMerge Android Libraries for %~3[0m
+  call "%~1\%~2\Android\MergeLibraries.bat"
+  IF ERRORLEVEL 1 goto ERROR
+)
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR

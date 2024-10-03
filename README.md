@@ -332,7 +332,7 @@ using Delphi can now leverage Material 3 principles to create
 stunning, cohesive interfaces across platforms like Android, iOS, 
 Windows, and macOS.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.png?raw=true" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.jps?raw=true" />
 
 ## Key Alcinoe Controls for Material 3 Design
 
@@ -344,7 +344,7 @@ font to match Material 3’s bold, clear design principles. It
 supports HTML content, enabling you to easily include icons or 
 rich text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3buttons.png?raw=true" style="max-width: 100%;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true"/>
 
 ### 2. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 
@@ -353,7 +353,7 @@ border, and shadow and utilize smooth transitions between states.
 Their highly customizable nature allows you to create checkbox 
 and radio button components that align with Material 3’s aesthetic.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" style="max-width: 100%;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" />
 
 ### 3. **TALTrackBar and TALSwitch**
 These controls utilize TALRectangle components for tracks and 
@@ -369,7 +369,7 @@ shadow, and font properties. These controls adapt across platforms
 while maintaining a consistent, clean interface for text input, 
 with features like autosizing and prompt text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material-design-form-input-text-fields.webp?raw=true" style="max-width: 100%;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material-design-form-input-text-fields.webp?raw=true" />
 
 ## Why Alcinoe for Material 3?
 While Material 3 focuses on responsive and adaptive design, 

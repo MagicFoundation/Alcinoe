@@ -1,4 +1,4 @@
-Index: fmx/FMX.Canvas.D2D.pas
+Index: Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas
 --- a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas	(revision 1)
@@ -20,8 +20,8 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/
 +    procedure SetSize(const AWidth, AHeight: Single); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
      { caps }
      class function GetAttribute(const Value: TCanvasAttribute): Integer; override;
-     { drawing }
-@@ -1048,7 +1048,7 @@
+     { brushes }
+@@ -1105,7 +1105,7 @@
  
  { TCanvasD2D }
  
@@ -30,7 +30,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/
    const AQuality: TCanvasQuality);
  var
    ParentHandle: TWinWindowHandle;
-@@ -1516,7 +1516,8 @@
+@@ -1599,7 +1599,8 @@
  
          // in design-time just draw buffer
          if IsDesignTime then
@@ -40,7 +40,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/
        end;
      end;
    finally
-@@ -1564,7 +1565,7 @@
+@@ -1647,7 +1648,7 @@
      FTarget.SetTransform(D2Matrix(M * TMatrix.CreateScaling(Scale, Scale)));
  end;
  
@@ -49,7 +49,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/
  var
    Res: HResult;
  begin
-@@ -1571,13 +1572,15 @@
+@@ -1654,13 +1655,15 @@
    Res := SharedDevice.GetDeviceRemovedReason;
    if Res <> S_OK then
    begin
@@ -67,7 +67,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/
    begin
      MultithreadEnter;
      try
-Index: fmx/FMX.Canvas.GDIP.pas
+Index: Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas
 --- a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas	(revision 1)
@@ -87,10 +87,10 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx
      destructor Destroy; override;
 -    procedure SetSize(const AWidth, AHeight: Integer); override;
 +    procedure SetSize(const AWidth, AHeight: Single); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
-     { text }
-     function LoadFontFromStream(const AStream: TStream): Boolean; override;
-     { mesauring }
-@@ -232,7 +232,7 @@
+     { brushes }
+     class function CalculateStrokeBrush(const ABrush: TStrokeBrush): TStrokeBrush; overload; inline;
+     class function CalculateBrush(const ABrush: TBrush): TBrush; overload; inline;
+@@ -235,7 +235,7 @@
      FSmoothingMode := SmoothingModeHighQuality;
  end;
  
@@ -99,7 +99,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx
    const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
  begin
    inherited CreateFromWindow(AParent, AWidth, AHeight, AQuality);
-@@ -264,7 +264,8 @@
+@@ -293,7 +293,8 @@
    else
      FGPGraphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
    FGPFamily := TGPFontFamily.Create('Tahoma');
@@ -109,7 +109,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx
      FFontScale := 96 / FGPGraphics.GetDpiX
    else
      FFontScale := 1;
-@@ -504,7 +505,8 @@
+@@ -533,7 +534,8 @@
              WindowHandleToPlatform(Parent).BufferHandle, R.Left, R.Top, SRCCOPY);
          end
        else
@@ -119,7 +119,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx
      end;
    end;
  end;
-@@ -552,9 +554,10 @@
+@@ -581,9 +583,10 @@
    end;
  end;
  
@@ -132,7 +132,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx
    begin
      inherited;
      FreeAndNil(FGPGraphics);
-Index: fmx/FMX.Canvas.GPU.Helpers.pas
+Index: Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas
 --- a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 1)
@@ -228,7 +228,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Ath
      FContext.DrawPrimitives(TPrimitivesKind.Triangles, @FBatchVertexBuffer[0], @FBatchIndexBuffer[0], SolidDecl,
        SizeOf(TVertexBufferItem), FBatchedVertices, SizeOf(TIndexBufferItem), FBatchedIndices, FCurrentMaterial, 1);
    end
-Index: fmx/FMX.Canvas.GPU.pas
+Index: Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas
 --- a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas	(revision 1)
@@ -279,16 +279,16 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
                                   const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
      constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
      constructor CreateFromPrinter(const APrinter: TAbstractPrinter); override;
-@@ -164,7 +166,7 @@
-     class function GetCanvasStyle: TCanvasStyles; override;
-     class function GetAttribute(const Value: TCanvasAttribute): Integer; override;
+@@ -167,7 +169,7 @@
+     class function CalculateStrokeBrush(const ABrush: TStrokeBrush): TStrokeBrush; overload; inline;
+     class function CalculateBrush(const ABrush: TBrush): TBrush; overload; inline;
      { buffer }
 -    procedure SetSize(const AWidth, AHeight: Integer); override;
 +    procedure SetSize(const AWidth, AHeight: Single); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
      { drawing }
      procedure MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string; const WordWrap: Boolean;
        const Flags: TFillTextFlags; const ATextAlign: TTextAlign; const AVTextAlign: TTextAlign = TTextAlign.Center); override;
-@@ -313,7 +315,7 @@
+@@ -316,7 +318,7 @@
      Result := SrcColor;
  end;
  
@@ -297,7 +297,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
    const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
  var
    Multisample: TMultisample;
-@@ -409,7 +411,7 @@
+@@ -412,7 +414,7 @@
    end;
  end;
  
@@ -306,7 +306,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
  begin
    inherited;
    if FContext <> nil then
-@@ -513,7 +515,8 @@
+@@ -516,7 +518,8 @@
    if Result then
    begin
      FClippingEnabled := False;
@@ -316,7 +316,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
      FCanvasHelper.ResetScissorRect;
      FCanvasHelper.UpdateDrawingMode;
    end;
-@@ -568,7 +571,7 @@
+@@ -571,7 +574,7 @@
  
  procedure TCanvasGpu.DoIntersectClipRect(const ARect: TRectF);
  var
@@ -325,7 +325,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
    TopLeft, BottomRight: TPointF;
  begin
    FClippingEnabled := True;
-@@ -575,8 +578,9 @@
+@@ -578,8 +581,9 @@
    TopLeft := ARect.TopLeft * Matrix;
    BottomRight := ARect.BottomRight * Matrix;
  
@@ -337,7 +337,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
    FCurrentClipRect := Intersection;
  
    FCanvasHelper.ScissorRect := Intersection;
-@@ -1203,6 +1207,12 @@
+@@ -1274,6 +1278,12 @@
    TCanvasGpu.FreeResources;
  end;
  
@@ -350,7 +350,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/
  initialization
    TCustomCanvasGpu.ModulateColor := $FFFFFFFF;
    TCustomCanvasGpu.AlignToPixels := False;
-Index: fmx/FMX.Canvas.Mac.pas
+Index: Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas b/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas
 --- a/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas	(revision 1)
@@ -364,7 +364,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas b/Embarcadero/Athens/fmx/
        const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
      /// <summary>Initialize Canvas for bitmap.</summary>
      constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
-@@ -701,7 +701,7 @@
+@@ -704,7 +704,7 @@
        end;
  end;
  
@@ -373,7 +373,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas b/Embarcadero/Athens/fmx/
    const AQuality: TCanvasQuality);
  begin
    inherited;
-Index: fmx/FMX.Context.DX11.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.DX11.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.DX11.pas b/Embarcadero/Athens/fmx/FMX.Context.DX11.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.DX11.pas	(revision 1)
@@ -459,7 +459,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.DX11.pas b/Embarcadero/Athens/fm
  begin
    SaveClearFPUState;
    try
-Index: fmx/FMX.Context.DX9.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.DX9.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.DX9.pas b/Embarcadero/Athens/fmx/FMX.Context.DX9.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.DX9.pas	(revision 1)
@@ -600,7 +600,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.DX9.pas b/Embarcadero/Athens/fmx
  begin
    if SharedDevice <> nil then
    begin
-Index: fmx/FMX.Context.GLES.Android.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas b/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas	(revision 1)
@@ -684,7 +684,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas b/Embarcadero/A
    else
      glScissor(R.Left, Round(Height * Scale) - R.Bottom, R.Width, R.Height);
  
-Index: fmx/FMX.Context.GLES.iOS.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas b/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas	(revision 1)
@@ -781,7 +781,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas b/Embarcadero/Athen
    else
      glScissor(R.Left, Round(Height * Scale) - R.Bottom, R.Width, R.Height);
  
-Index: fmx/FMX.Context.GLES.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.GLES.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.pas b/Embarcadero/Athens/fmx/FMX.Context.GLES.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.GLES.pas	(revision 1)
@@ -929,7 +929,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.pas b/Embarcadero/Athens/fm
  
          glUniform1i(Variable.Index, Variable.TextureUnit);
          glActiveTexture(GL_TEXTURE0);
-Index: fmx/FMX.Context.Mac.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.Mac.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.Mac.pas b/Embarcadero/Athens/fmx/FMX.Context.Mac.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.Mac.pas	(revision 1)
@@ -1101,7 +1101,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.Mac.pas b/Embarcadero/Athens/fmx
  end;
  
  procedure TContextOpenGL.DoSetShaders(const VertexShader, PixelShader: TContextShader);
-Index: fmx/FMX.Context.Metal.pas
+Index: Embarcadero/Athens/fmx/FMX.Context.Metal.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Context.Metal.pas b/Embarcadero/Athens/fmx/FMX.Context.Metal.pas
 --- a/Embarcadero/Athens/fmx/FMX.Context.Metal.pas	(revision 1)
@@ -1241,7 +1241,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Context.Metal.pas b/Embarcadero/Athens/f
    if Texture <> nil then
    begin
      LTexture := TMTLTexture.Wrap(Pointer(Texture.Handle));
-Index: fmx/FMX.Controls.pas
+Index: Embarcadero/Athens/fmx/FMX.Controls.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FMX.Controls.pas
 --- a/Embarcadero/Athens/fmx/FMX.Controls.pas	(revision 1)
@@ -1275,7 +1275,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          FControls[I].RecalcUpdateRect;
  end;
  
-@@ -2493,7 +2499,7 @@
+@@ -2498,7 +2504,7 @@
        begin
          for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
          begin
@@ -1284,7 +1284,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
              Continue;
            R := FControls[I].UpdateRect;
            Result := UnionRect(Result, R);
-@@ -2530,7 +2536,7 @@
+@@ -2535,7 +2541,7 @@
      for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
      begin
        Control := FControls[I];
@@ -1293,7 +1293,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          Result := UnionRect(Result, Control.GetChildrenRect);
      end
  end;
-@@ -3053,7 +3059,7 @@
+@@ -3058,7 +3064,7 @@
      for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
      begin
        Control := Controls[I];
@@ -1302,7 +1302,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
          Continue;
  
        NewObj := Control.ObjectAtPoint(AScreenPoint);
-@@ -3686,6 +3692,12 @@
+@@ -3699,6 +3705,12 @@
      Result := 0;
  end;
  
@@ -1315,7 +1315,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  function TControl.GetLeft: Single;
  begin
    Result := Position.X;
-@@ -3957,7 +3969,9 @@
+@@ -3970,7 +3982,9 @@
  begin
    if not FNeedAlign then
      Exit;
@@ -1325,7 +1325,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.Realign;
-@@ -4145,6 +4159,7 @@
+@@ -4158,6 +4172,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseEnter) then
      FOnMouseEnter(Self);
@@ -1333,7 +1333,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.DoMouseLeave;
-@@ -4154,6 +4169,7 @@
+@@ -4167,6 +4182,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseLeave) then
      FOnMouseLeave(Self);
@@ -1341,7 +1341,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  function TControl.GetCanFocus: Boolean;
-@@ -4214,34 +4230,34 @@
+@@ -4227,34 +4243,34 @@
    if not Assigned(AConsumer) or (FScene = nil) or (ControlsCount = 0)then
      Exit;
  
@@ -1402,7 +1402,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
        end;
  
        if AllowPaint then
-@@ -4630,6 +4646,7 @@
+@@ -4643,6 +4659,7 @@
  
    if Assigned(FOnMouseDown) then
      FOnMouseDown(Self, Button, Shift, X, Y);
@@ -1410,7 +1410,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
    if FAutoCapture then
      Capture;
    if Button = TMouseButton.mbLeft then
-@@ -4652,6 +4669,7 @@
+@@ -4665,6 +4682,7 @@
  begin
    if Assigned(FOnMouseMove) then
      FOnMouseMove(Self, Shift, X, Y);
@@ -1418,7 +1418,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-@@ -4660,6 +4678,7 @@
+@@ -4673,6 +4691,7 @@
  
    if Assigned(FOnMouseUp) then
      FOnMouseUp(Self, Button, Shift, X, Y);
@@ -1426,7 +1426,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
    if FPressed then
    begin
      FPressed := False;
-@@ -4674,6 +4693,41 @@
+@@ -4687,6 +4706,41 @@
      FOnMouseWheel(Self, Shift, WheelDelta, Handled)
  end;
  
@@ -1468,7 +1468,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
  var
    Operation: TDragOperation;
-Index: fmx/FMX.Controls3D.pas
+Index: Embarcadero/Athens/fmx/FMX.Controls3D.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Controls3D.pas b/Embarcadero/Athens/fmx/FMX.Controls3D.pas
 --- a/Embarcadero/Athens/fmx/FMX.Controls3D.pas	(revision 1)
@@ -1493,12 +1493,12 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls3D.pas b/Embarcadero/Athens/fmx/
      BitmapContext.Free;
    finally
      Texture.Free;
-Index: fmx/FMX.Filter.pas
+Index: Embarcadero/Athens/fmx/FMX.Filter.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Filter.pas b/Embarcadero/Athens/fmx/FMX.Filter.pas
 --- a/Embarcadero/Athens/fmx/FMX.Filter.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Filter.pas	(working copy)
-@@ -1608,9 +1608,10 @@
+@@ -1611,9 +1611,10 @@
  
  function TFilterContext3D.InputTexture: TTexture;
  begin
@@ -1512,7 +1512,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Filter.pas b/Embarcadero/Athens/fmx/FMX.
      Result := FInput;
  end;
  
-@@ -1940,9 +1941,10 @@
+@@ -1943,9 +1944,10 @@
  
  function TFilterContext3D.TargetTexture: TTexture;
  begin
@@ -1526,12 +1526,12 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Filter.pas b/Embarcadero/Athens/fmx/FMX.
      Result := FTarget;
  end;
  
-Index: fmx/FMX.Forms.pas
+Index: Embarcadero/Athens/fmx/FMX.Forms.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.Forms.pas
 --- a/Embarcadero/Athens/fmx/FMX.Forms.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Forms.pas	(working copy)
-@@ -4436,7 +4436,10 @@
+@@ -4438,7 +4438,10 @@
  
  procedure TCommonCustomForm.SetHovered(const Value: IControl);
  begin
@@ -1543,7 +1543,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    begin
      if FHovered <> nil then
      begin
-@@ -4915,7 +4918,10 @@
+@@ -4917,7 +4920,10 @@
      LControl := AControl
    else
      LControl := nil;
@@ -1555,7 +1555,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    begin
      if Application.ShowHint and (LControl <> nil) then
      begin
-@@ -5734,7 +5740,10 @@
+@@ -5736,7 +5742,10 @@
  
  procedure TCommonCustomForm.SetCaptured(const Value: IControl);
  begin
@@ -1567,7 +1567,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    begin
      if FCaptured <> nil then
      begin
-@@ -6028,7 +6037,10 @@
+@@ -6030,7 +6039,10 @@
  
  procedure TCommonCustomForm.SetActiveControl(const AControl: IControl);
  begin
@@ -1579,7 +1579,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    begin
      if FActiveControl <> nil then
        FActiveControl.RemoveFreeNotify(Self);
-@@ -6230,7 +6242,7 @@
+@@ -6232,7 +6244,7 @@
    if Handle <> nil then
    begin
      LSize := FWinService.GetClientSize(Self);
@@ -1588,7 +1588,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    end;
  end;
  
-Index: fmx/FMX.Forms3D.pas
+Index: Embarcadero/Athens/fmx/FMX.Forms3D.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Forms3D.pas b/Embarcadero/Athens/fmx/FMX.Forms3D.pas
 --- a/Embarcadero/Athens/fmx/FMX.Forms3D.pas	(revision 1)
@@ -1603,7 +1603,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms3D.pas b/Embarcadero/Athens/fmx/FMX
  
              FEffectBitmap.Assign(Context);
              Effect.ProcessEffect(nil, FEffectBitmap, 1);
-Index: fmx/FMX.Graphics.pas
+Index: Embarcadero/Athens/fmx/FMX.Graphics.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Graphics.pas b/Embarcadero/Athens/fmx/FMX.Graphics.pas
 --- a/Embarcadero/Athens/fmx/FMX.Graphics.pas	(revision 1)
@@ -1683,7 +1683,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Graphics.pas b/Embarcadero/Athens/fmx/FM
        if not Result then
        begin
          Unlock;
-@@ -7682,7 +7683,7 @@
+@@ -7683,7 +7684,7 @@
    end;
  end;
  
@@ -1692,7 +1692,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Graphics.pas b/Embarcadero/Athens/fmx/FM
  begin
    FWidth := AWidth;
    FHeight := AHeight;
-Index: fmx/FMX.Platform.iOS.pas
+Index: Embarcadero/Athens/fmx/FMX.Platform.iOS.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas
 --- a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas	(revision 1)
@@ -1703,7 +1703,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
  {                                                       }
  {              Delphi FireMonkey Platform               }
  {                                                       }
-@@ -1071,7 +1071,13 @@
+@@ -1076,7 +1076,13 @@
      WindowManager.NativeWindow.makeKeyAndVisible;
  
      // Post initialization
@@ -1718,26 +1718,31 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fm
      FMX.Forms.Application.RealCreateForms;
      TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
    finally
-Index: fmx/FMX.Platform.Screen.Android.pas
+Index: Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
 --- a/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas	(working copy)
-@@ -258,9 +258,11 @@
-   function ScaleRect(const ARect: TRect; const AScale: Single): TRect;
-   begin
-     Result.Left := Trunc(ARect.Left / AScale);
--    Result.Right := Trunc(ARect.Right / AScale);
-+    //https://quality.embarcadero.com/browse/RSP-41516
-+    Result.Right := ceil(ARect.Right / AScale);
-     Result.Top := Trunc(ARect.Top / AScale);
--    Result.Bottom := Trunc(ARect.Bottom / AScale);
-+    //https://quality.embarcadero.com/browse/RSP-41516
-+    Result.Bottom := ceil(ARect.Bottom / AScale);
-   end;
+@@ -255,12 +255,13 @@
+ 
+ function TAndroidScreenServices.TryFillDisplayInfo(const ANativeDisplay: JDisplay; var ADisplay: TDisplay): Boolean;
+ 
+-   function ScaleRect(const ARect: TRect; const AScale: Single): TRect;
++   // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++   function ScaleRect(const ARect: TRect; const AScale: Single): TRectF;
+    begin
+-     Result.Left := Trunc(ARect.Left / AScale);
+-     Result.Right := Ceil(ARect.Right / AScale);
+-     Result.Top := Trunc(ARect.Top / AScale);
+-     Result.Bottom := Ceil(ARect.Bottom / AScale);
++     Result.Left := ARect.Left / AScale;
++     Result.Right := ARect.Right / AScale;
++     Result.Top := ARect.Top / AScale;
++     Result.Bottom := ARect.Bottom / AScale;
+    end;
  
    function CalculatePhysicalWorkarea(const ANativeDisplay: JDisplay; const APhysicalBounds: TRect): TRect;
-Index: fmx/FMX.Platform.UI.Android.pas
+Index: Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas
 --- a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas	(revision 1)
@@ -1769,7 +1774,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    public
      /// <summary>Renders form Immediately.</summary>
      procedure Render; override;
-@@ -1172,15 +1172,15 @@
+@@ -1171,15 +1171,15 @@
  end;
  
  procedure TAndroidWindowHandle.TFormViewListener.onSizeChanged(w, h, oldw, oldh: Integer);
@@ -1780,16 +1785,16 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    FOwner.FFormBounds.Width := w / PlatformAndroid.WindowService.Scale;
    FOwner.FFormBounds.Height:= h / PlatformAndroid.WindowService.Scale;
  
--  FormBounds := FOwner.Bounds.Truncate;
+-  FormBounds := FOwner.Bounds.Ceiling;
 -  FOwner.Form.SetBoundsF(FormBounds.Left, FormBounds.Top, FormBounds.Width, FormBounds.Height);
 +  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
-+  //FormBounds := FOwner.Bounds.Truncate;
++  //FormBounds := FOwner.Bounds.Ceiling;
 +  //FOwner.Form.SetBoundsF(FormBounds.Left, FormBounds.Top, FormBounds.Width, FormBounds.Height);
 +  FOwner.Form.SetBoundsF(FOwner.Bounds);
  end;
  
  function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
-@@ -2875,7 +2875,7 @@
+@@ -2898,7 +2898,7 @@
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
    AtomicIncrement(FRefCount);
@@ -1798,7 +1803,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    AtomicDecrement(FRefCount);
    inherited;
  end;
-@@ -2885,7 +2885,7 @@
+@@ -2908,7 +2908,7 @@
    if not FIsNeededUpdate then
    begin
      FIsNeededUpdate := True;
@@ -1807,7 +1812,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    end;
  end;
  
-@@ -2893,7 +2893,7 @@
+@@ -2916,7 +2916,7 @@
  begin
  end;
  
@@ -1816,7 +1821,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  begin
    Render;
    FIsNeededUpdate := False;
-Index: fmx/FMX.Presentation.Android.Style.pas
+Index: Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
 --- a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas	(revision 1)
@@ -1845,7 +1850,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarca
    FreeAndNil(FCanvas);
    FCanvas := TCanvasManager.CreateFromWindow(Handle, Size.Width, Size.Height);
    Result := True;
-Index: fmx/FMX.Presentation.Win.Style.pas
+Index: Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas
 --- a/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas	(revision 1)
@@ -1860,7 +1865,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas b/Embarcadero
    FBackground.BitmapScale := Handle.Scale;
    inherited;
  end;
-Index: fmx/FMX.Skia.Canvas.GL.pas
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas
 --- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas	(revision 1)
@@ -1879,7 +1884,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
    {$DEFINE SKIA_GL}
  {$ENDIF}
  
-@@ -28,12 +29,7 @@
+@@ -28,16 +29,8 @@
  type
    { TGlSharedContextCustom }
  
@@ -1891,9 +1896,13 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
 -  end;
 +  TGlSharedContextCustom = class abstract(TGrSharedContext);
  
+-var
+-  GlobalUseSkiaGLSwapInterval: Integer;
+-
  implementation
  
-@@ -42,31 +38,19 @@
+ uses
+@@ -45,31 +38,19 @@
    FMX.Graphics,
    FMX.Types,
    {$IF DEFINED(ANDROID)}
@@ -1928,7 +1937,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
  
    { Skia }
    System.Skia,
-@@ -80,130 +64,29 @@
+@@ -83,130 +64,29 @@
    TGlCanvas = class(TGrCanvas)
    private
      FBackBufferSurface: ISkSurface;
@@ -2063,7 +2072,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
      function GetTextureColorType: TSkColorType; override;
      function GetTextureOrigin: TGrSurfaceOrigin; override;
      procedure RefreshContext; override;
-@@ -211,454 +94,121 @@
+@@ -214,454 +94,121 @@
      constructor Create(const AQuality: TCanvasQuality);
      procedure FinalizeTextureCache(const ABitmap: TGrBitmapHandle); override;
      procedure InitializeTextureCache(const ABitmap: TGrBitmapHandle); override;
@@ -2191,10 +2200,10 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
 -    if not TryMakeCurrent then
 -      Exit;
 -    {$IF DEFINED(ANDROID)}
--    eglSwapInterval(TGlSharedContext(SharedContext).Display, 0);
+-    eglSwapInterval(TGlSharedContext(SharedContext).Display, GlobalUseSkiaGLSwapInterval);
 -    {$ELSEIF DEFINED(MSWINDOWS)}
 -    if TGlSharedContext(SharedContext).GlInterface.HasExtension(FDC, 'WGL_EXT_swap_control') then
--      TGlSharedContext(SharedContext).GlInterface.SwapIntervalEXT(0);
+-      TGlSharedContext(SharedContext).GlInterface.SwapIntervalEXT(GlobalUseSkiaGLSwapInterval);
 -    {$ENDIF}
 -    FGrDirectContext := TGrDirectContext.MakeGl(TGlSharedContext(SharedContext).GrGlInterface);
 -    Result           := FGrDirectContext <> nil;
@@ -2580,7 +2589,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
  { TGlSharedContext }
  
  procedure TGlSharedContext.BeginContext;
-@@ -665,9 +215,6 @@
+@@ -668,9 +215,6 @@
  begin
    inherited;
    try
@@ -2590,7 +2599,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
      MakeCurrent;
    except
      inherited EndContext;
-@@ -678,372 +225,22 @@
+@@ -681,372 +225,22 @@
  constructor TGlSharedContext.Create(const AQuality: TCanvasQuality);
  begin
    inherited Create;
@@ -2975,7 +2984,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
    inherited;
  end;
  
-@@ -1082,11 +279,9 @@
+@@ -1085,11 +279,9 @@
  procedure TGlSharedContext.MakeCurrent;
  begin
    {$IF DEFINED(ANDROID)}
@@ -2989,7 +2998,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
    {$ENDIF}
      raise EGlError.Create('Could not make shared context as current.');
  end;
-@@ -1096,48 +291,6 @@
+@@ -1099,55 +291,11 @@
    MakeCurrent;
  end;
  
@@ -3037,8 +3046,15 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/
 -
  {$HPPEMIT END '#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_FMX_SKIA_CANVAS_GL)'}
  {$HPPEMIT END '    using ::Fmx::Skia::Canvas::Gl::TGlSharedContextCustom;'}
+-{$HPPEMIT END '    using ::Fmx::Skia::Canvas::Gl::GlobalUseSkiaGLSwapInterval;'}
  {$HPPEMIT END '#endif'}
-Index: fmx/FMX.Skia.Canvas.Metal.pas
+ 
+ initialization
+-  GlobalUseSkiaGLSwapInterval := {$IFDEF ANDROID}1{$ELSE}0{$ENDIF};
+   RegisterSkiaRenderCanvas(TGlCanvas, False,
+     function: Boolean
+     begin
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas
 --- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas	(revision 1)
@@ -3061,7 +3077,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas b/Embarcadero/Athe
  begin
    inherited;
    FGrDirectContext := TGrSharedContext(SharedContext).GrDirectContext;
-Index: fmx/FMX.Skia.Canvas.pas
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas
 --- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas	(revision 1)
@@ -3093,7 +3109,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx
      function BeginCanvas(const AContextHandle: THandle): ISkCanvas; override;
      function CreateSharedContext: IGrSharedContext; virtual; abstract;
      procedure EndCanvas(const AContextHandle: THandle); override;
-@@ -2141,9 +2141,10 @@
+@@ -2154,9 +2154,10 @@
  
  {$ENDIF}
  
@@ -3106,7 +3122,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx
    begin
      inherited;
      Resized;
-@@ -2234,7 +2235,7 @@
+@@ -2247,7 +2248,7 @@
  {$IFDEF MSWINDOWS}
  
  constructor TSkCanvasBase.CreateFromWindow(const AParent: TWindowHandle;
@@ -3115,7 +3131,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx
  begin
    inherited;
    if WindowHandleToPlatform(Parent){$IF CompilerVersion < 30}.Form{$ENDIF}.Transparency then
-@@ -2412,7 +2413,7 @@
+@@ -2425,7 +2426,7 @@
  end;
  
  constructor TGrCanvas.CreateFromWindow(const AParent: TWindowHandle;
@@ -3124,12 +3140,12 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx
  begin
    inherited;
    if not FInitialized then
-Index: fmx/FMX.Skia.Canvas.Vulkan.pas
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas
 --- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas	(revision 1)
 +++ b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas	(working copy)
-@@ -197,7 +197,7 @@
+@@ -200,7 +200,7 @@
      procedure DestroySurface;
      procedure DestroySwapchain;
    protected
@@ -3138,7 +3154,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas b/Embarcadero/Ath
      function CreateSharedContext: IGrSharedContext; override;
      function GetSurfaceFromWindow(const AContextHandle: THandle): TSkSurface; override;
      procedure Resized; override;
-@@ -285,7 +285,7 @@
+@@ -288,7 +288,7 @@
  { TVkCanvas }
  
  constructor TVkCanvas.CreateFromWindow(const AParent: TWindowHandle;
@@ -3147,7 +3163,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas b/Embarcadero/Ath
  begin
    inherited;
    FGrDirectContext := TGrSharedContext(SharedContext).GrDirectContext;
-Index: fmx/FMX.StrokeBuilder.pas
+Index: Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas b/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas
 --- a/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas	(revision 1)
@@ -4231,7 +4247,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas b/Embarcadero/Athens/f
  
    FinalizeArrays;
  end;
-Index: fmx/FMX.Types3D.pas
+Index: Embarcadero/Athens/fmx/FMX.Types3D.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX.Types3D.pas
 --- a/Embarcadero/Athens/fmx/FMX.Types3D.pas	(revision 1)
@@ -4367,7 +4383,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
  
  type
    TOpenObject = class(TFmxObject);
-@@ -3196,6 +3200,17 @@
+@@ -3199,6 +3203,17 @@
    FPixelFormat := Value;
  end;
  
@@ -4385,7 +4401,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
  procedure TTexture.SetSize(const AWidth, AHeight: Integer);
  begin
    TMonitor.Enter(Self);
-@@ -3270,7 +3285,7 @@
+@@ -3273,7 +3288,7 @@
  
  { TContext3D }
  
@@ -4394,7 +4410,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
    const AMultisample: TMultisample; const ADepthStencil: Boolean);
  begin
    inherited Create;
-@@ -3305,7 +3320,7 @@
+@@ -3308,7 +3323,7 @@
    begin
      FSaveStates := TList<TContextStates>.Create;
      FCurrentMatrix := TMatrix3D.Identity;
@@ -4403,7 +4419,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
      ResetStates;
    end;
    Inc(FContextCount);
-@@ -3506,8 +3521,9 @@
+@@ -3509,8 +3524,9 @@
  begin
    if Dest is TBitmap then
    begin
@@ -4415,7 +4431,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
    end
    else
      inherited;
-@@ -3742,9 +3758,10 @@
+@@ -3745,9 +3761,10 @@
    DoSetShaderVariable(Name, Data);
  end;
  
@@ -4428,7 +4444,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
    begin
      FreeBuffer;
      FWidth := AWidth;
-@@ -3791,7 +3808,7 @@
+@@ -3794,7 +3811,7 @@
    FCurrentCameraInvMatrix := FCurrentCameraMatrix.Inverse;
  end;
  
@@ -4437,7 +4453,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
  begin
    FCurrentScissorRect := ScissorRect;
    DoSetScissorRect(FCurrentScissorRect);
-@@ -4600,11 +4617,13 @@
+@@ -4603,11 +4620,13 @@
  begin
    if (Dest <> nil) and Dest.Map(TMapAccess.Write, M) then
    try
@@ -4452,8 +4468,8 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
 +      ARect.Intersect(Rect(0, 0, Round(Width), Round(Height)));
      end;
      DoCopyToBits(M.Data, M.Pitch, ARect);
-   finally
-@@ -4787,7 +4806,7 @@
+     if (PixelFormat <> Dest.PixelFormat) and (PixelFormatBytes[PixelFormat] = PixelFormatBytes[Dest.PixelFormat]) then
+@@ -4792,7 +4811,7 @@
      procedure DoSetShaderVariable(const Name: string; const Texture: TTexture); override;
      procedure DoSetShaderVariable(const Name: string; const Matrix: TMatrix3D); override;
    public
@@ -4462,7 +4478,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
        const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
      constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
        const ADepthStencil: Boolean); override;
-@@ -4796,7 +4815,7 @@
+@@ -4801,7 +4820,7 @@
  
  { TCustomDX9Context }
  
@@ -4471,7 +4487,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
    const AMultisample: TMultisample; const ADepthStencil: Boolean);
  begin
    inherited;
-@@ -4909,7 +4928,7 @@
+@@ -4914,7 +4933,7 @@
      Result := nil;
  end;
  
@@ -4480,7 +4496,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX
    const ADepthStencil: Boolean): TContext3D;
  begin
    if DefaultContextClass <> nil then
-Index: fmx/FMX.VirtualKeyboard.Android.pas
+Index: Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas
 --- a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas	(revision 1)
@@ -4503,7 +4519,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcader
      try
        FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
        FPreviousVKRect := VKRect;
-Index: rtl/android/Androidapi.JNI.App.pas
+Index: Embarcadero/Athens/rtl/android/Androidapi.JNI.App.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.App.pas b/Embarcadero/Athens/rtl/android/Androidapi.JNI.App.pas
 --- a/Embarcadero/Athens/rtl/android/Androidapi.JNI.App.pas	(revision 1)
@@ -4574,7 +4590,7 @@ diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.App.pas b/Embarcadero
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar', TypeInfo(Androidapi.JNI.App.JActionBar));
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_LayoutParams', TypeInfo(Androidapi.JNI.App.JActionBar_LayoutParams));
    TRegTypes.RegisterType('Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener', TypeInfo(Androidapi.JNI.App.JActionBar_OnMenuVisibilityListener));
-Index: rtl/android/Androidapi.JNI.GraphicsContentViewText.pas
+Index: Embarcadero/Athens/rtl/android/Androidapi.JNI.GraphicsContentViewText.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.GraphicsContentViewText.pas b/Embarcadero/Athens/rtl/android/Androidapi.JNI.GraphicsContentViewText.pas
 --- a/Embarcadero/Athens/rtl/android/Androidapi.JNI.GraphicsContentViewText.pas	(revision 1)
@@ -4620,7 +4636,7 @@ diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.GraphicsContentViewTe
      procedure drawRenderNode(renderNode: JRenderNode); cdecl;
      procedure enableZ; cdecl;
      function getHeight: Integer; cdecl;
-Index: rtl/android/Androidapi.JNI.Hardware.HardwareBuffer.pas
+Index: Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.HardwareBuffer.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.HardwareBuffer.pas b/Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.HardwareBuffer.pas
 new file mode 100644
@@ -4744,7 +4760,7 @@ new file mode 100644
 +  RegisterTypes;
 +end.
 \ No newline at end of file
-Index: rtl/android/Androidapi.JNI.Hardware.pas
+Index: Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.pas b/Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.pas
 --- a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.pas	(revision 1)
@@ -4794,7 +4810,7 @@ diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Hardware.pas b/Embarc
    TRegTypes.RegisterType('Androidapi.JNI.Hardware.JSensor', TypeInfo(Androidapi.JNI.Hardware.JSensor));
    TRegTypes.RegisterType('Androidapi.JNI.Hardware.JSensorDirectChannel', TypeInfo(Androidapi.JNI.Hardware.JSensorDirectChannel));
    TRegTypes.RegisterType('Androidapi.JNI.Hardware.JSensorEvent', TypeInfo(Androidapi.JNI.Hardware.JSensorEvent));
-Index: rtl/android/Androidapi.JNI.Media.pas
+Index: Embarcadero/Athens/rtl/android/Androidapi.JNI.Media.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Media.pas b/Embarcadero/Athens/rtl/android/Androidapi.JNI.Media.pas
 --- a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Media.pas	(revision 1)
@@ -4808,7 +4824,35 @@ diff --git a/Embarcadero/Athens/rtl/android/Androidapi.JNI.Media.pas b/Embarcade
    Androidapi.JNI.GraphicsContentViewText,
    Androidapi.JNI.Hardware,
    Androidapi.JNI.JavaTypes,
-Index: rtl/ios/iOSapi.AVFoundation.pas
+Index: Embarcadero/Athens/rtl/common/System.Skia.API.pas
+===================================================================
+diff --git a/Embarcadero/Athens/rtl/common/System.Skia.API.pas b/Embarcadero/Athens/rtl/common/System.Skia.API.pas
+--- a/Embarcadero/Athens/rtl/common/System.Skia.API.pas	(revision 1)
++++ b/Embarcadero/Athens/rtl/common/System.Skia.API.pas	(working copy)
+@@ -2428,11 +2428,17 @@
+       procedure LINKLIB_cxx;                         external '/usr/lib/libc++.dylib';
+       procedure LINKLIB_cxxabi;                      external '/usr/lib/libc++abi.dylib';
+     {$ELSEIF DEFINED(ANDROID)}
+-      procedure LINKLIB_EGL;                         external 'libEGL.so';
+-      procedure LINKLIB_GLESv2;                      external 'libGLESv2.so';
+-      procedure LINKLIB_log;                         external 'liblog.so';
+-      procedure LINKLIB_cxxstatic;                   external 'libc++_static.a';
+-      procedure LINKLIB_cxxabi;                      external 'libc++abi.a';
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997
++      //procedure LINKLIB_EGL;                         external 'libEGL.so';
++      //procedure LINKLIB_GLESv2;                      external 'libGLESv2.so';
++      //procedure LINKLIB_log;                         external 'liblog.so';
++      //procedure LINKLIB_cxxstatic;                   external 'libc++_static.a';
++      //procedure LINKLIB_cxxabi;                      external 'libc++abi.a';
++      procedure eglInitialize;                         external 'libEGL.so';
++      procedure glCreateShader;                        external 'libGLESv2.so';
++      procedure __android_log_write;                   external 'liblog.so';
++      procedure _ZTSSt12bad_any_cast;                  external 'libc++_static.a';
++      procedure __cxa_guard_acquire;                   external 'libc++abi.a';
+     {$ENDIF}
+   {$ENDIF}
+ {$ELSE}
+Index: Embarcadero/Athens/rtl/ios/iOSapi.AVFoundation.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/Athens/rtl/ios/iOSapi.AVFoundation.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.AVFoundation.pas	(revision 1)
@@ -4822,7 +4866,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.AVFoundation.pas b/Embarcadero/At
    end;
    TAVPlayerItem = class(TOCGenericImport<AVPlayerItemClass, AVPlayerItem>)  end;
  
-Index: rtl/ios/iOSapi.CoreImage.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.CoreImage.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreImage.pas b/Embarcadero/Athens/rtl/ios/iOSapi.CoreImage.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.CoreImage.pas	(revision 1)
@@ -4864,7 +4908,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreImage.pas b/Embarcadero/Athen
 +end;
 +
  end.
-Index: rtl/ios/iOSapi.CoreLocation.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.CoreLocation.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/Athens/rtl/ios/iOSapi.CoreLocation.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.CoreLocation.pas	(revision 1)
@@ -4955,7 +4999,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreLocation.pas b/Embarcadero/At
      function center: CLLocationCoordinate2D; cdecl;
      function radius: CLLocationDistance; cdecl;
      function containsCoordinate(coordinate: CLLocationCoordinate2D): Boolean; cdecl;
-Index: rtl/ios/iOSapi.CoreText.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.CoreText.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreText.pas b/Embarcadero/Athens/rtl/ios/iOSapi.CoreText.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.CoreText.pas	(revision 1)
@@ -5040,7 +5084,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreText.pas b/Embarcadero/Athens
 +end;
 +
  end.
-Index: rtl/ios/iOSapi.CoreVideo.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.CoreVideo.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreVideo.pas b/Embarcadero/Athens/rtl/ios/iOSapi.CoreVideo.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.CoreVideo.pas	(revision 1)
@@ -5077,7 +5121,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.CoreVideo.pas b/Embarcadero/Athen
  
  function kCVPixelBufferPixelFormatTypeKey: CFStringRef;
  
-Index: rtl/ios/iOSapi.Foundation.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.Foundation.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Athens/rtl/ios/iOSapi.Foundation.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.Foundation.pas	(revision 1)
@@ -5120,7 +5164,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.Foundation.pas b/Embarcadero/Athe
  // Convenience method for creating an NSString from a Delphi Unicode string
  function NSSTR(const Str: string): NSString; inline; deprecated 'use StrToNSStr instead';
  
-Index: rtl/ios/iOSapi.Security.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.Security.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.Security.pas b/Embarcadero/Athens/rtl/ios/iOSapi.Security.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.Security.pas	(revision 1)
@@ -5151,7 +5195,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.Security.pas b/Embarcadero/Athens
 +end;
 +
  end.
-Index: rtl/ios/iOSapi.UIKit.pas
+Index: Embarcadero/Athens/rtl/ios/iOSapi.UIKit.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.UIKit.pas b/Embarcadero/Athens/rtl/ios/iOSapi.UIKit.pas
 --- a/Embarcadero/Athens/rtl/ios/iOSapi.UIKit.pas	(revision 1)
@@ -5216,7 +5260,7 @@ diff --git a/Embarcadero/Athens/rtl/ios/iOSapi.UIKit.pas b/Embarcadero/Athens/rt
      { UITextInputTraits }
      function autocapitalizationType: UITextAutocapitalizationType; cdecl;
      function autocorrectionType: UITextAutocorrectionType; cdecl;
-Index: rtl/osx/Macapi.AppKit.pas
+Index: Embarcadero/Athens/rtl/osx/Macapi.AppKit.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/osx/Macapi.AppKit.pas b/Embarcadero/Athens/rtl/osx/Macapi.AppKit.pas
 --- a/Embarcadero/Athens/rtl/osx/Macapi.AppKit.pas	(revision 1)
@@ -5324,7 +5368,7 @@ diff --git a/Embarcadero/Athens/rtl/osx/Macapi.AppKit.pas b/Embarcadero/Athens/r
    end;
    TNSTextField = class(TOCGenericImport<NSTextFieldClass, NSTextField>)  end;
  
-Index: rtl/osx/Macapi.CoreText.pas
+Index: Embarcadero/Athens/rtl/osx/Macapi.CoreText.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/osx/Macapi.CoreText.pas b/Embarcadero/Athens/rtl/osx/Macapi.CoreText.pas
 --- a/Embarcadero/Athens/rtl/osx/Macapi.CoreText.pas	(revision 1)
@@ -5418,7 +5462,7 @@ diff --git a/Embarcadero/Athens/rtl/osx/Macapi.CoreText.pas b/Embarcadero/Athens
 +end;
 +
  end.
-Index: rtl/osx/Macapi.Foundation.pas
+Index: Embarcadero/Athens/rtl/osx/Macapi.Foundation.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/osx/Macapi.Foundation.pas b/Embarcadero/Athens/rtl/osx/Macapi.Foundation.pas
 --- a/Embarcadero/Athens/rtl/osx/Macapi.Foundation.pas	(revision 1)
@@ -5431,7 +5475,7 @@ diff --git a/Embarcadero/Athens/rtl/osx/Macapi.Foundation.pas b/Embarcadero/Athe
      function length: NSUInteger; cdecl;
    end;
    TNSAttributedString = class(TOCGenericImport<NSAttributedStringClass, NSAttributedString>)  end;
-Index: rtl/osx/Macapi.ImageIO.pas
+Index: Embarcadero/Athens/rtl/osx/Macapi.ImageIO.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/osx/Macapi.ImageIO.pas b/Embarcadero/Athens/rtl/osx/Macapi.ImageIO.pas
 --- a/Embarcadero/Athens/rtl/osx/Macapi.ImageIO.pas	(revision 1)
@@ -5448,7 +5492,7 @@ diff --git a/Embarcadero/Athens/rtl/osx/Macapi.ImageIO.pas b/Embarcadero/Athens/
    libImageIO = '/System/Library/Frameworks/ApplicationServices.framework/ApplicationServices';
  {$ELSE !MACOS64}
    libImageIO = '/System/Library/Frameworks/ApplicationServices.framework/Frameworks/ImageIO.framework/ImageIO';
-Index: rtl/osx/Macapi.QuartzCore.pas
+Index: Embarcadero/Athens/rtl/osx/Macapi.QuartzCore.pas
 ===================================================================
 diff --git a/Embarcadero/Athens/rtl/osx/Macapi.QuartzCore.pas b/Embarcadero/Athens/rtl/osx/Macapi.QuartzCore.pas
 --- a/Embarcadero/Athens/rtl/osx/Macapi.QuartzCore.pas	(revision 1)

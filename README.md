@@ -1,10 +1,10 @@
 Alcinoe
 =======
 
-<b>Alcinoe</b> is a comprehensive library of both visual and non-visual 
+**Alcinoe** is a comprehensive library of both visual and non-visual 
 components for Delphi. These components are freely available 
 for use in commercial, shareware, freeware, and open-source 
-projects. <b>Alcinoe</b> is fully compatible with <b>Delphi Athens 12.2</b>. 
+projects. **Alcinoe** is fully compatible with **Delphi Athens 12.2**. 
 If you find this library helpful, please consider giving it a 
 star on GitHub. It’s free and greatly supports the project’s 
 visibility and growth.
@@ -108,7 +108,7 @@ From time to time, we may need to rename units, classes,
 and functions in Alcinoe. To help you automatically update 
 these names in your project and stay aligned with the 
 latest version of Alcinoe, we provide a tool called 
-<b>CodeRenaming</b>. You can find this tool here: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming)
+**CodeRenaming**. You can find this tool here: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming)
 
 
 Propose a Change on GitHub
@@ -117,17 +117,17 @@ Propose a Change on GitHub
 If you'd like to suggest changes to the Alcinoe directory, 
 please follow these steps:
 
-1. <b>Fork the Alcinoe Repository</b>: First, you'll need 
+1. **Fork the Alcinoe Repository**: First, you'll need 
    to fork the repository. Forking creates a personal copy 
    of the Alcinoe source code that you can modify as needed..  
    
    ![Fork](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/createfork.jpg?raw=true)
 
-2. <b>Make Your Edits</b>: After forking, make the necessary 
+2. **Make Your Edits**: After forking, make the necessary 
    changes to the source code. Then, commit and push these 
    changes to your forked repository.
 
-3. <b>Submit a Pull Request</b>: Once you're happy with your 
+3. **Submit a Pull Request**: Once you're happy with your 
    changes, go to your forked repository, click on 'Contribute,' 
    and select 'Open a pull request' to submit your proposal.
    
@@ -147,37 +147,37 @@ TCanvasGPU graphics engine in nearly every aspect.
 
 #### Key Advantages of Skia: ####
 
-* <b>Solid Graphics Foundation</b>: Since Skia is the 
+* **Solid Graphics Foundation**: Since Skia is the 
   same graphics engine used by Flutter, apps built 
   with Flutter or Delphi + Skia share the same 
   foundational graphics technology.
-* <b>Performance</b>: The Skia algorithms are optimized 
+* **Performance**: The Skia algorithms are optimized 
   to the extent that they can often render directly 
   onto the form surface without requiring an 
   internal buffer.
-* <b>Cross-Platform Consistency</b>: Skia offers a 
+* **Cross-Platform Consistency**: Skia offers a 
   consistent graphics engine across all platforms 
   (Windows, iOS, macOS, Android).
-* <b>Rich Features</b>: Skia provides powerful capabilities 
+* **Rich Features**: Skia provides powerful capabilities 
   typical of a robust graphics engine, including 
   advanced text formatting and shadow rendering.
 
 #### Drawbacks of Skia: ####
 
-* <b>Increased Package Size</b>: Adding Skia increases 
+* **Increased Package Size**: Adding Skia increases 
   the package size by approximately 25 MB.
-* <b>Dependency on Google</b>: Skia is a Google product, 
+* **Dependency on Google**: Skia is a Google product, 
   and while Embarcadero has traditionally focused on 
   offering an independent product free from GAFA domination, 
   using Skia introduces a dependency on Google's technology.
-* <b>OpenGL Limitations</b>: Under OpenGL, only raster 
+* **OpenGL Limitations**: Under OpenGL, only raster 
   images (CPU) can be shared across different threads. 
   This means that GPU textures cannot be created in 
   background threads and later drawn on the main form 
   surface. Interestingly, there seems to be no noticeable 
   speed improvement when drawing GPU images compared to 
   raster images.
-* <b>Image Rendering Performance</b>: While Skia excels 
+* **Image Rendering Performance**: While Skia excels 
   at drawing shapes directly on the form surface, it is 
   notably slower (4x more slower) than the legacy Delphi 
   canvas (TCanvasGPU) when rendering images onto the form.
@@ -237,10 +237,10 @@ Windows, and macOS.
 ## Key Alcinoe Controls for Material 3 Design
 
 ### 1. **TALButton**
-TALButton offers full customization for states such as Enabled, 
-Pressed, and Disabled, allowing for modern Material 3 button 
-styles. You can adjust properties like fill, border, shadow, and 
-font to match Material 3’s bold, clear design principles. It 
+**TALButton** offers full customization for states such as **Enabled, 
+Pressed**, and **Disabled**, allowing for modern Material 3 button 
+styles. You can adjust properties like **fill, border, shadow**, and 
+**font** to match Material 3’s bold, clear design principles. It 
 supports HTML content, enabling you to easily include icons or 
 rich text.
 
@@ -248,15 +248,15 @@ rich text.
 
 ### 2. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 
-design. They include customizable properties for checkmark, 
-border, and shadow and utilize smooth transitions between states. 
+design. They include customizable properties for **checkmark, 
+border**, and **shadow** and utilize smooth transitions between states. 
 Their highly customizable nature allows you to create checkbox 
 and radio button components that align with Material 3’s aesthetic.
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" width="600" style="width:600px;" />
 
 ### 4. **TALSwitch**
-TALSwitch is designed for easy customization, allowing you to 
+**TALSwitch** is designed for easy customization, allowing you to 
 control the design of the switch in states such as **Enabled**, 
 **Hovered**, **Focused**, **Pressed**, and **Disabled**. The 
 control provides smooth, responsive transitions between on and 
@@ -269,7 +269,7 @@ Delphi applications.
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3switch.gif?raw=true" />
 
 ### 3. **TALTrackBar and TALRangeTrackBar**
-TALTrackBar allows for extensive customization of its appearance 
+**TALTrackBar** allows for extensive customization of its appearance 
 and behavior, making it an ideal choice for implementing Material 3’s 
 clean and modern slider design. You can easily customize the track and 
 thumb with properties such as **fill**, **stroke**, and **shadow** to 
@@ -282,9 +282,9 @@ and **Pressed** contribute to a polished, fluid user experience.
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3trackbar.gif?raw=true" />
 
 ### 4. **TALEdit and TALMemo**
-Alcinoe’s native TALEdit and TALMemo controls are designed to 
-match Material 3’s input fields, offering customizable border, 
-shadow, and font properties. These controls adapt across platforms 
+Alcinoe’s native **TALEdit** and **TALMemo** controls are designed to 
+match Material 3’s input fields, offering customizable **border, 
+shadow**, and **font** properties. These controls adapt across platforms 
 while maintaining a consistent, clean interface for text input, 
 with features like autosizing and prompt text.
 

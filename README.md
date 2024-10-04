@@ -451,23 +451,29 @@ DeployMan / DeployProjNormalizer / DProjNormalizer
   the comparison of changes. 
   Learn more at [Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer).
 <br/>
-<br/>
-  
+
 
 Interpolated Animation
 ======================
 
-The TALAnimation component is a refined iteration of Delphi's foundational
-TAnimation object, meticulously tailored for mobile platforms. By forgoing the
-traditional Timer mechanism and instead adopting platform-specific technologies,
-this component offers a vastly improved animation experience for mobile users.
-On Android, animations are seamlessly integrated with the Choreographer,
-ensuring they sync perfectly with the device's refresh rate. Meanwhile, on iOS,
-the precision of DisplayLink is harnessed, leading to optimized and fluid
-animation rendering. Beyond these foundational changes, one of the most notable
-enhancements is the capability to support custom interpolation algorithms. This
-offers developers the flexibility to design unique and intricate animation
-patterns, moving beyond the traditional ease-in or ease-out sequences.
+The **TALAnimation** component is a refined version of Delphi's 
+foundational **TAnimation** object, specifically optimized for 
+mobile platforms. Instead of relying on the traditional Timer 
+mechanism, this component adopts platform-specific technologies, 
+delivering a significantly improved animation experience for 
+mobile users.
+
+- On **Android**, animations are seamlessly integrated with 
+  the **Choreographer**, ensuring perfect synchronization 
+  with the device’s refresh rate.
+
+- On **iOS**, the precision of **DisplayLink** is utilized, 
+  resulting in smooth and optimized animation rendering.
+
+A key enhancement of **TALAnimation** is its support for 
+custom interpolation algorithms, giving developers the 
+flexibility to create unique and complex animation patterns, 
+far beyond the traditional ease-in or ease-out sequences.
 
 <p align="left">
   <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/interpolated1.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
@@ -487,15 +493,19 @@ SpringForce Animation
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />
   
-Inspired by Android's SpringForce, the TALSpringForceAnimation Component brings
-the intrigue of physics-based animations to the Delphi platform. This component
-captures the real-world dynamism of objects influenced by spring mechanics. The
-resulting animations are ones that stretch, bounce, and settle, mirroring
-real-world behaviors and offering a tangible sense of realism to users.
-Developers have the added advantage of being able to adjust various physical
-properties of the spring, such as its stiffness and damping ratio. This ensures
-that a broad spectrum of animation behaviors can be realized, catering to the
-specific nuances of different applications.
+Inspired by Android's **SpringForce**, the **TALSpringForceAnimation** 
+component brings the dynamics of physics-based animations to the 
+Delphi platform. This component simulates the real-world behavior 
+of objects influenced by spring mechanics, producing animations that 
+stretch, bounce, and settle, mirroring the physical world. 
+
+Developers can fine-tune various physical properties of the spring, 
+such as stiffness and damping ratio, allowing for a wide range of 
+animation behaviors. This flexibility enables developers to create 
+animations tailored to the specific nuances of different applications, 
+offering a more realistic and engaging user experience.
+This version improves the flow and clarity of the description 
+while keeping the markdown formatting
 
 Learn more at 
 [Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)

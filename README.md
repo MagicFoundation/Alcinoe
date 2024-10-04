@@ -12,8 +12,8 @@ the code.
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/star.jpg?raw=true" />
 
 
-Example of app made with Alcinoe
---------------------------------
+Example of an App Built with Alcinoe
+------------------------------------
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
   <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/youtubekiskis.jpg?raw=true"/>
@@ -328,7 +328,7 @@ responsive, dynamic text behavior. Learn more at
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/htmltext.png?raw=true" />
 <br/>
   
-Video player for FireMonkey
+Video Player for FireMonkey
 ===========================
 
 ALVideoPlayer renders video to a texture, which is 
@@ -356,7 +356,7 @@ with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/Magi
 <br/>
 
 
-WebRTC Delphi wrapper
+WebRTC Delphi Wrapper
 =====================
 
 WebRTC (Web Real-Time Communications) is a technology which 
@@ -397,7 +397,7 @@ high-performance animation experience. Learn more at
 <br/>
   
   
-AndroidMerger: Integrate AAR SDK in FMX Android app
+AndroidMerger: Integrate AAR SDK in FMX Android App
 ===================================================
                                  
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/androidmerger.jpg?raw=true"/>
@@ -502,8 +502,8 @@ Learn more at
 Scrolling Engine
 ================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="left" width="222" height="480" />
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="left" width="1" height="480" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="right" width="222" height="480" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="right" width="32" height="480" />
   
 TALOverScroller and TALVelocityTracker are essential components of the
 TALScrollEngine, playing crucial roles in refining user interface interactions.
@@ -527,7 +527,7 @@ top-notch scrolling experience, rooted in established and trusted technologies.
 Learn more at 
 [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
-<br clear="left"/>
+<br clear="right"/>
 <br/>
   
 

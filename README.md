@@ -216,6 +216,157 @@ benefit of a unified graphics engine across all platforms,
 along with additional features like animated images.
 
 
+Material 3 Controls for Delphi: A Modern UI Approach
+====================================================
+
+In recent years, Material Design has emerged as a guiding design 
+language for developers creating modern, user-friendly, and 
+visually appealing applications. With the release of Material You 
+(Material Design 3), Google has taken a step further by allowing 
+greater personalization and a more dynamic appearance. Developers 
+using Delphi can now leverage Material 3 principles to create 
+stunning, cohesive interfaces across platforms like Android, iOS, 
+Windows, and macOS.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.jpg?raw=true" />
+
+## Key Alcinoe Controls for Material 3 Design
+
+### 1. **TALButton**
+TALButton offers full customization for states such as Enabled, 
+Pressed, and Disabled, allowing for modern Material 3 button 
+styles. You can adjust properties like fill, border, shadow, and 
+font to match Material 3’s bold, clear design principles. It 
+supports HTML content, enabling you to easily include icons or 
+rich text.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" width="540" style="width:540px;"/>
+
+### 2. **TALCheckBox and TALRadioButton**
+Both controls follow Material 3’s minimalistic and responsive 
+design. They include customizable properties for checkmark, 
+border, and shadow and utilize smooth transitions between states. 
+Their highly customizable nature allows you to create checkbox 
+and radio button components that align with Material 3’s aesthetic.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" width="600" style="width:600px;" />
+
+### 4. **TALSwitch**
+TALSwitch is designed for easy customization, allowing you to 
+control the design of the switch in states such as **Enabled**, 
+**Hovered**, **Focused**, **Pressed**, and **Disabled**. The 
+control provides smooth, responsive transitions between on and 
+off states, reflecting the fluid, adaptable nature of 
+Material 3’s switches. The customizable design ensures that 
+TALSwitch fits seamlessly into a modern, minimalistic interface, 
+offering both visual appeal and optimized performance for 
+Delphi applications.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3switch.gif?raw=true" />
+
+### 3. **TALTrackBar and TALRangeTrackBar**
+TALTrackBar allows for extensive customization of its appearance 
+and behavior, making it an ideal choice for implementing Material 3’s 
+clean and modern slider design. You can easily customize the track and 
+thumb with properties such as **fill**, **stroke**, and **shadow** to 
+achieve the sleek, minimalistic look that defines Material 3. The 
+slider's interactions, including value indicators and stop indicators, 
+are smooth, ensuring responsive feedback as the user interacts with the 
+control. Its transitions between states like **Enabled**, **Focused**, 
+and **Pressed** contribute to a polished, fluid user experience.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3trackbar.gif?raw=true" />
+
+### 4. **TALEdit and TALMemo**
+Alcinoe’s native TALEdit and TALMemo controls are designed to 
+match Material 3’s input fields, offering customizable border, 
+shadow, and font properties. These controls adapt across platforms 
+while maintaining a consistent, clean interface for text input, 
+with features like autosizing and prompt text.
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3edit.webp?raw=true" />
+
+## Why Alcinoe for Material 3?
+While Material 3 focuses on responsive and adaptive design, 
+performance is equally important. Alcinoe’s double-buffered 
+rendering ensures that your controls are fast and fluid, 
+even during complex UI interactions like scrolling. This 
+performance boost aligns perfectly with Material 3’s goal 
+of seamless, responsive user interfaces.
+
+Incorporating Alcinoe in your Delphi projects allows you to 
+create modern, high-performance apps with a polished 
+Material 3 appearance, without compromising on speed or 
+cross-platform compatibility.
+
+Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+<br/>
+<br/>
+  
+  
+Video player for FireMonkey
+===========================
+
+ALVideoPlayer renders video to a texture, which is 
+important for integrating the video into a Delphi form and 
+supporting Z-ORDER for placing controls on top of it. 
+Official Delphi video players are just native video player 
+windows on top of the form and do not support Z-ORDER.
+
+For Android, Alcinoe uses ExoPlayer, which supports 
+features such as dynamic adaptive streaming over 
+HTTP (DASH), HLS, SmoothStreaming, and common encryption 
+that are not supported by MediaPlayer. ExoPlayer is 
+designed to be easy to customize and extend. For iOS, I use 
+AVPlayer with support for HLS, similar to ExoPlayer.
+
+<p align="left">
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+</p>
+
+Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
+with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
+<br/>
+<br/>
+
+
+WebRTC Delphi wrapper
+=====================
+
+WebRTC (Web Real-Time Communications) is a technology which 
+enables Web applications and sites to capture and optionally 
+stream audio and/or video media, as well as to exchange arbitrary 
+data between browsers and mobile applications without requiring 
+an intermediary. The set of standards that comprises WebRTC 
+makes it possible to share data and perform teleconferencing 
+peer-to-peer, without requiring that the user installs plug-ins 
+or any other third-party software.
+
+<p align="center">
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
+</p>
+
+With the TALWebRTC component, you can easily incorporate video 
+and audio chat into your applications, giving your users a more 
+interactive and immersive experience! Learn more at 
+[{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
+<br/>
+<br/>
+  
+  
+Confetti Falling Animation
+==========================
+
+ALConfetti is a vanilla Delphi library for creating a configurable, 
+high-performance confetti falling animation. Learn more at 
+[{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
+
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
+<br/>
+  
+  
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
                                  
@@ -268,155 +419,6 @@ across commits, simplifying the task of comparing differences
 <br/>
   
 
-Opengl video player for FireMonkey
-==================================
-
-ALVideoPlayer renders video to a texture, which is 
-important for integrating the video into a Delphi form and 
-supporting Z-ORDER for placing controls on top of it. 
-Official Delphi video players are just native video player 
-windows on top of the form and do not support Z-ORDER.
-
-For Android, Alcinoe uses ExoPlayer, which supports 
-features such as dynamic adaptive streaming over 
-HTTP (DASH), HLS, SmoothStreaming, and common encryption 
-that are not supported by MediaPlayer. ExoPlayer is 
-designed to be easy to customize and extend. For iOS, I use 
-AVPlayer with support for HLS, similar to ExoPlayer.
-
-<p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-</p>
-
-Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
-with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
-<br/>
-<br/>
-
-
-WebRTC Delphi wrapper
-=====================
-
-WebRTC (Web Real-Time Communications) is a technology which 
-enables Web applications and sites to capture and optionally 
-stream audio and/or video media, as well as to exchange arbitrary 
-data between browsers and mobile applications without requiring 
-an intermediary. The set of standards that comprises WebRTC 
-makes it possible to share data and perform teleconferencing 
-peer-to-peer, without requiring that the user installs plug-ins 
-or any other third-party software.
-
-<p align="center">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
-</p>
-
-With the TALWebRTC component, you can easily incorporate video 
-and audio chat into your applications, giving your users a more 
-interactive and immersive experience! Learn more at 
-[{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
-<br/>
-<br/>
-
-
-Material 3 Controls for Delphi: A Modern UI Approach
-====================================================
-
-In recent years, Material Design has emerged as a guiding design 
-language for developers creating modern, user-friendly, and 
-visually appealing applications. With the release of Material You 
-(Material Design 3), Google has taken a step further by allowing 
-greater personalization and a more dynamic appearance. Developers 
-using Delphi can now leverage Material 3 principles to create 
-stunning, cohesive interfaces across platforms like Android, iOS, 
-Windows, and macOS.
-
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.jpg?raw=true" />
-
-## Key Alcinoe Controls for Material 3 Design
-
-### 1. **TALButton**
-TALButton offers full customization for states such as Enabled, 
-Pressed, and Disabled, allowing for modern Material 3 button 
-styles. You can adjust properties like fill, border, shadow, and 
-font to match Material 3’s bold, clear design principles. It 
-supports HTML content, enabling you to easily include icons or 
-rich text.
-
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" width="540" style="width:540px;"/>
-
-### 2. **TALCheckBox and TALRadioButton**
-Both controls follow Material 3’s minimalistic and responsive 
-design. They include customizable properties for checkmark, 
-border, and shadow and utilize smooth transitions between states. 
-Their highly customizable nature allows you to create checkbox 
-and radio button components that align with Material 3’s aesthetic.
-
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" />
-
-### 4. **TALSwitch**
-TALSwitch is designed for easy customization, allowing you to 
-control the design of the switch in states such as **Enabled**, 
-**Hovered**, **Focused**, **Pressed**, and **Disabled**. The 
-control provides smooth, responsive transitions between on and 
-off states, reflecting the fluid, adaptable nature of 
-Material 3’s switches. The customizable design ensures that 
-TALSwitch fits seamlessly into a modern, minimalistic interface, 
-offering both visual appeal and optimized performance for 
-Delphi applications.
-
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3switch.gif?raw=true" />
-
-### 3. **TALTrackBar and TALRangeTrackBar**
-TALTrackBar allows for extensive customization of its appearance 
-and behavior, making it an ideal choice for implementing Material 3’s 
-clean and modern slider design. You can easily customize the track and 
-thumb with properties such as **fill**, **stroke**, and **shadow** to 
-achieve the sleek, minimalistic look that defines Material 3. The 
-slider's interactions, including value indicators and stop indicators, 
-are smooth, ensuring responsive feedback as the user interacts with the 
-control. Its transitions between states like **Enabled**, **Focused**, 
-and **Pressed** contribute to a polished, fluid user experience.
-
-### 4. **TALEdit and TALMemo**
-Alcinoe’s native TALEdit and TALMemo controls are designed to 
-match Material 3’s input fields, offering customizable border, 
-shadow, and font properties. These controls adapt across platforms 
-while maintaining a consistent, clean interface for text input, 
-with features like autosizing and prompt text.
-
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material-design-form-input-text-fields.webp?raw=true" />
-
-## Why Alcinoe for Material 3?
-While Material 3 focuses on responsive and adaptive design, 
-performance is equally important. Alcinoe’s double-buffered 
-rendering ensures that your controls are fast and fluid, 
-even during complex UI interactions like scrolling. This 
-performance boost aligns perfectly with Material 3’s goal 
-of seamless, responsive user interfaces.
-
-Incorporating Alcinoe in your Delphi projects allows you to 
-create modern, high-performance apps with a polished 
-Material 3 appearance, without compromising on speed or 
-cross-platform compatibility.
-
-Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
-<br/>
-<br/>
-  
-  
-Confetti Falling Animation
-==========================
-
-ALConfetti is a vanilla Delphi library for creating a configurable, 
-high-performance confetti falling animation. Learn more at 
-[{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
-
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
-<br/>
-  
-  
 Interpolated Animation
 ======================
 

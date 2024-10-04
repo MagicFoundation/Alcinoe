@@ -541,13 +541,20 @@ Learn more at
 <br/>
   
 
-Firebase cloud messaging
+Firebase Cloud Messaging
 ========================
 
-Delphi implementation of the latest version of Firebase 
-cloud messaging (FCM) with HTTP V1 protocol that will 
-permit you to send alert notifications with images in 
-Android and iOS. Learn more at 
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/firebasecloudmessaging.jpg?raw=true"/>
+
+The Delphi implementation of the latest version of **Firebase Cloud 
+Messaging (FCM)** using the **HTTP V1 protocol** enables you to 
+send advanced push notifications, including rich media like 
+images, to Android and iOS devices. This allows developers to deliver 
+real-time alerts, updates, and user-specific notifications directly 
+to mobile users, improving engagement and communication within 
+their apps.
+
+Learn more at 
 [Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)
 <br/>
 <br/>
@@ -556,20 +563,24 @@ Android and iOS. Learn more at
 GeoPositioning for Android/iOS
 ==============================
 
-The TALGeoPositionSensor component is a Delphi component that grants access to
-location services on iOS and Android devices. It enables the retrieval of the
-device's current location, and can provide location updates as the device's
-location changes. It supports a range of location providers, including GPS,
-cellular network triangulation, and Wi-Fi positioning.
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/geopositioning.webp?raw=true"  width="540" style="width:540px;"/>
 
-Aside from granting access to location services, TALGeoPositionSensor also
-automates the process of acquiring the user's permission to use the location
-sensor on both iOS and Android devices. The component can handle situations
-where the user has previously refused access to their location. The
-TALGeoPositionSensor component provides a comprehensive solution for developers
-seeking to integrate location-based functionality into their apps without
-having to worry about low-level implementation details. Learn more at 
-[Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
+The **TALGeoPositionSensor** component is a Delphi component that 
+provides access to location services on iOS and Android devices. 
+It allows developers to retrieve the device's current location 
+and receive updates as the location changes. The component supports 
+various location providers, including GPS, cellular network 
+triangulation, and Wi-Fi positioning.
+
+In addition to accessing location services, **TALGeoPositionSensor** 
+automates the process of requesting user permission to use location 
+data on both iOS and Android. It also handles scenarios where users 
+have previously denied location access. By using this component, 
+developers can seamlessly integrate location-based functionality 
+into their apps without needing to manage the underlying 
+implementation details.
+
+Learn more at [Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
 <br/>
 <br/>
   

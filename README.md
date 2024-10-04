@@ -432,20 +432,24 @@ Learn more at [Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/t
 <br/>
   
 
-DeployMan/DeployProjNormalizer/DProjNormalizer
-==============================================
-                                 
-DeployMan, DeployProjNormalizer, and DProjNormalizer are essential tools 
-for managing Delphi app deployments. DeployMan greatly simplifies the 
-deployment of files and folders for iOS and Android apps, ideal for 
-handling extensive files like 3rd party SDKs (learn more at [Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan)). 
-DeployProjNormalizer allows you to create a new deployproj file from 
-scratch using the dproj as a reference and normalizes it by ordering 
-the nodes, facilitating the comparison of different revisions with diff 
-tools (learn more at [Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)). 
-Lastly, DProjNormalizer orders the nodes in a DProj file to maintain consistency 
-across commits, simplifying the task of comparing differences 
-(learn more at [Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer). 
+DeployMan / DeployProjNormalizer / DProjNormalizer
+==================================================
+
+- **DeployMan** simplifies the deployment of files and folders for 
+  iOS and Android apps, making it ideal for managing large files 
+  like third-party SDKs. 
+  Learn more at [Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan).
+  
+- **DeployProjNormalizer** enables the creation of a new 
+  deployproj file from scratch using the dproj as a reference, 
+  normalizing it by ordering nodes to facilitate comparison 
+  across different revisions with diff tools. 
+  Learn more at [Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer).
+
+- **DProjNormalizer** focuses on ordering nodes in a DProj 
+  file, ensuring consistency across commits and simplifying 
+  the comparison of changes. 
+  Learn more at [Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer).
 <br/>
 <br/>
   

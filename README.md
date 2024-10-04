@@ -311,20 +311,20 @@ Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/t
 High-Performance Text Control with HTML Formatting and Interactive Capabilities
 ===============================================================================
 
-TALText is a powerful component similar to TText, but with 
-enhanced capabilities, such as support for basic HTML text 
-formatting. Despite integrating HTML formatting, TALText 
-offers significant performance improvements over TText. 
-This is achieved through its use of a double-buffered engine, 
-which renders the text on an internal buffer and then 
-draws only this buffer onto the form during each paint cycle. 
-This design makes TALText extremely fast and efficient. 
-Additionally, TALText extends its functionality by 
-supporting mouse event handling that can detect the 
-specific HTML elements (e.g., span ID and bounds) under 
-the mouse pointer. This feature allows for interactive 
-text elements, making it perfect for applications requiring 
-responsive, dynamic text behavior. Learn more at 
+**TALText** is a robust component similar to **TText**, but 
+with enhanced capabilities like basic HTML text formatting 
+support. Despite incorporating HTML formatting, **TALText** 
+delivers substantial performance improvements over **TText**. 
+This is achieved through its double-buffered engine, 
+which renders text on an internal buffer and then draws 
+only the buffer onto the form during each paint cycle. This 
+design ensures that **TALText** is extremely fast and efficient.
+Additionally, **TALText** enhances functionality by supporting 
+mouse event handling, allowing it to detect specific 
+HTML elements (such as span IDs and bounds) under the mouse 
+pointer. This feature enables interactive text elements, 
+making it ideal for applications requiring dynamic, 
+responsive text behavior. Learn more at 
 [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/htmltext.png?raw=true" />
@@ -333,27 +333,28 @@ responsive, dynamic text behavior. Learn more at
 Video Player for FireMonkey
 ===========================
 
-ALVideoPlayer renders video to a texture, which is 
-important for integrating the video into a Delphi form and 
-supporting Z-ORDER for placing controls on top of it. 
-Official Delphi video players are just native video player 
-windows on top of the form and do not support Z-ORDER.
+**ALVideoPlayer** renders video onto a texture, allowing 
+seamless integration into a Delphi form while supporting 
+Z-ORDER, enabling controls to be placed on top of the video. 
+In contrast, Delphi’s official video players are native 
+video player windows overlaid on the form, which do not 
+support Z-ORDER.
 
-For Android, Alcinoe uses ExoPlayer, which supports 
-features such as dynamic adaptive streaming over 
-HTTP (DASH), HLS, SmoothStreaming, and common encryption 
-that are not supported by MediaPlayer. ExoPlayer is 
-designed to be easy to customize and extend. For iOS, I use 
-AVPlayer with support for HLS, similar to ExoPlayer.
+On Android, **Alcinoe** uses **ExoPlayer**, which provides 
+advanced features such as dynamic adaptive streaming over 
+HTTP (DASH), HLS, SmoothStreaming, and common encryption—capabilities 
+not available in MediaPlayer. **ExoPlayer** is also designed 
+to be easily customizable and extendable. On iOS, 
+**AVPlayer** is used, offering similar HLS support to 
+**ExoPlayer**.
 
 <p align="left">
   <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
-Learn more at [Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
-with the demo located at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
 <br/>
 <br/>
 
@@ -361,23 +362,22 @@ with the demo located at [Demos/ALFmxControls](https://github.com/MagicFoundatio
 WebRTC Delphi Wrapper
 =====================
 
-WebRTC (Web Real-Time Communications) is a technology which 
-enables Web applications and sites to capture and optionally 
-stream audio and/or video media, as well as to exchange arbitrary 
-data between browsers and mobile applications without requiring 
-an intermediary. The set of standards that comprises WebRTC 
-makes it possible to share data and perform teleconferencing 
-peer-to-peer, without requiring that the user installs plug-ins 
-or any other third-party software.
+WebRTC (Web Real-Time Communications) is a technology that 
+allows web applications and sites to capture and stream 
+audio and/or video media, as well as exchange arbitrary 
+data between browsers and mobile applications without an 
+intermediary. The set of standards behind WebRTC enables 
+peer-to-peer data sharing and teleconferencing without 
+the need for plug-ins or third-party software.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
-With the TALWebRTC component, you can easily incorporate video 
-and audio chat into your applications, giving your users a more 
-interactive and immersive experience! Learn more at 
-[Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
+With the **TALWebRTC** component, you can easily integrate 
+video and audio chat into your applications, providing users 
+with a more interactive and immersive experience! 
+Learn more at [Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
 <br/>
 <br/>
   

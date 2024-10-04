@@ -9,14 +9,14 @@ this project useful, please consider giving it a 'star' on
 GitHub. It doesn't cost anything, but it helps to promote 
 the code.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/star.jpg?raw=true" />
 
 
 Example of app made with Alcinoe
 --------------------------------
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtubekiskis.jpg?raw=true"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/youtubekiskis.jpg?raw=true"/>
 </a>
 
 
@@ -120,7 +120,7 @@ please follow these steps:
    creating a copy of the Alcinoe source code that you can 
    edit as you wish.  
    
-   ![Fork](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/createfork.jpg?raw=true)
+   ![Fork](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/createfork.jpg?raw=true)
 
 2. Make the necessary edits to the source code, and then 
    commit and push the changes to your forked repository.
@@ -129,7 +129,7 @@ please follow these steps:
    proposal. To do so, go to your forked repository, select 
    'Contribute,' and then choose 'Open a pull request.'  
    
-   ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/openpullrequest.jpg?raw=true)
+   ![Contribute](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/openpullrequest.jpg?raw=true)
 <br/>
 
 
@@ -345,9 +345,9 @@ designed to be easy to customize and extend. For iOS, I use
 AVPlayer with support for HLS, similar to ExoPlayer.
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
 Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
@@ -369,7 +369,7 @@ peer-to-peer, without requiring that the user installs plug-ins
 or any other third-party software.
 
 <p align="center">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
 With the TALWebRTC component, you can easily incorporate video 
@@ -393,14 +393,14 @@ or dynamic visual effects, ALConfetti delivers a smooth,
 high-performance animation experience. Learn more at 
 [{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 <br/>
   
   
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
                                  
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/androidmerger.jpg?raw=true"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/androidmerger.jpg?raw=true"/>
 
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 
@@ -465,9 +465,9 @@ offers developers the flexibility to design unique and intricate animation
 patterns, moving beyond the traditional ease-in or ease-out sequences.
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/interpolated1.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/interpolated1.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/interpolated2.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/interpolated2.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
 </p>
 
 Learn more at 
@@ -479,8 +479,8 @@ Learn more at
 SpringForce Animation
 =====================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />
   
 Inspired by Android's SpringForce, the TALSpringForceAnimation Component brings
 the intrigue of physics-based animations to the Delphi platform. This component
@@ -502,8 +502,8 @@ Learn more at
 Scrolling Engine
 ================
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="left" width="222" height="480" />
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="480" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="left" width="222" height="480" />
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="left" width="1" height="480" />
   
 TALOverScroller and TALVelocityTracker are essential components of the
 TALScrollEngine, playing crucial roles in refining user interface interactions.
@@ -598,9 +598,9 @@ your photos beautiful and expressive in just minutes!
 Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter2.jpg?raw=true" width="320" style="width:320px;"/>
+  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagefilter2.jpg?raw=true" width="320" style="width:320px;"/>
 </p>
 <br/>
   

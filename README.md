@@ -544,7 +544,7 @@ Learn more at
 Firebase Cloud Messaging
 ========================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/firebasecloudmessaging.jpg?raw=true"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/firebasecloudmessaging.jpg?raw=true" width="600" style="width:600px;"/>
 
 The Delphi implementation of the latest version of **Firebase Cloud 
 Messaging (FCM)** using the **HTTP V1 protocol** enables you to 
@@ -563,7 +563,7 @@ Learn more at
 GeoPositioning for Android/iOS
 ==============================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/geopositioning.webp?raw=true"  width="540" style="width:540px;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/geopositioning.webp?raw=true" width="540" style="width:540px;"/>
 
 The **TALGeoPositionSensor** component is a Delphi component that 
 provides access to location services on iOS and Android devices. 
@@ -588,11 +588,13 @@ Learn more at [Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alc
 Google OAuth 2.0 Access Token
 =============================
 
-Google APIs use the OAuth 2.0 protocol for authentication 
-and authorization. You can use the function 
-ALGenerateGoogleOAuth2AccessToken to generate an OAuth 2.0 
-Access Token. Learn more at 
-[Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
+Google APIs utilize the **OAuth 2.0** protocol for authentication 
+and authorization. The function **ALGenerateGoogleOAuth2AccessToken** 
+allows you to easily generate an OAuth 2.0 access token, which 
+can be used to securely access Google services and APIs within 
+your Delphi applications.
+
+Learn more at [Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
 <br/>
 <br/>
   
@@ -600,22 +602,26 @@ Access Token. Learn more at
 Android/iOS VKontakte/Facebook SDK login
 ========================================
 
-The VKontakte/Facebook SDK for Android enables users to 
-sign into your app using VKontakte/Facebook Login. Once 
-logged in, users can grant permissions to your app, 
-allowing you to retrieve information or perform actions on 
-VKontakte/Facebook on their behalf. Learn more at 
-[Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/facebooklogin.webp?raw=true" width="540" style="width:540px;"/>
+
+The **VKontakte/Facebook SDK** for Android and iOS allows users 
+to sign into your app using their VKontakte or Facebook credentials. 
+Once logged in, users can grant permissions to your app, enabling you 
+to retrieve information or perform actions on VKontakte/Facebook 
+on their behalf.
+
+Learn more at [Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
 <br/>
 <br/>
-  
+
 
 Photo Editor Filters for Android/iOS
 ====================================
 
-With TALColorAdjustEffect, you can apply gorgeous photo 
-filters that enhance your images with just one tap. Make 
-your photos beautiful and expressive in just minutes! 
+With **TALColorAdjustEffect**, you can effortlessly apply stunning 
+photo filters to enhance your images with just a single tap. 
+Transform your photos into beautiful and expressive works of art in minutes! 
+
 Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
@@ -629,14 +635,17 @@ Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alci
 Json Parser
 ===========
 
-TALJSONDocument is a Delphi parser/writer for JSON/BSON 
-data formats. It supports both DOM and SAX parsers. (Note 
-that a better name for SAX could be SAJ for Simple API for 
-JSON instead of Simple API for XML, but as the concept of 
-SAX is well-known, I will keep this name.) TALJSONDocument 
-also supports BSON format and uses a syntax similar to 
-TALXMLDocument/TXMLDocument. Additionally, TALJSONDocument 
-can export Json/Bson data to TALStringList.
+**TALJSONDocument** is a Delphi parser and writer for both **JSON** 
+and **BSON** data formats. It supports both **DOM** and **SAX** 
+parsers (although a more appropriate name for SAX could be 
+**SAJ**—Simple API for JSON—rather than Simple API for XML, the 
+well-known SAX terminology is retained). 
+
+In addition to its JSON capabilities, **TALJSONDocument** also 
+supports the **BSON** format, using a syntax similar to 
+**TALXMLDocument/TXMLDocument**. It can further export JSON/BSON 
+data to **TALStringList**, making it a flexible tool for data 
+parsing and manipulation in Delphi applications.
 
 Example :
 
@@ -673,55 +682,57 @@ Learn more at [Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Al
 <br/>
   
 
-ImageMagick wrapper for Delphi
+ImageMagick Wrapper for Delphi
 ==============================
 
-Use ImageMagick® to create, edit, compose, or convert bitmap 
-images. It can read and write images in a variety of formats 
-(over 200) including PNG, JPEG, GIF, HEIC, TIFF, DPX, EXR, 
-WebP, Postscript, PDF, and SVG. Use ImageMagick to resize, 
-flip, mirror, rotate, distort, shear and transform images, 
-adjust image colors, apply various special effects, or draw 
-text, lines, polygons, ellipses and Bézier curves.
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagemagick.png?raw=true"/>
+
+Use **ImageMagick®** to create, edit, compose, or convert bitmap 
+images. It supports over 200 image formats, including **PNG**, 
+**JPEG**, **GIF**, **HEIC**, **TIFF**, **DPX**, **EXR**, **WebP**, 
+**Postscript**, **PDF**, and **SVG**.
+
+With ImageMagick, you can resize, flip, mirror, rotate, distort, 
+shear, and transform images. Additionally, it allows for color 
+adjustments, the application of various special effects, and the 
+drawing of text, lines, polygons, ellipses, and Bézier curves. 
+This powerful tool enables a wide range of image manipulations 
+within Delphi projects.
 
 Example :
 
 ```
-    var LWand: PMagickWand;
-    begin
+    //Create the ImageMagick Library
+    ALCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
+    try
     
-      //Create the ImageMagick Library
-      alCreateImageMagickLibrary({alcinoe} + '\Libraries\dll\imagemagick\win32\imagemagick', min(2, System.CPUCount){aThreadLimit});
+      //create the wand pointer
+      var LWand := ALImageMagickLib.NewMagickWand;
       try
-      
-        //create the wand pointer
-        LWand := ALImageMagickLib.NewMagickWand;
-        try
-      
-          //load the image
-          if ALImageMagickLib.MagickReadImage(LWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(LWand);
-          
-          //Set the compression quality
-          if ALImageMagickLib.MagickSetImageCompressionQuality(LWand,80) <> MagickTrue then RaiseLastMagickWandError(LWand);
-      
-          //autorate the image
-          if ALImageMagickLib.MagickAutoOrientImage(LWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
-      
-          //Resize the image using the Lanczos filter
-          if ALImageMagickLib.MagickResizeImage(LWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
-             
-          //save the image
-          ALImageMagickLib.MagickWriteImage(LWand, pansiChar(aOutputFilename));
-      
-        finally
-          ALImageMagickLib.DestroyMagickWand(LWand);
-        end;
+    
+        //load the image
+        if ALImageMagickLib.MagickReadImage(LWand, pansiChar(aInputFilename)) <> MagickTrue then RaiseLastMagickWandError(LWand);
+        
+        //Set the compression quality
+        if ALImageMagickLib.MagickSetImageCompressionQuality(LWand,80) <> MagickTrue then RaiseLastMagickWandError(LWand);
+    
+        //autorate the image
+        if ALImageMagickLib.MagickAutoOrientImage(LWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
+    
+        //Resize the image using the Lanczos filter
+        if ALImageMagickLib.MagickResizeImage(LWand, 640, 480, LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
+           
+        //save the image
+        ALImageMagickLib.MagickWriteImage(LWand, pansiChar(aOutputFilename));
     
       finally
-        alFreeImageMagickLibrary;
+        ALImageMagickLib.DestroyMagickWand(LWand);
       end;
-
+  
+    finally
+      ALFreeImageMagickLibrary;
     end;
+
 ```
 
 Learn more at [Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)

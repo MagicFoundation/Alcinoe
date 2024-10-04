@@ -81,23 +81,23 @@ including retrieving and patching the original Delphi
 source code, downloading the necessary iOS/Android 
 libraries, generating the Alcinoe JAR files, building 
 the BPL (Borland Package Library), compiling the tools 
-in the [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/) 
+in the [Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/) 
 directory, and finally compiling all demos found in the 
-[{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/) 
+[Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/) 
 directory. Please note that some demos require 
 components from [devexpress](https://www.devexpress.com/).
 
 If you only need to use Alcinoe's non-visual components, 
 no further steps are necessary. Simply ensure that 
-[{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+[Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
 is included in your project's search path.
 
 To use Alcinoe's visual components at design time, you 
 will need to install the BPL. Open Delphi, go to 
 Component > Install Packages..., and select the BPL 
-from [{alcinoe}\Libraries\bpl\Alcinoe\Win32\\{YourDelphiVersion}\Alcinoe{YourDelphiVersion}.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
-Additionally, include both [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
-and all subdirectories from [{alcinoe}\Embarcadero\\{YourDelphiVersion}](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
+from [Libraries\bpl\Alcinoe\Win32\\{YourDelphiVersion}\Alcinoe{YourDelphiVersion}.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
+Additionally, include both [Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+and all subdirectories from [Embarcadero\\{YourDelphiVersion}](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
 in your search path.
 
 
@@ -540,7 +540,7 @@ Delphi implementation of the latest version of Firebase
 cloud messaging (FCM) with HTTP V1 protocol that will 
 permit you to send alert notifications with images in 
 Android and iOS. Learn more at 
-[{alcinoe}\Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)
+[Demos\ALNotificationService](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALNotificationService)
 <br/>
 <br/>
 
@@ -561,7 +561,7 @@ where the user has previously refused access to their location. The
 TALGeoPositionSensor component provides a comprehensive solution for developers
 seeking to integrate location-based functionality into their apps without
 having to worry about low-level implementation details. Learn more at 
-[{alcinoe}\Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
+[Demos\ALGeoPositionSensor](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALGeoPositionSensor)
 <br/>
 <br/>
   
@@ -586,7 +586,7 @@ sign into your app using VKontakte/Facebook Login. Once
 logged in, users can grant permissions to your app, 
 allowing you to retrieve information or perform actions on 
 VKontakte/Facebook on their behalf. Learn more at 
-[{alcinoe}\Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
+[Demos\ALFacebookLogin](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFacebookLogin)
 <br/>
 <br/>
   
@@ -597,7 +597,7 @@ Photo Editor Filters for Android/iOS
 With TALColorAdjustEffect, you can apply gorgeous photo 
 filters that enhance your images with just one tap. Make 
 your photos beautiful and expressive in just minutes! 
-Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
+Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
   <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
@@ -821,7 +821,7 @@ two-way interactive communication sessions between a user's
 browser and a server. This allows you to send messages to a 
 server and receive event-driven responses without having to 
 poll the server for a reply. Learn more at 
-[{alcinoe}\Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
+[Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
 <br/>
 <br/>
   
@@ -841,7 +841,7 @@ faster than in Delphi's TStringList. Furthermore,
 TALStringList is not a Unicode TStringList, but a 100% 
 Ansi StringList. You can start exploring this feature 
 with the demo located at 
-[{alcinoe}\Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
+[Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
 <br/>
 <br/>
 
@@ -856,7 +856,7 @@ you can execute PHP scripts within the Delphi program
 without the need for a web server. The component uses 
 the CGI/FastCGI interface (php-cgi.exe) of PHP to 
 communicate with the PHP engine. Learn more at 
-[{alcinoe}\Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
+[Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
 <br/>
 <br/>
   

@@ -1,13 +1,13 @@
 Alcinoe
 =======
 
-Alcinoe is a library of visual and non-visual components for 
-Delphi. These components can be used in commercial, shareware, 
-freeware, and open-source projects at no cost. Alcinoe is 
-compatible with <b>Delphi Athens 12.2</b>. If you find 
-this project useful, please consider giving it a 'star' on 
-GitHub. It doesn't cost anything, but it helps to promote 
-the code.
+<b>Alcinoe</b> is a comprehensive library of both visual and non-visual 
+components for Delphi. These components are freely available 
+for use in commercial, shareware, freeware, and open-source 
+projects. <b>Alcinoe</b> is fully compatible with <b>Delphi Athens 12.2</b>. 
+If you find this library helpful, please consider giving it a 
+star on GitHub. It’s free and greatly supports the project’s 
+visibility and growth.
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/star.jpg?raw=true" />
 
@@ -23,9 +23,9 @@ Example of an App Built with Alcinoe
 Embarcadero Quality Reports
 ---------------------------
 
-Please ask for the resolution of these quality reports. The 
-lack of resolution on these issues from Embarcadero has compelled 
-us to patch the original Delphi source files:
+Please request the resolution of these quality reports. Due 
+to the unresolved issues from Embarcadero, we have been 
+forced to apply patches to the original Delphi source files:
 
 * [Project option to define where to look/create the LaunchScreen.TemplateiOS directory](https://quality.embarcadero.com/browse/RSP-33503)
 * [Support for the new Android Splash Screen standard](https://quality.embarcadero.com/browse/RSP-39331)
@@ -71,63 +71,65 @@ us to patch the original Delphi source files:
 * [Missing Method Declarations in UITextView and UITextField Interfaces in iOSapi.UIKit.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941)
 * [Incorrect External Declarations in System.Skia.API for Android Linking in Athens 12.2](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997)
 
+
 Install Alcinoe
 ---------------
 
-To set up Alcinoe, first execute [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat). This 
-batch file handles a series of tasks: it retrieves and 
-patches the original Delphi source code, downloads the 
-necessary iOS/Android libraries, constructs the Alcinoe 
-JAR files, builds the BPL (Borland Package Library), 
-compiles tools from the [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/) directory, and 
-finally compiles all demos in the [{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/) 
-directory. Please be aware that some demos utilize 
+To set up Alcinoe, start by running the [CompileAll.bat](https://github.com/MagicFoundation/Alcinoe/tree/master/CompileAll.bat)
+script. This batch file performs a series of tasks, 
+including retrieving and patching the original Delphi 
+source code, downloading the necessary iOS/Android 
+libraries, generating the Alcinoe JAR files, building 
+the BPL (Borland Package Library), compiling the tools 
+in the [{alcinoe}\Tools](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/) 
+directory, and finally compiling all demos found in the 
+[{alcinoe}\Demos](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/) 
+directory. Please note that some demos require 
 components from [devexpress](https://www.devexpress.com/).
 
-If your goal is to use only the non-visual components 
-from Alcinoe, no further installation steps are necessary. 
-Just ensure to include [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) in your project's 
-search path.
+If you only need to use Alcinoe's non-visual components, 
+no further steps are necessary. Simply ensure that 
+[{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+is included in your project's search path.
 
-For those wanting to use Alcinoe's visual components 
-during design time, a few more steps are required. You 
-will need to install the BPL: Open Delphi, navigate to 
-Component > Install Packages... and select the BPL from 
-[{alcinoe}\Libraries\bpl\Alcinoe\Win32\\{YourDelphiVersion}\Alcinoe{YourDelphiVersion}.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
-Also, remember to include both [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) and all 
-subdirectories from [{alcinoe}\Embarcadero\\{YourDelphiVersion}](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
+To use Alcinoe's visual components at design time, you 
+will need to install the BPL. Open Delphi, go to 
+Component > Install Packages..., and select the BPL 
+from [{alcinoe}\Libraries\bpl\Alcinoe\Win32\\{YourDelphiVersion}\Alcinoe{YourDelphiVersion}.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
+Additionally, include both [{alcinoe}\Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
+and all subdirectories from [{alcinoe}\Embarcadero\\{YourDelphiVersion}](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
 in your search path.
 
 
 Update Alcinoe
 --------------
 
-We occasionally need to rename units, classes, and 
-functions. To assist you in automatically updating 
-these names in your project to align with the latest 
-version of Alcinoe, we offer a tool called CodeRenaming. 
-You can find this tool at the following link: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming)
+From time to time, we may need to rename units, classes, 
+and functions in Alcinoe. To help you automatically update 
+these names in your project and stay aligned with the 
+latest version of Alcinoe, we provide a tool called 
+<b>CodeRenaming</b>. You can find this tool here: [CodeRenaming](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/CodeRenaming)
 
 
-Propose a change using GitHub
------------------------------
+Propose a Change on GitHub
+--------------------------
 
-If you need to suggest a change to the Alcine directory, 
+If you'd like to suggest changes to the Alcinoe directory, 
 please follow these steps:
 
-1. To make changes to the Alcinoe repository, you'll need 
-   to fork it. Don't worry, forking simply involves 
-   creating a copy of the Alcinoe source code that you can 
-   edit as you wish.  
+1. <b>Fork the Alcinoe Repository</b>: First, you'll need 
+   to fork the repository. Forking creates a personal copy 
+   of the Alcinoe source code that you can modify as needed..  
    
    ![Fork](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/createfork.jpg?raw=true)
 
-2. Make the necessary edits to the source code, and then 
-   commit and push the changes to your forked repository.
+2. <b>Make Your Edits</b>: After forking, make the necessary 
+   changes to the source code. Then, commit and push these 
+   changes to your forked repository.
 
-3. Once you're satisfied with your changes, submit your 
-   proposal. To do so, go to your forked repository, select 
-   'Contribute,' and then choose 'Open a pull request.'  
+3. <b>Submit a Pull Request</b>: Once you're happy with your 
+   changes, go to your forked repository, click on 'Contribute,' 
+   and select 'Open a pull request' to submit your proposal.
    
    ![Contribute](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/openpullrequest.jpg?raw=true)
 <br/>

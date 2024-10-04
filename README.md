@@ -9,14 +9,14 @@ this project useful, please consider giving it a 'star' on
 GitHub. It doesn't cost anything, but it helps to promote 
 the code.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-24.jpg?raw=true" alt="like" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-24.jpg?raw=true" />
 
 
 Example of app made with Alcinoe
 --------------------------------
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtube_kiskis2.jpg?raw=true" alt="KisKis" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtubekiskis.jpg?raw=true"/>
 </a>
 
 
@@ -242,7 +242,7 @@ font to match Material 3’s bold, clear design principles. It
 supports HTML content, enabling you to easily include icons or 
 rich text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" width="540" style="width:540px;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" />
 
 ### 2. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 
@@ -305,6 +305,28 @@ Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation
 <br/>
 <br/>
   
+
+TALText Control
+===============
+
+TALText is a powerful component similar to TText, but with 
+enhanced capabilities, such as support for basic HTML text 
+formatting. Despite integrating HTML formatting, TALText 
+offers significant performance improvements over TText. 
+This is achieved through its use of a double-buffered engine, 
+which renders the text on an internal buffer and then 
+draws only this buffer onto the form during each paint cycle. 
+This design makes TALText extremely fast and efficient. 
+Additionally, TALText extends its functionality by 
+supporting mouse event handling that can detect the 
+specific HTML elements (e.g., span ID and bounds) under 
+the mouse pointer. This feature allows for interactive 
+text elements, making it perfect for applications requiring 
+responsive, dynamic text behavior. Learn more at 
+[{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/htmltext.png?raw=true" />
+<br/>
   
 Video player for FireMonkey
 ===========================
@@ -372,7 +394,7 @@ high-performance confetti falling animation. Learn more at
 AndroidMerger: Integrate AAR SDK in FMX Android app
 ===================================================
                                  
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-26.jpg?raw=true" width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/androidmerger.jpg?raw=true"/>
 
 An Android library, also called as Android Archive, includes 
 everything you need to build an app like source files, 

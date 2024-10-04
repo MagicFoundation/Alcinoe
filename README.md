@@ -214,7 +214,9 @@ outperform Skia—often by as much as 2x. While the performance
 of the OS graphics APIs is superior, Skia still offers the 
 benefit of a unified graphics engine across all platforms, 
 along with additional features like animated images.
-
+<br/>
+<br/>
+  
 
 Material 3 Controls for Delphi: A Modern UI Approach
 ====================================================

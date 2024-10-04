@@ -385,15 +385,16 @@ Learn more at [Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe
 Confetti Falling Animation
 ==========================
 
-ALConfetti is a lightweight and highly efficient Delphi 
-library designed to create a visually appealing, customizable 
-confetti falling animation. Built for performance and 
-flexibility, it allows developers to easily adjust parameters 
-like speed, size, and color, ensuring seamless integration 
-into any project. Whether for celebrations, notifications, 
-or dynamic visual effects, ALConfetti delivers a smooth, 
-high-performance animation experience. Learn more at 
-[Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
+**ALConfetti** is a lightweight and highly efficient 
+Delphi library designed to create visually appealing, 
+customizable confetti falling animations. Built for 
+performance and flexibility, it allows developers to 
+easily adjust parameters such as speed, size, and 
+color, ensuring seamless integration into any project. 
+Whether it's for celebrations, notifications, or 
+dynamic visual effects, **ALConfetti** delivers a 
+smooth, high-performance animation experience. 
+Learn more at [Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 <br/>
@@ -401,32 +402,30 @@ high-performance animation experience. Learn more at
   
 AndroidMerger: Integrate AAR SDK in FMX Android App
 ===================================================
-                                 
+
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/androidmerger.jpg?raw=true"/>
 
-An Android library, also called as Android Archive, includes 
-everything you need to build an app like source files, 
-resource files, manifest etc. This is the reason why AARs are 
-different from JARs. AARs can contain resource files as well 
-other than compiled byte code. 
+An Android library, also known as an Android Archive (AAR), 
+contains everything needed to build an app, including source 
+files, resource files, and the manifest. Unlike JARs, AARs 
+can include resource files in addition to compiled bytecode.
 
-Adding such library to Delphi project is long and convoluted 
-process consisting of extracting resources from library, 
-manually adding them to Delphi deployment files, compiling 
-R.Java class, checking dependancies, etc.
+Integrating an AAR into a Delphi project can be a long and 
+complex process, involving extracting resources, manually 
+adding them to Delphi deployment files, compiling the 
+**R.java** class, checking dependencies, and more.
 
-With AndroidMerger all of the above can now be done 
-automatically in a single command line. In brief 
-AndroidMerger will:
- 
-* Use graddle or internal implementation to list all dependencies.
-* Download libraries and dependancies from local or central maven repository.
-* Merge the resources of all AARs inside a single directory.
-* Merge the AndroidManifest files of all AARs inside AndroidManifest.template.xml.
-* Merge google-services.json in the resources of the project.
-* Create the R.jar with all resource IDs using aapt or aapt2.
-* Update the project file (.dproj) to include all resources.
-* Generate the Delphi native bridge file from the Java libraries.
+With **AndroidMerger**, this entire process is automated 
+in a single command line. In short, **AndroidMerger** will:
+
+- Use Gradle or an internal implementation to list all dependencies.
+- Download libraries and dependencies from local or central Maven repositories.
+- Merge the resources of all AARs into a single directory.
+- Combine the **AndroidManifest** files of all AARs into **AndroidManifest.template.xml**.
+- Merge **google-services.json** into the project's resources.
+- Create the **R.jar** with all resource IDs using **aapt** or **aapt2**.
+- Update the project file (*.dproj*) to include all resources.
+- Generate the Delphi native bridge file from the Java libraries.
 
 Learn more at [Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
 <br/>

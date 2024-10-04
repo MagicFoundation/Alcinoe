@@ -826,7 +826,7 @@ Learn more at [Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundat
 MongoDb client
 ==============
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/mongodb.webp?raw=true"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/mongodb.webp?raw=true"  width="600" style="width:600px;"/>
 
 This is a Delphi driver with **connection pooling** for accessing a **MongoDB** 
 server. Connection pooling refers to a cache of database connections that are 
@@ -847,13 +847,19 @@ Learn more at [Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFounda
 WebSocket client
 ================
 
-The WebSocket client for Delphi is implemented on top of 
-WinHTTP. WebSocket is a communication protocol that enables 
-two-way interactive communication sessions between a user's 
-browser and a server. This allows you to send messages to a 
-server and receive event-driven responses without having to 
-poll the server for a reply. Learn more at 
-[Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/websocket.png?raw=true"  width="540" style="width:540px;"/>
+
+The **WebSocket client** for Delphi is built on top of **WinHTTP** and 
+provides a communication protocol for two-way, interactive communication 
+sessions between a user's browser and a server. This enables sending 
+messages to a server and receiving event-driven responses without the 
+need for constant polling. 
+
+With WebSocket, real-time communication is streamlined, making it ideal 
+for applications that require low-latency, continuous data exchange 
+between the client and server. 
+
+Learn more at [Demos\ALWinHTTPWebSocketClient](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALWinHTTPWebSocketClient)
 <br/>
 <br/>
   
@@ -861,18 +867,20 @@ poll the server for a reply. Learn more at
 Fast TStringList
 ================
 
-TALStringList works the same as Delphi's TStringList, 
-except that it allows you to search for a name=value 
-using a quicksort algorithm when the list is sorted. 
-Additionally, TALStringList uses a locale-independent 
-algorithm (based on the 8-bit ordinal value of each 
-character) instead of the AnsiCompareText and 
-AnsiCompareStr used by Delphi's TStringList. As a 
-result, sorting in TALStringList is up to 10 times 
-faster than in Delphi's TStringList. Furthermore, 
-TALStringList is not a Unicode TStringList, but a 100% 
-Ansi StringList. You can start exploring this feature 
-with the demo located at 
+**TALStringList** functions similarly to Delphi's **TStringList**, 
+but with significant performance improvements. When the list is sorted, 
+it uses a quicksort algorithm to search for `name=value` pairs, enabling 
+much faster lookups. 
+
+Additionally, **TALStringList** uses a locale-independent sorting 
+algorithm based on the 8-bit ordinal value of each character, rather 
+than Delphi's **AnsiCompareText** and **AnsiCompareStr**. This results 
+in sorting speeds up to 10 times faster than Delphi's **TStringList**.
+
+Unlike **TStringList**, **TALStringList** is not Unicode-based but is 
+a fully **Ansi** string list, optimized for performance.
+
+You can start exploring this feature with the demo located at 
 [Demos\ALSortedListBenchmark](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALSortedListBenchmark)
 <br/>
 <br/>
@@ -881,14 +889,17 @@ with the demo located at
 PHP runner
 ==========
 
-ALPHPRunnerEngine is a simple yet useful component that 
-allows you to easily use PHP (any version) as a scripting 
-language in Delphi applications. With ALPhpRunnerEngine, 
-you can execute PHP scripts within the Delphi program 
-without the need for a web server. The component uses 
-the CGI/FastCGI interface (php-cgi.exe) of PHP to 
-communicate with the PHP engine. Learn more at 
-[Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
+**ALPHPRunnerEngine** is a simple yet powerful component that allows 
+you to seamlessly use **PHP** (any version) as a scripting language 
+within Delphi applications. With **ALPHPRunnerEngine**, you can 
+execute PHP scripts directly in your Delphi program without the 
+need for a web server. 
+
+This component leverages the **CGI/FastCGI** interface (using **php-cgi.exe**) 
+to communicate with the PHP engine, making it easy to integrate PHP 
+functionality into Delphi-based projects.
+
+Learn more at [Demos\ALPhpRunner](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALPhpRunner)
 <br/>
 <br/>
   
@@ -896,22 +907,28 @@ communicate with the PHP engine. Learn more at
 Memcached Client
 ================
 
-What is Memcached? Free & open source, high-performance,
-distributed memory object caching system, generic in
-nature, but intended for use in speeding up dynamic web
-applications by alleviating database load. Learn more at 
-[Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
+**What is Memcached?** Memcached is a free, open-source, 
+high-performance, distributed memory object caching system. 
+It is generic in nature but is primarily used to speed up 
+dynamic web applications by reducing database load. By 
+caching frequently accessed data in memory, Memcached helps 
+improve the performance and scalability of applications.
+
+Learn more at [Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
 <br/>
 <br/>
   
 
-GSM component
+GSM Component
 =============
 
-The TAlGSMComm component allows you to implement SMS text 
-messaging using the text-mode interface defined in the GSM 
-Technical Specification 07.05. Learn more at 
-[Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
+The **TAlGSMComm** component enables SMS text messaging 
+using the text-mode interface defined in the **GSM Technical 
+Specification 07.05**. This component allows for easy 
+integration of SMS functionality into your applications, 
+adhering to the standard protocols used in GSM networks.
+
+Learn more at [Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
 <br/>
 <br/>
   
@@ -919,24 +936,29 @@ Technical Specification 07.05. Learn more at
 SQLite3 Client
 ==============
 
-Query the SQLite3 database and get the results in XML format
-or in JSON/BSON format. Learn more at 
-[Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
+The **SQLite3 Client** for Delphi allows you to query an 
+**SQLite3** database and retrieve the results in multiple 
+formats, including **XML**, **JSON**, and **BSON**. 
+This flexibility makes it ideal for applications that 
+require data exchange in different formats, enabling 
+smooth integration with various systems and APIs.
+
+Learn more at [Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
 <br/>
 <br/>
   
 
-And much more
+And Much More
 =============
 
-* CGI runner 
+* CGI Runner 
 * Http Client (WinInet/WinHTTP)
 * MySQL Client 
 * NNTP Client
 * POP3 Client
 * SMTP Client
 * Xml Parser 
-* etc ...
+* Etc ...
 <br/>
 <br/>
 
@@ -944,33 +966,37 @@ And much more
 DELPHI D2009+ (UNICODE)
 =======================
 
-No mistake, Unicode was necessary for a product like Delphi. 
-However, the way Embarcadero decided to implement it is 
-questionable. They chose to migrate from 8-bit strings to 
-16-bit strings instead of implementing Unicode through 
-8-bit strings (UTF-8). This made the migration of some 
-Delphi applications prior to D2009 very difficult, especially 
-for applications that assumed that strings were 8-bit. 
-Here's a very good article about why you should avoid 
-using UTF-16: [utf8everywhere.org](http://www.utf8everywhere.org/)
+There's no doubt that **Unicode** was necessary for a 
+product like Delphi. However, the approach Embarcadero 
+chose for its implementation has raised some concerns. 
+Instead of adopting **UTF-8** through 8-bit strings, 
+they opted to migrate from 8-bit strings to 16-bit strings 
+(UTF-16). This decision made migrating Delphi applications 
+prior to D2009 challenging, especially for those that 
+relied on the assumption that strings were 8-bit. 
 
-Starting with D2009, AnsiString now has a codepage, 
-and some transliteration (OldCodePage => UTF-16 => 
-NewCodePage) will occur when assigning one AnsiString 
-with a different codepage to another AnsiString with 
-a different codepage. To avoid this, it's important to 
-always set the project option to the code page you want 
-(e.g., 65001 for UTF-8) and also to call 
-SetMultiByteConversionCodePage(CP_UTF8) at the beginning 
-of the program. Additionally, it's crucial to avoid using 
-two different string types (e.g., UTF8String and 
-AnsiString) even if they have the same codepage because 
-the compiler, at compile time, doesn't know that the 
-codepage is the same and will do a transliteration 
-(e.g., MyAnsiStringUTF8 := MyUTF8String will result in 
-UTF-8 => UTF-16 => UTF-8). This is why we use only 
-AnsiString in all our code instead of UTF8String (even 
-when we assume that the string contains only UTF-8 
-characters) to avoid these transliterations. Always follow 
-the rule of using only AnsiString with 
-SetMultiByteConversionCodePage(CP_UTF8).
+For more insights into why **UTF-16** can be problematic, 
+here's an excellent article: [utf8everywhere.org](http://www.utf8everywhere.org/).
+
+Starting with **D2009**, **AnsiString** now has a code 
+page, and some transliteration occurs when assigning an 
+**AnsiString** with one code page to another **AnsiString** 
+with a different code page (e.g., OldCodePage => UTF-16 => 
+NewCodePage). To prevent unwanted transliterations, it's 
+crucial to set the project's code page to the desired 
+one (e.g., 65001 for UTF-8) and call 
+`SetMultiByteConversionCodePage(CP_UTF8)` at the beginning 
+of the program.
+
+Additionally, avoid mixing different string types 
+(e.g., **UTF8String** and **AnsiString**) even if they share 
+the same code page. The Delphi compiler doesn't recognize this 
+at compile time and will still perform unnecessary 
+transliterations (e.g., `MyAnsiStringUTF8 := MyUTF8String` 
+results in **UTF-8 => UTF-16 => UTF-8**).
+
+To minimize these issues, it's best to use **AnsiString** 
+exclusively in your code, even when handling UTF-8 content. 
+Always ensure that **AnsiString** is paired with 
+`SetMultiByteConversionCodePage(CP_UTF8)` to prevent 
+undesired conversions. 

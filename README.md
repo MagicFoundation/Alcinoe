@@ -197,7 +197,7 @@ For example, on a Google Pixel 7, I can render 2000 textures
 simultaneously at 90 FPS using TCanvasGPU. However, with 
 Skia, I can only render 500 images at the same frame rate. 
 You can verify this using the demo app located at 
-[{alcinoe}/Demos/ALFmxGraphics](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxGraphics).
+[Demos/ALFmxGraphics](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxGraphics).
 
 #### The Chosen Approach: ####
 
@@ -303,7 +303,7 @@ create modern, high-performance apps with a polished
 Material 3 appearance, without compromising on speed or 
 cross-platform compatibility.
 
-Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 <br/>
 <br/>
   
@@ -325,7 +325,7 @@ specific HTML elements (e.g., span ID and bounds) under
 the mouse pointer. This feature allows for interactive 
 text elements, making it perfect for applications requiring 
 responsive, dynamic text behavior. Learn more at 
-[{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+[Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/htmltext.png?raw=true" />
 <br/>
@@ -352,8 +352,8 @@ AVPlayer with support for HLS, similar to ExoPlayer.
   <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
-Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
-with the demo located at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
+Learn more at [Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
+with the demo located at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
 <br/>
 <br/>
 
@@ -377,7 +377,7 @@ or any other third-party software.
 With the TALWebRTC component, you can easily incorporate video 
 and audio chat into your applications, giving your users a more 
 interactive and immersive experience! Learn more at 
-[{alcinoe}/Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
+[Demos/ALLiveVideoChat](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALLiveVideoChat)
 <br/>
 <br/>
   
@@ -393,7 +393,7 @@ like speed, size, and color, ensuring seamless integration
 into any project. Whether for celebrations, notifications, 
 or dynamic visual effects, ALConfetti delivers a smooth, 
 high-performance animation experience. Learn more at 
-[{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
+[Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 <br/>
@@ -428,7 +428,7 @@ AndroidMerger will:
 * Update the project file (.dproj) to include all resources.
 * Generate the Delphi native bridge file from the Java libraries.
 
-Learn more at [{alcinoe}/Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
+Learn more at [Tools/AndroidMerger](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/AndroidMerger)
 <br/>
 <br/>
   
@@ -439,14 +439,14 @@ DeployMan/DeployProjNormalizer/DProjNormalizer
 DeployMan, DeployProjNormalizer, and DProjNormalizer are essential tools 
 for managing Delphi app deployments. DeployMan greatly simplifies the 
 deployment of files and folders for iOS and Android apps, ideal for 
-handling extensive files like 3rd party SDKs (learn more at [{alcinoe}/Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan)). 
+handling extensive files like 3rd party SDKs (learn more at [Tools/DeployMan](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployMan)). 
 DeployProjNormalizer allows you to create a new deployproj file from 
 scratch using the dproj as a reference and normalizes it by ordering 
 the nodes, facilitating the comparison of different revisions with diff 
-tools (learn more at [{alcinoe}/Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)). 
+tools (learn more at [Tools/DeployProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DeployProjNormalizer)). 
 Lastly, DProjNormalizer orders the nodes in a DProj file to maintain consistency 
 across commits, simplifying the task of comparing differences 
-(learn more at [{alcinoe}/Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer). 
+(learn more at [Tools/DProjNormalizer](https://github.com/MagicFoundation/Alcinoe/tree/master/Tools/DProjNormalizer). 
 <br/>
 <br/>
   
@@ -473,7 +473,7 @@ patterns, moving beyond the traditional ease-in or ease-out sequences.
 </p>
 
 Learn more at 
-[{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+[Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
 <br/>
 <br/>
   
@@ -495,7 +495,7 @@ that a broad spectrum of animation behaviors can be realized, catering to the
 specific nuances of different applications.
 
 Learn more at 
-[{alcinoe}/Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
+[Demos/ALAnimation](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALAnimation)
 
 <br clear="left"/>
 <br/>
@@ -527,7 +527,7 @@ Android's scrolling mechanisms, the TALScrollEngine offers Delphi developers a
 top-notch scrolling experience, rooted in established and trusted technologies.
 
 Learn more at 
-[{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
+[Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
 <br clear="right"/>
 <br/>
@@ -573,7 +573,7 @@ Google APIs use the OAuth 2.0 protocol for authentication
 and authorization. You can use the function 
 ALGenerateGoogleOAuth2AccessToken to generate an OAuth 2.0 
 Access Token. Learn more at 
-[{alcinoe}/Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
+[Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Cipher.pas) 
 <br/>
 <br/>
   
@@ -649,7 +649,7 @@ To access the document nodes :
     MyJsonDoc.GetChildNodeValueDateTime('birth', Now{default if node not exists});
 ```
 
-Learn more at [{alcinoe}/Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)
+Learn more at [Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.JSONDoc.pas)
 <br/>
 <br/>
   
@@ -705,7 +705,7 @@ Example :
     end;
 ```
 
-Learn more at [{alcinoe}/Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
+Learn more at [Source/Alcinoe.ImageMagick.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.ImageMagick.pas)
 <br/>
 <br/>
   
@@ -788,7 +788,7 @@ it. However, TALInit is designed to be as efficient as the traditional way
 of initializing fields. This means developers can enjoy the convenience
 without having to worry about any hidden costs in execution time.
 
-Learn more at [{alcinoe}/Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
+Learn more at [Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALRTTI)
 <br/>
 <br/>
 
@@ -807,7 +807,7 @@ all the connections are being used, a new connection is
 made and added to the pool. Connection pooling also reduces 
 the amount of time a user must wait to establish a 
 connection to the database. Learn more at 
-[{alcinoe}/Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
+[Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
 <br/>
 <br/>
   
@@ -868,7 +868,7 @@ What is Memcached? Free & open source, high-performance,
 distributed memory object caching system, generic in
 nature, but intended for use in speeding up dynamic web
 applications by alleviating database load. Learn more at 
-[{alcinoe}/Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
+[Source/Alcinoe.MemCached.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MemCached.Client.pas)
 <br/>
 <br/>
   
@@ -879,7 +879,7 @@ GSM component
 The TAlGSMComm component allows you to implement SMS text 
 messaging using the text-mode interface defined in the GSM 
 Technical Specification 07.05. Learn more at 
-[{alcinoe}/Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
+[Source/Alcinoe.GSMComm.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.GSMComm.pas)
 <br/>
 <br/>
   
@@ -889,7 +889,7 @@ SQLite3 Client
 
 Query the SQLite3 database and get the results in XML format
 or in JSON/BSON format. Learn more at 
-[{alcinoe}/Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
+[Source/Alcinoe.Sqlite3.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.Sqlite3.Client.pas)
 <br/>
 <br/>
   

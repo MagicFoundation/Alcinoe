@@ -9,7 +9,7 @@ this project useful, please consider giving it a 'star' on
 GitHub. It doesn't cost anything, but it helps to promote 
 the code.
 
-<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-24.jpg?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
 
 
 Example of app made with Alcinoe
@@ -120,7 +120,7 @@ please follow these steps:
    creating a copy of the Alcinoe source code that you can 
    edit as you wish.  
    
-   ![Fork](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-27.jpg?raw=true)
+   ![Fork](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/createfork.jpg?raw=true)
 
 2. Make the necessary edits to the source code, and then 
    commit and push the changes to your forked repository.
@@ -129,7 +129,7 @@ please follow these steps:
    proposal. To do so, go to your forked repository, select 
    'Contribute,' and then choose 'Open a pull request.'  
    
-   ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-28.jpg?raw=true)
+   ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/openpullrequest.jpg?raw=true)
 <br/>
 
 
@@ -306,8 +306,8 @@ Learn more at [{alcinoe}/Demos/ALFmxControls](https://github.com/MagicFoundation
 <br/>
   
 
-TALText Control
-===============
+High-Performance Text Control with HTML Formatting and Interactive Capabilities
+===============================================================================
 
 TALText is a powerful component similar to TText, but with 
 enhanced capabilities, such as support for basic HTML text 
@@ -345,9 +345,9 @@ designed to be easy to customize and extend. For iOS, I use
 AVPlayer with support for HLS, similar to ExoPlayer.
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
 Learn more at [{alcinoe}/Source/Alcinoe.FMX.VideoPlayer.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.FMX.VideoPlayer.pas) and you can also start exploring this feature 
@@ -369,7 +369,7 @@ peer-to-peer, without requiring that the user installs plug-ins
 or any other third-party software.
 
 <p align="center">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-25.jpg?raw=true" alt="Delphi WebRTC wrapper" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
 With the TALWebRTC component, you can easily incorporate video 
@@ -383,8 +383,14 @@ interactive and immersive experience! Learn more at
 Confetti Falling Animation
 ==========================
 
-ALConfetti is a vanilla Delphi library for creating a configurable, 
-high-performance confetti falling animation. Learn more at 
+ALConfetti is a lightweight and highly efficient Delphi 
+library designed to create a visually appealing, customizable 
+confetti falling animation. Built for performance and 
+flexibility, it allows developers to easily adjust parameters 
+like speed, size, and color, ensuring seamless integration 
+into any project. Whether for celebrations, notifications, 
+or dynamic visual effects, ALConfetti delivers a smooth, 
+high-performance animation experience. Learn more at 
 [{alcinoe}/Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
 <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
@@ -592,9 +598,9 @@ your photos beautiful and expressive in just minutes!
 Learn more at [{alcinoe}\Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-18.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/img-19.jpg?raw=true" alt="video player for FireMonkey" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter2.jpg?raw=true" width="320" style="width:320px;"/>
 </p>
 <br/>
   

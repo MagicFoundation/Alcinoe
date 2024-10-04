@@ -95,9 +95,9 @@ is included in your project's search path.
 To use Alcinoe's visual components at design time, you 
 will need to install the BPL. Open Delphi, go to 
 Component > Install Packages..., and select the BPL 
-from [Libraries\bpl\Alcinoe\Win32\\{YourDelphiVersion}\Alcinoe{YourDelphiVersion}.bpl](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe/Win32). 
+from [Libraries\bpl\Alcinoe](https://github.com/MagicFoundation/Alcinoe/tree/master/Libraries/bpl/Alcinoe). 
 Additionally, include both [Source](https://github.com/MagicFoundation/Alcinoe/tree/master/Source) 
-and all subdirectories from [Embarcadero\\{YourDelphiVersion}](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/) 
+and all subdirectories from [Embarcadero\Athens](https://github.com/MagicFoundation/Alcinoe/tree/master/Embarcadero/Athens/) 
 in your search path.
 
 

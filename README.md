@@ -826,18 +826,20 @@ Learn more at [Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundat
 MongoDb client
 ==============
 
-This is a Delphi driver (with connection pooling) for 
-accessing a MongoDB server. Connection pooling is a cache 
-of database connections that are maintained so that they 
-can be reused when future requests to the database are 
-required. After a connection is created in connection 
-pooling, it is placed in the pool and is used over again so 
-that a new connection does not have to be established. If 
-all the connections are being used, a new connection is 
-made and added to the pool. Connection pooling also reduces 
-the amount of time a user must wait to establish a 
-connection to the database. Learn more at 
-[Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/mongodb.webp?raw=true"/>
+
+This is a Delphi driver with **connection pooling** for accessing a **MongoDB** 
+server. Connection pooling refers to a cache of database connections that are 
+maintained for reuse, reducing the need to establish a new connection for 
+each request. Once a connection is created, it is placed in the pool and can 
+be reused for future database requests. 
+
+If all connections in the pool are in use, a new connection is created and 
+added to the pool. This approach reduces the time required to establish 
+connections, enhancing performance and efficiency when interacting with 
+the MongoDB database.
+
+Learn more at [Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFoundation/Alcinoe/tree/master/Source/Alcinoe.MongoDB.Client.pas)
 <br/>
 <br/>
   

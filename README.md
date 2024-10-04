@@ -602,7 +602,7 @@ Learn more at [Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alc
 Android/iOS VKontakte/Facebook SDK login
 ========================================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/facebooklogin.webp?raw=true" width="540" style="width:540px;"/>
+<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/facebooklogin.jpg?raw=true" width="540" style="width:540px;"/>
 
 The **VKontakte/Facebook SDK** for Android and iOS allows users 
 to sign into your app using their VKontakte or Facebook credentials. 

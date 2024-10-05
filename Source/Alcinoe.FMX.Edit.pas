@@ -911,6 +911,13 @@ type
     property BufLabelTextDrawableRect: TRectF read fBufLabelTextDrawableRect;
     property BufSupportingTextDrawable: TALDrawable read fBufSupportingTextDrawable;
     property BufSupportingTextDrawableRect: TRectF read fBufSupportingTextDrawableRect;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadtextPrompt(Reader: TReader);
+    procedure ReadtextPromptColor(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -1064,6 +1071,7 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
+  System.UIConsts,
   FMX.Types3D,
   FMX.Utils,
   {$IF defined(android)}
@@ -4175,6 +4183,33 @@ begin
   ALFreeAndNil(fEditControl);
   inherited Destroy;
 end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBaseEdit.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('TextPrompt', ReadTextPrompt{ReadData}, nil{WriteData}, false{hasdata});
+  Filer.DefineProperty('TextPromptColor', ReadTextPromptColor{ReadData}, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBaseEdit.ReadTextPrompt(Reader: TReader);
+begin
+  PromptText := Reader.ReadString;
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALBaseEdit.ReadTextPromptColor(Reader: TReader);
+begin
+  Var LColor: Integer;
+  if IdentToAlphaColor(Reader.ReadIdent, Lcolor) then PromptTextColor := LColor;
+end;
+{$ENDIF}
 
 {*********************************}
 procedure TALBaseEdit.AlignToPixel;

@@ -841,6 +841,12 @@ type
   protected
     procedure SetTextSettings(const Value: TALTextSettings); reintroduce;
     function CreateTextSettings: TALBaseTextSettings; override;
+  {$IF defined(ALBackwardCompatible)}
+  private
+    procedure ReadTextIsHtml(Reader: TReader);
+  protected
+    procedure DefineProperties(Filer: TFiler); override;
+  {$ENDIF}
   public
     property Elements;
   published
@@ -3828,6 +3834,23 @@ function TALBaseText.IsYRadiusStored: Boolean;
 begin
   Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
 end;
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALText.DefineProperties(Filer: TFiler);
+begin
+  inherited;
+  Filer.DefineProperty('TextIsHtml', ReadTextIsHtml{ReadData}, nil{WriteData}, false{hasdata});
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALText.ReadTextIsHtml(Reader: TReader);
+begin
+  TextSettings.IsHtml := Reader.ReadBoolean;
+end;
+{$ENDIF}
 
 {*******************************************************}
 function TALText.CreateTextSettings: TALBaseTextSettings;

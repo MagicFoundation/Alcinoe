@@ -2735,7 +2735,7 @@ begin
         If not ALTryStrToInt('$' + AHexValue.Substring(2, 2), G) or (G < low(Byte)) or (G > high(Byte)) then exit(false);
         If not ALTryStrToInt('$' + AHexValue.Substring(4, 2), B) or (B < low(Byte)) or (B > high(Byte)) then exit(false);
       end;
-    8: // RRGGBBAA
+    8: // AARRGGBB
       begin
         If not ALTryStrToInt('$' + AHexValue.Substring(0, 2), A) or (A < low(Byte)) or (A > high(Byte)) then exit(false);
         If not ALTryStrToInt('$' + AHexValue.Substring(2, 2), R) or (R < low(Byte)) or (R > high(Byte)) then exit(false);

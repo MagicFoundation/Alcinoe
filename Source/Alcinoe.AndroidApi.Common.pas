@@ -54,7 +54,7 @@ type
   end;
 
   {********************************************}
-  [JavaSignature('com/alcinoe/util/ALFileUtil')]
+  [JavaSignature('io/magicfoundation/alcinoe/util/ALFileUtil')]
   JALFileUtil = interface(JObject)
     ['{5F130085-03D3-4436-87BB-84A3BB9F22E0}']
   end;
@@ -66,7 +66,7 @@ type
   end;
 
   {******************************************************************}
-  [JavaSignature('com/alcinoe/datepicker/ALDatePickerDialogListener')]
+  [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialogListener')]
   JALDatePickerDialogListener = interface(IJavaInstance)
     ['{9A145783-462B-4E51-AAFC-48F68C79C3EA}']
     procedure onBtnClick(which: integer; year: integer; month: integer; dayOfMonth: integer); cdecl;
@@ -85,7 +85,7 @@ type
   end;
 
   {**********************************************************}
-  [JavaSignature('com/alcinoe/datepicker/ALDatePickerDialog')]
+  [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialog')]
   JALDatePickerDialog = interface(JObject)
     ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
     procedure show(
@@ -102,7 +102,7 @@ type
   end;
 
   {*********************************************************}
-  [JavaSignature('com/alcinoe/edittext/ALKeyPreImeListener')]
+  [JavaSignature('io/magicfoundation/alcinoe/edittext/ALKeyPreImeListener')]
   JALKeyPreImeListener = interface(IJavaInstance)
     ['{343578E2-962A-461E-ADD7-47A1E4BAA1D9}']
     function onKeyPreIme(keyCode: Integer; event: JKeyEvent): Boolean; cdecl;
@@ -119,7 +119,7 @@ type
   end;
 
   {************************************************}
-  [JavaSignature('com/alcinoe/edittext/ALEditText')]
+  [JavaSignature('io/magicfoundation/alcinoe/edittext/ALEditText')]
   JALEditText = interface(JEditText)
     ['{A3E765A1-44EB-45C0-9AA5-19A38C029CE5}']
     procedure setKeyPreImeListener(listener: JALKeyPreImeListener); cdecl;
@@ -243,7 +243,7 @@ type
   end;
 
   {****************************************************************}
-  [JavaSignature('com/alcinoe/content/ALBroadcastReceiverListener')]
+  [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiverListener')]
   JALBroadcastReceiverListener = interface(IJavaInstance)
     ['{8AD95D78-A7FC-4613-8D94-55CC19EB1565}']
     procedure onReceive(context: JContext; intent: JIntent); cdecl;
@@ -257,7 +257,7 @@ type
   end;
 
   {********************************************************}
-  [JavaSignature('com/alcinoe/content/ALBroadcastReceiver')]
+  [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiver')]
   JALBroadcastReceiver = interface(JBroadcastReceiver)
     ['{42427B26-C270-4832-8645-F788FCB549CB}']
     procedure setListener(listener: JALBroadcastReceiverListener); cdecl;

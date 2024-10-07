@@ -1,4 +1,4 @@
-package com.alcinoe.firebase.messaging;
+package io.magicfoundation.alcinoe.firebase.messaging;
 
 import java.util.Map;
 import org.json.JSONObject;

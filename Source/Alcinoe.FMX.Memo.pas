@@ -523,7 +523,7 @@ begin
   Result := TypeInfo(IALIosMemoTextView);
 end;
 
-{************************************************}
+{**********************************************}
 function TALIosMemoTextView.GetView: UITextView;
 begin
   Result := inherited GetView<UITextView>;

@@ -1,4 +1,4 @@
-package com.alcinoe.webrtc;
+package io.magicfoundation.alcinoe.webrtc;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

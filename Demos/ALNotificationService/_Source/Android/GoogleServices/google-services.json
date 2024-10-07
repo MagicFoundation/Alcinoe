@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:362697684107:android:d39c4bc6df5853ec37508e",
         "android_client_info": {
-          "package_name": "com.alcinoe.alnotificationservicedemo"
+          "package_name": "io.magicfoundation.alcinoe.alnotificationservicedemo"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "362697684107-s2bk1sotd1d815eg3756nnqleulcs5ki.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.alcinoe.alnotificationservicedemo"
+                "bundle_id": "io.magicfoundation.alcinoe.alnotificationservicedemo"
               }
             }
           ]

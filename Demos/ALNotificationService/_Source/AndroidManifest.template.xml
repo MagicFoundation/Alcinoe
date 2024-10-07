@@ -97,8 +97,8 @@
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->
     
-    <!-- ===== com.alcinoe.alcinoe-firebase-messaging ===== -->
-    <service android:name="com.alcinoe.firebase.messaging.ALFirebaseMessagingService"
+    <!-- ===== io.magicfoundation.alcinoe.alcinoe-firebase-messaging ===== -->
+    <service android:name="io.magicfoundation.alcinoe.firebase.messaging.ALFirebaseMessagingService"
              android:directBootAware="true"
              android:exported="true">
       <intent-filter>

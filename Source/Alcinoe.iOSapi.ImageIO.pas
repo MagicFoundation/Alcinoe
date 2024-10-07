@@ -1,12 +1,13 @@
+unit Alcinoe.iOSapi.ImageIO;
+
+interface
+
+{$I Alcinoe.inc}
+
 {$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1936 has been resolved. If resolved, remove this unit.'}
   {$MESSAGE WARN 'Check if Macapi.ImageIO.pas was not updated and adjust the IFDEF.'}
 {$ENDIF}
-unit Alcinoe.iOSapi.ImageIO;
-
-{$WEAKPACKAGEUNIT}
-
-interface
 
 uses
   Posix.StdDef,

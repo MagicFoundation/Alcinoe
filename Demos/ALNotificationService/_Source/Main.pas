@@ -102,7 +102,7 @@ const
   //The info are taken from an account (wonderful.life.photos@gmail.com) that I
   //created specifically for this demo. I retrieve it like this:
   // * go to Firebase console project settings (ALNotificationServiceDemo)
-  //   https://console.firebase.google.com/project/alnotificationservicedemo/settings/general/android:com.alcinoe.alnotificationservicedemo
+  //   https://console.firebase.google.com/project/alnotificationservicedemo/settings/general/android:io.magicfoundation.alcinoe.alnotificationservicedemo
   // * Then click on clound messaging and click on Manage Service Accounts under Firebase Cloud Messaging API (V1)
   // * Then download the json key associated with the Service accounts for project "ALNotificationServiceDemo"
   // * find all the info below inside the json key you just downloaded

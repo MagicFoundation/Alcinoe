@@ -1,4 +1,4 @@
-package com.alcinoe.appsflyer;
+package io.magicfoundation.alcinoe.appsflyer;
 
 import java.util.HashMap;
 import android.app.Application;

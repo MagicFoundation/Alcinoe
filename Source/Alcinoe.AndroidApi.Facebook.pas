@@ -52,7 +52,7 @@ type
     {class} function canShow: boolean; cdecl;
     {class} procedure show(activity: JActivity; contentUrl: Jnet_Uri; quote: JString); cdecl;
   end;
-  [JavaSignature('com/alcinoe/facebook/share/ALFacebookShareLinkDialog')]
+  [JavaSignature('io/magicfoundation/alcinoe/facebook/share/ALFacebookShareLinkDialog')]
   JALFacebookShareLinkDialog = interface(JObject)
     ['{CB1C33F4-A26F-4543-8899-63D25EF5C6E0}']
   end;

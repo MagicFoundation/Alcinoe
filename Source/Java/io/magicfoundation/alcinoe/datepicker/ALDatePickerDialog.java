@@ -1,4 +1,4 @@
-package com.alcinoe.datepicker;
+package io.magicfoundation.alcinoe.datepicker;
 
 import android.app.DatePickerDialog;
 import android.widget.DatePicker;

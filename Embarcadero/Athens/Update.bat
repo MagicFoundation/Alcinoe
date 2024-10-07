@@ -19,76 +19,21 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
 
-SET FileName=%ALBaseDir%\Embarcadero\Athens\internet
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-IF EXIST "%FileName%" goto ERROR
-mkdir "%FileName%"
-
-SET FileName=%ALBaseDir%\Embarcadero\Athens\Indy10
-IF EXIST "%FileName%" rmdir /s /q "%FileName%"
-IF EXIST "%FileName%" goto ERROR
-mkdir "%FileName%"
-mkdir "%FileName%\Core"
-mkdir "%FileName%\Protocols"
-mkdir "%FileName%\System"
-
 SET FileName=%ALBaseDir%\Embarcadero\Athens\rtl
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
-mkdir "%FileName%\ios"
-mkdir "%FileName%\osx"
-mkdir "%FileName%\android"
 mkdir "%FileName%\common"
-mkdir "%FileName%\net"
 
 echo Copy "%EmbSourceDir%\fmx"
 xcopy /Q "%EmbSourceDir%\fmx" "%ALBaseDir%\Embarcadero\Athens\fmx"
 IF ERRORLEVEL 1 goto ERROR
 
-echo Copy "%EmbSourceDir%\internet"
-xcopy /Q "%EmbSourceDir%\internet" "%ALBaseDir%\Embarcadero\Athens\internet"
-IF ERRORLEVEL 1 goto ERROR
-
-echo Copy "%EmbSourceDir%\Indy10\Core"
-xcopy /Q "%EmbSourceDir%\Indy10\Core" "%ALBaseDir%\Embarcadero\Athens\Indy10\Core"
-IF ERRORLEVEL 1 goto ERROR
-
-echo Copy "%EmbSourceDir%\Indy10\Protocols"
-xcopy /Q "%EmbSourceDir%\Indy10\Protocols" "%ALBaseDir%\Embarcadero\Athens\Indy10\Protocols"
-IF ERRORLEVEL 1 goto ERROR
-
-echo Copy "%EmbSourceDir%\Indy10\System"
-xcopy /Q "%EmbSourceDir%\Indy10\System" "%ALBaseDir%\Embarcadero\Athens\Indy10\System"
-IF ERRORLEVEL 1 goto ERROR
-
-IF EXIST "%EmbSourceDir%\rtl\ios" (
-  echo Copy "%EmbSourceDir%\rtl\ios"
-  xcopy /Q "%EmbSourceDir%\rtl\ios" "%ALBaseDir%\Embarcadero\Athens\rtl\ios"
+IF EXIST "%EmbSourceDir%\rtl\common\System.Skia.API.pas" (
+  echo Copy "%EmbSourceDir%\rtl\common\System.Skia.API.pas"
+  copy /Y "%EmbSourceDir%\rtl\common\System.Skia.API.pas" "%ALBaseDir%\Embarcadero\Athens\rtl\common\System.Skia.API.pas"
   IF ERRORLEVEL 1 goto ERROR
 )
-
-IF EXIST "%EmbSourceDir%\rtl\osx" (
-  echo Copy "%EmbSourceDir%\rtl\osx"
-  xcopy /Q "%EmbSourceDir%\rtl\osx" "%ALBaseDir%\Embarcadero\Athens\rtl\osx"
-  IF ERRORLEVEL 1 goto ERROR
-)
-
-IF EXIST "%EmbSourceDir%\rtl\android" (
-  echo Copy "%EmbSourceDir%\rtl\android"
-  xcopy /Q "%EmbSourceDir%\rtl\android" "%ALBaseDir%\Embarcadero\Athens\rtl\android"
-  IF ERRORLEVEL 1 goto ERROR
-)
-
-IF EXIST "%EmbSourceDir%\rtl\common" (
-  echo Copy "%EmbSourceDir%\rtl\common"
-  xcopy /Q "%EmbSourceDir%\rtl\common" "%ALBaseDir%\Embarcadero\Athens\rtl\common"
-  IF ERRORLEVEL 1 goto ERROR
-)
-
-echo Copy "%EmbSourceDir%\rtl\net"
-xcopy /Q "%EmbSourceDir%\rtl\net" "%ALBaseDir%\Embarcadero\Athens\rtl\net"
-IF ERRORLEVEL 1 goto ERROR
 
 echo Patch the locally copied source code
 git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace --whitespace=nowarn .\Embarcadero\Athens\Athens.patch -v

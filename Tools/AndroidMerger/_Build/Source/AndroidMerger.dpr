@@ -1979,7 +1979,7 @@ begin
       {$IF defined(DEBUG)}
       LParamLst.Clear;
       LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
-      LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;com.alcinoe:alcinoe-firebase-messaging:1.0.1');
+      LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1');
       LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
       LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
       LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');

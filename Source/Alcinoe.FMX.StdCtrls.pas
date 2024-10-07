@@ -2142,6 +2142,9 @@ uses
   FMX.Canvas.GPU,
   Alcinoe.FMX.Types3D,
   {$ENDIF}
+  {$IF DEFINED(IOS)}
+  iOSapi.CoreGraphics,
+  {$ENDIF}
   {$IF DEFINED(ALMacOS)}
   Macapi.CoreGraphics,
   {$ENDIF}

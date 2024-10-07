@@ -45,5 +45,3 @@ type
 implementation
 
 end.
-
-

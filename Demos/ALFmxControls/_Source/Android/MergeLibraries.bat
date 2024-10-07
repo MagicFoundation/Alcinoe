@@ -9,9 +9,9 @@ if "%ALBaseDir%"=="" (
 )
 
 set Libraries=%ALBaseDir%\Demos\ALFmxControls\_Source\Android\App\
-set Libraries=%Libraries%;com.alcinoe:alcinoe-edittext:1.0.0
-set Libraries=%Libraries%;com.alcinoe:alcinoe-datepicker:1.0.0
-set Libraries=%Libraries%;com.alcinoe:alcinoe-common:1.0.1
+set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-edittext:1.0.0
+set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-datepicker:1.0.0
+set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-common:1.0.1
 set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-core:2.19.1
 set Libraries=%Libraries%;com.google.android.exoplayer:exoplayer-hls:2.19.1
 

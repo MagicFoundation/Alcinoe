@@ -6,7 +6,7 @@
     <PropertyGroup>
         <DeviceId Condition="'$(Platform)'=='Android'"/>
         <DeviceId Condition="'$(Platform)'=='Android64'"/>
-        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">62b33d7c49d0205577b0ff7e84ca992988118bd2</DeviceId>
+        <DeviceId Condition="'$(Platform)'=='iOSDevice64'">00008112-001679590AC1A01E</DeviceId>
         <DeviceId Condition="'$(Platform)'=='iOSSimARM64'">BABDA219-1CEE-43B2-8F32-B7242E9705B5</DeviceId>
     </PropertyGroup>
     <ItemGroup Condition="'$(Platform)'=='OSX64'"/>
@@ -66,6 +66,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-pl\values-pl.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-pl\</RemoteDir>
+            <RemoteName>values-pl.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-pt-rBR\values-pt-rBR.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-pt-rBR\</RemoteDir>
             <RemoteName>values-pt-rBR.xml</RemoteName>
@@ -78,15 +87,6 @@
         <DeployFile Include="Android\Merged\res\values-ur\values-ur.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-ur\</RemoteDir>
             <RemoteName>values-ur.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-pl\values-pl.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-pl\</RemoteDir>
-            <RemoteName>values-pl.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -156,18 +156,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-km\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-km\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\color\common_google_signin_btn_tint.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\color\</RemoteDir>
+            <RemoteName>common_google_signin_btn_tint.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\color\common_google_signin_btn_tint.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\color\</RemoteDir>
-            <RemoteName>common_google_signin_btn_tint.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-km\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-km\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -264,18 +264,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rGB\values-en-rGB.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
-            <RemoteName>values-en-rGB.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ca\values-ca.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ca\</RemoteDir>
+            <RemoteName>values-ca.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ca\values-ca.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ca\</RemoteDir>
-            <RemoteName>values-ca.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rGB\values-en-rGB.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
+            <RemoteName>values-en-rGB.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -336,18 +336,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rIN\values-en-rIN.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rIN\</RemoteDir>
-            <RemoteName>values-en-rIN.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
+            <RemoteName>values-as.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
-            <RemoteName>values-as.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rIN\values-en-rIN.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rIN\</RemoteDir>
+            <RemoteName>values-en-rIN.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -390,18 +390,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-sk\values-sk.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-sk\</RemoteDir>
-            <RemoteName>values-sk.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ar\values-ar.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ar\</RemoteDir>
+            <RemoteName>values-ar.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ar\values-ar.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ar\</RemoteDir>
-            <RemoteName>values-ar.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-sk\values-sk.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-sk\</RemoteDir>
+            <RemoteName>values-sk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -624,18 +624,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-gu\values-gu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-gu\</RemoteDir>
-            <RemoteName>values-gu.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-bs\values-bs.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-bs\</RemoteDir>
+            <RemoteName>values-bs.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-bs\values-bs.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-bs\</RemoteDir>
-            <RemoteName>values-bs.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-gu\values-gu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-gu\</RemoteDir>
+            <RemoteName>values-gu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1065,18 +1065,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1092,18 +1092,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-et\values-et.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-et\</RemoteDir>
-            <RemoteName>values-et.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-az\values-az.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-az\</RemoteDir>
+            <RemoteName>values-az.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-az\values-az.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-az\</RemoteDir>
-            <RemoteName>values-az.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-et\values-et.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-et\</RemoteDir>
+            <RemoteName>values-et.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1254,18 +1254,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zu\values-zu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
-            <RemoteName>values-zu.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ro\values-ro.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
+            <RemoteName>values-ro.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ro\values-ro.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
-            <RemoteName>values-ro.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-zu\values-zu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
+            <RemoteName>values-zu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1353,18 +1353,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-vi\values-vi.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-vi\</RemoteDir>
-            <RemoteName>values-vi.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rXC\values-en-rXC.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rXC\</RemoteDir>
+            <RemoteName>values-en-rXC.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rXC\values-en-rXC.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rXC\</RemoteDir>
-            <RemoteName>values-en-rXC.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-vi\values-vi.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-vi\</RemoteDir>
+            <RemoteName>values-vi.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1542,9 +1542,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ko\values-ko.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ko\</RemoteDir>
-            <RemoteName>values-ko.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-iw\values-iw.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-iw\</RemoteDir>
+            <RemoteName>values-iw.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1560,9 +1560,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-iw\values-iw.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-iw\</RemoteDir>
-            <RemoteName>values-iw.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ko\values-ko.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ko\</RemoteDir>
+            <RemoteName>values-ko.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1605,18 +1605,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rHK\values-zh-rHK.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rHK\</RemoteDir>
-            <RemoteName>values-zh-rHK.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-fi\values-fi.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-fi\</RemoteDir>
+            <RemoteName>values-fi.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-fi\values-fi.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-fi\</RemoteDir>
-            <RemoteName>values-fi.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-zh-rHK\values-zh-rHK.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rHK\</RemoteDir>
+            <RemoteName>values-zh-rHK.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1830,18 +1830,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-eu\</RemoteDir>
-            <RemoteName>values-eu.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-bn\values-bn.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-bn\</RemoteDir>
+            <RemoteName>values-bn.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-bn\values-bn.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-bn\</RemoteDir>
-            <RemoteName>values-bn.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-eu\</RemoteDir>
+            <RemoteName>values-eu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1956,9 +1956,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ro\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ja\</RemoteDir>
+            <RemoteName>values-ja.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -1974,9 +1974,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ja\</RemoteDir>
-            <RemoteName>values-ja.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ro\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2064,6 +2064,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-es-rUS\values-es-rUS.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-es-rUS\</RemoteDir>
+            <RemoteName>values-es-rUS.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-kn\values.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-kn\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
@@ -2076,15 +2085,6 @@
         <DeployFile Include="Android\Merged\res\values-si\values-si.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-si\</RemoteDir>
             <RemoteName>values-si.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-es-rUS\values-es-rUS.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-es-rUS\</RemoteDir>
-            <RemoteName>values-es-rUS.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2118,8 +2118,8 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rTW\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
+        <DeployFile Include="Android\Merged\res\values-ta\values.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
@@ -2145,9 +2145,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ta\values.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
+        <DeployFile Include="Android\Merged\res\values-zh-rTW\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-kk\values-kk.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-kk\</RemoteDir>
+            <RemoteName>values-kk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2172,9 +2181,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
-            <RemoteName>values-nb.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-lt\values-lt.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-lt\</RemoteDir>
+            <RemoteName>values-lt.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2190,18 +2199,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-kk\values-kk.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-kk\</RemoteDir>
-            <RemoteName>values-kk.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-lt\values-lt.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-lt\</RemoteDir>
-            <RemoteName>values-lt.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
+            <RemoteName>values-nb.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2235,18 +2235,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-uk\values-uk.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-uk\</RemoteDir>
-            <RemoteName>values-uk.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-fa\values-fa.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-fa\</RemoteDir>
+            <RemoteName>values-fa.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-fa\values-fa.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-fa\</RemoteDir>
-            <RemoteName>values-fa.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-uk\values-uk.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-uk\</RemoteDir>
+            <RemoteName>values-uk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2370,18 +2370,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\layout\notification_template_custom_big.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
-            <RemoteName>notification_template_custom_big.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rGB\values.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rGB\values.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\layout\notification_template_custom_big.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
+            <RemoteName>notification_template_custom_big.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2559,18 +2559,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-pa\values-pa.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-pa\</RemoteDir>
-            <RemoteName>values-pa.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
+            <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
-            <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-pa\values-pa.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-pa\</RemoteDir>
+            <RemoteName>values-pa.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2721,18 +2721,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-cs\values-cs.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-cs\</RemoteDir>
-            <RemoteName>values-cs.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\googleg_disabled_color_18.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
+            <RemoteName>googleg_disabled_color_18.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\googleg_disabled_color_18.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
-            <RemoteName>googleg_disabled_color_18.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-cs\values-cs.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-cs\</RemoteDir>
+            <RemoteName>values-cs.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -2865,18 +2865,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-v16\values-v16.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-v16\</RemoteDir>
-            <RemoteName>values-v16.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-gl\values-gl.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-gl\</RemoteDir>
+            <RemoteName>values-gl.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-gl\values-gl.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-gl\</RemoteDir>
-            <RemoteName>values-gl.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-v16\values-v16.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-v16\</RemoteDir>
+            <RemoteName>values-v16.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3045,18 +3045,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-th\values-th.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-th\</RemoteDir>
-            <RemoteName>values-th.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ta\values-ta.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
+            <RemoteName>values-ta.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ta\values-ta.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
-            <RemoteName>values-ta.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-th\values-th.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-th\</RemoteDir>
+            <RemoteName>values-th.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3270,6 +3270,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
+            <RemoteName>values-nb.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\drawable-xhdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
@@ -3282,15 +3291,6 @@
         <DeployFile Include="Android\Merged\res\values-in\values.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-in\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
-            <RemoteName>values-nb.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3639,15 +3639,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rTW\values-zh-rTW.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
-            <RemoteName>values-zh-rTW.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-ml\values-ml.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-ml\</RemoteDir>
             <RemoteName>values-ml.xml</RemoteName>
@@ -3660,6 +3651,15 @@
         <DeployFile Include="Android\Merged\res\values-pa\values-pa.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-pa\</RemoteDir>
             <RemoteName>values-pa.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-zh-rTW\values-zh-rTW.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
+            <RemoteName>values-zh-rTW.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3693,18 +3693,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
-            <RemoteName>values-as.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-af\values-af.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-af\</RemoteDir>
+            <RemoteName>values-af.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-af\values-af.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-af\</RemoteDir>
-            <RemoteName>values-af.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
+            <RemoteName>values-as.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -3936,15 +3936,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rCN\values-zh-rCN.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rCN\</RemoteDir>
-            <RemoteName>values-zh-rCN.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>common_google_signin_btn_icon_dark_normal_background.9.png</RemoteName>
@@ -3972,6 +3963,24 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-zh-rCN\values-zh-rCN.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rCN\</RemoteDir>
+            <RemoteName>values-zh-rCN.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-be\values-be.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-be\</RemoteDir>
+            <RemoteName>values-be.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-bs\values-bs.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-bs\</RemoteDir>
             <RemoteName>values-bs.xml</RemoteName>
@@ -3984,15 +3993,6 @@
         <DeployFile Include="Android\Merged\res\values-hy\values-hy.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-hy\</RemoteDir>
             <RemoteName>values-hy.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-be\values-be.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-be\</RemoteDir>
-            <RemoteName>values-be.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4377,18 +4377,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4431,6 +4431,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-ru\values-ru.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ru\</RemoteDir>
+            <RemoteName>values-ru.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-sr\values-sr.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-sr\</RemoteDir>
             <RemoteName>values-sr.xml</RemoteName>
@@ -4461,15 +4470,6 @@
         <DeployFile Include="Android\Merged\res\values-lo\values-lo.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-lo\</RemoteDir>
             <RemoteName>values-lo.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ru\values-ru.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ru\</RemoteDir>
-            <RemoteName>values-ru.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4532,6 +4532,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-pl\values-pl.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-pl\</RemoteDir>
+            <RemoteName>values-pl.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-pt-rBR\values-pt-rBR.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-pt-rBR\</RemoteDir>
             <RemoteName>values-pt-rBR.xml</RemoteName>
@@ -4544,15 +4553,6 @@
         <DeployFile Include="Android\Merged\res\values-ur\values-ur.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-ur\</RemoteDir>
             <RemoteName>values-ur.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-pl\values-pl.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-pl\</RemoteDir>
-            <RemoteName>values-pl.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4622,18 +4622,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-km\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-km\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\color\common_google_signin_btn_tint.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\color\</RemoteDir>
+            <RemoteName>common_google_signin_btn_tint.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\color\common_google_signin_btn_tint.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\color\</RemoteDir>
-            <RemoteName>common_google_signin_btn_tint.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-km\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-km\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4730,18 +4730,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rGB\values-en-rGB.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
-            <RemoteName>values-en-rGB.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ca\values-ca.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ca\</RemoteDir>
+            <RemoteName>values-ca.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ca\values-ca.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ca\</RemoteDir>
-            <RemoteName>values-ca.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rGB\values-en-rGB.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
+            <RemoteName>values-en-rGB.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4802,18 +4802,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rIN\values-en-rIN.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rIN\</RemoteDir>
-            <RemoteName>values-en-rIN.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
+            <RemoteName>values-as.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
-            <RemoteName>values-as.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rIN\values-en-rIN.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rIN\</RemoteDir>
+            <RemoteName>values-en-rIN.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -4856,18 +4856,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-sk\values-sk.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-sk\</RemoteDir>
-            <RemoteName>values-sk.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ar\values-ar.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ar\</RemoteDir>
+            <RemoteName>values-ar.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ar\values-ar.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ar\</RemoteDir>
-            <RemoteName>values-ar.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-sk\values-sk.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-sk\</RemoteDir>
+            <RemoteName>values-sk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5090,18 +5090,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-gu\values-gu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-gu\</RemoteDir>
-            <RemoteName>values-gu.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-bs\values-bs.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-bs\</RemoteDir>
+            <RemoteName>values-bs.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-bs\values-bs.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-bs\</RemoteDir>
-            <RemoteName>values-bs.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-gu\values-gu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-gu\</RemoteDir>
+            <RemoteName>values-gu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5531,18 +5531,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5558,18 +5558,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-et\values-et.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-et\</RemoteDir>
-            <RemoteName>values-et.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-az\values-az.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-az\</RemoteDir>
+            <RemoteName>values-az.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-az\values-az.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-az\</RemoteDir>
-            <RemoteName>values-az.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-et\values-et.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-et\</RemoteDir>
+            <RemoteName>values-et.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5720,18 +5720,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zu\values-zu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
-            <RemoteName>values-zu.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ro\values-ro.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
+            <RemoteName>values-ro.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ro\values-ro.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
-            <RemoteName>values-ro.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-zu\values-zu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zu\</RemoteDir>
+            <RemoteName>values-zu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -5819,18 +5819,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-vi\values-vi.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-vi\</RemoteDir>
-            <RemoteName>values-vi.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rXC\values-en-rXC.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rXC\</RemoteDir>
+            <RemoteName>values-en-rXC.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rXC\values-en-rXC.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rXC\</RemoteDir>
-            <RemoteName>values-en-rXC.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-vi\values-vi.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-vi\</RemoteDir>
+            <RemoteName>values-vi.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6008,9 +6008,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ko\values-ko.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ko\</RemoteDir>
-            <RemoteName>values-ko.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-iw\values-iw.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-iw\</RemoteDir>
+            <RemoteName>values-iw.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6026,9 +6026,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-iw\values-iw.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-iw\</RemoteDir>
-            <RemoteName>values-iw.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ko\values-ko.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ko\</RemoteDir>
+            <RemoteName>values-ko.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6071,18 +6071,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rHK\values-zh-rHK.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rHK\</RemoteDir>
-            <RemoteName>values-zh-rHK.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-fi\values-fi.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-fi\</RemoteDir>
+            <RemoteName>values-fi.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-fi\values-fi.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-fi\</RemoteDir>
-            <RemoteName>values-fi.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-zh-rHK\values-zh-rHK.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rHK\</RemoteDir>
+            <RemoteName>values-zh-rHK.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6296,18 +6296,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-eu\</RemoteDir>
-            <RemoteName>values-eu.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-bn\values-bn.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-bn\</RemoteDir>
+            <RemoteName>values-bn.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-bn\values-bn.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-bn\</RemoteDir>
-            <RemoteName>values-bn.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-eu\values-eu.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-eu\</RemoteDir>
+            <RemoteName>values-eu.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6422,9 +6422,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ro\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ja\</RemoteDir>
+            <RemoteName>values-ja.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6440,9 +6440,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ja\values-ja.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ja\</RemoteDir>
-            <RemoteName>values-ja.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ro\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ro\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6530,6 +6530,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-es-rUS\values-es-rUS.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-es-rUS\</RemoteDir>
+            <RemoteName>values-es-rUS.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-kn\values.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-kn\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
@@ -6542,15 +6551,6 @@
         <DeployFile Include="Android\Merged\res\values-si\values-si.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-si\</RemoteDir>
             <RemoteName>values-si.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-es-rUS\values-es-rUS.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-es-rUS\</RemoteDir>
-            <RemoteName>values-es-rUS.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6584,8 +6584,8 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rTW\values.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
+        <DeployFile Include="Android\Merged\res\values-ta\values.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
@@ -6611,9 +6611,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ta\values.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
+        <DeployFile Include="Android\Merged\res\values-zh-rTW\values.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-kk\values-kk.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-kk\</RemoteDir>
+            <RemoteName>values-kk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6638,9 +6647,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
-            <RemoteName>values-nb.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-lt\values-lt.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-lt\</RemoteDir>
+            <RemoteName>values-lt.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6656,18 +6665,9 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-kk\values-kk.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-kk\</RemoteDir>
-            <RemoteName>values-kk.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-lt\values-lt.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-lt\</RemoteDir>
-            <RemoteName>values-lt.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
+            <RemoteName>values-nb.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6701,18 +6701,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-uk\values-uk.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-uk\</RemoteDir>
-            <RemoteName>values-uk.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-fa\values-fa.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-fa\</RemoteDir>
+            <RemoteName>values-fa.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-fa\values-fa.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-fa\</RemoteDir>
-            <RemoteName>values-fa.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-uk\values-uk.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-uk\</RemoteDir>
+            <RemoteName>values-uk.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -6836,18 +6836,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\layout\notification_template_custom_big.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
-            <RemoteName>notification_template_custom_big.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-en-rGB\values.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
+            <RemoteName>values.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-en-rGB\values.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-en-rGB\</RemoteDir>
-            <RemoteName>values.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\layout\notification_template_custom_big.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\layout\</RemoteDir>
+            <RemoteName>notification_template_custom_big.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7025,18 +7025,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-pa\values-pa.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-pa\</RemoteDir>
-            <RemoteName>values-pa.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
+            <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
-            <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-pa\values-pa.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-pa\</RemoteDir>
+            <RemoteName>values-pa.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7187,18 +7187,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-cs\values-cs.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-cs\</RemoteDir>
-            <RemoteName>values-cs.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\googleg_disabled_color_18.png" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
+            <RemoteName>googleg_disabled_color_18.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-hdpi-v4\googleg_disabled_color_18.png" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-hdpi-v4\</RemoteDir>
-            <RemoteName>googleg_disabled_color_18.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-cs\values-cs.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-cs\</RemoteDir>
+            <RemoteName>values-cs.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7331,18 +7331,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-v16\values-v16.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-v16\</RemoteDir>
-            <RemoteName>values-v16.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-gl\values-gl.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-gl\</RemoteDir>
+            <RemoteName>values-gl.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-gl\values-gl.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-gl\</RemoteDir>
-            <RemoteName>values-gl.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-v16\values-v16.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-v16\</RemoteDir>
+            <RemoteName>values-v16.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7511,18 +7511,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-th\values-th.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-th\</RemoteDir>
-            <RemoteName>values-th.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-ta\values-ta.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
+            <RemoteName>values-ta.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ta\values-ta.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ta\</RemoteDir>
-            <RemoteName>values-ta.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-th\values-th.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-th\</RemoteDir>
+            <RemoteName>values-th.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -7736,6 +7736,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
+            <RemoteName>values-nb.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\drawable-xhdpi-v4\notify_panel_notification_icon_bg.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\drawable-xhdpi-v4\</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
@@ -7748,15 +7757,6 @@
         <DeployFile Include="Android\Merged\res\values-in\values.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-in\</RemoteDir>
             <RemoteName>values.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-nb\values-nb.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-nb\</RemoteDir>
-            <RemoteName>values-nb.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8105,15 +8105,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rTW\values-zh-rTW.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
-            <RemoteName>values-zh-rTW.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-ml\values-ml.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-ml\</RemoteDir>
             <RemoteName>values-ml.xml</RemoteName>
@@ -8126,6 +8117,15 @@
         <DeployFile Include="Android\Merged\res\values-pa\values-pa.xml" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-pa\</RemoteDir>
             <RemoteName>values-pa.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-zh-rTW\values-zh-rTW.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rTW\</RemoteDir>
+            <RemoteName>values-zh-rTW.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8159,18 +8159,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
-            <RemoteName>values-as.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-af\values-af.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-af\</RemoteDir>
+            <RemoteName>values-af.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-af\values-af.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-af\</RemoteDir>
-            <RemoteName>values-af.xml</RemoteName>
+        <DeployFile Include="Android\Merged\res\values-as\values-as.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-as\</RemoteDir>
+            <RemoteName>values-as.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8402,15 +8402,6 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-zh-rCN\values-zh-rCN.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rCN\</RemoteDir>
-            <RemoteName>values-zh-rCN.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
         <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_icon_dark_normal_background.9.png" Condition="'$(Config)'=='Release'">
             <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
             <RemoteName>common_google_signin_btn_icon_dark_normal_background.9.png</RemoteName>
@@ -8438,6 +8429,24 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-zh-rCN\values-zh-rCN.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-zh-rCN\</RemoteDir>
+            <RemoteName>values-zh-rCN.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-be\values-be.xml" Condition="'$(Config)'=='Release'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-be\</RemoteDir>
+            <RemoteName>values-be.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-bs\values-bs.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-bs\</RemoteDir>
             <RemoteName>values-bs.xml</RemoteName>
@@ -8450,15 +8459,6 @@
         <DeployFile Include="Android\Merged\res\values-hy\values-hy.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-hy\</RemoteDir>
             <RemoteName>values-hy.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-be\values-be.xml" Condition="'$(Config)'=='Release'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-be\</RemoteDir>
-            <RemoteName>values-be.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8843,18 +8843,18 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
-            <RemoteName>ic_launcher.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
+            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
-        <DeployFile Include="Android\Merged\res\drawable-mdpi-v4\common_google_signin_btn_text_light_normal_background.9.png" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\drawable-mdpi-v4\</RemoteDir>
-            <RemoteName>common_google_signin_btn_text_light_normal_background.9.png</RemoteName>
+        <DeployFile Include="Android\Merged\res\mipmap-xhdpi\ic_launcher.png" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\mipmap-xhdpi\</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -8897,6 +8897,15 @@
             <RemoteCommand/>
             <Overwrite>True</Overwrite>
         </DeployFile>
+        <DeployFile Include="Android\Merged\res\values-ru\values-ru.xml" Condition="'$(Config)'=='Debug'">
+            <RemoteDir>ALGeoPositionSensorDemo\res\values-ru\</RemoteDir>
+            <RemoteName>values-ru.xml</RemoteName>
+            <DeployClass>File</DeployClass>
+            <Operation>0</Operation>
+            <LocalCommand/>
+            <RemoteCommand/>
+            <Overwrite>True</Overwrite>
+        </DeployFile>
         <DeployFile Include="Android\Merged\res\values-sr\values-sr.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-sr\</RemoteDir>
             <RemoteName>values-sr.xml</RemoteName>
@@ -8927,15 +8936,6 @@
         <DeployFile Include="Android\Merged\res\values-lo\values-lo.xml" Condition="'$(Config)'=='Debug'">
             <RemoteDir>ALGeoPositionSensorDemo\res\values-lo\</RemoteDir>
             <RemoteName>values-lo.xml</RemoteName>
-            <DeployClass>File</DeployClass>
-            <Operation>0</Operation>
-            <LocalCommand/>
-            <RemoteCommand/>
-            <Overwrite>True</Overwrite>
-        </DeployFile>
-        <DeployFile Include="Android\Merged\res\values-ru\values-ru.xml" Condition="'$(Config)'=='Debug'">
-            <RemoteDir>ALGeoPositionSensorDemo\res\values-ru\</RemoteDir>
-            <RemoteName>values-ru.xml</RemoteName>
             <DeployClass>File</DeployClass>
             <Operation>0</Operation>
             <LocalCommand/>
@@ -9174,5 +9174,6 @@
         </DeployFile>
     </ItemGroup>
     <ItemGroup Condition="'$(Platform)'=='iOSSimARM64'"/>
+    <ItemGroup Condition="'$(Platform)'=='Win64x'"/>
     <ItemGroup Condition="'$(Platform)'=='Linux64'"/>
 </Project>

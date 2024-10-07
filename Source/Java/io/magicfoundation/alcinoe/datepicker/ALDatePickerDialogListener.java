@@ -1,4 +1,4 @@
-package com.alcinoe.datepicker;
+package io.magicfoundation.alcinoe.datepicker;
 
 public interface ALDatePickerDialogListener {
   

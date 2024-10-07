@@ -19,7 +19,7 @@ type
   end;
 
   {**********************************************************************}
-  [JavaSignature('com/alcinoe/installreferrer/ALInstallReferrerListener')]
+  [JavaSignature('io/magicfoundation/alcinoe/installreferrer/ALInstallReferrerListener')]
   JALInstallReferrerListener = interface(IJavaInstance)
     ['{AA8674DA-EE8D-4324-97FB-4810EBDDD30B}']
     procedure onGetInstallReferrerSuccess(referrer: JString; clickTimestampSeconds: int64; installBeginTimestampSeconds: int64); cdecl;
@@ -34,7 +34,7 @@ type
   end;
 
   {**************************************************************}
-  [JavaSignature('com/alcinoe/installreferrer/ALInstallReferrer')]
+  [JavaSignature('io/magicfoundation/alcinoe/installreferrer/ALInstallReferrer')]
   JALInstallReferrer = interface(JObject)
     ['{8E2550A4-C4B9-425F-A09A-5F397F1542AA}']
     procedure setListener(listener: JALInstallReferrerListener); cdecl;

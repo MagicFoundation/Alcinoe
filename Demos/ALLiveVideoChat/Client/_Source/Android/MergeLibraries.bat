@@ -9,7 +9,7 @@ if "%ALBaseDir%"=="" (
 )
 
 set Libraries=%ALBaseDir%\Demos\ALLiveVideoChat\Client\_Source\Android\App\
-set Libraries=%Libraries%;com.alcinoe:alcinoe-webrtc:1.0.0
+set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-webrtc:1.0.0
 
 REM Required by fmx.jar, else the app crash at startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Landroidx/activity/result/contract/ActivityResultContracts$OpenDocument;

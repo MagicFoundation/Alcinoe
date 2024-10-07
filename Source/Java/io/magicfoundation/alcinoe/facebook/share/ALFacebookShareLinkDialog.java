@@ -1,4 +1,4 @@
-package com.alcinoe.facebook.share;
+package io.magicfoundation.alcinoe.facebook.share;
 
 import com.facebook.share.widget.ShareDialog;
 import com.facebook.share.model.ShareLinkContent;

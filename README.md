@@ -45,7 +45,6 @@ forced to apply patches to the original Delphi source files:
 * [AVPlayerItem miss the function addOutput](https://quality.embarcadero.com/browse/RSP-16853)
 * [CLVisit is missing from the implementation of CLLocationManager](https://quality.embarcadero.com/browse/RSP-18621)
 * [Miss kCIInputImageKey in iOSapi.CoreImage.pas](https://quality.embarcadero.com/browse/RSP-19878)
-* [Miss some definition in IOSapi.Security](https://quality.embarcadero.com/browse/RSP-20279)
 * [Effect ProcessTexture is not working and function TFilter.InputTexture: TTexture do unecessary work](https://quality.embarcadero.com/browse/RSP-20825)
 * [TVirtualKeyboardAndroid.GetVirtualKeyboardState not accurate](https://quality.embarcadero.com/browse/RSP-24737)
 * [Add NSPersonNameComponents in iOSapi.Foundation.pas](https://quality.embarcadero.com/browse/RSP-28096)

@@ -68,6 +68,8 @@ uses
   Alcinoe.AndroidApi.InstallReferrer,
   Alcinoe.AndroidApi.VKontakte,
   Alcinoe.AndroidApi.WebRTC,
+  Alcinoe.Androidapi.JNI.App,
+  Alcinoe.Androidapi.JNI.GraphicsContentViewText,
   Alcinoe.FMX.NativeView.Android,
   {$ENDIF}
   {$IFDEF iOS}
@@ -83,6 +85,14 @@ uses
   Alcinoe.iOSApi.FirebaseMessaging,
   Alcinoe.iOSApi.MessageUI,
   Alcinoe.iOSApi.Photos,
+  Alcinoe.iOSapi.ImageIO,
+  Alcinoe.iOSapi.Foundation,
+  Alcinoe.iOSapi.AVFoundation,
+  Alcinoe.iOSapi.CoreImage,
+  Alcinoe.iOSapi.CoreLocation,
+  Alcinoe.iOSapi.CoreText,
+  Alcinoe.iOSapi.CoreVideo,
+  Alcinoe.iOSapi.UIKit,
   {$IFNDEF IOSSIMULATOR}
   //[DCC Error] E2597 ld: building for iOS Simulator, but linking in dylib built for iOS, for architecture arm64
   //https://stackoverflow.com/questions/63607158/xcode-building-for-ios-simulator-but-linking-in-an-object-file-built-for-ios-f
@@ -103,6 +113,10 @@ uses
   Alcinoe.FMX.WebRTC,
   {$ENDIF}
   {$IFDEF ALMacOS}
+  Alcinoe.Macapi.AppKit,
+  Alcinoe.Macapi.CoreText,
+  Alcinoe.Macapi.Foundation,
+  Alcinoe.Macapi.QuartzCore,
   Alcinoe.FMX.NativeView.Mac,
   {$ENDIF}
   Alcinoe.AVLBinaryTree,

@@ -9,7 +9,7 @@ if "%ALBaseDir%"=="" (
 )
 
 set Libraries=%ALBaseDir%\Demos\ALNotificationService\_Source\Android\App\
-set Libraries=%Libraries%;com.alcinoe:alcinoe-firebase-messaging:1.0.1
+set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1
 
 REM Required by fmx.jar, else the app crash at startup with 
 REM java.lang.NoClassDefFoundError: Failed resolution of: Landroidx/activity/result/contract/ActivityResultContracts$OpenDocument;

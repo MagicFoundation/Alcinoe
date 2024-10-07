@@ -9,7 +9,7 @@ if "%ALBaseDir%"=="" (
 )
 
 set Libraries=%ALBaseDir%\Demos\ALFacebookLogin\_Source\Android\App\
-set Libraries=%Libraries%;com.alcinoe:alcinoe-facebook-share:1.0.1
+set Libraries=%Libraries%;io.magicfoundation.alcinoe:alcinoe-facebook-share:1.0.1
 set Libraries=%Libraries%;com.facebook.android:facebook-login:15.2.0
 
 REM Required by fmx.jar, else the app crash at startup with 

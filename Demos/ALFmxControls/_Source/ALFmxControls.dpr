@@ -21,7 +21,7 @@ begin
   GlobalUseVulkan := False;
   {$ENDIF}
   //GlobalUseGPUCanvas := True;
-  GlobalUseMetal := True;
+  //GlobalUseMetal := True;
   Application.Initialize;
   Application.CreateForm(TMainForm, MainForm);
   Application.Run;

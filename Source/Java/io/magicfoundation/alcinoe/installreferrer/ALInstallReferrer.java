@@ -1,4 +1,4 @@
-package com.alcinoe.installreferrer;
+package io.magicfoundation.alcinoe.installreferrer;
 
 import android.content.Context;
 import android.util.Log;

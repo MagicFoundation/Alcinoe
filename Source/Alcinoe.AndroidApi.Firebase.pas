@@ -56,7 +56,7 @@ type
     {class} property newTokenDispatcher: JMutableLiveData read _GetnewTokenDispatcher;
     {class} property newMessageDispatcher: JMutableLiveData read _GetnewMessageDispatcher;
   end;
-  [JavaSignature('com/alcinoe/firebase/messaging/ALFirebaseMessagingService')]
+  [JavaSignature('io/magicfoundation/alcinoe/firebase/messaging/ALFirebaseMessagingService')]
   JALFirebaseMessagingService = interface(JObject)
     ['{9F3FF329-E17E-41B4-9C4A-214AF6A1FC05}']
   end;

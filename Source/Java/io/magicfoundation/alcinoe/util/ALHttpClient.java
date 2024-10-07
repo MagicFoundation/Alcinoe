@@ -1,4 +1,4 @@
-package com.alcinoe.util;
+package io.magicfoundation.alcinoe.util;
 
 import java.util.HashMap;
 import java.util.Map;

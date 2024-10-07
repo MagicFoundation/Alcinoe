@@ -1,4 +1,4 @@
-package com.alcinoe.edittext;
+package io.magicfoundation.alcinoe.edittext;
 
 import android.widget.EditText;
 import android.util.AttributeSet;

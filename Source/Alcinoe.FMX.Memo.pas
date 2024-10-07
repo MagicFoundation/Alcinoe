@@ -15,6 +15,7 @@ uses
   iOSapi.Foundation,
   iOSapi.UIKit,
   Macapi.ObjectiveC,
+  Alcinoe.iOSapi.UIKit,
   Alcinoe.FMX.NativeView.iOS,
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
@@ -23,6 +24,7 @@ uses
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
   Macapi.CocoaTypes,
+  Alcinoe.Macapi.AppKit,
   Alcinoe.FMX.NativeView.Mac,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.Messages,
@@ -225,8 +227,8 @@ type
     property View: NSTextField read GetView;
   end;
 
-  {**************************************************************}
-  TALMacMemoTextViewDelegate = class(TOCLocal, NSTextViewDelegate)
+  {************************************************************************************}
+  TALMacMemoTextViewDelegate = class(TOCLocal, Alcinoe.Macapi.AppKit.NSTextViewDelegate)
   private
     FMemoControl: TALMacMemoControl;
   public
@@ -412,7 +414,7 @@ begin
   LUIEdgeInsets.bottom := 0;
   LUIEdgeInsets.right := 0;
   View.setTextContainerInset(LUIEdgeInsets);
-  View.textContainer.setLineFragmentPadding(0);
+  TALUITextView.Wrap(NSObjectToID(View)).textContainer.setLineFragmentPadding(0);
 end;
 
 {**************************************************************}
@@ -427,7 +429,7 @@ procedure TALIosMemoTextView.SetEnabled(const value: Boolean);
 begin
   inherited;
   View.setEditable(value);
-  View.setSelectable(value);
+  TALUITextView.Wrap(NSObjectToID(View)).setSelectable(value);
 end;
 
 {**************************************************************************}
@@ -498,6 +500,9 @@ end;
 {***********************************************************}
 function TALIosMemoTextView.canBecomeFirstResponder: Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosMemoTextView.canBecomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  {$ENDIF}
   Result := UITextView(Super).canBecomeFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
 
@@ -507,9 +512,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  Result := UITextView(Super).becomeFirstResponder;
   if (not TControl(FMemoControl.Owner).IsFocused) then
     TControl(FMemoControl.Owner).SetFocus;
-  Result := UITextView(Super).becomeFirstResponder;
 end;
 
 {********************************************************}
@@ -518,7 +523,7 @@ begin
   Result := TypeInfo(IALIosMemoTextView);
 end;
 
-{**********************************************}
+{************************************************}
 function TALIosMemoTextView.GetView: UITextView;
 begin
   Result := inherited GetView<UITextView>;
@@ -857,7 +862,7 @@ begin
           // LForKeys.addObject(NSObjectToID(NSFontAttributeName));
 
           var LDictionary := TNSDictionary.Wrap(TNSDictionary.OCClass.dictionaryWithObjects(LObjects, LForKeys));
-          NativeView.View.setTypingAttributes(LDictionary);
+          TALUITextView.Wrap(NSObjectToID(NativeView.View)).setTypingAttributes(LDictionary);
           // I can't call LDictionary.release or I have an error
           // LDictionary.release;
         finally
@@ -869,7 +874,7 @@ begin
       end;
     end
     else
-      NativeView.View.setTypingAttributes(nil);
+       TALUITextView.Wrap(NSObjectToID(NativeView.View)).setTypingAttributes(nil);
 
     // Font
     NativeView.View.setFont(TUIFont.Wrap(LFontRef));
@@ -915,7 +920,7 @@ end;
 function TALIosMemoControl.getLineCount: integer;
 begin
   Result := 0;
-  var LlayoutManager := NativeView.view.layoutManager;
+  var LlayoutManager := TALUITextView.Wrap(NSObjectToID(NativeView.view)).layoutManager;
   var LnumberOfGlyphs := LlayoutManager.numberOfGlyphs;
   var LlineRange: NSRange;
   var LIndex: Integer := 0;
@@ -978,6 +983,9 @@ end;
 {***********************************************************}
 function TALMacMemoScrollView.acceptsFirstResponder: Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALMacMemoScrollView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  {$ENDIF}
   Result := NSScrollView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
 
@@ -987,9 +995,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacMemoScrollView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  Result := NSScrollView(Super).becomeFirstResponder;
   if (not TControl(FMemoControl.Owner).IsFocused) then
     TControl(FMemoControl.Owner).SetFocus;
-  Result := NSScrollView(Super).becomeFirstResponder;
 end;
 
 {**********************************************************}
@@ -1026,6 +1034,9 @@ end;
 {*********************************************************}
 function TALMacMemoTextView.acceptsFirstResponder: Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALMacMemoTextView.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  {$ENDIF}
   Result := NSTextView(Super).acceptsFirstResponder and TControl(fMemoControl.Owner).canFocus;
 end;
 
@@ -1035,9 +1046,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacMemoTextView.becomeFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  Result := NSTextView(Super).becomeFirstResponder;
   if (not TControl(FMemoControl.Owner).IsFocused) then
     TControl(FMemoControl.Owner).SetFocus;
-  Result := NSTextView(Super).becomeFirstResponder;
 end;
 
 {***********************************************************************************}
@@ -1082,7 +1093,7 @@ begin
   ALLog('TALMacMemoTextViewDelegate.textViewShouldChangeTextInRangeReplacementText', TalLogType.VERBOSE);
   {$ENDIF}
   if FMemoControl.maxLength > 0 then begin
-    var LText: NSString := textView.&String;
+    var LText: NSString := TALNSText.wrap(NSObjectToID(textView)).&String;
     if shouldChangeTextInRange.length + shouldChangeTextInRange.location > LText.length then exit(false);
     result := LText.length + replacementString.length - shouldChangeTextInRange.length <= NSUInteger(FMemoControl.maxLength);
   end
@@ -1117,6 +1128,9 @@ end;
 {************************************************************}
 function TALMacMemoPlaceHolder.acceptsFirstResponder: Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALMacMemoPlaceHolder.acceptsFirstResponder', 'control.name: ' + fMemoControl.parent.Name, TalLogType.VERBOSE);
+  {$ENDIF}
   Result := False;
   FmemoControl.NativeView.View.becomeFirstResponder;
 end;
@@ -1139,7 +1153,7 @@ begin
   FTextView.View.textContainer.setLineFragmentPadding(0);
   //--
   FTextViewDelegate := TALMacMemoTextViewDelegate.Create(Self);
-  FTextView.View.setDelegate(FTextViewDelegate.GetObjectID);
+  TALNSTextView.Wrap(NSObjectToID(FTextView.View)).setDelegate(FTextViewDelegate.GetObjectID);
   //--
   FPlaceholderLabel := TALMacMemoPlaceHolder.Create(Self);
   FPlaceholderLabel.view.initWithFrame(RectToNSRect(TRect.Create(0,0,0,0)));
@@ -1299,7 +1313,7 @@ end;
 {*****************************************}
 function TALMacMemoControl.getText: String;
 begin
-  result := NSStrToStr(FtextView.View.&String);
+  result := NSStrToStr(TALNSText.wrap(NSObjectToID(FtextView.View)).&String);
 end;
 
 {*******************************************************}
@@ -1566,21 +1580,25 @@ begin
 
       if HasUnconstrainedAutosizeY then begin
 
-        var LAdjustement: Single := ((GetLineHeight / 100) * 25);
+        var LLineHeight: Single := GetLineHeight;
+        if IsPixelAlignmentEnabled then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
+
+        var LAdjustement: Single := ((LLineHeight / 100) * 25);
+        if IsPixelAlignmentEnabled then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
 
         If LInlinedLabelText then begin
           SetBounds(
             Position.X,
             Position.Y,
             Width,
-            (GetLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
+            (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
         end
         else begin
           SetBounds(
             Position.X,
             Position.Y,
             Width,
-            (GetLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
+            (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
         end;
 
       end;

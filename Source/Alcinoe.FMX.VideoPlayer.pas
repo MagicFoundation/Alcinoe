@@ -41,6 +41,8 @@ uses
   iOSapi.Foundation,
   iOSapi.AVFoundation,
   iOSapi.CoreVideo,
+  Alcinoe.iOSapi.AVFoundation,
+  Alcinoe.iOSapi.CoreVideo,
   Alcinoe.FMX.Ani,
   {$endIF}
   {$IF defined(ALSkiaCanvas)}
@@ -237,7 +239,7 @@ type
     class var appAudioSessionActivated: Boolean;
   private
     FPlayer: AVPlayer;
-    FPlayerItem: AVPlayerItem;
+    FPlayerItem: ALAVPlayerItem;
     FPlayerItemVideoOutput: AVPlayerItemVideoOutput;
     FKVODelegate: TKVODelegate;
     fNotificationsDelegate: TNotificationsDelegate;
@@ -1693,7 +1695,7 @@ begin
                           // URL contains no valid data or otherwise can't be used by the player item, its status
                           // later changes to AVPlayerItemStatusFailed. You can determine the nature of the failure
                           // by querying the player item’s error property.
-                          FPlayerItem := TAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
+                          FPlayerItem := TALAVPlayerItem.Wrap(TAVPlayerItem.OCClass.playerItemWithURL(LURL));
                           FPlayerItem.retain;
                           //aURL.release;   | >> we can't do this else we will have an eaccessViolation when we will free the FPlayerItem
                           //aURL := nil;    | >> http://stackoverflow.com/questions/42222508/why-we-need-to-do-retain-for-objective-c-object-field

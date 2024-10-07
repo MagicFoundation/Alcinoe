@@ -1244,11 +1244,13 @@ uses
   Macapi.CoreFoundation,
   Macapi.Helpers,
   Macapi.AppKit,
+  Alcinoe.Macapi.CoreText,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
+  Alcinoe.iOSapi.CoreText,
   {$ENDIF}
   {$IF defined(MSWINDOWS)}
   Winapi.Windows,

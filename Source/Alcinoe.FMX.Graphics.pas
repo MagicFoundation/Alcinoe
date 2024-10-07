@@ -1022,11 +1022,12 @@ uses
   {$IF defined(ANDROID)}
   Androidapi.JNIBridge,
   Androidapi.JNI.JavaTypes,
-  Androidapi.JNI.Hardware.HardwareBuffer,
+  Androidapi.JNI.Hardware,
   Androidapi.Helpers,
   Androidapi.JNI.Media,
   Androidapi.Bitmap,
   Alcinoe.AndroidApi.Common,
+  Alcinoe.Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(IOS)}
   Fmx.Utils,
@@ -1036,7 +1037,8 @@ uses
   Macapi.ObjectiveC,
   Macapi.CoreFoundation,
   Macapi.Helpers,
-  Macapi.ImageIO,
+  Alcinoe.iOSapi.ImageIO,
+  Alcinoe.iOSapi.CoreImage,
   {$ENDIF}
   {$IF defined(ALMacOS)}
   Fmx.Utils,
@@ -1046,6 +1048,7 @@ uses
   Macapi.CoreFoundation,
   Macapi.Helpers,
   Macapi.ImageIO,
+  Alcinoe.Macapi.QuartzCore,
   {$ENDIF}
   FMX.Effects,
   System.UIConsts,
@@ -3702,7 +3705,7 @@ begin
                                        ABlurRadius,
                                        TJShader_TileMode.JavaClass.MIRROR);
             LRenderNode.setRenderEffect(LBlurRenderEffect);
-            var LrenderCanvas := LrenderNode.beginRecording;
+            var LrenderCanvas := TJALRecordingCanvas.wrap(LrenderNode.beginRecording);
             LRenderCanvas.drawBitmap(LBitmap, 0{left}, 0{top}, nil{paint});
             LRenderNode.endRecording;
             LHardwareRenderer.createRenderRequest.setWaitForPresent(true).syncAndDraw;
@@ -3712,7 +3715,7 @@ begin
               var LHardwareBuffer := LImage.GetHardwareBuffer;
               if LHardwareBuffer = nil then raise Exception.Create('No HardwareBuffer');
               try
-                var LHardwareBitmap := TJBitmap.javaclass.wrapHardwareBuffer(LhardwareBuffer, ALGetGlobalJColorSpace);
+                var LHardwareBitmap := TJALBitmap.javaclass.wrapHardwareBuffer(LhardwareBuffer, ALGetGlobalJColorSpace);
                 if LHardwareBitmap=nil then raise Exception.Create('Create Bitmap Failed');
                 try
                   //This is necessary to convert later the JBitmap in texture via texImage2D
@@ -3850,15 +3853,15 @@ begin
       // pixels outside the edges of the image. But because there are no pixels,
       // you get this weird artefact. You can use "CIAffineClamp" filter to
       // "extend" your image infinitely in all directions.
-      var LClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
+      var LClampFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
       LClampFilter.setDefaults;
       LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
 
-      var LBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
+      var LBlurFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
       LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
       LBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aBlurRadius), kCIInputRadiusKey);
 
-      var LCIContext := TCIContext.Wrap(TCIContext.OCClass.contextWithOptions(nil));
+      var LCIContext := TCIContext.Wrap({$IF defined(ALMacOS)}TALCIContext{$ELSE}TCIContext{$ENDIF}.OCClass.contextWithOptions(nil));
       var LCGImageRef := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
       if LCGImageRef = nil then raise Exception.Create('Failed to create CGImageRef from CIContext');
       try
@@ -4518,15 +4521,15 @@ begin
       // pixels outside the edges of the image. But because there are no pixels,
       // you get this weird artefact. You can use "CIAffineClamp" filter to
       // "extend" your image infinitely in all directions.
-      var LClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
+      var LClampFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
       LClampFilter.setDefaults;
       LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
 
-      var LBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
+      var LBlurFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
       LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
       LBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aBlurRadius), kCIInputRadiusKey);
 
-      var LCIContext := TCIContext.Wrap(TCIContext.OCClass.contextWithOptions(nil));
+      var LCIContext := TCIContext.Wrap({$IF defined(ALMacOS)}TALCIContext{$ELSE}TCIContext{$ENDIF}.OCClass.contextWithOptions(nil));
       var LCGImageRef := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
       if LCGImageRef = nil then raise Exception.Create('Failed to create CGImageRef from CIContext');
       try
@@ -5813,15 +5816,15 @@ begin
       // pixels outside the edges of the image. But because there are no pixels,
       // you get this weird artefact. You can use "CIAffineClamp" filter to
       // "extend" your image infinitely in all directions.
-      var LClampFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
+      var LClampFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIAffineClamp')));
       LClampFilter.setDefaults;
       LClampFilter.setValueforKey(NSObjectToID(LCIImage), kCIInputImageKey);
 
-      var LBlurFilter := TCIFilter.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
+      var LBlurFilter := {$IF defined(ALMacOS)}TALCIFilter{$ELSE}TCIFilter{$ENDIF}.Wrap(TCIFilter.OCClass.filterWithName(StrToNsStr('CIGaussianBlur')));
       LBlurFilter.setValueforKey(NSObjectToID(LClampFilter.outputImage), kCIInputImageKey);
       LBlurFilter.setValueforKey(TNSNumber.OCClass.numberWithFloat(aBlurRadius), kCIInputRadiusKey);
 
-      var LCIContext := TCIContext.Wrap(TCIContext.OCClass.contextWithOptions(nil));
+      var LCIContext := TCIContext.Wrap({$IF defined(ALMacOS)}TALCIContext{$ELSE}TCIContext{$ENDIF}.OCClass.contextWithOptions(nil));
       var LCGImageRef := LCIContext.createCGImage(LBlurFilter.outputImage, LCIImage.extent);
       if LCGImageRef = nil then raise Exception.Create('Failed to create CGImageRef from CIContext');
       try
@@ -14314,7 +14317,10 @@ begin
   else
     Result := TPixelFormat.RGBA;
   {$ELSEIF DEFINED(MACOS)}
-  Result := TPixelFormat.BGRA;
+  if GlobalUseMetal then
+    Result := TPixelFormat.BGRA
+  else
+    Result := TPixelFormat.RGBA;
   {$ELSEIF DEFINED(LINUX)}
   Result := TPixelFormat.BGRA;
   {$ELSE}

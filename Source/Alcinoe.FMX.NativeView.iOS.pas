@@ -28,9 +28,11 @@ type
     FControl: TControl;
     FForm: TCommonCustomForm;
     FVisible: Boolean;
+    FIgnoreResetFocus: Boolean;
     function GetView: UIView; overload;
     procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
     procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+    procedure FormChangingFocusControlListener(const Sender: TObject; const AMessage: TMessage);
   protected
     procedure InitView; virtual;
     function GetFormView(const AForm: TCommonCustomForm): UIView;
@@ -72,8 +74,10 @@ begin
   InitView;
   View.setExclusiveTouch(True);
   FVisible := True;
+  FIgnoreResetFocus := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
   TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TFormChangingFocusControl, FormChangingFocusControlListener);
 end;
 
 {************************************************************}
@@ -89,6 +93,7 @@ destructor TALIosNativeView.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
   TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
+  TMessageManager.DefaultManager.Unsubscribe(TFormChangingFocusControl, FormChangingFocusControlListener);
   RootChanged(nil);
   inherited;
 end;
@@ -99,6 +104,42 @@ begin
   // This event is called only when the window's handle is recreated.
   if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
     RootChanged(Form);
+end;
+
+{***********************************************************************************************************}
+procedure TALIosNativeView.FormChangingFocusControlListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if not (AMessage is TFormChangingFocusControl) then
+    Exit;
+
+  var LMessage := TFormChangingFocusControl(AMessage);
+  // When form changes focus from on text-input control to other, it reset focus from current focused control and
+  // set focus to new one. In this steps Virtual Keyboard can be hidden and shown again. This causes the keyboard
+  // to blink. For avoiding it, we disable reset focus (hiding keyboard), if new focused control also uses Virtual Keyboard.
+  //
+  // procedure TCommonCustomForm.SetFocused(const Value: IControl);
+  // begin
+  //   ...
+  //   var Message: TFormChangingFocusControl := TFormChangingFocusControl.Create(FFocused, NewFocused, False);
+  //   try
+  //     TMessageManager.DefaultManager.SendMessage(LParentForm, Message, False);
+  //     if LParentForm <> Self then
+  //     begin
+  //       LParentForm.Active := True;
+  //       LParentForm.SetFocused(Value);
+  //     end
+  //     else if FFocused <> NewFocused then
+  //     begin
+  //       ClearFocusedControl;
+  //       SetFocusedControl(NewFocused);
+  //     end;
+  //   finally
+  //     Message.IsChanged := True;
+  //     TMessageManager.DefaultManager.SendMessage(LParentForm, Message, True);
+  //   end;
+  //   ...
+  //
+  FIgnoreResetFocus := (not LMessage.IsChanged) and Supports(LMessage.NewFocusedControl, IVirtualKeyboardControl);
 end;
 
 {******************************************************************************************************}
@@ -195,7 +236,8 @@ end;
 {************************************}
 procedure TALIosNativeView.ResetFocus;
 begin
-  View.resignFirstResponder;
+  if not FIgnoreResetFocus then
+    View.resignFirstResponder;
 end;
 
 {**********************************}

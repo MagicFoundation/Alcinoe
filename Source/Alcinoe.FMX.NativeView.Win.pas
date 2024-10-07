@@ -468,10 +468,12 @@ end;
 {************************************}
 procedure TALWinNativeView.ResetFocus;
 begin
-  if (Form <> nil) and Form.IsHandleAllocated then
-    WinApi.Windows.SetFocus(FormToHWND(Form))
-  else
-    SendMessage(Handle, WM_KILLFOCUS, 0, 0);
+  if GetFocus = Handle then begin
+    if (Form <> nil) and Form.IsHandleAllocated then
+      WinApi.Windows.SetFocus(FormToHWND(Form))
+    else
+      SendMessage(Handle, WM_KILLFOCUS, 0, 0);
+  end;
 end;
 
 {**************************************************************}

@@ -22,6 +22,7 @@ uses
   iOSapi.UIKit,
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
+  Alcinoe.iOSapi.UIKit,
   Alcinoe.FMX.NativeView.iOS,
   {$ELSEIF defined(ALMacOS)}
   System.TypInfo,
@@ -30,6 +31,7 @@ uses
   Macapi.ObjectiveC,
   Macapi.ObjCRuntime,
   Macapi.CocoaTypes,
+  Alcinoe.Macapi.AppKit,
   Alcinoe.FMX.NativeView.Mac,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.Messages,
@@ -414,8 +416,8 @@ type
     property View: NSTextField read GetView;
   end;
 
-  {*************************************************************************}
-  TALMacEditTextFieldDelegate = class(TOCLocal, NSControlTextEditingDelegate)
+  {***********************************************************************************************}
+  TALMacEditTextFieldDelegate = class(TOCLocal, Alcinoe.Macapi.AppKit.NSControlTextEditingDelegate)
   private
     FEditControl: TALMacEditControl;
   public
@@ -566,8 +568,8 @@ type
 
 type
 
-  {******************************************************************************}
-  TALBaseEdit = class(TALBaseRectangle, IControlTypeSupportable, IALNativeControl)
+  {*******************************************************************************************************}
+  TALBaseEdit = class(TALBaseRectangle, IVirtualKeyboardControl, IControlTypeSupportable, IALNativeControl)
   public
     type
       // ----------------
@@ -833,16 +835,12 @@ type
     procedure SetOnReturnKey(const Value: TNotifyEvent);
     procedure OnEnterImpl(Sender: TObject);
     procedure OnExitImpl(Sender: TObject);
-    procedure SetKeyboardType(Value: TVirtualKeyboardType);
-    function GetKeyboardType: TVirtualKeyboardType;
     procedure setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
     function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure SetPassword(const Value: Boolean);
     function GetPassword: Boolean;
     procedure SetCheckSpelling(const Value: Boolean);
     function GetCheckSpelling: Boolean;
-    procedure SetReturnKeyType(const Value: TReturnKeyType);
-    function GetReturnKeyType: TReturnKeyType;
     procedure SetDefStyleAttr(const Value: String);
     procedure SetDefStyleRes(const Value: String);
     procedure SetMaxLength(const Value: integer);
@@ -852,6 +850,12 @@ type
     function HasOpacityLabelTextAnimation: Boolean;
     function HasTranslationLabelTextAnimation: Boolean;
     procedure UpdateEditControlStyle;
+    { IVirtualKeyboardControl }
+    procedure SetKeyboardType(Value: TVirtualKeyboardType);
+    function GetKeyboardType: TVirtualKeyboardType;
+    procedure SetReturnKeyType(Value: TReturnKeyType);
+    function GetReturnKeyType: TReturnKeyType;
+    function IVirtualKeyboardControl.IsPassword = GetPassword;
     { IControlTypeSupportable }
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
@@ -1090,11 +1094,13 @@ uses
   iOSapi.CoreText,
   FMX.Helpers.iOS,
   FMX.Consts,
+  Alcinoe.iOSapi.Foundation,
   {$ELSEIF defined(ALMacOS)}
   Macapi.CoreFoundation,
   Macapi.Helpers,
   FMX.Helpers.Mac,
   FMX.Consts,
+  Alcinoe.Macapi.Foundation,
   Alcinoe.StringUtils,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.CommCtrl,
@@ -1262,7 +1268,18 @@ end;
 Procedure TALBaseEditControl.AddNativeView;
 begin
   {$IF not defined(ALDPK)}
+  if NativeView.visible then exit;
   NativeView.SetVisible(true);
+  if Parentcontrol.IsFocused then begin
+    NativeView.SetFocus;
+    {$IF defined(android)}
+    ALVirtualKeyboardVisible := True;
+    {$IF defined(DEBUG)}
+    ALLog('TALBaseEditControl.showVirtualKeyboard', 'control.name: ' + Name, TalLogType.VERBOSE);
+    {$ENDIF}
+    MainActivity.getVirtualKeyboard.showFor(NativeView.View);
+    {$ENDIF}
+  end;
   {$ENDIF}
 end;
 
@@ -1270,6 +1287,21 @@ end;
 Procedure TALBaseEditControl.RemoveNativeView;
 begin
   {$IF not defined(ALDPK)}
+  if not NativeView.visible then exit;
+  NativeView.ResetFocus;
+  {$IF defined(android)}
+  ALVirtualKeyboardVisible := False;
+  TThread.ForceQueue(nil,
+    procedure
+    begin
+      If not ALVirtualKeyboardVisible then begin
+        {$IF defined(DEBUG)}
+        ALLog('TALBaseEditControl.hideVirtualKeyboard', TalLogType.VERBOSE);
+        {$ENDIF}
+        MainActivity.getVirtualKeyboard.hide;
+      end;
+    end);
+  {$ENDIF}
   NativeView.SetVisible(False);
   {$ENDIF}
 end;
@@ -2095,6 +2127,9 @@ end;
 {************************************************************}
 function TALIosEditTextField.canBecomeFirstResponder: Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALIosEditTextField.canBecomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  {$ENDIF}
   Result := UITextField(Super).canBecomeFirstResponder and TControl(fEditControl.Owner).canFocus;
 end;
 
@@ -2104,9 +2139,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALIosEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  Result := UITextField(Super).becomeFirstResponder;
   if (not TControl(fEditControl.Owner).IsFocused) then
     TControl(fEditControl.Owner).SetFocus;
-  Result := UITextField(Super).becomeFirstResponder;
 end;
 
 {*******************************************************}
@@ -2355,7 +2390,7 @@ end;
 {***********************************************}
 function TALIosEditControl.GetPromptText: String;
 begin
-  var LAttributedString := NativeView.View.AttributedPlaceholder;
+  var LAttributedString := TALNSAttributedString.wrap(NSObjectToID(TUITextField.Wrap(NSObjectToID(NativeView.View)).AttributedPlaceholder));
   if LAttributedString = nil then Result := NSStrToStr(NativeView.View.placeholder)
   else result := NSStrToStr(LAttributedString.&String);
 end;
@@ -2519,7 +2554,7 @@ begin
   inherited;
   View.SetBezeled(False);
   View.setBordered(false);
-  View.setLineBreakMode(NSLineBreakByClipping);
+  TALNSControl.Wrap(NSObjectToID(View)).setLineBreakMode(NSLineBreakByClipping);
   View.setDrawsBackground(false);
   View.setFocusRingType(NSFocusRingTypeNone);
 end;
@@ -2541,6 +2576,9 @@ end;
 {**********************************************************}
 function TALMacEditTextField.acceptsFirstResponder: Boolean;
 begin
+  {$IF defined(DEBUG)}
+  ALLog('TALMacEditTextField.acceptsFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
+  {$ENDIF}
   Result := NSTextField(Super).acceptsFirstResponder and TControl(fEditControl.Owner).canFocus;
 end;
 
@@ -2550,9 +2588,9 @@ begin
   {$IF defined(DEBUG)}
   ALLog('TALMacEditTextField.becomeFirstResponder', 'control.name: ' + fEditControl.parent.Name, TalLogType.VERBOSE);
   {$ENDIF}
+  Result := NSTextField(Super).becomeFirstResponder;
   if (not TControl(fEditControl.Owner).IsFocused) then
     TControl(fEditControl.Owner).SetFocus;
-  Result := NSTextField(Super).becomeFirstResponder;
 end;
 
 {*********************************************************}
@@ -2628,7 +2666,7 @@ constructor TALMacEditControl.Create(AOwner: TComponent);
 begin
   inherited create(AOwner);
   FTextFieldDelegate := TALMacEditTextFieldDelegate.Create(Self);
-  NativeView.View.setDelegate(FTextFieldDelegate.GetObjectID);
+  TALNSTextField.wrap(NSObjectToID(NativeView.View)).setDelegate(FTextFieldDelegate.GetObjectID);
   FFillColor := $ffffffff;
   fMaxLength := 0;
   fReturnKeyType := tReturnKeyType.Default;
@@ -2723,9 +2761,9 @@ end;
 {***********************************************}
 function TALMacEditControl.GetPromptText: String;
 begin
-  var LAttributedString := NativeView.View.placeholderAttributedString;
-  if LAttributedString = nil then Result := NSStrToStr(NativeView.View.PlaceholderString)
-  else result := NSStrToStr(LAttributedString.&String);
+  var LAttributedString := TALNSTextField.Wrap(NSObjectToID(NativeView.View)).placeholderAttributedString;
+  if LAttributedString = nil then Result := NSStrToStr(TALNSTextField.Wrap(NSObjectToID(NativeView.View)).PlaceholderString)
+  else result := NSStrToStr(TALNSAttributedString.wrap(NSObjectToID(LAttributedString)).&String);
 end;
 
 {*************************************************************}
@@ -2797,7 +2835,7 @@ begin
       end;
     end;
 
-    NativeView.View.setPlaceholderAttributedString(LPromptTextAttr);
+    TALNSTextField.Wrap(NSObjectToID(NativeView.View)).setPlaceholderAttributedString(LPromptTextAttr);
 
   finally
     LPromptTextAttr.release;
@@ -3070,21 +3108,22 @@ begin
       //LOWORD(LMargins) = Left Margin
       //HIWORD(LMargins) = Right Margin
       case FeditControl.TextSettings.HorzAlign of
-          TALTextHorzAlign.Center: begin
-            var LTextSize: TSize;
-            GetTextExtentPoint32(LDC, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText), LTextSize);
-            TextOut(LDC, round((FeditControl.Width - LtextSize.cx) / 2), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
-          end;
-          TALTextHorzAlign.Leading,
-          TALTextHorzAlign.Justify:  begin
-            TextOut(LDC, round(LOWORD(LMargins) * ALGetScreenScale), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
-          end;
-          TALTextHorzAlign.Trailing: begin
-            var LTextSize: TSize;
-            GetTextExtentPoint32(LDC, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText), LTextSize);
-            TextOut(LDC, round(FeditControl.Width - LtextSize.cx - HIWORD(LMargins)), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
-          end;
-        else raise Exception.Create('Error 21CC0DF5-9030-4F6C-9830-112E17E1A392');
+        TALTextHorzAlign.Center: begin
+          var LTextSize: TSize;
+          GetTextExtentPoint32(LDC, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText), LTextSize);
+          TextOut(LDC, round((FeditControl.Width - LtextSize.cx) / 2), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
+        end;
+        TALTextHorzAlign.Leading,
+        TALTextHorzAlign.Justify:  begin
+          TextOut(LDC, round(LOWORD(LMargins) * ALGetScreenScale), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
+        end;
+        TALTextHorzAlign.Trailing: begin
+          var LTextSize: TSize;
+          GetTextExtentPoint32(LDC, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText), LTextSize);
+          TextOut(LDC, round(FeditControl.Width - LtextSize.cx - HIWORD(LMargins)), 0, Pchar(FEditControl.PromptText), Length(FEditControl.PromptText));
+        end;
+        else
+          raise Exception.Create('Error 21CC0DF5-9030-4F6C-9830-112E17E1A392');
       end;
 
     finally
@@ -4480,7 +4519,8 @@ begin
   end;
   //--
   {$IF not defined(ALDPK)}
-  NativeView.SetFocus;
+  if HasNativeView then
+    NativeView.SetFocus;
   {$ENDIF}
   {$IF defined(android)}
   if IsFocused then begin
@@ -4512,7 +4552,8 @@ begin
   end;
   //--
   {$IF not defined(ALDPK)}
-  NativeView.ResetFocus;
+  if HasNativeView then
+    NativeView.ResetFocus;
   {$ENDIF}
   {$IF defined(android)}
   ALVirtualKeyboardVisible := False;
@@ -5012,8 +5053,8 @@ begin
   result := EditControl.CheckSpelling;
 end;
 
-{******************************************************************}
-procedure TALBaseEdit.SetReturnKeyType(const Value: TReturnKeyType);
+{************************************************************}
+procedure TALBaseEdit.SetReturnKeyType(Value: TReturnKeyType);
 begin
   EditControl.ReturnKeyType := Value;
 end;
@@ -6229,19 +6270,22 @@ begin
 
       if HasUnconstrainedAutosizeY then begin
 
+        var LLineHeight: Single := GetLineHeight;
+        if IsPixelAlignmentEnabled then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
+
         If LInlinedLabelText then begin
           SetBounds(
             Position.X,
             Position.Y,
             Width,
-            GetLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
+            LLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
         end
         else begin
           SetBounds(
             Position.X,
             Position.Y,
             Width,
-            GetLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
+            LLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom);
         end;
 
       end;
@@ -6283,6 +6327,9 @@ begin
       LMarginRect.Top :=    Max(LMarginRect.Top    + LStrokeSize.Top,    0);
       LMarginRect.Right :=  Max(LMarginRect.Right  + LStrokeSize.Right,  0);
       LMarginRect.Bottom := Max(LMarginRect.Bottom + LStrokeSize.Bottom, 0);
+
+      if IsPixelAlignmentEnabled then
+        LMarginRect := ALAlignEdgesToPixelRound(LMarginRect, ALGetScreenScale, TEpsilon.Position);
 
       EditControl.Margins.Rect := LMarginRect;
 

@@ -97,6 +97,7 @@ uses
   Macapi.ObjectiveC,
   iOSapi.CoreLocation,
   iOSapi.Foundation,
+  Alcinoe.iOSapi.CoreLocation,
   {$ENDIF}
   FMX.Platform;
 

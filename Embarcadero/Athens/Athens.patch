@@ -1,0 +1,4549 @@
+Index: Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas b/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas
+--- a/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Canvas.D2D.pas	(working copy)
+@@ -205,7 +205,7 @@
+     procedure DoEndScene; override;
+     procedure DoFlush; override;
+     { creation }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     constructor CreateFromPrinter(const APrinter: TAbstractPrinter); override;
+@@ -233,7 +233,7 @@
+     procedure DoExcludeClipRect(const ARect: TRectF); override;
+   public
+     destructor Destroy; override;
+-    procedure SetSize(const AWidth, AHeight: Integer); override;
++    procedure SetSize(const AWidth, AHeight: Single); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { caps }
+     class function GetAttribute(const Value: TCanvasAttribute): Integer; override;
+     { brushes }
+@@ -1105,7 +1105,7 @@
+ 
+ { TCanvasD2D }
+ 
+-constructor TCanvasD2D.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TCanvasD2D.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AQuality: TCanvasQuality);
+ var
+   ParentHandle: TWinWindowHandle;
+@@ -1599,7 +1599,8 @@
+ 
+         // in design-time just draw buffer
+         if IsDesignTime then
+-          Winapi.Windows.BitBlt(FContextHandle, 0, 0, Width, Height, ParentHandle.BufferHandle, 0, 0, SRCCOPY);
++          // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++          Winapi.Windows.BitBlt(FContextHandle, 0, 0, Round(Width), Round(Height), ParentHandle.BufferHandle, 0, 0, SRCCOPY);
+       end;
+     end;
+   finally
+@@ -1647,7 +1648,7 @@
+     FTarget.SetTransform(D2Matrix(M * TMatrix.CreateScaling(Scale, Scale)));
+ end;
+ 
+-procedure TCanvasD2D.SetSize(const AWidth, AHeight: Integer);
++procedure TCanvasD2D.SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ var
+   Res: HResult;
+ begin
+@@ -1654,13 +1655,15 @@
+   Res := SharedDevice.GetDeviceRemovedReason;
+   if Res <> S_OK then
+   begin
+-    if (Parent <> nil) and ((AWidth <> Width) or (AHeight <> Height)) then
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    if (Parent <> nil) and ((not SameValue(AWidth, Width, TEpsilon.Matrix)) or (not SameValue(AHeight, Height, TEpsilon.Matrix))) then
+       inherited;
+     HandleDeviceRemoved(Res);
+     Exit;
+   end;
+ 
+-  if (Parent <> nil) and ((AWidth <> Width) or (AHeight <> Height)) then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  if (Parent <> nil) and ((not sameValue(AWidth, Width, TEpsilon.Matrix)) or (not sameValue(AHeight, Height, TEpsilon.Matrix))) then
+   begin
+     MultithreadEnter;
+     try
+Index: Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas b/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas
+--- a/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Canvas.GDIP.pas	(working copy)
+@@ -72,7 +72,7 @@
+     function DoBeginScene(AClipRects: PClipRects = nil; AContextHandle: THandle = 0): Boolean; override;
+     procedure DoEndScene; override;
+     { creation }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     constructor CreateFromPrinter(const APrinter: TAbstractPrinter); override;
+@@ -101,7 +101,7 @@
+     procedure DoExcludeClipRect(const ARect: TRectF); override;
+   public
+     destructor Destroy; override;
+-    procedure SetSize(const AWidth, AHeight: Integer); override;
++    procedure SetSize(const AWidth, AHeight: Single); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { brushes }
+     class function CalculateStrokeBrush(const ABrush: TStrokeBrush): TStrokeBrush; overload; inline;
+     class function CalculateBrush(const ABrush: TBrush): TBrush; overload; inline;
+@@ -235,7 +235,7 @@
+     FSmoothingMode := SmoothingModeHighQuality;
+ end;
+ 
+-constructor TCanvasGdiPlus.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TCanvasGdiPlus.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
+ begin
+   inherited CreateFromWindow(AParent, AWidth, AHeight, AQuality);
+@@ -293,7 +293,8 @@
+   else
+     FGPGraphics.SetTextRenderingHint(TextRenderingHintAntiAlias);
+   FGPFamily := TGPFontFamily.Create('Tahoma');
+-  if (Width > 0) and (Height > 0) and not SameValue(FGPGraphics.GetDpiX, 0.0, TEpsilon.Scale) then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  if (compareValue(Width, 0, TEpsilon.Matrix) > 0) and (compareValue(Height, 0, TEpsilon.Matrix) > 0) and not SameValue(FGPGraphics.GetDpiX, 0.0, TEpsilon.Scale) then
+     FFontScale := 96 / FGPGraphics.GetDpiX
+   else
+     FFontScale := 1;
+@@ -533,7 +534,8 @@
+             WindowHandleToPlatform(Parent).BufferHandle, R.Left, R.Top, SRCCOPY);
+         end
+       else
+-        Winapi.Windows.BitBlt(FContextHandle, 0, 0, Width, Height, WindowHandleToPlatform(Parent).BufferHandle, 0, 0, SRCCOPY);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        Winapi.Windows.BitBlt(FContextHandle, 0, 0, Round(Width), Round(Height), WindowHandleToPlatform(Parent).BufferHandle, 0, 0, SRCCOPY);
+     end;
+   end;
+ end;
+@@ -581,9 +583,10 @@
+   end;
+ end;
+ 
+-procedure TCanvasGdiPlus.SetSize(const AWidth, AHeight: Integer);
++procedure TCanvasGdiPlus.SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+-  if (Parent <> nil) and ((AWidth <> Width) or (AHeight <> Height)) then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  if (Parent <> nil) and ((not sameValue(AWidth, Width, TEpsilon.Matrix)) or (not sameValue(AHeight, Height, TEpsilon.Matrix))) then
+   begin
+     inherited;
+     FreeAndNil(FGPGraphics);
+Index: Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas b/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas
+--- a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Canvas.GPU.Helpers.pas	(working copy)
+@@ -80,10 +80,10 @@
+       const Indices: TIndexArray; const VertexCount, PrimitiveCount: Integer);
+   protected
+     // Scissor rectangle that limits drawing to certain portion of the screen.
+-    FScissorRect: TRect;
++    FScissorRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ 
+     // Implements actual code that changes the scissor rectangle.
+-    procedure SetScissorRect(const Value: TRect);
++    procedure SetScissorRect(const Value: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ 
+     // Does the actual clearing of the stencil buffer on hardware device.
+     procedure DoClearStencil(const StencilValue: Cardinal);
+@@ -134,10 +134,10 @@
+       const Indices: TIndexArray; const VertexCount, PrimitiveCount: Integer);
+ 
+     procedure ResetScissorRect;
+-    procedure SetScissorRectWithoutUpdate(const R: TRect);
++    procedure SetScissorRectWithoutUpdate(const R: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     procedure SetContext(const Context: TContext3D);
+ 
+-    property ScissorRect: TRect read FScissorRect write SetScissorRect;
++    property ScissorRect: TRectF read FScissorRect write SetScissorRect; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     property DrawingMode: TDrawingMode read FDrawingMode write SetDrawingMode;
+     property FlushCountPerFrame: Integer read FFlushCountPerFrame;
+     property PrimitiveCountPerFrame: Integer read FPrimitiveCountPerFrame;
+@@ -206,9 +206,9 @@
+   end;
+ end;
+ 
+-procedure TCanvasHelper.SetScissorRect(const Value: TRect);
++procedure TCanvasHelper.SetScissorRect(const Value: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ var
+-  NewValue: TRect;
++  NewValue: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   if FContext <> nil then
+   begin
+@@ -235,7 +235,7 @@
+   end;
+ end;
+ 
+-procedure TCanvasHelper.SetScissorRectWithoutUpdate(const R: TRect);
++procedure TCanvasHelper.SetScissorRectWithoutUpdate(const R: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   FScissorRect := R;
+ end;
+@@ -253,7 +253,8 @@
+   end;
+ 
+   FFlushCountPerFrame := 0;
+-  FScissorRect := TRect.Create(0, 0, 0, 0);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  FScissorRect := TRectF.Create(0, 0, 0, 0);
+   FPrimitiveCountPerFrame := 0;
+   FCurrentTopology := TBatchingTopology.None;
+   FCurrentTexture := nil;
+@@ -313,8 +314,11 @@
+ 
+   if Material <> nil then
+     M := Material
+-  else if Texture <> nil then
+-    M := FTexMat
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
++  else if Texture <> nil then begin
++    if Texture.material <> nil then M := Texture.material
++    else M := FTexMat
++  end
+   else
+     M := FSolidMat;
+ 
+@@ -432,7 +436,9 @@
+ var
+   SolidDecl: TVertexDeclaration;
+ begin
+-  if FCurrentMaterial = FTexMat then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
++  if (FCurrentMaterial = FTexMat) or
++     ((FCurrentMaterial <> nil) and (FCurrentTexture <> nil) and (FCurrentMaterial = FCurrentTexture.Material)) then
+   begin
+     SetLength(SolidDecl, 3);
+     SolidDecl[0].Format := TVertexFormat.Vertex;
+@@ -441,7 +447,7 @@
+     SolidDecl[1].Offset := 12;
+     SolidDecl[2].Format := TVertexFormat.Color0;
+     SolidDecl[2].Offset := 20;
+-    FTexMat.Texture := FCurrentTexture;
++    TCanvasTextureMaterial(FCurrentMaterial).Texture := FCurrentTexture; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     FContext.DrawPrimitives(TPrimitivesKind.Triangles, @FBatchVertexBuffer[0], @FBatchIndexBuffer[0], SolidDecl,
+       SizeOf(TVertexBufferItem), FBatchedVertices, SizeOf(TIndexBufferItem), FBatchedIndices, FCurrentMaterial, 1);
+   end
+Index: Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas b/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas
+--- a/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Canvas.GPU.pas	(working copy)
+@@ -72,6 +72,8 @@
+ procedure RegisterCanvasClasses;
+ procedure UnregisterCanvasClasses;
+ 
++function CanvasHelper: TCanvasHelper; // << https://quality.embarcadero.com/browse/RSP-18797
++
+ implementation
+ 
+ uses
+@@ -88,13 +90,13 @@
+   TCanvasSaveStateCtx = class(TCanvasSaveState)
+   private
+     FClippingEnabled: Boolean;
+-    FSavedClipRect: TRect;
++    FSavedClipRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     FDrawingMode: TDrawingMode;
+   protected
+     procedure AssignTo(Dest: TPersistent); override;
+   public
+     procedure Assign(Source: TPersistent); override;
+-    property SavedClipRect: TRect read FSavedClipRect;
++    property SavedClipRect: TRectF read FSavedClipRect; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   end;
+ 
+   TCanvasGpu = class(TCustomCanvasGpu, IModulateCanvas)
+@@ -105,9 +107,9 @@
+     FStrokeBuilder: TStrokeBuilder;
+   private
+     [Weak] FSaveCanvas: TCanvasGpu;
+-    FSavedScissorRect: TRect;
++    FSavedScissorRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     FClippingEnabled: Boolean;
+-    FCurrentClipRect: TRect;
++    FCurrentClipRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     procedure InternalFillPolygon(const Points: TPolygon; const AOpacity: Single; const ABrush: TBrush;
+                                   const PolyBounds: TRectF);
+     class procedure CreateResources;
+@@ -129,7 +131,7 @@
+     procedure DoEndScene; override;
+     procedure DoFlush; override;
+     { creation }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+                                  const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     constructor CreateFromPrinter(const APrinter: TAbstractPrinter); override;
+@@ -167,7 +169,7 @@
+     class function CalculateStrokeBrush(const ABrush: TStrokeBrush): TStrokeBrush; overload; inline;
+     class function CalculateBrush(const ABrush: TBrush): TBrush; overload; inline;
+     { buffer }
+-    procedure SetSize(const AWidth, AHeight: Integer); override;
++    procedure SetSize(const AWidth, AHeight: Single); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     procedure MeasureLines(const ALines: TLineMetricInfo; const ARect: TRectF; const AText: string; const WordWrap: Boolean;
+       const Flags: TFillTextFlags; const ATextAlign: TTextAlign; const AVTextAlign: TTextAlign = TTextAlign.Center); override;
+@@ -316,7 +318,7 @@
+     Result := SrcColor;
+ end;
+ 
+-constructor TCanvasGpu.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TCanvasGpu.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
+ var
+   Multisample: TMultisample;
+@@ -412,7 +414,7 @@
+   end;
+ end;
+ 
+-procedure TCanvasGpu.SetSize(const AWidth, AHeight: Integer);
++procedure TCanvasGpu.SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   inherited;
+   if FContext <> nil then
+@@ -516,7 +518,8 @@
+   if Result then
+   begin
+     FClippingEnabled := False;
+-    FCurrentClipRect := TRect.Create(0, 0, Width, Height);
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    FCurrentClipRect := TRectF.Create(0, 0, Width, Height);
+     FCanvasHelper.ResetScissorRect;
+     FCanvasHelper.UpdateDrawingMode;
+   end;
+@@ -571,7 +574,7 @@
+ 
+ procedure TCanvasGpu.DoIntersectClipRect(const ARect: TRectF);
+ var
+-  Intersection: TRect;
++  Intersection: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   TopLeft, BottomRight: TPointF;
+ begin
+   FClippingEnabled := True;
+@@ -578,8 +581,9 @@
+   TopLeft := ARect.TopLeft * Matrix;
+   BottomRight := ARect.BottomRight * Matrix;
+ 
+-  Intersection := TRect.Intersect(FCurrentClipRect, Rect(Trunc(TopLeft.X), Trunc(TopLeft.Y), Round(BottomRight.X),
+-    Round(BottomRight.Y)));
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  Intersection := TRectF.Intersect(FCurrentClipRect, RectF(TopLeft.X, TopLeft.Y, BottomRight.X,
++    BottomRight.Y));
+   FCurrentClipRect := Intersection;
+ 
+   FCanvasHelper.ScissorRect := Intersection;
+@@ -1274,6 +1278,12 @@
+   TCanvasGpu.FreeResources;
+ end;
+ 
++//https://quality.embarcadero.com/browse/RSP-18797
++function CanvasHelper: TCanvasHelper;
++begin
++  result := TCanvasGpu.FCanvasHelper;
++end;
++
+ initialization
+   TCustomCanvasGpu.ModulateColor := $FFFFFFFF;
+   TCustomCanvasGpu.AlignToPixels := False;
+Index: Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas b/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas
+--- a/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Canvas.Mac.pas	(working copy)
+@@ -118,7 +118,7 @@
+     /// <summary>Return current canvas scale.</summary>
+     function GetCanvasScale: Single; override;
+     /// <summary>Initialize Canvas for form.</summary>
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+     /// <summary>Initialize Canvas for bitmap.</summary>
+     constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
+@@ -704,7 +704,7 @@
+       end;
+ end;
+ 
+-constructor TCanvasQuartz.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TCanvasQuartz.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AQuality: TCanvasQuality);
+ begin
+   inherited;
+Index: Embarcadero/Athens/fmx/FMX.Context.DX11.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.DX11.pas b/Embarcadero/Athens/fmx/FMX.Context.DX11.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.DX11.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.DX11.pas	(working copy)
+@@ -132,7 +132,7 @@
+     procedure DoSetContextState(AState: TContextState); override;
+     procedure DoSetStencilOp(const Fail, ZFail, ZPass: TStencilOp); override;
+     procedure DoSetStencilFunc(const Func: TStencilfunc; Ref, Mask: Cardinal); override;
+-    procedure DoSetScissorRect(const ScissorRect: TRect); override;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     procedure DoDrawPrimitivesBatch(const AKind: TPrimitivesKind; const Vertices, Indices: Pointer;
+       const VertexDeclaration: TVertexDeclaration; const VertexSize, VertexCount, IndexSize,
+@@ -151,7 +151,7 @@
+     procedure DoSetShaderVariable(const Name: string; const Texture: TTexture); override;
+     procedure DoSetShaderVariable(const Name: string; const Matrix: TMatrix3D); override;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AMultisample: TMultisample;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AMultisample: TMultisample; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -507,7 +507,7 @@
+ 
+ { TDX11Context }
+ 
+-constructor TDX11Context.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TDX11Context.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   inherited;
+@@ -771,7 +771,7 @@
+ 
+ procedure TDX11Context.DoCopyToBitmap(const Dest: TBitmap; const ARect: TRect);
+ var
+-  CopyRect: TRect;
++  CopyRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   LCanvas: TCustomCanvasGpu;
+ begin
+   if (TCanvasStyle.NeedGPUSurface in Dest.CanvasClass.GetCanvasStyle) and (Texture <> nil) then
+@@ -778,7 +778,8 @@
+   begin
+     if TCustomCanvasGpu(Dest.Canvas).BeginScene then
+     try
+-      CopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Width, Height));
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      CopyRect := TRectF.Intersect(ARect, TRectF.Create(0, 0, Width, Height));
+ 
+       LCanvas := TCustomCanvasGpu(Dest.Canvas);
+       LCanvas.Clear(0);
+@@ -805,8 +806,9 @@
+     begin
+       FillChar(Desc, SizeOf(D3D11_TEXTURE2D_DESC), 0);
+       Desc.Format := DXGI_FORMAT_B8G8R8A8_UNORM;
+-      Desc.Width := Trunc(Width * Scale); // px
+-      Desc.Height := Trunc(Height * Scale); // px
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      Desc.Width := Round(Width * Scale); // px
++      Desc.Height := Round(Height * Scale); // px
+       Desc.MipLevels := 1;
+       Desc.ArraySize := 1;
+       Desc.SampleDesc.Count := 1;
+@@ -825,9 +827,10 @@
+ 
+     if Succeeded(SharedContext.Map(FCopyBuffer, 0, D3D11_MAP_READ, 0, Mapped)) then
+     try
+-      if (ARect.Left = 0) and (ARect.Top = 0) and (ARect.Width = Width) and (ARect.Height = Height) and
+-         (Mapped.RowPitch = Cardinal(Pitch)) and (Pitch = Width * 4) then
+-        Move(Mapped.pData^, Bits^, Pitch * Height)
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      if (ARect.Left = 0) and (ARect.Top = 0) and SameValue(ARect.Width, Width, TEpsilon.Matrix) and SameValue(ARect.Height, Height, TEpsilon.Matrix) and
++         (Mapped.RowPitch = Cardinal(Pitch)) and SameValue(Pitch, Width * 4, TEpsilon.Matrix) then
++        Move(Mapped.pData^, Bits^, Pitch * Round(Height))
+       else
+       begin
+         for I := ARect.Top to ARect.Bottom - 1 do
+@@ -1658,7 +1661,7 @@
+   Shader.Handle := 0;
+ end;
+ 
+-procedure TDX11Context.DoSetScissorRect(const ScissorRect: TRect);
++procedure TDX11Context.DoSetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   SaveClearFPUState;
+   try
+Index: Embarcadero/Athens/fmx/FMX.Context.DX9.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.DX9.pas b/Embarcadero/Athens/fmx/FMX.Context.DX9.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.DX9.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.DX9.pas	(working copy)
+@@ -113,7 +113,7 @@
+     procedure DoSetContextState(AState: TContextState); override;
+     procedure DoSetStencilOp(const Fail, ZFail, ZPass: TStencilOp); override;
+     procedure DoSetStencilFunc(const Func: TStencilfunc; Ref, Mask: Cardinal); override;
+-    procedure DoSetScissorRect(const ScissorRect: TRect); override;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     procedure DoDrawPrimitivesBatch(const AKind: TPrimitivesKind; const Vertices, Indices: Pointer;
+       const VertexDeclaration: TVertexDeclaration; const VertexSize, VertexCount, IndexSize,
+@@ -132,7 +132,7 @@
+     procedure DoSetShaderVariable(const Name: string; const Texture: TTexture); override;
+     procedure DoSetShaderVariable(const Name: string; const Matrix: TMatrix3D); override;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -356,7 +356,7 @@
+   FIB32LockPos := 0;
+ end;
+ 
+-constructor TDX9Context.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TDX9Context.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   inherited;
+@@ -398,12 +398,13 @@
+   FillChar(Result, SizeOf(Result), 0);
+   Result.hDeviceWindow := Wnd;
+   Result.Windowed := True;
+-  Result.BackBufferWidth := Width;
+-  Result.BackBufferHeight := Height;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  Result.BackBufferWidth := Round(Width);
++  Result.BackBufferHeight := Round(Height);
+   Result.BackBufferFormat := D3DFMT_A8R8G8B8;
+-  if Width = 0 then
++  if SameValue(Width, 0.0, TEpsilon.Matrix) then
+     Result.BackBufferWidth := 2;
+-  if Height = 0 then
++  if SameValue(Height, 0.0, TEpsilon.Matrix) then
+     Result.BackBufferHeight := 2;
+ 
+   Result.BackBufferCount := 1;
+@@ -451,7 +452,8 @@
+       begin
+         HR := FSwapChain.GetBackBuffer(0, D3DBACKBUFFER_TYPE_MONO, FSwapChainSurf);
+         if DepthStencil then
+-          HR := SharedDevice.CreateDepthStencilSurface(Width, Height, D3DFMT_D24S8, FPresentParams.MultiSampleType, 0, false, FSwapChainDepth, nil);
++          // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++          HR := SharedDevice.CreateDepthStencilSurface(Round(Width), Round(Height), D3DFMT_D24S8, FPresentParams.MultiSampleType, 0, false, FSwapChainDepth, nil);
+       end;
+     end;
+   end;
+@@ -497,7 +499,7 @@
+ 
+ procedure TDX9Context.DoCopyToBitmap(const Dest: TBitmap; const ARect: TRect);
+ var
+-  CopyRect: TRect;
++  CopyRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   if Valid then
+   begin
+@@ -505,11 +507,13 @@
+     begin
+       if TCustomCanvasGpu(Dest.Canvas).BeginScene then
+       try
+-        CopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Width, Height));
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        CopyRect := TRectF.Intersect(ARect, TRectF.Create(0, 0, Width, Height));
+ 
+         TCustomCanvasGpu(Dest.Canvas).Clear(0);
+         TCustomCanvasGpu(Dest.Canvas).SetMatrix(TMatrix.Identity);
+-        TCustomCanvasGpu(Dest.Canvas).DrawTexture(TRectF.Create(CopyRect.Left, CopyRect.Top, CopyRect.Right, CopyRect.Bottom),
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        TCustomCanvasGpu(Dest.Canvas).DrawTexture(CopyRect,
+           TRectF.Create(0, 0, CopyRect.Width, CopyRect.Height), $FFFFFFFF, Texture);
+       finally
+         TCustomCanvasGpu(Dest.Canvas).EndScene;
+@@ -527,12 +531,15 @@
+   M: TBitmapData;
+   I: Integer;
+ begin
+-  ARect.Intersect(ARect, Rect(0, 0, Width, Height));
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  ARect.Intersect(ARect, Rect(0, 0, Round(Width), Round(Height)));
+   if FSysMemBuf = nil then
+   begin
+-    if FAILED(SharedDevice.CreateOffscreenPlainSurface(Width, Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, FSysMemBuf, nil)) then Exit;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    if FAILED(SharedDevice.CreateOffscreenPlainSurface(Round(Width), Round(Height), D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, FSysMemBuf, nil)) then Exit;
+     if (FPresentParams.MultiSampleType <> D3DMULTISAMPLE_NONE) then
+-      SharedDevice.CreateRenderTarget(Width, Height, D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, False, FColorBuf2, nil);
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      SharedDevice.CreateRenderTarget(Round(Width), Round(Height), D3DFMT_A8R8G8B8, D3DMULTISAMPLE_NONE, 0, False, FColorBuf2, nil);
+   end;
+   if Texture <> nil then
+     RT := FTextureSurf
+@@ -557,10 +564,12 @@
+     begin
+       if not FAILED(FSysMemBuf.LockRect(Surface, nil, 0)) then
+       begin
+-        if (ARect.Left = 0) and (ARect.Top = 0) and (ARect.Width = Width) and (ARect.Height = Height) and
+-          (Surface.Pitch = M.Pitch) and (M.Pitch = Width * 4)
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        if (ARect.Left = 0) and (ARect.Top = 0) and SameValue(ARect.Width, Width, Tepsilon.Matrix) and SameValue(ARect.Height, Height, Tepsilon.Matrix) and
++          (Surface.Pitch = M.Pitch) and sameValue(M.Pitch, Width * 4, TEpsilon.Matrix)
+         then
+-          Move(Surface.pBits^, Bits^, Pitch * Height)
++          // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++          Move(Surface.pBits^, Bits^, Pitch * Round(Height))
+         else
+         begin
+           for I := ARect.Top to ARect.Bottom - 1 do
+@@ -606,8 +615,9 @@
+     Viewport.Y := 0;
+     if Texture <> nil then
+     begin
+-      Viewport.Width := Width;
+-      Viewport.Height := Height;
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      Viewport.Width := Round(Width);
++      Viewport.Height := Round(Height);
+     end
+     else
+     begin
+@@ -683,7 +693,7 @@
+     Result := inherited DoBitmapToTexture(Bitmap);
+ end;
+ 
+-procedure TDX9Context.DoSetScissorRect(const ScissorRect: TRect);
++procedure TDX9Context.DoSetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   if SharedDevice <> nil then
+   begin
+Index: Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas b/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.GLES.Android.pas	(working copy)
+@@ -436,13 +436,13 @@
+     function TryGetOrCreateFrameBuffer(var AFrameBuf: GLuint): Boolean;
+   protected
+     class function GetShaderArch: TContextShaderArch; override;
+-    procedure DoSetScissorRect(const ScissorRect: TRect); override;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     function DoBeginScene: Boolean; override;
+     procedure DoEndScene; override;
+     { buffer }
+     procedure DoCreateBuffer; override;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -452,7 +452,7 @@
+ 
+ { TContextAndroid }
+ 
+-constructor TContextAndroid.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TContextAndroid.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   FSupportMS := False;
+@@ -792,7 +792,8 @@
+     if Texture = nil then
+       glViewport(0, 0, Round(Width * Scale), Round(Height * Scale))
+     else
+-      glViewport(0, 0, Width, Height);
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glViewport(0, 0, Round(Width), Round(Height));
+ 
+     if FContext = nil then
+       if Parent <> nil then
+@@ -809,7 +810,8 @@
+       else
+       begin
+         FContext := FSharedContext;
+-        FSurface := CreateEGLPBufferSurface(Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        FSurface := CreateEGLPBufferSurface(Round(Width), Round(Height));
+       end;
+ 
+     Result := inherited DoBeginScene;
+@@ -889,10 +891,12 @@
+     try
+       TryGetFrameBuffer(LFrameBuf);
+ 
+-      if not CreateFrameBuffer(Width, Height, Texture.Handle, DepthStencil, LFrameBuf, FDepthBuf, FStencilBuf) and
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      if not CreateFrameBuffer(Round(Width), Round(Height), Texture.Handle, DepthStencil, LFrameBuf, FDepthBuf, FStencilBuf) and
+         DepthStencil then
+       begin
+-        if not CreateFrameBuffer(Width, Height, Texture.Handle, False, LFrameBuf, FDepthBuf, FStencilBuf) then
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        if not CreateFrameBuffer(Round(Width), Round(Height), Texture.Handle, False, LFrameBuf, FDepthBuf, FStencilBuf) then
+           RaiseContextExceptionFmt(@SCannotCreateRenderBuffers, [ClassName]);
+       end;
+ 
+@@ -908,7 +912,7 @@
+   Result := TContextShaderArch.Android;
+ end;
+ 
+-procedure TContextAndroid.DoSetScissorRect(const ScissorRect: TRect);
++procedure TContextAndroid.DoSetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ var
+   R: TRect;
+ begin
+@@ -916,7 +920,8 @@
+     Round(ScissorRect.Right * Scale), Round(ScissorRect.Bottom * Scale));
+ 
+   if Texture <> nil then
+-    glScissor(R.Left, Height - R.Bottom, R.Width, R.Height)
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    glScissor(R.Left, Round(Height) - R.Bottom, R.Width, R.Height)
+   else
+     glScissor(R.Left, Round(Height * Scale) - R.Bottom, R.Width, R.Height);
+ 
+Index: Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas b/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.GLES.iOS.pas	(working copy)
+@@ -129,13 +129,13 @@
+   private
+   protected
+     class function GetShaderArch: TContextShaderArch; override;
+-    procedure DoSetScissorRect(const ScissorRect: TRect); override;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { buffer }
+     procedure DoCreateBuffer; override;
+     function DoBeginScene: Boolean; override;
+     procedure DoEndScene; override;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -143,7 +143,7 @@
+ 
+ { TContextIOS }
+ 
+-constructor TContextIOS.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TContextIOS.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   inherited;
+@@ -180,7 +180,8 @@
+       begin
+         glGenRenderbuffers(1, @FDepthBuf);
+         glBindRenderbuffer(GL_RENDERBUFFER, FDepthBuf);
+-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, Round(Width), Round(Height));
+         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FDepthBuf);
+         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FDepthBuf);
+         glBindRenderbuffer(GL_RENDERBUFFER, 0);
+@@ -195,13 +196,15 @@
+       glBindFramebuffer(GL_FRAMEBUFFER, FFrameBufMS);
+       glGenRenderbuffers(1, @FRenderBufMS);
+       glBindRenderbuffer(GL_RENDERBUFFER, FRenderBufMS);
+-      glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, FMSValue, GL_RGBA8_OES, Width, Height);
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, FMSValue, GL_RGBA8_OES, Round(Width), Round(Height));
+       glFrameBufferRenderBuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, FRenderBufMS);
+       if DepthStencil then
+       begin
+         glGenRenderbuffers(1, @FDepthBufMS);
+         glBindRenderbuffer(GL_RENDERBUFFER, FDepthBufMS);
+-        glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, FMSValue, GL_DEPTH24_STENCIL8_OES, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageMultisampleAPPLE(GL_RENDERBUFFER, FMSValue, GL_DEPTH24_STENCIL8_OES, Round(Width), Round(Height));
+         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FDepthBufMS);
+         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FDepthBufMS);
+         glBindRenderbuffer(GL_RENDERBUFFER, 0);
+@@ -224,7 +227,8 @@
+       begin
+         glGenRenderbuffers(1, @FDepthBuf);
+         glBindRenderbuffer(GL_RENDERBUFFER, FDepthBuf);
+-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_OES, Round(Width), Round(Height));
+         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, FDepthBuf);
+         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, FDepthBuf);
+         glBindRenderbuffer(GL_RENDERBUFFER, 0);
+@@ -257,7 +261,8 @@
+     end;
+ 
+     if Texture <> nil then
+-      glViewport(0, 0, Width, Height)
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glViewport(0, 0, Round(Width), Round(Height))
+     else
+       glViewport(0, 0, Round(Width * Scale), Round(Height * Scale));
+ 
+@@ -287,7 +292,7 @@
+   end;
+ end;
+ 
+-procedure TContextIOS.DoSetScissorRect(const ScissorRect: TRect);
++procedure TContextIOS.DoSetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ var
+   R: TRect;
+ begin
+@@ -295,7 +300,8 @@
+     Round(ScissorRect.Right * Scale), Round(ScissorRect.Bottom * Scale));
+ 
+   if Texture <> nil then
+-    glScissor(R.Left, Height - R.Bottom, R.Width, R.Height)
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    glScissor(R.Left, Round(Height) - R.Bottom, R.Width, R.Height)
+   else
+     glScissor(R.Left, Round(Height * Scale) - R.Bottom, R.Width, R.Height);
+ 
+Index: Embarcadero/Athens/fmx/FMX.Context.GLES.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.GLES.pas b/Embarcadero/Athens/fmx/FMX.Context.GLES.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.GLES.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.GLES.pas	(working copy)
+@@ -602,10 +602,12 @@
+       glBindTexture(GL_TEXTURE_2D, DestContext.Texture.Handle);
+       glBindFramebuffer(GL_FRAMEBUFFER, FFrameBuf);
+ 
+-      CopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Width, Height));
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      CopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Round(Width), Round(Height)));
+ 
+       if (TTextureStyle.RenderTarget in Texture.Style) and (TContextStyle.RenderTargetFlipped in Style) then
+-        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, ARect.Left, DestContext.Height - CopyRect.Bottom, CopyRect.Left, Height - CopyRect.Bottom, CopyRect.Width, CopyRect.Height)
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glCopyTexSubImage2D(GL_TEXTURE_2D, 0, ARect.Left, Round(DestContext.Height) - CopyRect.Bottom, CopyRect.Left, Round(Height) - CopyRect.Bottom, CopyRect.Width, CopyRect.Height)
+       else
+         glCopyTexSubImage2D(GL_TEXTURE_2D, 0, ARect.Left, ARect.Top, CopyRect.Left, CopyRect.Top, CopyRect.Width, CopyRect.Height);
+ 
+@@ -626,10 +628,14 @@
+   BitmapBuffer: PAlphaColorArray;
+   BitmapBufferLen: Integer;
+   LCopyRect: TRect;
++  LWidth,LHeight: Integer; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   if Valid then
+   begin
+-    BitmapBufferLen := Width * Height * 4;
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    LWidth := Round(Width);
++    LHeight := Round(Height);
++    BitmapBufferLen := LWidth * LHeight * 4;
+     GetMem(BitmapBuffer, BitmapBufferLen);
+     try
+       if FFrameBuf <> 0 then
+@@ -637,10 +643,11 @@
+         glGetIntegerv(GL_FRAMEBUFFER_BINDING, @OldFBO);
+         glBindFramebuffer(GL_FRAMEBUFFER, FFrameBuf);
+       end;
+-      glReadPixels(0, 0, Width, Height, GL_RGBA, GL_UNSIGNED_BYTE, BitmapBuffer);
+-      LCopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Width, Height));
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glReadPixels(0, 0, LWidth, LHeight, GL_RGBA, GL_UNSIGNED_BYTE, BitmapBuffer);
++      LCopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, LWidth, LHeight));
+       for I := LCopyRect.Top to LCopyRect.Bottom - 1 do
+-        Move(BitmapBuffer[LCopyRect.Left + (Height - 1 - I) * Width],
++        Move(BitmapBuffer[LCopyRect.Left + (LHeight - 1 - I) * LWidth],
+              PAlphaColorArray(Bits)[LCopyRect.Left + I * (Pitch div 4)],
+              LCopyRect.Width * 4);
+       if FFrameBuf <> 0 then
+@@ -886,36 +893,58 @@
+   begin
+     glActiveTexture(GL_TEXTURE0);
+     glGenTextures(1, @Tex);
+-    glBindTexture(GL_TEXTURE_2D, Tex);
+-  {$IFDEF IOS}
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+-  {$ELSE}
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+-  {$ENDIF}
+-    case Texture.MagFilter of
+-      TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+-      TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+-    end;
+-    if TTextureStyle.MipMaps in Texture.Style then
++
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1550
++    {$IFDEF ANDROID}
++    if (TTextureStyle.External in Texture.Style) then
+     begin
++      glBindTexture(GL_TEXTURE_EXTERNAL_OES, Tex);
++      glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_S, GL_REPEAT);
++      glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_WRAP_T, GL_REPEAT);
++      case Texture.MagFilter of
++        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
++      end;
+       case Texture.MinFilter of
+-        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+-        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
++        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+       end;
++      glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
+     end
+     else
++    {$ENDIF}
+     begin
+-      case Texture.MinFilter of
+-        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+-        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
++      glBindTexture(GL_TEXTURE_2D, Tex);
++    {$IFDEF IOS}
++      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
++      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
++    {$ELSE}
++      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
++      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
++    {$ENDIF}
++      case Texture.MagFilter of
++        TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
++        TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+       end;
++      if TTextureStyle.MipMaps in Texture.Style then
++      begin
++        case Texture.MinFilter of
++          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
++          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
++        end;
++      end
++      else
++      begin
++        case Texture.MinFilter of
++          TTextureFilter.Nearest: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
++          TTextureFilter.Linear: glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
++        end;
++      end;
++      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
++      glBindTexture(GL_TEXTURE_2D, 0);
+     end;
+-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Texture.Width, Texture.Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nil);
+-    glBindTexture(GL_TEXTURE_2D, 0);
++
+     ITextureAccess(Texture).Handle := Tex;
+-
+     TGlesDiagnostic.RaiseIfHasError(@SCannotCreateTexture, [ClassName]);
+   end;
+ end;
+@@ -1259,8 +1288,15 @@
+ 
+         if Texture = nil then
+           glBindTexture(GL_TEXTURE_2D, 0)
+-        else
++        else begin
++          {$IF defined(ANDROID)}
++          // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1550
++          if (TTextureStyle.External in Texture.Style) then
++            glBindTexture(GL_TEXTURE_EXTERNAL_OES, Texture.Handle)
++          else
++          {$ENDIF}
+           glBindTexture(GL_TEXTURE_2D, Texture.Handle);
++        end;
+ 
+         glUniform1i(Variable.Index, Variable.TextureUnit);
+         glActiveTexture(GL_TEXTURE0);
+Index: Embarcadero/Athens/fmx/FMX.Context.Mac.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.Mac.pas b/Embarcadero/Athens/fmx/FMX.Context.Mac.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.Mac.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.Mac.pas	(working copy)
+@@ -328,7 +328,7 @@
+     procedure DoSetContextState(AState: TContextState); override;
+     procedure DoSetStencilOp(const Fail, ZFail, ZPass: TStencilOp); override;
+     procedure DoSetStencilFunc(const Func: TStencilfunc; Ref, Mask: Cardinal); override;
+-    procedure DoSetScissorRect(const ScissorRect: TRect); override;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     procedure DoDrawPrimitivesBatch(const AKind: TPrimitivesKind; const Vertices, Indices: Pointer;
+       const VertexDeclaration: TVertexDeclaration; const VertexSize, VertexCount, IndexSize,
+@@ -345,7 +345,7 @@
+     procedure DoSetShaderVariable(const Name: string; const Texture: TTexture); override;
+     procedure DoSetShaderVariable(const Name: string; const Matrix: TMatrix3D); override;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -499,7 +499,7 @@
+ 
+ { TContextOpenGL }
+ 
+-constructor TContextOpenGL.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TContextOpenGL.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ type
+   TFormatAttributes = array of NSOpenGLPixelFormatAttribute;
+@@ -597,7 +597,8 @@
+       begin
+         glGenRenderbuffersEXT(1, @FDepthBuf);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FDepthBuf);
+-        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, Round(Width), Round(Height));
+         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, FDepthBuf);
+         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, FDepthBuf);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+@@ -612,13 +613,15 @@
+       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FFrameBufMS);
+       glGenRenderbuffersEXT(1, @FRenderBufMS);
+       glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FRenderBufMS);
+-      glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_RGBA, Width, Height);
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_RGBA, Round(Width), Round(Height));
+       glFrameBufferRenderBufferEXT(GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT, GL_RENDERBUFFER_EXT, FRenderBufMS);
+       if DepthStencil then
+       begin
+         glGenRenderbuffersEXT(1, @FDepthBufMS);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FDepthBufMS);
+-        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_DEPTH24_STENCIL8_EXT, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_DEPTH24_STENCIL8_EXT, Round(Width), Round(Height));
+         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, FDepthBufMS);
+         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, FDepthBufMS);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+@@ -642,7 +645,8 @@
+       begin
+         glGenRenderbuffersEXT(1, @FDepthBuf);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FDepthBuf);
+-        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, Round(Width), Round(Height));
+         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, FDepthBuf);
+         glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, FDepthBuf);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, 0);
+@@ -672,12 +676,14 @@
+       if FRenderBuf <> 0 then
+       begin
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FRenderBuf);
+-        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_RGBA, Round(Width), Round(Height));
+       end;
+       if FDepthBuf <> 0 then
+       begin
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FDepthBuf);
+-        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT, GL_DEPTH24_STENCIL8_EXT, Round(Width), Round(Height));
+       end;
+       Status := glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+       if Status <> GL_FRAMEBUFFER_COMPLETE_EXT then
+@@ -686,11 +692,13 @@
+       begin
+         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FFrameBufMS);
+         glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FRenderBufMS);
+-        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_RGBA, Width, Height);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_RGBA, Round(Width), Round(Height));
+         if FDepthBufMS <> 0 then
+         begin
+           glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, FDepthBufMS);
+-          glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_DEPTH24_STENCIL8_EXT, Width, Height);
++          // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++          glRenderbufferStorageMultisampleEXT(GL_RENDERBUFFER_EXT, FMSValue, GL_DEPTH24_STENCIL8_EXT, Round(Width), Round(Height));
+         end;
+         Status := glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT);
+         if Status <> GL_FRAMEBUFFER_COMPLETE_EXT then
+@@ -741,7 +749,8 @@
+     end;
+ 
+     if Texture <> nil then
+-      glViewport(0, 0, Width, Height)
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glViewport(0, 0, Round(Width), Round(Height))
+     else
+       glViewport(0, 0, Round(Width * Scale), Round(Height * Scale));
+ 
+@@ -872,13 +881,16 @@
+   begin
+     if FBitmapBuffer = nil then
+     begin
+-      FBitmapBufferLen := Width * Height * 4;
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      FBitmapBufferLen := Round(Width) * Round(Height) * 4;
+       GetMem(FBitmapBuffer, FBitmapBufferLen);
+     end;
+-    if FBitmapBufferLen <> Width * Height * 4 then
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    if FBitmapBufferLen <> Round(Width) * Round(Height) * 4 then
+     begin
+       FreeMem(FBitmapBuffer);
+-      FBitmapBufferLen := Width * Height * 4;
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      FBitmapBufferLen := Round(Width) * Round(Height) * 4;
+       GetMem(FBitmapBuffer, FBitmapBufferLen);
+     end;
+     if Texture <> nil then
+@@ -887,7 +899,8 @@
+       glGetTexImage(GL_TEXTURE_2D, 0, PixelFormatToFormat(TPixelFormat.RGBA), GL_UNSIGNED_BYTE, FBitmapBuffer);
+ 
+       for I := ARect.Top to ARect.Bottom - 1 do
+-        Move(FBitmapBuffer[(Height - 1 - I) * Width + ARect.Left], PAlphaColorArray(Bits)[I * (Pitch div 4) + ARect.Left], ARect.Width * 4);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        Move(FBitmapBuffer[(Round(Height) - 1 - I) * Round(Width) + ARect.Left], PAlphaColorArray(Bits)[I * (Pitch div 4) + ARect.Left], ARect.Width * 4);
+       glBindTexture(GL_TEXTURE_2D, 0);
+     end
+     else
+@@ -894,11 +907,13 @@
+     begin
+       glGetIntegerv(GL_FRAMEBUFFER_BINDING, @OldFBO);
+       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, FFrameBuf);
+-      glReadPixels(0, 0, Width, Height, PixelFormatToFormat(TPixelFormat.RGBA), GL_UNSIGNED_BYTE, FBitmapBuffer);
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      glReadPixels(0, 0, Round(Width), Round(Height), PixelFormatToFormat(TPixelFormat.RGBA), GL_UNSIGNED_BYTE, FBitmapBuffer);
+       glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, OldFBO);
+ 
+       for I := ARect.Top to ARect.Bottom - 1 do
+-        Move(FBitmapBuffer[(Height - 1 - I) * Width + ARect.Left], PAlphaColorArray(Bits)[I * (Pitch div 4) + ARect.Left], ARect.Width * 4);
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        Move(FBitmapBuffer[(Round(Height) - 1 - I) * Round(Width) + ARect.Left], PAlphaColorArray(Bits)[I * (Pitch div 4) + ARect.Left], ARect.Width * 4);
+     end;
+   end;
+ end;
+@@ -1379,9 +1394,10 @@
+   Shader.Handle := 0;
+ end;
+ 
+-procedure TContextOpenGL.DoSetScissorRect(const ScissorRect: TRect);
++procedure TContextOpenGL.DoSetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+-  glScissor(ScissorRect.Left, Round(Height * Scale) - ScissorRect.Bottom, ScissorRect.Width, ScissorRect.Height);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  glScissor(Round(ScissorRect.Left), Round(Height * Scale) - round(ScissorRect.Bottom), round(ScissorRect.Width), round(ScissorRect.Height));
+ end;
+ 
+ procedure TContextOpenGL.DoSetShaders(const VertexShader, PixelShader: TContextShader);
+Index: Embarcadero/Athens/fmx/FMX.Context.Metal.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Context.Metal.pas b/Embarcadero/Athens/fmx/FMX.Context.Metal.pas
+--- a/Embarcadero/Athens/fmx/FMX.Context.Metal.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Context.Metal.pas	(working copy)
+@@ -128,7 +128,7 @@
+     procedure DoSetStencilOp(const Fail, ZFail, ZPass: TStencilOp); override;
+     procedure DoSetStencilFunc(const Func: TStencilfunc; Ref, Mask: Cardinal); override;
+     { scissor }
+-    procedure DoSetScissorRect(const ScissorRect: TRect); override;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     procedure DoDrawPrimitivesBatch(const AKind: TPrimitivesKind; const Vertices, Indices: Pointer;
+       const VertexDeclaration: TVertexDeclaration; const VertexSize, VertexCount, IndexSize,
+@@ -147,7 +147,7 @@
+     procedure DoSetShaderVariable(const Name: string; const Texture: TTexture); override;
+     procedure DoSetShaderVariable(const Name: string; const Matrix: TMatrix3D); override;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -235,7 +235,7 @@
+   Result.alpha := AAlpha;
+ end;
+ 
+-function MakeMTLScissorRect(const ARect: TRect; const AScale: Single): MTLScissorRect;
++function MakeMTLScissorRect(const ARect: TRectF; const AScale: Single): MTLScissorRect; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   Result.x := Round(ARect.Left * AScale);
+   Result.y := Round(ARect.Top * AScale);
+@@ -826,7 +826,7 @@
+   end;
+ end;
+ 
+-constructor TContextMetal.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TContextMetal.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   inherited;
+@@ -976,7 +976,8 @@
+     TContextState.csScissorOff:
+     begin
+       if FRenderCommandEncoder <> nil then
+-        FRenderCommandEncoder.setScissorRect(MakeMTLScissorRect(Rect(0, 0, width, height), Scale));
++        // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++        FRenderCommandEncoder.setScissorRect(MakeMTLScissorRect(RectF(0, 0, width, height), Scale));
+     end;
+     // Faces
+     TContextState.csFrontFace:
+@@ -1041,7 +1042,7 @@
+   FStencilReferenceValue := Ref;
+ end;
+ 
+-procedure TContextMetal.DoSetScissorRect(const ScissorRect: TRect);
++procedure TContextMetal.DoSetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   if FRenderCommandEncoder = nil then
+     Exit;
+@@ -1169,7 +1170,7 @@
+ 
+ procedure TContextMetal.DoCopyToBitmap(const Dest: TBitmap; const ARect: TRect);
+ var
+-  LCopyRect: TRect;
++  LCopyRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   LSourceTexture: MTLTexture;
+   LDestTexture: MTLTexture;
+   LTexture: TTexture;
+@@ -1182,15 +1183,17 @@
+   if (TCanvasStyle.NeedGPUSurface in Dest.CanvasClass.GetCanvasStyle) and
+      ((Texture <> nil) or (FOnScreenTexture <> nil)) then
+   begin
+-    LCopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Width, Height));
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    LCopyRect := TRectF.Intersect(ARect, TRectF.Create(0, 0, Width, Height));
+     if (Texture <> nil) then
+     begin
+       LSourceTexture := TMTLTexture.Wrap(Pointer(Texture.Handle));
+-      LSourceOrigin.x := LCopyRect.left;
+-      LSourceOrigin.y := LCopyRect.top;
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      LSourceOrigin.x := Round(LCopyRect.left);
++      LSourceOrigin.y := Round(LCopyRect.top);
+       LSourceOrigin.z := 0;
+-      LSourceSize.width := LCopyRect.Width;
+-      LSourceSize.height := LCopyRect.Height;
++      LSourceSize.width := Round(LCopyRect.Width);
++      LSourceSize.height := Round(LCopyRect.Height);
+       LSourceSize.depth := 1;
+     end
+     else
+@@ -1237,22 +1240,13 @@
+ 
+ procedure TContextMetal.DoCopyToBits(const Bits: Pointer; const Pitch: Integer; const ARect: TRect);
+ 
+-  function CreateRegion(const ARect: TRect; const AScale: Single): MTLRegion;
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  function CreateRegion(const ARect: TRectF; const AScale: Single): MTLRegion;
+   begin
+-    if SameValue(AScale, 1, TEpsilon.Scale) then
+-    begin
+-      Result.origin.x := ARect.left;
+-      Result.origin.y := ARect.top;
+-      Result.size.width := ARect.Width;
+-      Result.size.height := ARect.Height;
+-    end
+-    else
+-    begin
+-      Result.origin.x := Round(ARect.Left * Scale);
+-      Result.origin.y := Round(ARect.Top * Scale);
+-      Result.size.width := Round(ARect.Width * Scale);
+-      Result.size.height := Round(ARect.Height * Scale);
+-    end;
++    Result.origin.x := Round(ARect.Left * Scale);
++    Result.origin.y := Round(ARect.Top * Scale);
++    Result.size.width := Round(ARect.Width * Scale);
++    Result.size.height := Round(ARect.Height * Scale);
+     Result.origin.z := 0;
+     Result.size.depth := 1;
+   end;
+@@ -1275,7 +1269,7 @@
+   end;
+ 
+ var
+-  LCopyRect: TRect;
++  LCopyRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   LTexture: MTLTexture;
+   LRegion: MTLRegion;
+ begin
+@@ -1284,7 +1278,8 @@
+   if FCommandBuffer <> nil then
+     FCommandBuffer.waitUntilCompleted;
+ 
+-  LCopyRect := TRect.Intersect(ARect, TRect.Create(0, 0, Width, Height));
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  LCopyRect := TRectF.Intersect(ARect, TRectF.Create(0, 0, Width, Height));
+   if Texture <> nil then
+   begin
+     LTexture := TMTLTexture.Wrap(Pointer(Texture.Handle));
+Index: Embarcadero/Athens/fmx/FMX.Controls.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FMX.Controls.pas
+--- a/Embarcadero/Athens/fmx/FMX.Controls.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Controls.pas	(working copy)
+@@ -520,6 +520,11 @@
+     procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
+     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); virtual;
+     procedure MouseClick(Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual;
++    procedure ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseEnter(const AObject: TControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
++    procedure ChildrenMouseLeave(const AObject: TControl); virtual; // https://quality.embarcadero.com/browse/RSP-24397
+     procedure KeyDown(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
+     procedure KeyUp(var Key: Word; var KeyChar: WideChar; Shift: TShiftState); virtual;
+     procedure DialogKey(var Key: Word; Shift: TShiftState); virtual;
+@@ -607,6 +612,7 @@
+     { optimization }
+     function GetFirstVisibleObjectIndex: Integer; virtual;
+     function GetLastVisibleObjectIndex: Integer; virtual;
++    function IsVisibleObject(const AObject: TControl): Boolean; virtual; // https://quality.embarcadero.com/browse/RSP-42357
+     function GetDefaultSize: TSizeF; virtual;
+     { bi-di }
+     function FillTextFlags: TFillTextFlags; virtual;
+@@ -2421,7 +2427,7 @@
+   FRecalcUpdateRect := True;
+   if FControls <> nil then
+     for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+-      if I < FControls.Count then
++      if (I < FControls.Count) and IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
+         FControls[I].RecalcUpdateRect;
+ end;
+ 
+@@ -2498,7 +2504,7 @@
+       begin
+         for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
+         begin
+-          if not FControls[I].Visible then
++          if not IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
+             Continue;
+           R := FControls[I].UpdateRect;
+           Result := UnionRect(Result, R);
+@@ -2535,7 +2541,7 @@
+     for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+     begin
+       Control := FControls[I];
+-      if Control.Visible then
++      if IsVisibleObject(Control) then // https://quality.embarcadero.com/browse/RSP-42357
+         Result := UnionRect(Result, Control.GetChildrenRect);
+     end
+ end;
+@@ -3058,7 +3064,7 @@
+     for I := GetLastVisibleObjectIndex - 1 downto GetFirstVisibleObjectIndex do
+     begin
+       Control := Controls[I];
+-      if not Control.GetVisible then
++      if not IsVisibleObject(Control) then // https://quality.embarcadero.com/browse/RSP-42357
+         Continue;
+ 
+       NewObj := Control.ObjectAtPoint(AScreenPoint);
+@@ -3699,6 +3705,12 @@
+     Result := 0;
+ end;
+ 
++// https://quality.embarcadero.com/browse/RSP-42357
++function TControl.IsVisibleObject(const AObject: TControl): Boolean;
++begin
++  result := AObject.Visible;
++end;
++
+ function TControl.GetLeft: Single;
+ begin
+   Result := Position.X;
+@@ -3970,7 +3982,9 @@
+ begin
+   if not FNeedAlign then
+     Exit;
++  var LOriginalSize: TPointF := Size.Size; // https://quality.embarcadero.com/browse/RSP-15768
+   AlignObjects(Self, FPadding, FSize.Width, FSize.Height, FLastWidth, FLastHeight, FDisableAlign);
++  if not LOriginalSize.EqualsTo(Size.Size) then DoRealign; // https://quality.embarcadero.com/browse/RSP-15768
+ end;
+ 
+ procedure TControl.Realign;
+@@ -4158,6 +4172,7 @@
+   ApplyTriggerEffect(Self, 'IsMouseOver');
+   if Assigned(FOnMouseEnter) then
+     FOnMouseEnter(Self);
++  if fparentControl <> nil then fparentControl.ChildrenMouseEnter(Self); // https://quality.embarcadero.com/browse/RSP-24397
+ end;
+ 
+ procedure TControl.DoMouseLeave;
+@@ -4167,6 +4182,7 @@
+   ApplyTriggerEffect(Self, 'IsMouseOver');
+   if Assigned(FOnMouseLeave) then
+     FOnMouseLeave(Self);
++  if fparentControl <> nil then fparentControl.ChildrenMouseLeave(Self); // https://quality.embarcadero.com/browse/RSP-24397
+ end;
+ 
+ function TControl.GetCanFocus: Boolean;
+@@ -4227,34 +4243,34 @@
+   if not Assigned(AConsumer) or (FScene = nil) or (ControlsCount = 0)then
+     Exit;
+ 
+-  for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
+-    if FControls[I].Visible then
+-    begin
+-      Control := FControls[I];
+-      if Control.FScene = nil then
+-        Continue;
+-      if not Control.FInPaintTo and Control.UpdateRect.IsEmpty then
+-        Continue;
+-      if (ClipChildren or SmallSizeControl) and not IntersectRect(UpdateRect, Control.UpdateRect) then
+-        Continue;
++    for I := GetFirstVisibleObjectIndex to GetLastVisibleObjectIndex - 1 do
++      if IsVisibleObject(FControls[I]) then // https://quality.embarcadero.com/browse/RSP-42357
++      begin
++        Control := FControls[I];
++        if Control.FScene = nil then
++          Continue;
++        if not Control.FInPaintTo and Control.UpdateRect.IsEmpty then
++          Continue;
++        if (ClipChildren or SmallSizeControl) and not IntersectRect(UpdateRect, Control.UpdateRect) then
++          Continue;
+ 
+-      AllowPaint := False;
+-      if Control.FInPaintTo then
+-        AllowPaint := True;
+-      if not AllowPaint then
+-      begin
+-        if Assigned(Control.CustomSceneAddRect) then
+-          AllowPaint := True
+-        else
++        AllowPaint := False;
++        if Control.FInPaintTo then
++          AllowPaint := True;
++        if not AllowPaint then
+         begin
+-          R := UnionRect(Control.GetChildrenRect, Control.UpdateRect);
+-          for J := 0 to FScene.GetUpdateRectsCount - 1 do
+-            if IntersectRect(FScene.GetUpdateRect(J), R) then
+-            begin
+-              AllowPaint := True;
+-              Break;
+-            end;
+-        end;
++          if Assigned(Control.CustomSceneAddRect) then
++            AllowPaint := True
++          else
++          begin
++            R := UnionRect(Control.GetChildrenRect, Control.UpdateRect);
++            for J := 0 to FScene.GetUpdateRectsCount - 1 do
++              if IntersectRect(FScene.GetUpdateRect(J), R) then
++              begin
++                AllowPaint := True;
++                Break;
++              end;
++          end;
+       end;
+ 
+       if AllowPaint then
+@@ -4643,6 +4659,7 @@
+ 
+   if Assigned(FOnMouseDown) then
+     FOnMouseDown(Self, Button, Shift, X, Y);
++  if fparentControl <> nil then fparentControl.ChildrenMouseDown(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
+   if FAutoCapture then
+     Capture;
+   if Button = TMouseButton.mbLeft then
+@@ -4665,6 +4682,7 @@
+ begin
+   if Assigned(FOnMouseMove) then
+     FOnMouseMove(Self, Shift, X, Y);
++  if fparentControl <> nil then fparentControl.ChildrenMouseMove(Self, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
+ end;
+ 
+ procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+@@ -4673,6 +4691,7 @@
+ 
+   if Assigned(FOnMouseUp) then
+     FOnMouseUp(Self, Button, Shift, X, Y);
++  if fparentControl <> nil then fparentControl.ChildrenMouseUp(Self, Button, Shift, X, Y); // https://quality.embarcadero.com/browse/RSP-24397
+   if FPressed then
+   begin
+     FPressed := False;
+@@ -4687,6 +4706,41 @@
+     FOnMouseWheel(Self, Shift, WheelDelta, Handled)
+ end;
+ 
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseDown(AObject, Button, Shift, X, Y);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseMove(const AObject: TControl; Shift: TShiftState; X, Y: Single);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseMove(AObject, Shift, X, Y);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseUp(AObject, Button, Shift, X, Y);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseEnter(const AObject: TControl);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseEnter(AObject);
++end;
++
++// https://quality.embarcadero.com/browse/RSP-24397
++procedure TControl.ChildrenMouseLeave(const AObject: TControl);
++begin
++  if fParentControl <> nil then
++    fParentControl.ChildrenMouseLeave(AObject);
++end;
++
+ procedure TControl.DragEnter(const Data: TDragObject; const Point: TPointF);
+ var
+   Operation: TDragOperation;
+Index: Embarcadero/Athens/fmx/FMX.Controls3D.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Controls3D.pas b/Embarcadero/Athens/fmx/FMX.Controls3D.pas
+--- a/Embarcadero/Athens/fmx/FMX.Controls3D.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Controls3D.pas	(working copy)
+@@ -1896,7 +1896,8 @@
+       finally
+         TempContext := nil;
+       end;
+-      BitmapContext.CopyToBitmap(ABitmap, Rect(0, 0, BitmapContext.Width, BitmapContext.Height));
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      BitmapContext.CopyToBitmap(ABitmap, Rect(0, 0, Round(BitmapContext.Width), Round(BitmapContext.Height)));
+       BitmapContext.Free;
+     finally
+       Texture.Free;
+@@ -1951,7 +1952,8 @@
+         TempContext := nil;
+       end;
+     end;
+-    BitmapContext.CopyToBitmap(ABitmap, Rect(0, 0, BitmapContext.Width, BitmapContext.Height));
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    BitmapContext.CopyToBitmap(ABitmap, Rect(0, 0, Round(BitmapContext.Width), Round(BitmapContext.Height)));
+     BitmapContext.Free;
+   finally
+     Texture.Free;
+Index: Embarcadero/Athens/fmx/FMX.Filter.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Filter.pas b/Embarcadero/Athens/fmx/FMX.Filter.pas
+--- a/Embarcadero/Athens/fmx/FMX.Filter.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Filter.pas	(working copy)
+@@ -1611,9 +1611,10 @@
+ 
+ function TFilterContext3D.InputTexture: TTexture;
+ begin
+-  if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
+-    Result := TContextManager.DefaultContextClass.BitmapToTexture(FInputBitmap)
+-  else
++  //https://quality.embarcadero.com/browse/RSP-20825
++  //if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
++  //  Result := TContextManager.DefaultContextClass.BitmapToTexture(FInputBitmap)
++  //else
+     Result := FInput;
+ end;
+ 
+@@ -1943,9 +1944,10 @@
+ 
+ function TFilterContext3D.TargetTexture: TTexture;
+ begin
+-  if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
+-    Result := TContextManager.DefaultContextClass.BitmapToTexture(FTargetBitmap)
+-  else
++  //https://quality.embarcadero.com/browse/RSP-20825
++  //if TCanvasStyle.NeedGPUSurface in TCanvasManager.DefaultCanvas.GetCanvasStyle then
++  //  Result := TContextManager.DefaultContextClass.BitmapToTexture(FTargetBitmap)
++  //else
+     Result := FTarget;
+ end;
+ 
+Index: Embarcadero/Athens/fmx/FMX.Forms.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.Forms.pas
+--- a/Embarcadero/Athens/fmx/FMX.Forms.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Forms.pas	(working copy)
+@@ -4438,7 +4438,10 @@
+ 
+ procedure TCommonCustomForm.SetHovered(const Value: IControl);
+ begin
+-  if (Value <> FHovered) then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((Value <> nil) and (FHovered = nil)) or
++     ((Value = nil) and (FHovered <> nil)) or
++     ((Value <> nil) and (FHovered <> nil) and (Value.GetObject <> FHovered.GetObject)) then
+   begin
+     if FHovered <> nil then
+     begin
+@@ -4917,7 +4920,10 @@
+     LControl := AControl
+   else
+     LControl := nil;
+-  if LControl <> FLastHinted then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((LControl <> nil) and (FLastHinted = nil)) or
++     ((LControl = nil) and (FLastHinted <> nil)) or
++     ((LControl <> nil) and (FLastHinted <> nil) and (LControl.GetObject <> FLastHinted.GetObject)) then
+   begin
+     if Application.ShowHint and (LControl <> nil) then
+     begin
+@@ -5736,7 +5742,10 @@
+ 
+ procedure TCommonCustomForm.SetCaptured(const Value: IControl);
+ begin
+-  if FCaptured <> Value then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((Value <> nil) and (FCaptured = nil)) or
++     ((Value = nil) and (FCaptured <> nil)) or
++     ((Value <> nil) and (FCaptured <> nil) and (Value.GetObject <> FCaptured.GetObject)) then
+   begin
+     if FCaptured <> nil then
+     begin
+@@ -6030,7 +6039,10 @@
+ 
+ procedure TCommonCustomForm.SetActiveControl(const AControl: IControl);
+ begin
+-  if AControl <> FActiveControl then
++  //https://quality.embarcadero.com/browse/RSP-36612
++  if ((AControl <> nil) and (FActiveControl = nil)) or
++     ((AControl = nil) and (FActiveControl <> nil)) or
++     ((AControl <> nil) and (FActiveControl <> nil) and (AControl.GetObject <> FActiveControl.GetObject)) then
+   begin
+     if FActiveControl <> nil then
+       FActiveControl.RemoveFreeNotify(Self);
+@@ -6232,7 +6244,7 @@
+   if Handle <> nil then
+   begin
+     LSize := FWinService.GetClientSize(Self);
+-    FCanvas := TCanvasManager.CreateFromWindow(Handle, Round(LSize.X), Round(LSize.Y), FQuality);
++    FCanvas := TCanvasManager.CreateFromWindow(Handle, LSize.X, LSize.Y, FQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   end;
+ end;
+ 
+Index: Embarcadero/Athens/fmx/FMX.Forms3D.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Forms3D.pas b/Embarcadero/Athens/fmx/FMX.Forms3D.pas
+--- a/Embarcadero/Athens/fmx/FMX.Forms3D.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Forms3D.pas	(working copy)
+@@ -374,7 +374,8 @@
+             Effect := TEffect(Children[i]);
+ 
+             if FEffectBitmap = nil then
+-              FEffectBitmap := TTextureBitmap.Create(FContext.Width, FContext.Height);
++              // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++              FEffectBitmap := TTextureBitmap.Create(Round(FContext.Width), Round(FContext.Height));
+ 
+             FEffectBitmap.Assign(Context);
+             Effect.ProcessEffect(nil, FEffectBitmap, 1);
+Index: Embarcadero/Athens/fmx/FMX.Graphics.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Graphics.pas b/Embarcadero/Athens/fmx/FMX.Graphics.pas
+--- a/Embarcadero/Athens/fmx/FMX.Graphics.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Graphics.pas	(working copy)
+@@ -1052,7 +1052,7 @@
+   protected
+     FClippingChangeCount: Integer;
+     FSavingStateCount: Integer;
+-    FWidth, FHeight: Integer;
++    FWidth, FHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     FFont: TFont;
+     FCanvasSaveData: TCanvasSaveStateList;
+     FPrinter: TAbstractPrinter;
+@@ -1069,7 +1069,7 @@
+     procedure RaiseIfBeginSceneCountZero;
+     procedure DoFlush; virtual;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); virtual;
+     constructor CreateFromBitmap(const ABitmap: TBitmap; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); virtual;
+     constructor CreateFromPrinter(const APrinter: TAbstractPrinter); virtual;
+@@ -1117,7 +1117,7 @@
+     class function GetCanvasStyle: TCanvasStyles; virtual;
+     class function GetAttribute(const Value: TCanvasAttribute): Integer; virtual;
+     { scene }
+-    procedure SetSize(const AWidth, AHeight: Integer); virtual;
++    procedure SetSize(const AWidth, AHeight: Single); virtual; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     function BeginScene(AClipRects: PClipRects = nil;  AContextHandle: THandle = 0): Boolean;
+     procedure EndScene;
+     property BeginSceneCount: Integer read FBeginSceneCount;
+@@ -1213,8 +1213,8 @@
+     property Fill: TBrush read FFill write SetFill;
+     property Font: TFont read FFont;
+     property Matrix: TMatrix read FMatrix;
+-    property Width: Integer read FWidth;
+-    property Height: Integer read FHeight;
++    property Width: Single read FWidth; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    property Height: Single read FHeight; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     property Bitmap: TBitmap read FBitmap;
+     property Scale: Single read FScale;
+     /// <summary>Allows to offset drawing area</summary>
+@@ -1257,7 +1257,7 @@
+     // Return canvas instance used for text measuring for example
+     class property MeasureCanvas: TCanvas read GetMeasureCanvas;
+     // Creation helper
+-    class function CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    class function CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault): TCanvas;
+     class function CreateFromBitmap(const ABitmap: TBitmap;
+       const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault): TCanvas;
+@@ -6034,7 +6034,7 @@
+   Result := DefaultPrinterCanvas.CreateFromPrinter(APrinter);
+ end;
+ 
+-class function TCanvasManager.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++class function TCanvasManager.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault): TCanvas;
+ begin
+   Result := DefaultCanvas.CreateFromWindow(AParent, AWidth, AHeight, AQuality);
+@@ -6169,7 +6169,7 @@
+ 
+ { TCanvas }
+ 
+-constructor TCanvas.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TCanvas.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault);
+ begin
+   inherited Create;
+@@ -6392,7 +6392,8 @@
+   try
+     if FBeginSceneCount = 0 then
+     begin
+-      Result := (Width > 0) and (Height > 0) and DoBeginScene(AClipRects, AContextHandle);
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      Result := (CompareValue(Width, 0, TEpsilon.Matrix) > 0) and (CompareValue(Height, 0, TEpsilon.Matrix) > 0) and DoBeginScene(AClipRects, AContextHandle);
+       if not Result then
+       begin
+         Unlock;
+@@ -7683,7 +7684,7 @@
+   end;
+ end;
+ 
+-procedure TCanvas.SetSize(const AWidth, AHeight: Integer);
++procedure TCanvas.SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   FWidth := AWidth;
+   FHeight := AHeight;
+Index: Embarcadero/Athens/fmx/FMX.Platform.iOS.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas b/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas
+--- a/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Platform.iOS.pas	(working copy)
+@@ -1,4 +1,4 @@
+-{*******************************************************}
++﻿{*******************************************************}
+ {                                                       }
+ {              Delphi FireMonkey Platform               }
+ {                                                       }
+@@ -1076,7 +1076,13 @@
+     WindowManager.NativeWindow.makeKeyAndVisible;
+ 
+     // Post initialization
+-    PlatformCocoaTouch.HandleApplicationEvent(TApplicationEvent.FinishedLaunching, nil);
++    // https://quality.embarcadero.com/browse/RSP-40351
++    Var LContext := TiOSOpenApplicationContext.Create(string.Empty, string.Empty, options);
++    Try
++      PlatformCocoaTouch.HandleApplicationEvent(TApplicationEvent.FinishedLaunching, LContext);
++    finally
++      LContext.Free;
++    End;
+     FMX.Forms.Application.RealCreateForms;
+     TiOSHelper.CurrentDevice.beginGeneratingDeviceOrientationNotifications;
+   finally
+Index: Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas
+--- a/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Platform.Screen.Android.pas	(working copy)
+@@ -255,12 +255,13 @@
+ 
+ function TAndroidScreenServices.TryFillDisplayInfo(const ANativeDisplay: JDisplay; var ADisplay: TDisplay): Boolean;
+ 
+-   function ScaleRect(const ARect: TRect; const AScale: Single): TRect;
++   // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++   function ScaleRect(const ARect: TRect; const AScale: Single): TRectF;
+    begin
+-     Result.Left := Trunc(ARect.Left / AScale);
+-     Result.Right := Ceil(ARect.Right / AScale);
+-     Result.Top := Trunc(ARect.Top / AScale);
+-     Result.Bottom := Ceil(ARect.Bottom / AScale);
++     Result.Left := ARect.Left / AScale;
++     Result.Right := ARect.Right / AScale;
++     Result.Top := ARect.Top / AScale;
++     Result.Bottom := ARect.Bottom / AScale;
+    end;
+ 
+   function CalculatePhysicalWorkarea(const ANativeDisplay: JDisplay; const APhysicalBounds: TRect): TRect;
+Index: Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas
+--- a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas	(working copy)
+@@ -26,7 +26,7 @@
+   TAndroidMotionManager = class;
+   TTextServiceAndroid = class;
+ 
+-  TRender<T: class> = class(TJavaLocal, JRunnable)
++  TRender<T: class> = class(TJavaLocal, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
+   private
+     [Weak] FContext: T;
+     FIsNeededUpdate: Boolean;
+@@ -41,14 +41,14 @@
+     /// <summary>Posts event to event bus for future rendering.</summary>
+     procedure PostRender;
+ 
+-    { JRunnable }
+-    procedure run; cdecl;
++    { JChoreographer_FrameCallback } // https://quality.embarcadero.com/browse/RSP-38660
++    procedure doFrame(frameTimeNanos: Int64); cdecl; // https://quality.embarcadero.com/browse/RSP-38660
+   public
+     property Context: T read FContext;
+   end;
+ 
+   /// <summary>Render of form. It is responsible for drawing FireMonkey form on native Surface.</summary>
+-  TFormRender = class(TRender<TAndroidWindowHandle>, JRunnable)
++  TFormRender = class(TRender<TAndroidWindowHandle>, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
+   public
+     /// <summary>Renders form Immediately.</summary>
+     procedure Render; override;
+@@ -1171,15 +1171,15 @@
+ end;
+ 
+ procedure TAndroidWindowHandle.TFormViewListener.onSizeChanged(w, h, oldw, oldh: Integer);
+-var
+-  FormBounds: TRect;
+ begin
+   FOwner.FWasFormRealignedFirstTime := True;
+   FOwner.FFormBounds.Width := w / PlatformAndroid.WindowService.Scale;
+   FOwner.FFormBounds.Height:= h / PlatformAndroid.WindowService.Scale;
+ 
+-  FormBounds := FOwner.Bounds.Ceiling;
+-  FOwner.Form.SetBoundsF(FormBounds.Left, FormBounds.Top, FormBounds.Width, FormBounds.Height);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  //FormBounds := FOwner.Bounds.Ceiling;
++  //FOwner.Form.SetBoundsF(FormBounds.Left, FormBounds.Top, FormBounds.Width, FormBounds.Height);
++  FOwner.Form.SetBoundsF(FOwner.Bounds);
+ end;
+ 
+ function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
+@@ -2898,7 +2898,7 @@
+ begin
+   TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
+   AtomicIncrement(FRefCount);
+-  TAndroidHelper.MainHandler.removeCallbacks(Self);
++  TJChoreographer.JavaClass.getInstance.removeFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
+   AtomicDecrement(FRefCount);
+   inherited;
+ end;
+@@ -2908,7 +2908,7 @@
+   if not FIsNeededUpdate then
+   begin
+     FIsNeededUpdate := True;
+-    TAndroidHelper.MainHandler.post(Self);
++    TJChoreographer.JavaClass.getInstance.postFrameCallback(Self); // https://quality.embarcadero.com/browse/RSP-38660
+   end;
+ end;
+ 
+@@ -2916,7 +2916,7 @@
+ begin
+ end;
+ 
+-procedure TRender<T>.run;
++procedure TRender<T>.doFrame(frameTimeNanos: Int64); // https://quality.embarcadero.com/browse/RSP-38660
+ begin
+   Render;
+   FIsNeededUpdate := False;
+Index: Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas
+--- a/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Presentation.Android.Style.pas	(working copy)
+@@ -71,7 +71,7 @@
+   end;
+ 
+   /// <summary>Render of native view.</summary>
+-  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JRunnable)
++  TAndroidPresentationRender = class(TRender<TAndroidNativeScene>, JChoreographer_FrameCallback) // https://quality.embarcadero.com/browse/RSP-38660
+   public
+     procedure Render; override;
+   end;
+@@ -286,11 +286,12 @@
+ 
+ function TAndroidNativeScene.DestroyCanvas(const ASurface: JSurfaceTexture): Boolean;
+ var
+-  Size: TSize;
++  Size: TSizeF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   Handle.Surface := nil;
+ 
+-  Size := TSize.Create(FCanvas.Width, FCanvas.Height);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  Size := TSizeF.Create(FCanvas.Width, FCanvas.Height);
+   FreeAndNil(FCanvas);
+   FCanvas := TCanvasManager.CreateFromWindow(Handle, Size.Width, Size.Height);
+   Result := True;
+Index: Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas b/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas
+--- a/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Presentation.Win.Style.pas	(working copy)
+@@ -400,7 +400,8 @@
+ begin
+   PhysicalSize := FWindowHandle.WndClientSize;
+   FCanvas.SetSize(PhysicalSize.Width, PhysicalSize.Height);
+-  FBackground.SetSize(FCanvas.Width, FCanvas.Height);
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  FBackground.SetSize(Round(FCanvas.Width), Round(FCanvas.Height));
+   FBackground.BitmapScale := Handle.Scale;
+   inherited;
+ end;
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas
+--- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.GL.pas	(working copy)
+@@ -1,3 +1,4 @@
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1541
+ {************************************************************************}
+ {                                                                        }
+ {                              Skia4Delphi                               }
+@@ -15,7 +16,7 @@
+ {$SCOPEDENUMS ON}
+ {$HPPEMIT NOUSINGNAMESPACE}
+ 
+-{$IF DEFINED(MSWINDOWS) or DEFINED(ANDROID) or DEFINED(IOS)}
++{$IF DEFINED(ANDROID) or DEFINED(IOS)}
+   {$DEFINE SKIA_GL}
+ {$ENDIF}
+ 
+@@ -28,16 +29,8 @@
+ type
+   { TGlSharedContextCustom }
+ 
+-  TGlSharedContextCustom = class abstract(TGrSharedContext)
+-  protected
+-    FStencilBits: Integer;
+-  public
+-    property StencilBits: Integer read FStencilBits;
+-  end;
++  TGlSharedContextCustom = class abstract(TGrSharedContext);
+ 
+-var
+-  GlobalUseSkiaGLSwapInterval: Integer;
+-
+ implementation
+ 
+ uses
+@@ -45,31 +38,19 @@
+   FMX.Graphics,
+   FMX.Types,
+   {$IF DEFINED(ANDROID)}
+-  FMX.Platform.UI.Android,
+-  FMX.Presentation.Android.Style,
+-  Androidapi.Egl,
++  FMX.Context.GLES.Android,
+   Androidapi.Gles2,
+   Androidapi.Gles2ext,
+-  Androidapi.JNI.GraphicsContentViewText,
+-  Androidapi.JNIBridge,
+-  Androidapi.NativeWindow,
+-  Androidapi.NativeWindowJni,
+   {$ELSEIF DEFINED(IOS)}
+   FMX.Platform.iOS,
++  FMX.Context.GLES.iOS,
+   iOSapi.GLKit,
+   iOSapi.OpenGLES,
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FMX.Platform.Win,
+-  Winapi.OpenGL,
+-  Winapi.OpenGLext,
+-  Winapi.Windows,
+-  System.AnsiStrings,
+-  System.Generics.Collections,
+-  System.Generics.Defaults,
+   {$ENDIF}
+   System.Math,
+   System.SysUtils,
+   System.Types,
++  FMX.Types3D,
+ 
+   { Skia }
+   System.Skia,
+@@ -83,130 +64,29 @@
+   TGlCanvas = class(TGrCanvas)
+   private
+     FBackBufferSurface: ISkSurface;
+-    {$IF DEFINED(ANDROID)}
+-    FANativeWindow: PANativeWindow;
+-    FContext: EGLContext;
+-    FOldContext: EGLContext;
+-    FOldDisplay: EGLDisplay;
+-    FOldDraw: EGLSurface;
+-    FOldRead: EGLSurface;
+-    FSurface: EGLSurface;
+-    {$ELSEIF DEFINED(IOS)}
+-    FContext: EAGLContext;
+-    FOldContext: EAGLContext;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    FDC: HDC;
+-    FGLRC: HGLRC;
+-    FOldDC: HDC;
+-    FOldGLRC: HGLRC;
+-    {$ENDIF}
+-    function CreateContext: Boolean;
+-    procedure DestroyContext;
+-    procedure MakeCurrent;
+-    procedure RestoreCurrent;
+-    procedure SaveCurrent;
++    FContext: TContext3D;
+     function TryMakeCurrent: Boolean;
++  strict protected
++    function BeginCanvas(const AContextHandle: THandle): ISkCanvas; override;
++    procedure EndCanvas(const AContextHandle: THandle); override;
+   protected
+-    procedure BeforeRestore; override;
+     function CreateSharedContext: IGrSharedContext; override;
+-    procedure DoDrawBitmap(const ABitmap: FMX.Graphics.TBitmap; const ASrcRect, ADestRect: TRectF; const AOpacity: Single; const AHighSpeed: Boolean); override;
+     function GetSurfaceFromWindow(const AContextHandle: THandle): TSkSurface; override;
+     procedure Resized; override;
+-    procedure SwapBuffers(const AContextHandle: THandle); override;
+   public
+     destructor Destroy; override;
+     class function IsSupported: Boolean;
+   end;
+ 
+-{$IF DEFINED(MSWINDOWS)}
+-
+-const
+-  WGL_DRAW_TO_WINDOW_ARB           = $2001;
+-  WGL_ACCELERATION_ARB             = $2003;
+-  WGL_SUPPORT_OPENGL_ARB           = $2010;
+-  WGL_DOUBLE_BUFFER_ARB            = $2011;
+-  WGL_COLOR_BITS_ARB               = $2014;
+-  WGL_ALPHA_BITS_ARB               = $201B;
+-  WGL_STENCIL_BITS_ARB             = $2023;
+-  WGL_FULL_ACCELERATION_ARB        = $2027;
+-  WGL_SAMPLE_BUFFERS_ARB           = $2041;
+-  WGL_SAMPLES_ARB                  = $2042;
+-  WGL_CONTEXT_CORE_PROFILE_BIT_ARB = $00000001;
+-  WGL_CONTEXT_MAJOR_VERSION_ARB    = $2091;
+-  WGL_CONTEXT_MINOR_VERSION_ARB    = $2092;
+-  WGL_CONTEXT_PROFILE_MASK_ARB     = $9126;
+-
+ type
+-  PFNWGLCHOOSEPIXELFORMATARBPROC      = function (hdc: HDC; const piAttribIList: PInteger; const pfAttribFList: PSingle; nMaxFormats: UINT; piFormats: PInteger; nNumFormats: PUINT): BOOL; stdcall;
+-  PFNWGLCREATECONTEXTATTRIBSARBPROC   = function (hDC: HDC; hShareContext: HGLRC; const attribList: PInteger): HGLRC; stdcall;
+-  PFNWGLGETEXTENSIONSSTRINGARBPROC    = function (hdc: HDC): MarshaledAString; stdcall;
+-  PFNWGLGETPIXELFORMATATTRIBIVARBPROC = function (hdc: HDC; iPixelFormat, iLayerPlane: Integer; nAttributes: UINT; const piAttributes: PInteger; piValues: PInteger): BOOL; stdcall;
+-  PFNWGLSWAPINTERVALEXTPROC           = function (interval: Integer): BOOL; stdcall;
+-
+-  { TGlInterface }
+-
+-  TGlInterface = record
+-  private
+-    FChoosePixelFormatARB: PFNWGLCHOOSEPIXELFORMATARBPROC;
+-    FCreateContextAttribsARB: PFNWGLCREATECONTEXTATTRIBSARBPROC;
+-    FGetExtensionsStringARB: PFNWGLGETEXTENSIONSSTRINGARBPROC;
+-    FGetPixelFormatAttribivARB: PFNWGLGETPIXELFORMATATTRIBIVARBPROC;
+-    FSwapIntervalEXT: PFNWGLSWAPINTERVALEXTPROC;
+-  private
+-    procedure GetGlProc(const AName: MarshaledAString; out AProc); inline;
+-  public
+-    procedure Initialize;
+-    function HasExtension(const AHDC: HDC; const AName: MarshaledAString): Boolean;
+-    property ChoosePixelFormatARB: PFNWGLCHOOSEPIXELFORMATARBPROC read FChoosePixelFormatARB;
+-    property CreateContextAttribsARB: PFNWGLCREATECONTEXTATTRIBSARBPROC read FCreateContextAttribsARB;
+-    property GetExtensionsStringARB: PFNWGLGETEXTENSIONSSTRINGARBPROC read FGetExtensionsStringARB;
+-    property GetPixelFormatAttribivARB: PFNWGLGETPIXELFORMATATTRIBIVARBPROC read FGetPixelFormatAttribivARB;
+-    property SwapIntervalEXT: PFNWGLSWAPINTERVALEXTPROC read FSwapIntervalEXT;
+-  end;
+-{$ENDIF}
+-
+-type
+   { TGlSharedContext }
+ 
+   TGlSharedContext = class(TGlSharedContextCustom)
+   private
+     procedure MakeCurrent;
+-  private
+-    [Volatile] FBeginContextCount: Integer;
+-    FGrGlInterface: IGrGlInterface;
+-    {$IF DEFINED(ANDROID)}
+-    FConfig: EGLConfig;
+-    FContext: EGLContext;
+-    FDisplay: EGLDisplay;
+-    FOldContext: EGLContext;
+-    FOldDisplay: EGLDisplay;
+-    FOldDraw: EGLSurface;
+-    FOldRead: EGLSurface;
+-    FSurface: EGLSurface;
+-    {$ELSEIF DEFINED(IOS)}
+-    FContext: EAGLContext;
+-    FLibraryHandle: HMODULE;
+-    FOldContext: EAGLContext;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    FContextAttributes: TArray<Integer>;
+-    FDC: HDC;
+-    FGlInterface: TGlInterface;
+-    FGLRC: HGLRC;
+-    FOldDC: HDC;
+-    FOldGLRC: HGLRC;
+-    FPixelFormat: Integer;
+-    FPixelFormatDescriptor: TPixelFormatDescriptor;
+-    FWindow: HWND;
+-    {$ENDIF}
+-    procedure CreateBackendContext(const AQuality: TCanvasQuality);
+-    procedure DestroyBackendContext;
+-    procedure RestoreCurrent;
+-    procedure SaveAndMakeCurrent; inline;
+-    procedure SaveCurrent;
+   protected
+     procedure BeginContext; override;
+     procedure DestroyContext; override;
+-    procedure EndContext; override;
+     function GetTextureColorType: TSkColorType; override;
+     function GetTextureOrigin: TGrSurfaceOrigin; override;
+     procedure RefreshContext; override;
+@@ -214,454 +94,121 @@
+     constructor Create(const AQuality: TCanvasQuality);
+     procedure FinalizeTextureCache(const ABitmap: TGrBitmapHandle); override;
+     procedure InitializeTextureCache(const ABitmap: TGrBitmapHandle); override;
+-    property GrGlInterface: IGrGlInterface read FGrGlInterface;
+-    {$IF DEFINED(ANDROID)}
+-    property Config: EGLConfig read FConfig;
+-    property Context: EGLContext read FContext;
+-    property Display: EGLDisplay read FDisplay;
+-    const ContextAttributes: array[0..2] of EGLint = (EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE);
+-    {$ELSEIF DEFINED(IOS)}
+-    property Context: EAGLContext read FContext;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    property ContextAttributes: TArray<Integer> read FContextAttributes;
+-    property GlInterface: TGlInterface read FGlInterface;
+-    property GLRC: HGLRC read FGLRC;
+-    property PixelFormat: Integer read FPixelFormat;
+-    property PixelFormatDescriptor: TPixelFormatDescriptor read FPixelFormatDescriptor;
+-    {$ENDIF}
+   end;
+ 
+ { TGlCanvas }
+ 
+-procedure TGlCanvas.BeforeRestore;
++function TGlCanvas.BeginCanvas(const AContextHandle: THandle): ISkCanvas;
+ begin
+-  inherited;
+-  if Parent <> nil then
+-    MakeCurrent
+-  else if Supports(FWrapper, IGrCanvasWrapper) then
+-    TGlSharedContext(SharedContext).MakeCurrent;
+-end;
+-
+-function TGlCanvas.CreateContext: Boolean;
+-{$IFDEF ANDROID}
+-var
+-  LFormat: GLint;
+-  LJSurface: JSurface;
+-  LSurface: Pointer;
+-{$ENDIF}
+-begin
+-  Result := False;
+-  {$IF DEFINED(ANDROID)}
+-  if FANativeWindow = nil then
++  if (Fcontext = nil) and (Parent <> nil) then
+   begin
+-    if Parent is TAndroidWindowHandle then
+-    begin
+-      if TAndroidWindowHandle(Parent).Holder = nil then
+-        Exit;
+-      LSurface := (TAndroidWindowHandle(Parent).Holder.getSurface as ILocalObject).GetObjectID;
+-    end
+-    else if Parent is TAndroidHandle then
+-    begin
+-      if TAndroidHandle(Parent).Surface = nil then
+-        Exit;
+-      LJSurface := TJSurface.JavaClass.init(TAndroidHandle(Parent).Surface);
+-      LSurface  := TJNIResolver.JavaInstanceToID(LJSurface);
+-    end
++    var LMultisample: TMultisample;
++    case Quality of
++      TCanvasQuality.HighPerformance: LMultisample := TMultisample.None;
++      TCanvasQuality.HighQuality: LMultisample := TMultisample.FourSamples;
+     else
+-      Exit;
+-    FANativeWindow := ANativeWindow_fromSurface(TJNIResolver.GetJNIEnv, LSurface);
+-    if FANativeWindow = nil then
+-      Exit;
+-    eglGetConfigAttrib(TGlSharedContext(SharedContext).Display, TGlSharedContext(SharedContext).Config, EGL_NATIVE_VISUAL_ID, @LFormat);
+-    ANativeWindow_setBuffersGeometry(FANativeWindow, 0, 0, LFormat);
+-    FSurface := eglCreateWindowSurface(TGlSharedContext(SharedContext).Display, TGlSharedContext(SharedContext).Config, FANativeWindow, nil);
+-    if FSurface = EGL_NO_SURFACE then
+-    begin
+-      ANativeWindow_release(FANativeWindow);
+-      FANativeWindow := nil;
+-      Exit;
++      LMultisample := TMultisample.None;
+     end;
++    FContext := TContextManager.CreateFromWindow(Parent, Width, Height, LMultisample, true);
+   end;
+-  FContext := eglCreateContext(TGlSharedContext(SharedContext).Display, TGlSharedContext(SharedContext).Config, TGlSharedContext(SharedContext).Context, @TGlSharedContext.ContextAttributes);
+-  if FContext = EGL_NO_CONTEXT then
+-    Exit;
+-  {$ELSEIF DEFINED(IOS)}
+-  FContext := TEAGLContext.Wrap(TEAGLContext.Alloc.initWithAPI(kEAGLRenderingAPIOpenGLES2, TGlSharedContext(SharedContext).Context.sharegroup));
+-  if FContext = nil then
+-    Exit;
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  if FDC = 0 then
++
++  if FContext <> nil then
+   begin
+-    FDC := GetDC(WindowHandleToPlatform(Parent).Wnd);
+-    if FDC = 0 then
+-      Exit;
+-    SetPixelFormat(FDC, TGlSharedContext(SharedContext).PixelFormat, @TGlSharedContext(SharedContext).PixelFormatDescriptor);
+-  end;
+-  if TGlSharedContext(SharedContext).ContextAttributes <> nil then
+-  begin
+-    FGLRC := TGlSharedContext(SharedContext).GlInterface.CreateContextAttribsARB(FDC, TGlSharedContext(SharedContext).GLRC, Pointer(TGlSharedContext(SharedContext).ContextAttributes));
+-    if FGLRC = 0 then
+-      Exit;
++    if FContext.BeginScene then
++      result := inherited
++    else
++      Result := nil;
+   end
+-  else
+-  begin
+-    FGLRC := wglCreateContext(FDC);
+-    if FGLRC = 0 then
+-      Exit;
+-    if not wglShareLists(TGlSharedContext(SharedContext).GLRC, FGLRC) then
+-    begin
+-      wglDeleteContext(FGLRC);
+-      Exit;
+-    end;
++  else begin
++    if TryMakeCurrent then
++      result := inherited
++    else
++      Result := nil;
+   end;
+-  {$ENDIF}
+-  try
+-    if not TryMakeCurrent then
+-      Exit;
+-    {$IF DEFINED(ANDROID)}
+-    eglSwapInterval(TGlSharedContext(SharedContext).Display, GlobalUseSkiaGLSwapInterval);
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    if TGlSharedContext(SharedContext).GlInterface.HasExtension(FDC, 'WGL_EXT_swap_control') then
+-      TGlSharedContext(SharedContext).GlInterface.SwapIntervalEXT(GlobalUseSkiaGLSwapInterval);
+-    {$ENDIF}
+-    FGrDirectContext := TGrDirectContext.MakeGl(TGlSharedContext(SharedContext).GrGlInterface);
+-    Result           := FGrDirectContext <> nil;
+-  finally
+-    if not Result then
+-      {$IF DEFINED(ANDROID)}
+-      eglDestroyContext(TGlSharedContext(SharedContext).Display, FContext);
+-      {$ELSEIF DEFINED(IOS)}
+-      FContext.release;
+-      {$ELSEIF DEFINED(MSWINDOWS)}
+-      wglDeleteContext(FGLRC);
+-      {$ENDIF}
+-  end;
+-  {$IFDEF IOS}
+-  if Result then
+-  begin
+-    GLKView(WindowHandleToPlatform(Parent).View).setContext(FContext);
+-    GLKView(WindowHandleToPlatform(Parent).View).bindDrawable;
+-  end;
+-  {$ENDIF}
+ end;
+ 
+-function TGlCanvas.CreateSharedContext: IGrSharedContext;
++procedure TGlCanvas.EndCanvas(const AContextHandle: THandle);
+ begin
+-  Result := TGlSharedContext.Create(Quality);
+-end;
+-
+-destructor TGlCanvas.Destroy;
+-begin
+-  if Parent <> nil then
+-  begin
+-    DestroyContext;
+-    {$IF DEFINED(ANDROID)}
+-    if FANativeWindow <> nil then
+-    begin
+-      eglDestroySurface(TGlSharedContext(SharedContext).Display, FSurface);
+-      ANativeWindow_release(FANativeWindow);
+-    end;
+-    {$ELSEIF DEFINED(MSWINDOWS)}
+-    if FDC <> 0 then
+-      ReleaseDC(WindowHandleToPlatform(Parent).Wnd, FDC);
+-    {$ENDIF}
+-  end;
+   inherited;
++  if FContext <> nil then
++    FContext.EndScene;
+ end;
+ 
+-procedure TGlCanvas.DestroyContext;
++function TGlCanvas.CreateSharedContext: IGrSharedContext;
+ begin
+-  if FGrDirectContext <> nil then
+-  begin
+-    SaveCurrent;
+-    try
+-      TryMakeCurrent;
+-      FBackBufferSurface := nil;
+-      FGrDirectContext.AbandonContext;
+-      FGrDirectContext := nil;
+-      {$IF DEFINED(ANDROID)}
+-      eglDestroyContext(TGlSharedContext(SharedContext).Display, FContext);
+-      {$ELSEIF DEFINED(IOS)}
+-      FContext.release;
+-      {$ELSEIF DEFINED(MSWINDOWS)}
+-      wglDeleteContext(FGLRC);
+-      {$ENDIF}
+-    finally
+-      RestoreCurrent;
+-    end;
+-  end;
++  Result := TGlSharedContext.Create(Quality);
+ end;
+ 
+-procedure TGlCanvas.DoDrawBitmap(const ABitmap: FMX.Graphics.TBitmap;
+-  const ASrcRect, ADestRect: TRectF; const AOpacity: Single;
+-  const AHighSpeed: Boolean);
++destructor TGlCanvas.Destroy;
+ begin
+-  if Parent <> nil then
+-    MakeCurrent
+-  else if Supports(FWrapper, IGrCanvasWrapper) then
+-    TGlSharedContext(SharedContext).MakeCurrent;
++  FBackBufferSurface := nil;
++  FGrDirectContext := nil;
++  if Fcontext <> nil then
++    FreeAndNil(FContext);
+   inherited;
+ end;
+ 
+ function TGlCanvas.GetSurfaceFromWindow(
+   const AContextHandle: THandle): TSkSurface;
+-var
+-  LGrBackendRenderTarget: IGrBackendRenderTarget;
+-  LGrGlFramebufferInfo: TGrGlFramebufferInfo;
+ begin
+   Result := nil;
+-  SaveCurrent;
+-  try
+-    if FBackBufferSurface <> nil then
+-    begin
+-      if not TryMakeCurrent then
+-        Exit;
+-    end
+-    else
+-    begin
+-      if FGrDirectContext = nil then
+-      begin
+-        if not CreateContext then
+-          Exit;
+-      end
+-      else if not TryMakeCurrent then
+-        Exit;
+-      glGetIntegerv(GL_FRAMEBUFFER_BINDING, @GLuint(LGrGlFramebufferInfo.FBOID));
+-      LGrGlFramebufferInfo.Format := {$IF DEFINED(IOS) or DEFINED(ANDROID)}GL_RGBA8_OES{$ELSE}GL_RGBA8{$ENDIF};
+-      LGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Round(Width * Scale), Round(Height * Scale), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), TGlSharedContext(SharedContext).StencilBits, LGrGlFramebufferInfo);
+-      FBackBufferSurface     := TSkSurface.MakeFromRenderTarget(FGrDirectContext, LGrBackendRenderTarget, TGrSurfaceOrigin.BottomLeft, TSkColorType.RGBA8888);
+-    end;
+-    Result := TSkSurface(FBackBufferSurface);
+-  finally
+-    if Result = nil then
+-      RestoreCurrent;
+-  end;
+-end;
+ 
+-class function TGlCanvas.IsSupported: Boolean;
+-{$IFDEF MSWINDOWS}
+-const
+-  WGLARBPixelFormatExtName = 'WGL_ARB_pixel_format';
+-var
+-  LClass: TWndClass;
+-  LDC: HDC;
+-  LEnd: MarshaledAString;
+-  LExtensions: MarshaledAString;
+-  LGetExtensionsStringARB: PFNWGLGETEXTENSIONSSTRINGARBPROC;
+-  LGLRC: HGLRC;
+-  LPixelFormat: Integer;
+-  LPixelFormatDescriptor: TPixelFormatDescriptor;
+-  LWindow: HWND;
+-{$ENDIF}
+-begin
+-{$IF DEFINED(MSWINDOWS)}
+-  FillChar(LClass, SizeOf(TWndClass), 0);
+-  LClass.lpfnWndProc   := @DefWindowProc;
+-  LClass.hInstance     := HInstance;
+-  LClass.lpszClassName := '_temp';
+-  if Winapi.Windows.RegisterClass(LClass) = 0 then
+-    Exit(False);
+-  try
+-    LWindow := CreateWindowEx(WS_EX_TOOLWINDOW, '_temp', nil, WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
+-    if LWindow = 0 then
+-      Exit(False);
+-    try
+-      LDC := GetDC(LWindow);
+-      if LDC = 0 then
+-        Exit(False);
+-      try
+-        FillChar(LPixelFormatDescriptor, SizeOf(TPixelFormatDescriptor), 0);
+-        LPixelFormatDescriptor.nSize        := SizeOf(TPixelFormatDescriptor);
+-        LPixelFormatDescriptor.nVersion     := 1;
+-        LPixelFormatDescriptor.dwFlags      := PFD_DRAW_TO_WINDOW or PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER;
+-        LPixelFormatDescriptor.iPixelType   := PFD_TYPE_RGBA;
+-        LPixelFormatDescriptor.cColorBits   := 24;
+-        LPixelFormatDescriptor.cAlphaBits   := 8;
+-        LPixelFormatDescriptor.cStencilBits := 8;
+-        LPixelFormatDescriptor.iLayerType   := PFD_MAIN_PLANE;
+-        LPixelFormat := ChoosePixelFormat(LDC, @LPixelFormatDescriptor);
+-        if (LPixelFormat = 0) or (not SetPixelFormat(LDC, LPixelFormat, @LPixelFormatDescriptor)) then
+-          Exit(False);
+-        LGLRC := wglCreateContext(LDC);
+-        if LGLRC = 0 then
+-          Exit(False);
+-        try
+-          if not wglMakeCurrent(LDC, LGLRC) then
+-            Exit(False);
+-          try
+-            LGetExtensionsStringARB := GetProcAddress(GetModuleHandle(opengl32), 'wglGetExtensionsStringARB');
+-            if not Assigned(LGetExtensionsStringARB) then
+-            begin
+-              LGetExtensionsStringARB := wglGetProcAddress('wglGetExtensionsStringARB');
+-              if not Assigned(LGetExtensionsStringARB) then
+-                Exit(False);
+-            end;
+-            LExtensions := LGetExtensionsStringARB(LDC);
+-            while LExtensions^ <> #0 do
+-            begin
+-              LEnd := LExtensions;
+-              while (LEnd^ <> ' ') and (LEnd^ <> #0) do
+-                Inc(LEnd);
+-              if (LEnd - LExtensions = Length(WGLARBPixelFormatExtName)) and (System.AnsiStrings.StrLIComp(LExtensions, WGLARBPixelFormatExtName, LEnd - LExtensions) = 0) then
+-                Exit(True);
+-              if LEnd^ = #0 then
+-                Break;
+-              LExtensions := LEnd + 1;
+-            end;
+-            Result := False;
+-          finally
+-            wglMakeCurrent(0, 0);
+-          end;
+-        finally
+-          wglDeleteContext(LGLRC);
+-        end;
+-      finally
+-        ReleaseDC(LWindow, LDC);
+-      end;
+-    finally
+-      DestroyWindow(LWindow);
+-    end;
+-  finally
+-    Winapi.Windows.UnregisterClass('_temp', HInstance);
+-  end;
+-{$ELSE}
+-  Result := True;
+-{$ENDIF}
+-end;
+-
+-procedure TGlCanvas.MakeCurrent;
+-begin
+   if not TryMakeCurrent then
+-    raise EGlError.Create('Could not make context as current.');
+-end;
++    Exit;
+ 
+-procedure TGlCanvas.Resized;
+-begin
+-  inherited;
+-  if FBackBufferSurface <> nil then
++  if FGrDirectContext = nil then
+   begin
+-    SaveCurrent;
+-    try
+-      MakeCurrent;
+-      FBackBufferSurface := nil;
+-    finally
+-      RestoreCurrent;
+-    end;
++    // GPU-wrapped objects cannot be shared between different GrDirectContexts.
++    // For instance, an SkImage created on one GrDirectContext cannot be used on another.
++    // Therefore, we use the same instance of GrDirectContext between TGlCanvas and TGlSharedContext.
++    // As a result, TGlCanvas is effectively not multithreaded.
++    FGrDirectContext := TGlSharedContext(SharedContext).GrDirectContext;
++    if FGrDirectContext = nil then
++      Exit;
+   end;
+-end;
+ 
+-procedure TGlCanvas.RestoreCurrent;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  eglMakeCurrent(FOldDisplay, FOldDraw, FOldRead, FOldContext);
+-  {$ELSEIF DEFINED(IOS)}
+-  TEAGLContext.OCClass.setCurrentContext(FOldContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  wglMakeCurrent(FOldDC, FOldGLRC);
+-  {$ENDIF}
++  if FBackBufferSurface = nil then
++  begin
++    var LGrGlFramebufferInfo: TGrGlFramebufferInfo;
++    glGetIntegerv(GL_FRAMEBUFFER_BINDING, @GLuint(LGrGlFramebufferInfo.FBOID));
++    LGrGlFramebufferInfo.Format := {$IF DEFINED(IOS) or DEFINED(ANDROID)}GL_RGBA8_OES{$ELSE}GL_RGBA8{$ENDIF};
++    var LStencilBits: GLint;
++    glGetIntegerv(GL_STENCIL_BITS, @LStencilBits);
++    var LGrBackendRenderTarget: IGrBackendRenderTarget := TGrBackendRenderTarget.CreateGl(Round(Width * Scale), Round(Height * Scale), Min(CanvasQualitySampleCount[Quality], FGrDirectContext.GetMaxSurfaceSampleCountForColorType(TSkColorType.RGBA8888)), LStencilBits, LGrGlFramebufferInfo);
++    FBackBufferSurface     := TSkSurface.MakeFromRenderTarget(FGrDirectContext, LGrBackendRenderTarget, TGrSurfaceOrigin.BottomLeft, TSkColorType.RGBA8888);
++  end;
++
++  Result := TSkSurface(FBackBufferSurface);
+ end;
+ 
+-procedure TGlCanvas.SaveCurrent;
++class function TGlCanvas.IsSupported: Boolean;
+ begin
+-  {$IF DEFINED(ANDROID)}
+-  FOldDisplay := eglGetCurrentDisplay;
+-  if FOldDisplay = EGL_NO_DISPLAY then
+-  begin
+-    FOldDisplay := TGlSharedContext(SharedContext).Display;
+-    FOldDraw    := EGL_NO_SURFACE;
+-    FOldRead    := EGL_NO_SURFACE;
+-    FOldContext := EGL_NO_CONTEXT;
+-  end
+-  else
+-  begin
+-    FOldDraw    := eglGetCurrentSurface(EGL_DRAW);
+-    FOldRead    := eglGetCurrentSurface(EGL_READ);
+-    FOldContext := eglGetCurrentContext;
+-  end;
+-  {$ELSEIF DEFINED(IOS)}
+-  FOldContext := TEAGLContext.Wrap(TEAGLContext.OCClass.currentContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FOldDC   := wglGetCurrentDC;
+-  FOldGLRC := wglGetCurrentContext;
+-  {$ENDIF}
++{$IF DEFINED(ANDROID) or DEFINED(IOS)}
++  Result := True;
++{$ELSE}
++  Result := False;
++{$ENDIF}
+ end;
+ 
+-procedure TGlCanvas.SwapBuffers(const AContextHandle: THandle);
++procedure TGlCanvas.Resized;
+ begin
+   inherited;
+-  {$IF DEFINED(ANDROID)}
+-  if eglSwapBuffers(TGlSharedContext(SharedContext).Display, FSurface) = EGL_FALSE then
+-    raise EGrCanvas.Create('Could not swap buffers.');
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  if not Winapi.Windows.SwapBuffers(FDC) then
+-    raise EGrCanvas.Create('Could not swap buffers.');
+-  {$ENDIF}
+-  RestoreCurrent;
++  FBackBufferSurface := nil;
++  if Fcontext <> nil then
++    Fcontext.Resize;
+ end;
+ 
+ function TGlCanvas.TryMakeCurrent: Boolean;
+ begin
+   {$IF DEFINED(ANDROID)}
+-  Result := eglMakeCurrent(TGlSharedContext(SharedContext).Display, FSurface, FSurface, FContext) <> EGL_FALSE;
++  Result := TCustomAndroidContext.Valid;
+   {$ELSEIF DEFINED(IOS)}
+-  Result := TEAGLContext.OCClass.setCurrentContext(FContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  Result := wglMakeCurrent(FDC, FGLRC);
++  Result := TCustomContextIOS.Valid;
+   {$ELSE}
+   Result := False;
+   {$ENDIF}
+ end;
+ 
+-{$IFDEF MSWINDOWS}
+-
+-{ TGlInterface }
+-
+-procedure TGlInterface.GetGlProc(const AName: MarshaledAString; out AProc);
+-begin
+-  PPointer(@AProc)^ := GetProcAddress(GetModuleHandle(opengl32), AName);
+-  if PPointer(@AProc)^ = nil then
+-    PPointer(@AProc)^ := wglGetProcAddress(AName);
+-end;
+-
+-function TGlInterface.HasExtension(const AHDC: HDC;
+-  const AName: MarshaledAString): Boolean;
+-var
+-  LEnd: MarshaledAString;
+-  LExtensions: MarshaledAString;
+-begin
+-  if not Assigned(FGetExtensionsStringARB) then
+-    Exit(False);
+-  if System.AnsiStrings.StrComp(AName, 'WGL_ARB_extensions_string') = 0 then
+-    Exit(True);
+-  LExtensions := FGetExtensionsStringARB(AHDC);
+-  if LExtensions <> nil then
+-  begin
+-    while LExtensions^ <> #0 do
+-    begin
+-      LEnd := LExtensions;
+-      while (LEnd^ <> ' ') and (LEnd^ <> #0) do
+-        Inc(LEnd);
+-      if (LEnd - LExtensions = Length(AName)) and (System.AnsiStrings.StrLIComp(LExtensions, AName, LEnd - LExtensions) = 0) then
+-        Exit(True);
+-      if LEnd^ = #0 then
+-        Break;
+-      LExtensions := LEnd + 1;
+-    end;
+-  end;
+-  Result := False;
+-end;
+-
+-procedure TGlInterface.Initialize;
+-begin
+-  GetGlProc('wglChoosePixelFormatARB', FChoosePixelFormatARB);
+-  GetGlProc('wglCreateContextAttribsARB', FCreateContextAttribsARB);
+-  GetGlProc('wglGetExtensionsStringARB', FGetExtensionsStringARB);
+-  GetGlProc('wglGetPixelFormatAttribivARB', FGetPixelFormatAttribivARB);
+-  GetGlProc('wglSwapIntervalEXT', FSwapIntervalEXT);
+-end;
+-
+-{$ENDIF}
+-
+ { TGlSharedContext }
+ 
+ procedure TGlSharedContext.BeginContext;
+@@ -668,9 +215,6 @@
+ begin
+   inherited;
+   try
+-    Inc(FBeginContextCount);
+-    if FBeginContextCount = 1 then
+-      SaveCurrent;
+     MakeCurrent;
+   except
+     inherited EndContext;
+@@ -681,372 +225,22 @@
+ constructor TGlSharedContext.Create(const AQuality: TCanvasQuality);
+ begin
+   inherited Create;
+-  CreateBackendContext(AQuality);
+-  try
+-    FGrGlInterface   := TGrGlInterface.MakeNative;
+-    FGrDirectContext := TGrDirectContext.MakeGl(FGrGlInterface);
+-    if FGrDirectContext = nil then
+-    begin
+-      FGrGlInterface := nil;
+-      DestroyBackendContext;
+-      raise EGrCanvas.Create('Could not create shared direct context.');
+-    end;
+-  finally
+-    RestoreCurrent;
+-  end;
++  MakeCurrent;
++  // Ideally, we should have a separate FGrDirectContext for each thread
++  // (FMX.Context.GLES.Android already manages distinct OpenGL contexts per thread).
++  // However, the design of TGrSharedContext does not allow for this, as GrDirectContext
++  // is a member variable without a virtual getter. For now, I prefer not to modify FMX.Skia.Canvas.
++  // As a result, TGlSharedContext is effectively not multithreaded.
++  FGrDirectContext := TGrDirectContext.MakeGl;
++  if FGrDirectContext = nil then
++    raise EGrCanvas.Create('Could not create shared direct context.');
+ end;
+ 
+-procedure TGlSharedContext.CreateBackendContext(const AQuality: TCanvasQuality);
+-{$IF DEFINED(ANDROID)}
+-
+-  function SelectConfig(const AAttributes: TArray<Integer>;
+-    const AMinSampleCount: Integer = 1): EGLConfig;
+-  var
+-    LAttributes: TArray<GLint>;
+-    LCount: GLint;
+-  begin
+-    LAttributes := AAttributes;
+-    if AMinSampleCount > 1 then
+-    begin
+-      LAttributes := LAttributes + [
+-        EGL_SAMPLES        , AMinSampleCount,
+-        EGL_SAMPLE_BUFFERS , 1];
+-    end;
+-    LAttributes := LAttributes + [EGL_NONE];
+-    if (eglChooseConfig(FDisplay, Pointer(LAttributes), @Result, 1, @LCount) = EGL_FALSE) or (LCount <= 0) then
+-      Exit(nil);
+-  end;
+-
+-const
+-  SurfaceAttributes: array[0..4] of EGLint = (EGL_WIDTH, 1, EGL_HEIGHT, 1, EGL_NONE);
+-var
+-  LConfigAttributes: TArray<GLint>;
+-{$ELSEIF DEFINED(MSWINDOWS)}
+-  // There are some known issues with implementations of certain drivers,
+-  // especially older ones, related to the "WGL_ARB_pixel_format" extension:
+-  //
+-  //  - The order in which pixel formats are returned by the function
+-  //    wglChoosePixelFormatARB may not follow the order of the smallest number
+-  //    of samples, meaning that the first chosen may have a higher number than
+-  //    necessary;
+-  //
+-  // - The parameter nNumFormats of the wglChoosePixelFormatARB function may
+-  //   return all formats available numbers instead of just the number that will
+-  //   actually be returned;
+-  //
+-  // - The "pfAttribFList" parameter cannot be "nil", and attributes must end
+-  //   with two null values instead of one.
+-  function SelectPixelFormat(const AAttributes: TArray<Integer>;
+-    const AMinSampleCount: Integer = 1): Integer;
+-  type
+-    TRankPixelFormat = record
+-      Index: Integer;
+-      PixelFormat: Integer;
+-      SampleCount: Integer;
+-    end;
+-
+-  const
+-    AttributesF: array[0..1] of Single = (0, 0);
+-
+-    QueryAttribute: Integer = WGL_SAMPLES_ARB;
+-  var
+-    I: Integer;
+-    LAttributes: TArray<Integer>;
+-    LCount: Cardinal;
+-    LPixelFormats: array[0..63] of Integer;
+-    LRankPixelFormat: TRankPixelFormat;
+-    LRankPixelFormats: TList<TRankPixelFormat>;
+-  begin
+-    if AMinSampleCount = 1 then
+-    begin
+-      LAttributes := AAttributes + [0, 0];
+-      if (not FGlInterface.ChoosePixelFormatARB(FDC, Pointer(LAttributes), @AttributesF, 1, @Result, @LCount)) or (LCount = 0) then
+-        Exit(0);
+-    end
+-    else
+-    begin
+-      LAttributes := AAttributes + [
+-        WGL_SAMPLE_BUFFERS_ARB , 1               ,
+-        WGL_SAMPLES_ARB        , AMinSampleCount ,
+-        0                      , 0];
+-      if (not FGlInterface.ChoosePixelFormatARB(FDC, Pointer(LAttributes), @AttributesF, 64, @LPixelFormats, @LCount)) or (LCount = 0) then
+-        Exit(0);
+-      LCount            := Min(LCount, 64);
+-      LRankPixelFormats := TList<TRankPixelFormat>.Create;
+-      try
+-        for I := 0 to LCount - 1 do
+-        begin
+-          LRankPixelFormat.Index := I;
+-          LRankPixelFormat.PixelFormat := LPixelFormats[I];
+-          FGlInterface.GetPixelFormatAttribivARB(FDC, LPixelFormats[I], 0, 1, @QueryAttribute, @LRankPixelFormat.SampleCount);
+-          LRankPixelFormats.Add(LRankPixelFormat);
+-        end;
+-        LRankPixelFormats.Sort(TComparer<TRankPixelFormat>.Construct(
+-          function(const ALeft, ARight: TRankPixelFormat): Integer
+-          begin
+-            Result := ALeft.SampleCount - ARight.SampleCount;
+-            if Result = 0 then
+-              Result := ALeft.Index - ARight.Index;
+-          end));
+-        Result := LRankPixelFormats.First.PixelFormat;
+-      finally
+-        LRankPixelFormats.Free;
+-      end;
+-    end;
+-  end;
+-
+-const
+-  CoreVersions: array[0..11] of GLInt = (
+-    4, 3,
+-    4, 2,
+-    4, 1,
+-    4, 0,
+-    3, 3,
+-    3, 2);
+-
+-  PixelFormatDescriptor: TPixelFormatDescriptor = (
+-    nSize           : SizeOf(TPixelFormatDescriptor);
+-    nVersion        : 1;
+-    dwFlags         : PFD_DRAW_TO_WINDOW or PFD_SUPPORT_OPENGL or PFD_DOUBLEBUFFER;
+-    iPixelType      : PFD_TYPE_RGBA;
+-    cColorBits      : 24;
+-    cRedBits        : 0;
+-    cRedShift       : 0;
+-    cGreenBits      : 0;
+-    cGreenShift     : 0;
+-    cBlueBits       : 0;
+-    cBlueShift      : 0;
+-    cAlphaBits      : 8;
+-    cAlphaShift     : 0;
+-    cAccumBits      : 0;
+-    cAccumRedBits   : 0;
+-    cAccumGreenBits : 0;
+-    cAccumBlueBits  : 0;
+-    cAccumAlphaBits : 0;
+-    cDepthBits      : 0;
+-    cStencilBits    : 8;
+-    cAuxBuffers     : 0;
+-    iLayerType      : PFD_MAIN_PLANE;
+-    bReserved       : 0;
+-    dwLayerMask     : 0;
+-    dwVisibleMask   : 0;
+-    dwDamageMask    : 0);
+-var
+-  I: Integer;
+-  LClass: TWndClass;
+-  LDC: HDC;
+-  LGLRC: HGLRC;
+-  LPixelFormat: Integer;
+-  LPixelFormatAttributes: TArray<Integer>;
+-  LWindow: HWND;
+-{$ENDIF}
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  FDisplay := eglGetDisplay(EGL_DEFAULT_DISPLAY);
+-  if (FDisplay = EGL_NO_DISPLAY) or (eglInitialize(FDisplay, nil, nil) = EGL_FALSE) then
+-    raise EGlError.Create('Could not initialize the default display.');
+-  try
+-    LConfigAttributes := [
+-      EGL_RENDERABLE_TYPE , EGL_OPENGL_ES2_BIT ,
+-      EGL_SURFACE_TYPE    , EGL_PBUFFER_BIT    ,
+-      EGL_RED_SIZE        , 8                  ,
+-      EGL_GREEN_SIZE      , 8                  ,
+-      EGL_BLUE_SIZE       , 8                  ,
+-      EGL_ALPHA_SIZE      , 8                  ,
+-      EGL_STENCIL_SIZE    , 8];
+-    if AQuality <> TCanvasQuality.HighPerformance then
+-    begin
+-      if AQuality = TCanvasQuality.HighQuality then
+-        FConfig := SelectConfig(LConfigAttributes, 4);
+-      if FConfig = nil then
+-        FConfig := SelectConfig(LConfigAttributes, 2);
+-    end;
+-    if FConfig = nil then
+-    begin
+-      FConfig := SelectConfig(LConfigAttributes);
+-      if FConfig = nil then
+-        raise EGlError.Create('Could not choose configuration.');
+-    end;
+-    eglGetConfigAttrib(FDisplay, FConfig, EGL_STENCIL_SIZE, @FStencilBits);
+-    FSurface := eglCreatePbufferSurface(FDisplay, FConfig, @SurfaceAttributes);
+-    if FSurface = EGL_NO_SURFACE then
+-      raise EGlError.Create('Could not create shared surface.');
+-    try
+-      FContext := eglCreateContext(FDisplay, FConfig, EGL_NO_CONTEXT, @ContextAttributes);
+-      if FContext = EGL_NO_CONTEXT then
+-        raise EGlError.Create('Could not create shared context.');
+-      SaveAndMakeCurrent;
+-    except
+-      eglDestroySurface(FDisplay, FSurface);
+-      raise;
+-    end;
+-  except
+-    eglTerminate(FDisplay);
+-    raise;
+-  end;
+-  {$ELSEIF DEFINED(IOS)}
+-  FLibraryHandle := SafeLoadLibrary(libGLKit);
+-  if FLibraryHandle = 0 then
+-    raise EGrCanvas.Create('Could not load "GLKit" framework.');
+-  try
+-    FContext := TEAGLContext.Wrap(TEAGLContext.Alloc.initWithAPI(kEAGLRenderingAPIOpenGLES2));
+-    if FContext = nil then
+-      raise EGlError.Create('Could not create shared context.');
+-    SaveAndMakeCurrent;
+-    glGetIntegerv(GL_STENCIL_BITS, @FStencilBits);
+-  except
+-    FreeLibrary(FLibraryHandle);
+-    raise;
+-  end;
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FillChar(LClass, SizeOf(TWndClass), 0);
+-  LClass.lpfnWndProc   := @DefWindowProc;
+-  LClass.hInstance     := HInstance;
+-  LClass.lpszClassName := '_SkDummy';
+-  if Winapi.Windows.RegisterClass(LClass) = 0 then
+-    raise EGrCanvas.Create('Could not register class.');
+-  try
+-    LWindow := CreateWindowEx(WS_EX_TOOLWINDOW, '_SkDummy', nil, WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
+-    if LWindow = 0 then
+-      raise EGrCanvas.Create('Could not create temporary window.');
+-    try
+-      SaveCurrent;
+-      try
+-        LDC := GetDC(LWindow);
+-        if LDC = 0 then
+-          raise EGrCanvas.Create('Could not get temporary device context.');
+-        try
+-          LPixelFormat := ChoosePixelFormat(LDC, @PixelFormatDescriptor);
+-          if (LPixelFormat = 0) or (not SetPixelFormat(LDC, LPixelFormat, @PixelFormatDescriptor)) then
+-            raise EGrCanvas.Create('Could not choose/set pixel format for temporary device context.');
+-          LGLRC := wglCreateContext(LDC);
+-          if LGLRC = 0 then
+-            raise EGlError.Create('Could not create temporary context.');
+-          try
+-            if not wglMakeCurrent(LDC, LGLRC) then
+-              raise EGlError.Create('Could not make temporary context as current.');
+-            try
+-              FGlInterface.Initialize;
+-            finally
+-              wglMakeCurrent(0, 0);
+-            end;
+-          finally
+-            wglDeleteContext(LGLRC);
+-          end;
+-        finally
+-          ReleaseDC(LWindow, LDC);
+-        end;
+-      finally
+-        DestroyWindow(LWindow);
+-      end;
+-      FWindow := CreateWindowEx(WS_EX_TOOLWINDOW, '_SkDummy', nil, WS_POPUP, 0, 0, 0, 0, 0, 0, HInstance, nil);
+-      if FWindow = 0 then
+-        raise EGrCanvas.Create('Could not create shared window.');
+-      try
+-        FDC := GetDC(FWindow);
+-        if FDC = 0 then
+-          raise EGrCanvas.Create('Could not get shared device context.');
+-        try
+-          LPixelFormatAttributes := [
+-            WGL_DRAW_TO_WINDOW_ARB , 1                         ,
+-            WGL_ACCELERATION_ARB   , WGL_FULL_ACCELERATION_ARB ,
+-            WGL_SUPPORT_OPENGL_ARB , 1                         ,
+-            WGL_DOUBLE_BUFFER_ARB  , 1                         ,
+-            WGL_COLOR_BITS_ARB     , 24                        ,
+-            WGL_ALPHA_BITS_ARB     , 8                         ,
+-            WGL_STENCIL_BITS_ARB   , 8];
+-          if (AQuality <> TCanvasQuality.HighPerformance) and (FGlInterface.HasExtension(FDC, 'WGL_ARB_multisample')) then
+-          begin
+-            if AQuality = TCanvasQuality.HighQuality then
+-              FPixelFormat := SelectPixelFormat(LPixelFormatAttributes, 4);
+-            if FPixelFormat = 0 then
+-              FPixelFormat := SelectPixelFormat(LPixelFormatAttributes, 2);
+-          end;
+-          if FPixelFormat = 0 then
+-          begin
+-            FPixelFormat := SelectPixelFormat(LPixelFormatAttributes);
+-            if FPixelFormat = 0 then
+-              raise EGlError.Create('Could not choose pixel format.');
+-          end;
+-          if (not DescribePixelFormat(FDC, FPixelFormat, SizeOf(TPixelFormatDescriptor), FPixelFormatDescriptor)) or (not SetPixelFormat(FDC, FPixelFormat, @PixelFormatDescriptor)) then
+-            raise EGrCanvas.Create('Could not set pixel format for shared device context.');
+-          FStencilBits := FPixelFormatDescriptor.cStencilBits;
+-          if FGlInterface.HasExtension(FDC, 'WGL_ARB_create_context') then
+-          begin
+-            FContextAttributes := [
+-              WGL_CONTEXT_MAJOR_VERSION_ARB , -1                               ,
+-              WGL_CONTEXT_MINOR_VERSION_ARB , -1                               ,
+-              WGL_CONTEXT_PROFILE_MASK_ARB  , WGL_CONTEXT_CORE_PROFILE_BIT_ARB ,
+-              0];
+-            for I := 0 to Length(CoreVersions) div 2 - 1 do
+-            begin
+-              FContextAttributes[1] := CoreVersions[I * 2];
+-              FContextAttributes[3] := CoreVersions[I * 2 + 1];
+-              FGLRC := FGlInterface.CreateContextAttribsARB(FDC, 0, Pointer(FContextAttributes));
+-              if FGLRC <> 0 then
+-                Break;
+-            end;
+-          end;
+-          if FGLRC = 0 then
+-          begin
+-            FContextAttributes := nil;
+-            FGLRC := wglCreateContext(FDC);
+-            if FGLRC = 0 then
+-              raise EGlError.Create('Could not create shared context.');
+-          end;
+-          MakeCurrent;
+-        except
+-          ReleaseDC(FWindow, FDC);
+-          raise;
+-        end;
+-      except
+-        RestoreCurrent;
+-        raise;
+-      end;
+-    except
+-      DestroyWindow(FWindow);
+-      raise;
+-    end;
+-  except
+-    Winapi.Windows.UnregisterClass('_SkDummy', HInstance);
+-    raise;
+-  end;
+-  {$ENDIF}
+-end;
+-
+-procedure TGlSharedContext.DestroyBackendContext;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  eglDestroyContext(FDisplay, FContext);
+-  eglDestroySurface(FDisplay, FSurface);
+-  eglTerminate(FDisplay);
+-  {$ELSEIF DEFINED(IOS)}
+-  FContext.release;
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  wglDeleteContext(FGLRC);
+-  ReleaseDC(FWindow, FDC);
+-  DestroyWindow(FWindow);
+-  Winapi.Windows.UnregisterClass('_SkDummy', HInstance);
+-  {$ENDIF}
+-end;
+-
+ procedure TGlSharedContext.DestroyContext;
+ begin
+-  SaveAndMakeCurrent;
+-  try
+-    FGrGlInterface := nil;
+-    inherited;
+-  finally
+-    RestoreCurrent;
+-  end;
+-  DestroyBackendContext;
+-end;
+-
+-procedure TGlSharedContext.EndContext;
+-begin
+-  Dec(FBeginContextCount);
+-  if FBeginContextCount = 0 then
+-    RestoreCurrent;
++  // This is done in TGrSharedContext.DestroyContext
++  // FGrDirectContext.AbandonContext;
++  // FGrDirectContext := nil;
+   inherited;
+ end;
+ 
+@@ -1085,11 +279,9 @@
+ procedure TGlSharedContext.MakeCurrent;
+ begin
+   {$IF DEFINED(ANDROID)}
+-  if eglMakeCurrent(FDisplay, FSurface, FSurface, FContext) = EGL_FALSE then
++  if not TCustomAndroidContext.Valid then
+   {$ELSEIF DEFINED(IOS)}
+-  if not TEAGLContext.OCClass.setCurrentContext(FContext) then
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  if not wglMakeCurrent(FDC, FGLRC) then
++  if not TCustomContextIOS.Valid then
+   {$ENDIF}
+     raise EGlError.Create('Could not make shared context as current.');
+ end;
+@@ -1099,55 +291,11 @@
+   MakeCurrent;
+ end;
+ 
+-procedure TGlSharedContext.RestoreCurrent;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  eglMakeCurrent(FOldDisplay, FOldDraw, FOldRead, FOldContext);
+-  {$ELSEIF DEFINED(IOS)}
+-  TEAGLContext.OCClass.setCurrentContext(FOldContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  wglMakeCurrent(FOldDC, FOldGLRC);
+-  {$ENDIF}
+-end;
+-
+-procedure TGlSharedContext.SaveAndMakeCurrent;
+-begin
+-  SaveCurrent;
+-  MakeCurrent;
+-end;
+-
+-procedure TGlSharedContext.SaveCurrent;
+-begin
+-  {$IF DEFINED(ANDROID)}
+-  FOldDisplay := eglGetCurrentDisplay;
+-  if FOldDisplay = EGL_NO_DISPLAY then
+-  begin
+-    FOldDisplay := FDisplay;
+-    FOldDraw    := EGL_NO_SURFACE;
+-    FOldRead    := EGL_NO_SURFACE;
+-    FOldContext := EGL_NO_CONTEXT;
+-  end
+-  else
+-  begin
+-    FOldDraw    := eglGetCurrentSurface(EGL_DRAW);
+-    FOldRead    := eglGetCurrentSurface(EGL_READ);
+-    FOldContext := eglGetCurrentContext;
+-  end;
+-  {$ELSEIF DEFINED(IOS)}
+-  FOldContext := TEAGLContext.Wrap(TEAGLContext.OCClass.currentContext);
+-  {$ELSEIF DEFINED(MSWINDOWS)}
+-  FOldDC   := wglGetCurrentDC;
+-  FOldGLRC := wglGetCurrentContext;
+-  {$ENDIF}
+-end;
+-
+ {$HPPEMIT END '#if !defined(DELPHIHEADER_NO_IMPLICIT_NAMESPACE_USE) && !defined(NO_USING_NAMESPACE_FMX_SKIA_CANVAS_GL)'}
+ {$HPPEMIT END '    using ::Fmx::Skia::Canvas::Gl::TGlSharedContextCustom;'}
+-{$HPPEMIT END '    using ::Fmx::Skia::Canvas::Gl::GlobalUseSkiaGLSwapInterval;'}
+ {$HPPEMIT END '#endif'}
+ 
+ initialization
+-  GlobalUseSkiaGLSwapInterval := {$IFDEF ANDROID}1{$ELSE}0{$ENDIF};
+   RegisterSkiaRenderCanvas(TGlCanvas, False,
+     function: Boolean
+     begin
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas
+--- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Metal.pas	(working copy)
+@@ -68,7 +68,7 @@
+     FBackBufferSurface: ISkSurface;
+     FCurrentDrawable: CAMetalDrawable;
+   protected
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     function CreateSharedContext: IGrSharedContext; override;
+     function GetSurfaceFromWindow(const AContextHandle: THandle): TSkSurface; override;
+     procedure SwapBuffers(const AContextHandle: THandle); override;
+@@ -138,7 +138,7 @@
+ { TMtlCanvas }
+ 
+ constructor TMtlCanvas.CreateFromWindow(const AParent: TWindowHandle;
+-  const AWidth, AHeight: Integer; const AQuality: TCanvasQuality);
++  const AWidth, AHeight: Single; const AQuality: TCanvasQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   inherited;
+   FGrDirectContext := TGrSharedContext(SharedContext).GrDirectContext;
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas
+--- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.pas	(working copy)
+@@ -145,7 +145,7 @@
+     procedure SetMatrix(const AMatrix: TMatrix); override;
+     {$ENDIF}
+     property Canvas: ISkCanvas read FCanvas;
+-    procedure SetSize(const AWidth, AHeight: Integer); override; final;
++    procedure SetSize(const AWidth, AHeight: Single); override; final; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     class function GetCanvasStyle: TCanvasStyles; override;
+     class function QualityToSamplingOptions(const AQuality: TCanvasQuality; const AHighSpeed: Boolean = False): TSkSamplingOptions;
+   end;
+@@ -178,7 +178,7 @@
+     FSurface: TSkSurface;
+   strict protected
+     {$IFDEF MSWINDOWS}
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     {$ENDIF}
+     function BeginCanvas(const AContextHandle: THandle): ISkCanvas; override;
+     procedure EndCanvas(const AContextHandle: THandle); override;
+@@ -290,7 +290,7 @@
+     FSharedContext: IGrSharedContext;
+   strict protected
+     FGrDirectContext: IGrDirectContext;
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     function BeginCanvas(const AContextHandle: THandle): ISkCanvas; override;
+     function CreateSharedContext: IGrSharedContext; virtual; abstract;
+     procedure EndCanvas(const AContextHandle: THandle); override;
+@@ -2154,9 +2154,10 @@
+ 
+ {$ENDIF}
+ 
+-procedure TSkCanvasCustom.SetSize(const AWidth, AHeight: Integer);
++procedure TSkCanvasCustom.SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+-  if (Width <> AWidth) or (Height <> AHeight) then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  if (not SameValue(Width, AWidth, TEpsilon.Matrix)) or (not SameValue(Height, AHeight, TEpsilon.Matrix)) then
+   begin
+     inherited;
+     Resized;
+@@ -2247,7 +2248,7 @@
+ {$IFDEF MSWINDOWS}
+ 
+ constructor TSkCanvasBase.CreateFromWindow(const AParent: TWindowHandle;
+-  const AWidth, AHeight: Integer; const AQuality: TCanvasQuality);
++  const AWidth, AHeight: Single; const AQuality: TCanvasQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   inherited;
+   if WindowHandleToPlatform(Parent){$IF CompilerVersion < 30}.Form{$ENDIF}.Transparency then
+@@ -2425,7 +2426,7 @@
+ end;
+ 
+ constructor TGrCanvas.CreateFromWindow(const AParent: TWindowHandle;
+-  const AWidth, AHeight: Integer; const AQuality: TCanvasQuality);
++  const AWidth, AHeight: Single; const AQuality: TCanvasQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   inherited;
+   if not FInitialized then
+Index: Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas
+--- a/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Skia.Canvas.Vulkan.pas	(working copy)
+@@ -200,7 +200,7 @@
+     procedure DestroySurface;
+     procedure DestroySwapchain;
+   protected
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AQuality: TCanvasQuality = TCanvasQuality.SystemDefault); override; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     function CreateSharedContext: IGrSharedContext; override;
+     function GetSurfaceFromWindow(const AContextHandle: THandle): TSkSurface; override;
+     procedure Resized; override;
+@@ -288,7 +288,7 @@
+ { TVkCanvas }
+ 
+ constructor TVkCanvas.CreateFromWindow(const AParent: TWindowHandle;
+-  const AWidth, AHeight: Integer; const AQuality: TCanvasQuality);
++  const AWidth, AHeight: Single; const AQuality: TCanvasQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   inherited;
+   FGrDirectContext := TGrSharedContext(SharedContext).GrDirectContext;
+Index: Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas b/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas
+--- a/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.StrokeBuilder.pas	(working copy)
+@@ -88,8 +88,10 @@
+ 
+ implementation
+ 
++//https://quality.embarcadero.com/browse/RSP-41618
++
+ uses
+-  System.UIConsts, System.Generics.Collections, FMX.Types, System.SysUtils;
++  System.UIConsts, System.Generics.Collections;
+ 
+ function PointFDot(const P1, P2: TPointF): Single;
+ begin
+@@ -96,142 +98,6 @@
+   Result := (P1.X * P2.X) + (P1.Y * P2.Y);
+ end;
+ 
+-type
+-  TVertex = record
+-    P: TPointF;
+-    I: Integer;
+-    class operator Implicit(const APoint: TPointF): TVertex;
+-  end;
+-
+-  TEndCaps = (Start, Stop);
+-  TEndCap = set of TEndCaps;
+-
+-  TStrokeBuilderHelper = class helper for TStrokeBuilder
+-    procedure StartSegment(const P1, P2: TPointF; var A, B: TVertex);
+-    procedure EdgePoints(const P, Direction: TPointF; var A, B: TVertex);
+-    function AddVertex(var V: TVertex): Integer;
+-    procedure Triangle(var A, B, C: TVertex);
+-    procedure Quad(var A, B, C, D: TVertex);
+-    procedure Arc(const O: TPointF; var A, B, C: TVertex; Clockwise: Boolean);
+-  end;
+-
+-class operator TVertex.Implicit(const APoint: TPointF): TVertex;
+-begin
+-  Result.I := -1;
+-  Result.P := APoint;
+-end;
+-
+-procedure Intersect(const A: TVertex; var B: TVertex; const C, D: TVertex);
+-var
+-  D1, D2: TPointF;
+-  Denom, Numer: Single;
+-begin
+-  D1 := B.P - A.P;
+-  D2 := D.P - C.P;
+-  Denom := D1.CrossProduct(D2);
+-  if Abs(Denom) < Epsilon then
+-    Exit;
+-  Numer := D2.CrossProduct(A.P - C.P) / Denom;
+-  B.I := -1;
+-  B.P := A.P + Numer * D1;
+-end;
+-
+-procedure TStrokeBuilderHelper.StartSegment(const P1, P2: TPointF; var A, B: TVertex);
+-var
+-  D1: TPointF;
+-begin
+-  D1 := (P2 - P1).Normalize;
+-  EdgePoints(P1, D1, A, B);
+-end;
+-
+-procedure TStrokeBuilderHelper.EdgePoints(const P, Direction: TPointF; var A, B: TVertex);
+-begin
+-  A.I := -1;
+-  A.P.X := P.X + FHalfThickness * direction.Y;
+-  A.P.Y := P.Y - FHalfThickness * direction.X;
+-  B.I := -1;
+-  B.P.X := P.X - FHalfThickness * direction.Y;
+-  B.P.Y := P.Y + FHalfThickness * direction.X;
+-end;
+-
+-function TStrokeBuilderHelper.AddVertex(var V: TVertex): Integer;
+-begin
+-  if V.I < 0 then
+-  begin
+-    V.I := FCurrentVertex;
+-    InsertVertex(V.P, FStrokeColor);
+-  end;
+-  Result := V.I;
+-end;
+-
+-procedure TStrokeBuilderHelper.Triangle(var A, B, C: TVertex);
+-begin
+-  AddVertex(A);
+-  AddVertex(B);
+-  AddVertex(C);
+-  InsertIndex(A.I);
+-  InsertIndex(B.I);
+-  InsertIndex(C.I);
+-end;
+-
+-procedure TStrokeBuilderHelper.Quad(var A, B, C, D: TVertex);
+-begin
+-  AddVertex(A);
+-  AddVertex(B);
+-  AddVertex(D);
+-  AddVertex(C);
+-  InsertIndex(B.I);
+-  InsertIndex(C.I);
+-  InsertIndex(D.I);
+-  InsertIndex(D.I);
+-  InsertIndex(A.I);
+-  InsertIndex(B.I);
+-end;
+-
+-procedure TStrokeBuilderHelper.Arc(const O: TPointF; var A, B, C: TVertex; Clockwise: Boolean);
+-var
+-  P1, P2: TPointF;
+-  A1, A2: Single;
+-  n: Integer;
+-  P, Z, V: TVertex;
+-  Angle, R: Single;
+-  SN, CS: Single;
+-begin
+-  P1 := B.P - O;
+-  P2 := C.P - O;
+-  A1 := ArcTan2(P1.Y, P1.X);
+-  A2 := ArcTan2(P2.Y, P2.X);
+-  if Clockwise then
+-  begin
+-    if A2 > A1 then
+-      A2 := A2 - 2 * PI;
+-  end
+-  else
+-  begin
+-    if A1 > A2 then
+-      A1 := A1 - 2 * PI;
+-  end;
+-  angle := A2 - A1;
+-
+-  n := Round(Abs(angle) / (10 * PI / 180));
+-  if n < 1 then
+-    n := 1;
+-  P := B;
+-  Z := A;
+-  for var i := 0 to n - 2 do
+-  begin
+-    R := (i + 1) *  angle / n;
+-    SinCos(R, SN, CS);
+-    V.I := -1;
+-    V.P.X := O.X + CS * P1.X - SN * P1.Y;
+-    V.P.Y := O.Y + SN * P1.X + CS * P1.Y;
+-    Triangle(Z, P, V);
+-    P := V;
+-  end;
+-  V := C;
+-  Triangle(Z, P, V);
+-end;
+-
+ {$REGION 'Stroke Builder implementation'}
+ 
+ function TStrokeBuilder.GetMatrixScale: TPointF;
+@@ -1056,458 +922,145 @@
+ end;
+ 
+ procedure TStrokeBuilder.BuildIntermPolygon(const Points: TPolygon; const Opacity: Single; BreakAtEnd: Boolean);
+-const
+-  COS_170_DEGREE = -0.98;
+ var
+-  CurScale: TPointF;
+-  CurIndex: Integer;
+-  FirstPoint: Integer;
++  StepSize, Distance: Single;
++  CurScale, SrcPos, DestPos, PieceDirVec, ThickPerp: TPointF;
++  SrcPosValid, DestPosValid: Boolean;
++  PatternStepCount, CurIndex, TempVertexCount, TempIndexCount: Integer;
++begin
++  if Length(Points) < 2 then
++  begin
++    InitArrays(0, 0);
++    Exit;
++  end;
+ 
+-  procedure PolyLine(Start, Count: Integer);
+-  var
+-    Closed: Boolean;
+-    Loop: Boolean;
+-    SaveThickness: Single;
+-    SaveColor: TAlphaColor;
+-    First, I: Integer;
+-    P1, P2, P3: TPointF;
+-    D1: TPointF;
+-    L1: Single;
+-    A, B, C, D, E, F: TVertex;
++  CurScale := GetMatrixScale;
+ 
+-    Dashes: array of Single;
+-    iDash : Integer;
+-    DashLen: Single;
++  FThickness := FBrush.Thickness * (CurScale.X + CurScale.Y) * 0.5;
++  FHalfThickness := FThickness * 0.5;
++  FStrokeColor := PremultiplyAlpha(MakeColor(FBrush.Color, Opacity));
+ 
+-    EndCap: TEndCap;
++  FUndeterminedMode := True;
++  InitArrayPointers;
+ 
+-    procedure NextDash;
+-    begin
+-      iDash := (iDash + 1) mod Length(Dashes);
+-      DashLen := Dashes[iDash];
+-    end;
++  PatternStepCount := GetPatternStepCount;
++  if PatternStepCount < 1 then
++  begin
++    InitArrays(0, 0);
++    Exit;
++  end;
+ 
+-    procedure EndSegment(var A, B: TVertex; P1, P2: TPointF);
+-    var
+-      C, D, O: TVertex;
+-      D1: TPointF;
+-      L1: Single;
+-    begin
+-      D1 := (P2 - P1).Normalize;
+-      L1 := (P2 - P1).Length;
++  StepSize := FThickness * PatternStepCount;
+ 
+-      while L1 > DashLen do
+-      begin
+-        O.P := P1;
+-        P1 := P1 + D1 * DashLen;
+-        L1 := L1 - DashLen;
+-        EdgePoints(P1, D1, C, D);
+-        if not Odd(iDash) then
+-        begin
+-          if Brush.Cap = TStrokeCap.Round then
+-          begin
+-            if TEndCaps.Start in EndCap then
+-            begin
+-              O.P := O.P + D1 * FHalfThickness;
+-              EdgePoints(O.P, D1, A, B);
+-              O.I := -1;
+-              Arc(O.P, O, B, A, False);
+-            end;
+-            O.P := P1 - D1 * FHalfThickness;
+-            EdgePoints(O.P, D1, E, F);
+-            Quad(A, B, F, E);
+-            O.I := -1;
+-            Arc(O.P, O, E, F, False);
+-          end
+-          else
+-            Quad(A, B, D, C);
+-        end;
+-        A := C;
+-        B := D;
+-        NextDash;
+-        EndCap := [TEndCaps.Start, TEndCaps.Stop];
+-      end;
++  CurIndex := 0;
+ 
+-      if Odd(iDash) or (L1 < FThickness) then
+-        Exit;
++  SrcPosValid := False;
++  DestPosValid := False;
+ 
+-      if Brush.Cap = TStrokeCap.Round then
+-      begin
+-        if TEndCaps.Start in EndCap then
+-        begin
+-          P1 := P1 + D1 * FHalfThickness;
+-          EdgePoints(P1, D1, A, B);
+-          O := P1;
+-          Arc(P1, O, B, A, False);
+-        end;
+-        P2 := P2 - D1 * FHalfThickness;
+-      end;
+-      EdgePoints(P2, D1, C, D);
+-      Quad(A, B, D, C);
+-      if Brush.Cap = TStrokeCap.Round then
+-      begin
+-        O := P2;
+-        Arc(P2, O, C, D, False);
+-      end;
+-    end;
++  while CurIndex < Length(Points) do
++  begin
++    if (CurIndex >= Length(Points) - 1) and BreakAtEnd then
++      Break;
+ 
+-    procedure DrawJoin(var A, B: TVertex; var P1, P2: TPointF; const P3: TPointF; Visible: Boolean = True);
+-    const
+-      COS_170_DEGREE = -0.98;
+-    var
+-      D1, D2: TPointF;
+-      L1: Single;
+-      C, D: TVertex;                 //    A........C E..........G
+-      E, F: TVertex;                 //  P1:        :P2          :P3
+-      G, H: TVertex;                 //    B........D F..........H
+-      O: TVertex;
+-      Style: TStrokeJoin;
+-      CosAngle: Single;
+-      Clockwise: Boolean;
++    if not SrcPosValid then
++    begin
++      SrcPos := Points[CurIndex];
+ 
+-      procedure Capsule;
++      if (SrcPos.X >= $FFFF) or (SrcPos.Y >= $FFFF) then
+       begin
+-        if Brush.Cap = TStrokeCap.Round then
+-        begin
+-          if TEndCaps.Start in EndCap then
+-          begin
+-            P1 := P1 + D1 * FHalfThickness;
+-            EdgePoints(P1, D1, A, B);
+-            O := P1;
+-            Arc(P1, O, B, A, False);
+-          end;
+-          if (L1 > FHalfThickness) or not (TEndCaps.Start in EndCap) then
+-            Quad(A, B, D, C)
+-          else
+-          begin
+-            C := A;
+-            D := B;
+-          end;
+-        end else
+-          Quad(A, B, D, C);
++        DestPosValid := False;
++        Inc(CurIndex);
++        Continue;
+       end;
+ 
++      SrcPos := SrcPos * FMatrix;
++    end
++    else
++      SrcPosValid := False;
++
++    if not DestPosValid then
+     begin
+-      D1 := (P2 - P1).Normalize;
+-      L1 := (P2 - P1).Length;
+-      D2 := (P3 - P2).Normalize;
++      DestPos := Points[(CurIndex + 1) mod Length(Points)];
+ 
+-      Style := Brush.Join;
+-      CosAngle := D1.AngleCosine(D2);
+-      if (Style = TStrokeJoin.Miter) and (CosAngle < COS_170_DEGREE) then
+-        Style := TStrokeJoin.Bevel;
+-
+-      while L1 > DashLen do
++      if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
+       begin
+-        O.P := P1;
+-        P1 := P1 + D1 * DashLen;
+-        L1 := L1 - DashLen;
+-        EdgePoints(P1, D1, C, D);
+-        if Visible and not Odd(iDash) then
++        DestPos := Points[CurIndex];
++        if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
+         begin
+-          if Brush.Cap = TStrokeCap.Round then
+-          begin
+-            if TEndCaps.Start in EndCap then
+-            begin
+-              O.P := O.P + D1 * FHalfThickness;
+-              EdgePoints(O.P, D1, A, B);
+-              O.I := -1;
+-              Arc(O.P, O, B, A, False);
+-            end;
+-            O.P := P1 - D1 * FHalfThickness;
+-            EdgePoints(O.P, D1, E, F);
+-            Quad(A, B, F, E);
+-            O.I := -1;
+-            Arc(O.P, O, E, F, False);
+-          end else
+-            Quad(A, B, D, C);
++          Inc(CurIndex);
++          Continue;
+         end;
+-        A := C;
+-        B := D;
+-        NextDash;
+-        EndCap := [TEndCaps.Start, TEndCaps.Stop];
+-      end;
+-      DashLen := DashLen - L1;
+-      if Odd(iDash) then
+-        Visible := False;
+ 
+-      if Visible then
+-      begin
+-        if (L1 < FHalfThickness) and (TEndCaps.Start in EndCap) then
+-        begin
+-          P1 := P2 - D2 * L1;
+-          EdgePoints(P1, D2, A, B);
+-          D1 := D2;
+-          Style := TStrokeJoin.Miter;
+-        end;
+-        if (DashLen < FHalfThickness) and (TEndCaps.Start in EndCap) then
+-        begin
+-          if Brush.Cap = TStrokeCap.Round then
+-          begin
+-            if TEndCaps.Start in EndCap then
+-            begin
+-              P1 := P1 + D1 * FHalfThickness;
+-              EdgePoints(P1, D1, A, B);
+-              O := P1;
+-              Arc(P1, O, B, A, False);
+-            end;
+-            P1 := P1 + D1 * (DashLen + L1 - FThickness);
+-            EdgePoints(P1, D1, C, D);
+-            Quad(A, B, D, C);
+-            O := P1;
+-            Arc(P1, O, C, D, False);
+-          end
+-          else
+-          begin
+-            P1 := P1 + D1 * (DashLen + L1);
+-            EdgePoints(P1, D1, C, D);
+-            Quad(A, B, D, C);
+-          end;
+-          P2 := P2 + D2 * DashLen;
+-          NextDash;
+-          Visible := False;
+-        end;
+-      end;
+-
+-      EdgePoints(P2, D1, C, D);
+-      EdgePoints(P2, D2, E, F);
+-      EdgePoints(P3, D2, G, H);
+-
+-      if Style = TStrokeJoin.Miter then
+-      begin
+-        Intersect(A, C, E, G);
+-        Intersect(B, D, F, H);
+-        if Visible then
+-          Capsule;
+-        A := C;
+-        B := D;
++        DestPos := DestPos * FMatrix;
+       end
+       else
+-      begin
+-        if CosAngle >= COS_170_DEGREE then
+-        begin
+-          Clockwise := (D1.X * D2.Y - D2.X * D1.Y) < 0;
+-          if Clockwise then
+-          begin
+-            Intersect(A, C, E, G);
+-            if Visible then
+-            begin
+-              Capsule;
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(C, D, F);
+-                TStrokeJoin.Round: Arc(P2, C, D, F, True);
+-              end;
+-            end;
+-            D := F;
+-          end
+-          else
+-          begin
+-            Intersect(B, D, F, H);
+-            if Visible then
+-            begin
+-              Capsule;
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(D, C, E);
+-                TStrokeJoin.Round: Arc(P2, D, C, E, False);
+-              end;
+-            end;
+-            C := E;
+-          end;
+-          A := C;
+-          B := D;
+-        end
+-        else
+-        begin
+-          if Visible then
+-            Quad(A, B, D, C);
+-          A := D;
+-          B := C;
+-        end;
+-      end;
+-
+-      P1 := P2;
+-      P2 := P3;
+-      if Visible then
+-        EndCap := [TEndCaps.Stop]
+-      else
+-        EndCap := [TEndCaps.Start, TEndCaps.Stop];
+-    end;
+-
+-  begin
+-    if Count < 2 then
+-      Exit;
+-
+-    Closed := Points[Start].EqualsTo(Points[Start + Count - 1]);
+-    if Closed then
+-    begin
+-      Dec(Count);
+-      if Count = 2 then
+-        Exit;
++        DestPos := DestPos * FMatrix;
+     end
+     else
+-      Closed := not BreakAtEnd;
++      DestPosValid := False;
+ 
+-    case Brush.Dash of
+-      TStrokeDash.Dash       : Dashes := [3 * FThickness, FThickness];
+-      TStrokeDash.Dot        : Dashes := [FThickness, FThickness];
+-      TStrokeDash.DashDot    : Dashes := [3 * FThickness, FThickness, FThickness, FThickness];
+-      TStrokeDash.DashDotDot : Dashes := [3 * FThickness, FThickness, FThickness, FThickness, FThickness, FThickness];
+-      TStrokeDash.Custom:
+-      begin
+-        SetLength(Dashes, Length(Brush.DashArray));
+-        for I := 0 to Length(Dashes) - 1 do
+-          if Odd(I) then
+-            Dashes[I] := Brush.DashArray[I] * FThickness - FThickness
+-          else
+-            Dashes[I] := Brush.DashArray[I] * FThickness + FThickness
+-      end;
+-    else
+-      Dashes := [Single.MaxValue];
+-    end;
+-    iDash := 0;
+-    DashLen := Dashes[iDash];
++    Distance := DestPos.Distance(SrcPos);
+ 
+-    if  FThickness < 3 then
++    if Distance >= StepSize then
+     begin
+-      SaveThickness := FHalfThickness;
+-      FHalfThickness := 1.75 * FHalfThickness;
+-      F.I := -1;
+-      if Closed then
+-      begin
+-        First := 0;
+-        F.P := Points[Start + Count - 1] * FMatrix;
+-      end
+-      else
+-      begin
+-        First := 1;
+-        F.P := Points[Start] * FMatrix;
+-      end;
+-      for I := First to Count - 1 do
+-      begin
+-        E := F;
+-        F.I := -1;
+-        F.P := Points[Start + I] * FMatrix;
+-        D1 := (F.P - E.P);
+-        L1 := D1.Length;
+-        D1 := D1/L1;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-        while L1 > 0 do
+-        begin
+-          if odd(iDash) then
+-          begin
+-            if L1 < DashLen then
+-            begin
+-              DashLen := DashLen - L1;
+-              Break;
+-            end;
+-            E.I := -1;
+-            E.P := E.P + DashLen * D1;
+-            L1 := L1 - DashLen;
+-            NextDash;
+-          end
+-          else
+-          begin
+-            if L1 > DashLen then
+-            begin
+-              F.I := -1;
+-              F.P := E.P + DashLen * D1;
+-              L1 := L1 - DashLen;
+-              NextDash;
+-            end
+-            else
+-            begin
+-              F.P := Points[Start + I] * FMatrix;
+-              DashLen := DashLen - L1;
+-              L1 := 0;
+-            end;
+-            EdgePoints(E.P, D1, A, B);
+-            EdgePoints(F.P, D1, C, D);
+-            AddVertex(E);
+-            AddVertex(F);
+-            SaveColor := FStrokeColor;
+-            FStrokeColor := MakeColor(FStrokeColor, 0.25);
+-            AddVertex(A);
+-            Quad(A, E, F, C);
+-            AddVertex(B);
+-            Quad(B, E, F, D);
+-            FStrokeColor := SaveColor;
+-            E := F;
+-          end;
+-        end;
+-      end;
+-      FHalfThickness := SaveThickness;
+-      Exit;
+-    end;
++      InsertSegment(SrcPos, PieceDirVec, ThickPerp, DestPos, False);
+ 
+-    Loop := Closed;
+-    if Loop then
+-    begin
+-      L1 := (Points[Start + Count - 1] * FMatrix - Points[Start] * FMatrix).Length;
+-      for I := 0 to Count - 2 do
+-      begin
+-        L1 := L1 + (Points[Start + I + 1] * FMatrix - Points[Start + I] * FMatrix).Length;
+-        while L1 > DashLen do
+-        begin
+-          L1 := L1 - DashLen;
+-          NextDash;
+-        end;
+-        DashLen := DashLen - L1;
+-        L1 := 0;
+-      end;
+-      Loop := (DashLen > FThickness) and not Odd(iDash);
+-      iDash := 0;
+-      DashLen := Dashes[0];
+-    end;
++      SrcPos := SrcPos + (PieceDirVec * StepSize);
+ 
+-    if Loop then
+-    begin
+-      P1 := Points[Start + Count - 1] * FMatrix;
+-      P2 := Points[Start] * FMatrix;
+-      P3 := Points[Start + 1] * FMatrix;
+-      StartSegment(P1, P2, A, B);
+-      EndCap := [TEndCaps.Stop];
+-      DrawJoin(A, B, P1, P2, P3, False);
+-      EndCap := [TEndCaps.Stop];
+-      iDash := 0;
+-      DashLen := Dashes[0] - FHalfThickness;
+-    end
+-    else
+-    begin
+-      P1 := Points[Start + 0] * FMatrix;
+-      P2 := Points[Start + 1] * FMatrix;
+-      D1 := (P2 - P1).Normalize;
+-      P1 := P1 - D1 * FHalfThickness;
+-      StartSegment(P1, P2, A, B);
+-      EndCap := [TEndCaps.Start, TEndCaps.Stop];
++      SrcPosValid := True;
++      DestPosValid := True;
++      Continue;
+     end;
+ 
+-    for I := 0 to Count - 3 do
++    if (CurIndex = Length(Points) - 1) or (Points[CurIndex + 1].X >= $FFFF) or (Points[CurIndex + 1].Y >= $FFFF) or
++      ((CurIndex < Length(Points) - 2) and (Points[CurIndex + 1].X < $FFFF) and (Points[CurIndex + 1].Y < $FFFF) and
++      (Points[CurIndex + 2].X < $FFFF) and (Points[CurIndex + 2].Y < $FFFF) and
++      (Points[CurIndex + 1].Distance(Points[CurIndex + 2]) > StepSize)) then
+     begin
+-      P3 := Points[Start + I + 2] * FMatrix;
+-      DrawJoin(A, B, P1, P2, P3);
+-    end;
++      ComputeBuildEstimates(1 + Distance / StepSize, TempVertexCount, TempIndexCount);
+ 
+-    if Closed then
+-    begin
+-      P3 := Points[Start] * FMatrix;
+-      DrawJoin(A, B, P1, P2, P3);
+-      if Loop then
++      if FSegmentCount > 1 then
+       begin
+-        P3 := Points[Start + 1] * FMatrix;
+-        DrawJoin(A, B, P1, P2, P3);
++        PieceDirVec := (DestPos - SrcPos).Normalize();
++        ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
++
++        InsertSegment(SrcPos, PieceDirVec, ThickPerp, DestPos, True);
++      end;
++
++      if CurIndex < Length(Points) - 1 then
++      begin
++        Inc(CurIndex);
++        Continue;
+       end
+       else
+-        EndSegment(A, B, P1, P3);
+-    end
+-    else
+-    begin
+-      D1 := (P2 - P1).Normalize;
+-      P2 := P2 + D1 * FHalfThickness;
+-      EndSegment(A, B, P1, P2);
++        Break;
+     end;
++
++    SrcPosValid := True;
++    Inc(CurIndex);
+   end;
+ 
++  FinalizeArrays;
++end;
++
++procedure TStrokeBuilder.BuildIntermPath(const Path: TPathData; const Opacity: Single);
++var
++  Points: TPolygon;
+ begin
++  Path.FlattenToPolygon(Points, 1);
++  BuildIntermPolygon(Points, Opacity, (Path.Count > 0) and (Path[Path.Count - 1].Kind <> TPathPointKind.Close));
++end;
++
++procedure TStrokeBuilder.BuildSolidPolygon(const Points: TPolygon; const Opacity: Single; BreakAtEnd: Boolean);
++var
++  StepSize, Distance: Single;
++  CurScale, SrcPos, DestPos, PieceDirVec, ThickPerp: TPointF;
++  SrcPosValid, DestPosValid, PrevVerticesPlaced: Boolean;
++  CurIndex: Integer;
++begin
+   if Length(Points) < 2 then
+   begin
+     InitArrays(0, 0);
+@@ -1523,258 +1076,154 @@
+   FUndeterminedMode := True;
+   InitArrayPointers;
+ 
+-  FirstPoint := 0;
++  //StepSize := FThickness;
++  //if StepSize < 2 then
++  //  StepSize := 2;
++  Stepsize := 1;
++
+   CurIndex := 0;
++
++  SrcPosValid := False;
++  DestPosValid := False;
++  PrevVerticesPlaced := False;
++
+   while CurIndex < Length(Points) do
+   begin
+-    if Points[CurIndex] = PolygonPointBreak then
++    if (CurIndex >= Length(Points) - 1) and BreakAtEnd and (Points[0] <> Points[Length(Points) - 1]) then
++      Break;
++
++    if not SrcPosValid then
+     begin
+-      PolyLine(FirstPoint, CurIndex - FirstPoint);
+-      FirstPoint := CurIndex + 1;
+-    end;
+-    Inc(CurIndex);
+-  end;
+-  PolyLine(FirstPoint, CurIndex - FirstPoint);
++      SrcPos := Points[CurIndex];
+ 
+-  FinalizeArrays;
+-end;
++      if (SrcPos.X >= $FFFF) or (SrcPos.Y >= $FFFF) then
++      begin
++        DestPosValid := False;
++        PrevVerticesPlaced := False;
++        Inc(CurIndex);
++        Continue;
++      end;
+ 
+-procedure TStrokeBuilder.BuildIntermPath(const Path: TPathData; const Opacity: Single);
+-var
+-  Points: TPolygon;
+-begin
+-  Path.FlattenToPolygon(Points, 1);
+-  BuildIntermPolygon(Points, Opacity, (Path.Count > 0) and (Path[Path.Count - 1].Kind <> TPathPointKind.Close));
+-end;
+-
+-procedure TStrokeBuilder.BuildSolidPolygon(const Points: TPolygon; const Opacity: Single; BreakAtEnd: Boolean);
+-const
+-  COS_170_DEGREE = -0.98;
+-var
+-  CurScale: TPointF;
+-  CurIndex: Integer;
+-  FirstPoint: Integer;
+-
+-  procedure PolyLine(Start, Count: Integer);
+-  var
+-    Closed: Boolean;
+-    SaveThickness: Single;
+-    SaveColor: TAlphaColor;
+-    First, I: Integer;
+-    P0, P1: TPointF;
+-    L1: Single;
+-    D1, D2: TPointF;
+-    A, B, C, D, E, F, G, H, V: TVertex;
+-    Style: TStrokeJoin;
+-    CosAngle: Single;
+-    Clockwise: Boolean;
+-    NoCap: Boolean;
+-  begin
+-    if Count < 2 then
+-      Exit;
+-
+-    Closed := Points[Start].EqualsTo(Points[Start + Count - 1]);
+-    if Closed then
+-    begin
+-      Dec(Count);
+-      if Count < 2 then
+-        Exit;
++      SrcPos := SrcPos * FMatrix;
+     end
+     else
+-      Closed := not BreakAtEnd;
++      SrcPosValid := False;
+ 
+-    if FThickness < 3 then
++    if not DestPosValid then
+     begin
+-      SaveThickness := FHalfThickness;
+-      FHalfThickness := 1.75 * FHalfThickness;
+-      F.I := -1;
+-      if Closed then
++      DestPos := Points[(CurIndex + 1) mod Length(Points)];
++
++      if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
+       begin
+-        First := 0;
+-        F.P := Points[Start + Count - 1] * FMatrix;
++        DestPos := Points[CurIndex];
++        if (DestPos.X >= $FFFF) or (DestPos.Y >= $FFFF) then
++        begin
++          PrevVerticesPlaced := False;
++          Inc(CurIndex);
++          Continue;
++        end;
++
++        DestPos := DestPos * FMatrix;
+       end
+       else
+-      begin
+-        First := 1;
+-        F.P := Points[Start] * FMatrix;
+-      end;
+-      for I := First to Count - 1 do
+-      begin
+-        E := F;
+-        F.I := -1;
+-        F.P := Points[Start + I] * FMatrix;
+-        D1 := (F.P - E.P);
+-        L1 := D1.Length;
+-        D1 := D1/L1;
+-        EdgePoints(E.P, D1, A, B);
+-        EdgePoints(F.P, D1, C, D);
++        DestPos := DestPos * FMatrix;
++    end
++    else
++      DestPosValid := False;
+ 
+-        AddVertex(E);
+-        AddVertex(F);
+-        SaveColor := FStrokeColor;
+-        FStrokeColor := MakeColor(FStrokeColor, 0.25);
+-        AddVertex(A);
+-        Quad(A, E, F, C);
+-        AddVertex(B);
+-        Quad(B, E, F, D);
+-        FStrokeColor := SaveColor;
+-      end;
+-      FHalfThickness := SaveThickness;
+-      Exit;
+-    end;
++    Distance := DestPos.Distance(SrcPos);
+ 
+-    if Closed then
++    if Distance >= StepSize then
+     begin
+-      NoCap := True;
+-      P0 := Points[Start + Count - 2] * FMatrix;
+-      P1 := Points[Start + Count - 1] * FMatrix;
+-      Dec(Start, 2);
+-      Inc(Count, 3);
+-    end
+-    else
+-    begin
+-      NoCap := False;
+-      P0 := Points[Start] * FMatrix;
+-      P1 := Points[Start + 1] * FMatrix;
+-    end;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-    D2 := (P1 - P0).Normalize;
++      InsertVertex(SrcPos - ThickPerp, FStrokeColor);
++      InsertVertex(SrcPos + ThickPerp, FStrokeColor);
+ 
+-    if (Brush.Cap = TStrokeCap.Flat) and not Closed then
+-      P0 := P0 - D2 * FHalfThickness;
++      if PrevVerticesPlaced then
++      begin
++        InsertIndex(FCurrentVertex - 3);
++        InsertIndex(FCurrentVertex - 1);
++        InsertIndex(FCurrentVertex - 2);
+ 
+-    EdgePoints(P0, D2, A, B);
+-    EdgePoints(P1, D2, G, H);
++        InsertIndex(FCurrentVertex - 2);
++        InsertIndex(FCurrentVertex - 4);
++        InsertIndex(FCurrentVertex - 3);
++      end;
+ 
+-    if (Brush.Cap = TStrokeCap.Round) and not Closed then
+-    begin
+-      V.I := -1;
+-      V.P := P0;
+-      Arc(P0, V, B, A, False);
++      PrevVerticesPlaced := True;
++
++      SrcPos := SrcPos + (PieceDirVec * StepSize);
++
++      SrcPosValid := True;
++      DestPosValid := True;
++      Continue;
+     end;
+ 
+-    for I := 0 to Count - 3 do
++    if ((CurIndex < Length(Points) - 2) and (Points[CurIndex + 1].X < $FFFF) and (Points[CurIndex + 1].Y < $FFFF) and
++      (Points[CurIndex + 2].X < $FFFF) and (Points[CurIndex + 2].Y < $FFFF) and
++      (Points[CurIndex + 1].Distance(Points[CurIndex + 2]) > StepSize)) then
+     begin
+-      P0 := P1;
+-      if Closed and (I = Count - 3) then
+-        P1 := Points[Start + 2] * FMatrix
+-      else
+-        P1 := Points[Start + I + 2] * FMatrix;
+-      D1 := D2;
+-      D2 := (P1 - P0).Normalize;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-      CosAngle := D1.AngleCosine(D2);
+-      Style := Brush.Join;
+-      if (Style = TStrokeJoin.Miter) and (CosAngle < COS_170_DEGREE) then
+-        Style := TStrokeJoin.Bevel;
++      InsertVertex(DestPos - ThickPerp, FStrokeColor);
++      InsertVertex(DestPos + ThickPerp, FStrokeColor);
+ 
+-      C := G;
+-      D := H;
+-      EdgePoints(P0, D2, E, F);
+-      EdgePoints(P1, D2, G, H);
++      if PrevVerticesPlaced then
++      begin
++        InsertIndex(FCurrentVertex - 3);
++        InsertIndex(FCurrentVertex - 1);
++        InsertIndex(FCurrentVertex - 2);
+ 
+-      if Style = TStrokeJoin.Miter then
++        InsertIndex(FCurrentVertex - 2);
++        InsertIndex(FCurrentVertex - 4);
++        InsertIndex(FCurrentVertex - 3);
++      end;
++
++      if CurIndex < Length(Points) - 1 then
+       begin
+-        Intersect(A, C, E, G);
+-        Intersect(B, D, F, H);
+-        if not NoCap then
+-          Quad(A, B, D, C);
+-        A := C;
+-        B := D;
++        Inc(CurIndex);
++        Continue;
+       end
+       else
+-      begin
+-        if CosAngle >= COS_170_DEGREE then
+-        begin
+-          Clockwise := (D1.X * D2.Y - D2.X * D1.Y) < 0;
+-          if Clockwise then
+-          begin
+-            Intersect(A, C, E, G);
+-            if NoCap = False then
+-            begin
+-              Quad(A, B, D, C);
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(C, D, F);
+-                TStrokeJoin.Round: Arc(P0, C, D, F, True);
+-              end;
+-            end;
+-            A := C;
+-            B := D;
+-            D := F;
+-          end
+-          else
+-          begin
+-            Intersect(B, D, F, H);
+-            if NoCap = False then
+-            begin
+-              Quad(A, B, D, C);
+-              case Style of
+-                TStrokeJoin.Bevel: Triangle(D, C, E);
+-                TStrokeJoin.Round: Arc(P0, D, C, E, False);
+-              end;
+-            end;
+-            A := C;
+-            B := D;
+-            C := E;
+-          end;
+-          A := C;
+-          B := D;
+-        end
+-        else if not NoCap then
+-        begin
+-          if Style = TStrokeJoin.Round then
+-            Arc(P0, D, C, E, False);
+-          Quad(A, B, D, C);
+-          A := D;
+-          B := C;
+-        end;
+-      end;
+-      NoCap := False;
++        Break;
+     end;
+ 
+-    if not Closed then
++    if (CurIndex = Length(Points) - 1) or (Points[CurIndex + 1].X >= $FFFF) or (Points[CurIndex + 1].Y >= $FFFF) then
+     begin
+-      if Brush.Cap = TStrokeCap.Flat then
+-        P1 := P1 + D2 * FHalfThickness;
+-      EdgePoints(P1, D2, C, D);
+-      Quad(A, B, D, C);
+-      if Brush.Cap = TStrokeCap.Round then
+-      begin
+-        V.I := -1;
+-        V.P := P1;
+-        Arc(P1, V, C, D, False);
+-      end;
+-    end;
+-  end;
++      PieceDirVec := (DestPos - SrcPos).Normalize;
++      ThickPerp := TPointF.Create(-PieceDirVec.Y, PieceDirVec.X) * FHalfThickness;
+ 
+-begin
+-  if Length(Points) < 2 then
+-  begin
+-    InitArrays(0, 0);
+-    Exit;
+-  end;
++      InsertVertex(DestPos - ThickPerp, FStrokeColor);
++      InsertVertex(DestPos + ThickPerp, FStrokeColor);
+ 
+-  CurScale := GetMatrixScale;
++      if PrevVerticesPlaced then
++      begin
++        InsertIndex(FCurrentVertex - 3);
++        InsertIndex(FCurrentVertex - 1);
++        InsertIndex(FCurrentVertex - 2);
+ 
+-  FThickness := FBrush.Thickness * (CurScale.X + CurScale.Y) * 0.5;
+-  FHalfThickness := FThickness * 0.5;
+-  FStrokeColor := PremultiplyAlpha(MakeColor(FBrush.Color, Opacity));
++        InsertIndex(FCurrentVertex - 2);
++        InsertIndex(FCurrentVertex - 4);
++        InsertIndex(FCurrentVertex - 3);
++      end;
+ 
+-  FUndeterminedMode := True;
+-  InitArrayPointers;
++      PrevVerticesPlaced := False;
+ 
+-  FirstPoint := 0;
+-  CurIndex := 0;
+-  while CurIndex < Length(Points) do
+-  begin
+-    if Points[CurIndex] = PolygonPointBreak then
+-    begin
+-      PolyLine(FirstPoint, CurIndex - FirstPoint);
+-      FirstPoint := CurIndex + 1;
++      if CurIndex < Length(Points) - 1 then
++      begin
++        Inc(CurIndex);
++        Continue;
++      end
++      else
++        Break;
+     end;
++
++    SrcPosValid := True;
+     Inc(CurIndex);
+   end;
+-  PolyLine(FirstPoint, CurIndex - FirstPoint);
+ 
+   FinalizeArrays;
+ end;
+Index: Embarcadero/Athens/fmx/FMX.Types3D.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.Types3D.pas b/Embarcadero/Athens/fmx/FMX.Types3D.pas
+--- a/Embarcadero/Athens/fmx/FMX.Types3D.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.Types3D.pas	(working copy)
+@@ -440,7 +440,7 @@
+ 
+   TTextureFilter = (Nearest, Linear);
+ 
+-  TTextureStyle = (MipMaps, Dynamic, RenderTarget, Volatile);
++  TTextureStyle = (MipMaps, Dynamic, RenderTarget, Volatile, External); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1550
+ 
+   TTextureStyles = set of TTextureStyle;
+ 
+@@ -458,9 +458,11 @@
+     FBits: Pointer;
+     FContextLostId: TMessageSubscriptionId;
+     FContextResetId: TMessageSubscriptionId;
++    FMaterial: TMaterial; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     procedure ContextLostHandler(const Sender : TObject; const Msg : TMessage);
+     procedure ContextResetHandler(const Sender : TObject; const Msg : TMessage);
+     procedure SetPixelFormat(const Value: TPixelFormat);
++    procedure SetMaterial(const Value: TMaterial); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     procedure SetStyle(const Value: TTextureStyles);
+     function GetBytesPerPixel: Integer;
+     procedure SetMagFilter(const Value: TTextureFilter);
+@@ -490,6 +492,7 @@
+     property PixelFormat: TPixelFormat read FPixelFormat write SetPixelFormat;
+     property TextureScale: Single read FTextureScale; // hi resolution mode
+     property Style: TTextureStyles read FStyle write SetStyle;
++    property Material: TMaterial read FMaterial write SetMaterial; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+     property Width: Integer read FWidth write SetWidth;
+     property Height: Integer read FHeight write SetHeight;
+     property Handle: TTextureHandle read FHandle;
+@@ -637,7 +640,7 @@
+       States: TStatesArray;
+       Matrix: TMatrix3D;
+       Context: TContext3D;
+-      ScissorRect: TRect;
++      ScissorRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     end;
+   private class var
+     FContextCount: Integer;
+@@ -656,7 +659,7 @@
+     FCurrentMaterial: TMaterial;
+     FCurrentMaterialClass: TMaterialClass;
+     FCurrentFormat: TVertexFormats;
+-    FCurrentScissorRect: TRect;
++    FCurrentScissorRect: TRectF; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   private
+     FBeginSceneCount: Integer;
+     FRecalcScreenMatrix, FRecalcProjectionMatrix: Boolean;
+@@ -664,7 +667,7 @@
+     FInvScreenMatrix, FInvProjectionMatrix: TMatrix3D;
+     FCenterOffset: TPosition;
+     FParent: TWindowHandle;
+-    FWidth, FHeight: Integer;
++    FWidth, FHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     FScale: Single;
+     FTexture: TTexture;
+     FLights: TLightDescriptionList;
+@@ -707,7 +710,7 @@
+     procedure DoSetStencilOp(const Fail, ZFail, ZPass: TStencilOp); virtual; abstract;
+     procedure DoSetStencilFunc(const Func: TStencilfunc; Ref, Mask: Cardinal); virtual; abstract;
+     { scissor }
+-    procedure DoSetScissorRect(const ScissorRect: TRect); virtual; abstract;
++    procedure DoSetScissorRect(const ScissorRect: TRectF); virtual; abstract; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     /// <summary> Provides a mechanism to draw the specified batch of primitives on currently selected hardware-accelerated
+     /// layer. This method may support only a limited number of vertices and/or primitives. It may be called multiple
+@@ -737,7 +740,7 @@
+     { IFreeNotification }
+     procedure FreeNotification(AObject: TObject); virtual;
+     { constructors }
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); virtual;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); virtual;
+@@ -746,7 +749,7 @@
+     function GetIndexBufferSupport: TIndexBufferSupport; virtual;
+   public
+     destructor Destroy; override;
+-    procedure SetSize(const AWidth, AHeight: Integer);
++    procedure SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     procedure SetMultisample(const Multisample: TMultisample);
+     procedure SetStateFromContext(const AContext: TContext3D);
+     class procedure ResetStates; static;
+@@ -775,7 +778,7 @@
+     procedure SetContextState(const State: TContextState);
+     procedure SetStencilOp(const Fail, ZFail, ZPass: TStencilOp);
+     procedure SetStencilFunc(const Func: TStencilfunc; Ref, Mask: Cardinal);
+-    procedure SetScissorRect(const ScissorRect: TRect);
++    procedure SetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { drawing }
+     procedure DrawTriangles(const Vertices: TVertexBuffer; const Indices: TIndexBuffer;
+       const Material: TMaterial; const Opacity: Single);
+@@ -821,7 +824,7 @@
+     class property CurrentOpacity: Single read FCurrentOpacity;
+     class property CurrentVertexShader: TContextShader read FCurrentVertexShader;
+     class property CurrentPixelShader: TContextShader read FCurrentPixelShader;
+-    class property CurrentScissorRect: TRect read FCurrentScissorRect;
++    class property CurrentScissorRect: TRectF read FCurrentScissorRect; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     { lights }
+     property Lights: TLightDescriptionList read FLights;
+     { caps }
+@@ -839,8 +842,8 @@
+     property DefaultMaterial: TMaterial read FDefaultMaterial;
+     { properties }
+     property CenterOffset: TPosition read FCenterOffset;
+-    property Height: Integer read FHeight;
+-    property Width: Integer read FWidth;
++    property Height: Single read FHeight; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    property Width: Single read FWidth; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     /// <summary>Scale factor of context depends on real resolution of context. It gets from Texture.TextureScale or TWindowHandle.Scale.</summary>
+     property Scale: Single read FScale;
+     property Texture: TTexture read FTexture;
+@@ -882,7 +885,7 @@
+     class procedure InitializeShader(const Shader: TContextShader);
+     class procedure FinalizeShader(const Shader: TContextShader);
+     // Creation
+-    class function CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    class function CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean): TContext3D;
+     class function CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean): TContext3D;
+@@ -959,7 +962,8 @@
+ implementation
+ 
+ uses
+-  System.Math, System.TypInfo, System.RTLConsts, FMX.Platform, FMX.Materials, FMX.Surfaces, FMX.Consts, FMX.Utils;
++  System.Math, System.TypInfo, System.RTLConsts, FMX.Platform, FMX.Materials, FMX.Surfaces, FMX.Consts, FMX.Utils,
++  FMX.Materials.Canvas; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
+ 
+ type
+   TOpenObject = class(TFmxObject);
+@@ -3199,6 +3203,17 @@
+   FPixelFormat := Value;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549
++procedure TTexture.SetMaterial(const Value: TMaterial);
++begin
++  // We cannot use TCanvasTextureMaterial in the interface
++  // because it would create a circular reference.
++  if not (Value is TCanvasTextureMaterial) then
++    raise Exception.Create('Material must be a descendant of TCanvasTextureMaterial');
++  // The material is not owned by TTexture
++  FMaterial := Value;
++end;
++
+ procedure TTexture.SetSize(const AWidth, AHeight: Integer);
+ begin
+   TMonitor.Enter(Self);
+@@ -3273,7 +3288,7 @@
+ 
+ { TContext3D }
+ 
+-constructor TContext3D.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TContext3D.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   inherited Create;
+@@ -3308,7 +3323,7 @@
+   begin
+     FSaveStates := TList<TContextStates>.Create;
+     FCurrentMatrix := TMatrix3D.Identity;
+-    FCurrentScissorRect := Rect(0, 0, 0, 0);
++    FCurrentScissorRect := RectF(0, 0, 0, 0); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     ResetStates;
+   end;
+   Inc(FContextCount);
+@@ -3509,8 +3524,9 @@
+ begin
+   if Dest is TBitmap then
+   begin
+-    TBitmap(Dest).SetSize(Width, Height);
+-    CopyToBitmap(TBitmap(Dest), Rect(0, 0, Width, Height));
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    TBitmap(Dest).SetSize(Round(Width), Round(Height));
++    CopyToBitmap(TBitmap(Dest), Rect(0, 0, Round(Width), Round(Height)));
+   end
+   else
+     inherited;
+@@ -3745,9 +3761,10 @@
+   DoSetShaderVariable(Name, Data);
+ end;
+ 
+-procedure TContext3D.SetSize(const AWidth, AHeight: Integer);
++procedure TContext3D.SetSize(const AWidth, AHeight: Single); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+-  if (FWidth <> AWidth) or (FHeight <> AHeight) then
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++  if (not SameValue(FWidth, AWidth, TEpsilon.Matrix)) or (not SameValue(FHeight, AHeight, TEpsilon.Matrix)) then
+   begin
+     FreeBuffer;
+     FWidth := AWidth;
+@@ -3794,7 +3811,7 @@
+   FCurrentCameraInvMatrix := FCurrentCameraMatrix.Inverse;
+ end;
+ 
+-procedure TContext3D.SetScissorRect(const ScissorRect: TRect);
++procedure TContext3D.SetScissorRect(const ScissorRect: TRectF); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+ begin
+   FCurrentScissorRect := ScissorRect;
+   DoSetScissorRect(FCurrentScissorRect);
+@@ -4603,11 +4620,13 @@
+ begin
+   if (Dest <> nil) and Dest.Map(TMapAccess.Write, M) then
+   try
+-    if (ARect.Width > Width) or (ARect.Height > Height) then
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++    if (CompareValue(ARect.Width, Width, TEpsilon.Matrix) > 0) or (compareValue(ARect.Height, Height, TEpsilon.Matrix) > 0) then
+     begin
+       for I := ARect.Top to ARect.Bottom - 1 do
+         FillChar(M.GetPixelAddr(ARect.Left, I)^, ARect.Width * M.BytesPerPixel, 0);
+-      ARect.Intersect(Rect(0, 0, Width, Height));
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
++      ARect.Intersect(Rect(0, 0, Round(Width), Round(Height)));
+     end;
+     DoCopyToBits(M.Data, M.Pitch, ARect);
+     if (PixelFormat <> Dest.PixelFormat) and (PixelFormatBytes[PixelFormat] = PixelFormatBytes[Dest.PixelFormat]) then
+@@ -4792,7 +4811,7 @@
+     procedure DoSetShaderVariable(const Name: string; const Texture: TTexture); override;
+     procedure DoSetShaderVariable(const Name: string; const Matrix: TMatrix3D); override;
+   public
+-    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++    constructor CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+       const AMultisample: TMultisample; const ADepthStencil: Boolean); override;
+     constructor CreateFromTexture(const ATexture: TTexture; const AMultisample: TMultisample;
+       const ADepthStencil: Boolean); override;
+@@ -4801,7 +4820,7 @@
+ 
+ { TCustomDX9Context }
+ 
+-constructor TNullContext.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer;
++constructor TNullContext.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const AMultisample: TMultisample; const ADepthStencil: Boolean);
+ begin
+   inherited;
+@@ -4914,7 +4933,7 @@
+     Result := nil;
+ end;
+ 
+-class function TContextManager.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Integer; const AMultisample: TMultisample;
++class function TContextManager.CreateFromWindow(const AParent: TWindowHandle; const AWidth, AHeight: Single; const AMultisample: TMultisample; // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   const ADepthStencil: Boolean): TContext3D;
+ begin
+   if DefaultContextClass <> nil then
+Index: Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas
+===================================================================
+diff --git a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas b/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas
+--- a/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas	(revision 1)
++++ b/Embarcadero/Athens/fmx/FMX.VirtualKeyboard.Android.pas	(working copy)
+@@ -218,8 +218,15 @@
+   VKRect.TopLeft := ConvertPixelToPoint(TPointF.Create(newFrame.Left, newFrame.Top)).Round;
+   VKRect.BottomRight := ConvertPixelToPoint(TPointF.Create(newFrame.Right, newFrame.Bottom)).Round;
+ 
+-  if (FNeedNotifyAboutFrameChanges or ((MainActivity.getVirtualKeyboard.isVirtualKeyboardShown) and (VKRect.Height > 0)))
+-     and (FPreviousVKRect <> VKRect) then
++  // https://quality.embarcadero.com/browse/RSP-24737
++  // I made the conclusion that the event onVirtualKeyboardWillHidden and onVirtualKeyboardWillShown
++  // are inconsistent. often the onVirtualKeyboardWillHidden is not fired (for exemple when you
++  // click on the return key of the keybord in the bottom left) and sometime (more hard to reproduce
++  // but I guarantee I see it) the onVirtualKeyboardWillShown is not fired. But what seam consistant
++  // is the fire to this function onVirtualKeyboardFrameChanged with good value for VKRect
++  // So I decide to only take care of this event
++
++  if (FPreviousVKRect <> VKRect) then
+     try
+       FKeyboardService.SendNotificationAboutKeyboardEvent(VKRect);
+       FPreviousVKRect := VKRect;
+Index: Embarcadero/Athens/rtl/common/System.Skia.API.pas
+===================================================================
+diff --git a/Embarcadero/Athens/rtl/common/System.Skia.API.pas b/Embarcadero/Athens/rtl/common/System.Skia.API.pas
+--- a/Embarcadero/Athens/rtl/common/System.Skia.API.pas	(revision 1)
++++ b/Embarcadero/Athens/rtl/common/System.Skia.API.pas	(working copy)
+@@ -2428,11 +2428,17 @@
+       procedure LINKLIB_cxx;                         external '/usr/lib/libc++.dylib';
+       procedure LINKLIB_cxxabi;                      external '/usr/lib/libc++abi.dylib';
+     {$ELSEIF DEFINED(ANDROID)}
+-      procedure LINKLIB_EGL;                         external 'libEGL.so';
+-      procedure LINKLIB_GLESv2;                      external 'libGLESv2.so';
+-      procedure LINKLIB_log;                         external 'liblog.so';
+-      procedure LINKLIB_cxxstatic;                   external 'libc++_static.a';
+-      procedure LINKLIB_cxxabi;                      external 'libc++abi.a';
++      // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997
++      //procedure LINKLIB_EGL;                         external 'libEGL.so';
++      //procedure LINKLIB_GLESv2;                      external 'libGLESv2.so';
++      //procedure LINKLIB_log;                         external 'liblog.so';
++      //procedure LINKLIB_cxxstatic;                   external 'libc++_static.a';
++      //procedure LINKLIB_cxxabi;                      external 'libc++abi.a';
++      procedure eglInitialize;                         external 'libEGL.so';
++      procedure glCreateShader;                        external 'libGLESv2.so';
++      procedure __android_log_write;                   external 'liblog.so';
++      procedure _ZTSSt12bad_any_cast;                  external 'libc++_static.a';
++      procedure __cxa_guard_acquire;                   external 'libc++abi.a';
+     {$ENDIF}
+   {$ENDIF}
+ {$ELSE}

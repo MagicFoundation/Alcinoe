@@ -9,14 +9,14 @@ If you find this library helpful, please consider giving it a
 star on GitHub. It’s free and greatly supports the project’s 
 visibility and growth.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/star.jpg?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/star.jpg?raw=true" />
 
 
 Example of an App Built with Alcinoe
 ------------------------------------
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/youtubekiskis.jpg?raw=true"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtubekiskis.jpg?raw=true"/>
 </a>
 
 
@@ -120,7 +120,7 @@ please follow these steps:
    to fork the repository. Forking creates a personal copy 
    of the Alcinoe source code that you can modify as needed..  
    
-   ![Fork](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/createfork.jpg?raw=true)
+   ![Fork](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/createfork.jpg?raw=true)
 
 2. **Make Your Edits**: After forking, make the necessary 
    changes to the source code. Then, commit and push these 
@@ -130,7 +130,7 @@ please follow these steps:
    changes, go to your forked repository, click on 'Contribute,' 
    and select 'Open a pull request' to submit your proposal.
    
-   ![Contribute](https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/openpullrequest.jpg?raw=true)
+   ![Contribute](https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/openpullrequest.jpg?raw=true)
 <br/>
 
 
@@ -231,7 +231,7 @@ using Delphi can now leverage Material 3 principles to create
 stunning, cohesive interfaces across platforms like Android, iOS, 
 Windows, and macOS.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3design.jpg?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3design.jpg?raw=true" />
 
 ## Key Alcinoe Controls for Material 3 Design
 
@@ -243,7 +243,7 @@ styles. You can adjust properties like **fill, border, shadow**, and
 supports HTML content, enabling you to easily include icons or 
 rich text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3button.png?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3button.png?raw=true" />
 
 ### 2. **TALCheckBox and TALRadioButton**
 Both controls follow Material 3’s minimalistic and responsive 
@@ -252,7 +252,7 @@ border**, and **shadow** and utilize smooth transitions between states.
 Their highly customizable nature allows you to create checkbox 
 and radio button components that align with Material 3’s aesthetic.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3checkbox.png?raw=true" width="600" style="width:600px;" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3checkbox.png?raw=true" width="600" style="width:600px;" />
 
 ### 4. **TALSwitch**
 **TALSwitch** is designed for easy customization, allowing you to 
@@ -265,7 +265,7 @@ TALSwitch fits seamlessly into a modern, minimalistic interface,
 offering both visual appeal and optimized performance for 
 Delphi applications.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3switch.gif?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3switch.gif?raw=true" />
 
 ### 3. **TALTrackBar and TALRangeTrackBar**
 **TALTrackBar** allows for extensive customization of its appearance 
@@ -278,7 +278,7 @@ are smooth, ensuring responsive feedback as the user interacts with the
 control. Its transitions between states like **Enabled**, **Focused**, 
 and **Pressed** contribute to a polished, fluid user experience.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3trackbar.gif?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3trackbar.gif?raw=true" />
 
 ### 4. **TALEdit and TALMemo**
 Alcinoe’s native **TALEdit** and **TALMemo** controls are designed to 
@@ -287,7 +287,7 @@ shadow**, and **font** properties. These controls adapt across platforms
 while maintaining a consistent, clean interface for text input, 
 with features like autosizing and prompt text.
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/material3edit.webp?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/material3edit.webp?raw=true" />
 
 ## Why Alcinoe for Material 3?
 While Material 3 focuses on responsive and adaptive design, 
@@ -326,7 +326,7 @@ making it ideal for applications requiring dynamic,
 responsive text behavior. Learn more at 
 [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls)
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/htmltext.png?raw=true" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/htmltext.png?raw=true" />
 <br/>
   
 Video Player for FireMonkey
@@ -348,9 +348,9 @@ to be easily customizable and extendable. On iOS,
 **ExoPlayer**.
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/videoplayer3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer1.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer2.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/videoplayer3.jpg?raw=true" alt="video player for FireMonkey" width="270" style="width:270px;"/>
 </p>
 
 Learn more at [Demos/ALFmxControls](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxControls) 
@@ -370,7 +370,7 @@ peer-to-peer data sharing and teleconferencing without
 the need for plug-ins or third-party software.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/webrtc.jpg?raw=true" alt="Delphi WebRTC wrapper" />
 </p>
 
 With the **TALWebRTC** component, you can easily integrate 
@@ -395,14 +395,14 @@ dynamic visual effects, **ALConfetti** delivers a
 smooth, high-performance animation experience. 
 Learn more at [Demos/ALConfetti](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALConfetti)
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/confetti.gif?raw=true" alt="confetti" width="564" style="width:564px;" />
 <br/>
   
   
 AndroidMerger: Integrate AAR SDK in FMX Android App
 ===================================================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/androidmerger.jpg?raw=true"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/androidmerger.jpg?raw=true"/>
 
 An Android library, also known as an Android Archive (AAR), 
 contains everything needed to build an app, including source 
@@ -475,9 +475,9 @@ flexibility to create unique and complex animation patterns,
 far beyond the traditional ease-in or ease-out sequences.
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/interpolated1.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/interpolated1.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/interpolated2.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/interpolated2.gif?raw=true" alt="Interpolated Animation" width="320" style="width:320px;"/>
 </p>
 
 Learn more at 
@@ -489,8 +489,8 @@ Learn more at
 SpringForce Animation
 =====================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/springforce.gif?raw=true" alt="SpringForce Animation" align="left" width="320" height="711" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="left" width="1" height="711" />
   
 Inspired by Android's **SpringForce**, the **TALSpringForceAnimation** 
 component brings the dynamics of physics-based animations to the 
@@ -516,8 +516,8 @@ Learn more at
 Scrolling Engine
 ================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="right" width="222" height="480" />
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/empty.png?raw=true" align="right" width="32" height="480" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/scrollingengine.gif?raw=true" alt="Scrolling Engine" align="right" width="222" height="480" />
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" align="right" width="32" height="480" />
   
 **TALOverScroller** and **TALVelocityTracker** are key components 
 of the **TALScrollEngine**, enhancing user interface interactions. 
@@ -543,7 +543,7 @@ Learn more at
 Firebase Cloud Messaging
 ========================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/firebasecloudmessaging.jpg?raw=true" width="600" style="width:600px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/firebasecloudmessaging.jpg?raw=true" width="600" style="width:600px;"/>
 
 The Delphi implementation of the latest version of **Firebase Cloud 
 Messaging (FCM)** using the **HTTP V1 protocol** enables you to 
@@ -562,7 +562,7 @@ Learn more at
 GeoPositioning for Android/iOS
 ==============================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/geopositioning.webp?raw=true" width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/geopositioning.webp?raw=true" width="540" style="width:540px;"/>
 
 The **TALGeoPositionSensor** component is a Delphi component that 
 provides access to location services on iOS and Android devices. 
@@ -601,7 +601,7 @@ Learn more at [Source/Alcinoe.Cipher.pas](https://github.com/MagicFoundation/Alc
 Android/iOS VKontakte/Facebook SDK login
 ========================================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/facebooklogin.jpg?raw=true" width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/facebooklogin.jpg?raw=true" width="540" style="width:540px;"/>
 
 The **VKontakte/Facebook SDK** for Android and iOS allows users 
 to sign into your app using their VKontakte or Facebook credentials. 
@@ -624,9 +624,9 @@ Transform your photos into beautiful and expressive works of art in minutes!
 Learn more at [Demos\ALFmxFilterEffects](https://github.com/MagicFoundation/Alcinoe/tree/master/Demos/ALFmxFilterEffects)
 
 <p align="left">
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter1.jpg?raw=true" width="320" style="width:320px;"/>
   &nbsp;&nbsp;&nbsp;
-  <img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagefilter2.jpg?raw=true" width="320" style="width:320px;"/>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagefilter2.jpg?raw=true" width="320" style="width:320px;"/>
 </p>
 <br/>
   
@@ -684,7 +684,7 @@ Learn more at [Source/Alcinoe.JSONDoc.pas](https://github.com/MagicFoundation/Al
 ImageMagick Wrapper for Delphi
 ==============================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/imagemagick.png?raw=true"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/imagemagick.png?raw=true"/>
 
 Use **ImageMagick®** to create, edit, compose, or convert bitmap 
 images. It supports over 200 image formats, including **PNG**, 
@@ -825,7 +825,7 @@ Learn more at [Alcinoe/tree/master/Demos/ALRTTI](https://github.com/MagicFoundat
 MongoDb client
 ==============
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/mongodb.webp?raw=true"  width="600" style="width:600px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/mongodb.webp?raw=true"  width="600" style="width:600px;"/>
 
 This is a Delphi driver with **connection pooling** for accessing a **MongoDB** 
 server. Connection pooling refers to a cache of database connections that are 
@@ -846,7 +846,7 @@ Learn more at [Source/Alcinoe.MongoDB.Client.pas](https://github.com/MagicFounda
 WebSocket client
 ================
 
-<img src="https://raw.githubusercontent.com/MagicFoundation/Alcinoe/Skia/References/DocImages/websocket.png?raw=true"  width="540" style="width:540px;"/>
+<img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/websocket.png?raw=true"  width="540" style="width:540px;"/>
 
 The **WebSocket client** for Delphi is built on top of **WinHTTP** and 
 provides a communication protocol for two-way, interactive communication 

@@ -70,7 +70,7 @@ REM clean Libraries
 REM ---------------
 
 if NOT "%LibraryToBuild%"=="" GOTO SKIP_clean_Libraries
-SET FileName=%ALBaseDir%\Libraries\jar\com\alcinoe
+SET FileName=%ALBaseDir%\Libraries\jar\io\magicfoundation\alcinoe
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
@@ -115,9 +115,9 @@ REM ------------------------
 echo [36mBuild alcinoe-common[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\util\*.java
-SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\com\alcinoe\content\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-common" "1.0.1"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\util\*.java
+SET SourceFiles=%SourceFiles% %ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\content\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-common" "1.0.1"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
@@ -129,8 +129,8 @@ REM ----------------------------
 echo [36mBuild alcinoe-datepicker[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\datepicker\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-datepicker" "1.0.0"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\datepicker\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-datepicker" "1.0.0"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
@@ -142,8 +142,8 @@ REM --------------------------
 echo [36mBuild alcinoe-edittext[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\edittext\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-edittext" "1.0.0"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\edittext\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-edittext" "1.0.0"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
@@ -157,8 +157,8 @@ type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.3.0"
 Call :UPDATE_ClASSPATH "https://artifactory.wetransform.to/artifactory/libs-snapshot" "org.webrtc" "google-webrtc" "1.0.25331"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\webrtc\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-webrtc" "1.0.0"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\webrtc\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-webrtc" "1.0.0"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
@@ -176,10 +176,10 @@ REM Use Tools\AndroidLibScanner\AndroidLibScanner.bat to determine the required 
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.lifecycle" "lifecycle-livedata-core" "2.0.0"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "com.google.android.gms" "play-services-basement" "18.1.0"
 @echo androidx.appcompat:appcompat:1.6.1>> %TMPDependenciesFile%
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\firebase\messaging\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-firebase-messaging" "1.0.1"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\firebase\messaging\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-firebase-messaging" "1.0.1"
 
-SET FirebaseMessagingDir=%ALBaseDir%\Libraries\jar\com\alcinoe\alcinoe-firebase-messaging\1.0.1\
+SET FirebaseMessagingDir=%ALBaseDir%\Libraries\jar\io\magicfoundation\alcinoe\alcinoe-firebase-messaging\1.0.1\
 SET FirebaseMessagingFilename=alcinoe-firebase-messaging-1.0.1
 SET AndroidManifestFilename=%FirebaseMessagingDir%\AndroidManifest.xml
 IF EXIST "%AndroidManifestFilename%" del "%AndroidManifestFilename%" /s > nul
@@ -187,9 +187,9 @@ IF EXIST "%AndroidManifestFilename%" goto ERROR
 
 @echo ^<?xml version="1.0" encoding="utf-8"?^>> %AndroidManifestFilename%
 @echo ^<manifest xmlns:android="http://schemas.android.com/apk/res/android">> %AndroidManifestFilename%
-@echo           package="com.alcinoe.alcinoe-firebase-messaging" ^>>> %AndroidManifestFilename%
+@echo           package="io.magicfoundation.alcinoe.alcinoe-firebase-messaging" ^>>> %AndroidManifestFilename%
 @echo   ^<application^>>> %AndroidManifestFilename%
-@echo     ^<service android:name="com.alcinoe.firebase.messaging.ALFirebaseMessagingService">> %AndroidManifestFilename%
+@echo     ^<service android:name="io.magicfoundation.alcinoe.firebase.messaging.ALFirebaseMessagingService">> %AndroidManifestFilename%
 @echo              android:directBootAware="true">> %AndroidManifestFilename%
 @echo              android:exported="true"^>>> %AndroidManifestFilename%
 @echo       ^<intent-filter^>>> %AndroidManifestFilename%
@@ -225,8 +225,8 @@ REM Mandatory dependencies of com.facebook.android:facebook-common:15.2.0 requir
 REM Use Tools\AndroidLibScanner\AndroidLibScanner.bat to determine the required versions of those dependencies
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.fragment" "fragment" "1.3.0"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "androidx.annotation" "annotation" "1.1.0"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\facebook\share\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-facebook-share" "1.0.1"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\facebook\share\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-facebook-share" "1.0.1"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
 
@@ -239,8 +239,8 @@ echo [36mBuild alcinoe-installreferrer[0m
 type nul > %TMPDependenciesFile%
 SET ClassPath="%SDKApiLevelPath%\android.jar"
 Call :UPDATE_ClASSPATH "https://dl.google.com/android/maven2" "com.android.installreferrer" "installreferrer" "2.2"
-SET SourceFiles=%ALBaseDir%\Source\Java\com\alcinoe\installreferrer\*.java
-Call :BUILD_JAR "com.alcinoe" "alcinoe-installreferrer" "1.0.0"
+SET SourceFiles=%ALBaseDir%\Source\Java\io\magicfoundation\alcinoe\installreferrer\*.java
+Call :BUILD_JAR "io.magicfoundation.alcinoe" "alcinoe-installreferrer" "1.0.0"
 if NOT "%LibraryToBuild%"=="" GOTO FINISHED
 
  
@@ -257,7 +257,7 @@ REM ------------------
 
 :UPDATE_ClASSPATH
 
-REM %~2 the groupId (com.alcinoe)
+REM %~2 the groupId (io.magicfoundation.alcinoe)
 REM %~3 the artifactId (alcinoe-facebook)
 REM %~4 the version (1.0.0)
 
@@ -346,7 +346,7 @@ REM ------------------
 
 :BUILD_JAR
 
-REM %~1 the groupId (com.alcinoe)
+REM %~1 the groupId (io.magicfoundation.alcinoe)
 REM %~2 the artifactId (alcinoe-facebook)
 REM %~3 the version (1.0.0)
 

@@ -35,7 +35,7 @@ interface
 
 {$SCOPEDENUMS OFF}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if https://github.com/project-jedi/jcl.git jcl\source\common\JclExprEval.pas was not updated from References\jcl\source\common\JclExprEval.pas and adjust the IFDEF'}
 {$IFEND}
 

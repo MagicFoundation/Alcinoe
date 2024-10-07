@@ -1,10 +1,6 @@
 //https://docwiki.embarcadero.com/RADStudio/Alexandria/en/Compiler_Versions
-{$IF (CompilerVersion <= 36.0) and (not declared(RTLVersion121))} // This mean <= Delphi Athens 12.0
-  //When updating this block delete the define below and add a new define that
-  //is set for the current compiler version. Then progressively replace in all source
-  //files the old define by the new define. This must be done for all the MagicFoundation 
-  //projects, not only for the Alcinoe project.
-  {$DEFINE ALCompilerVersionSupported120}
+{$IF (CompilerVersion <= 36.0) and (not declared(RTLVersion123))} // Delphi Athens 12.2
+  {$DEFINE ALCompilerVersionSupported122}
 {$ENDIF}
 
 {$IF defined(CPUX86) or defined(CPUX64)} // CPU is an Intel 386 or later on any platform.
@@ -43,12 +39,25 @@
   {$MESSAGE ERROR 'Unknown Extended type'}
 {$ENDIF}
 
-{$IF Defined(ANDROID) or defined(IOS)}
-  {$DEFINE ALUseTexture}
+{$IF Defined(SKIA)}
+  {$DEFINE ALSkiaEngine}
+  {$DEFINE ALSkiaCanvas}
+{$ELSEIF Defined(ALDPK)}
+  {$DEFINE ALSkiaEngine}
+{$ELSEIF Defined(ANDROID) or defined(IOS)}
+  {$DEFINE ALGpuCanvas}
+{$ENDIF}
+
+{$IF Defined(ALSkiaEngine)}
+  {$DEFINE ALSkiaAvailable}
 {$ENDIF}
 
 {$IF defined(MACOS) and not defined(IOS)}
   {$DEFINE ALMacOS} 
+{$ENDIF}
+
+{$IF defined(ALMacOS) or defined(IOS)}
+  {$DEFINE ALAppleOS} 
 {$ENDIF}
 
 {$IF not defined(MSWINDOWS)}
@@ -56,3 +65,7 @@
 {$ENDIF}
 
 {$SCOPEDENUMS ON}
+
+{$IF Defined(ALDPK)}
+  {$DEFINE ALBackwardCompatible}
+{$ENDIF}

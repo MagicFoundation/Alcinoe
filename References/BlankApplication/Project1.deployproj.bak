@@ -1,26 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
       <LocalCommand/>
@@ -255,15 +235,6 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\Project1.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\classes\</RemoteDir>
-      <RemoteName>Project1.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Debug\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
@@ -363,26 +334,6 @@
       <RemoteCommand/>
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
@@ -618,15 +569,6 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\Project1.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\classes\</RemoteDir>
-      <RemoteName>Project1.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Release\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
@@ -729,46 +671,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
       <LocalCommand/>
@@ -1012,15 +914,6 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\Project1.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\classes\</RemoteDir>
-      <RemoteName>Project1.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android64\Debug\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
@@ -1120,46 +1013,6 @@
       <RemoteCommand/>
       <RemoteDir>Project1\res\values\</RemoteDir>
       <RemoteName>styles.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\Artwork\Android\FM_AdaptiveIcon_Background.xml">
       <DeployClass>Android_AdaptiveIconBackground</DeployClass>
@@ -1404,15 +1257,6 @@
       <RemoteDir>Project1\</RemoteDir>
       <RemoteName>AndroidManifest.xml</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\Project1.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1\classes\</RemoteDir>
-      <RemoteName>Project1.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android64\Release\colors-night-v21.xml">
       <DeployClass>Android_ColorsDark</DeployClass>
       <LocalCommand/>
@@ -1516,26 +1360,6 @@
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Linux64&#39;"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosx64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -1555,15 +1379,6 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.dSYM">
-      <DeployClass>ProjectOSXDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSX64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
@@ -1581,26 +1396,6 @@
       <RemoteCommand/>
       <RemoteDir>Project1.app\Contents\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosx64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
@@ -1641,26 +1436,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosxarm64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -1680,15 +1455,6 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.dSYM">
-      <DeployClass>ProjectOSXDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="OSXARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectOSXEntitlements</DeployClass>
       <LocalCommand/>
@@ -1706,26 +1472,6 @@
       <RemoteCommand/>
       <RemoteDir>Project1.app\Contents\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosxarm64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
@@ -1859,6 +1605,7 @@
       <Required>True</Required>
     </DeployFile>
   </ItemGroup>
+  <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Win64x&#39;"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;">
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_152x152.png">
       <DeployClass>iPad_AppIcon152</DeployClass>
@@ -2049,15 +1796,6 @@
       <RemoteDir>Project1.app\</RemoteDir>
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.dSYM">
-      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSDevice64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
@@ -2495,15 +2233,6 @@
       <RemoteName>Project1</RemoteName>
       <Required>True</Required>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.dSYM">
-      <DeployClass>ProjectiOSDeviceDebug</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>Project1.app\..\$(PROJECTNAME).app.dSYM\Contents\Resources\DWARF\</RemoteDir>
-      <RemoteName>Project1</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="iOSSimARM64\Debug\Project1.entitlements">
       <DeployClass>ProjectiOSEntitlements</DeployClass>
       <LocalCommand/>
@@ -2753,9 +2482,9 @@
     <ProjectFileVersion>12</ProjectFileVersion>
   </ProjectExtensions>
   <PropertyGroup>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">2B011FDH200DHE</DeviceId>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">2B011FDH200DHE</DeviceId>
+    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android&#39;"/>
+    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;"/>
     <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSDevice64&#39;"/>
-    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;"/>
+    <DeviceId Condition="&#39;$(Platform)&#39;==&#39;iOSSimARM64&#39;">BABDA219-1CEE-43B2-8F32-B7242E9705B5</DeviceId>
   </PropertyGroup>
 </Project>

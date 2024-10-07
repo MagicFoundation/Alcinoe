@@ -1,0 +1,1 @@
+Aapt2File=c:\program files (x86)\embarcadero\studio\23.0\bin\Android\aapt2-8.2.1.exe

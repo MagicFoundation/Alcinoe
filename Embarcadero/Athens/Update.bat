@@ -1,5 +1,5 @@
 @echo off
-SETLOCAL
+setlocal enabledelayedexpansion
 
 if "%ALBaseDir%"=="" (
   cls  
@@ -23,39 +23,20 @@ SET FileName=%ALBaseDir%\Embarcadero\Athens\rtl
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 IF EXIST "%FileName%" goto ERROR
 mkdir "%FileName%"
-mkdir "%FileName%\ios"
-mkdir "%FileName%\osx"
-mkdir "%FileName%\android"
-mkdir "%FileName%\net"
+mkdir "%FileName%\common"
 
 echo Copy "%EmbSourceDir%\fmx"
 xcopy /Q "%EmbSourceDir%\fmx" "%ALBaseDir%\Embarcadero\Athens\fmx"
 IF ERRORLEVEL 1 goto ERROR
 
-IF EXIST "%EmbSourceDir%\rtl\ios" (
-  echo Copy "%EmbSourceDir%\rtl\ios"
-  xcopy /Q "%EmbSourceDir%\rtl\ios" "%ALBaseDir%\Embarcadero\Athens\rtl\ios"
+IF EXIST "%EmbSourceDir%\rtl\common\System.Skia.API.pas" (
+  echo Copy "%EmbSourceDir%\rtl\common\System.Skia.API.pas"
+  copy /Y "%EmbSourceDir%\rtl\common\System.Skia.API.pas" "%ALBaseDir%\Embarcadero\Athens\rtl\common\System.Skia.API.pas"
   IF ERRORLEVEL 1 goto ERROR
 )
-
-IF EXIST "%EmbSourceDir%\rtl\osx" (
-  echo Copy "%EmbSourceDir%\rtl\osx"
-  xcopy /Q "%EmbSourceDir%\rtl\osx" "%ALBaseDir%\Embarcadero\Athens\rtl\osx"
-  IF ERRORLEVEL 1 goto ERROR
-)
-
-IF EXIST "%EmbSourceDir%\rtl\android" (
-  echo Copy "%EmbSourceDir%\rtl\android"
-  xcopy /Q "%EmbSourceDir%\rtl\android" "%ALBaseDir%\Embarcadero\Athens\rtl\android"
-  IF ERRORLEVEL 1 goto ERROR
-)
-
-echo Copy "%EmbSourceDir%\rtl\net"
-xcopy /Q "%EmbSourceDir%\rtl\net" "%ALBaseDir%\Embarcadero\Athens\rtl\net"
-IF ERRORLEVEL 1 goto ERROR
 
 echo Patch the locally copied source code
-git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace .\Embarcadero\Athens\Athens.patch -v
+git -C "%ALBaseDir%" apply --ignore-space-change --ignore-whitespace --whitespace=nowarn .\Embarcadero\Athens\Athens.patch -v
 
 echo Remove warnings from the copied files
 for /f "delims=" %%a IN ('dir /b /s %ALBaseDir%\Embarcadero\Athens\*.pas') do Call :ADD_HINTS_OFF "%%a"
@@ -72,11 +53,15 @@ IF EXIST "%TmpFileName%" del "%TmpFileName%"
 IF EXIST "%TmpFileName%" goto ERROR
 certutil -dump "%~1" | findstr /C:"ef bb bf" > nul
 if %errorlevel% equ 0 (
-  echo ﻿{$HINTS OFF}{$WARNINGS OFF}{>"%TmpFileName%"
+  set /p firstLine=<"%~1"
+  set first3=!firstLine:~0,3!
+  set restOfLine=!firstLine:~3!
+  echo ﻿{$HINTS OFF}{$WARNINGS OFF}{!first3!^}!restOfLine!>"%TmpFileName%"
+  more +1 "%~1" >> "%TmpFileName%"
 ) else (
   echo {$HINTS OFF}{$WARNINGS OFF}>"%TmpFileName%"
+  type "%~1">>"%TmpFileName%"
 )
-type "%~1">>"%TmpFileName%"
 del "%~1"
 move "%TmpFileName%" "%~1" >nul
 

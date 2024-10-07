@@ -8,7 +8,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if Web.HTTPApp was not updated and adjust the IFDEF'}
 {$IFEND}
 
@@ -30,13 +30,14 @@ type
   TALHTTPProtocolVersion = (v1_0, v1_1);
 
   {--Request method--}
-  TALHTTPMethod = (Get,
-                   Post,
-                   Head,
-                   Trace,
-                   Put,
-                   Delete,
-                   Options);
+  TALHTTPMethod = (
+    Get,
+    Post,
+    Head,
+    Trace,
+    Put,
+    Delete,
+    Options);
 
   {--Request header--}
   TALHTTPRequestHeader = Class(TObject)
@@ -479,26 +480,28 @@ Function  AlCombineUrl(
 {$ENDIF}
 
 const
-  AlRfc822DayOfWeekNames: array[1..7] of AnsiString = ('Sun',
-                                                       'Mon',
-                                                       'Tue',
-                                                       'Wed',
-                                                       'Thu',
-                                                       'Fri',
-                                                       'Sat');
+  AlRfc822DayOfWeekNames: array[1..7] of AnsiString = (
+    'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat');
 
-  ALRfc822MonthOfTheYearNames: array[1..12] of AnsiString = ('Jan',
-                                                             'Feb',
-                                                             'Mar',
-                                                             'Apr',
-                                                             'May',
-                                                             'Jun',
-                                                             'Jul',
-                                                             'Aug',
-                                                             'Sep',
-                                                             'Oct',
-                                                             'Nov',
-                                                             'Dec');
+  ALRfc822MonthOfTheYearNames: array[1..12] of AnsiString = (
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec');
 
 function ALGmtDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;
 function ALDateTimeToRfc822Str(const aValue: TDateTime): AnsiString;

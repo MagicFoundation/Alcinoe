@@ -231,6 +231,7 @@ uses
   Androidapi.JNI.Embarcadero,
   Androidapi.JNI.Support,
   FMX.Platform.Android,
+  Alcinoe.Androidapi.JNI.App,
   {$ENDIF}
   {$IF defined(IOS)}
   Macapi.Helpers,
@@ -555,10 +556,11 @@ begin
   {$IF defined(ANDROID)}
   // Create the NotificationChannel, but only on API 26+ (Android 8.0 oreo)
   if TOSVersion.Check(8) then begin
-    var LNotificationChannel := TJNotificationChannel.JavaClass.init(
-                                  StringToJString(ANotificationChannel.FID),
-                                  StrToJCharSequence(ANotificationChannel.FName),
-                                  ALNotificationImportanceToNative(ANotificationChannel.FImportance));
+    var LNotificationChannel := TJALNotificationChannel.Wrap(
+                                  TJNotificationChannel.JavaClass.init(
+                                    StringToJString(ANotificationChannel.FID),
+                                    StrToJCharSequence(ANotificationChannel.FName),
+                                    ALNotificationImportanceToNative(ANotificationChannel.FImportance)));
     LNotificationChannel.setLockscreenVisibility(ALNotificationVisibilityToNative(ANotificationChannel.FLockscreenVisibility));
     LNotificationChannel.enableVibration(ANotificationChannel.FEnableVibration);
     LNotificationChannel.enableLights(ANotificationChannel.FEnableLights);
@@ -566,7 +568,7 @@ begin
     if ANotificationChannel.FEnableSound then
       LNotificationChannel.setSound(
         TJSettings_System.JavaClass.DEFAULT_NOTIFICATION_URI, // 'content://settings/system/notification_sound'
-        TJNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
+        TJALNotification.JavaClass.AUDIO_ATTRIBUTES_DEFAULT)
     else
       LNotificationChannel.setSound(nil, nil);
     var LNotificationServiceNative := TAndroidHelper.Context.getSystemService(TJContext.JavaClass.NOTIFICATION_SERVICE);
@@ -641,14 +643,17 @@ begin
     if (ANotification.FLargeIconStream <> nil) and (ANotification.FLargeIconStream.Size > 0)  then begin
       try
 
-        LLargeIconBitmap := ALFitIntoAndCropImageV2(
-                              ANotification.FLargeIconStream,
-                              function(const aOriginalSize: TPointF): TpointF
-                              begin
-                                if aOriginalSize.x > aOriginalSize.y then result := TpointF.create(aOriginalSize.Y, aOriginalSize.Y)
-                                else result := TpointF.create(aOriginalSize.x, aOriginalSize.x);
-                              end,
-                              TpointF.create(-50, -50));
+        var LtmpBitmap := ALLoadFromStreamToJBitmap(ANotification.FLargeIconStream);
+        try
+          var W := LtmpBitmap.getWidth;
+          var H := LtmpBitmap.getHeight;
+          if W > H then W := H
+          else H := W;
+          LLargeIconBitmap := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(LtmpBitmap, W, H);
+        finally
+          if not LtmpBitmap.equals(LLargeIconBitmap) then LtmpBitmap.recycle;
+          LtmpBitmap := nil;
+        end;
 
       except
         on E: Exception do begin

@@ -2,21 +2,22 @@ unit Unit1;
 
 interface
 
-uses Windows,
-     Messages,
-     SysUtils,
-     Variants,
-     Classes,
-     Graphics,
-     Controls,
-     Forms,
-     Dialogs,
-     StdCtrls,
-     shellapi,
-     ExtCtrls,
-     ComCtrls,
-     SyncObjs,
-     Alcinoe.NNTP.Client;
+uses
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls,
+  shellapi,
+  ExtCtrls,
+  ComCtrls,
+  SyncObjs,
+  Alcinoe.NNTP.Client;
 
 type
   TForm1 = class(TForm)
@@ -80,9 +81,10 @@ var
 
 implementation
 
-Uses Alcinoe.StringUtils,
-     Alcinoe.InternetMessages,
-     Alcinoe.MultiPartParser;
+Uses
+  Alcinoe.StringUtils,
+  Alcinoe.InternetMessages,
+  Alcinoe.MultiPartParser;
 
 {$R *.DFM}
 
@@ -164,32 +166,32 @@ end;
 
 {************************************************}
 procedure TForm1.ButtonPostClick(Sender: TObject);
-Var aNewsArticleHeader: TALNewsArticleHeader;
-    AMultiPartMixedAttachments : TALMultiPartMixedContents;
-    i : integer;
+Var LNewsArticleHeader: TALNewsArticleHeader;
+    LMultiPartMixedAttachments : TALMultiPartMixedContents;
+    I : integer;
 begin
-  aNewsArticleHeader := TALNewsArticleHeader.Create;
+  LNewsArticleHeader := TALNewsArticleHeader.Create;
   Try
 
-    aNewsArticleHeader.From := AnsiString(FromEdit.Text);
-    aNewsArticleHeader.Newsgroups := AnsiString(NewsGroupEdit.Text);
-    aNewsArticleHeader.Subject := AnsiString(SubjectEdit.Text);
+    LNewsArticleHeader.From := AnsiString(FromEdit.Text);
+    LNewsArticleHeader.Newsgroups := AnsiString(NewsGroupEdit.Text);
+    LNewsArticleHeader.Subject := AnsiString(SubjectEdit.Text);
     If Trim(FileAttachMemo.Lines.text) <> '' then begin
-      AMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
+      LMultiPartMixedAttachments := TALMultiPartMixedContents.Create(true);
       Try
-        For i := 0 to FileAttachMemo.Lines.Count - 1 do
-          If FileAttachMemo.Lines[i] <> '' then
-            AMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[i])));
-          FNnTPClient.PostMultipartMixed(aNewsArticleHeader, AnsiString(MsgMemo.Lines.Text), 'text/plain', AMultiPartMixedAttachments);
+        For I := 0 to FileAttachMemo.Lines.Count - 1 do
+          If FileAttachMemo.Lines[I] <> '' then
+            LMultiPartMixedAttachments.Add.LoadDataFromFileAsAttachmentBase64Encode(ALTrim(AnsiString(FileAttachMemo.Lines[I])));
+          FNnTPClient.PostMultipartMixed(LNewsArticleHeader, AnsiString(MsgMemo.Lines.Text), 'text/plain', LMultiPartMixedAttachments);
       finally
-        AMultiPartMixedAttachments.Free;
+        LMultiPartMixedAttachments.Free;
       end;
     end
-    else FNNTPClient.Post(aNewsArticleHeader, AnsiString(MsgMemo.Lines.Text));
+    else FNNTPClient.Post(LNewsArticleHeader, AnsiString(MsgMemo.Lines.Text));
     DisplayMemo.Lines.Add('POST SUCCESS');
 
   finally
-    aNEwsArticleHeader.Free;
+    LNewsArticleHeader.Free;
   end;
 end;
 

@@ -1,15 +1,92 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <resources>
-    <style name="BlueBGTextView" parent="@android:style/Widget.Holo.EditText">
-    <item name="android:background">#FF0087B4</item>
-    <item name="android:textCursorDrawable">@null</item>
+    <style name="AppThemeDatePickerDialogTheme" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+    <item name="android:datePickerStyle">@style/AppThemeDatePickerStyle</item>
+    <item name="android:colorAccent">#ff0288d1</item>
+    <item name="android:colorControlNormal">#ff6bc6e7</item>
   </style>
-    <style name="AppThemeEditTextStyle" parent="@android:style/Widget.Holo.Light.EditText">
-    <item name="android:background">@null</item>
+    <style name="AppThemeDatePickerStyle" parent="@android:style/Widget.Material.Light.DatePicker">
+    <item name="android:datePickerMode">spinner</item>
   </style>
-    <style name="AppTheme" parent="@android:style/Theme.Holo.Light.NoActionBar"> 
+    <style name="AppThemeEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item> 
+    <item name="android:textColorHighlight">#ff9acfed</item>
+  </style>
+    <style name="Material3LightFilledEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_light_filled</item> 
+    <item name="android:textColorHighlight">#666750A4</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_light_filled</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_light_filled</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_light_filled</item>
+  </style>
+    <style name="Material3LightOutlinedEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_light_outlined</item> 
+    <item name="android:textColorHighlight">#666750A4</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_light_outlined</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_light_outlined</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_light_outlined</item>
+  </style>
+    <style name="Material3DarkFilledEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_dark_filled</item> 
+    <item name="android:textColorHighlight">#66D0BCFF</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_dark_filled</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_dark_filled</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_dark_filled</item>
+  </style>
+    <style name="Material3DarkOutlinedEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_dark_outlined</item> 
+    <item name="android:textColorHighlight">#66D0BCFF</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_dark_outlined</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_dark_outlined</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_dark_outlined</item>
+  </style>
+    <style name="Material3LightFilledErrorEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_light_filled_error</item> 
+    <item name="android:textColorHighlight">#66B3261E</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_light_filled_error</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_light_filled_error</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_light_filled_error</item>
+  </style>
+    <style name="Material3LightOutlinedErrorEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_light_outlined_error</item> 
+    <item name="android:textColorHighlight">#66B3261E</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_light_outlined_error</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_light_outlined_error</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_light_outlined_error</item>
+  </style>
+    <style name="Material3DarkFilledErrorEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_dark_filled_error</item> 
+    <item name="android:textColorHighlight">#66F2B8B5</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_dark_filled_error</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_dark_filled_error</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_dark_filled_error</item>
+  </style>
+    <style name="Material3DarkOutlinedErrorEditTextStyle" parent="@android:style/Widget.Material.Light.EditText">
+    <item name="android:background">@null</item>   
+    <item name="android:textCursorDrawable">@drawable/text_cursor_mtrl3_dark_outlined_error</item> 
+    <item name="android:textColorHighlight">#66F2B8B5</item>
+    <item name="android:textSelectHandle">@drawable/text_select_handle_middle_mtrl3_dark_outlined_error</item>
+    <item name="android:textSelectHandleLeft">@drawable/text_select_handle_left_mtrl3_dark_outlined_error</item>
+    <item name="android:textSelectHandleRight">@drawable/text_select_handle_right_mtrl3_dark_outlined_error</item>
+  </style>
+    <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar"> 
     <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
     <item name="android:colorAccent">#ff0288d1</item>
-    <item type="attr" name="BlueBGTextViewStyle">@style/BlueBGTextView</item>
+    <item name="Material3LightFilledEditTextStyle">@style/Material3LightFilledEditTextStyle</item>
+    <item name="Material3LightOutlinedEditTextStyle">@style/Material3LightOutlinedEditTextStyle</item>
+    <item name="Material3DarkFilledEditTextStyle">@style/Material3DarkFilledEditTextStyle</item>
+    <item name="Material3DarkOutlinedEditTextStyle">@style/Material3DarkOutlinedEditTextStyle</item>
+    <item name="Material3LightFilledErrorEditTextStyle">@style/Material3LightFilledErrorEditTextStyle</item>
+    <item name="Material3LightOutlinedErrorEditTextStyle">@style/Material3LightOutlinedErrorEditTextStyle</item>
+    <item name="Material3DarkFilledErrorEditTextStyle">@style/Material3DarkFilledErrorEditTextStyle</item>
+    <item name="Material3DarkOutlinedErrorEditTextStyle">@style/Material3DarkOutlinedErrorEditTextStyle</item>
+    <item name="android:datePickerDialogTheme">@style/AppThemeDatePickerDialogTheme</item>
   </style>
 </resources>

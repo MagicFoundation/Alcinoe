@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{5148A347-83D2-463A-8E4D-3015A05EBFAB}</ProjectGuid>
-    <ProjectVersion>19.5</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <FrameworkType>VCL</FrameworkType>
     <MainSource>ALLibPhoneNumberDemo.dpr</MainSource>
     <Base>True</Base>
@@ -9,6 +9,7 @@
     <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
     <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Application</AppType>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">ALLibPhoneNumberDemo</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>
@@ -80,7 +81,7 @@
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_UsePackage>dxBarRS18;dxPSCoreRS18;dxSkinOffice2007GreenRS18;dxPScxPCProdRS18;dxSkinBlueRS18;cxTreeListRS18;frxDB18;dxDockingRS18;dxThemeRS18;dxPSdxOCLnkRS18;dxSkinsdxRibbonPainterRS18;dxSkinOffice2007BlueRS18;DBXInterBaseDriver;DataSnapServer;DataSnapCommon;cxTreeListdxBarPopupMenuRS18;dxSkinsdxBarPainterRS18;DbxCommonDriver;vclimg;dbxcds;DatasnapConnectorsFreePascal;dxSkinscxPCPainterRS18;vcldb;dxSkinDarkRoomRS18;cxExportRS18;dcldxSkinsCoreRS18;CustomIPTransport;dxSkinBlueprintRS18;dsnap;IndyIPServer;dxSkinOffice2010BlueRS18;IndyCore;cxVerticalGridRS18;CloudService;dxPSdxDBOCLnkRS18;FmxTeeUI;dxADOServerModeRS18;dxSkinDarkSideRS18;cxSchedulerRibbonStyleEventEditorRS18;dxPScxExtCommonRS18;cxEditorsRS18;cxSchedulerRS18;dxSpellCheckerRS18;cxPageControldxBarPopupMenuRS18;dxPScxVGridLnkRS18;dxSkinSharpPlusRS18;dxSkinValentineRS18;dxRibbonRS18;dxSkinGlassOceansRS18;bindcompfmx;vcldbx;cxBarEditItemRS18;cxPageControlRS18;dxSkinSharpRS18;dbrtl;dxSkinDevExpressDarkStyleRS18;bindcomp;inetdb;dxSkinXmas2008BlueRS18;DBXOdbcDriver;xmlrtl;ibxpress;dxBarExtItemsRS18;frxe18;dxSkinLiquidSkyRS18;dxSkinPumpkinRS18;dxSkinOffice2013WhiteRS18;vclactnband;bindengine;soaprtl;FMXTee;dxSkinMetropolisRS18;bindcompvcl;dxPsPrVwAdvRS18;cxSpreadSheetRS18;cxPivotGridRS18;vclie;dxmdsRS18;dxBarDBNavRS18;dxTileControlRS18;dxComnRS18;dxWizardControlRS18;DBXInformixDriver;dxBarExtDBItemsRS18;Intraweb;dxPScxSchedulerLnkRS18;dxNavBarRS18;dsnapcon;DBXFirebirdDriver;dxPSTeeChartRS18;inet;dxSkinscxSchedulerPainterRS18;dxPScxCommonRS18;dxSkinWhiteprintRS18;vclx;DBXSybaseASADriver;dxorgcRS18;dbexpress;dxSkinOffice2007BlackRS18;dxSkinSummer2008RS18;dxSkinBlackRS18;IndyIPClient;vclZipForged18;dxGDIPlusRS18;dxSkinCoffeeRS18;dxLayoutControlRS18;dxSkinMoneyTwinsRS18;dxSkinVS2010RS18;DBXSqliteDriver;fmx;IndySystem;TeeDB;frx18;inetdbbde;vclib;DataSnapClient;dxPScxTLLnkRS18;dxSkinOffice2013DarkGrayRS18;cxSchedulerGridRS18;dxtrmdRS18;DataSnapProviderClient;DBXSybaseASEDriver;dclZipForged18;dxSkinSilverRS18;dxTabbedMDIRS18;MetropolisUILiveTile;dxPSLnksRS18;vcldsnap;dxPScxPivotGridLnkRS18;DBXDb2Driver;dxPScxSSLnkRS18;dxSkinOffice2010SilverRS18;DBXOracleDriver;dxServerModeRS18;vclribbon;dxdborRS18;dxSkinsdxDLPainterRS18;fmxase;vcl;IndyIPCommon;DBXMSSQLDriver;CodeSiteExpressPkg;cxPivotGridChartRS18;inetdbxpress;webdsnap;dxPScxGridLnkRS18;dxSkinsCoreRS18;dxSkinLondonLiquidSkyRS18;cxLibraryRS18;adortl;dxSkinOffice2013LightGrayRS18;dxSkinDevExpressStyleRS18;dxSkinTheAsphaltWorldRS18;dxSkinSpringTimeRS18;dxSkinHighContrastRS18;dxPSdxDBTVLnkRS18;dxSkinCaramelRS18;dxSkinOffice2007SilverRS18;rtl;DbxClientDriver;dxSkinMetropolisDarkRS18;Tee;dxSkinStardustRS18;svnui;dxDBXServerModeRS18;IndyProtocols;DBXMySQLDriver;dxSkiniMaginaryRS18;dxFlowChartRS18;bindcompdbx;TeeUI;dxSkinMcSkinRS18;vcltouch;dxPSPrVwRibbonRS18;dxSkinOffice2007PinkRS18;dxPSdxFCLnkRS18;VclSmp;cxGridRS18;dxSkinSevenRS18;dxSkinOffice2010BlackRS18;cxSchedulerTreeBrowserRS18;DataSnapConnectors;dxPSDBTeeChartRS18;dxdbtrRS18;dxCoreRS18;fmxobj;dxSkinFoggyRS18;dxSkinSevenClassicRS18;dxSkinsdxNavBarPainterRS18;svn;dxSkinLilianRS18;dxPSdxLCLnkRS18;fmxdae;cxPivotGridOLAPRS18;cxDataRS18;bdertl;DataSnapIndy10ServerTransport;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
   </PropertyGroup>
@@ -91,7 +92,7 @@
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
@@ -109,11 +110,11 @@
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_RemoteDebug>false</DCC_RemoteDebug>
     <BT_BuildType>Debug</BT_BuildType>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
   </PropertyGroup>
@@ -125,14 +126,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Win32)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Win64)&#39;!=&#39;&#39;">
     <AppEnableRuntimeThemes>true</AppEnableRuntimeThemes>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <AppDPIAwarenessMode>PerMonitor</AppDPIAwarenessMode>
   </PropertyGroup>
@@ -206,7 +207,7 @@
           <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
-      <Deployment Version="4"/>
+      <Deployment Version="5"/>
       <Platforms>
         <Platform value="Win32">True</Platform>
         <Platform value="Win64">True</Platform>

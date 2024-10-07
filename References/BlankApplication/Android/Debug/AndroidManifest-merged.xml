@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- BEGIN_INCLUDE(manifest) -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.embarcadero.Project1"
+    android:installLocation="auto"
+    android:versionCode="1"
+    android:versionName="1.0.0" >
+
+    <uses-sdk
+        android:minSdkVersion="23"
+        android:targetSdkVersion="34" />
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
+
+    <queries>
+    </queries>
+
+    <application
+        android:debuggable="true"
+        android:extractNativeLibs="true"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="Project1"
+        android:largeHeap="False"
+        android:persistent="False"
+        android:requestLegacyExternalStorage="true"
+        android:resizeableActivity="true"
+        android:restoreAnyVersion="False"
+        android:theme="@style/AppTheme" >
+
+        <!-- Trigger Google Play services to install the backported photo picker module. -->
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
+            android:enabled="false"
+            android:exported="false"
+            tools:ignore="MissingClass" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+            </intent-filter>
+
+            <meta-data
+                android:name="photopicker_activity:0:required"
+                android:value="" />
+        </service>
+
+        <!--
+             Our activity is a subclass of the built-in NativeActivity framework class.
+             This will take care of integrating with our NDK code.
+        -->
+        <activity
+            android:name="com.embarcadero.firemonkey.FMXNativeActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|screenLayout|uiMode"
+            android:exported="true"
+            android:label="Project1"
+            android:launchMode="singleTask" >
+
+            <!-- Tell NativeActivity the name of our .so -->
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="Project1" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver android:name="com.embarcadero.rtl.notifications.NotificationAlarm" />
+    </application>
+
+</manifest> <!-- END_INCLUDE(manifest) -->

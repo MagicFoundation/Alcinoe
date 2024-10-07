@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FirebaseMessaging.pas to build

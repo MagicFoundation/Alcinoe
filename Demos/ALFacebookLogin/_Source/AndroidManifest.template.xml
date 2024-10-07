@@ -19,6 +19,9 @@
    
     <%queries-child-elements%>
     
+    <!-- https://developers.facebook.com/docs/sharing/android/ -->
+    <provider android:authorities="com.facebook.katana.provider.PlatformProvider"/>
+    
     <!-- ============================================ -->
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->

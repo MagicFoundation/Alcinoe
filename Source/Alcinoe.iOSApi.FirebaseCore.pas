@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   //Pleast update <Alcinoe>\Libraries\ios\firebase\ to the last one and then run
   //<Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorIOS.bat
   //and gave the path to <Alcinoe>\Source\Alcinoe.iOSApi.FirebaseCore.pas to build
@@ -40,7 +40,11 @@ type
 implementation
 
 {*******************************************************************************************}
+{$IF Defined(IOSSIMULATOR)}
+procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a';
+{$ELSE}
 procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.ios.a';
+{$ENDIF}
 procedure FirebaseCoreInternalLoader; cdecl; external framework 'FirebaseCoreInternal';
 procedure FirebaseCoreLoader; cdecl; external framework 'FirebaseCore';
 procedure FBLPromisesLoader; cdecl; external framework 'FBLPromises';
@@ -49,13 +53,20 @@ procedure FirebaseInstallationsLoader; cdecl; external framework 'FirebaseInstal
 //just after installing the app (but if we relaunch it again then everything work good)
 procedure GoogleUtilitiesLoader; cdecl; external framework 'GoogleUtilities';
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-38700 is corrected and if yes check if all declarations below are still mandatories.'}
 {$ENDIF}
+{$IF Defined(IOSSIMULATOR)}
+procedure libswiftCompatibility50Loader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibility50.a';
+procedure libswiftCompatibility51Loader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibility51.a';
+procedure libswiftCompatibilityConcurrencyLoader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibilityConcurrency.a';
+procedure libswiftCompatibilityDynamicReplacementsLoader; cdecl; external '/usr/lib/swift/iphonesimulator/libswiftCompatibilityDynamicReplacements.a';
+{$ELSE}
 procedure libswiftCompatibility50Loader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibility50.a';
 procedure libswiftCompatibility51Loader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibility51.a';
 procedure libswiftCompatibilityConcurrencyLoader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibilityConcurrency.a';
 procedure libswiftCompatibilityDynamicReplacementsLoader; cdecl; external '/usr/lib/swift/iphoneos/libswiftCompatibilityDynamicReplacements.a';
+{$ENDIF}
 procedure libswiftCoreFoundationLoader; cdecl; external '/usr/lib/swift/libswiftCoreFoundation.dylib';
 procedure libswiftCoreImageLoader; cdecl; external '/usr/lib/swift/libswiftCoreImage.dylib';
 procedure libswiftCoreLoader; cdecl; external '/usr/lib/swift/libswiftCore.dylib';

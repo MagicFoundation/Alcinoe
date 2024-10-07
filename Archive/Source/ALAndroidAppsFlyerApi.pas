@@ -44,7 +44,7 @@ type
     {class} procedure updateServerUninstallToken(context: JContext; refreshedToken: JString); cdecl;
     {class} procedure setCustomerUserId(id: JString); cdecl;
   end;
-  [JavaSignature('com/alcinoe/appsflyer/ALAppsFlyer')]
+  [JavaSignature('io/magicfoundation/alcinoe/appsflyer/ALAppsFlyer')]
   JALAppsFlyerLib = interface(JObject)
     ['{6145C2CE-433B-4F69-B996-614EA0C015A5}']
   end;

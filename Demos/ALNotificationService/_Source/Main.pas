@@ -54,7 +54,8 @@ uses
   Alcinoe.FMX.NotificationService,
   Alcinoe.Common,
   Alcinoe.FMX.ErrorReporting,
-  Alcinoe.FMX.Objects;
+  Alcinoe.FMX.Objects,
+  Alcinoe.FMX.Controls;
 
 type
   TForm1 = class(TForm)
@@ -101,40 +102,41 @@ const
   //The info are taken from an account (wonderful.life.photos@gmail.com) that I
   //created specifically for this demo. I retrieve it like this:
   // * go to Firebase console project settings (ALNotificationServiceDemo)
-  //   https://console.firebase.google.com/project/alnotificationservicedemo/settings/general/android:com.alcinoe.alnotificationservicedemo
+  //   https://console.firebase.google.com/project/alnotificationservicedemo/settings/general/android:io.magicfoundation.alcinoe.alnotificationservicedemo
   // * Then click on clound messaging and click on Manage Service Accounts under Firebase Cloud Messaging API (V1)
   // * Then download the json key associated with the Service accounts for project "ALNotificationServiceDemo"
   // * find all the info below inside the json key you just downloaded
   FirebaseMessagingHttpV1ProjectID: AnsiString = 'alnotificationservicedemo';
   FirebaseMessagingHttpV1ServiceAccountEmail: AnsiString = 'firebase-adminsdk-nwe4e@alnotificationservicedemo.iam.gserviceaccount.com';
-  FirebaseMessagingHttpV1ServiceAccountPrivateKey: AnsiString = '-----BEGIN PRIVATE KEY-----'+
-                                                                'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMzhD2+LmYJrxD'+
-                                                                'RtUqQkHPwQRDjRC0AyD5JBJjuvtpgZoBEfYAd8CYuS2ah2dY7jGgzjqrQ7ovyv8H'+
-                                                                'gs1gKLXZXC8VHxKn/VtGqpqBWm65M3CvlFN3/aFCw2PV8YC/dq4NuVr3/bowJbha'+
-                                                                'hL+LUhFzXRqKQAhGajO/wZJQkjaO48F9zNbXuuyRf60Sj6aPjqOJjHJeFHEq9Kij'+
-                                                                'Dam4R/IJVMMeoOXhyX26xPrqRBoPxuJwlSZg6lZBzGCXxXxMUTCHvO5Ki15TeJef'+
-                                                                'Fo4EpXkZrw3VfsLF2+ucbSzByRctjqyU3m7/kOp0hxiZ5wRolSyIwX9N9NIbw4lO'+
-                                                                'FJu5/jeRAgMBAAECggEABnckWZkMhFGqi9ASRTSGQ1fUAnMBxrXAZOi34nIartFw'+
-                                                                'ZeZutX4plFc6Bvakx6rWEMmx47jCuB8qEHIXYg0yl7hnpNP2HHLMu8XS/WIJpSgu'+
-                                                                'BTz0k24PO+zeyibG3qGRaROvRMSNOoYQgADcGPTv7Yw44s+t8zJkjI21GgiX+iVM'+
-                                                                'xW7bvii0sC7v+QSmfKpdmHtjc0QcdGz02dQ2m0uaNyGSYQzqn21D+vS7vbCUpr5X'+
-                                                                'QdQ+TEp4lDsa3Wf2b4avDEVnMFrag1bPO9mjo8M+9NkpMQbA/SvFv78He4DZpljJ'+
-                                                                'Rp6I+cJ6xWyxdNR4PPVV89Dsk34XQS/TytMlSZipKQKBgQDo3iuOAKshh/m8uiwm'+
-                                                                'uT2NuvKuvqbuDgwTgKd7Nr9tKTbJcfHfBaiPRdrgYDu30YOHsxFfL80HUIv15CDe'+
-                                                                'DNeufp8UVEqXl6EzOAgcXm3BWFqOjkgFWpcgQeBevYlJYhdzLUF6WeO6gBpYhr2F'+
-                                                                'mnIxHtsn+y7jRSDyoLBmPF8tEwKBgQDhJkGjBP3B+R+wxcjphoZZgobraFFm+DKk'+
-                                                                '5eJKu9f5O3BJfIk57pFnGzfhrjEKKKe3Ub7i0f1SV7jkCROSxRtUXB8zWi6adQkK'+
-                                                                'fPN3CGCkU//yQz0PUcwX7XPzS/PvMMkvQ690LAgxHTBwEKEHHxF0zZcw6dRUNkA+'+
-                                                                'NCA61+NRSwKBgHqZvcSdhXu54zoBqo0YqdecvXhS2AAtVR5Pdd3hDRejwzx7ySPq'+
-                                                                'DryfwoSvJcG5hM5E8Lh0qjVXqthiqws9J7Cu6YICfuMg6bXVoi+NZ6uLoOG89x4a'+
-                                                                'e8Z36HD4yPbhtgblpLuN59+g4j4Jcm6MyeIipK+AB0eQdbBH+ZdZ4aIRAoGAQbeB'+
-                                                                '5wxY6RpHFrjUSN1cL5o6uVGMmQqO9bSn1Xp4sqWXw8tW3pL02+yE5hmK9NUjBw4U'+
-                                                                'Mm5qi3NRYzYHAYsIzBnLfZiwC6NnjSklgzPtyWk/Rr47f1I3yTAk7PnZbJKH1oTi'+
-                                                                'HH2Rsow7jCo+Zi66UKaFn+BQengPTli2o5ZKInsCgYEAzuEA7iz6mxj4Tl14/EHl'+
-                                                                'lXPOUUZ8a1T+hkiV4IHg5sacRoyIF8LtlQdx4LL8tNiCj0p1Y6vVzmFDDrOdGww2'+
-                                                                'TENN4jneIB6Y2Gzh7KLfiD543aLOd5RJc6hNGbBHJ5jd5E8VxnswUd0L6v0LrG9o'+
-                                                                'RVNesy22JS69CCX39m8T2MU='+
-                                                                '-----END PRIVATE KEY-----';
+  FirebaseMessagingHttpV1ServiceAccountPrivateKey: AnsiString =
+    '-----BEGIN PRIVATE KEY-----'+
+    'MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDMzhD2+LmYJrxD'+
+    'RtUqQkHPwQRDjRC0AyD5JBJjuvtpgZoBEfYAd8CYuS2ah2dY7jGgzjqrQ7ovyv8H'+
+    'gs1gKLXZXC8VHxKn/VtGqpqBWm65M3CvlFN3/aFCw2PV8YC/dq4NuVr3/bowJbha'+
+    'hL+LUhFzXRqKQAhGajO/wZJQkjaO48F9zNbXuuyRf60Sj6aPjqOJjHJeFHEq9Kij'+
+    'Dam4R/IJVMMeoOXhyX26xPrqRBoPxuJwlSZg6lZBzGCXxXxMUTCHvO5Ki15TeJef'+
+    'Fo4EpXkZrw3VfsLF2+ucbSzByRctjqyU3m7/kOp0hxiZ5wRolSyIwX9N9NIbw4lO'+
+    'FJu5/jeRAgMBAAECggEABnckWZkMhFGqi9ASRTSGQ1fUAnMBxrXAZOi34nIartFw'+
+    'ZeZutX4plFc6Bvakx6rWEMmx47jCuB8qEHIXYg0yl7hnpNP2HHLMu8XS/WIJpSgu'+
+    'BTz0k24PO+zeyibG3qGRaROvRMSNOoYQgADcGPTv7Yw44s+t8zJkjI21GgiX+iVM'+
+    'xW7bvii0sC7v+QSmfKpdmHtjc0QcdGz02dQ2m0uaNyGSYQzqn21D+vS7vbCUpr5X'+
+    'QdQ+TEp4lDsa3Wf2b4avDEVnMFrag1bPO9mjo8M+9NkpMQbA/SvFv78He4DZpljJ'+
+    'Rp6I+cJ6xWyxdNR4PPVV89Dsk34XQS/TytMlSZipKQKBgQDo3iuOAKshh/m8uiwm'+
+    'uT2NuvKuvqbuDgwTgKd7Nr9tKTbJcfHfBaiPRdrgYDu30YOHsxFfL80HUIv15CDe'+
+    'DNeufp8UVEqXl6EzOAgcXm3BWFqOjkgFWpcgQeBevYlJYhdzLUF6WeO6gBpYhr2F'+
+    'mnIxHtsn+y7jRSDyoLBmPF8tEwKBgQDhJkGjBP3B+R+wxcjphoZZgobraFFm+DKk'+
+    '5eJKu9f5O3BJfIk57pFnGzfhrjEKKKe3Ub7i0f1SV7jkCROSxRtUXB8zWi6adQkK'+
+    'fPN3CGCkU//yQz0PUcwX7XPzS/PvMMkvQ690LAgxHTBwEKEHHxF0zZcw6dRUNkA+'+
+    'NCA61+NRSwKBgHqZvcSdhXu54zoBqo0YqdecvXhS2AAtVR5Pdd3hDRejwzx7ySPq'+
+    'DryfwoSvJcG5hM5E8Lh0qjVXqthiqws9J7Cu6YICfuMg6bXVoi+NZ6uLoOG89x4a'+
+    'e8Z36HD4yPbhtgblpLuN59+g4j4Jcm6MyeIipK+AB0eQdbBH+ZdZ4aIRAoGAQbeB'+
+    '5wxY6RpHFrjUSN1cL5o6uVGMmQqO9bSn1Xp4sqWXw8tW3pL02+yE5hmK9NUjBw4U'+
+    'Mm5qi3NRYzYHAYsIzBnLfZiwC6NnjSklgzPtyWk/Rr47f1I3yTAk7PnZbJKH1oTi'+
+    'HH2Rsow7jCo+Zi66UKaFn+BQengPTli2o5ZKInsCgYEAzuEA7iz6mxj4Tl14/EHl'+
+    'lXPOUUZ8a1T+hkiV4IHg5sacRoyIF8LtlQdx4LL8tNiCj0p1Y6vVzmFDDrOdGww2'+
+    'TENN4jneIB6Y2Gzh7KLfiD543aLOd5RJc6hNGbBHJ5jd5E8VxnswUd0L6v0LrG9o'+
+    'RVNesy22JS69CCX39m8T2MU='+
+    '-----END PRIVATE KEY-----';
 
 {*******************************************}
 procedure TForm1.FormCreate(Sender: TObject);

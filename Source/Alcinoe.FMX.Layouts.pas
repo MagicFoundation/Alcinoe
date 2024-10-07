@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Layouts.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -17,6 +17,8 @@ uses
   FMX.layouts,
   FMX.Types,
   FMX.Controls,
+  Alcinoe.FMX.Controls,
+  ALcinoe.FMX.Common,
   Alcinoe.FMX.StdCtrls,
   Alcinoe.FMX.ScrollEngine;
 
@@ -24,19 +26,77 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALLayout = class(TLayout)
-  private
-    FAutoSize: Boolean;
-    procedure SetAutoSize(const Value: Boolean);
+  TALLayout = class(TALControl, IALAutosizeControl)
   protected
+    FAutoSize: Boolean;
+    function GetAutoSize: Boolean; virtual;
+    procedure SetAutoSize(const Value: Boolean); virtual;
     procedure DoRealign; override;
     procedure AdjustSize; virtual;
+    procedure Paint; override;
+    { IALAutosizeControl }
+    function HasUnconstrainedAutosizeX: Boolean; virtual;
+    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
   published
+    //property Action;
+    property Align;
+    property Anchors;
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
-    property AutoSize: Boolean read FAutoSize write SetAutoSize default False;
+    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest default False;
+    property Locked;
+    property Margins;
+    property Opacity;
+    property Padding;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Size;
+    property TabOrder;
+    property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
+    //property OnCanFocus;
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    //property OnEnter;
+    //property OnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
   end;
 
   {*************************}
@@ -51,7 +111,7 @@ type
   //   * InternalSizeChanged => FParentControl.Realign;
   // These notifications are crucial to trigger the realignment of the
   // scrollbox.
-  TALScrollBoxContent = class(TContent)
+  TALScrollBoxContent = class(TALContent)
   private
     FScrollBox: TALCustomScrollBox;
   protected
@@ -83,6 +143,7 @@ type
   private
     FScrollBox: TALCustomScrollBox;
   protected
+    function GetDefaultSize: TSizeF; override;
     procedure DoChanged; override;
     procedure Resize; override;
   public
@@ -103,10 +164,9 @@ type
 
   {*******************************************************************************************************************************}
   TALScrollBoxPositionChangeEvent = procedure (Sender: TObject; const OldViewportPosition, NewViewportPosition: TPointF) of object;
-  TALScrollBoxBarInit = procedure(const sender: TObject; const aScrollBar: TALScrollBoxBar) of object;
 
-  {**********************************}
-  TALCustomScrollBox = class(TControl)
+  {**********************************************************}
+  TALCustomScrollBox = class(TALControl, IALScrollableControl)
   private
     FScrollEngine: TALScrollBoxScrollEngine;
     FContent: TALScrollBoxContent;
@@ -119,16 +179,13 @@ type
     FAutoHide: Boolean;
     FMouseEvents: Boolean;
     FOnViewportPositionChange: TALScrollBoxPositionChangeEvent;
-    fOnScrollBarInit: TALScrollBoxBarInit;
     fOnAniStart: TnotifyEvent;
     fOnAniStop: TnotifyEvent;
     fMouseDownPos: TpointF;
     fScrollCapturedByMe: boolean;
-    fScrollCapturedByOther: boolean;
     fMaxContentWidth: Single;
     fMaxContentHeight: single;
     fAnchoredContentOffset: TPointF;
-    procedure setScrollCapturedByMe(const Value: boolean);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetShowScrollBars(const Value: Boolean);
     procedure SetAutoHide(const Value: Boolean);
@@ -138,8 +195,9 @@ type
     procedure internalMouseMove(Shift: TShiftState; X, Y: Single);
     procedure internalMouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure internalMouseLeave;
+    { IALScrollableControl }
+    function GetScrollEngine: TALScrollEngine;
   protected
-    procedure Loaded; override;
     procedure DoAddObject(const AObject: TFmxObject); override;
     procedure DoRealign; override;
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; virtual;
@@ -159,12 +217,12 @@ type
     procedure MouseWheel(Shift: TShiftState; WheelDelta: Integer; var Handled: Boolean); override;
     property HScrollBar: TALScrollBoxBar read fHScrollBar;
     property VScrollBar: TALScrollBoxBar read fVScrollBar;
-    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored;
-    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored;
+    property MaxContentWidth: Single read fMaxContentWidth write fMaxContentWidth stored isMaxContentWidthStored nodefault;
+    property MaxContentHeight: Single read fMaxContentHeight write fMaxContentHeight stored isMaxContentHeightStored nodefault;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    property ScrollEngine: TALScrollBoxScrollEngine read FScrollEngine;
+    property ScrollEngine: TALScrollEngine read GetScrollEngine;
     procedure Sort(Compare: TFmxObjectSortCompare); override;
     procedure ScrollBy(const Dx, Dy: Single);
     function GetTabList: ITabList; override;
@@ -174,7 +232,6 @@ type
     property DisableMouseWheel: Boolean read FDisableMouseWheel write FDisableMouseWheel default False;
     property ShowScrollBars: Boolean read FShowScrollBars write SetShowScrollBars default True;
     property OnViewportPositionChange: TALScrollBoxPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property OnScrollBarInit: TALScrollBoxBarInit read fOnScrollBarInit write fOnScrollBarInit;
     property ClipChildren default true;
     property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
     property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
@@ -188,17 +245,24 @@ type
   published
     property HScrollBar;
     property VScrollBar;
+    //property Action;
     property Align;
     property Anchors;
     property AutoHide;
-    property ClipParent;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
     property DragMode;
-    property Enabled;
     property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
     property Locked;
     property Margins;
@@ -216,33 +280,31 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    property OnAniStart;
+    property OnAniStop;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
-    { ScrollBox events }
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnViewportPositionChange;
-    property OnScrollBarInit;
-    property OnAniStart;
-    property OnAniStop;
   end;
 
   {*************************}
@@ -254,22 +316,29 @@ type
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
     function CreateScrollEngine: TALScrollBoxScrollEngine; override;
   published
-    property MaxContentWidth;
     property VScrollBar;
+    //property Action;
     property Align;
     property Anchors;
     property AutoHide;
-    property ClipParent;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
     property DragMode;
-    property Enabled;
     property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
     property Locked;
     property Margins;
+    property MaxContentWidth;
     property Opacity;
     property Padding;
     property PopupMenu;
@@ -284,33 +353,31 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    property OnAniStart;
+    property OnAniStop;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
-    { ScrollBox events }
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnViewportPositionChange;
-    property OnScrollBarInit;
-    property OnAniStart;
-    property OnAniStop;
   end;
 
   {*************************}
@@ -322,22 +389,29 @@ type
     function CreateScrollBar(const aOrientation: TOrientation): TALScrollBoxBar; override;
     function CreateScrollEngine: TALScrollBoxScrollEngine; override;
   published
-    property MaxContentHeight;
     property HScrollBar;
+    //property Action;
     property Align;
     property Anchors;
     property AutoHide;
-    property ClipParent;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
     property DragMode;
-    property Enabled;
     property EnableDragHighlight;
+    property Enabled;
     property Height;
-    property Hint;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
     property Locked;
     property Margins;
+    property MaxContentHeight;
     property Opacity;
     property Padding;
     property PopupMenu;
@@ -352,33 +426,31 @@ type
     property TouchTargetExpansion;
     property Visible;
     property Width;
-    property ParentShowHint;
-    property ShowHint;
-    { Events }
-    property OnPainting;
-    property OnPaint;
-    property OnResize;
-    property OnResized;
-    { Drag and Drop events }
+    property OnAniStart;
+    property OnAniStop;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    { Mouse events }
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
-    { ScrollBox events }
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
     property OnViewportPositionChange;
-    property OnScrollBarInit;
-    property OnAniStart;
-    property OnAniStop;
   end;
 
 procedure Register;
@@ -398,14 +470,28 @@ uses
   FMX.utils,
   FMX.Ani,
   Alcinoe.StringUtils,
-  Alcinoe.FMX.Common,
+  Alcinoe.FMX.Objects,
   Alcinoe.Common;
+
+{**}
+Type
+  _TControlAccessProtected = class(Tcontrol);
 
 {***********************************************}
 constructor TALLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
   FAutoSize := False;
+  CanParentFocus := True;
+  HitTest := False;
+end;
+
+{************************}
+procedure TALLayout.Paint;
+begin
+  inherited;
+  if (csDesigning in ComponentState) and not Locked then
+    DrawDesignBorder;
 end;
 
 {****************************}
@@ -420,87 +506,26 @@ procedure TALLayout.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (FAutoSize) then begin // if FAutoSize is false nothing to adjust
+     (FAutoSize) then // if FAutoSize is false nothing to adjust
+    ALAutoSize(Self);
+end;
 
-    var LSize := TSizeF.Create(0,0);
-    for var Lcontrol in Controls do begin
-      case Lcontrol.Align of
+{**************************************}
+function TALLayout.GetAutoSize: Boolean;
+begin
+  result := FAutoSize;
+end;
 
-        //--
-        TAlignLayout.None,
-        TAlignLayout.Center:;
+{****************************************************}
+function TALLayout.HasUnconstrainedAutosizeX: Boolean;
+begin
+  result := GetAutoSize;
+end;
 
-        //--
-        TAlignLayout.Top,
-        TAlignLayout.MostTop,
-        TAlignLayout.Bottom,
-        TAlignLayout.MostBottom: begin
-          LSize.Width := Max(LSize.Width, Width);
-          LSize.height := Max(LSize.height, Lcontrol.Position.Y + Lcontrol.Height + Lcontrol.Margins.bottom + padding.bottom);
-        end;
-
-        //--
-        TAlignLayout.Left,
-        TAlignLayout.MostLeft,
-        TAlignLayout.Right,
-        TAlignLayout.MostRight: Begin
-          LSize.Width := Max(LSize.Width, Lcontrol.Position.X + Lcontrol.width + Lcontrol.Margins.right + padding.right);
-          LSize.height := Max(LSize.Height, Height);
-        End;
-
-        //--
-        TAlignLayout.Client,
-        TAlignLayout.Contents,
-        TAlignLayout.Scale,
-        TAlignLayout.Fit,
-        TAlignLayout.FitLeft,
-        TAlignLayout.FitRight: Begin
-          LSize.Width := Max(LSize.Width, Width);
-          LSize.height := Max(LSize.Height, Height);
-        End;
-
-        //--
-        TAlignLayout.Horizontal,
-        TAlignLayout.VertCenter: Begin
-          LSize.Width := Max(LSize.Width, Width);
-        End;
-
-        //--
-        TAlignLayout.Vertical,
-        TAlignLayout.HorzCenter: Begin
-          LSize.height := Max(LSize.Height, Height);
-        End;
-
-      end;
-    end;
-
-    // This to take care of the align constraint
-    if Align in [TAlignLayout.Client,
-                 TAlignLayout.Contents,
-                 TAlignLayout.Top,
-                 TAlignLayout.Bottom,
-                 TAlignLayout.MostTop,
-                 TAlignLayout.MostBottom,
-                 TAlignLayout.Horizontal,
-                 TAlignLayout.VertCenter] then begin
-      LSize.Width := Width;
-    end;
-    if Align in [TAlignLayout.Client,
-                 TAlignLayout.Contents,
-                 TAlignLayout.Left,
-                 TAlignLayout.Right,
-                 TAlignLayout.MostLeft,
-                 TAlignLayout.MostRight,
-                 TAlignLayout.Vertical,
-                 TAlignLayout.HorzCenter] then begin
-      LSize.height := height;
-    end;
-
-    if LSize.Width = 0 then LSize.Width := Width;
-    if LSize.Height = 0 then LSize.Height := Height;
-    SetBounds(Position.X, Position.Y, LSize.Width, LSize.Height);
-
-  end;
+{****************************************************}
+function TALLayout.HasUnconstrainedAutosizeY: Boolean;
+begin
+  result := GetAutoSize;
 end;
 
 {****************************************************}
@@ -529,9 +554,9 @@ function TALScrollBoxContent.IsVisibleObject(const AObject: TControl): Boolean;
 begin
   if AObject.Visible then begin
     Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
-              (AObject.Position.Y + AObject.Height > -Position.Y) and
+              (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > -Position.Y) and
               (AObject.Position.X < -Position.X + FscrollBox.Width) and
-              (AObject.Position.X + AObject.Width > Position.X);
+              (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > Position.X);
   end
   else
     result := False;
@@ -635,6 +660,12 @@ begin
   HitTest := False;
 end;
 
+{**********************************************}
+function TALScrollBoxBar.GetDefaultSize: TSizeF;
+begin
+  Result := TSizeF.Create(150, 4);
+end;
+
 {**********************************}
 procedure TALScrollBoxBar.DoChanged;
 begin
@@ -674,7 +705,6 @@ begin
   FDisableMouseWheel := False;
   FMouseEvents := False;
   FOnViewportPositionChange := nil;
-  fOnScrollBarInit := nil;
   fOnAniStart := nil;
   fOnAniStop := nil;
   fScrollEngine := CreateScrollEngine;
@@ -692,7 +722,6 @@ begin
   //-----
   fMouseDownPos := TpointF.zero;
   fScrollCapturedByMe := False;
-  fScrollCapturedByOther := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
 end;
 
@@ -721,14 +750,19 @@ function TALCustomScrollBox.CalcContentBounds: TRectF;
 begin
   Result := LocalRect;
   if (FContent <> nil) then begin
-    for var I := 0 to FContent.ControlsCount - 1 do
-      if FContent.Controls[I].Visible then begin
+    for var I := 0 to FContent.ControlsCount - 1 do begin
+      var LControl := FContent.Controls[I];
+      if LControl.Visible then begin
         {$IFDEF MSWINDOWS}
-        if (csDesigning in ComponentState) and Supports(FContent.Controls[I], IDesignerControl) then
+        if (csDesigning in ComponentState) and Supports(LControl, IDesignerControl) then
           Continue;
         {$ENDIF}
-        Result.Union(FContent.Controls[I].BoundsRect);
+        var LBoundsRect := LControl.BoundsRect;
+        LBoundsRect.Right := LBoundsRect.Right + LControl.Margins.Right;
+        LBoundsRect.Bottom := LBoundsRect.Bottom + LControl.Margins.Bottom;
+        Result.Union(LBoundsRect);
       end;
+    end;
   end;
   if result.Top < 0 then result.Top := 0;
   if result.left < 0 then result.left := 0;
@@ -752,13 +786,13 @@ procedure TALCustomScrollBox.DoRealign;
       fVScrollBar.Enabled := AContentRect.Height > Height;
       fVScrollBar.Visible := FShowScrollBars and
                              ((AContentRect.Height > Height) or (not FAutoHide));
-      fVScrollBar.ValueRange.BeginUpdate;
+      fVScrollBar.BeginUpdate;
       try
-        fVScrollBar.ValueRange.Min := 0;
-        fVScrollBar.ValueRange.Max := AContentRect.Height;
-        fVScrollBar.ValueRange.ViewportSize := height;
+        fVScrollBar.Min := 0;
+        fVScrollBar.Max := AContentRect.Height;
+        fVScrollBar.ViewportSize := height;
       finally
-        fVScrollBar.ValueRange.EndUpdate;
+        fVScrollBar.EndUpdate;
       end;
       fVScrollBar.SetBounds(
         width - fVScrollBar.Width - fVScrollBar.Margins.Right,
@@ -775,13 +809,13 @@ procedure TALCustomScrollBox.DoRealign;
       fHScrollBar.Enabled := AContentRect.Width > Width;
       fHScrollBar.Visible := FShowScrollBars and
                              ((AContentRect.Width > Width) or (not FAutoHide));
-      fHScrollBar.ValueRange.BeginUpdate;
+      fHScrollBar.BeginUpdate;
       try
-        fHScrollBar.ValueRange.Min := 0;
-        fHScrollBar.ValueRange.Max := AContentRect.Width;
-        fHScrollBar.ValueRange.ViewportSize := Width;
+        fHScrollBar.Min := 0;
+        fHScrollBar.Max := AContentRect.Width;
+        fHScrollBar.ViewportSize := Width;
       finally
-        fHScrollBar.ValueRange.EndUpdate;
+        fHScrollBar.EndUpdate;
       end;
       fHScrollBar.SetBounds(
         fHScrollBar.Margins.left,
@@ -844,10 +878,10 @@ begin
   Result.Beginupdate;
   try
     Result.Orientation := aOrientation;
-    result.Thumb.HitTest := not HasTouchScreen; // at design time (windows) will be always true = default value
-                                                // this mean that true will be never save in the dfm! only false
-                                                // can be stored in the dfm. so only false in the dfm can override
-                                                // this settings
+    // At design time (on Windows), this will always be True, which is the default value.
+    // This means that True will never be saved in the DFM; only False can be stored in the DFM.
+    // Therefore, only False in the DFM can override this setting.
+    result.Thumb.HitTest := not HasTouchScreen;
     if aOrientation = TOrientation.Vertical then Result.Name := 'VScrollBar'
     else Result.Name := 'HScrollBar';
     Result.Visible := False;
@@ -877,24 +911,15 @@ begin
   Result.AutoShowing := HasTouchScreen;
 end;
 
-{***********************************************************************}
-procedure TALCustomScrollBox.setScrollCapturedByMe(const Value: boolean);
+{***********************************************************}
+function TALCustomScrollBox.GetScrollEngine: TALScrollEngine;
 begin
-  if Value <> fScrollCapturedByMe  then begin
-    {$IFDEF DEBUG}
-    //ALLog('TALCustomScrollBox.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
-    {$ENDIF}
-    fScrollCapturedByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value));
-  end;
+  result := FScrollEngine;
 end;
 
 {**************************************************************************************************}
 procedure TALCustomScrollBox.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
@@ -904,13 +929,15 @@ begin
   //  TalLogType.verbose);
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
+    {$IFDEF DEBUG}
+    if fScrollCapturedByMe then
+      raise Exception.Create('Error 8EA8C349-8441-4D2F-BC5A-872772A40513');
+    {$ENDIF}
     if fScrollEngine.down then begin
       fScrollEngine.Down := false;
       FMouseEvents := False;
     end;
-    fScrollCapturedByOther := True;
-  end
-  else fScrollCapturedByOther := False;
+  end;
 end;
 
 {*****************************************************************************************************}
@@ -922,9 +949,8 @@ begin
   //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
-  FMouseEvents := true;
-  if (not fScrollCapturedByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+  if (Button = TMouseButton.mbLeft) then begin
+    FMouseEvents := true;
     fMouseDownPos := TpointF.Create(X,Y);
     ScrollEngine.MouseDown(X, Y);
   end;
@@ -946,7 +972,10 @@ begin
          (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop)) or
         ((ttVertical in fScrollEngine.TouchTracking) and
          (abs(fMouseDownPos.y - y) > abs(fMouseDownPos.x - x)) and
-         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then setScrollCapturedByMe(True);
+         (abs(fMouseDownPos.y - y) > TALScrollEngine.DefaultTouchSlop))) then begin
+      fScrollCapturedByMe := True;
+      TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(True));
+    end;
     ScrollEngine.MouseMove(X, Y);
   end;
 end;
@@ -961,7 +990,7 @@ begin
   //  TalLogType.verbose);
   {$ENDIF}
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseUp(X, Y);
     FMouseEvents := False;
   end;
@@ -974,7 +1003,7 @@ begin
   //ALLog('TALCustomScrollBox.internalMouseLeave', TalLogType.verbose);
   {$ENDIF}
   if FMouseEvents then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseLeave;
     FMouseEvents := False;
   end;
@@ -1008,15 +1037,18 @@ begin
   internalMouseLeave;
 end;
 
-{**}
-Type
-  _TALControlAccessProtected = class(Tcontrol);
-
 {*************}
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+  if not aObject.AutoCapture then begin
+    {$IF defined(MSWindows)}
+    // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
+    // This action deactivates some functionalities in the native control, such as the right-click menu.
+    if not Supports(aObject, IALNativeControl) then
+    {$ENDIF}
+      _TControlAccessProtected(aObject).capture;
+  end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
@@ -1037,7 +1069,14 @@ end;
 {$IFNDEF ALDPK}
 procedure TALCustomScrollBox.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+  if not aObject.AutoCapture then begin
+    {$IF defined(MSWindows)}
+    // On Windows, calling doCapture will invoke Winapi.Windows.SetCapture(FormToHWND(AForm));
+    // This action deactivates some functionalities in the native control, such as the right-click menu.
+    if not Supports(aObject, IALNativeControl) then
+    {$ENDIF}
+      _TControlAccessProtected(aObject).releasecapture;
+  end;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
@@ -1087,16 +1126,6 @@ begin
      (not (AObject is TAnimation)) and
      (not (AObject is TALScrollBoxBar)) then FContent.AddObject(AObject)
   else inherited;
-end;
-
-{**********************************}
-procedure TALCustomScrollBox.Loaded;
-begin
-  inherited Loaded;
-  if assigned(fOnScrollBarInit) then begin
-    if assigned(fVscrollBar) then fOnScrollBarInit(self, fVscrollBar);
-    if assigned(fHscrollBar) then fOnScrollBarInit(self, fHscrollBar);
-  end;
 end;
 
 {**********************************************************}
@@ -1210,8 +1239,26 @@ procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALLayout, TALScrollBox, TALVertScrollBox, TALHorzScrollBox]);
   {$IFDEF ALDPK}
-  UnlistPublishedProperty(TALScrollBoxBar, 'Locked');
+  UnlistPublishedProperty(TALLayout, 'Size');
+  UnlistPublishedProperty(TALLayout, 'StyleName');
+  UnlistPublishedProperty(TALLayout, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALScrollBox, 'Size');
+  UnlistPublishedProperty(TALScrollBox, 'StyleName');
+  UnlistPublishedProperty(TALScrollBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALVertScrollBox, 'Size');
+  UnlistPublishedProperty(TALVertScrollBox, 'StyleName');
+  UnlistPublishedProperty(TALVertScrollBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALHorzScrollBox, 'Size');
+  UnlistPublishedProperty(TALHorzScrollBox, 'StyleName');
+  UnlistPublishedProperty(TALHorzScrollBox, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALScrollBoxBar, 'Size');
   UnlistPublishedProperty(TALScrollBoxBar, 'StyleName');
+  UnlistPublishedProperty(TALScrollBoxBar, 'OnTap');
+  UnlistPublishedProperty(TALScrollBoxBar, 'Locked');
   UnlistPublishedProperty(TALScrollBoxBar, 'Anchors'); // not work https://quality.embarcadero.com/browse/RSP-15684
   UnlistPublishedProperty(TALScrollBoxBar, 'Align');
   UnlistPublishedProperty(TALScrollBoxBar, 'Position');

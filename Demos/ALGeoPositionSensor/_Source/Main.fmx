@@ -30,6 +30,7 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 2
     Text = 'Request Approximate Location Access'
+    TextSettings.Trimming = None
     OnClick = Button1Click
   end
   object Button4: TButton
@@ -40,6 +41,7 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 1
     Text = 'Request Background Location Access'
+    TextSettings.Trimming = None
     OnClick = Button4Click
   end
   object Button5: TButton
@@ -50,6 +52,7 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 0
     Text = 'Request Precise Location Access'
+    TextSettings.Trimming = None
     OnClick = Button5Click
   end
   object Button6: TButton
@@ -60,6 +63,7 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 4
     Text = 'Start Location Update'
+    TextSettings.Trimming = None
     OnClick = Button6Click
   end
   object Button7: TButton
@@ -70,6 +74,7 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 5
     Text = 'Get Authorizations Granted'
+    TextSettings.Trimming = None
     OnClick = Button7Click
   end
   object Button2: TButton
@@ -80,6 +85,7 @@ object Form1: TForm1
     Size.PlatformDefault = False
     TabOrder = 3
     Text = 'Stop Location Update'
+    TextSettings.Trimming = None
     OnClick = Button2Click
   end
 end

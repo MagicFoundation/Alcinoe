@@ -30,10 +30,6 @@ object Form1: TForm1
       Caption = 'Application'
       Color = 15066860
       ParentColor = False
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 994
-      ExplicitHeight = 582
       DesignSize = (
         994
         582)
@@ -42,18 +38,21 @@ object Form1: TForm1
         Top = 8
         Caption = 'List of Url'
         ParentFont = False
+        TabOrder = 4
         Transparent = True
       end
       object Label1: TcxLabel
         Left = 11
         Top = 167
         Caption = 'Number of thread'
+        TabOrder = 9
         Transparent = True
       end
       object Label2: TcxLabel
         Left = 11
         Top = 193
         Caption = 'Max Http Request by Thread'
+        TabOrder = 10
         Transparent = True
       end
       object Label3: TcxLabel
@@ -61,6 +60,7 @@ object Form1: TForm1
         Top = 166
         Caption = 'Delay between each call'
         ParentFont = False
+        TabOrder = 11
         Transparent = True
       end
       object Label5: TcxLabel
@@ -68,6 +68,7 @@ object Form1: TForm1
         Top = 167
         Caption = 'ms'
         ParentFont = False
+        TabOrder = 12
         Transparent = True
       end
       object MemoLstUrl: TcxMemo
@@ -75,7 +76,7 @@ object Form1: TForm1
         Top = 29
         Anchors = [akLeft, akTop, akRight]
         Lines.Strings = (
-          'http://www.pap.fr')
+          'https://www.yahoo.com')
         ParentFont = False
         TabOrder = 0
         Height = 124
@@ -313,10 +314,6 @@ object Form1: TForm1
     object TabSheet2: TcxTabSheet
       Caption = 'Configuration'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object GroupBox3: TcxGroupBox
         Left = 7
         Top = 11
@@ -336,6 +333,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'UserName'
           ParentFont = False
+          TabOrder = 2
           Transparent = True
         end
         object Label19: TcxLabel
@@ -343,6 +341,7 @@ object Form1: TForm1
           Top = 46
           Caption = 'Password'
           ParentFont = False
+          TabOrder = 3
           Transparent = True
         end
         object EditUserName: TcxTextEdit
@@ -379,6 +378,7 @@ object Form1: TForm1
           Top = 45
           Caption = 'Send'
           ParentFont = False
+          TabOrder = 3
           Transparent = True
         end
         object Label17: TcxLabel
@@ -386,6 +386,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'Connect'
           ParentFont = False
+          TabOrder = 4
           Transparent = True
         end
         object Label20: TcxLabel
@@ -393,6 +394,7 @@ object Form1: TForm1
           Top = 69
           Caption = 'Receive'
           ParentFont = False
+          TabOrder = 5
           Transparent = True
         end
         object EditSendTimeout: TcxTextEdit
@@ -645,6 +647,7 @@ object Form1: TForm1
           Top = 45
           Caption = 'Port'
           ParentFont = False
+          TabOrder = 5
           Transparent = True
         end
         object Label12: TcxLabel
@@ -652,6 +655,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'Server'
           ParentFont = False
+          TabOrder = 6
           Transparent = True
         end
         object Label11: TcxLabel
@@ -659,6 +663,7 @@ object Form1: TForm1
           Top = 69
           Caption = 'UserName'
           ParentFont = False
+          TabOrder = 7
           Transparent = True
         end
         object Label16: TcxLabel
@@ -666,6 +671,7 @@ object Form1: TForm1
           Top = 94
           Caption = 'Password'
           ParentFont = False
+          TabOrder = 8
           Transparent = True
         end
         object Label13: TcxLabel
@@ -673,6 +679,7 @@ object Form1: TForm1
           Top = 117
           Caption = 'Bypass'
           ParentFont = False
+          TabOrder = 9
           Transparent = True
         end
         object EdProxyPort: TcxTextEdit
@@ -732,6 +739,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'Upload'
           ParentFont = False
+          TabOrder = 1
           Transparent = True
         end
         object EditBufferUploadSize: TcxTextEdit
@@ -762,6 +770,7 @@ object Form1: TForm1
           Top = 22
           Caption = 'Format "Name: values" on each lines'
           ParentFont = False
+          TabOrder = 1
           Transparent = True
         end
         object MemoRequestRawHeader: TcxMemo

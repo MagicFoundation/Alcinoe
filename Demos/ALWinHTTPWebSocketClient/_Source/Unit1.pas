@@ -41,7 +41,9 @@ uses
   cxClasses,
   dxBarBuiltInMenu,
   Alcinoe.StringUtils,
-  Alcinoe.WebSocket.Client.WinHTTP, dxCore;
+  Alcinoe.WebSocket.Client.WinHTTP,
+  dxCore,
+  dxUIAClasses;
 
 type
   TForm1 = class(TForm)

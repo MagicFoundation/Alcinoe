@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<resources>
+    <string name="exo_download_completed">بارگیری کامل شد</string>
+    <string name="exo_download_description">بارگیری</string>
+    <string name="exo_download_downloading">درحال بارگیری</string>
+    <string name="exo_download_failed">بارگیری نشد</string>
+    <string name="exo_download_notification_channel_name">بارگیری‌ها</string>
+    <string name="exo_download_paused">بارگیری‌ها موقتاً متوقف شد</string>
+    <string name="exo_download_paused_for_network">بارگیری‌ها درانتظار شبکه است</string>
+    <string name="exo_download_paused_for_wifi">بارگیری‌ها در انتظار Wi-Fi است</string>
+    <string name="exo_download_removing">حذف بارگیری‌ها</string>
+    <string msgid="6277540029070332960" name="status_bar_notification_info_overflow">"999+"</string>
+</resources>

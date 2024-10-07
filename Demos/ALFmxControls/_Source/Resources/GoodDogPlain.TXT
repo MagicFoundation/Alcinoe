@@ -1,0 +1,27 @@
+GoodDog Plain©1997 Fonthead Design
+
+What is GoodDog Plain?
+This is the latest font from Fonthead Design! It is a stripped down
+version of my other font called GoodDog Cool. It is still whacky and fun, 
+looks great as text, and guaranteed to make your documents fun!
+Also if you want the other two fonts in this set-- GoodDog Cool, 
+and GoodDog Bones (clip art!), be sure to visit my web site!
+You can find them there for free download!
+
+Is it shareware?
+No! This is FREEWARE! Use it to your hearts content without any guilt. 
+
+Where is the Fonthead World Wide Web site?
+http://www.fonthead.com
+
+How can you contact me?
+Email:
+   ethan@fonthead.com
+URL:
+   http://www.fonthead.com
+
+
+Distribution and Copyright Info:
+This font is freeware, but is not in the public domain (meaning it is the sole property
+of Fonthead Design). You have permission to redistribute this package as long as this 
+readme and the accompanying files are included. and... Use the font everywhere!

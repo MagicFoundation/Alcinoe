@@ -7,7 +7,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   //Please run <Alcinoe>\Tools\NativeBridgeFileGenerator\NativeBridgeFileGeneratorAndroid.bat
   //with the library identifiers com.facebook.android:facebook-android-sdk:xx.xx.xx where xx.xx.xx
   //is the last version of the facebook-android-sdk (You can find this version at
@@ -52,7 +52,7 @@ type
     {class} function canShow: boolean; cdecl;
     {class} procedure show(activity: JActivity; contentUrl: Jnet_Uri; quote: JString); cdecl;
   end;
-  [JavaSignature('com/alcinoe/facebook/share/ALFacebookShareLinkDialog')]
+  [JavaSignature('io/magicfoundation/alcinoe/facebook/share/ALFacebookShareLinkDialog')]
   JALFacebookShareLinkDialog = interface(JObject)
     ['{CB1C33F4-A26F-4543-8899-63D25EF5C6E0}']
   end;

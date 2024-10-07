@@ -28,8 +28,6 @@ object Form1: TForm1
       item
         Width = 200
       end>
-    ExplicitTop = 743
-    ExplicitWidth = 999
   end
   object Panel3: TPanel
     Left = 0
@@ -39,8 +37,6 @@ object Form1: TForm1
     Align = alClient
     Caption = 'Panel2'
     TabOrder = 2
-    ExplicitWidth = 999
-    ExplicitHeight = 414
     object Splitter4: TSplitter
       Left = 705
       Top = 1
@@ -58,8 +54,6 @@ object Form1: TForm1
       Align = alRight
       Caption = 'Panel2'
       TabOrder = 0
-      ExplicitLeft = 704
-      ExplicitHeight = 412
       object ALMemoResult: TcxMemo
         Left = 1
         Top = 1
@@ -75,7 +69,6 @@ object Form1: TForm1
         Style.Font.Style = []
         Style.IsFontAssigned = True
         TabOrder = 0
-        ExplicitHeight = 410
         Height = 411
         Width = 292
       end
@@ -88,8 +81,6 @@ object Form1: TForm1
       Align = alClient
       Caption = 'Panel2'
       TabOrder = 1
-      ExplicitWidth = 700
-      ExplicitHeight = 412
       object GridThread: TcxGrid
         Left = 1
         Top = 1
@@ -103,8 +94,6 @@ object Form1: TForm1
         Font.Style = []
         ParentFont = False
         TabOrder = 0
-        ExplicitWidth = 698
-        ExplicitHeight = 410
         object TableViewThread: TcxGridTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.First.Visible = False
@@ -192,303 +181,20 @@ object Form1: TForm1
     ParentBackground = False
     ParentColor = False
     TabOrder = 0
-    Properties.ActivePage = Firebird
+    Properties.ActivePage = MySQL
     Properties.CustomButtons.Buttons = <>
-    ExplicitWidth = 999
     ClientRectBottom = 324
     ClientRectLeft = 5
     ClientRectRight = 998
     ClientRectTop = 27
-    object Firebird: TcxTabSheet
-      Caption = 'Firebird'
-      ImageIndex = 2
-      ExplicitWidth = 989
-      object Label2: TcxLabel
-        Left = 71
-        Top = 93
-        Caption = 'Login'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label4: TcxLabel
-        Left = 50
-        Top = 118
-        Caption = 'Password'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label15: TcxLabel
-        Left = 58
-        Top = 143
-        Caption = 'Charset'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label16: TcxLabel
-        Left = 37
-        Top = 43
-        Caption = 'FBClient DLL'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label17: TcxLabel
-        Left = 404
-        Top = 19
-        Caption = 'SQL'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label18: TcxLabel
-        Left = 50
-        Top = 69
-        Caption = 'Database'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label13: TcxLabel
-        Left = 841
-        Top = 202
-        Caption = 'Nb Loop:'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label26: TcxLabel
-        Left = 814
-        Top = 227
-        Caption = 'Commit every:'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label29: TcxLabel
-        Left = 830
-        Top = 177
-        Caption = 'Nb Thread:'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label30: TcxLabel
-        Left = 34
-        Top = 167
-        Caption = 'Num_buffers'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label31: TcxLabel
-        Left = 22
-        Top = 19
-        Caption = 'Firebird Version'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label1: TcxLabel
-        Left = 387
-        Top = 146
-        Caption = 'Params'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label14: TcxLabel
-        Left = 373
-        Top = 161
-        Caption = '(1 by row)'
-        ParentFont = False
-        Transparent = True
-      end
-      object Label27: TcxLabel
-        Left = 78
-        Top = 194
-        Caption = 'TPB'
-        ParentFont = False
-        Transparent = True
-      end
-      object ALButtonFirebirdSelect: TcxButton
-        Left = 807
-        Top = 50
-        Width = 161
-        Height = 25
-        Caption = 'SELECT'
-        TabOrder = 10
-        OnClick = ALButtonFirebirdSelectClick
-      end
-      object ALEditFirebirdLogin: TcxTextEdit
-        Left = 106
-        Top = 93
-        TabOrder = 2
-        Text = 'SYSDBA'
-        Width = 249
-      end
-      object ALEditFirebirdPassword: TcxTextEdit
-        Left = 106
-        Top = 118
-        TabOrder = 3
-        Width = 249
-      end
-      object ALEditFirebirdCharset: TcxTextEdit
-        Left = 106
-        Top = 143
-        TabOrder = 4
-        Text = 'NONE'
-        Width = 72
-      end
-      object ALEditFirebirdLib: TcxButtonEdit
-        Left = 106
-        Top = 43
-        Properties.Buttons = <
-          item
-            Default = True
-            Kind = bkEllipsis
-          end>
-        Properties.OnButtonClick = ALEditButtonFindFileClick
-        TabOrder = 0
-        Text = 'FBClient.dll'
-        Width = 249
-      end
-      object ALMemoFireBirdQuery: TcxMemo
-        Left = 432
-        Top = 16
-        Lines.Strings = (
-          'Select '
-          '  FieldA'
-          'From'
-          '  TableSample'
-          'Where'
-          '  fieldB = ? or'
-          '  fieldC= ?'
-          '  ')
-        ParentFont = False
-        Properties.ScrollBars = ssVertical
-        TabOrder = 7
-        Height = 121
-        Width = 338
-      end
-      object ALEditFirebirdDatabase: TcxButtonEdit
-        Left = 106
-        Top = 69
-        Properties.Buttons = <
-          item
-            Default = True
-            Kind = bkEllipsis
-          end>
-        Properties.OnButtonClick = ALEditButtonFindFileClick
-        TabOrder = 1
-        Width = 249
-      end
-      object ALButtonFirebirdLoopSelect: TcxButton
-        Left = 807
-        Top = 112
-        Width = 161
-        Height = 25
-        Caption = 'Loop SELECT'
-        TabOrder = 12
-        OnClick = ALButtonFirebirdLoopSelectClick
-      end
-      object ALButtonFirebirdUpdate: TcxButton
-        Left = 807
-        Top = 81
-        Width = 161
-        Height = 25
-        Caption = 'UPDATE'
-        TabOrder = 11
-        OnClick = ALButtonFirebirdUpdateClick
-      end
-      object ALButtonFirebirdLoopUpdate: TcxButton
-        Left = 807
-        Top = 143
-        Width = 161
-        Height = 25
-        Caption = 'Loop UPDATE'
-        TabOrder = 13
-        OnClick = ALButtonFirebirdLoopUpdateClick
-      end
-      object ALEditFirebirdNBLoop: TcxTextEdit
-        Left = 894
-        Top = 199
-        TabOrder = 15
-        Text = '1000000'
-        Width = 74
-      end
-      object ALEditFirebirdNbLoopBeforeCommit: TcxTextEdit
-        Left = 894
-        Top = 224
-        TabOrder = 16
-        Text = '1'
-        Width = 74
-      end
-      object ALEditFirebirdNBThread: TcxTextEdit
-        Left = 894
-        Top = 174
-        TabOrder = 14
-        Text = '1'
-        Width = 74
-      end
-      object ALEditFireBirdNum_buffers: TcxTextEdit
-        Left = 106
-        Top = 167
-        TabOrder = 5
-        Text = '0'
-        Width = 46
-      end
-      object ALButtonFirebirdCreateDatabase: TcxButton
-        Left = 807
-        Top = 19
-        Width = 161
-        Height = 25
-        Caption = 'Create Database'
-        TabOrder = 9
-        OnClick = ALButtonFirebirdCreateDatabaseClick
-      end
-      object ALMemoFireBirdParams: TcxMemo
-        Left = 432
-        Top = 143
-        Lines.Strings = (
-          '<#randomString maxlength=50>'
-          '<#randomNumber>')
-        ParentFont = False
-        Properties.ScrollBars = ssVertical
-        TabOrder = 8
-        Height = 134
-        Width = 338
-      end
-      object ALMemoFirebirdTPB: TcxMemo
-        Left = 106
-        Top = 192
-        Lines.Strings = (
-          'isc_tpb_version3'
-          'isc_tpb_write'
-          'isc_tpb_read_committed'
-          'isc_tpb_no_rec_version'
-          'isc_tpb_nowait')
-        Properties.ScrollBars = ssVertical
-        TabOrder = 6
-        Height = 85
-        Width = 249
-      end
-      object ALComboBoxFirebirdapiVer: TcxComboBox
-        Left = 106
-        Top = 17
-        Properties.DropDownListStyle = lsFixedList
-        Properties.Items.Strings = (
-          'FB102'
-          'FB103'
-          'FB15'
-          'FB20'
-          'FB25')
-        TabOrder = 31
-        Text = 'FB25'
-        Width = 121
-      end
-    end
     object MySQL: TcxTabSheet
       Caption = 'MySQL'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TcxLabel
         Left = 45
         Top = 74
         Caption = 'Host Name'
         ParentFont = False
+        TabOrder = 15
         Transparent = True
       end
       object Label6: TcxLabel
@@ -496,6 +202,7 @@ object Form1: TForm1
         Top = 148
         Caption = 'Login'
         ParentFont = False
+        TabOrder = 16
         Transparent = True
       end
       object Label7: TcxLabel
@@ -503,6 +210,7 @@ object Form1: TForm1
         Top = 173
         Caption = 'Password'
         ParentFont = False
+        TabOrder = 17
         Transparent = True
       end
       object Label8: TcxLabel
@@ -510,6 +218,7 @@ object Form1: TForm1
         Top = 99
         Caption = 'Port Number'
         ParentFont = False
+        TabOrder = 18
         Transparent = True
       end
       object Label10: TcxLabel
@@ -517,6 +226,7 @@ object Form1: TForm1
         Top = 198
         Caption = 'Charset'
         ParentFont = False
+        TabOrder = 19
         Transparent = True
       end
       object Label11: TcxLabel
@@ -524,6 +234,7 @@ object Form1: TForm1
         Top = 49
         Caption = 'LibMySql dll'
         ParentFont = False
+        TabOrder = 20
         Transparent = True
       end
       object Label9: TcxLabel
@@ -531,6 +242,7 @@ object Form1: TForm1
         Top = 22
         Caption = 'SQL'
         ParentFont = False
+        TabOrder = 21
         Transparent = True
       end
       object Label12: TcxLabel
@@ -538,6 +250,7 @@ object Form1: TForm1
         Top = 124
         Caption = 'Database'
         ParentFont = False
+        TabOrder = 22
         Transparent = True
       end
       object Label32: TcxLabel
@@ -545,6 +258,7 @@ object Form1: TForm1
         Top = 182
         Caption = 'Nb Loop:'
         ParentFont = False
+        TabOrder = 23
         Transparent = True
       end
       object Label33: TcxLabel
@@ -552,6 +266,7 @@ object Form1: TForm1
         Top = 207
         Caption = 'Commit every:'
         ParentFont = False
+        TabOrder = 24
         Transparent = True
       end
       object Label34: TcxLabel
@@ -559,6 +274,7 @@ object Form1: TForm1
         Top = 157
         Caption = 'Nb Thread:'
         ParentFont = False
+        TabOrder = 25
         Transparent = True
       end
       object Label40: TcxLabel
@@ -566,6 +282,7 @@ object Form1: TForm1
         Top = 23
         Caption = 'LibMySql Version'
         ParentFont = False
+        TabOrder = 26
         Transparent = True
       end
       object ALEditMySqlHost: TcxTextEdit
@@ -710,15 +427,12 @@ object Form1: TForm1
     object SQLLite3: TcxTabSheet
       Caption = 'SQLLite3'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label24: TcxLabel
         Left = 17
         Top = 21
         Caption = 'Sqlite3.dll'
         ParentFont = False
+        TabOrder = 17
         Transparent = True
       end
       object Label25: TcxLabel
@@ -726,6 +440,7 @@ object Form1: TForm1
         Top = 21
         Caption = 'SQL'
         ParentFont = False
+        TabOrder = 18
         Transparent = True
       end
       object Label19: TcxLabel
@@ -733,6 +448,7 @@ object Form1: TForm1
         Top = 46
         Caption = 'Database'
         ParentFont = False
+        TabOrder = 19
         Transparent = True
       end
       object Label20: TcxLabel
@@ -740,6 +456,7 @@ object Form1: TForm1
         Top = 173
         Caption = 'Nb Loop:'
         ParentFont = False
+        TabOrder = 20
         Transparent = True
       end
       object Label21: TcxLabel
@@ -747,6 +464,7 @@ object Form1: TForm1
         Top = 235
         Caption = 'cache_size'
         ParentFont = False
+        TabOrder = 21
         Transparent = True
       end
       object Label22: TcxLabel
@@ -754,6 +472,7 @@ object Form1: TForm1
         Top = 260
         Caption = 'page_size'
         ParentFont = False
+        TabOrder = 22
         Transparent = True
       end
       object Label23: TcxLabel
@@ -761,6 +480,7 @@ object Form1: TForm1
         Top = 198
         Caption = 'Commit every:'
         ParentFont = False
+        TabOrder = 23
         Transparent = True
       end
       object Label28: TcxLabel
@@ -768,6 +488,7 @@ object Form1: TForm1
         Top = 148
         Caption = 'Nb Thread:'
         ParentFont = False
+        TabOrder = 24
         Transparent = True
       end
       object ALEditSqlite3Lib: TcxButtonEdit
@@ -976,15 +697,12 @@ object Form1: TForm1
     object Sphinx: TcxTabSheet
       Caption = 'Sphinx'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label36: TcxLabel
         Left = 38
         Top = 49
         Caption = 'LibMysql dll'
         ParentFont = False
+        TabOrder = 11
         Transparent = True
       end
       object Label37: TcxLabel
@@ -992,6 +710,7 @@ object Form1: TForm1
         Top = 75
         Caption = 'Host Name'
         ParentFont = False
+        TabOrder = 12
         Transparent = True
       end
       object Label38: TcxLabel
@@ -999,6 +718,7 @@ object Form1: TForm1
         Top = 100
         Caption = 'Port Number'
         ParentFont = False
+        TabOrder = 13
         Transparent = True
       end
       object Label43: TcxLabel
@@ -1006,6 +726,7 @@ object Form1: TForm1
         Top = 21
         Caption = 'SQL'
         ParentFont = False
+        TabOrder = 14
         Transparent = True
       end
       object Label44: TcxLabel
@@ -1013,6 +734,7 @@ object Form1: TForm1
         Top = 156
         Caption = 'Nb Thread:'
         ParentFont = False
+        TabOrder = 15
         Transparent = True
       end
       object Label45: TcxLabel
@@ -1020,6 +742,7 @@ object Form1: TForm1
         Top = 181
         Caption = 'Nb Loop:'
         ParentFont = False
+        TabOrder = 16
         Transparent = True
       end
       object Label46: TcxLabel
@@ -1027,6 +750,7 @@ object Form1: TForm1
         Top = 206
         Caption = 'Commit every:'
         ParentFont = False
+        TabOrder = 17
         Transparent = True
       end
       object Label39: TcxLabel
@@ -1034,6 +758,7 @@ object Form1: TForm1
         Top = 24
         Caption = 'LibMySql Version'
         ParentFont = False
+        TabOrder = 18
         Transparent = True
       end
       object ALEditSphinxLib: TcxButtonEdit
@@ -1151,15 +876,12 @@ object Form1: TForm1
     object MemCached: TcxTabSheet
       Caption = 'MemCached'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label41: TcxLabel
         Left = 25
         Top = 21
         Caption = 'Host Name'
         ParentFont = False
+        TabOrder = 14
         Transparent = True
       end
       object Label42: TcxLabel
@@ -1167,6 +889,7 @@ object Form1: TForm1
         Top = 46
         Caption = 'Port Number'
         ParentFont = False
+        TabOrder = 15
         Transparent = True
       end
       object Label47: TcxLabel
@@ -1174,6 +897,7 @@ object Form1: TForm1
         Top = 97
         Caption = 'DATA'
         ParentFont = False
+        TabOrder = 16
         Transparent = True
       end
       object Label48: TcxLabel
@@ -1181,6 +905,7 @@ object Form1: TForm1
         Top = 244
         Caption = 'Nb Thread:'
         ParentFont = False
+        TabOrder = 17
         Transparent = True
       end
       object Label49: TcxLabel
@@ -1188,6 +913,7 @@ object Form1: TForm1
         Top = 269
         Caption = 'Nb Loop:'
         ParentFont = False
+        TabOrder = 18
         Transparent = True
       end
       object ALEditMemCachedHost: TcxTextEdit
@@ -1340,6 +1066,7 @@ object Form1: TForm1
         Top = 19
         Caption = 'Key'
         ParentFont = False
+        TabOrder = 22
         Transparent = True
       end
       object ALLabel43234: TcxLabel
@@ -1347,6 +1074,7 @@ object Form1: TForm1
         Top = 46
         Caption = 'Flags'
         ParentFont = False
+        TabOrder = 23
         Transparent = True
       end
       object ALEditMemCachedFlags: TcxTextEdit
@@ -1361,6 +1089,7 @@ object Form1: TForm1
         Top = 70
         Caption = 'Expiration'
         ParentFont = False
+        TabOrder = 25
         Transparent = True
       end
       object ALEditMemCachedExpTime: TcxTextEdit
@@ -1401,15 +1130,12 @@ object Form1: TForm1
     object MongoDB: TcxTabSheet
       Caption = 'MongoDB'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object cxLabel3: TcxLabel
         Left = 25
         Top = 21
         Caption = 'Host Name'
         ParentFont = False
+        TabOrder = 16
         Transparent = True
       end
       object ALEditMongoDBHost: TcxTextEdit
@@ -1424,6 +1150,7 @@ object Form1: TForm1
         Top = 46
         Caption = 'Port Number'
         ParentFont = False
+        TabOrder = 17
         Transparent = True
       end
       object ALEditMongoDBPort: TcxTextEdit
@@ -1438,6 +1165,7 @@ object Form1: TForm1
         Top = 47
         Caption = 'For Select: Query'
         ParentFont = False
+        TabOrder = 18
         Transparent = True
       end
       object MemoMongoDBQuery: TcxMemo
@@ -1526,6 +1254,7 @@ object Form1: TForm1
         Top = 254
         Caption = 'Nb Thread:'
         ParentFont = False
+        TabOrder = 19
         Transparent = True
       end
       object cxLabel11: TcxLabel
@@ -1533,6 +1262,7 @@ object Form1: TForm1
         Top = 280
         Caption = 'Nb Loop:'
         ParentFont = False
+        TabOrder = 20
         Transparent = True
       end
       object ALEditMongoDBNBLoop: TcxTextEdit
@@ -1547,6 +1277,7 @@ object Form1: TForm1
         Top = 140
         Caption = 'For select: ReturnFieldsSelector'
         ParentFont = False
+        TabOrder = 21
         Transparent = True
       end
       object MemoMongoDBSelector: TcxMemo
@@ -1565,6 +1296,7 @@ object Form1: TForm1
         Top = 21
         Caption = 'FullCollectionName'
         ParentFont = False
+        TabOrder = 22
         Transparent = True
       end
       object EditMongoDBFullCollectionName: TcxTextEdit
@@ -1579,6 +1311,7 @@ object Form1: TForm1
         Top = 249
         Caption = 'Skip'
         ParentFont = False
+        TabOrder = 23
         Transparent = True
       end
       object EditMongoDBSkip: TcxTextEdit
@@ -1593,6 +1326,7 @@ object Form1: TForm1
         Top = 249
         Caption = 'First'
         ParentFont = False
+        TabOrder = 24
         Transparent = True
       end
       object EditMongoDBFirst: TcxTextEdit
@@ -1607,6 +1341,7 @@ object Form1: TForm1
         Top = 78
         Caption = 'For update: Selector'
         ParentFont = False
+        TabOrder = 25
         Transparent = True
       end
       object cxLabel14: TcxLabel
@@ -1614,6 +1349,7 @@ object Form1: TForm1
         Top = 156
         Caption = 'For update: Update'
         ParentFont = False
+        TabOrder = 26
         Transparent = True
       end
       object cxLabel15: TcxLabel
@@ -1621,6 +1357,7 @@ object Form1: TForm1
         Top = 62
         Caption = 'For insert: Documents'
         ParentFont = False
+        TabOrder = 27
         Transparent = True
       end
       object cxLabel16: TcxLabel
@@ -1628,6 +1365,7 @@ object Form1: TForm1
         Top = 95
         Caption = 'For delete: Selector'
         ParentFont = False
+        TabOrder = 28
         Transparent = True
       end
       object CheckGroupMongoDBSelectFlags: TcxCheckGroup

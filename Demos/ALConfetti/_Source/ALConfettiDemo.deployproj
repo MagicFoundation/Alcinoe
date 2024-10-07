@@ -1,35 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALConfettiDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\classes\</RemoteDir>
-      <RemoteName>ALConfettiDemo.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -1173,35 +1144,6 @@
       <RemoteCommand/>
       <RemoteDir>ALConfettiDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALConfettiDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\classes\</RemoteDir>
-      <RemoteName>ALConfettiDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -2349,55 +2291,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\ALConfettiDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\classes\</RemoteDir>
-      <RemoteName>ALConfettiDemo.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -3541,55 +3434,6 @@
       <RemoteCommand/>
       <RemoteDir>ALConfettiDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(SKIADIR)\Binary\Shared\Android\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\Android64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39; and &#39;$(AndroidAppBundle)&#39;==&#39;true&#39;" Include="$(BDS)\binandroid32\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\armeabi-v7a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binandroid64\libsk4d.so">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\library\lib\arm64-v8a\</RemoteDir>
-      <RemoteName>libsk4d.so</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALConfettiDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo\classes\</RemoteDir>
-      <RemoteName>ALConfettiDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -4737,26 +4581,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSX64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosx64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -4803,26 +4627,6 @@
       <RemoteDir>ALConfettiDemo.app\Contents\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSX64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosx64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -4862,26 +4666,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;OSXARM64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosxarm64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>
       <LocalCommand/>
@@ -4927,26 +4711,6 @@
       <RemoteCommand/>
       <RemoteDir>ALConfettiDemo.app\Contents\</RemoteDir>
       <RemoteName>Info.plist</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;!=&#39;&#39;" Include="$(SKIADIR)\Binary\Shared\OSXARM64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39; And &#39;$(SKIADIR)&#39;==&#39;&#39;" Include="$(BDS)\binosxarm64\libsk4d.dylib">
-      <DeployClass>Skia</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALConfettiDemo.app\Contents\MacOS\</RemoteDir>
-      <RemoteName>libsk4d.dylib</RemoteName>
-      <Required>True</Required>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="$(BDS)\bin\delphi_PROJECTICNS.icns">
       <DeployClass>ProjectOSXResource</DeployClass>

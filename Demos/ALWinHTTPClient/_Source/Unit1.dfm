@@ -10,11 +10,9 @@ object Form1: TForm1
   Font.Height = -11
   Font.Name = 'MS Sans Serif'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  PixelsPerInch = 96
   TextHeight = 13
   object MainStatusBar: TStatusBar
     Left = 0
@@ -71,7 +69,6 @@ object Form1: TForm1
           Align = alTop
           BevelOuter = bvNone
           TabOrder = 1
-          ExplicitTop = -4
           DesignSize = (
             780
             45)
@@ -86,6 +83,7 @@ object Form1: TForm1
             Style.Font.Name = 'Tahoma'
             Style.Font.Style = []
             Style.IsFontAssigned = True
+            TabOrder = 1
             Transparent = True
           end
           object editURL: TcxTextEdit
@@ -224,8 +222,6 @@ object Form1: TForm1
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitTop = 41
-          ExplicitHeight = 144
           object Panel152: TPanel
             Left = 0
             Top = 0
@@ -234,7 +230,6 @@ object Form1: TForm1
             Align = alLeft
             BevelOuter = bvNone
             TabOrder = 1
-            ExplicitHeight = 144
             object Label4: TcxLabel
               AlignWithMargins = True
               Left = 8
@@ -252,12 +247,13 @@ object Form1: TForm1
               Style.Font.Name = 'Tahoma'
               Style.Font.Style = [fsBold]
               Style.IsFontAssigned = True
+              TabOrder = 0
               Transparent = True
             end
             object MemoPostDataStrings: TcxMemo
               AlignWithMargins = True
               Left = 8
-              Top = 38
+              Top = 36
               Margins.Left = 8
               Margins.Top = 0
               Align = alClient
@@ -271,8 +267,7 @@ object Form1: TForm1
               Style.Font.Style = []
               Style.IsFontAssigned = True
               TabOrder = 1
-              ExplicitHeight = 86
-              Height = 84
+              Height = 86
               Width = 381
             end
             object CheckBoxUrlEncodePostData: TcxCheckBox
@@ -289,7 +284,6 @@ object Form1: TForm1
               State = cbsChecked
               TabOrder = 2
               Transparent = True
-              ExplicitWidth = 121
             end
           end
           object Panel153: TPanel
@@ -304,7 +298,6 @@ object Form1: TForm1
             Align = alClient
             BevelOuter = bvNone
             TabOrder = 0
-            ExplicitHeight = 144
             object Label7: TcxLabel
               AlignWithMargins = True
               Left = 3
@@ -315,8 +308,8 @@ object Form1: TForm1
               Align = alTop
               Caption = 'Format "Name=FileName"'
               ParentFont = False
+              TabOrder = 0
               Transparent = True
-              ExplicitTop = 21
             end
             object Label5: TcxLabel
               AlignWithMargins = True
@@ -334,12 +327,13 @@ object Form1: TForm1
               Style.Font.Name = 'Tahoma'
               Style.Font.Style = [fsBold]
               Style.IsFontAssigned = True
+              TabOrder = 1
               Transparent = True
             end
             object MemoPostDataFiles: TcxMemo
               AlignWithMargins = True
               Left = 3
-              Top = 34
+              Top = 36
               Margins.Top = 0
               Align = alClient
               ParentFont = False
@@ -352,7 +346,7 @@ object Form1: TForm1
               Style.Font.Style = []
               Style.IsFontAssigned = True
               TabOrder = 2
-              Height = 88
+              Height = 86
               Width = 375
             end
           end
@@ -398,8 +392,6 @@ object Form1: TForm1
           Align = alLeft
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitTop = -4
-          ExplicitHeight = 341
           DesignSize = (
             267
             322)
@@ -408,6 +400,7 @@ object Form1: TForm1
             Top = 6
             Caption = 'Header:'
             ParentFont = False
+            TabOrder = 0
             Transparent = True
           end
           object MemoResponseRawHeader: TcxMemo
@@ -425,8 +418,7 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            ExplicitHeight = 229
-            Height = 210
+            Height = 172
             Width = 260
           end
         end
@@ -439,8 +431,6 @@ object Form1: TForm1
           BevelOuter = bvNone
           Caption = 'Panel5'
           TabOrder = 1
-          ExplicitTop = -4
-          ExplicitHeight = 341
           DesignSize = (
             506
             322)
@@ -449,6 +439,7 @@ object Form1: TForm1
             Top = 6
             Caption = 'Content:'
             ParentFont = False
+            TabOrder = 0
             Transparent = True
           end
           object MemoContentBody: TcxMemo
@@ -466,8 +457,7 @@ object Form1: TForm1
             Style.Font.Style = []
             Style.IsFontAssigned = True
             TabOrder = 1
-            ExplicitHeight = 229
-            Height = 210
+            Height = 172
             Width = 495
           end
           object ButtonSaveToFile: TcxButton
@@ -528,6 +518,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'UserName'
           ParentFont = False
+          TabOrder = 2
           Transparent = True
         end
         object Label19: TcxLabel
@@ -535,6 +526,7 @@ object Form1: TForm1
           Top = 46
           Caption = 'Password'
           ParentFont = False
+          TabOrder = 3
           Transparent = True
         end
         object EditUserName: TcxTextEdit
@@ -573,6 +565,7 @@ object Form1: TForm1
           Top = 45
           Caption = 'Send'
           ParentFont = False
+          TabOrder = 3
           Transparent = True
         end
         object Label17: TcxLabel
@@ -580,6 +573,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'Connect'
           ParentFont = False
+          TabOrder = 4
           Transparent = True
         end
         object Label20: TcxLabel
@@ -587,6 +581,7 @@ object Form1: TForm1
           Top = 69
           Caption = 'Receive'
           ParentFont = False
+          TabOrder = 5
           Transparent = True
         end
         object EditSendTimeout: TcxTextEdit
@@ -887,6 +882,7 @@ object Form1: TForm1
           Top = 45
           Caption = 'Port'
           ParentFont = False
+          TabOrder = 5
           Transparent = True
         end
         object Label12: TcxLabel
@@ -894,6 +890,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'Server'
           ParentFont = False
+          TabOrder = 6
           Transparent = True
         end
         object Label11: TcxLabel
@@ -901,6 +898,7 @@ object Form1: TForm1
           Top = 69
           Caption = 'UserName'
           ParentFont = False
+          TabOrder = 7
           Transparent = True
         end
         object Label16: TcxLabel
@@ -908,6 +906,7 @@ object Form1: TForm1
           Top = 94
           Caption = 'Password'
           ParentFont = False
+          TabOrder = 8
           Transparent = True
         end
         object Label13: TcxLabel
@@ -915,6 +914,7 @@ object Form1: TForm1
           Top = 117
           Caption = 'Bypass'
           ParentFont = False
+          TabOrder = 9
           Transparent = True
         end
         object EdProxyPort: TcxTextEdit
@@ -979,6 +979,7 @@ object Form1: TForm1
           Top = 21
           Caption = 'Upload'
           ParentFont = False
+          TabOrder = 1
           Transparent = True
         end
         object EditBufferUploadSize: TcxTextEdit
@@ -1014,6 +1015,7 @@ object Form1: TForm1
           Top = 22
           Caption = 'Format "Name: values" on each lines'
           ParentFont = False
+          TabOrder = 1
           Transparent = True
         end
         object MemoRequestRawHeader: TcxMemo

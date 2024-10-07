@@ -24,13 +24,16 @@
   <!-- AndroidMerger auto-generated section (BEGIN) -->
   <!-- ============================================ -->
   
-  <!-- ===== androidx.core ===== -->
-  <!-- <application android:appComponentFactory="androidx.core.app.CoreComponentFactory"/> -->
   <!-- ===== com.google.firebase.messaging ===== -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
   <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
+  <!-- ===== androidx.core ===== -->
+  <permission android:name="%package%.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+              android:protectionLevel="signature"/>
+  <uses-permission android:name="%package%.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"/>
+  <!-- <application android:appComponentFactory="androidx.core.app.CoreComponentFactory"/> -->
   <!-- ===== com.google.android.datatransport.backend.cct ===== -->
   <uses-permission android:name="android.permission.INTERNET"/>
   
@@ -83,16 +86,14 @@
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->
     
-    <!-- ===== com.alcinoe.alcinoe-firebase-messaging ===== -->
-    <service android:name="com.alcinoe.firebase.messaging.ALFirebaseMessagingService"
-             android:directBootAware="true">
+    <!-- ===== io.magicfoundation.alcinoe.alcinoe-firebase-messaging ===== -->
+    <service android:name="io.magicfoundation.alcinoe.firebase.messaging.ALFirebaseMessagingService"
+             android:directBootAware="true"
+             android:exported="true">
       <intent-filter>
         <action android:name="com.google.firebase.MESSAGING_EVENT"/>
       </intent-filter>
     </service>
-    <!-- ===== com.google.android.gms.common ===== -->
-    <meta-data android:name="com.google.android.gms.version"
-               android:value="@integer/google_play_services_version"/>
     <!-- ===== com.google.firebase.messaging ===== -->
     <receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver"
               android:exported="true"
@@ -121,6 +122,15 @@
       <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
                  android:value="com.google.firebase.components.ComponentRegistrar"/>
     </service>
+    <!-- ===== com.google.firebase ===== -->
+    <provider android:name="com.google.firebase.provider.FirebaseInitProvider"
+              android:authorities="%package%.firebaseinitprovider"
+              android:directBootAware="true"
+              android:exported="false"
+              android:initOrder="100"/>
+    <!-- ===== com.google.android.gms.common ===== -->
+    <meta-data android:name="com.google.android.gms.version"
+               android:value="@integer/google_play_services_version"/>
     <!-- ===== com.google.android.datatransport.backend.cct ===== -->
     <service android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
              android:exported="false">
@@ -137,12 +147,6 @@
     <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
               android:theme="@android:style/Theme.Translucent.NoTitleBar"
               android:exported="false"/>
-    <!-- ===== com.google.firebase ===== -->
-    <provider android:name="com.google.firebase.provider.FirebaseInitProvider"
-              android:authorities="%package%.firebaseinitprovider"
-              android:directBootAware="true"
-              android:exported="false"
-              android:initOrder="100"/>
     <!-- ===== androidx.emoji2 ===== -->
     <provider android:name="androidx.startup.InitializationProvider"
               android:authorities="%package%.androidx-startup"

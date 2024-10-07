@@ -9,7 +9,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if System.IniFiles was not updated and adjust the IFDEF'}
 {$ENDIF}
 

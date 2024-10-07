@@ -1,0 +1,1 @@
+PlatformFile=c:\Dev\MagicFoundation\PlatformSDKs\Android\platforms\android-34\android.jar

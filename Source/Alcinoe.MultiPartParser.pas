@@ -61,15 +61,15 @@ type
   TALMultiPartBaseContents = class(TObjectList)
   private
   protected
-    function GetItem(Index: Integer): TALMultiPartBaseContent;
-    procedure SetItem(Index: Integer; AObject: TALMultiPartBaseContent);
+    function GetItem(Index: NativeInt): TALMultiPartBaseContent;
+    procedure SetItem(Index: NativeInt; AObject: TALMultiPartBaseContent);
   public
     Function Add: TALMultiPartBaseContent; overload;
     function Add(AObject: TALMultiPartBaseContent): Integer; overload;
     function Remove(AObject: TALMultiPartBaseContent): Integer;
     function IndexOf(AObject: TALMultiPartBaseContent): Integer;
     procedure Insert(Index: Integer; AObject: TALMultiPartBaseContent);
-    property Items[Index: Integer]: TALMultiPartBasecontent read GetItem write SetItem; default;
+    property Items[Index: NativeInt]: TALMultiPartBasecontent read GetItem write SetItem; default;
   end;
 
   {--TAlMultiPartBaseStream-------------------}
@@ -160,15 +160,15 @@ type
   TALMultiPartAlternativeContents = class(TALMultiPartBaseContents)
   private
   protected
-    function GetItem(Index: Integer): TALMultiPartAlternativeContent;
-    procedure SetItem(Index: Integer; AObject: TALMultiPartAlternativeContent);
+    function GetItem(Index: NativeInt): TALMultiPartAlternativeContent;
+    procedure SetItem(Index: NativeInt; AObject: TALMultiPartAlternativeContent);
   public
     Function Add: TALMultiPartAlternativeContent; overload;
     function Add(AObject: TALMultiPartAlternativeContent): Integer; overload;
     function Remove(AObject: TALMultiPartAlternativeContent): Integer;
     function IndexOf(AObject: TALMultiPartAlternativeContent): Integer;
     procedure Insert(Index: Integer; AObject: TALMultiPartAlternativeContent);
-    property Items[Index: Integer]: TALMultiPartAlternativecontent read GetItem write SetItem; default;
+    property Items[Index: NativeInt]: TALMultiPartAlternativecontent read GetItem write SetItem; default;
   end;
 
   {--TAlMultiPartAlternativeStream----------------------------}
@@ -239,15 +239,15 @@ type
   TALMultiPartFormDataContents = class(TALMultiPartBaseContents)
   private
   protected
-    function GetItem(Index: Integer): TALMultiPartFormDataContent;
-    procedure SetItem(Index: Integer; AObject: TALMultiPartFormDataContent);
+    function GetItem(Index: NativeInt): TALMultiPartFormDataContent;
+    procedure SetItem(Index: NativeInt; AObject: TALMultiPartFormDataContent);
   public
     Function Add: TALMultiPartFormDataContent; overload;
     function Add(AObject: TALMultiPartFormDataContent): Integer; overload;
     function Remove(AObject: TALMultiPartFormDataContent): Integer;
     function IndexOf(AObject: TALMultiPartFormDataContent): Integer;
     procedure Insert(Index: Integer; AObject: TALMultiPartFormDataContent);
-    property Items[Index: Integer]: TALMultiPartFormDatacontent read GetItem write SetItem; default;
+    property Items[Index: NativeInt]: TALMultiPartFormDatacontent read GetItem write SetItem; default;
   end;
 
   {--TAlMultiPartFormDataStream----------------------------}
@@ -334,15 +334,15 @@ type
   TALMultiPartMixedContents = class(TALMultiPartBaseContents)
   private
   protected
-    function GetItem(Index: Integer): TALMultiPartMixedContent;
-    procedure SetItem(Index: Integer; AObject: TALMultiPartMixedContent);
+    function GetItem(Index: NativeInt): TALMultiPartMixedContent;
+    procedure SetItem(Index: NativeInt; AObject: TALMultiPartMixedContent);
   public
     Function Add: TALMultiPartMixedContent; overload;
     function Add(AObject: TALMultiPartMixedContent): Integer; overload;
     function Remove(AObject: TALMultiPartMixedContent): Integer;
     function IndexOf(AObject: TALMultiPartMixedContent): Integer;
     procedure Insert(Index: Integer; AObject: TALMultiPartMixedContent);
-    property Items[Index: Integer]: TALMultiPartMixedcontent read GetItem write SetItem; default;
+    property Items[Index: NativeInt]: TALMultiPartMixedcontent read GetItem write SetItem; default;
   end;
 
   {--TAlMultiPartMixedStream----------------------------}
@@ -695,8 +695,8 @@ begin
   end;
 end;
 
-{*********************************************************************************}
-function TALMultiPartBaseContents.GetItem(Index: Integer): TALMultiPartBaseContent;
+{***********************************************************************************}
+function TALMultiPartBaseContents.GetItem(Index: NativeInt): TALMultiPartBaseContent;
 begin
   Result := TALMultiPartBaseContent(inherited Items[Index]);
 end;
@@ -719,8 +719,8 @@ begin
   Result := inherited Remove(AObject);
 end;
 
-{*******************************************************************************************}
-procedure TALMultiPartBaseContents.SetItem(Index: Integer; AObject: TALMultiPartBaseContent);
+{*********************************************************************************************}
+procedure TALMultiPartBaseContents.SetItem(Index: NativeInt; AObject: TALMultiPartBaseContent);
 begin
   inherited Items[Index] := AObject;
 end;
@@ -895,8 +895,8 @@ begin
   end;
 end;
 
-{***********************************************************************************************}
-function TALMultiPartAlternativeContents.GetItem(Index: Integer): TALMultiPartAlternativeContent;
+{*************************************************************************************************}
+function TALMultiPartAlternativeContents.GetItem(Index: NativeInt): TALMultiPartAlternativeContent;
 begin
   Result := TALMultiPartAlternativeContent(inherited Items[Index]);
 end;
@@ -919,8 +919,8 @@ begin
   Result := inherited Remove(AObject);
 end;
 
-{*********************************************************************************************************}
-procedure TALMultiPartAlternativeContents.SetItem(Index: Integer; AObject: TALMultiPartAlternativeContent);
+{***********************************************************************************************************}
+procedure TALMultiPartAlternativeContents.SetItem(Index: NativeInt; AObject: TALMultiPartAlternativeContent);
 begin
   inherited Items[Index] := AObject;
 end;
@@ -1024,8 +1024,8 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
-function TALMultiPartFormDataContents.GetItem(Index: Integer): TALMultiPartFormDataContent;
+{*******************************************************************************************}
+function TALMultiPartFormDataContents.GetItem(Index: NativeInt): TALMultiPartFormDataContent;
 begin
   Result := TALMultiPartFormDataContent(inherited Items[Index]);
 end;
@@ -1048,8 +1048,8 @@ begin
   Result := inherited Remove(AObject);
 end;
 
-{***************************************************************************************************}
-procedure TALMultiPartFormDataContents.SetItem(Index: Integer; AObject: TALMultiPartFormDataContent);
+{*****************************************************************************************************}
+procedure TALMultiPartFormDataContents.SetItem(Index: NativeInt; AObject: TALMultiPartFormDataContent);
 begin
   inherited Items[Index] := AObject;
 end;
@@ -1273,8 +1273,8 @@ begin
   end;
 end;
 
-{***********************************************************************************}
-function TALMultiPartMixedContents.GetItem(Index: Integer): TALMultiPartMixedContent;
+{*************************************************************************************}
+function TALMultiPartMixedContents.GetItem(Index: NativeInt): TALMultiPartMixedContent;
 begin
   Result := TALMultiPartMixedContent(inherited Items[Index]);
 end;
@@ -1297,8 +1297,8 @@ begin
   Result := inherited Remove(AObject);
 end;
 
-{*********************************************************************************************}
-procedure TALMultiPartMixedContents.SetItem(Index: Integer; AObject: TALMultiPartMixedContent);
+{***********************************************************************************************}
+procedure TALMultiPartMixedContents.SetItem(Index: NativeInt; AObject: TALMultiPartMixedContent);
 begin
   inherited Items[Index] := AObject;
 end;

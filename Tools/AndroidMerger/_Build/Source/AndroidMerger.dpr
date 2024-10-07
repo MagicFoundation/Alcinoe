@@ -229,17 +229,6 @@ begin
               Var i := 0;
               while i <= LSrcXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
                 var LSrcNode := LSrcXmlDoc.DocumentElement.ChildNodes[i];
-                //https://stackoverflow.com/questions/74385101/values-xml-with-tag-id-name-vs-item-name-type-id
-                //https://stackoverflow.com/questions/74381063/found-tag-id-where-item-is-expected-with-aapt
-                {$IFNDEF ALCompilerVersionSupported120}
-                  {$MESSAGE WARN 'Check if Delphi still use aapt (https://quality.embarcadero.com/browse/RSP-27606) and if not remove the code below'}
-                {$IFEND}
-                if (LSrcNode.NodeType = ntElement) and (LSrcNode.NodeName = 'id') and (LSr.Name='values.xml') then begin
-                  LSrcNode.NodeName := 'item';
-                  if LSrcNode.Attributes['type'] <> '' then raise Exception.Create('Error 6A259E48-8543-42B4-9DAD-B5614A490959');
-                  LSrcNode.Attributes['type'] := 'id';
-                end;
-                //----
                 if (LSrcNode.NodeType = ntElement) and (not _nodeIsAlreadyPresent(LSrcNode, LDestXmlDoc)) then begin
                   LDestXmlDoc.DocumentElement.ChildNodes.Add(TALXmlTextNode.Create('    '));
                   LDestXmlDoc.DocumentElement.ChildNodes.Add(LSrcXmlDoc.DocumentElement.ChildNodes.Extract(i));
@@ -868,70 +857,39 @@ begin
   if Not TDirectory.Exists(ARJavaDir) then raise EALException.CreateFmt('Directory %s does not exist', [ARJavaDir]);
   if not AlEmptyDirectoryW(ARJavaDir, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [ARJavaDir]);
 
-  //init LisAapt2
-  var LisAapt2 := ALPosIgnoreCaseW('aapt2.exe', AAaptFilename) > 0;
-
   //init LDebugRtxtDir
   {$IF defined(DEBUG)}
   var LDebugRtxtDir := ATmpDir + 'Debug\TextSymbols\';
-  if LisAapt2 then LDebugRtxtDir := LDebugRtxtDir + 'Aapt2\'
-  else LDebugRtxtDir := LDebugRtxtDir + 'Aapt\';
   TDirectory.CreateDirectory(LDebugRtxtDir);
-  if LisAapt2 then begin
-    LDebugRtxtDir := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.txt';
-    if Tfile.Exists(LDebugRtxtDir) then raise Exception.Create('Error EBDF9955-15D3-4B06-AD50-A02805834EE2');
-  end
-  else begin
-    LDebugRtxtDir := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir));
-    if TDirectory.Exists(LDebugRtxtDir) then raise Exception.Create('Error A612C4A3-8FC8-4420-A945-95BB2DD565D8');
-    TDirectory.CreateDirectory(LDebugRtxtDir);
-  end;
+  var LDebugRtxtFilename := LDebugRtxtDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.txt';
+  if Tfile.Exists(LDebugRtxtFilename) then raise Exception.Create('Error EBDF9955-15D3-4B06-AD50-A02805834EE2');
   {$ENDIF}
 
   //init LDebugRJavaFilename
   {$IF defined(DEBUG)}
-  var LDebugRJavaFilename := ATmpDir + 'Debug\RJava\';
-  if LisAapt2 then LDebugRJavaFilename := LDebugRJavaFilename + 'Aapt2\'
-  else LDebugRJavaFilename := LDebugRJavaFilename + 'Aapt\';
-  TDirectory.CreateDirectory(LDebugRJavaFilename);
-  var LDebugRJavaOriginalFilename := LDebugRJavaFilename + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.java';
+  var LDebugRJavaDir := ATmpDir + 'Debug\RJava\';
+  TDirectory.CreateDirectory(LDebugRJavaDir);
+  var LDebugRJavaOriginalFilename := LDebugRJavaDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.java';
   if Tfile.Exists(LDebugRJavaOriginalFilename) then raise Exception.Create('Error C0110540-F418-42B3-8230-37314867DDC6');
-  //var LDebugRJavaCompressedFilename := LDebugRJavaFilename + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.compressed.java';
+  //var LDebugRJavaCompressedFilename := LDebugRJavaDir + ALExtractFileName(ALExcludeTrailingPathDelimiterW(ALibDir)) + '.R.compressed.java';
   {$ENDIF}
 
   //Create R.java
-  var LCmdLine: String;
-  if LisAapt2 then begin
-    var LOutputPath := ATmpDir + 'linked_res.ap_';
-    if Tfile.Exists(LOutputPath) then Tfile.Delete(LOutputPath);
-    LCmdLine := '"'+AAaptFilename+'" '+
-                'link '+ // Links resources into an apk.
-                '--manifest "'+ALibDir+'\AndroidManifest.xml" '+ // Path to the Android manifest to build.
-                '-o "'+LOutputPath+'" '+ // Output path.
-                '-I "'+ALExcludeTrailingPathDelimiterW(ASDKApiLevelJarFilename)+'" '+ // Adds an Android APK to link against.
-                '-R "'+ALExcludeTrailingPathDelimiterW(AMergedResDir)+'" '+ // Compilation unit to link, using `overlay` semantics. The last conflicting resource given takes precedence.
-                '--java "'+ALExcludeTrailingPathDelimiterW(ARJavaDir)+'" '+ // Directory in which to generate R.java.
-                {$IF defined(DEBUG)}
-                '--output-text-symbols "'+ LDebugRtxtDir +'" ' + // Generates a text file containing the resource symbols of the R class in the specified file
-                {$ENDIF}
-                //Without auto-add-overlay we have error like
-                //C:\Dev\MagicFoundation\Alcinoe\Tools\AndroidMerger\tmp\compiled_res.flata@values-da_values.arsc.flat: note: define an <add-resource> tag or use --auto-add-overlay.
-                '--auto-add-overlay'; // Allows the addition of new resources in overlays without <add-resource> tags.
-  end
-  else begin
-    LCmdLine := '"'+AAaptFilename+'" '+
-                'package '+ // Package the android resources.  It will read assets and resources that are supplied with the -M -A -S or raw-files-dir arguments.  The -J -P -F and -R options control which files are output.
-                '-f '+ // force overwrite of existing files
-                '-m '+ // make package directories under location specified by -J
-                '-M "'+ALibDir+'\AndroidManifest.xml" '+ // specify full path to AndroidManifest.xml to include in zip
-                '-I "'+ALExcludeTrailingPathDelimiterW(ASDKApiLevelJarFilename)+'" '+ // add an existing package to base include set
-                '-S "'+ALExcludeTrailingPathDelimiterW(AMergedResDir)+'" '+ // directory in which to find resources.  Multiple directories will be scanned and the first match found (left to right) will take precedence.
-                '-J "'+ALExcludeTrailingPathDelimiterW(ARJavaDir)+'" '+ // specify where to output R.java resource constant definitions
-                {$IF defined(DEBUG)}
-                '--output-text-symbols '+ LDebugRtxtDir +' ' + // Generates a text file containing the resource symbols of the R class in the specified file
-                {$ENDIF}
-                '--auto-add-overlay'; // Automatically add resources that are only in overlays.
-  end;
+  var LOutputPath := ATmpDir + 'linked_res.ap_';
+  if Tfile.Exists(LOutputPath) then Tfile.Delete(LOutputPath);
+  var LCmdLine := '"'+AAaptFilename+'" '+
+                  'link '+ // Links resources into an apk.
+                  '--manifest "'+ALibDir+'\AndroidManifest.xml" '+ // Path to the Android manifest to build.
+                  '-o "'+LOutputPath+'" '+ // Output path.
+                  '-I "'+ALExcludeTrailingPathDelimiterW(ASDKApiLevelJarFilename)+'" '+ // Adds an Android APK to link against.
+                  '-R "'+ALExcludeTrailingPathDelimiterW(AMergedResDir)+'" '+ // Compilation unit to link, using `overlay` semantics. The last conflicting resource given takes precedence.
+                  '--java "'+ALExcludeTrailingPathDelimiterW(ARJavaDir)+'" '+ // Directory in which to generate R.java.
+                  {$IF defined(DEBUG)}
+                  '--output-text-symbols "'+ LDebugRtxtFilename +'" ' + // Generates a text file containing the resource symbols of the R class in the specified file
+                  {$ENDIF}
+                  //Without auto-add-overlay we have error like
+                  //C:\Dev\MagicFoundation\Alcinoe\Tools\AndroidMerger\tmp\compiled_res.flata@values-da_values.arsc.flat: note: define an <add-resource> tag or use --auto-add-overlay.
+                  '--auto-add-overlay'; // Allows the addition of new resources in overlays without <add-resource> tags.
   ExecuteCmdLine(LCmdLine);
 
   //get all R.java
@@ -1901,13 +1859,9 @@ begin
     {$ENDREGION}
 
     {$REGION 'Retrieve delphi configuration'}
-    {$IFNDEF ALCompilerVersionSupported120}
-      {$MESSAGE WARN 'Check if Delphi still use aapt (https://quality.embarcadero.com/browse/RSP-27606) and if not remove all usage of aapt.exe and use only aapt2.exe'}
-    {$IFEND}
     JDKDir := ''; // C:\Program Files\Eclipse Adoptium\jdk-11.0.16.101-hotspot\
     var LDelphiRootDir: String := ''; // C:\Program Files (x86)\Embarcadero\Studio\22.0\
-    Var LAaptFilename: String := '';  // C:\SDKs\android\build-tools\32.0.0\aapt.exe
-    Var LAapt2Filename: String := ''; // C:\SDKs\android\build-tools\32.0.0\aapt2.exe
+    Var LAapt2Filename: String := ''; // c:\Program Files (x86)\Embarcadero\Studio\23.0\bin\Android\aapt2-8.2.1.exe
     Var LSDKApiLevelDir: String := ''; // C:\SDKs\android\platforms\android-32\
     Var LSDKApiLevelJarFilename: String := ''; // C:\SDKs\android\platforms\android-32\android.jar
     var LJavacFilename: String := ''; // C:\Program Files\Eclipse Adoptium\jdk-11.0.16.101-hotspot\bin\javac.exe
@@ -1945,10 +1899,14 @@ begin
         LRegistry.CloseKey;
         if not LRegistry.OpenKeyReadOnly('SOFTWARE\Embarcadero\BDS\'+LCompilerVersionStr+'\PlatformSDKs\'+LPlatformSDKName) then
           raise Exception.Create('Incorrect Embarcadero Delphi Registry');
-        LAaptFilename := LRegistry.ReadString('SDKAaptPath');
-        if LAaptFilename = '' then raise Exception.Create('SDKAaptPath is not configured');
-        if not TFile.exists(LAaptFilename) then raise Exception.CreateFmt('%s does not exist', [LAaptFilename]);
-        LAapt2Filename := ALStringReplaceW(LAaptFilename, 'aapt.exe', 'aapt2.exe', [rfIgnoreCase]);
+        LAapt2Filename := '';
+        var Lfiles := TDirectory.GetFiles(TPath.combine(LDelphiRootDir, 'bin\Android\'));
+        for var i := Low(Lfiles) to High(Lfiles) do
+          if AlposIgnoreCaseW('aapt2', Lfiles[i]) > 0 then begin
+            LAapt2Filename := Lfiles[i];
+            break;
+          end;
+        if LAapt2Filename = '' then raise Exception.Create('aapt2 not found');
         if not TFile.exists(LAapt2Filename) then raise Exception.CreateFmt('%s does not exist', [LAapt2Filename]);
         LSDKApiLevelDir := LRegistry.ReadString('SDKApiLevelPath');
         if not TDirectory.Exists(LSDKApiLevelDir) then raise Exception.CreateFmt('Directory %s does not exist', [LSDKApiLevelDir]);
@@ -2021,12 +1979,11 @@ begin
       {$IF defined(DEBUG)}
       LParamLst.Clear;
       LParamLst.add('-LocalMavenRepositoryDir=..\..\Libraries\jar\');
-      LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;com.alcinoe:alcinoe-firebase-messaging:1.0.0');
+      LParamLst.add('-Libraries=.\_Build\Sample\SampleApp;io.magicfoundation.alcinoe:alcinoe-firebase-messaging:1.0.1');
       LParamLst.add('-OutputDir=.\_Build\Sample\Merged\');
       LParamLst.add('-DProj=_Build\Sample\Sample.dproj');
       LParamLst.add('-AndroidManifest=_Build\Sample\AndroidManifest.template.xml');
       LParamLst.add('-DProjNormalizer=..\DProjNormalizer\DProjNormalizer.exe');
-      LParamLst.add('-RJarSwapper=..\RJarSwapper\RJarSwapper.bat');
       LParamLst.add('-UseGradle=true');
       LParamLst.add('-GoogleServicesJson=_Build\Sample\google-services.json');
       {$ENDIF}
@@ -2125,10 +2082,6 @@ begin
 
       {$REGION 'Init LGoogleServicesJson'}
       var LGoogleServicesJson := ExpandFileName(ALTrim(LParamLst.Values['-GoogleServicesJson']));
-      {$ENDREGION}
-
-      {$REGION 'Init LRJarSwapper'}
-      var LRJarSwapper := ExpandFileName(ALTrim(LParamLst.Values['-RJarSwapper']));
       {$ENDREGION}
 
       {$REGION 'Init LUseGradle'}
@@ -3124,40 +3077,30 @@ begin
       end;
       {$ENDREGION}
 
-      {$REGION 'create r-apk.jar and r-aab.jar'}
-      for var LApk := False to True do begin
-        Writeln('Create r-'+ALIfThenW(LApk, 'apk', 'aab')+'.jar');
-        if not LApk then begin
-          CreateRFlata(
-            LResOutputDir, // const AMergedResPath: String;
-            LRFlataFilename, // const ARFlataPath: String;
-            LAapt2Filename);// const AAaptPath: String);
-        end;
-        //--
-        if not AlEmptyDirectoryW(LtmpDirectoryRClass, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectoryRClass]);
-        for var I := 0 to LLibraries.childnodes.Count - 1 do begin
-          CreateRClasses(
-            ALIncludeTrailingPathDelimiterW(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
-            ALIfThenW(LApk, LResOutputDir, LRFlataFilename), // const AMergedResPath: String;
-            LtmpDirectory, // const ATmpDir: String;
-            LtmpDirectoryRJava, // const ARjavaPath: String;
-            LtmpDirectoryRClass, // const ARClassPath: String;
-            ALIfThenW(LApk, LAaptFilename, LAapt2Filename), // const AAaptPath: String;
-            LSDKApiLevelJarFilename, // const ASDKApiLevelJar: String
-            LJavacFilename); // const AJavacPath: String
-        end;
-        //--
-        CreateRJar(
-          LLibsOutputDir + ALIfThenW(LApk, 'r-apk.jar', 'r-aab.jar'), // const aRJarPath: String;
+      {$REGION 'create r.jar'}
+      Writeln('Create r.jar');
+      CreateRFlata(
+        LResOutputDir, // const AMergedResPath: String;
+        LRFlataFilename, // const ARFlataPath: String;
+        LAapt2Filename);// const AAaptPath: String);
+      //--
+      if not AlEmptyDirectoryW(LtmpDirectoryRClass, true{SubDirectory}) then raise EALException.CreateFmt('Cannot clear %s', [LtmpDirectoryRClass]);
+      for var I := 0 to LLibraries.childnodes.Count - 1 do begin
+        CreateRClasses(
+          ALIncludeTrailingPathDelimiterW(string(LLibraries.childNodes[I].GetChildNodeValueText('uncompressdir', ''{default}))), // const ALibPath: String;
+          LRFlataFilename, // const AMergedResPath: String;
+          LtmpDirectory, // const ATmpDir: String;
+          LtmpDirectoryRJava, // const ARjavaPath: String;
           LtmpDirectoryRClass, // const ARClassPath: String;
-          LJarExeFilename); // const AJarPath: String);
+          LAapt2Filename, // const AAaptPath: String;
+          LSDKApiLevelJarFilename, // const ASDKApiLevelJar: String
+          LJavacFilename); // const AJavacPath: String
       end;
-      {$ENDREGION}
-
-      {$REGION 'create R.Jar'}
-      Var LJarFilename := LLibsOutputDir + 'r.jar';
-      if TFile.Exists(LJarFilename) then raise Exception.Create('Error 7FD3D8B3-1565-4897-8943-1519C302875A');
-      Tfile.Copy(LLibsOutputDir + 'r-apk.jar', LJarFilename);
+      //--
+      CreateRJar(
+        LLibsOutputDir + 'r.jar', // const aRJarPath: String;
+        LtmpDirectoryRClass, // const ARClassPath: String;
+        LJarExeFilename); // const AJarPath: String);
       {$ENDREGION}
 
       {$REGION 'Merge AndroidManifest'}
@@ -3302,7 +3245,7 @@ begin
           if LDeploymentNode = nil then raise Exception.Create('ProjectExtensions.BorlandProject.Deployment node not found!');
 
           //init LDeployFilesToDeactivate
-          {$IFNDEF ALCompilerVersionSupported120}
+          {$IFNDEF ALCompilerVersionSupported122}
             {$MESSAGE WARN 'Check if no new Android resource files were added in DeployProjNormalizer'}
           {$IFEND}
           LDeployFilesToDeactivate.Add('Android_Strings=<PlatForm>\<Config>\strings.xml');
@@ -3482,13 +3425,11 @@ begin
           end;
 
           //add to ItemGroup all items from local libs folder (ClassesdexFile)
-          var LLibs32bitFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\32bit\r.jar
-          var LLibs32bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\32bit\
+          var LLibs32bitFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\r.jar
+          var LLibs32bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\
           for Var I := Low(LLibs32bitFiles) to High(LLibs32bitFiles) do begin
-            if ALSameTextW(ALExtractFileName(LLibs32bitFiles[i]), 'r-apk.jar') or
-               ALSameTextW(ALExtractFileName(LLibs32bitFiles[i]), 'r-aab.jar') then continue;
             if not ALSameTextW(ALExtractFileExt(LLibs32bitFiles[i]),'.jar') then raise Exception.Create('Error F44A9437-4B53-4D12-A434-7FD978B4E6F1');
-            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibs32bitFiles[i])); // android\libs\32bit\r.jar
+            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibs32bitFiles[i])); // android\libs\r.jar
             With LItemGroupNode.AddChild('JavaReference') do begin
               Attributes['Include'] := LLocalName;
               AddChild('ContainerId').Text := 'ClassesdexFile';
@@ -3496,18 +3437,16 @@ begin
           end;
 
           //add to ItemGroup all items from local libs folder (ClassesdexFile64)
-          var LLibs64bitFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\64bit\r.jar
-          var LLibs64bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\64bit\
-          for Var I := Low(LLibs64bitFiles) to High(LLibs64bitFiles) do begin
-            if ALSameTextW(ALExtractFileName(LLibs64bitFiles[i]), 'r-apk.jar') or
-               ALSameTextW(ALExtractFileName(LLibs64bitFiles[i]), 'r-aab.jar') then continue;
-            if not ALSameTextW(ALExtractFileExt(LLibs64bitFiles[i]),'.jar') then raise Exception.Create('Error 21B5091B-8149-4817-90E1-52A31C08FA1F');
-            Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibs64bitFiles[i])); // android\libs\64bit\r.jar
-            With LItemGroupNode.AddChild('JavaReference') do begin
-              Attributes['Include'] := LLocalName;
-              AddChild('ContainerId').Text := 'ClassesdexFile64';
-            end;
-          end;
+          //var LLibs64bitFiles := TDirectory.GetFiles(LLibsOutputDir, '*', TSearchOption.soAllDirectories); // c:\....android\libs\r.jar
+          //var LLibs64bitRelativePath := ansiString(ExtractRelativePath(LDProjDir, LLibsOutputDir)); // android\libs\
+          //for Var I := Low(LLibs64bitFiles) to High(LLibs64bitFiles) do begin
+          //  if not ALSameTextW(ALExtractFileExt(LLibs64bitFiles[i]),'.jar') then raise Exception.Create('Error 21B5091B-8149-4817-90E1-52A31C08FA1F');
+          //  Var LLocalName := AnsiString(ExtractRelativePath(LDProjDir, LLibs64bitFiles[i])); // android\libs\r.jar
+          //  With LItemGroupNode.AddChild('JavaReference') do begin
+          //    Attributes['Include'] := LLocalName;
+          //    AddChild('ContainerId').Text := 'ClassesdexFile64';
+          //  end;
+          //end;
 
           //Update EnabledSysJars
           for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
@@ -3524,75 +3463,6 @@ begin
             if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
               Var LDisabledSysJarsNode := LPropertyGroupNode.ChildNodes.FindNode('DisabledSysJars');
               if LDisabledSysJarsNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LDisabledSysJarsNode);
-            end;
-          end;
-
-          //add the RJarSwapper command line
-          if LRJarSwapper <> '' then begin
-            var LRJarDir := ExtractRelativePath(ALExtractFilePath(LDProjDir), LLibsOutputDir);
-            Var LConditions := TALStringListA.Create;
-            try
-              if LPlatforms.IndexOf('Android') >= 0 then begin
-                if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android=Debug');
-                if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android=Release');
-              end;
-              if LPlatforms.IndexOf('Android64') >= 0 then begin
-                if LConfigs.IndexOf('Debug') >= 0 then LConditions.Add('Android64=Debug');
-                if LConfigs.IndexOf('Release') >= 0 then LConditions.Add('Android64=Release');
-              end;
-              //----
-              for var I := 0 to LdprojXmlDoc.DocumentElement.ChildNodes.Count - 1 do begin
-                var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.ChildNodes[i];
-                if LPropertyGroupNode.NodeName = 'PropertyGroup' then begin
-                  var LCondition := LPropertyGroupNode.Attributes['Condition'];
-                  var LPlatform: AnsiString := '';
-                  if (ALPosIgnoreCaseA('Android64', LCondition) > 0) then LPlatform := 'Android64'
-                  else if (ALPosIgnoreCaseA('Android', LCondition) > 0) then LPlatform := 'Android';
-                  if LPlatforms.IndexOf(LPlatform) >= 0 then begin
-                    Var LPreBuildEventNode := LPropertyGroupNode.ChildNodes.FindNode('PreBuildEvent');
-                    var LPreBuildEventXml: ansiString := '';
-                    if (LPreBuildEventNode <> nil) then LPreBuildEventNode.SaveToXML(LPreBuildEventXml, true{SaveOnlyChildNodes});
-                    if (LPreBuildEventXml <> '') and
-                       (ALPosIgnoreCaseA('RJarSwapper.bat', LPreBuildEventXml) <= 0) then
-                      raise Exception.Create('Cannot set RJarSwapper.bat in PreBuildEvent because it''s not empty');
-                    if LPreBuildEventNode <> nil then LPropertyGroupNode.ChildNodes.Remove(LPreBuildEventNode);
-                    Var LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventCancelOnError');
-                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                    LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventIgnoreExitCode');
-                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                    LIndex := LPropertyGroupNode.ChildNodes.IndexOf('PreBuildEventExecuteWhen');
-                    if LIndex >= 0 then LPropertyGroupNode.ChildNodes.Delete(LIndex);
-                    //A little (completely) ugly but i considere that
-                    //'$(Cfg_1_Android)'!='' => mean we are in debug
-                    //'$(Cfg_2_Android)'!='' => mean we are in release
-                    var J := LConditions.IndexOf(LPlatform+'=Debug');
-                    if (J >= 0) and
-                       (ALSameTextA(LCondition, '''$(Cfg_1_'+LPlatform+')''!=''''')) then begin
-                      LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"';
-                      LConditions.Delete(J);
-                    end
-                    else begin
-                      J := LConditions.IndexOf(LPlatform+'=Release');
-                      if (J >= 0) and
-                         (ALSameTextA(LCondition, '''$(Cfg_2_'+LPlatform+')''!=''''')) then begin
-                        LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
-                        LConditions.Delete(J);
-                      end;
-                    end;
-                  end;
-                end;
-              end;
-              //----
-              //for var I := 0 to LConditions.Count - 1 do begin
-              //  var LPropertyGroupNode := LdprojXmlDoc.DocumentElement.AddChild('PropertyGroup');
-              //  LPropertyGroupNode.Attributes['Condition'] := '''$(Config)''=='''+LConditions.ValueFromIndex[i]+''' And ''$(Platform)''=='''+LConditions.Names[i]+'''';
-              //  if ALSameTextA(LConditions.ValueFromIndex[i], 'Debug') then
-              //    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="false"'
-              //  else if ALSameTextA(LConditions.ValueFromIndex[i], 'Release') then
-              //    LPropertyGroupNode.AddChild('PreBuildEvent').Text := '"'+AnsiString(ExtractRelativePath(LDProjDir, LRJarSwapper))+'" -RJarDir="'+ansiString(LRJarDir)+'" -IsAabPackage="true"';
-              //end;
-            finally
-              ALFreeAndNil(LConditions);
             end;
           end;
 
@@ -3684,7 +3554,6 @@ begin
       Writeln('    -Platforms=Default Android;Android64. Separate Platforms with '';''.');
       Writeln('    -GoogleServicesJson=Path to the google-services.json');
       Writeln('    -DProjNormalizer=Path to the Alcinoe DProjNormalizer tool.');
-      Writeln('    -RJarSwapper=Path to the Alcinoe RJarSwapper tool.');
       Writeln('    -UseGradle=Use Gradle build tool to retrieve the dependencies. default false');
       Writeln('    -GenerateNativeBridgeFile=Generate in OutputDir the Delphi native bridge file from the Java libraries.');
       Writeln('    -NoInteraction=Non-interactive mode.');
@@ -3697,7 +3566,6 @@ begin
       Writeln('    -DProj=c:\MyProject\MyProject.dproj^');
       Writeln('    -AndroidManifest=c:\MyProject\AndroidManifest.template.xml^');
       Writeln('    -DProjNormalizer=c:\Alcinoe\Tools\DeployProjNormalizer\DeployProjNormalizer.exe^');
-      Writeln('    -RJarSwapper=c:\Alcinoe\Tools\RJarSwapper\RJarSwapper.bat');
       Writeln('    -UseGradle=true');
       Writeln('');
       Writeln('');

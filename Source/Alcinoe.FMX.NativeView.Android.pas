@@ -4,13 +4,12 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.Presentation.Android.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
 uses
-  System.Classes,
-  System.Types,
+  system.Messaging,
   Androidapi.JNI.GraphicsContentViewText,
   Androidapi.JNIBridge,
   Androidapi.JNI.Widget,
@@ -27,44 +26,25 @@ type
   {**************************}
   TALAndroidNativeView = class
   private
-    [Weak] FControl: TControl;
-    [Weak] FForm: TCommonCustomForm;
+    FControl: TControl;
+    FForm: TCommonCustomForm;
     FView: JView;
     FLayout: JViewGroup;
-    FSize: TSizeF;
     FVisible: Boolean;
     FFocusChangedListener: TALAndroidFocusChangedListener;
-    function GetZOrderManager: TAndroidZOrderManager;
+    procedure BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+    procedure AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
   protected
-    procedure SetSize(const ASize: TSizeF); virtual;
-    procedure UpdateVisible;
-  protected
-    //procedure PMGetNativeObject(var AMessage: TDispatchMessageWithValue<IInterface>); message PM_GET_NATIVE_OBJECT;
-    procedure SetAbsoluteEnabled(const value: Boolean); //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
-    procedure SetVisible(const Value: Boolean); // procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
-    //procedure PMGetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_GET_VISIBLE;
-    procedure SetAlpha(const Value: Single); // procedure PMSetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_SET_ABSOLUTE_OPACITY;
-    //procedure PMGetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_GET_ABSOLUTE_OPACITY;
-    //procedure PMSetSize(var AMessage: TDispatchMessageWithValue<TSizeF>); message PM_SET_SIZE;
-    //procedure PMGetSize(var AMessage: TDispatchMessageWithValue<TSizeF>); message PM_GET_SIZE;
-    //procedure PMIsFocused(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_IS_FOCUSED;
-    //procedure PMDoExit(var AMessage: TDispatchMessage); message PM_DO_EXIT;
-    //procedure PMDoEnter(var AMessage: TDispatchMessage); message PM_DO_ENTER;
-    //procedure PMResetFocus(var AMessage: TDispatchMessage); message PM_RESET_FOCUS;
-    procedure SetClipChildren(const Value: Boolean); // procedure PMSetClipChildren(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_CLIP_CHILDREN;
-    procedure AncestorVisibleChanged; // procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
-    //procedure PMAncestorPresentationLoaded(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESTOR_PRESENTATION_LOADED;
-    //procedure PMAncestorPresentationUnloading(var AMessage: TDispatchMessageWithValue<TFmxObject>); message PM_ANCESTOR_PRESENTATION_UNLOADING;
-    //procedure PMUnload(var AMessage: TDispatchMessage); message PM_UNLOAD;
-    //procedure PMRefreshParent(var AMessage: TDispatchMessage); message PM_REFRESH_PARENT;
-    //procedure PMAbsoluteChanged(var AMessage: TDispatchMessage); message PM_ABSOLUTE_CHANGED;
-    function PointInObjectLocal(X: Single; Y: Single): Boolean; //procedure PMPointInObject(var AMessage: TDispatchMessageWithValue<TPointInObjectLocalInfo>); message PM_POINT_IN_OBJECT_LOCAL;
-    procedure ChangeOrder; // PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
-    procedure RootChanged(const aRoot: IRoot); // procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
+    function GetFormView(const AForm: TCommonCustomForm): JView;
+  public
+    procedure SetEnabled(const value: Boolean); virtual; //procedure PMSetAbsoluteEnabled(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_ABSOLUTE_ENABLED;
+    procedure SetVisible(const Value: Boolean); virtual; // procedure PMSetVisible(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_SET_VISIBLE;
+    procedure SetAlpha(const Value: Single); virtual; // procedure PMSetAlpha(var AMessage: TDispatchMessageWithValue<Single>); message PM_SET_ABSOLUTE_OPACITY;
+    procedure AncestorVisibleChanged; virtual; // procedure PMAncestorVisibleChanged(var AMessage: TDispatchMessageWithValue<Boolean>); message PM_ANCESSTOR_VISIBLE_CHANGED;
+    procedure RootChanged(const aRoot: IRoot); virtual; // procedure PMRootChanged(var AMessage: TDispatchMessageWithValue<IRoot>); message PM_ROOT_CHANGED;
+    procedure ChangeOrder; virtual; // PMChangeOrder(var AMessage: TDispatchMessage); message PM_CHANGE_ORDER;
   protected
     function GetView<T: JView>: T; overload;
-    procedure UpdateFrame;
-    procedure RefreshNativeParent; virtual;
     function CreateView: JView; virtual;
     function CreateLayout: JViewGroup; virtual;
     procedure InitView; virtual;
@@ -72,14 +52,11 @@ type
     constructor Create; overload; virtual;
     constructor Create(const AControl: TControl); overload; virtual;
     destructor Destroy; override;
-    function HasZOrderManager: Boolean;
     procedure SetFocus; virtual;
     procedure ResetFocus; virtual;
+    procedure UpdateFrame;
     property Form: TCommonCustomForm read FForm;
-    property ZOrderManager: TAndroidZOrderManager read GetZOrderManager;
-  public
     property Control: TControl read FControl;
-    property Size: TSizeF read FSize write SetSize;
     property Layout: JViewGroup read FLayout;
     property View: JView read FView;
     property Visible: Boolean read FVisible;
@@ -89,7 +66,7 @@ type
   {********************************************}
   TALAndroidBaseViewListener = class(TJavaLocal)
   private
-    [Weak] FView: TALAndroidNativeView;
+    FView: TALAndroidNativeView;
   public
     constructor Create(const AView: TALAndroidNativeView);
     property View: TALAndroidNativeView read FView;
@@ -109,38 +86,21 @@ var
 implementation
 
 uses
+  System.Classes,
   System.SysUtils,
+  System.Types,
   Androidapi.Helpers,
   Androidapi.JNI.App,
-  FMX.Platform,
   FMX.Platform.Android,
+  FMX.Platform.UI.Android,
   FMX.Consts,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
-{****************************************************************}
-constructor TALAndroidNativeView.Create(const AControl: TControl);
-begin
-  FControl := AControl;
-  Create;
-  RefreshNativeParent;
-end;
-
-{*****************************************************}
-function TALAndroidNativeView.CreateLayout: JViewGroup;
-begin
-  Result := TJRelativeLayout.JavaClass.init(TAndroidHelper.Context)
-end;
-
-{**********************************************}
-function TALAndroidNativeView.CreateView: JView;
-begin
-  Result := TJView.JavaClass.init(TAndroidHelper.Activity);
-end;
-
 {**************************************}
 constructor TALAndroidNativeView.Create;
-var LayoutParams: JRelativeLayout_LayoutParams;
+var
+  LayoutParams: JRelativeLayout_LayoutParams;
 begin
   inherited;
   FLayout := CreateLayout;
@@ -157,15 +117,67 @@ begin
   InitView;
 
   FVisible := True;
+
+  TMessageManager.DefaultManager.SubscribeToMessage(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
+  TMessageManager.DefaultManager.SubscribeToMessage(TAfterCreateFormHandle, AfterCreateHandleListener);
+end;
+
+{****************************************************************}
+constructor TALAndroidNativeView.Create(const AControl: TControl);
+begin
+  FControl := AControl;
+  Create;
+  RootChanged(Control.Root);
 end;
 
 {**************************************}
 destructor TALAndroidNativeView.Destroy;
 begin
-  if HasZOrderManager then ZOrderManager.RemoveLink(Control);
-  View.setOnFocusChangeListener(nil); // << https://quality.embarcadero.com/browse/RSP-24666
+  TMessageManager.DefaultManager.Unsubscribe(TBeforeDestroyFormHandle, BeforeDestroyHandleListener);
+  TMessageManager.DefaultManager.Unsubscribe(TAfterCreateFormHandle, AfterCreateHandleListener);
+  RootChanged(nil);
+  View.setOnFocusChangeListener(nil);
   ALFreeAndNil(FFocusChangedListener);
   inherited;
+end;
+
+{********************************************************************************************************}
+procedure TALAndroidNativeView.AfterCreateHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  // This event is called only when the window's handle is recreated.
+  if (AMessage is TAfterCreateFormHandle) and (TAfterCreateFormHandle(AMessage).Value = Form) then
+    RootChanged(Form);
+end;
+
+{**********************************************************************************************************}
+procedure TALAndroidNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
+begin
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
+    RootChanged(nil);
+end;
+
+{*****************************************************}
+function TALAndroidNativeView.CreateLayout: JViewGroup;
+begin
+  Result := TJRelativeLayout.JavaClass.init(TAndroidHelper.Context)
+end;
+
+{**********************************************}
+function TALAndroidNativeView.CreateView: JView;
+begin
+  Result := TJView.JavaClass.init(TAndroidHelper.Activity);
+end;
+
+{**************************************}
+procedure TALAndroidNativeView.InitView;
+begin
+end;
+
+{*******************************************************************************}
+function TALAndroidNativeView.GetFormView(const AForm: TCommonCustomForm): JView;
+begin
+  var LFormHandle: TAndroidWindowHandle := WindowHandleToPlatform(AForm.Handle);
+  Result := LFormHandle.FormLayout;
 end;
 
 {******************************************}
@@ -174,61 +186,82 @@ begin
   Result := T(FView);
 end;
 
-{********************************************************************}
-function TALAndroidNativeView.GetZOrderManager: TAndroidZOrderManager;
+{*****************************************}
+procedure TALAndroidNativeView.UpdateFrame;
 begin
-  if Form <> nil then Result := WindowHandleToPlatform(Form.Handle).ZOrderManager
-  else Result := nil;
-end;
-
-{******************************************************}
-function TALAndroidNativeView.HasZOrderManager: Boolean;
-begin
-  Result := (Form <> nil) and (Form.Handle <> nil);
-end;
-
-{**************************************}
-procedure TALAndroidNativeView.InitView;
-begin
-end;
-
-{****************************************************}
-procedure TALAndroidNativeView.AncestorVisibleChanged;
-begin
-  UpdateVisible;
+  // We cannot use ZOrderManager.UpdateOrderAndBounds(Control) as it causes the edit control to lose focus
+  // every time it is moved, which is particularly problematic when moving the edit from the bottom to the top
+  // to accommodate the virtual keyboard display. Additionally, we cannot use ZOrderManager.UpdateBounds(Control)
+  // because it updates not only the bounds but also the visibility! Code below is taken from
+  // TAndroidZOrderManager.UpdateBounds
+  if FForm = nil then exit;
+  var LBounds := Control.AbsoluteRect;
+  var LScreenScale: Single := FForm.Handle.Scale;
+  var R := TRectF.Create(
+             LBounds.Left * LScreenScale,
+             LBounds.Top * LScreenScale,
+             LBounds.Right * LScreenScale,
+             LBounds.Bottom * LScreenScale).Round;
+  If (R.Width <> Layout.getWidth) or (R.Height <> Layout.getHeight) then begin
+    var LParam: JRelativeLayout_LayoutParams := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
+    LParam.width := R.Width;
+    LParam.height := R.Height;
+    Layout.setLayoutParams(LParam);
+  end;
+  if Layout.getLeft <> R.Left then
+    Layout.setX(R.Left);
+  if Layout.getTop <> R.Top then
+    Layout.setY(R.Top);
 end;
 
 {*****************************************}
 procedure TALAndroidNativeView.ChangeOrder;
 begin
-  if ZOrderManager <> nil then
-    ZOrderManager.UpdateOrder(Control);
+  //if ZOrderManager <> nil then
+  //  ZOrderManager.UpdateOrder(Control);
 end;
 
-{******************************************************************************}
-function TALAndroidNativeView.PointInObjectLocal(X: Single; Y: Single): Boolean;
-var HitTestPoint: TPointF;
+{****************************************************}
+procedure TALAndroidNativeView.AncestorVisibleChanged;
 begin
-  HitTestPoint := TPointF.Create(x,y);
-  Result := Control.LocalRect.Contains(HitTestPoint);
+  SetVisible(Visible);
+end;
+
+{**************************************************************}
+procedure TALAndroidNativeView.SetVisible(const Value: Boolean);
+begin
+  FVisible := Value;
+  if not Visible or not Control.ParentedVisible then
+    Layout.setVisibility(TJView.JavaClass.GONE)
+  else
+    Layout.setVisibility(TJView.JavaClass.VISIBLE);
 end;
 
 {*************************************************************}
 procedure TALAndroidNativeView.RootChanged(const aRoot: IRoot);
 begin
-  // Changing root for native control means changing ZOrderManager, because one form owns ZOrderManager.
-  // So we need to remove itself from old one and add to new one.
-  if HasZOrderManager then ZOrderManager.RemoveLink(Control);
-
-  if aRoot is TCommonCustomForm then FForm := TCommonCustomForm(aRoot)
+  var LParent: JViewParent := Layout.getParent;
+  if LParent <> nil then
+    TJViewGroup.Wrap(LParent).removeView(Layout);
+  if aRoot is TCommonCustomForm then begin
+    FForm := TCommonCustomForm(aRoot);
+    var LParam: JRelativeLayout_LayoutParams;
+    var LParentGroup: JViewGroup := TJViewGroup.Wrap(GetFormView(FForm));
+    if Layout.getLayoutParams = nil then
+      LParam := TJRelativeLayout_LayoutParams.JavaClass.init(0, 0)
+    else
+      LParam := TJRelativeLayout_LayoutParams.Wrap(Layout.getLayoutParams);
+    // FMX form consists from two parts: form's view and layout for other native controls. Form's view embedded into Layout.
+    // So it should always holds 0 index. So when we rearrange native controls, we should keep in mind, that for native
+    // controls first index is 1.
+    LParentGroup.addView(Layout, 1, LParam);
+    UpdateFrame;
+  end
   else FForm := nil;
-
-  if HasZOrderManager then ZOrderManager.AddOrSetLink(Control, Layout, nil);
-  RefreshNativeParent;
 end;
 
-{**********************************************************************}
-procedure TALAndroidNativeView.SetAbsoluteEnabled(const value: Boolean);
+{**************************************************************}
+procedure TALAndroidNativeView.SetEnabled(const value: Boolean);
 begin
   FView.setEnabled(value);
 end;
@@ -239,64 +272,16 @@ begin
   FView.setAlpha(Value);
 end;
 
-{*******************************************************************}
-procedure TALAndroidNativeView.SetClipChildren(const Value: Boolean);
-begin
-  FLayout.setClipToPadding(Value);
-  FLayout.setClipToOutline(Value);
-  FLayout.setClipChildren(Value);
-end;
-
-{**************************************************************}
-procedure TALAndroidNativeView.SetVisible(const Value: Boolean);
-begin
-  FVisible := Value;
-  UpdateVisible;
-end;
-
-{*************************************************}
-procedure TALAndroidNativeView.RefreshNativeParent;
-begin
-  if HasZOrderManager then
-    ZOrderManager.UpdateOrderAndBounds(Control);
-end;
-
-{****************************************}
-procedure TALAndroidNativeView.ResetFocus;
-begin
-  FView.clearFocus;
-end;
-
 {**************************************}
 procedure TALAndroidNativeView.SetFocus;
 begin
   FView.requestFocus;
 end;
 
-{**********************************************************}
-procedure TALAndroidNativeView.SetSize(const ASize: TSizeF);
+{****************************************}
+procedure TALAndroidNativeView.ResetFocus;
 begin
-  FSize := ASize;
-  UpdateFrame;
-end;
-
-{*****************************************}
-procedure TALAndroidNativeView.UpdateFrame;
-begin
-  if ZOrderManager <> nil then
-    // UpdateBounds instead of UpdateOrderAndBounds because else everytime
-    // we will move the edit we will loose the focus and this is problematic
-    // if we for exemple move the edit from the bottom to the top to let some
-    // place to show the virtual keyboard
-    ZOrderManager.UpdateBounds(Control);
-end;
-
-{*******************************************}
-procedure TALAndroidNativeView.UpdateVisible;
-begin
-  if not Visible or not Control.ParentedVisible then Layout.setVisibility(TJView.JavaClass.GONE)
-  else if ZOrderManager = nil then Layout.setVisibility(TJView.JavaClass.VISIBLE)
-  else ZOrderManager.UpdateOrderAndBounds(Control);
+  FView.clearFocus;
 end;
 
 {*******************************************************************************}
@@ -325,8 +310,10 @@ begin
   // Since view can get focus without us, we synchronize native focus and fmx focus. For example, when user makes a tap
   // on Input control, control request focus itself and we can get the situation with two focused controls native and
   // styled Edit.
-  if hasFocus and not self.View.Control.IsFocused then self.View.Control.SetFocus
-  else if not hasFocus and self.View.Control.IsFocused then self.View.Control.ResetFocus;
+  if hasFocus and not self.View.Control.IsFocused then
+    self.View.Control.SetFocus
+  else if not hasFocus and self.View.Control.IsFocused then
+    self.View.Control.ResetFocus;
 
 end;
 

@@ -151,7 +151,7 @@ echo.
 
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.FBX.Lib.pas;Alcinoe.FBX.Base.pas" -CreateBackup="false" -NoInteraction=true
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.iOSapi.ImageIO.pas" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Tests\" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
@@ -185,7 +185,7 @@ goto RUN_TESTS
 
 :DO_RUN_TESTS
 
-call "%ALBaseDir%\Tests\RunTests.bat"
+call "%ALBaseDir%\Tests\DUnitX\RunTests.bat"
 IF ERRORLEVEL 1 goto ERROR
 echo.
 
@@ -205,7 +205,7 @@ SET FileName=%ALBaseDir%\Libraries\bpl\Alcinoe\Win32\%ALDelphiName%
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 
-Call :BUILD_PROJECT "%ALBaseDir%\Source" "" "Alcinoe%ALDelphiName%.dproj" "Win32"
+Call :BUILD_PROJECT "%ALBaseDir%\Source\Packages" "" "Alcinoe%ALDelphiName%.dproj" "Win32"
 IF ERRORLEVEL 1 goto ERROR
 
 
@@ -305,6 +305,8 @@ Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFacebookLogin" "_Source" "ALFacebookLo
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALNotificationService" "_Source" "ALNotificationServiceDemo.dproj"
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxControls" "_Source" "ALFmxControls.dproj"
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxFilterEffects" "_Source" "ALFmxFilterEffectsDemo.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALFmxGraphics" "_Source" "ALFmxGraphicsDemo.dproj"
+Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALGeoPositionSensor" "_Source" "ALGeoPositionSensorDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALJsonDoc" "_Source" "ALJsonDocDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALLibPhoneNumber" "_Source" "ALLibPhoneNumberDemo.dproj"
 Call :BUILD_FMX_DEMO "%ALBaseDir%\Demos\ALLiveVideoChat\Client" "_Source" "ALLiveVideoChatClient.dproj"
@@ -318,7 +320,6 @@ Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSortedListBenchmark" "_Source" "ALSort
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALSqlite3Client" "_Source" "ALSqlite3clientDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStressHTTPServer" "_Source" "ALStressHTTPServer.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALStringBenchmark" "_Source" "ALStringBenchmark.dproj"
-Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWebSpider" "_Source" "ALWebSpiderDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPClient" "_Source" "ALWinHTTPClientDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinHTTPWebSocketClient" "_Source" "ALWinHTTPWebSocketClientDemo.dproj"
 Call :BUILD_VCL_DEMO "%ALBaseDir%\Demos\ALWinInetHTTPClient" "_Source" "ALWinInetHTTPClientDemo.dproj"
@@ -409,6 +410,14 @@ REM %~2 the source directory relative to the base directory
 REM %~3 the dproj filename without path
 REM %~4 the platform
 
+SET FileName=%~1\%~2\dbgout.log
+if exist "%FileName%" del "%FileName%" /s
+if exist "%FileName%" goto ERROR
+
+SET FileName=%~1\*.skincfg
+if exist "%FileName%" del "%FileName%" /s
+if exist "%FileName%" goto ERROR
+
 SET FileName=%~1\*.rsm
 if exist "%FileName%" del "%FileName%" /s
 if exist "%FileName%" goto ERROR
@@ -433,6 +442,12 @@ SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
+
+if "%~4"=="Android" (
+  echo [36mMerge Android Libraries for %~3[0m
+  call "%~1\%~2\Android\MergeLibraries.bat"
+  IF ERRORLEVEL 1 goto ERROR
+)
 
 call "%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe" -DProj="%~1\%~2\%~3" -CreateBackup="false"
 IF ERRORLEVEL 1 goto ERROR
@@ -463,6 +478,10 @@ SET FileName=%~1\%~2\Dcu\
 IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
+
+SET FileName=%~1\%~2\dbgout.log
+if exist "%FileName%" del "%FileName%" /s
+if exist "%FileName%" goto ERROR
 
 EXIT /B 0
 

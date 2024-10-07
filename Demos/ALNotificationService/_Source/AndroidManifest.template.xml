@@ -97,8 +97,8 @@
     <!-- AndroidMerger auto-generated section (BEGIN) -->
     <!-- ============================================ -->
     
-    <!-- ===== com.alcinoe.alcinoe-firebase-messaging ===== -->
-    <service android:name="com.alcinoe.firebase.messaging.ALFirebaseMessagingService"
+    <!-- ===== io.magicfoundation.alcinoe.alcinoe-firebase-messaging ===== -->
+    <service android:name="io.magicfoundation.alcinoe.firebase.messaging.ALFirebaseMessagingService"
              android:directBootAware="true"
              android:exported="true">
       <intent-filter>
@@ -112,8 +112,6 @@
       <intent-filter>
         <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
       </intent-filter>
-      <meta-data android:name="com.google.android.gms.cloudmessaging.FINISHED_AFTER_HANDLED"
-                 android:value="true"/>
     </receiver>
     <service android:name="com.google.firebase.messaging.FirebaseMessagingService"
              android:directBootAware="true"
@@ -126,25 +124,21 @@
     <service android:name="com.google.firebase.components.ComponentDiscoveryService"
              android:exported="false"
              android:directBootAware="true">
-      <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingKtxRegistrar"
-                 android:value="com.google.firebase.components.ComponentRegistrar"/>
       <meta-data android:name="com.google.firebase.components:com.google.firebase.messaging.FirebaseMessagingRegistrar"
                  android:value="com.google.firebase.components.ComponentRegistrar"/>
       <!-- ===== com.google.firebase.datatransport ===== -->
       <meta-data android:name="com.google.firebase.components:com.google.firebase.datatransport.TransportRegistrar"
                  android:value="com.google.firebase.components.ComponentRegistrar"/>
-      <!-- ===== com.google.firebase ===== -->
-      <meta-data android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
-                 android:value="com.google.firebase.components.ComponentRegistrar"/>
-      <!-- ===== com.google.firebase.ktx ===== -->
-      <meta-data android:name="com.google.firebase.components:com.google.firebase.ktx.FirebaseCommonLegacyRegistrar"
-                 android:value="com.google.firebase.components.ComponentRegistrar"/>
       <!-- ===== com.google.firebase.installations ===== -->
-      <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
-                 android:value="com.google.firebase.components.ComponentRegistrar"/>
       <meta-data android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
                  android:value="com.google.firebase.components.ComponentRegistrar"/>
     </service>
+    <!-- ===== com.google.firebase ===== -->
+    <provider android:name="com.google.firebase.provider.FirebaseInitProvider"
+              android:authorities="%package%.firebaseinitprovider"
+              android:directBootAware="true"
+              android:exported="false"
+              android:initOrder="100"/>
     <!-- ===== com.google.android.gms.common ===== -->
     <meta-data android:name="com.google.android.gms.version"
                android:value="@integer/google_play_services_version"/>
@@ -196,12 +190,6 @@
     <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"
               android:theme="@android:style/Theme.Translucent.NoTitleBar"
               android:exported="false"/>
-    <!-- ===== com.google.firebase ===== -->
-    <provider android:name="com.google.firebase.provider.FirebaseInitProvider"
-              android:authorities="%package%.firebaseinitprovider"
-              android:directBootAware="true"
-              android:exported="false"
-              android:initOrder="100"/>
     
     <!-- ========================================== -->
     <!-- AndroidMerger auto-generated section (END) -->

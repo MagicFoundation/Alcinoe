@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{EBF8CE24-4BA3-4695-BD61-09DE88EECCC7}</ProjectGuid>
-    <ProjectVersion>20.1</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
     <MainSource>ALFacebookLogin.dpr</MainSource>
     <Base>True</Base>
@@ -160,7 +160,7 @@
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base)&#39;!=&#39;&#39;">
-    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;..\..\..\Embarcadero\Athens\rtl\ios;..\..\..\Embarcadero\Athens\rtl\osx;..\..\..\Embarcadero\Athens\rtl\android;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+    <DCC_UnitSearchPath>..\..\..\Source;..\..\..\Embarcadero\Athens\fmx;..\..\..\Embarcadero\Athens\rtl\common;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     <DCC_CodePage>65001</DCC_CodePage>
     <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
     <AUP_ACCESS_COARSE_LOCATION>true</AUP_ACCESS_COARSE_LOCATION>
@@ -185,9 +185,9 @@
     <DCC_K>false</DCC_K>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android)&#39;!=&#39;&#39;">
-    <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
+    <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_Build>1</VerInfo_Build>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -200,21 +200,25 @@
     <Android_NotificationIcon96>$(BDS)\bin\Artwork\Android\FM_NotificationIcon_96x96.png</Android_NotificationIcon96>
     <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
+    <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+    <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
+    <VerInfo_Keys>package=com.ALFacebookLogin.app;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_Android>true</Base_Android>
     <CfgParent>Base</CfgParent>
     <Base>true</Base>
-    <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
+    <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;CloudService;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;FireDACSqliteDriver;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;FireDACDSDriver;rtl;DbxClientDriver;CustomIPTransport;bindcomp;IndyIPClient;dbxcds;dsnapxml;DataSnapProviderClient;dbrtl;IndyProtocols;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
     <VerInfo_Build>1</VerInfo_Build>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
     <DCC_LinkerOptions>--version-script=..\..\..\Source\goExports.vsr</DCC_LinkerOptions>
     <Android_LauncherIcon192>$(BDS)\bin\Artwork\Android\FM_LauncherIcon_192x192.png</Android_LauncherIcon192>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
+    <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+    <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_iOSDevice64)&#39;!=&#39;&#39;">
     <iPhone_AppIcon180>$(BDS)\bin\Artwork\iOS\iPhone\FM_ApplicationIcon_180x180.png</iPhone_AppIcon180>
@@ -296,26 +300,29 @@
     <Manifest_File>(None)</Manifest_File>
     <Debugger_Launcher>/usr/X11/bin/xterm -e &#34;%debuggee%&#34;</Debugger_Launcher>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;tethering;FireDACMSSQLDriver;bindcompfmx;DBXOracleDriver;inetdb;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;FireDACDBXDriver;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;soapserver;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;IndyIPServer;IndySystem;fmxFireDAC;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;FireDACASADriver;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;FireDACDSDriver;rtl;DbxClientDriver;DBXSybaseASADriver;CustomIPTransport;bindcomp;DBXInformixDriver;IndyIPClient;dbxcds;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Win32)&#39;!=&#39;&#39;">
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXDb2Driver;DBXInterBaseDriver;vclactnband;vclFireDAC;emsclientfiredac;DataSnapFireDAC;svnui;tethering;FireDACADSDriver;DBXMSSQLDriver;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;vcltouch;vcldb;bindcompfmx;svn;Intraweb;DBXOracleDriver;inetdb;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;frx24;FireDACDBXDriver;dbexpress;IndyCore;vclx;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;DataSnapConnectors;VCLRESTComponents;soapserver;vclie;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;vcl;DBXSybaseASEDriver;IndyIPServer;IndySystem;FireDACDb2Driver;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;TeeDB;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;FireDACASADriver;DBXOdbcDriver;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;Tee;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;vclwinx;FireDACDSDriver;rtl;DbxClientDriver;DBXSybaseASADriver;frxTee24;CustomIPTransport;vcldsnap;bindcomp;appanalytics;DBXInformixDriver;IndyIPClient;bindcompvcl;TeeUI;frxe24;dbxcds;VclSmp;adortl;FireDACODBCDriver;DataSnapIndy10ServerTransport;frxDB24;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Win64)&#39;!=&#39;&#39;">
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <DCC_UsePackage>DBXSqliteDriver;RESTComponents;DataSnapServerMidas;DBXDb2Driver;DBXInterBaseDriver;vclactnband;vclFireDAC;emsclientfiredac;DataSnapFireDAC;tethering;FireDACADSDriver;DBXMSSQLDriver;DatasnapConnectorsFreePascal;FireDACMSSQLDriver;vcltouch;vcldb;bindcompfmx;Intraweb;DBXOracleDriver;inetdb;FmxTeeUI;emsedge;FireDACIBDriver;fmx;fmxdae;FireDACDBXDriver;dbexpress;IndyCore;vclx;dsnap;DataSnapCommon;emsclient;FireDACCommon;RESTBackendComponents;DataSnapConnectors;VCLRESTComponents;soapserver;vclie;bindengine;DBXMySQLDriver;FireDACOracleDriver;CloudService;FireDACMySQLDriver;DBXFirebirdDriver;FireDACCommonODBC;FireDACCommonDriver;DataSnapClient;inet;bindcompdbx;IndyIPCommon;vcl;DBXSybaseASEDriver;IndyIPServer;IndySystem;FireDACDb2Driver;dsnapcon;FireDACMSAccDriver;fmxFireDAC;FireDACInfxDriver;vclimg;TeeDB;FireDAC;emshosting;FireDACSqliteDriver;FireDACPgDriver;FireDACASADriver;DBXOdbcDriver;FireDACTDataDriver;FMXTee;soaprtl;DbxCommonDriver;Tee;DataSnapServer;xmlrtl;soapmidas;DataSnapNativeClient;fmxobj;vclwinx;FireDACDSDriver;rtl;DbxClientDriver;DBXSybaseASADriver;CustomIPTransport;vcldsnap;bindcomp;appanalytics;DBXInformixDriver;IndyIPClient;bindcompvcl;TeeUI;dbxcds;VclSmp;adortl;FireDACODBCDriver;DataSnapIndy10ServerTransport;dsnapxml;DataSnapProviderClient;dbrtl;inetdbxpress;FireDACMongoDBDriver;IndyProtocols;fmxase;$(DCC_UsePackage)</DCC_UsePackage>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
+    <AppDPIAwarenessMode>none</AppDPIAwarenessMode>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1)&#39;!=&#39;&#39;">
     <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -329,15 +336,15 @@
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_Android64)&#39;!=&#39;&#39;">
     <Cfg_1_Android>true</Cfg_1_Android>
     <CfgParent>Cfg_1</CfgParent>
     <Cfg_1>true</Cfg_1>
-    <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
+    <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <VerInfo_Build>1</VerInfo_Build>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;false&#34;</PreBuildEvent>
+    <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
+    <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -384,7 +391,6 @@
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android64)&#39;!=&#39;&#39;">
     <Cfg_2_Android>true</Cfg_2_Android>
@@ -392,7 +398,6 @@
     <Cfg_2>true</Cfg_2>
     <VerInfo_Build>1</VerInfo_Build>
     <IncludeAndroid_Splash>False</IncludeAndroid_Splash>
-    <PreBuildEvent>&#34;..\..\..\Tools\RJarSwapper\RJarSwapper.bat&#34; -RJarDir=&#34;Android\Merged\libs\&#34; -IsAabPackage=&#34;true&#34;</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -434,379 +439,190 @@
       <MainSource>MainSource</MainSource>
     </DelphiCompile>
     <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.activity-activity-1.8.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-1.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.annotation-annotation-experimental-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.appcompat-appcompat-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.appcompat-appcompat-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.appcompat-appcompat-resources-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.appcompat-appcompat-resources-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-common-2.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.arch.core-core-runtime-2.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.asynclayoutinflater-asynclayoutinflater-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.asynclayoutinflater-asynclayoutinflater-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.browser-browser-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.browser-browser-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.cardview-cardview-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.cardview-cardview-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.collection-collection-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.concurrent-concurrent-futures-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.coordinatorlayout-coordinatorlayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.coordinatorlayout-coordinatorlayout-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.core-core-1.8.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.3.2.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.core-core-ktx-1.3.2.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.cursoradapter-cursoradapter-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.customview-customview-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.customview-customview-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.documentfile-documentfile-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.documentfile-documentfile-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.drawerlayout-drawerlayout-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.fragment-fragment-1.3.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.fragment-fragment-1.3.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.interpolator-interpolator-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.interpolator-interpolator-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-core-ui-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-core-ui-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-core-utils-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-v4-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.legacy-legacy-support-v4-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-common-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-livedata-core-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-runtime-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.lifecycle-lifecycle-viewmodel-savedstate-2.6.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.loader-loader-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.loader-loader-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.localbroadcastmanager-localbroadcastmanager-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.media-media-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.media-media-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.print-print-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.print-print-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.profileinstaller-profileinstaller-1.3.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.savedstate-savedstate-1.2.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.slidingpanelayout-slidingpanelayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.slidingpanelayout-slidingpanelayout-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.startup-startup-runtime-1.1.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.swiperefreshlayout-swiperefreshlayout-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.tracing-tracing-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.vectordrawable-vectordrawable-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.vectordrawable-vectordrawable-animated-1.1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.versionedparcelable-versionedparcelable-1.1.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\androidx.viewpager-viewpager-1.0.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-facebook-share-1.0.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.alcinoe-alcinoe-facebook-share-1.0.1.jar">
-      <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.android.installreferrer-installreferrer-1.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.android.installreferrer-installreferrer-1.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-bolts-16.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-bolts-16.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-bolts-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-common-16.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-common-16.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-common-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-core-16.0.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-core-16.0.0.jar">
+    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-core-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-login-15.2.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.facebook.android-facebook-login-15.2.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.code.findbugs-jsr305-3.0.2.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.code.findbugs-jsr305-3.0.2.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.guava-failureaccess-1.0.1.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.guava-guava-32.1.3-android.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.guava-guava-32.1.3-android.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\com.google.zxing-core-3.3.3.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\com.google.zxing-core-3.3.3.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.checkerframework-checker-qual-3.37.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
+    <JavaReference Include="Android\Merged\libs\io.magicfoundation.alcinoe-alcinoe-facebook-share-1.0.1.jar">
+      <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.checkerframework-checker-qual-3.37.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains-annotations-13.0.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-common-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk7-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlin-kotlin-stdlib-jdk8-1.8.22.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-android-1.6.4.jar">
       <ContainerId>ClassesdexFile</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\org.jetbrains.kotlinx-kotlinx-coroutines-core-jvm-1.6.4.jar">
       <ContainerId>ClassesdexFile</ContainerId>
-    </JavaReference>
-    <JavaReference Include="Android\Merged\libs\r.jar">
-      <ContainerId>ClassesdexFile64</ContainerId>
     </JavaReference>
     <JavaReference Include="Android\Merged\libs\r.jar">
       <ContainerId>ClassesdexFile</ContainerId>
@@ -832,32 +648,11 @@
           <Source Name="MainSource">ALFacebookLogin.dpr</Source>
         </Source>
         <Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-          <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+          <Excluded_Packages Name="$(BDSBIN)\dclofficexp290.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
         </Excluded_Packages>
       </Delphi.Personality>
-      <Deployment Version="4">
-        <DeployFile Class="AndroidLibnativeArmeabiFile" Configuration="Release" LocalName="$(BDS)\lib\android\debug\armeabi\libnative-activity.so">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>libALFacebookLogin.so</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidLibnativeArmeabiv7aFile" Configuration="Release" LocalName="$(BDS)\lib\android\debug\armeabi-v7a\libnative-activity.so">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>libALFacebookLogin.so</RemoteName>
-          </Platform>
-        </DeployFile>
-        <DeployFile Class="AndroidLibnativeMipsFile" Configuration="Release" LocalName="$(BDS)\lib\android\debug\mips\libnative-activity.so">
-          <Platform Name="Android64">
-            <Enabled>false</Enabled>
-            <Overwrite>true</Overwrite>
-            <RemoteName>libALFacebookLogin.so</RemoteName>
-          </Platform>
-        </DeployFile>
+      <Deployment Version="5">
         <DeployFile Class="AndroidSplashImageDef" Configuration="Debug" LocalName="Android64\Debug\splash_image_def.xml">
           <Platform Name="Android64">
             <Enabled>false</Enabled>

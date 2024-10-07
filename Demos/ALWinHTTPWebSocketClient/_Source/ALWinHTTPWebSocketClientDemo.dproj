@@ -7,8 +7,9 @@
     <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Application</AppType>
     <FrameworkType>VCL</FrameworkType>
-    <ProjectVersion>19.5</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">ALWinHTTPWebSocketClientDemo</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>

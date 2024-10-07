@@ -642,13 +642,13 @@ end;
 procedure TForm1.ALButton21Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALFormatSettingsA;
+    LFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := ALDateToStrA(Random(10000), aFormatSettings);
+    S1 := ALDateToStrA(Random(10000), LFormatSettings);
   end;
   Showmessage('1,000,000 ALDateToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -657,13 +657,13 @@ end;
 procedure TForm1.ALButton22Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
+    LFormatSettings: TformatSettings;
     S1: String;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  GetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := Datetostr(Random(10000), aFormatSettings);
+    S1 := Datetostr(Random(10000), LFormatSettings);
   end;
   Showmessage('1,000,000 Datetostr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -672,15 +672,15 @@ end;
 procedure TForm1.ALButton27Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALFormatSettingsA;
+    LFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
     D1: TdateTime;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   S1 := '12/10/2012';
   For i := 0 to 1000000 do begin
-    ALTrystrToDateTime(S1, D1, aFormatSettings);
+    ALTrystrToDateTime(S1, D1, LFormatSettings);
   end;
   Showmessage('1,000,000 ALTrystrToDateTime in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -689,15 +689,15 @@ end;
 procedure TForm1.ALButton28Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
+    LFormatSettings: TformatSettings;
     S1: String;
     D1: TdateTime;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  GetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   S1 := '12/10/2012';
   For i := 0 to 1000000 do begin
-    TrystrToDateTime(S1, D1, aFormatSettings);
+    TrystrToDateTime(S1, D1, LFormatSettings);
   end;
   Showmessage('1,000,000 TrystrToDateTime in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -920,13 +920,13 @@ end;
 procedure TForm1.ALButton25Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALFormatSettingsA;
+    LFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   For i := 0 to 5000000 do begin
-    S1 := ALFloatToStrA(random(MaxInt) / random(Maxint), aFormatSettings);
+    S1 := ALFloatToStrA(random(MaxInt) / random(Maxint), LFormatSettings);
   end;
   Showmessage('5,000,000 ALFloatToStrA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -935,13 +935,13 @@ end;
 procedure TForm1.ALButton26Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
+    LFormatSettings: TformatSettings;
     S1: String;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  GetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   For i := 0 to 5000000 do begin
-    S1 := FloatToStr(random(MaxInt) / random(Maxint), aFormatSettings);
+    S1 := FloatToStr(random(MaxInt) / random(Maxint), LFormatSettings);
   end;
   Showmessage('5,000,000 FloatToStr in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1412,15 +1412,15 @@ end;
 procedure TForm1.ALButton40Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALFormatSettingsA;
+    LFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := ALFormatA('xxx %s xxxx %s xxxx', [ALRandomStrA(10), ALRandomStrA(20)], aFormatSettings);
-    S1 := ALFormatA('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], aFormatSettings);
-    S1 := ALFormatA('xxx %12.2m', [random(MaxInt) / random(MaxInt)], aFormatSettings);
+    S1 := ALFormatA('xxx %s xxxx %s xxxx', [ALRandomStrA(10), ALRandomStrA(20)], LFormatSettings);
+    S1 := ALFormatA('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], LFormatSettings);
+    S1 := ALFormatA('xxx %12.2m', [random(MaxInt) / random(MaxInt)], LFormatSettings);
   end;
   Showmessage('3,000,000 ALFormatA in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1429,15 +1429,15 @@ end;
 procedure TForm1.ALButton43Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
+    LFormatSettings: TformatSettings;
     S1: String;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  GetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   For i := 0 to 1000000 do begin
-    S1 := Format('xxx %s xxxx %s xxxx', [ALRandomStrW(10), ALRandomStrW(20)], aFormatSettings);
-    S1 := Format('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], aFormatSettings);
-    S1 := Format('xxx %12.2m', [random(MaxInt) / random(MaxInt)], aFormatSettings);
+    S1 := Format('xxx %s xxxx %s xxxx', [ALRandomStrW(10), ALRandomStrW(20)], LFormatSettings);
+    S1 := Format('xxx %*.*f xxx', [random(10), random(5), random(MaxInt) / random(MaxInt)], LFormatSettings);
+    S1 := Format('xxx %12.2m', [random(MaxInt) / random(MaxInt)], LFormatSettings);
   end;
   Showmessage('3,000,000 Format in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1446,15 +1446,15 @@ end;
 procedure TForm1.ALButton45Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TALFormatSettingsA;
+    LFormatSettings: TALFormatSettingsA;
     S1: AnsiString;
     E1: Extended;
 begin
-  ALGetLocaleFormatSettings(1033, aFormatSettings);
+  ALGetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   S1 := '121.23928322';
   For i := 0 to 10000000 do begin
-    ALTryStrToFloat(S1, E1, aFormatSettings);
+    ALTryStrToFloat(S1, E1, LFormatSettings);
   end;
   Showmessage('10,000,000 ALTrystrFloat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;
@@ -1463,15 +1463,15 @@ end;
 procedure TForm1.ALButton46Click(Sender: TObject);
 var i: integer;
     StartDate: TdateTime;
-    aFormatSettings: TformatSettings;
+    LFormatSettings: TformatSettings;
     S1: String;
     E1: Extended;
 begin
-  GetLocaleFormatSettings(1033, aFormatSettings);
+  GetLocaleFormatSettings(1033, LFormatSettings);
   StartDate := Now;
   S1 := '121.23928322';
   For i := 0 to 10000000 do begin
-    TryStrToFloat(S1, E1, aFormatSettings);
+    TryStrToFloat(S1, E1, LFormatSettings);
   end;
   Showmessage('10,000,000 ALTrystrFloat in: ' + FormatDateTime('nn:ss.zzz',now-StartDate));
 end;

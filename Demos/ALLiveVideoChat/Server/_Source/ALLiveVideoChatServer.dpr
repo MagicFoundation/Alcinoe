@@ -75,15 +75,15 @@ end;
 
 {***************************************************************************************************************************************}
 class procedure TCommandHandler.DoCommandGet(AContext: TIdContext; ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
-var aUserID: int64;
-    aLiveChat: TLiveChat;
-    aLiveChatCandidate: TLiveChatCandidate;
-    i: integer;
-    j: integer;
+var LUserID: int64;
+    LLiveChat: TLiveChat;
+    LLiveChatCandidate: TLiveChatCandidate;
+    I: integer;
+    J: integer;
 begin
 
   //init aUserID
-  if not TryStrToInt64(ARequestInfo.Params.Values['user_id'], aUserID) then
+  if not TryStrToInt64(ARequestInfo.Params.Values['user_id'], LUserID) then
     raise Exception.Create('user_id can''t be null');
 
   //init AResponseInfo.ContentType
@@ -93,23 +93,23 @@ begin
   if ARequestInfo.Params.Values['action'] = 'enter' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': enter');
+    writeln(inttostr(LUserID) + ': enter');
 
     //look if one guy is waiting a call
     for I := 0 to LiveChats.Count - 1 do begin
-      if LiveChats[i].id_caller = 0 then begin
-        LiveChats[i].id_caller := aUserID;
-        LiveChats[i].Status := 2;
-        AResponseInfo.ContentText := inttostr(LiveChats[i].id_caller);
+      if LiveChats[I].id_caller = 0 then begin
+        LiveChats[I].id_caller := LUserID;
+        LiveChats[I].Status := 2;
+        AResponseInfo.ContentText := inttostr(LiveChats[I].id_caller);
         exit;
       end;
     end;
 
     //no one is waiting a call, just add me in the waiting queue
-    aLiveChat := TLiveChat.create;
-    aLiveChat.id_callee := aUserID;
-    aLiveChat.Status := 1;
-    LiveChats.Add(aLiveChat);
+    LLiveChat := TLiveChat.create;
+    LLiveChat.id_callee := LUserID;
+    LLiveChat.Status := 1;
+    LiveChats.Add(LLiveChat);
     AResponseInfo.ContentText := '';
     exit;
 
@@ -120,13 +120,13 @@ begin
   else if ARequestInfo.Params.Values['action'] = 'set_offer' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': set_offer');
+    writeln(inttostr(LUserID) + ': set_offer');
 
     //look if one guy is waiting a call
     for I := 0 to LiveChats.Count - 1 do begin
-      if (LiveChats[i].id_caller = aUserID) and (LiveChats[i].Status = 2) then begin
-        LiveChats[i].Sdp_offer := ARequestInfo.Params.Values['sdp_offer'];
-        LiveChats[i].Status := 3;
+      if (LiveChats[I].id_caller = LUserID) and (LiveChats[I].Status = 2) then begin
+        LiveChats[I].Sdp_offer := ARequestInfo.Params.Values['sdp_offer'];
+        LiveChats[I].Status := 3;
         AResponseInfo.ContentText := 'OK';
         exit;
       end;
@@ -142,13 +142,13 @@ begin
   else if ARequestInfo.Params.Values['action'] = 'check_offer' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': check_offer');
+    writeln(inttostr(LUserID) + ': check_offer');
 
     //look if we have one offer
     for I := 0 to LiveChats.Count - 1 do begin
-      if (LiveChats[i].id_callee = aUserID) and (LiveChats[i].Status = 3) then begin
-        LiveChats[i].Status := 4;
-        AResponseInfo.ContentText := LiveChats[i].Sdp_offer;
+      if (LiveChats[I].id_callee = LUserID) and (LiveChats[I].Status = 3) then begin
+        LiveChats[I].Status := 4;
+        AResponseInfo.ContentText := LiveChats[I].Sdp_offer;
         exit;
       end;
     end;
@@ -164,13 +164,13 @@ begin
   else if ARequestInfo.Params.Values['action'] = 'set_answer' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': set_answer');
+    writeln(inttostr(LUserID) + ': set_answer');
 
     //look for our chat
     for I := 0 to LiveChats.Count - 1 do begin
-      if (LiveChats[i].id_callee = aUserID) and (LiveChats[i].Status = 4) then begin
-        LiveChats[i].sdp_answer := ARequestInfo.Params.Values['sdp_answer'];
-        LiveChats[i].Status := 5;
+      if (LiveChats[I].id_callee = LUserID) and (LiveChats[I].Status = 4) then begin
+        LiveChats[I].sdp_answer := ARequestInfo.Params.Values['sdp_answer'];
+        LiveChats[I].Status := 5;
         AResponseInfo.ContentText := 'OK';
         exit;
       end;
@@ -186,13 +186,13 @@ begin
   else if ARequestInfo.Params.Values['action'] = 'check_answer' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': check_answer');
+    writeln(inttostr(LUserID) + ': check_answer');
 
     //look if we have one offer
     for I := 0 to LiveChats.Count - 1 do begin
-      if (LiveChats[i].id_caller = aUserID) and (LiveChats[i].Status = 5) then begin
-        LiveChats[i].Status := 6;
-        AResponseInfo.ContentText := LiveChats[i].Sdp_answer;
+      if (LiveChats[I].id_caller = LUserID) and (LiveChats[I].Status = 5) then begin
+        LiveChats[I].Status := 6;
+        AResponseInfo.ContentText := LiveChats[I].Sdp_answer;
         exit;
       end;
     end;
@@ -207,17 +207,17 @@ begin
   else if ARequestInfo.Params.Values['action'] = 'set_candidate' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': set_candidate');
+    writeln(inttostr(LUserID) + ': set_candidate');
 
     //look for our chat
     for I := 0 to LiveChats.Count - 1 do begin
-      if (LiveChats[i].id_callee = aUserID) or (LiveChats[i].id_caller = aUserID) then begin
-        aLiveChatCandidate := TLiveChatCandidate.Create;
-        aLiveChatCandidate.SdpMid := ARequestInfo.Params.Values['SdpMid'];
-        aLiveChatCandidate.SdpMLineIndex := ARequestInfo.Params.Values['SdpMLineIndex'];
-        aLiveChatCandidate.Sdp := ARequestInfo.Params.Values['Sdp'];
-        if (LiveChats[i].id_callee = aUserID) then LiveChats[i].candidates_for_caller.Add(aLiveChatCandidate)
-        else LiveChats[i].candidates_for_callee.Add(aLiveChatCandidate);
+      if (LiveChats[I].id_callee = LUserID) or (LiveChats[I].id_caller = LUserID) then begin
+        LLiveChatCandidate := TLiveChatCandidate.Create;
+        LLiveChatCandidate.SdpMid := ARequestInfo.Params.Values['SdpMid'];
+        LLiveChatCandidate.SdpMLineIndex := ARequestInfo.Params.Values['SdpMLineIndex'];
+        LLiveChatCandidate.Sdp := ARequestInfo.Params.Values['Sdp'];
+        if (LiveChats[I].id_callee = LUserID) then LiveChats[I].candidates_for_caller.Add(LLiveChatCandidate)
+        else LiveChats[I].candidates_for_callee.Add(LLiveChatCandidate);
         AResponseInfo.ContentText := '';
         exit;
       end;
@@ -232,29 +232,29 @@ begin
   else if ARequestInfo.Params.Values['action'] = 'check_candidate' then begin
 
     //writeln
-    writeln(inttostr(aUserID) + ': check_candidate');
+    writeln(inttostr(LUserID) + ': check_candidate');
 
     //look if we have one offer
     AResponseInfo.ContentText := '';
     for I := 0 to LiveChats.Count - 1 do begin
-      if (LiveChats[i].id_callee = aUserID) then begin
-        for J := 0 to LiveChats[i].candidates_for_callee.Count -1 do begin
+      if (LiveChats[I].id_callee = LUserID) then begin
+        for J := 0 to LiveChats[I].candidates_for_callee.Count -1 do begin
           if AResponseInfo.ContentText <> '' then AResponseInfo.ContentText := AResponseInfo.ContentText + #13#10;
-          AResponseInfo.ContentText := AResponseInfo.ContentText + LiveChats[i].candidates_for_callee[j].SdpMid + #13#10 +
-                                                                   LiveChats[i].candidates_for_callee[j].SdpMLineIndex + #13#10 +
-                                                                   LiveChats[i].candidates_for_callee[j].Sdp;
+          AResponseInfo.ContentText := AResponseInfo.ContentText + LiveChats[I].candidates_for_callee[J].SdpMid + #13#10 +
+                                                                   LiveChats[I].candidates_for_callee[J].SdpMLineIndex + #13#10 +
+                                                                   LiveChats[I].candidates_for_callee[J].Sdp;
         end;
-        LiveChats[i].candidates_for_callee.Clear;
+        LiveChats[I].candidates_for_callee.Clear;
         exit;
       end
-      else if (LiveChats[i].id_caller = aUserID) then begin
-        for J := 0 to LiveChats[i].candidates_for_caller.Count -1 do begin
+      else if (LiveChats[I].id_caller = LUserID) then begin
+        for J := 0 to LiveChats[I].candidates_for_caller.Count -1 do begin
           if AResponseInfo.ContentText <> '' then AResponseInfo.ContentText := AResponseInfo.ContentText + #13#10;
-          AResponseInfo.ContentText := AResponseInfo.ContentText + LiveChats[i].candidates_for_caller[j].SdpMid + #13#10 +
-                                                                   LiveChats[i].candidates_for_caller[j].SdpMLineIndex + #13#10 +
-                                                                   LiveChats[i].candidates_for_caller[j].Sdp;
+          AResponseInfo.ContentText := AResponseInfo.ContentText + LiveChats[I].candidates_for_caller[J].SdpMid + #13#10 +
+                                                                   LiveChats[I].candidates_for_caller[J].SdpMLineIndex + #13#10 +
+                                                                   LiveChats[I].candidates_for_caller[J].Sdp;
         end;
-        LiveChats[i].candidates_for_caller.Clear;
+        LiveChats[I].candidates_for_caller.Clear;
         exit;
       end;
     end;

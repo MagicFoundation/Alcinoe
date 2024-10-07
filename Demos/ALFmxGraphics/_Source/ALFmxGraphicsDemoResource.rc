@@ -1,0 +1,6 @@
+family RCDATA "Resources\\family.jpg"
+familylittle RCDATA "Resources\\familylittle.png"
+familyrotate180 RCDATA "Resources\\familyrotate180.jpg"
+gbrcolorprofile RCDATA "Resources\\gbrcolorprofile.jpg"
+mask RCDATA "Resources\\mask.png"
+webkitlogop3 RCDATA "Resources\\webkitlogop3.png"

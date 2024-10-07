@@ -14,7 +14,8 @@ uses
   FMX.Controls.Presentation, FMX.StdCtrls, Alcinoe.Common, Alcinoe.FMX.Types3D, FMX.Objects,
   FMX.Canvas.GPU, Alcinoe.FMX.Graphics, FMX.Types3D, FMX.Effects, FMX.Filter.Effects,
   Alcinoe.FMX.StdCtrls, Alcinoe.FMX.Layouts, FMX.Layouts, system.messaging,
-  IdHTTP, Alcinoe.FMX.FilterEffects, FMX.Edit, Alcinoe.FMX.Objects;
+  IdHTTP, Alcinoe.FMX.FilterEffects, FMX.Edit, Alcinoe.FMX.Objects,
+  Alcinoe.FMX.Controls;
 
 type
   TForm1 = class(TForm)
@@ -554,7 +555,7 @@ begin
       0,
       fWebRTC.RemoteBitmap.Width,
       fWebRTC.RemoteBitmap.Height), // ARect
-    ALPrepareColor(TCustomCanvasGpu.ModulateColor, RemoteCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    ALModulateColor(TCustomCanvasGpu.ModulateColor, RemoteCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
     fWebRTC.RemoteBitmap);
   {$ENDIF}
 end;
@@ -577,7 +578,7 @@ begin
       0,
       fWebRTC.LocalBitmap.Width,
       fWebRTC.LocalBitmap.Height), // ARect
-    ALPrepareColor(TCustomCanvasGpu.ModulateColor, LocalCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
+    ALModulateColor(TCustomCanvasGpu.ModulateColor, LocalCameraLayout.AbsoluteOpacity), // https://quality.embarcadero.com/browse/RSP-15432
     fWebRTC.LocalBitmap);
   {$ENDIF}
 end;

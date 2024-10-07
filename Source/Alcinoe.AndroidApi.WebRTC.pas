@@ -191,7 +191,7 @@ type
   end;
 
   {*****************************************************}
-  [JavaSignature('com/alcinoe/webrtc/ALWebRTC$Listener')]
+  [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC$Listener')]
   JALWebRTC_Listener = interface(IJavaInstance)
     ['{C758A92B-AE93-4291-BFD5-1EBB83041CC9}']
     procedure onLocalFrameAvailable(textureId: integer; width: integer; height: integer; rotation: integer); cdecl;
@@ -211,7 +211,7 @@ type
   end;
 
   {*********************************************************************}
-  [JavaSignature('com/alcinoe/webrtc/ALWebRTC$PeerConnectionParameters')]
+  [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC$PeerConnectionParameters')]
   JALWebRTC_PeerConnectionParameters = interface(JObject)
     ['{AF3349B3-C8B9-4CA4-8D64-7E8711E7A2F4}']
     function _GetaecDump: Boolean; cdecl;
@@ -286,7 +286,7 @@ type
   end;
 
   {********************************************}
-  [JavaSignature('com/alcinoe/webrtc/ALWebRTC')]
+  [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC')]
   JALWebRTC = interface(JObject)
     ['{45B6132D-E7E4-4D39-A150-E489495FC19D}']
     procedure setListener(listener: JALWebRTC_Listener); cdecl;

@@ -35,7 +35,7 @@ type
     BtnRunBenchmark: TButton;
     SpinEditNbItems: TSpinEdit;
     CheckBoxTALJsonDocJSON: TCheckBox;
-    CheckBoxTALJsonDocUJSON: TCheckBox;
+    CheckBoxTALJsonDocWJSON: TCheckBox;
     CheckBoxSystemJSON: TCheckBox;
     CheckBoxDwsJSON: TCheckBox;
     Label3: TLabel;
@@ -61,18 +61,18 @@ implementation
 
 {**************************************}
 function GetTotalMemoryAllocated: int64;
-var aMemoryState: TMemoryManagerState;
+var LMemoryState: TMemoryManagerState;
     i: Integer;
 begin
 
   // get memory manager state
   {$WARNINGS OFF}
-  GetMemoryManagerState(aMemoryState);
+  GetMemoryManagerState(LMemoryState);
   {$WARNINGS ON}
 
   // take the allocated size
   Result := 0;
-  with aMemoryState do begin
+  with LMemoryState do begin
     // small blocks
     for i := Low(SmallBlockTypeStates) to High(SmallBlockTypeStates) do
       Inc(
@@ -98,7 +98,7 @@ begin
   MemoBSON.lines.Clear;
   MemoSaxModeEvents.Lines.Clear;
 
-  //Use the ansiString version of TALJSONDocument
+  //Use the ansiString version
   if not CheckBoxUseTALJsonDocumentW.Checked then begin
 
     //exemple 1 load the JSON doc in memory
@@ -161,7 +161,7 @@ begin
 
   end
 
-  //Use the unicode String version of TALJSONDocument
+  //Use the unicode String version
   else begin
 
     //exemple 1 load the JSON doc in memory
@@ -235,7 +235,7 @@ begin
   MemoBSON.Lines.Clear;
   MemoSaxModeEvents.Lines.Clear;
 
-  //Use the ansiString version of TALJSONDocument
+  //Use the ansiString version
   if not CheckBoxUseTALJsonDocumentW.Checked then begin
 
     var LALJsonDocumentA:= TALJSONDocumentA.Create;
@@ -288,7 +288,7 @@ begin
 
   end
 
-  //Use the unicode String version of TALJSONDocument
+  //Use the unicode String version
   else begin
 
     var LALJsonDocumentW:= TALJSONDocumentW.Create;
@@ -373,7 +373,7 @@ begin
   MemoJSON.Lines.Clear;
   MemoSaxModeEvents.lines.clear;
 
-  //Use the ansiString version of TALJSONDocument
+  //Use the ansiString version
   if not CheckBoxUseTALJsonDocumentW.Checked then begin
 
     //exemple 1 load the JSON doc in memory
@@ -434,7 +434,7 @@ begin
 
   end
 
-  //Use the unicode String version of TALJSONDocument
+  //Use the unicode String version
   else begin
 
     //exemple 1 load the JSON doc in memory
@@ -855,7 +855,7 @@ begin
   chart1.Series[2].Clear;
   chart1.Series[3].Clear;
   if CheckBoxTALJsonDocJSON.Checked then _DoTALJsonDocABench(StrToInt(SpinEditNbItems.Text));
-  if CheckBoxTALJsonDocUJSON.Checked then _DoTALJsonDocWBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxTALJsonDocWJSON.Checked then _DoTALJsonDocWBench(StrToInt(SpinEditNbItems.Text));
   if CheckBoxSystemJSON.Checked then _DoSystemJSONBench(StrToInt(SpinEditNbItems.Text));
   if CheckBoxdwsJSON.Checked then _DodwsJSONBench(StrToInt(SpinEditNbItems.Text));
 
@@ -933,7 +933,7 @@ begin
   chart1.Series[2].Clear;
   chart1.Series[3].Clear;
   if CheckBoxTALJsonDocJSON.Checked then _DoTALJsonDocABench(StrToInt(SpinEditNbItems.Text));
-  if CheckBoxTALJsonDocUJSON.Checked then _DoTALJsonDocWBench(StrToInt(SpinEditNbItems.Text));
+  if CheckBoxTALJsonDocWJSON.Checked then _DoTALJsonDocWBench(StrToInt(SpinEditNbItems.Text));
   if CheckBoxSystemJSON.Checked then _DoSystemJSONBench(StrToInt(SpinEditNbItems.Text));
   if CheckBoxdwsJSON.Checked then _DodwsJSONBench(StrToInt(SpinEditNbItems.Text));
 

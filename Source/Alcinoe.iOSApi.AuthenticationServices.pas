@@ -5,7 +5,8 @@ interface
 uses
   Macapi.ObjectiveC,
   iOSapi.CocoaTypes,
-  iOSapi.Foundation;
+  iOSapi.Foundation,
+  Alcinoe.iOSapi.Foundation;
 
 {$M+}
 

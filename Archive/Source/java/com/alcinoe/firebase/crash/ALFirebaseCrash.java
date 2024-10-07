@@ -1,4 +1,4 @@
-package com.alcinoe.firebase.crash;
+package io.magicfoundation.alcinoe.firebase.crash;
 
 import com.google.firebase.crash.FirebaseCrash;
 

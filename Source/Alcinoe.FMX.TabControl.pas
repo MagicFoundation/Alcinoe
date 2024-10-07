@@ -4,7 +4,7 @@ interface
 
 {$I Alcinoe.inc}
 
-{$IFNDEF ALCompilerVersionSupported120}
+{$IFNDEF ALCompilerVersionSupported122}
   {$MESSAGE WARN 'Check if FMX.TabControl.pas was not updated and adjust the IFDEF'}
 {$ENDIF}
 
@@ -17,6 +17,7 @@ uses
   FMX.Controls,
   Alcinoe.FMX.Ani,
   Alcinoe.FMX.Layouts,
+  Alcinoe.FMX.Controls,
   Alcinoe.FMX.ScrollEngine;
 
 type
@@ -37,8 +38,8 @@ type
                               const aVelocity: Single;
                               const aAnimation: TALFloatPropertyAnimation) of object;
 
-  {**************************}
-  TALTabItem = class(TControl)
+  {****************************}
+  TALTabItem = class(TALControl)
   private
     FTabControl: TALTabControl;
     FIsSelected: Boolean;
@@ -60,42 +61,67 @@ type
     property TabControl: TALTabControl read FTabControl;
     property ViewPortOffset: single read fViewPortOffset;
   published
+    //property Action;
+    //property Align;
+    //property Anchors;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
     property ClipChildren;
-    property ClipParent;
+    //property ClipParent;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
-    property Enabled default True;
+    property Enabled;
+    //property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest default false;
+    property &Index stored False;
     property IsSelected: Boolean read FIsSelected write SetIsSelected;
-    property Index stored False;
-    property Padding;
+    //property Locked;
+    //property Margins;
     property Opacity;
+    property Padding;
     property PopupMenu;
-    property Visible default True;
-    property ParentShowHint;
+    //property Position;
+    //property RotationAngle;
+    //property RotationCenter;
+    //property Scale;
+    //property Size;
+    //property TabOrder;
+    //property TabStop;
+    //property TouchTargetExpansion;
+    property Visible;
+    //property Width;
+    //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
   end;
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALTabControl = class(TControl, IItemsContainer)
+  TALTabControl = class(TALControl, IItemsContainer)
   public type
     TFindKind = (Next, Back, First, Last, Current);
   private
@@ -116,8 +142,6 @@ type
     fOnAniProcess: TnotifyEvent;
     fMouseDownPos: TPointF;
     fScrollCapturedByMe: boolean;
-    fScrollCapturedByOther: boolean;
-    procedure setScrollCapturedByMe(const Value: boolean);
     procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
     procedure SetTabIndex(const Value: Integer);
     function GetActiveTab: TALTabItem;
@@ -184,51 +208,69 @@ type
     property ScrollEngine: TALScrollEngine read FScrollEngine;
     property AniTransition: TALFloatPropertyAnimation read FAniTransition;
   published
+    //property Action;
+    property ActiveTab: TALTabItem read GetActiveTab write SetActiveTab stored False;
     property Align;
     property Anchors;
-    property ActiveTab: TALTabItem read GetActiveTab write SetActiveTab stored False;
     property AnimationEnabled: boolean read getAnimationEnabled write setAnimationEnabled default true;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    //property ClipChildren;
+    //property ClipParent;
     property Cursor;
     property DragMode;
     property EnableDragHighlight;
-    property Enabled default True;
-    property Locked;
+    property Enabled;
     property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
     property HitTest;
-    property Opacity;
+    property Locked;
     property Margins;
+    property Opacity;
+    //property Padding;
     property PopupMenu;
     property Position;
     property RotationAngle;
     property RotationCenter;
     property Scale;
     property Size;
+    //property TabOrder;
+    //property TabStop;
     property TabIndex: Integer read FTabIndex write SetTabIndex default -1;
-    property Visible default True;
+    //property TouchTargetExpansion;
+    property Visible;
     property Width;
+    property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
+    property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
+    property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
+    property OnAniProcess: TnotifyEvent read fOnAniProcess write fOnAniProcess;
+    //property OnCanFocus;
     property OnChange: TNotifyEvent read FOnChange write FOnChange; // Fired immediately after the selected tab changes.
     property OnDragEnter;
     property OnDragLeave;
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnClick;
-    property OnDblClick;
-    property OnMouseDown;
-    property OnMouseMove;
-    property OnMouseUp;
-    property OnMouseWheel;
+    //property OnEnter;
+    //property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
     property OnPainting;
     property OnPaint;
-    property OnResize;
+    //property OnResize;
     property OnResized;
     property OnViewportPositionChange: TALTabPositionChangeEvent read FOnViewportPositionChange write FOnViewportPositionChange;
-    property OnAniTransitionInit: TALTabAniTransitionInit read fOnAniTransitionInit write fOnAniTransitionInit;
-    property OnAniStart: TnotifyEvent read fOnAniStart write fOnAniStart;
-    property OnAniStop: TnotifyEvent read fOnAniStop write fOnAniStop;
-    property OnAniProcess: TnotifyEvent read fOnAniProcess write fOnAniProcess;
   end;
 
 procedure Register;
@@ -239,6 +281,9 @@ uses
   System.SysUtils,
   System.Math,
   System.Math.Vectors,
+  {$IFDEF ALDPK}
+  DesignIntf,
+  {$ENDIF}
   FMX.Utils,
   FMX.Consts,
   Alcinoe.StringUtils,
@@ -253,8 +298,6 @@ begin
   FIsSelected := false;
   fViewPortOffset := 0;
   Locked := True;
-  Enabled := True;
-  Visible := True;
   HitTest := False;
   // this because some tab can contain control without z-order like TALEdit and
   // when the tab (all the tab) is first created, it's created at a visible pos to be later realigned
@@ -460,8 +503,6 @@ begin
   FTabCount := 0;
   FMouseEvents := False;
   FOnChange := nil;
-  Visible := true;
-  Enabled := true;
   ClipChildren := true;
   FTabIndex := -1;
   FchildreenChanging := False;
@@ -470,7 +511,6 @@ begin
   SetAcceptsControls(True);
   fMouseDownPos := TpointF.Zero;
   fScrollCapturedByMe := False;
-  fScrollCapturedByOther := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //-----
   FScrollEngine := TALTabControlScrollEngine.Create(Self);
@@ -689,24 +729,9 @@ begin
     FOnChange(Self);
 end;
 
-{******************************************************************}
-procedure TALTabControl.setScrollCapturedByMe(const Value: boolean);
-begin
-  if Value <> fScrollCapturedByMe  then begin
-    {$IFDEF DEBUG}
-    //ALLog('TALTabControl.setScrollCapturedByMe', 'Value: ' + ALBoolToStrW(Value), TalLogType.verbose);
-    {$ENDIF}
-    fScrollCapturedByMe := Value;
-    TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(Value));
-  end;
-end;
-
 {*********************************************************************************************}
 procedure TALTabControl.ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
 begin
-  //the scrolling was Captured or released by another control (like a scrollbox for exemple)
-  //the problem is that the scrolling could be Captured BEFORE the mousedown is fired in parent control (baah yes)
-  //so we need the var fScrollCapturedByOther to handle this
   if (Sender = self) then exit;
   {$IFDEF DEBUG}
   //ALLog(
@@ -716,15 +741,18 @@ begin
   //  TalLogType.verbose);
   {$ENDIF}
   if TALScrollCapturedMessage(M).Captured then begin
+    {$IFDEF DEBUG}
+    if fScrollCapturedByMe then
+      raise Exception.Create('Error 9A590A21-139E-44EC-83F5-6813453329E4');
+    {$ENDIF}
     if fScrollEngine.down then begin
       fScrollEngine.Down := false; // instead of down := false to reposition the tabitem
       FMouseEvents := False;
-      // If i try with fScrollEngine.launchanimation i have a flickr because the anim stop and restart at a different speed
+      // If I try with fScrollEngine.launchanimation I have a flickr because the
+      // anim stop and restart at a different speed
       if not FAniTransition.Running then RealignTabs;
     end;
-    fScrollCapturedByOther := True;
-  end
-  else fScrollCapturedByOther := False;
+  end;
 end;
 
 {************************************************************************************************}
@@ -736,10 +764,9 @@ begin
   //  'Position:' + ALFormatFloatW('0.##', x, ALDefaultFormatSettingsW) + ',' + ALFormatFloatW('0.##', y, ALDefaultFormatSettingsW),
   //  TalLogType.verbose);
   {$ENDIF}
-  FMouseEvents := true;
   if not AnimationEnabled then exit;
-  if (not fScrollCapturedByOther) and FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+  if (Button = TMouseButton.mbLeft) then begin
+    FMouseEvents := true;
     fMouseDownPos := TPointF.Create(X,Y);
     ScrollEngine.MouseDown(X, Y);
   end;
@@ -758,7 +785,10 @@ begin
   if FMouseEvents then begin
     if (not fScrollCapturedByMe) and
        (abs(fMouseDownPos.x - x) > abs(fMouseDownPos.y - y)) and
-       (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then setScrollCapturedByMe(True);
+       (abs(fMouseDownPos.x - x) > TALScrollEngine.DefaultTouchSlop) then begin
+      fScrollCapturedByMe := True;
+      TMessageManager.DefaultManager.SendMessage(self, TALScrollCapturedMessage.Create(true));
+    end;
     ScrollEngine.MouseMove(X, Y);
   end;
 end;
@@ -774,7 +804,7 @@ begin
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents and (Button = TMouseButton.mbLeft) then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseUp(X, Y);
     FMouseEvents := False;
   end;
@@ -788,7 +818,7 @@ begin
   {$ENDIF}
   if not AnimationEnabled then exit;
   if FMouseEvents then begin
-    setScrollCapturedByMe(False);
+    FScrollCapturedByMe := False;
     ScrollEngine.MouseLeave;
     FMouseEvents := False;
   end;
@@ -824,13 +854,13 @@ end;
 
 {**}
 Type
-  _TALControlAccessProtected = class(Tcontrol);
+  _TControlAccessProtected = class(Tcontrol);
 
 {*************}
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseDown(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).capture;
+  if not aObject.AutoCapture then _TControlAccessProtected(aObject).capture;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseDown(Button, Shift, P.X, P.Y);
   inherited;
@@ -851,7 +881,7 @@ end;
 {$IFNDEF ALDPK}
 procedure TALTabControl.ChildrenMouseUp(const AObject: TControl; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
 begin
-  if not aObject.AutoCapture then _TALControlAccessProtected(aObject).releasecapture;
+  if not aObject.AutoCapture then _TControlAccessProtected(aObject).releasecapture;
   var P := AbsoluteToLocal(AObject.LocalToAbsolute(TpointF.Create(X, Y)));
   internalMouseUp(Button, Shift, P.X, P.Y);
   inherited;
@@ -1268,6 +1298,11 @@ end;
 procedure Register;
 begin
   RegisterComponents('Alcinoe', [TALTabControl]);
+  {$IFDEF ALDPK}
+  UnlistPublishedProperty(TALTabControl, 'Size');
+  UnlistPublishedProperty(TALTabControl, 'StyleName');
+  UnlistPublishedProperty(TALTabControl, 'OnTap');
+  {$ENDIF}
 end;
 
 initialization

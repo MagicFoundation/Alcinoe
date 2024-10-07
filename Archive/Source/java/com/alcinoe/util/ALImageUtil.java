@@ -1,4 +1,4 @@
-package com.alcinoe.util;
+package io.magicfoundation.alcinoe.util;
 
 import java.io.File;
 import java.io.FileOutputStream;

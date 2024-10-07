@@ -589,7 +589,7 @@ Type
     property Gamma: Single read fGamma write fGamma;
   end;
 
-  {$IFNDEF ALCompilerVersionSupported120}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Filter.Effects.TFilterBaseFilter still has the exact same fields and adjust the IFDEF'}
   {$ENDIF}
   TALFilterBaseFilterAccessPrivate = class(TFmxObject)
@@ -1114,6 +1114,12 @@ end;
 
 initialization
   RegisterClasses([TALColorAdjustEffect]);
-  TFilterManager.RegisterFilter('ColorAdjust', TALColorAdjustFilter); // << 'ColorAdjust' is the CATEGORY! Several filters can have the same category. this why 'ColorAdjust' and not 'ALColorAdjust'
-                                                                      // << the name of the filter is defined in TALColorAdjustFilter.FilterAttr as 'ALColorAdjust'
+  // 'ColorAdjust' is the CATEGORY! Several filters can have the same category. This why 'ColorAdjust' and not 'ALColorAdjust'
+  // the name of the filter is defined in TALColorAdjustFilter.FilterAttr as 'ALColorAdjust'
+  {$IF defined(ALDPK)}
+  // When you compile Alcinoe.dpk inside the IDE and when Alcinoe.dpk is already installed, you could receive the error :
+  // Cannot register filter. A filter with the same name "ALColorAdjust" already exists..
+  if TFilterManager.FilterByName('ALColorAdjust') = nil then
+  {$ENDIF}
+    TFilterManager.RegisterFilter('ColorAdjust', TALColorAdjustFilter);
 end.

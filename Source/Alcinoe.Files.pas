@@ -84,7 +84,6 @@ function  ALDeleteFile(const FileName: Ansistring): Boolean; overload; deprecate
 function  ALDeleteFile(const FileName: string): Boolean; overload; deprecated 'Use Tfile.Delete Instead';
 function  ALRenameFileA(const OldName, NewName: ansistring): Boolean; deprecated 'Use Tfile.Move Instead';
 function  ALRenameFileW(const OldName, NewName: string): Boolean; deprecated 'Use Tfile.Move Instead';
-
 {$ENDIF}
 
 implementation

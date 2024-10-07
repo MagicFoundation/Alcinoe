@@ -17,7 +17,7 @@ type
   TALBaseAVLBinaryTreeNode = class;
   TALBaseAVLBinaryTree = class;
 
-  {iterate function--------------------------------------------------}
+  {iterate function----------------------}
   TALAVLBinaryTreeIterateFunc = procedure(
                                   aTree: TALBaseAVLBinaryTree;
                                   aNode: TALBaseAVLBinaryTreeNode;
@@ -92,7 +92,7 @@ type
     Constructor Create; Override;
   end;
 
-  {TALIntegerKeyAVLBinaryTree-------------------------}
+  {TALIntegerKeyAVLBinaryTree----------------------------}
   TALIntegerKeyAVLBinaryTree = class(TALBaseAVLBinaryTree)
   private
   protected
@@ -122,7 +122,7 @@ type
     Constructor Create; Override;
   end;
 
-  {TALCardinalKeyAVLBinaryTree-------------------------}
+  {TALCardinalKeyAVLBinaryTree----------------------------}
   TALCardinalKeyAVLBinaryTree = class(TALBaseAVLBinaryTree)
   private
   protected
@@ -182,7 +182,7 @@ type
     Constructor Create; Override;
   end;
 
-  {TALStringKeyAVLBinaryTreeCompareKeyFunct----------------------------------------------------------}
+  {TALStringKeyAVLBinaryTreeCompareKeyFunct--------------------------------------------------------------}
   TALStringKeyAVLBinaryTreeCompareKeyFunct = function (const aKey1, aKey2: AnsiString): Integer of object;
 
   {TALStringKeyAVLBinaryTree----------------------------}

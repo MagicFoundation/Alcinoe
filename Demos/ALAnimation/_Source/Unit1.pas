@@ -8,7 +8,7 @@ uses
   FMX.Effects, FMX.Filter.Effects, FMX.Objects, FMX.Layouts, Alcinoe.FMX.Layouts,
   FMX.Controls.Presentation, FMX.StdCtrls, Alcinoe.FMX.FilterEffects, system.messaging,
   Alcinoe.FMX.Objects, FMX.ListBox, FMX.ani, Alcinoe.FMX.Ani, System.Generics.Collections,
-  FMX.TabControl;
+  FMX.TabControl, Alcinoe.FMX.Controls;
 
 type
   TForm1 = class(TForm)

@@ -1,4 +1,4 @@
-package com.alcinoe.facebook;
+package io.magicfoundation.alcinoe.facebook;
 
 import com.facebook.share.widget.AppInviteDialog;
 import com.facebook.share.model.AppInviteContent;

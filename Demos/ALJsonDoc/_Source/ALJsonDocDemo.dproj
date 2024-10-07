@@ -7,8 +7,9 @@
     <TargetedPlatforms>3</TargetedPlatforms>
     <AppType>Application</AppType>
     <FrameworkType>VCL</FrameworkType>
-    <ProjectVersion>19.5</ProjectVersion>
+    <ProjectVersion>20.2</ProjectVersion>
     <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Win32</Platform>
+    <ProjectName Condition="&#39;$(ProjectName)&#39;==&#39;&#39;">ALJsonDocDemo</ProjectName>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Base&#39; or &#39;$(Base)&#39;!=&#39;&#39;">
     <Base>true</Base>
@@ -26,6 +27,18 @@
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Release&#39; or &#39;$(Cfg_1)&#39;!=&#39;&#39;">
     <Cfg_1>true</Cfg_1>
     <CfgParent>Base</CfgParent>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win32&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+    <Cfg_1_Win32>true</Cfg_1_Win32>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
+    <Base>true</Base>
+  </PropertyGroup>
+  <PropertyGroup Condition="(&#39;$(Platform)&#39;==&#39;Win64&#39; and &#39;$(Cfg_1)&#39;==&#39;true&#39;) or &#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <Cfg_1_Win64>true</Cfg_1_Win64>
+    <CfgParent>Cfg_1</CfgParent>
+    <Cfg_1>true</Cfg_1>
     <Base>true</Base>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Config)&#39;==&#39;Debug&#39; or &#39;$(Cfg_2)&#39;!=&#39;&#39;">
@@ -85,6 +98,12 @@
     <DCC_DebugInformation>0</DCC_DebugInformation>
     <DCC_SymbolReferenceInfo>0</DCC_SymbolReferenceInfo>
     <DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_Win32)&#39;!=&#39;&#39;">
+    <BT_BuildType>Debug</BT_BuildType>
+  </PropertyGroup>
+  <PropertyGroup Condition="&#39;$(Cfg_1_Win64)&#39;!=&#39;&#39;">
+    <BT_BuildType>Debug</BT_BuildType>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2)&#39;!=&#39;&#39;">
     <DCC_DebugDCUs>true</DCC_DebugDCUs>

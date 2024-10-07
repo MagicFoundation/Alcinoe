@@ -1,15 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Condition="Exists(&#39;$(BDS)\bin\CodeGear.Deployment.targets&#39;)" Project="$(BDS)\bin\CodeGear.Deployment.targets"/>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\ALNotificationServiceDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo\classes\</RemoteDir>
-      <RemoteName>ALNotificationServiceDemo.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -5338,15 +5329,6 @@
       <RemoteCommand/>
       <RemoteDir>ALNotificationServiceDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\ALNotificationServiceDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo\classes\</RemoteDir>
-      <RemoteName>ALNotificationServiceDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
@@ -10679,15 +10661,6 @@
     </DeployFile>
   </ItemGroup>
   <ItemGroup Condition="&#39;$(Platform)&#39;==&#39;Android64&#39;">
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\ALNotificationServiceDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo\classes\</RemoteDir>
-      <RemoteName>ALNotificationServiceDemo.classes</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="..\Android64\Debug\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>
       <LocalCommand/>
@@ -16016,15 +15989,6 @@
       <RemoteCommand/>
       <RemoteDir>ALNotificationServiceDemo\res\values\</RemoteDir>
       <RemoteName>values.xml</RemoteName>
-    </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\ALNotificationServiceDemo.classes">
-      <DeployClass>AndroidClasses</DeployClass>
-      <LocalCommand/>
-      <Operation>64</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALNotificationServiceDemo\classes\</RemoteDir>
-      <RemoteName>ALNotificationServiceDemo.classes</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="..\Android64\Release\AndroidManifest.xml">
       <DeployClass>ProjectAndroidManifest</DeployClass>

@@ -479,6 +479,10 @@ IF EXIST "%FileName%" rmdir /s /q "%FileName%"
 if exist "%FileName%" goto ERROR
 mkdir "%FileName%"
 
+SET FileName=%~1\%~2\dbgout.log
+if exist "%FileName%" del "%FileName%" /s
+if exist "%FileName%" goto ERROR
+
 EXIT /B 0
 
 

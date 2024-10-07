@@ -403,7 +403,7 @@
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
-    <VerInfo_Build>11</VerInfo_Build>
+    <VerInfo_Build>12</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <PF_AliasKey>alfmxcontrols</PF_AliasKey>

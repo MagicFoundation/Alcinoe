@@ -1,10 +1,18 @@
 Alcinoe
 =======
 
-**Alcinoe** is a comprehensive library of both visual and non-visual 
-components for Delphi. These components are freely available 
-for use in commercial, shareware, freeware, and open-source 
-projects. **Alcinoe** is fully compatible with **Delphi Athens 12.2**. 
+At the heart of **Alcinoe** is a belief in empowering developers 
+to create fast, modern, and seamless applications without the 
+typical bottlenecks of complexity or performance limitations. 
+We believe that development should be focused on **innovation**, 
+not fighting against the constraints of your tools. Alcinoe is 
+built with the philosophy that every developer deserves the 
+**best performance**, the **freedom to customize**, and the 
+**power to deliver exceptional user experiences** across 
+platforms—all while maintaining **independence** from the 
+dominance of GAFA (Google, Apple, Facebook, Amazon). 
+
+**Alcinoe** is fully compatible with **Delphi Athens 12.2**. 
 If you find this library helpful, please consider giving it a 
 star on GitHub. It’s free and greatly supports the project’s 
 visibility and growth.

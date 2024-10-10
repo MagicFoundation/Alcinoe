@@ -1,4 +1,4 @@
-program ALFacebookLogin;
+program ALFacebookLoginDemo;
 
 uses
   System.StartUpCopy,

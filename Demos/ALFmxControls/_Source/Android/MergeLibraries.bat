@@ -31,7 +31,7 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^
  -Libraries="%Libraries%"^
  -OutputDir="%ALBaseDir%\Demos\ALFmxControls\_Source\Android\Merged"^
- -DProj="%ALBaseDir%\Demos\ALFmxControls\_Source\ALFmxControls.dproj"^
+ -DProj="%ALBaseDir%\Demos\ALFmxControls\_Source\ALFmxControlsDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALFmxControls\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
  -UseGradle=true^

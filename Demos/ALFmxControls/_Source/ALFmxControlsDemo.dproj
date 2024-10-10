@@ -3,10 +3,10 @@
     <ProjectGuid>{EF0D1D49-D453-4F42-8AD0-B84996375A4B}</ProjectGuid>
     <ProjectVersion>20.2</ProjectVersion>
     <FrameworkType>FMX</FrameworkType>
-    <MainSource>ALFmxControls.dpr</MainSource>
+    <MainSource>ALFmxControlsDemo.dpr</MainSource>
     <Base>True</Base>
     <Config Condition="&#39;$(Config)&#39;==&#39;&#39;">Debug</Config>
-    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">OSX64</Platform>
+    <Platform Condition="&#39;$(Platform)&#39;==&#39;&#39;">Android64</Platform>
     <TargetedPlatforms>693267</TargetedPlatforms>
     <AppType>Application</AppType>
     <PlatformSDK Condition="&#39;$(PlatformSDK)&#39;==&#39;&#39; And &#39;$(Platform)&#39;==&#39;Android64&#39;">AndroidSDK26.1.1_64bit.sdk</PlatformSDK>
@@ -168,7 +168,7 @@
     <AUP_READ_EXTERNAL_STORAGE>true</AUP_READ_EXTERNAL_STORAGE>
     <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
     <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
-    <SanitizedProjectName>ALFmxControls</SanitizedProjectName>
+    <SanitizedProjectName>ALFmxControlsDemo</SanitizedProjectName>
     <DCC_DcuOutput>.\Dcu\$(Platform)\$(Config)</DCC_DcuOutput>
     <DCC_ExeOutput>..\$(Platform)\$(Config)</DCC_ExeOutput>
     <DCC_E>false</DCC_E>
@@ -184,17 +184,17 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage)</DCC_UsePackage>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <VerInfo_Build>1</VerInfo_Build>
+    <VerInfo_Build>21</VerInfo_Build>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxcontrols;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxcontrolsdemo;label=$(MSBuildProjectName);versionCode=21;versionName=2.0.21;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
     <DCC_Define>ALSkiaEngine;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_Android64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxcontrols;label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxcontrolsdemo;label=$(MSBuildProjectName);versionCode=21;versionName=2.0.21;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_Android>true</Base_Android>
@@ -204,7 +204,7 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
     <EnabledSysJars>fmx.dex.jar</EnabledSysJars>
-    <VerInfo_Build>1</VerInfo_Build>
+    <VerInfo_Build>21</VerInfo_Build>
     <Android_NotificationAccentColor>#000000</Android_NotificationAccentColor>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
@@ -223,7 +223,7 @@
     <iPad_SpotLight80>$(BDS)\bin\Artwork\iOS\iPad\FM_SpotlightSearchIcon_80x80.png</iPad_SpotLight80>
     <iPhone_Spotlight80>$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_80x80.png</iPhone_Spotlight80>
     <BT_BuildType>Debug</BT_BuildType>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.21;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.21;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     <iPhone_Spotlight120>$(BDS)\bin\Artwork\iOS\iPhone\FM_SpotlightSearchIcon_120x120.png</iPhone_Spotlight120>
     <iPad_AppIcon83_5>$(BDS)\bin\Artwork\iOS\iPad\FM_ApplicationIcon_83.5x83.5.png</iPad_AppIcon83_5>
@@ -243,7 +243,7 @@
     <DCC_Define>ALSkiaEngine;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_iOSSimARM64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.21;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.21;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <DCC_UsePackage>DBXSqliteDriver;tethering;FireDACDBXDriver;RESTBackendComponents;bindengine;CloudService;DataSnapClient;bindcompdbx;IndyIPServer;IndySystem;fmxFireDAC;FMXTee;soaprtl;DbxCommonDriver;xmlrtl;soapmidas;DataSnapNativeClient;rtl;DbxClientDriver;IndyIPClient;DataSnapProviderClient;RESTComponents;DBXInterBaseDriver;emsclientfiredac;DataSnapFireDAC;bindcompfmx;FmxTeeUI;FireDACIBDriver;fmx;dbexpress;IndyCore;dsnap;DataSnapCommon;emsclient;FireDACCommon;soapserver;FireDACCommonDriver;inet;IndyIPCommon;FireDAC;FireDACSqliteDriver;FireDACDSDriver;CustomIPTransport;bindcomp;dbxcds;dsnapxml;dbrtl;IndyProtocols;fmxase;$(DCC_UsePackage);$(DCC_UsePackage)</DCC_UsePackage>
@@ -271,7 +271,7 @@
     <DCC_Define>ALSkiaEngine;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_OSX64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=1.0.0;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=2.0.21;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.21;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_OSX32>true</Base_OSX32>
@@ -284,7 +284,7 @@
     <DCC_Define>ALSkiaEngine;$(DCC_Define)</DCC_Define>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Base_OSXARM64)&#39;!=&#39;&#39;">
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=1.0.0;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleVersion=2.0.21;CFBundlePackageType=APPL;CFBundleSignature=????;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);NSHighResolutionCapable=true;LSApplicationCategoryType=public.app-category.utilities;NSContactsUsageDescription=The reason for accessing the contacts;CFBundleShortVersionString=2.0.21;NSLocationUsageDescription=The reason for accessing the location information of the user;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSCameraUsageDescription=The reason for accessing the camera;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSMotionUsageDescription=The reason for accessing the accelerometer;NSDesktopFolderUsageDescription=The reason for accessing the Desktop folder;NSDocumentsFolderUsageDescription=The reason for accessing the Documents folder;NSDownloadsFolderUsageDescription=The reason for accessing the Downloads folder;NSNetworkVolumesUsageDescription=The reason for accessing files on a network volume;NSRemovableVolumesUsageDescription=The reason for accessing files on a removable volume;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing the Bluetooth interface</VerInfo_Keys>
     <BT_BuildType>Debug</BT_BuildType>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <Base_OSX32>true</Base_OSX32>
@@ -299,7 +299,7 @@
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=2.0.21.21;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=2.0.21.21;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
@@ -311,7 +311,7 @@
     <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-    <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+    <VerInfo_Keys>CompanyName=;FileVersion=2.0.21.21;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=2.0.21.21;Comments=;ProgramID=io.magicfoundation.alcinoe.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
     <VerInfo_Locale>1033</VerInfo_Locale>
     <UWP_DelphiLogo44>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_44.png</UWP_DelphiLogo44>
     <UWP_DelphiLogo150>$(BDS)\bin\Artwork\Windows\UWP\delphi_UwpDefault_150.png</UWP_DelphiLogo150>
@@ -330,7 +330,7 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_DebugInformation>1</DCC_DebugInformation>
     <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
-    <VerInfo_Build>1</VerInfo_Build>
+    <VerInfo_Build>21</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -341,14 +341,14 @@
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
     <DCC_DebugInformation>1</DCC_DebugInformation>
     <Debugger_DebugSourcePath>C:\Temp\emb\;$(Debugger_DebugSourcePath);C:\Dev\MagicFoundation\Alcinoe\Source\;C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Athens\fmx\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
-    <VerInfo_Build>1</VerInfo_Build>
+    <VerInfo_Build>21</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.21;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.21;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
     <Debugger_DebugSourcePath>C:\Dev\MagicFoundation\Alcinoe\Embarcadero\Athens\fmx\;$(Debugger_DebugSourcePath)</Debugger_DebugSourcePath>
   </PropertyGroup>
@@ -356,7 +356,7 @@
     <Cfg_1>true</Cfg_1>
     <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
     <VerInfo_UIDeviceFamily>iPhoneAndiPad</VerInfo_UIDeviceFamily>
-    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=1.0.0;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=1.0.0;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
+    <VerInfo_Keys>CFBundleName=$(MSBuildProjectName);CFBundleDevelopmentRegion=en;CFBundleDisplayName=$(MSBuildProjectName);CFBundleIdentifier=$(MSBuildProjectName);CFBundleInfoDictionaryVersion=7.1;CFBundleVersion=2.0.21;CFBundlePackageType=APPL;CFBundleSignature=????;LSRequiresIPhoneOS=true;CFBundleAllowMixedLocalizations=YES;CFBundleExecutable=$(MSBuildProjectName);UIDeviceFamily=iPhone &#38; iPad;NSLocationAlwaysUsageDescription=The reason for accessing the location information of the user;NSLocationWhenInUseUsageDescription=The reason for accessing the location information of the user;UIBackgroundModes=;NSContactsUsageDescription=The reason for accessing the contacts;NSPhotoLibraryUsageDescription=The reason for accessing the photo library;NSCameraUsageDescription=The reason for accessing the camera;CFBundleShortVersionString=2.0.21;NSPhotoLibraryAddUsageDescription=The reason for adding to the photo library;NSFaceIDUsageDescription=The reason for accessing the face id;NSLocationAlwaysAndWhenInUseUsageDescription=The reason for accessing the location information of the user;NSMicrophoneUsageDescription=The reason for accessing the microphone;NSSiriUsageDescription=The reason for accessing Siri;ITSAppUsesNonExemptEncryption=false;NSBluetoothAlwaysUsageDescription=The reason for accessing bluetooth;NSBluetoothPeripheralUsageDescription=The reason for accessing bluetooth peripherals;NSCalendarsUsageDescription=The reason for accessing the calendar data;NSRemindersUsageDescription=The reason for accessing the reminders;NSMotionUsageDescription=The reason for accessing the accelerometer;NSSpeechRecognitionUsageDescription=The reason for requesting to send user data to Apple&#39;s speech recognition servers</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_1_OSX64)&#39;!=&#39;&#39;">
     <Cfg_1_OSX32>true</Cfg_1_OSX32>
@@ -394,7 +394,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_Android)&#39;!=&#39;&#39;">
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
-    <VerInfo_Build>1</VerInfo_Build>
+    <VerInfo_Build>21</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
   </PropertyGroup>
@@ -403,14 +403,14 @@
     <CfgParent>Cfg_2</CfgParent>
     <Cfg_2>true</Cfg_2>
     <IncludeAndroid_Splash>false</IncludeAndroid_Splash>
-    <VerInfo_Build>12</VerInfo_Build>
+    <VerInfo_Build>22</VerInfo_Build>
     <Android_BackgroundColor>#FFFFFF</Android_BackgroundColor>
     <Android_DarkBackgroundColor>#000000</Android_DarkBackgroundColor>
-    <PF_AliasKey>alfmxcontrols</PF_AliasKey>
+    <PF_AliasKey>alfmxcontrolsdemo</PF_AliasKey>
     <DCC_GenerateAndroidAppBundleFile>true</DCC_GenerateAndroidAppBundleFile>
     <BT_BuildType>AppStore</BT_BuildType>
     <VerInfo_AutoIncVersion>true</VerInfo_AutoIncVersion>
-    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxcontrols;label=ALFmxControls;versionCode=6;versionName=2.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
+    <VerInfo_Keys>package=io.magicfoundation.alcinoe.alfmxcontrolsdemo;label=ALFmxControlsDemo;versionCode=21;versionName=2.0.21;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=;minSdkVersion=23;targetSdkVersion=34</VerInfo_Keys>
   </PropertyGroup>
   <PropertyGroup Condition="&#39;$(Cfg_2_iOSDevice64)&#39;!=&#39;&#39;">
     <VerInfo_BundleId>$(MSBuildProjectName)</VerInfo_BundleId>
@@ -757,7 +757,7 @@
     <BorlandProject>
       <Delphi.Personality>
         <Source>
-          <Source Name="MainSource">ALFmxControls.dpr</Source>
+          <Source Name="MainSource">ALFmxControlsDemo.dpr</Source>
         </Source>
         <Excluded_Packages>
           <Excluded_Packages Name="$(BDSBIN)\dcloffice2k290.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
@@ -1729,6 +1729,18 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-hdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-hdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl3_dark_filled.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -2075,6 +2087,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-mdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-mdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl3_dark_filled.png">
@@ -2437,6 +2461,18 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl3_dark_filled.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -2723,6 +2759,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
             <RemoteName>text_select_handle_right_mtrl3_light_outlined_error.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xxhdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl3_dark_filled.png">
@@ -3061,6 +3109,18 @@
             <RemoteName>notification_tile_bg.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable\splashscreen.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable</RemoteDir>
+            <RemoteName>splashscreen.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable</RemoteDir>
+            <RemoteName>splashscreen.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\drawable\text_cursor_mtrl3_dark_filled.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -3301,6 +3361,18 @@
             <RemoteName>notification_template_part_time.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-anydpi-v26\ic_launcher.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-anydpi-v26</RemoteDir>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-anydpi-v26</RemoteDir>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -3311,6 +3383,30 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-hdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
@@ -3325,6 +3421,30 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -3337,6 +3457,30 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -3347,6 +3491,66 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-af\values-af.xml">
@@ -4345,6 +4549,18 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-v31\styles.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values-v31</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values-v31</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values-vi\values-vi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -4415,6 +4631,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
             <RemoteName>attrs.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values\colors.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values</RemoteDir>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values</RemoteDir>
+            <RemoteName>colors.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Debug" LocalName="Android\Merged\res\values\styles.xml">
@@ -4499,6 +4727,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-hdpi-v4</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-hdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-hdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-hdpi\text_select_handle_left_mtrl3_dark_filled.png">
@@ -4847,6 +5087,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-mdpi-v4</RemoteDir>
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-mdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-mdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-mdpi\text_select_handle_left_mtrl3_dark_filled.png">
@@ -5209,6 +5461,18 @@
             <RemoteName>notify_panel_notification_icon_bg.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xhdpi\text_select_handle_left_mtrl3_dark_filled.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -5495,6 +5759,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\drawable-xhdpi</RemoteDir>
             <RemoteName>text_select_handle_right_mtrl3_light_outlined_error.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xxhdpi\splashscreen_icon.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+            <RemoteName>splashscreen_icon.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable-xxhdpi\text_select_handle_left_mtrl3_dark_filled.png">
@@ -5833,6 +6109,18 @@
             <RemoteName>notification_tile_bg.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable\splashscreen.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable</RemoteDir>
+            <RemoteName>splashscreen.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\drawable</RemoteDir>
+            <RemoteName>splashscreen.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\drawable\text_cursor_mtrl3_dark_filled.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -6073,6 +6361,18 @@
             <RemoteName>notification_template_part_time.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-anydpi-v26\ic_launcher.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-anydpi-v26</RemoteDir>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-anydpi-v26</RemoteDir>
+            <RemoteName>ic_launcher.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -6083,6 +6383,30 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-hdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-hdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-hdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher.png">
@@ -6097,6 +6421,30 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-mdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-mdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -6109,6 +6457,30 @@
             <RemoteName>ic_launcher.png</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xhdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher.png">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -6119,6 +6491,66 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
             <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxhdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxxhdpi\ic_launcher.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_background.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_background.png</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\mipmap-xxxhdpi\ic_launcher_foreground.png">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\mipmap-xxxhdpi</RemoteDir>
+            <RemoteName>ic_launcher_foreground.png</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-af\values-af.xml">
@@ -7117,6 +7549,18 @@
             <RemoteName>styles.xml</RemoteName>
           </Platform>
         </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-v31\styles.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values-v31</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values-v31</RemoteDir>
+            <RemoteName>styles.xml</RemoteName>
+          </Platform>
+        </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values-vi\values-vi.xml">
           <Platform Name="Android">
             <Overwrite>true</Overwrite>
@@ -7187,6 +7631,18 @@
             <Overwrite>true</Overwrite>
             <RemoteDir>res\values</RemoteDir>
             <RemoteName>attrs.xml</RemoteName>
+          </Platform>
+        </DeployFile>
+        <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values\colors.xml">
+          <Platform Name="Android">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values</RemoteDir>
+            <RemoteName>colors.xml</RemoteName>
+          </Platform>
+          <Platform Name="Android64">
+            <Overwrite>true</Overwrite>
+            <RemoteDir>res\values</RemoteDir>
+            <RemoteName>colors.xml</RemoteName>
           </Platform>
         </DeployFile>
         <DeployFile Class="File" Configuration="Release" LocalName="Android\Merged\res\values\styles.xml">

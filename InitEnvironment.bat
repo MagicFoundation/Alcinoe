@@ -13,73 +13,87 @@ REM ---------------
 REM Call rsvars.bat 
 REM ---------------
 
-set ALDelphiName=
-IF "%ALDelphiVersion%"=="" (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\23.0\bin\rsvars.bat" (
+setlocal enabledelayedexpansion
+set LocalDelphiName=
+set LocalDelphiVersion=%ALDelphiVersion%
+set LocalDelphiDir=
+IF "%LocalDelphiVersion%"=="" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\23.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 12 Athens
-    set ALDelphiName=Athens
-    set ALDelphiVersion=23.0
+    set LocalDelphiName=Athens
+    set LocalDelphiVersion=23.0
   ) ELSE (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\22.0\bin\rsvars.bat" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\22.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 11 Alexandria
-    set ALDelphiName=Alexandria
-    set ALDelphiVersion=22.0
+    set LocalDelphiName=Alexandria
+    set LocalDelphiVersion=22.0
   ) ELSE (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\21.0\bin\rsvars.bat" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\21.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 10.4 Sydney
-    set ALDelphiName=Sydney
-    set ALDelphiVersion=21.0
+    set LocalDelphiName=Sydney
+    set LocalDelphiVersion=21.0
   ) ELSE (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\20.0\bin\rsvars.bat" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\20.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 10.3 Rio
-    set ALDelphiName=Rio
-    set ALDelphiVersion=20.0
+    set LocalDelphiName=Rio
+    set LocalDelphiVersion=20.0
   ) ELSE (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\19.0\bin\rsvars.bat" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\19.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 10.2 Tokyo
-    set ALDelphiName=Tokyo
-    set ALDelphiVersion=19.0
+    set LocalDelphiName=Tokyo
+    set LocalDelphiVersion=19.0
   ) ELSE (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\18.0\bin\rsvars.bat" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\18.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 10.1 Berlin
-    set ALDelphiName=Berlin
-    set ALDelphiVersion=18.0
+    set LocalDelphiName=Berlin
+    set LocalDelphiVersion=18.0
   ) ELSE (
-  IF EXIST "%PROGRAMFILES(X86)%\Embarcadero\Studio\17.0\bin\rsvars.bat" (
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\17.0" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF EXIST "!LocalDelphiDir!\bin\rsvars.bat" (
     ECHO Found Delphi 10 Seattle
-    set ALDelphiName=Seattle
-    set ALDelphiVersion=17.0
+    set LocalDelphiName=Seattle
+    set LocalDelphiVersion=17.0
   )))))))
 ) ELSE (
-  IF "%ALDelphiVersion%"=="23.0" (
-    set ALDelphiName=Athens
+  for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\%LocalDelphiVersion%" /v "RootDir"') do set LocalDelphiDir=%%B
+  IF "%LocalDelphiVersion%"=="23.0" (
+    set LocalDelphiName=Athens
   ) ELSE (
-  IF "%ALDelphiVersion%"=="22.0" (
-    set ALDelphiName=Alexandria
+  IF "%LocalDelphiVersion%"=="22.0" (
+    set LocalDelphiName=Alexandria
   ) ELSE (
-  IF "%ALDelphiVersion%"=="21.0" (
-    set ALDelphiName=Sydney
+  IF "%LocalDelphiVersion%"=="21.0" (
+    set LocalDelphiName=Sydney
   ) ELSE (
-  IF "%ALDelphiVersion%"=="20.0" (
-    set ALDelphiName=Rio
+  IF "%LocalDelphiVersion%"=="20.0" (
+    set LocalDelphiName=Rio
   ) ELSE (
-  IF "%ALDelphiVersion%"=="19.0" (
-    set ALDelphiName=Tokyo
+  IF "%LocalDelphiVersion%"=="19.0" (
+    set LocalDelphiName=Tokyo
   ) ELSE (
-  IF "%ALDelphiVersion%"=="18.0" (
-    set ALDelphiName=Berlin
+  IF "%LocalDelphiVersion%"=="18.0" (
+    set LocalDelphiName=Berlin
   ) ELSE (
-  IF "%ALDelphiVersion%"=="17.0" (
-    set ALDelphiName=Seattle
+  IF "%LocalDelphiVersion%"=="17.0" (
+    set LocalDelphiName=Seattle
   )))))))
 )
+endlocal & set "ALDelphiName=%LocalDelphiName%" & set "ALDelphiVersion=%LocalDelphiVersion%" & set "ALDelphiDir=%LocalDelphiDir%"
 
-IF "%ALDelphiName%"=="" (
+IF "%ALDelphiName%"=="" set ErrorFlag=1
+IF "%ALDelphiVersion%"=="" set ErrorFlag=1
+IF "%ALDelphiDir%"=="" set ErrorFlag=1
+IF "%ErrorFlag%"=="1" (
   ECHO Could not found Delphi
   goto ERROR
 )
   
-set ALDelphiDir=%PROGRAMFILES(X86)%\Embarcadero\Studio\%ALDelphiVersion%\
 CALL "%ALDelphiDir%\bin\rsvars.bat"
 IF ERRORLEVEL 1 goto ERROR
 

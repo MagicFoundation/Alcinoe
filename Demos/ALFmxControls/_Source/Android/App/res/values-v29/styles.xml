@@ -6,6 +6,7 @@
     <item name="android:forceDarkAllowed">false</item>
     <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
     <item name="android:colorAccent">#ff0288d1</item>
+    <item name="android:windowBackground">@drawable/splashscreen</item>
     <item name="Material3LightFilledEditTextStyle">@style/Material3LightFilledEditTextStyle</item>
     <item name="Material3LightOutlinedEditTextStyle">@style/Material3LightOutlinedEditTextStyle</item>
     <item name="Material3DarkFilledEditTextStyle">@style/Material3DarkFilledEditTextStyle</item>

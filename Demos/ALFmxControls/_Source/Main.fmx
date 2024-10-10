@@ -8139,9 +8139,6 @@ object MainForm: TMainForm
                 912282A4AEE768A3C17BEA1C922CA6D74D892281AE1D65E9A8E7608D793450E8
                 2C2508291A1F888D70D62C168301FB7089A825916A14E4FF2FC3D5009B80E6DA
                 640000000049454E44AE426082}
-              FileName = 
-                'C:\Dev\MagicFoundation\Alcinoe\Demos\ALFmxControls\_Source\Resou' +
-                'rces\gbrcolorprofile.jpg'
             end>
           Align = Top
           Size.Width = 150.000000000000000000

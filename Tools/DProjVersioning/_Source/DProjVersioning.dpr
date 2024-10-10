@@ -113,7 +113,7 @@ procedure UpdateProjMajorMinorPatchVersion(
             const aBuildNumber: Integer;
             const aMajorNumber: integer;
             Const aMinorNumber: integer;
-            Const aPatchOffset: integer);
+            Const aPatchBase: integer);
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _UpdateNameValueInSrcString(
@@ -198,14 +198,14 @@ begin
     //-----
     _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_MajorVer',           ALIntToStrA(aMajorNumber));
     _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_MinorVer',           ALIntToStrA(aMinorNumber));
-    _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_Release',            ALIntToStrA(max(0,aBuildNumber - aPatchOffset)));
+    _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_Release',            ALIntToStrA(max(0,aBuildNumber - aPatchBase)));
     _UpdateXmlNodeValue(        LPropertyGroupSrc, 'VerInfo_Build',              ALIntToStrA(aBuildNumber));
     _UpdateNameValueInSrcString(LPropertyGroupSrc, 'versionCode',                ALIntToStrA(aBuildNumber));
-    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'versionName',                ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)));
-    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'CFBundleVersion',            ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)));
-    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'CFBundleShortVersionString', ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)));
-    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'FileVersion',                ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)) + '.' + ALIntToStrA(aBuildNumber));
-    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'ProductVersion',             ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)) + '.' + ALIntToStrA(aBuildNumber));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'versionName',                ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'CFBundleVersion',            ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'CFBundleShortVersionString', ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'FileVersion',                ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)) + '.' + ALIntToStrA(aBuildNumber));
+    _UpdateNameValueInSrcString(LPropertyGroupSrc, 'ProductVersion',             ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)) + '.' + ALIntToStrA(aBuildNumber));
     //-----
     Delete(aDProjSrc,P1, P2-P1);
     Insert(LPropertyGroupSrc, aDProjSrc, P1);
@@ -215,10 +215,10 @@ begin
   //-----
   _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','MajorVer',       ALIntToStrA(aMajorNumber));
   _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','MinorVer',       ALIntToStrA(aMinorNumber));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','Release',        ALIntToStrA(max(0,aBuildNumber - aPatchOffset)));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','Release',        ALIntToStrA(max(0,aBuildNumber - aPatchBase)));
   _UpdateXmlNodeValue(aDProjSrc,'VersionInfo',    'Name','Build',          ALIntToStrA(aBuildNumber));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','FileVersion',    ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)) + '.' + ALIntToStrA(aBuildNumber));
-  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','ProductVersion', ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchOffset)) + '.' + ALIntToStrA(aBuildNumber));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','FileVersion',    ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)) + '.' + ALIntToStrA(aBuildNumber));
+  _UpdateXmlNodeValue(aDProjSrc,'VersionInfoKeys','Name','ProductVersion', ALIntToStrA(aMajorNumber)+ '.' + ALIntToStrA(aMinorNumber) + '.' + ALIntToStrA(max(0,aBuildNumber - aPatchBase)) + '.' + ALIntToStrA(aBuildNumber));
 end;
 
 begin
@@ -234,7 +234,7 @@ begin
     var LAction: AnsiString;
     var LMajorNumber: integer;
     var LMinorNumber: integer;
-    var LPatchOffset: integer;
+    var LPatchBase: integer;
     var LCreateBackup: Boolean;
     var LParamLst := TALStringListW.Create;
     try
@@ -244,7 +244,7 @@ begin
       LAction := ansiString(LParamLst.Values['-Action']); // getVersionName | incMajorMinorPatchVersion | decMajorMinorPatchVersion
       LMajorNumber := ALStrToIntDef(LParamLst.Values['-MajorNumber'], 1);
       LMinorNumber := ALStrToIntDef(LParamLst.Values['-MinorNumber'], 0);
-      LPatchOffset := ALStrToIntDef(LParamLst.Values['-PatchOffset'], 0);
+      LPatchBase := ALStrToIntDef(LParamLst.Values['-PatchBase'], 0);
       LCreateBackup := not ALSameTextW(ALTrim(LParamLst.Values['-CreateBackup']), 'false');
     finally
       ALFreeAndNil(LParamLst);
@@ -254,10 +254,10 @@ begin
       LAction := ansiString(paramstr(2)); // getVersionName | incMajorMinorPatchVersion | decMajorMinorPatchVersion
       LMajorNumber := ALStrToIntDef(ansiString(paramstr(3)), 1);
       LMinorNumber := ALStrToIntDef(ansiString(paramstr(4)), 0);
-      LPatchOffset := ALStrToIntDef(ansiString(paramstr(5)), 0);
+      LPatchBase := ALStrToIntDef(ansiString(paramstr(5)), 0);
       LCreateBackup := not ALSameTextW(ALTrim(paramstr(6)), 'false');
     end;
-    if LDProjFilename = '' then raise Exception.Create('Usage: DProjVersioning.exe -DProj="<DprojFilename>" -Action=<getVersionName/incMajorMinorPatchVersion/decMajorMinorPatchVersion> -MajorNumber=<x> -MinorNumber=<y> -PatchOffset=<z> -CreateBackup=<true/false>');
+    if LDProjFilename = '' then raise Exception.Create('Usage: DProjVersioning.exe -DProj="<DprojFilename>" -Action=<getVersionName/incMajorMinorPatchVersion/decMajorMinorPatchVersion> -MajorNumber=<x> -MinorNumber=<y> -PatchBase=<z> -CreateBackup=<true/false>');
     {$endregion}
 
     {$region 'getVersionName'}
@@ -276,7 +276,7 @@ begin
         LBuildNumber + 1, // const aBuildNumber: Integer;
         LMajorNumber, // const aMajorNumber: integer;
         LMinorNumber, // Const aMinorNumber: integer;
-        LPatchOffset); // Const aPatchOffset: integer);
+        LPatchBase); // Const aPatchBase: integer);
       if LCreateBackup then begin
         if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
         Tfile.move(LDProjFilename, LDProjFilename+ '.bak');
@@ -294,7 +294,7 @@ begin
         max(0, LBuildNumber - 1), // const aBuildNumber: Integer;
         LMajorNumber, // const aMajorNumber: integer;
         LMinorNumber, // Const aMinorNumber: integer;
-        LPatchOffset); // Const aPatchOffset: integer);
+        LPatchBase); // Const aPatchBase: integer);
       if LCreateBackup then begin
         if Tfile.exists(LDProjFilename + '.bak') then raise Exception.CreateFmt('The backup file (%s) already exists!', [LDProjFilename + '.bak']);
         Tfile.Move(LDProjFilename, LDProjFilename+ '.bak');

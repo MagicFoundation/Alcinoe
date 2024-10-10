@@ -28,7 +28,7 @@ call "%ALBaseDir%\Tools\AndroidMerger\AndroidMerger.exe"^
  -LocalMavenRepositoryDir="%ALBaseDir%\Libraries\jar\"^
  -Libraries="%Libraries%"^
  -OutputDir="%ALBaseDir%\Demos\ALFacebookLogin\_Source\Android\Merged"^
- -DProj="%ALBaseDir%\Demos\ALFacebookLogin\_Source\ALFacebookLogin.dproj"^
+ -DProj="%ALBaseDir%\Demos\ALFacebookLogin\_Source\ALFacebookLoginDemo.dproj"^
  -AndroidManifest="%ALBaseDir%\Demos\ALFacebookLogin\_Source\AndroidManifest.template.xml"^
  -DProjNormalizer="%ALBaseDir%\Tools\DProjNormalizer\DProjNormalizer.exe"^
  -UseGradle=true^

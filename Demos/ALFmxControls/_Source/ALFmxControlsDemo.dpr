@@ -1,4 +1,4 @@
-program ALFmxControls;
+program ALFmxControlsDemo;
 
 {$R *.dres}
 

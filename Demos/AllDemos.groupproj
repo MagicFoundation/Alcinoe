@@ -3,10 +3,10 @@
         <ProjectGuid>{367A912B-9E16-4BD0-8FB7-73468BE36E9F}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="ALFacebookLogin\_source\ALFacebookLogin.dproj">
+        <Projects Include="ALFacebookLogin\_source\ALFacebookLoginDemo.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="ALFmxControls\_source\ALFmxControls.dproj">
+        <Projects Include="ALFmxControls\_source\ALFmxControlsDemo.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="ALJsonDoc\_source\ALJsonDocDemo.dproj">

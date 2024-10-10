@@ -3,7 +3,7 @@
 //////////////////////////////////////
 
 "c:\Program Files\Eclipse Adoptium\jdk-11.0.16.101-hotspot\bin\keytool.exe" -genkey -v ^
--keystore "C:\Dev\WinSuite\WinDating\kiskis\_build\source\android\keystore\release.keystore" ^
+-keystore "release.keystore" ^
 -storepass <KEYSTORE_PASSWORD> ^
 -alias "<ALIAS_NAME>" ^
 -keypass <ALIAS_PASSWORD> ^
@@ -22,7 +22,7 @@
 //////////////////////////////////////////////////////////
 
 "c:\Program Files\Eclipse Adoptium\jdk-11.0.16.101-hotspot\bin\keytool.exe" -list -v ^
--keystore "C:\Dev\WinSuite\WinDating\kiskis\_build\source\android\keystore\release.keystore"
+-keystore "release.keystore"
 
 
 
@@ -31,4 +31,4 @@
 ///////////////////////////////////////
 
 "c:\Program Files\Eclipse Adoptium\jdk-11.0.16.101-hotspot\bin\keytool.exe" -exportcert -list -v ^
--alias <ALIAS_NAME> -keystore "C:\Dev\WinSuite\WinDating\kiskis\_build\source\android\keystore\release.keystore"
+-alias <ALIAS_NAME> -keystore "release.keystore"

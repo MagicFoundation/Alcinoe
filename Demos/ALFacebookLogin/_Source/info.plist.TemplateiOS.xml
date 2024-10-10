@@ -25,7 +25,7 @@
   <key>FacebookClientToken</key>
   <string>70f745f76d4ab40f76c1464d5626be3d</string>
   <key>FacebookDisplayName</key>
-  <string>ALFacebookLogin</string>
+  <string>ALFacebookLoginDemo</string>
   <key>LSApplicationQueriesSchemes</key>
   <array>
     <string>fbapi</string>

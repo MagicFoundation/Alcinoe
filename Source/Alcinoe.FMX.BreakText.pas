@@ -2568,6 +2568,15 @@ begin
                 exit;
               end;
 
+              // 4096 x 4096 pixels is generally considered a safe maximum size
+              // for surfaces across many systems
+              If (LSurfaceRect.Width > 4096) or
+                 (LSurfaceRect.Height > 4096) then begin
+                ARect.Width := 0;
+                ARect.Height := 0;
+                exit;
+              end;
+
               // Exit if AOnlyMeasure
               if AOnlyMeasure then exit;
 
@@ -3832,6 +3841,15 @@ begin
       // the subsequent ALCreateSurface call.
       If (ALCeil(ARect.Width, TEpsilon.Position) = 0) or
          (ALCeil(ARect.Height, TEpsilon.Position) = 0) then begin
+        ARect.Width := 0;
+        ARect.Height := 0;
+        exit;
+      end;
+
+      // 4096 x 4096 pixels is generally considered a safe maximum size
+      // for surfaces across many systems
+      If (LSurfaceRect.Width > 4096) or
+         (LSurfaceRect.Height > 4096) then begin
         ARect.Width := 0;
         ARect.Height := 0;
         exit;

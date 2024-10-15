@@ -223,7 +223,7 @@ end;
 procedure TALWinNativeView.BeforeDestroyMessageListener(const Sender: TObject; const AMessage: System.Messaging.TMessage);
 begin
   if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
-    RootChanged(nil);
+    SetParent(Handle, 0);
 end;
 
 {**************************************}

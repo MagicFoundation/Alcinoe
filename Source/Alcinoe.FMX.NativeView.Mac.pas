@@ -103,7 +103,7 @@ end;
 procedure TALMacNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
   if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
-    RootChanged(nil);
+    View.removeFromSuperview;
 end;
 
 {******************************************************************************************}

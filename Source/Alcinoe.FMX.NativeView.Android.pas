@@ -152,8 +152,11 @@ end;
 {**********************************************************************************************************}
 procedure TALAndroidNativeView.BeforeDestroyHandleListener(const Sender: TObject; const AMessage: TMessage);
 begin
-  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then
-    RootChanged(nil);
+  if (AMessage is TBeforeDestroyFormHandle) and (TBeforeDestroyFormHandle(AMessage).Value = Form) then begin
+    var LParent: JViewParent := Layout.getParent;
+    if LParent <> nil then
+      TJViewGroup.Wrap(LParent).removeView(Layout);
+  end;
 end;
 
 {*****************************************************}

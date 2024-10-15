@@ -1442,9 +1442,7 @@ begin
                         TextSettings.Font.Family, // const AFontFamily: String;
                         TextSettings.Font.Size, // const AFontSize: single;
                         TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
-                        TextSettings.Font.Slant, // const AFontSlant: TFontSlant;
-                        TextSettings.Font.Color, // const AFontColor: TalphaColor;
-                        TextSettings.Decoration.Kinds); // const ADecorationKinds: TALTextDecorationKinds;
+                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
     result := result * textsettings.LineHeightMultiplier;

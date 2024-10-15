@@ -1013,83 +1013,6 @@ procedure ALDrawMultiLineText(
   end;
   {$ENDREGION}
 
-  {$REGION '_GetSkFontStyle'}
-  {$IF defined(ALSkiaEngine)}
-  Function _GetSkFontStyle(
-             const AFontWeight: TFontWeight;
-             const AFontSlant: TFontSlant;
-             const AFontStretch: TFontStretch): sk_fontstyle_t;
-  begin
-    {$IFNDEF ALCompilerVersionSupported122}
-      {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_fontstyle_t didn''t changed'}
-    {$ENDIF}
-    //--
-    // Defined in SkFontStyle.h
-    //
-    //  enum Weight {
-    //      kInvisible_Weight   =    0,
-    //      kThin_Weight        =  100,
-    //      kExtraLight_Weight  =  200,
-    //      kLight_Weight       =  300,
-    //      kNormal_Weight      =  400,
-    //      kMedium_Weight      =  500,
-    //      kSemiBold_Weight    =  600,
-    //      kBold_Weight        =  700,
-    //      kExtraBold_Weight   =  800,
-    //      kBlack_Weight       =  900,
-    //      kExtraBlack_Weight  = 1000,
-    //  };
-    case AFontWeight of
-      TFontWeight.Thin: Result.weight := 100; // kThin_Weight        =  100,
-      TFontWeight.UltraLight: Result.weight := 200; // kExtraLight_Weight  =  200,
-      TFontWeight.Light: Result.weight := 300; // kLight_Weight       =  300,
-      TFontWeight.SemiLight: Result.weight := 350;
-      TFontWeight.Regular: Result.weight := 400; // kNormal_Weight      =  400,
-      TFontWeight.Medium: Result.weight := 500; // kMedium_Weight      =  500,
-      TFontWeight.Semibold: Result.weight := 600; // kSemiBold_Weight    =  600,
-      TFontWeight.Bold: Result.weight := 700; // kBold_Weight        =  700,
-      TFontWeight.UltraBold: Result.weight := 800; // kExtraBold_Weight   =  800,
-      TFontWeight.Black: Result.weight := 900; // kBlack_Weight       =  900,
-      TFontWeight.UltraBlack: Result.weight := 1000; // kExtraBlack_Weight  = 1000,
-      else raise Exception.Create('Error F5486A8A-8CE8-415D-A845-29AB360C82DE');
-    end;
-    //--
-    case AFontSlant of
-      TFontSlant.Regular: Result.slant := sk_fontslant_t.UPRIGHT_SK_FONTSLANT;
-      TFontSlant.Italic: Result.slant := sk_fontslant_t.ITALIC_SK_FONTSLANT;
-      TFontSlant.Oblique: Result.slant := sk_fontslant_t.OBLIQUE_SK_FONTSLANT;
-      else raise Exception.Create('Error 035F6EC0-7AAD-4AC8-BED6-3594DB666E62');
-    end;
-    //--
-    // Defined in SkFontStyle.h
-    //
-    //  enum Width {
-    //      kUltraCondensed_Width   = 1,
-    //      kExtraCondensed_Width   = 2,
-    //      kCondensed_Width        = 3,
-    //      kSemiCondensed_Width    = 4,
-    //      kNormal_Width           = 5,
-    //      kSemiExpanded_Width     = 6,
-    //      kExpanded_Width         = 7,
-    //      kExtraExpanded_Width    = 8,
-    //      kUltraExpanded_Width    = 9,
-    //  };
-    case AFontStretch of
-      TFontStretch.UltraCondensed: Result.width := 1; // kUltraCondensed_Width   = 1,
-      TFontStretch.ExtraCondensed: Result.width := 2; // kExtraCondensed_Width   = 2,
-      TFontStretch.Condensed     : Result.width := 3; // kCondensed_Width        = 3,
-      TFontStretch.SemiCondensed : Result.width := 4; // kSemiCondensed_Width    = 4,
-      TFontStretch.Regular       : Result.width := 5; // kNormal_Width           = 5,
-      TFontStretch.SemiExpanded  : Result.width := 6; // kSemiExpanded_Width     = 6,
-      TFontStretch.Expanded      : Result.width := 7; // kExpanded_Width         = 7,
-      TFontStretch.ExtraExpanded : Result.width := 8; // kExtraExpanded_Width    = 8,
-      TFontStretch.UltraExpanded : Result.width := 9; // kUltraExpanded_Width    = 9,
-      else raise Exception.Create('Error 05D911E1-D8A4-4692-AF95-DE878BE3838D');
-    end;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
   {$REGION '_getFontFamily'}
   {$IF not defined(ALSkiaEngine)}
   function _getFontFamily(const AFontFamilies: String): String;
@@ -1344,17 +1267,13 @@ procedure ALDrawMultiLineText(
              const AFontFamily: String;
              const AFontSize: single;
              const AFontWeight: TFontWeight;
-             const AFontSlant: TFontSlant;
-             const AFontColor: TalphaColor;
-             const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
+             const AFontSlant: TFontSlant): TALFontMetrics;
   begin
     Result := ALGetFontMetrics(
                 AFontFamily, // const AFontFamily: String;
                 AFontSize, // const AFontSize: single;
                 AFontWeight, // const AFontWeight: TFontWeight;
-                AFontSlant, // const AFontSlant: TFontSlant;
-                AFontColor, // const AFontColor: TalphaColor;
-                ADecorationKinds); // const ADecorationKinds: TALTextDecorationKinds);
+                AFontSlant); // const AFontSlant: TFontSlant;
     if Result.Leading > 0 then begin
       Result.Ascent := Result.Ascent - (Result.Leading/2);
       Result.Descent := Result.Descent + (Result.Leading/2);
@@ -1514,9 +1433,7 @@ procedure ALDrawMultiLineText(
                           AFontFamily, // const AFontFamily: String;
                           AFontSize, // const AFontSize: single;
                           AFontWeight, // const AFontWeight: TFontWeight;
-                          AFontSlant, // const AFontSlant: TFontSlant;
-                          AFontColor, // const AFontColor: TalphaColor;
-                          ADecorationKinds); // const ADecorationKinds: TALTextDecorationKinds;
+                          AFontSlant); // const AFontSlant: TFontSlant;
         var LfitRange: CFRange;
         var LSize := CTFramesetterSuggestFrameSizeWithConstraints(
                        LFrameSetter, //framesetter: CTFramesetterRef;
@@ -2246,7 +2163,7 @@ begin
                   sk4d_textstyle_set_font_size(LTextStyle, LFontSize);
 
                   // Set the font Weight, Slant and Stretch
-                  var LSkfontstyle := _GetSkFontStyle(LFontWeight, LFontSlant, LFontStretch);
+                  var LSkfontstyle := ALGetSkFontStyle(LFontWeight, LFontSlant, LFontStretch);
                   sk4d_textstyle_set_font_style(LTextStyle, @LSkfontstyle);
 
                   // Set the font color
@@ -3352,11 +3269,13 @@ begin
                                   LFontFamily, // const AFontFamily: String;
                                   LFontSize, // const AFontSize: single;
                                   LFontWeight, // const AFontWeight: TFontWeight;
-                                  LFontSlant, // const AFontSlant: TFontSlant;
-                                  LFontColor, // const AFontColor: TalphaColor;
-                                  LDecorationKind); // const ADecorationKinds: TALTextDecorationKinds;
+                                  LFontSlant); // const AFontSlant: TFontSlant;
 
             // Handle ALineHeightMultiplier
+            // To be in pair with skia, by default, text will layout with line height as defined by the font. Font-metrics defined line height may be
+            // taller or shorter than the font size. The height property allows manual adjustment of the height of the line
+            // as a multiple of fontSize. For most fonts, setting height to 1.0 is not the same as omitting or setting
+            // height to null.
             var LDrawTextOffsetY: Single;
             if not sameValue(LLineHeightMultiplier, 0, TEpsilon.Scale) then begin
               var LOldAscent := LFontMetrics.Ascent;
@@ -3580,9 +3499,7 @@ begin
                                     LFontFamily, // const AFontFamily: String;
                                     LFontSize, // const AFontSize: single;
                                     LFontWeight, // const AFontWeight: TFontWeight;
-                                    LFontSlant, // const AFontSlant: TFontSlant;
-                                    LFontColor, // const AFontColor: TalphaColor;
-                                    LDecorationKind); // const ADecorationKinds: TALTextDecorationKinds;
+                                    LFontSlant); // const AFontSlant: TFontSlant;
               //--
               var LExtendedTextElement: TExtendedTextElement;
               LExtendedTextElement.Id := '';

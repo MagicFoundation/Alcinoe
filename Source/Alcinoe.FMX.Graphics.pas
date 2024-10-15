@@ -9912,7 +9912,13 @@ begin
     1, // const h: integer)
     false); // const AAddPixelForAlignment: Boolean = true
   try
-    ALClearCanvas(LCanvas, TAlphaColors.Null);
+    if ALCanvasBeginScene(LCanvas) then begin
+      try
+        ALClearCanvas(LCanvas, TAlphaColors.Null);
+      finally
+        ALCanvasEndScene(LCanvas)
+      end;
+    end;
     Result := ALCreateDrawableFromSurface(LSurface);
   finally
     ALFreeAndNilSurface(LSurface, LCanvas);

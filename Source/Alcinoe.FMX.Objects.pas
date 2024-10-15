@@ -844,6 +844,7 @@ type
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadTextIsHtml(Reader: TReader);
+    procedure ReadLineSpacing(Reader: TReader);
   protected
     procedure DefineProperties(Filer: TFiler); override;
   {$ENDIF}
@@ -2878,6 +2879,30 @@ end;
 {***************************}
 procedure TALBaseText.Loaded;
 begin
+
+  {$IF defined(ALBackwardCompatible)}
+  if ALSametextW(TextSettings.Font.Family, 'sans-serif-thin') then begin
+    TextSettings.Font.Family := 'sans-serif';
+    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.regular
+    else TextSettings.Font.Weight := TFontWeight.thin;
+  end
+  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-light') then begin
+    TextSettings.Font.Family := 'sans-serif';
+    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.Semibold
+    else TextSettings.Font.Weight := TFontWeight.light;
+  end
+  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-medium') then begin
+    TextSettings.Font.Family := 'sans-serif';
+    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.UltraBold
+    else TextSettings.Font.Weight := TFontWeight.medium;
+  end
+  else if ALSametextW(TextSettings.Font.Family, 'sans-serif-black') then begin
+    TextSettings.Font.Family := 'sans-serif';
+    if TextSettings.Font.Weight = TFontWeight.Bold then TextSettings.Font.Weight := TFontWeight.UltraBlack
+    else TextSettings.Font.Weight := TFontWeight.black;
+  end;
+  {$ENDIF}
+
   if (AutoTranslate) and
      (Text <> '') and
      (not (csDesigning in ComponentState)) then
@@ -3841,6 +3866,7 @@ procedure TALText.DefineProperties(Filer: TFiler);
 begin
   inherited;
   Filer.DefineProperty('TextIsHtml', ReadTextIsHtml{ReadData}, nil{WriteData}, false{hasdata});
+  Filer.DefineProperty('LineSpacing', ReadLineSpacing{ReadData}, nil{WriteData}, false{hasdata});
 end;
 {$ENDIF}
 
@@ -3849,6 +3875,54 @@ end;
 procedure TALText.ReadTextIsHtml(Reader: TReader);
 begin
   TextSettings.IsHtml := Reader.ReadBoolean;
+end;
+{$ENDIF}
+
+{*********************************}
+{$IF defined(ALBackwardCompatible)}
+procedure TALText.ReadLineSpacing(Reader: TReader);
+begin
+  var LLineSpacing: Extended := Reader.ReadFloat;
+  // Luckily, TextSettings was defined before LineSpacing,
+  // so its properties are already read.
+  var LFontFamily := TextSettings.Font.Family;
+  if LFontFamily = '' then LFontFamily := 'sans-serif';
+  var LFontWeight := TextSettings.Font.Weight;
+  // There is a slight discrepancy in line height between platforms: Windows (Segoe UI),
+  // iOS (Helvetica Neue), and Android (Roboto). However, the line spacing remains consistent
+  // across all operating systems. Given the need to choose a font, we prefer to use the
+  // Roboto (Android) font for consistency.
+  if ALSametextW(LFontFamily, 'sans-serif') then LFontFamily := 'Roboto'
+  else if ALSametextW(LFontFamily, 'sans-serif-thin') then begin
+    LFontFamily := 'Roboto';
+    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.regular
+    else LFontWeight := TFontWeight.thin;
+  end
+  else if ALSametextW(LFontFamily, 'sans-serif-light') then begin
+    LFontFamily := 'Roboto';
+    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.Semibold
+    else LFontWeight := TFontWeight.light;
+  end
+  else if ALSametextW(LFontFamily, 'sans-serif-medium') then begin
+    LFontFamily := 'Roboto';
+    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBold
+    else LFontWeight := TFontWeight.medium;
+  end
+  else if ALSametextW(LFontFamily, 'sans-serif-black') then begin
+    LFontFamily := 'Roboto';
+    if LFontWeight = TFontWeight.Bold then LFontWeight := TFontWeight.UltraBlack
+    else LFontWeight := TFontWeight.black;
+  end
+  else LFontFamily := ALConvertFontFamily(LFontFamily);
+  var LFontMetrics := ALGetFontMetrics(
+                        LFontFamily, // TextSettings const AFontFamily: String;
+                        TextSettings.Font.Size, // const AFontSize: single;
+                        LFontWeight, // const AFontWeight: TFontWeight;
+                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
+  var LLineHeight := -LFontMetrics.Ascent + LFontMetrics.Descent;
+  // The LineHeightMultiplier property allows manual adjustment
+  // of the height of the line as a multiple of fontSize.
+  TextSettings.LineHeightMultiplier := RoundTo((LLineSpacing + LLineHeight) / TextSettings.Font.Size, -1);
 end;
 {$ENDIF}
 

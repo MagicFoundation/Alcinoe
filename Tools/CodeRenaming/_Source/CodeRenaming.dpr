@@ -546,7 +546,7 @@ begin
       LOldToNewNames.add('TALAniCalculations=TALScrollEngine');
       LOldToNewNames.add('TALNativeBitmap=TALSurface');
       LOldToNewNames.add('TALRasterImage=TALDrawable');
-      LOldToNewNames.add('TALMultiLineTextOptions=TALDrawMultiLineTextOptions');
+      LOldToNewNames.add('TALDrawMultiLineTextOptions=TALMultiLineTextOptions');
 
       //var names
       LOldToNewNames.add('ALDefaultFormatSettings=ALDefaultFormatSettingsA');
@@ -612,14 +612,6 @@ begin
     Writeln('');
     Writeln('');
     Writeln('Finished');
-    Writeln('Note: The functions below are overloaded, which means there are');
-    Writeln('multiple versions of them, and they cannot be renamed');
-    Writeln('automatically. You will need to manually rename them in your code.');
-    Writeln('ALIfThen=ALIfThenA');
-    Writeln('Alcinoe.JSONDoc.vALDefaultNodeIndent=ALDefaultJsonNodeIndentA');
-    Writeln('Alcinoe.XMLDoc.vALDefaultNodeIndent=ALDefaultXMLNodeIndent');
-
-    Writeln('');
     Writeln('Press <Enter> key to quit');
     Readln;
 

@@ -981,13 +981,17 @@ var
 {*********************************************************************}
 function  ALConvertFontFamily(const AFontFamily: TFontName): TFontName;
 function  ALExtractPrimaryFontFamily(const AFontFamilies: String): String;
+{$IF defined(ALSkiaEngine)}
+Function ALGetSkFontStyle(
+           const AFontWeight: TFontWeight;
+           const AFontSlant: TFontSlant;
+           const AFontStretch: TFontStretch): sk_fontstyle_t;
+{$ENDIF}
 function  ALGetFontMetrics(
             const AFontFamily: String;
             const AFontSize: single;
             const AFontWeight: TFontWeight;
-            const AFontSlant: TFontSlant;
-            const AFontColor: TalphaColor;
-            const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
+            const AFontSlant: TFontSlant): TALFontMetrics;
 function  ALGetResourceDirectory: String;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
@@ -1003,6 +1007,8 @@ function  ALAlignDimensionToPixelFloor(const Rect: TRectF; const Scale: single; 
 function  ALAlignDimensionToPixelFloor(const Dimension: single; const Scale: single; const Epsilon: Single = 0): single; overload;
 function  ALAlignToPixelRound(const Point: TPointF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TpointF; overload;
 function  ALAlignToPixelRound(const Rect: TRectF; const Matrix: TMatrix; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
+function  ALTextAlignToTextHorzAlign(const ATextAlign: TTextAlign): TALTextHorzAlign;
+function  ALTextAlignToTextVertAlign(const ATextAlign: TTextAlign): TALTextVertAlign;
 
 {$IF defined(ALAppleOS)}
 type
@@ -4930,17 +4936,17 @@ begin
     {$ELSEif defined(ALAppleOS)}
     // https://developer.apple.com/fonts/system-fonts/
     if ALSametextW(LFontFamily, 'sans-serif') then result := 'Helvetica Neue'
-    else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Helvetica Neue Thin'
-    else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Helvetica Neue Light'
-    else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Helvetica Neue Medium'
-    else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Helvetica Neue Bold'
+    //else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Helvetica Neue Thin'
+    //else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Helvetica Neue Light'
+    //else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Helvetica Neue Medium'
+    //else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Helvetica Neue Bold'
     else result := LFontFamily;
     {$ELSEIF defined(MSWINDOWS)}
     if ALSametextW(LFontFamily, 'sans-serif') then result := 'Segoe UI'
-    else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Segoe UI Light'
-    else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Segoe UI Light'
-    else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Segoe UI Semibold'
-    else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Segoe UI Black'
+    //else if ALSametextW(LFontFamily, 'sans-serif-thin') then result := 'Segoe UI Light'
+    //else if ALSametextW(LFontFamily, 'sans-serif-light') then result := 'Segoe UI Light'
+    //else if ALSametextW(LFontFamily, 'sans-serif-medium') then result := 'Segoe UI Semibold'
+    //else if ALSametextW(LFontFamily, 'sans-serif-black') then result := 'Segoe UI Black'
     else result := LFontFamily;
     {$ELSE}
     result := LFontFamily;
@@ -4959,6 +4965,82 @@ begin
   end;
 end;
 
+{*************************}
+{$IF defined(ALSkiaEngine)}
+Function ALGetSkFontStyle(
+           const AFontWeight: TFontWeight;
+           const AFontSlant: TFontSlant;
+           const AFontStretch: TFontStretch): sk_fontstyle_t;
+begin
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if declaration of System.Skia.API.sk_fontstyle_t didn''t changed'}
+  {$ENDIF}
+  //--
+  // Defined in SkFontStyle.h
+  //
+  //  enum Weight {
+  //      kInvisible_Weight   =    0,
+  //      kThin_Weight        =  100,
+  //      kExtraLight_Weight  =  200,
+  //      kLight_Weight       =  300,
+  //      kNormal_Weight      =  400,
+  //      kMedium_Weight      =  500,
+  //      kSemiBold_Weight    =  600,
+  //      kBold_Weight        =  700,
+  //      kExtraBold_Weight   =  800,
+  //      kBlack_Weight       =  900,
+  //      kExtraBlack_Weight  = 1000,
+  //  };
+  case AFontWeight of
+    TFontWeight.Thin: Result.weight := 100; // kThin_Weight        =  100,
+    TFontWeight.UltraLight: Result.weight := 200; // kExtraLight_Weight  =  200,
+    TFontWeight.Light: Result.weight := 300; // kLight_Weight       =  300,
+    TFontWeight.SemiLight: Result.weight := 350;
+    TFontWeight.Regular: Result.weight := 400; // kNormal_Weight      =  400,
+    TFontWeight.Medium: Result.weight := 500; // kMedium_Weight      =  500,
+    TFontWeight.Semibold: Result.weight := 600; // kSemiBold_Weight    =  600,
+    TFontWeight.Bold: Result.weight := 700; // kBold_Weight        =  700,
+    TFontWeight.UltraBold: Result.weight := 800; // kExtraBold_Weight   =  800,
+    TFontWeight.Black: Result.weight := 900; // kBlack_Weight       =  900,
+    TFontWeight.UltraBlack: Result.weight := 1000; // kExtraBlack_Weight  = 1000,
+    else raise Exception.Create('Error F5486A8A-8CE8-415D-A845-29AB360C82DE');
+  end;
+  //--
+  case AFontSlant of
+    TFontSlant.Regular: Result.slant := sk_fontslant_t.UPRIGHT_SK_FONTSLANT;
+    TFontSlant.Italic: Result.slant := sk_fontslant_t.ITALIC_SK_FONTSLANT;
+    TFontSlant.Oblique: Result.slant := sk_fontslant_t.OBLIQUE_SK_FONTSLANT;
+    else raise Exception.Create('Error 035F6EC0-7AAD-4AC8-BED6-3594DB666E62');
+  end;
+  //--
+  // Defined in SkFontStyle.h
+  //
+  //  enum Width {
+  //      kUltraCondensed_Width   = 1,
+  //      kExtraCondensed_Width   = 2,
+  //      kCondensed_Width        = 3,
+  //      kSemiCondensed_Width    = 4,
+  //      kNormal_Width           = 5,
+  //      kSemiExpanded_Width     = 6,
+  //      kExpanded_Width         = 7,
+  //      kExtraExpanded_Width    = 8,
+  //      kUltraExpanded_Width    = 9,
+  //  };
+  case AFontStretch of
+    TFontStretch.UltraCondensed: Result.width := 1; // kUltraCondensed_Width   = 1,
+    TFontStretch.ExtraCondensed: Result.width := 2; // kExtraCondensed_Width   = 2,
+    TFontStretch.Condensed     : Result.width := 3; // kCondensed_Width        = 3,
+    TFontStretch.SemiCondensed : Result.width := 4; // kSemiCondensed_Width    = 4,
+    TFontStretch.Regular       : Result.width := 5; // kNormal_Width           = 5,
+    TFontStretch.SemiExpanded  : Result.width := 6; // kSemiExpanded_Width     = 6,
+    TFontStretch.Expanded      : Result.width := 7; // kExpanded_Width         = 7,
+    TFontStretch.ExtraExpanded : Result.width := 8; // kExtraExpanded_Width    = 8,
+    TFontStretch.UltraExpanded : Result.width := 9; // kUltraExpanded_Width    = 9,
+    else raise Exception.Create('Error 05D911E1-D8A4-4692-AF95-DE878BE3838D');
+  end;
+end;
+{$ENDIF}
+
 {**}
 type
   // packed because of https://stackoverflow.com/questions/61731462/is-this-declaration-good-tdictionarytpairint32-int64-bool
@@ -4967,8 +5049,6 @@ type
     FontSize: single;
     FontWeight: TFontWeight;
     FontSlant: TFontSlant;
-    FontColor: TalphaColor;
-    DecorationKinds: TALTextDecorationKinds;
   end;
 
 {*}
@@ -4981,9 +5061,7 @@ function ALGetFontMetrics(
            const AFontFamily: String;
            const AFontSize: single;
            const AFontWeight: TFontWeight;
-           const AFontSlant: TFontSlant;
-           const AFontColor: TalphaColor;
-           const ADecorationKinds: TALTextDecorationKinds): TALFontMetrics;
+           const AFontSlant: TFontSlant): TALFontMetrics;
 begin
 
   var LFontMetricsKey: TALFontMetricsKey;
@@ -4995,8 +5073,6 @@ begin
   LFontMetricsKey.FontSize:= AFontSize;
   LFontMetricsKey.FontWeight:= AFontWeight;
   LFontMetricsKey.FontSlant:= AFontSlant;
-  LFontMetricsKey.FontColor:= AFontColor;
-  LFontMetricsKey.DecorationKinds:= ADecorationKinds;
   ALFontMetricsCacheLock.beginRead;
   Try
     if ALFontMetricsCache.TryGetValue(LFontMetricsKey, Result) then exit;
@@ -5004,7 +5080,45 @@ begin
     ALFontMetricsCacheLock.endRead;
   end;
 
-  {$IF defined(ANDROID)}
+  {$IF defined(ALSkiaEngine)}
+  var LFontFamily := ALExtractPrimaryFontFamily(AFontFamily);
+  var LSkFontStyle := ALGetSkFontStyle(AFontWeight, AFontSlant, TFontStretch.Regular);
+  var LSkTypeface := ALSkCheckHandle(
+                       sk4d_typeface_make_from_name(
+                         MarshaledAString(UTF8String(LFontFamily)), // const family_name: MarshaledAString;
+                         @LSkFontStyle)); // const style: psk_fontstyle_t);
+  try
+    var LSkFont := sk4d_font_create(
+                     LSkTypeface, // typeface: sk_typeface_t;
+                     AFontSize, // size,
+                     1.0, // sx,
+                     0.0); // kx: float): sk_font_t;
+    try
+      var LSkFontMetrics: sk_fontmetrics_t;
+      sk4d_font_get_metrics(LSkFont, @LSkFontMetrics);
+      Result.Ascent := LSkFontMetrics.ascent;
+      Result.Descent := LSkFontMetrics.descent;
+      Result.Leading := LSkFontMetrics.leading;
+    finally
+      sk4d_font_destroy(LSkFont);
+    end;
+  finally
+    sk4d_refcnt_unref(LSktypeface);
+  end;
+  {$ENDIF}
+
+  {$IF defined(ALAppleOS) and (not defined(ALSkiaEngine))}
+  var Lfont := ALCreateCTFontRef(AFontFamily, AFontSize, AFontWeight, AFontSlant);
+  try
+    Result.Ascent := -CTFontGetAscent(Lfont);
+    Result.Descent := CTFontGetDescent(Lfont);
+    Result.Leading := CTFontGetLeading(Lfont);
+  finally
+    CFRelease(LFont);
+  end;
+  {$ENDIF}
+
+  {$IF defined(ANDROID) and (not defined(ALSkiaEngine))}
   var LPaint := TJPaint.JavaClass.init;
   LPaint.setAntiAlias(true);
   LPaint.setSubpixelText(true);
@@ -5042,9 +5156,6 @@ begin
   end;
   LPaint.setTypeface(LTypeface);
   LPaint.setTextSize(AFontSize);
-  LPaint.setColor(integer(AFontColor));
-  LPaint.setUnderlineText(TALTextDecorationKind.Underline in ADecorationKinds);
-  LPaint.setStrikeThruText(TALTextDecorationKind.LineThrough in ADecorationKinds);
 
   var LFontMetrics := LPaint.getFontMetrics;
   Result.Ascent := LFontMetrics.Ascent;
@@ -5054,30 +5165,7 @@ begin
   LPaint := nil;
   {$ENDIF}
 
-  {$IF defined(ALAppleOS)}
-
-  var Lfont := ALCreateCTFontRef(AFontFamily, AFontSize, AFontWeight, AFontSlant);
-  try
-    Result.Ascent := -CTFontGetAscent(Lfont);
-    Result.Descent := CTFontGetDescent(Lfont);
-    Result.Leading := CTFontGetLeading(Lfont);
-    {$IF defined(DEBUG)}
-    //ALLog(
-    //  'ALGetFontMetrics',
-    //  'FontFamily: '+ AFontFamily + ' | '+
-    //  'FontSize: '+ ALFloatToStrW(AFontSize, ALDefaultFormatSettingsW) + ' | '+
-    //  'CTFontGetAscent: ' + ALFloatToStrW(CTFontGetAscent(Lfont), ALDefaultFormatSettingsW) + ' | '+
-    //  'CTFontGetDescent: ' + ALFloatToStrW(CTFontGetDescent(Lfont), ALDefaultFormatSettingsW) + ' | '+
-    //  'CTFontGetLeading: ' + ALFloatToStrW(CTFontGetLeading(Lfont), ALDefaultFormatSettingsW) + ' | '+
-    //  'CTFontGetBoundingBox.height: ' + ALFloatToStrW(CTFontGetBoundingBox(Lfont).size.height, ALDefaultFormatSettingsW));
-    {$ENDIF}
-  finally
-    CFRelease(LFont);
-  end;
-
-  {$ENDIF}
-
-  {$IF defined(MSWINDOWS)}
+  {$IF defined(MSWINDOWS) and (not defined(ALSkiaEngine))}
 
   // Since the Windows API only works with integers, I multiply the font size by 100
   // and later divide the result by 100 to achieve better precision.
@@ -5090,8 +5178,8 @@ begin
                  0, // nOrientaion: Integer;
                  FontWeightToWinapi(AFontWeight), // fnWeight: Integer;
                  Cardinal(not AFontSlant.IsRegular), // fdwItalic: DWORD
-                 cardinal(TALTextDecorationKind.Underline in ADecorationKinds), // fdwUnderline: DWORD
-                 cardinal(TALTextDecorationKind.LineThrough in ADecorationKinds), // fdwStrikeOut: DWORD
+                 0, // fdwUnderline: DWORD
+                 0, // fdwStrikeOut: DWORD
                  DEFAULT_CHARSET, // fdwCharSet: DWORD
                  OUT_DEFAULT_PRECIS, // fdwOutputPrecision: DWORD
                  CLIP_DEFAULT_PRECIS, // fdwClipPrecision: DWORD
@@ -5121,7 +5209,17 @@ begin
 
   ALFontMetricsCacheLock.beginWrite;
   Try
-    ALFontMetricsCache.TryAdd(LFontMetricsKey, Result);
+    if ALFontMetricsCache.TryAdd(LFontMetricsKey, Result) then begin
+      {$IF defined(DEBUG)}
+      ALLog(
+        'ALGetFontMetrics',
+        'FontFamily: '+ AFontFamily + ' | '+
+        'FontSize: '+ ALFloatToStrW(AFontSize, ALDefaultFormatSettingsW) + ' | '+
+        'Ascent: ' + ALFloatToStrW(Result.Ascent, ALDefaultFormatSettingsW) + ' | '+
+        'Descent: ' + ALFloatToStrW(Result.Descent, ALDefaultFormatSettingsW) + ' | '+
+        'Leading: ' + ALFloatToStrW(Result.Leading, ALDefaultFormatSettingsW));
+      {$ENDIF}
+    end;
   finally
     ALFontMetricsCacheLock.endWrite;
   end;
@@ -5453,6 +5551,28 @@ begin
   // Taken from function TCanvas.AlignToPixel(const Rect: TRectF): TRectF;
   Result.Right := Result.Left + Round(Rect.Width * Scale + Epsilon) / Scale; // keep ratio horizontally
   Result.Bottom := Result.Top + Round(Rect.Height * Scale + Epsilon) / Scale; // keep ratio vertically
+end;
+
+{***********************************************************************************}
+function  ALTextAlignToTextHorzAlign(const ATextAlign: TTextAlign): TALTextHorzAlign;
+begin
+  case ATextAlign of
+    TTextAlign.Center: result := TALTextHorzAlign.Center;
+    TTextAlign.Leading: result := TALTextHorzAlign.Leading;
+    TTextAlign.Trailing: result := TALTextHorzAlign.Trailing;
+    else Raise Exception.Create('Error #9123711A-62FC-47E2-A041-1D7727198CD2')
+  end;
+end;
+
+{***********************************************************************************}
+function  ALTextAlignToTextVertAlign(const ATextAlign: TTextAlign): TALTextVertAlign;
+begin
+  case ATextAlign of
+    TTextAlign.Center: result := TALTextVertAlign.Center;
+    TTextAlign.Leading: result := TALTextVertAlign.Leading;
+    TTextAlign.Trailing: result := TALTextVertAlign.Trailing;
+    else Raise Exception.Create('Error #9123711A-62FC-47E2-A041-1D7727198CD2')
+  end;
 end;
 
 {**********************}

@@ -2919,9 +2919,7 @@ begin
                         TextSettings.Font.Family, // const AFontFamily: String;
                         TextSettings.Font.Size, // const AFontSize: single;
                         TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
-                        TextSettings.Font.Slant, // const AFontSlant: TFontSlant;
-                        TextSettings.Font.Color, // const AFontColor: TalphaColor;
-                        TextSettings.Decoration.Kinds); // const ADecorationKinds: TALTextDecorationKinds;
+                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
     result := result * textsettings.LineHeightMultiplier;
@@ -3390,9 +3388,7 @@ begin
                         TextSettings.Font.Family, // const AFontFamily: String;
                         TextSettings.Font.Size, // const AFontSize: single;
                         TextSettings.Font.Weight, // const AFontWeight: TFontWeight;
-                        TextSettings.Font.Slant, // const AFontSlant: TFontSlant;
-                        TextSettings.Font.Color, // const AFontColor: TalphaColor;
-                        TextSettings.Decoration.Kinds); // const ADecorationKinds: TALTextDecorationKinds;
+                        TextSettings.Font.Slant); // const AFontSlant: TFontSlant;
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   // The classic Edit control doesn't natively support line spacing adjustments
   // if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
@@ -4383,6 +4379,14 @@ begin
   //--
   UpdateEditControlPromptText;
   UpdateNativeViewVisibility;
+  {$IF not defined(ALDPK)}
+  if NativeView.visible then begin
+    // Because AncestorParentChanged is not called during loading,
+    // we must call NativeView.SetVisible(true) in TALBaseEdit.Loaded
+    // to hide the NativeView in case a parent control is hidden.
+    NativeView.SetVisible(true);
+  end;
+  {$ENDIF}
 end;
 
 {*********************************************************}

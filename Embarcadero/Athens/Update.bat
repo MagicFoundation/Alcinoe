@@ -9,9 +9,8 @@ if "%ALBaseDir%"=="" (
   IF ERRORLEVEL 1 goto ERROR  
 )
 
-FOR /F "usebackq tokens=3*" %%A IN (`reg query "HKCU\Software\Embarcadero\BDS\%ALDelphiVersion%" /v RootDir`) DO set EmbSourceDir=%%A %%B 
-set EmbSourceDir=%EmbSourceDir:~0,-1%source
-
+for /f "tokens=2*" %%A in ('reg query "HKLM\SOFTWARE\WOW6432Node\Embarcadero\BDS\%ALDelphiVersion%" /v "RootDir"') do set EmbSourceDir=%%B
+set EmbSourceDir=%EmbSourceDir:~0,-1%\source
 if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 SET FileName=%ALBaseDir%\Embarcadero\Athens\fmx

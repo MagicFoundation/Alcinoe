@@ -653,6 +653,7 @@ uses
   System.RTLConsts,
   System.StrUtils,
   System.Masks,
+  System.IOUtils,
   system.netencoding,
   System.Ansistrings,
   System.Character,
@@ -8020,6 +8021,7 @@ end;
 procedure ALSaveStringtoFile(const Str: AnsiString; const filename: String);
 Var LFileStream: TFileStream;
 begin
+  TDirectory.CreateDirectory(ExtractFilePath(filename));
   LFileStream := TFileStream.Create(filename, fmCreate);
   try
     LFileStream.WriteBuffer(Pointer(Str)^, Length(Str));
@@ -8033,6 +8035,7 @@ procedure ALSaveStringtoFile(const Str: String; const filename: String; AEncodin
 var LfileStream: TfileStream;
     Buffer, Preamble: TBytes;
 begin
+  TDirectory.CreateDirectory(ExtractFilePath(filename));
   LfileStream := TfileStream.Create(filename,fmCreate);
   Try
 

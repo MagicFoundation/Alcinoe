@@ -77,6 +77,7 @@ forced to apply patches to the original Delphi source files:
 * [Missing CVMetalTexture and CVMetalTextureCache Declarations in iOSapi.CoreVideo.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1939)
 * [Missing Method Declarations in UITextView and UITextField Interfaces in iOSapi.UIKit.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941)
 * [Incorrect External Declarations in System.Skia.API for Android Linking in Athens 12.2](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997)
+* [Add Additional Notification Icon Sizes for iOS 16+](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2171)
 
 
 Install Alcinoe

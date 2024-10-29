@@ -265,6 +265,7 @@ goto BUILD_TOOLS
 :DO_BUILD_TOOLS
 
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\AndroidMerger" "_Build\Source" "AndroidMerger.dproj" "Win64"
+Call :BUILD_PROJECT "%ALBaseDir%\Tools\AppIconGenerator" "_Source" "AppIconGenerator.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployMan" "_Build\Source" "DeployMan.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DeployProjNormalizer" "_Source" "DeployProjNormalizer.dproj" "Win64"
 Call :BUILD_PROJECT "%ALBaseDir%\Tools\DProjNormalizer" "_Source" "DProjNormalizer.dproj" "Win64"

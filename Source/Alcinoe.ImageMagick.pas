@@ -233,6 +233,122 @@ type
     MagickTrue = 1);
 
 type
+  CompositeOperator = (
+    UndefinedCompositeOp,
+    AlphaCompositeOp,
+    AtopCompositeOp,
+    BlendCompositeOp,
+    BlurCompositeOp,
+    BumpmapCompositeOp,
+    ChangeMaskCompositeOp,
+    ClearCompositeOp,
+    ColorBurnCompositeOp,
+    ColorDodgeCompositeOp,
+    ColorizeCompositeOp,
+    CopyBlackCompositeOp,
+    CopyBlueCompositeOp,
+    CopyCompositeOp,
+    CopyCyanCompositeOp,
+    CopyGreenCompositeOp,
+    CopyMagentaCompositeOp,
+    CopyAlphaCompositeOp,
+    CopyRedCompositeOp,
+    CopyYellowCompositeOp,
+    DarkenCompositeOp,
+    DarkenIntensityCompositeOp,
+    DifferenceCompositeOp,
+    DisplaceCompositeOp,
+    DissolveCompositeOp,
+    DistortCompositeOp,
+    DivideDstCompositeOp,
+    DivideSrcCompositeOp,
+    DstAtopCompositeOp,
+    DstCompositeOp,
+    DstInCompositeOp,
+    DstOutCompositeOp,
+    DstOverCompositeOp,
+    ExclusionCompositeOp,
+    HardLightCompositeOp,
+    HardMixCompositeOp,
+    HueCompositeOp,
+    InCompositeOp,
+    IntensityCompositeOp,
+    LightenCompositeOp,
+    LightenIntensityCompositeOp,
+    LinearBurnCompositeOp,
+    LinearDodgeCompositeOp,
+    LinearLightCompositeOp,
+    LuminizeCompositeOp,
+    MathematicsCompositeOp,
+    MinusDstCompositeOp,
+    MinusSrcCompositeOp,
+    ModulateCompositeOp,
+    ModulusAddCompositeOp,
+    ModulusSubtractCompositeOp,
+    MultiplyCompositeOp,
+    NoCompositeOp,
+    OutCompositeOp,
+    OverCompositeOp,
+    OverlayCompositeOp,
+    PegtopLightCompositeOp,
+    PinLightCompositeOp,
+    PlusCompositeOp,
+    ReplaceCompositeOp,
+    SaturateCompositeOp,
+    ScreenCompositeOp,
+    SoftLightCompositeOp,
+    SrcAtopCompositeOp,
+    SrcCompositeOp,
+    SrcInCompositeOp,
+    SrcOutCompositeOp,
+    SrcOverCompositeOp,
+    ThresholdCompositeOp,
+    VividLightCompositeOp,
+    XorCompositeOp,
+    StereoCompositeOp,
+    FreezeCompositeOp,
+    InterpolateCompositeOp,
+    NegateCompositeOp,
+    ReflectCompositeOp,
+    SoftBurnCompositeOp,
+    SoftDodgeCompositeOp,
+    StampCompositeOp,
+    RMSECompositeOp);
+
+type
+  GravityType = (
+    UndefinedGravity,
+    ForgetGravity = 0,
+    NorthWestGravity = 1,
+    NorthGravity = 2,
+    NorthEastGravity = 3,
+    WestGravity = 4,
+    CenterGravity = 5,
+    EastGravity = 6,
+    SouthWestGravity = 7,
+    SouthGravity = 8,
+    SouthEastGravity = 9);
+
+type
+  AlphaChannelOption = (
+    UndefinedAlphaChannel,
+    ActivateAlphaChannel,
+    AssociateAlphaChannel,
+    BackgroundAlphaChannel,
+    CopyAlphaChannel,
+    DeactivateAlphaChannel,
+    DiscreteAlphaChannel,
+    DisassociateAlphaChannel,
+    ExtractAlphaChannel,
+    OffAlphaChannel,
+    OnAlphaChannel,
+    OpaqueAlphaChannel,
+    RemoveAlphaChannel,
+    SetAlphaChannel,
+    ShapeAlphaChannel,
+    TransparentAlphaChannel);
+
+type
   PMagickWand = pointer;
   PPixelWand = pointer;
   PDrawingWand = pointer;
@@ -243,7 +359,7 @@ type
     FlibMagickWand: THandle;
   public
 
-    {$REGION 'https://www.imagemagick.org/api/magick-wand.php - MagickWand.h'}
+    {$REGION 'https://imagemagick.org/api/magick-wand.php - MagickWand.h'}
 
     //MagickWandGenesis() initializes the MagickWand environment.
     //The format of the MagickWandGenesis method is:
@@ -300,9 +416,39 @@ type
     //wand: the magick wand.
     MagickResetIterator: procedure(wand: PMagickWand); cdecl;
 
+    //MagickSetLastIterator() sets the wand iterator to the last image.
+    //The last image is actually the current image, and the next use of MagickPreviousImage() will not change this allowing this function to be used to iterate over the images in the reverse direction. In this sense it is more like MagickResetIterator() than MagickSetFirstIterator().
+    //Typically this function is used before MagickAddImage(), MagickReadImage() functions to ensure new images are appended to the very end of wand's image list.
+    //The format of the MagickSetLastIterator method is:
+    //void MagickSetLastIterator(MagickWand *wand)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    MagickSetLastIterator: procedure(wand: PMagickWand); cdecl;
+
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/magick-image.php - magick-image.h'}
+    {$REGION 'https://imagemagick.org/api/magick-image.php - magick-image.h'}
+
+    //MagickNewImage() adds a blank image canvas of the specified size and background color to the wand.
+    //The format of the MagickNewImage method is:
+    //MagickBooleanType MagickNewImage(MagickWand *wand, const size_t columns,const size_t rows,const PixelWand *background)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //width: the image width.
+    //height: the image height.
+    //background: the image color.
+    MagickNewImage: function(wand: PMagickWand; const columns: size_t; const rows: size_t; const background: PPixelWand): MagickBooleanType; cdecl;
+
+    //MagickAddImage() adds a clone of the images from the second wand and inserts them into the first wand.
+    //Use MagickSetLastIterator(), to append new images into an existing wand, current image will be set to last image so later adds with also be appended to end of wand.
+    //Use MagickSetFirstIterator() to prepend new images into wand, any more images added will also be prepended before other images in the wand. However the order of a list of new images will not change.
+    //Otherwise the new images will be inserted just after the current image, and any later image will also be added after this current image but before the previously added images. Caution is advised when multiple image adds are inserted into the middle of the wand image list.
+    //The format of the MagickAddImage method is:
+    //MagickBooleanType MagickAddImage(MagickWand *wand, const MagickWand *add_wand)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //add_wand: A wand that contains the image list to be added
+    MagickAddImage: function(wand: PMagickWand; const add_wand: PMagickWand): MagickBooleanType; cdecl;
 
     //MagickNextImage() sets the next image in the wand as the current image.
     //It is typically used after MagickResetIterator(), after which its first use will set the first image as the current image (unless the wand is empty).
@@ -500,9 +646,61 @@ type
     //drawing_wand: the draw wand.
     MagickDrawImage: function(wand: PMagickWand; const drawing_wand: PDrawingWand): MagickBooleanType; cdecl;
 
+    //MagickExtentImage() extends the image as defined by the geometry, gravity, and wand background color.
+    //Set the (x,y) offset of the geometry to move the original wand relative to the extended wand.
+    //The format of the MagickExtentImage method is:
+    //MagickBooleanType MagickExtentImage(MagickWand *wand,const size_t width, const size_t height,const ssize_t x,const ssize_t y)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //width: the region width.
+    //height: the region height.
+    //x: the region x offset.
+    //y: the region y offset.
+    MagickExtentImage: function(wand: PMagickWand; const width: size_t; const height: size_t; const x: ssize_t; const y: ssize_t): MagickBooleanType; cdecl;
+
+    //MagickSetImageAlphaChannel() activates, deactivates, resets, or sets the alpha channel.
+    //The format of the MagickSetImageAlphaChannel method is:
+    //MagickBooleanType MagickSetImageAlphaChannel(MagickWand *wand, const AlphaChannelOption alpha_type)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //alpha_type: the alpha channel type: ActivateAlphaChannel, DeactivateAlphaChannel, OpaqueAlphaChannel, or SetAlphaChannel.
+    MagickSetImageAlphaChannel: function(wand: PMagickWand; const alpha_type: AlphaChannelOption): MagickBooleanType; cdecl;
+
+    //MagickSetImageBackgroundColor() sets the image background color.
+    //The format of the MagickSetImageBackgroundColor method is:
+    //MagickBooleanType MagickSetImageBackgroundColor(MagickWand *wand, const PixelWand *background)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    //background: the background pixel wand.
+    MagickSetImageBackgroundColor: function(wand: PMagickWand; const background: PPixelWand): MagickBooleanType; cdecl;
+
+    //MagickCompositeImage() composite one image onto another at the specified offset.
+    //The format of the MagickCompositeImage method is:
+    //MagickBooleanType MagickCompositeImage(MagickWand *wand, const MagickWand *source_wand,const CompositeOperator compose, const MagickBooleanType clip_to_self,const ssize_t x,const ssize_t y)
+    //A description of each parameter follows:
+    //wand: the magick wand holding the destination images
+    //source_image: the magick wand holding source image.
+    //compose: This operator affects how the composite is applied to the image. The default is Over. These are some of the compose methods available.
+    //         OverCompositeOp: InCompositeOp OutCompositeOp AtopCompositeOp XorCompositeOp PlusCompositeOp MinusCompositeOp AddCompositeOp SubtractCompositeOp DifferenceCompositeOp BumpmapCompositeOp CopyCompositeOp DisplaceCompositeOp
+    //clip_to_self: set to MagickTrue to limit composition to area composed.
+    //x: the column offset of the composited image.
+    //y: the row offset of the composited image.
+    MagickCompositeImage: function(wand: PMagickWand; const source_wand: PMagickWand; const compose: CompositeOperator; const clip_to_self: MagickBooleanType; const x: ssize_t; const y: ssize_t): MagickBooleanType; cdecl;
+
+    //MagickCompositeImageGravity() composite one image onto another using the specified gravity.
+    //The format of the MagickCompositeImageGravity method is:
+    //MagickBooleanType MagickCompositeImageGravity(MagickWand *wand, const MagickWand *source_wand,const CompositeOperator compose, const GravityType gravity)
+    //A description of each parameter follows:
+    //wand: the magick wand holding the destination images
+    //source_image: the magick wand holding source image.
+    //compose: This operator affects how the composite is applied to the image. The default is Over. These are some of the compose methods available.
+    //         OverCompositeOp InCompositeOp OutCompositeOp AtopCompositeOp XorCompositeOp PlusCompositeOp MinusCompositeOp AddCompositeOp SubtractCompositeOp DifferenceCompositeOp BumpmapCompositeOp CopyCompositeOp DisplaceCompositeOp
+    //gravity: positioning gravity (NorthWestGravity, NorthGravity, NorthEastGravity, WestGravity, CenterGravity, EastGravity, SouthWestGravity, SouthGravity, SouthEastGravity)
+    MagickCompositeImageGravity: function(wand: PMagickWand; const source_wand: PMagickWand; const compose: CompositeOperator; const gravity: GravityType): MagickBooleanType; cdecl;
+
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/magick-property.php - magick-property.h'}
+    {$REGION 'https://imagemagick.org/api/magick-property.php - magick-property.h'}
 
     //MagickGetImageProperty() returns a value associated with the specified property. Use MagickRelinquishMemory() to free the value when you are finished with it.
     //The format of the MagickGetImageProperty method is:
@@ -596,9 +794,24 @@ type
     //length: the length of the profile.
     MagickRemoveImageProfile: function(wand: PMagickWand; const name: PansiChar; length: pSize_t): PByte; cdecl;
 
+    //MagickGetBackgroundColor() returns the wand background color.
+    //The format of the MagickGetBackgroundColor method is:
+    //PixelWand *MagickGetBackgroundColor(MagickWand *wand)
+    //A description of each parameter follows:
+    //wand: the magick wand.
+    MagickGetBackgroundColor: function(wand: PMagickWand): PPixelWand; cdecl;
+
+    //MagickSetBackgroundColor() sets the wand background color.
+    //The format of the MagickSetBackgroundColor method is:
+    //MagickBooleanType MagickSetBackgroundColor(MagickWand *wand, const PixelWand *background)
+    //A description of each parameter follows:
+    //wand: The magick wand.
+    //background: The background pixel wand.
+    MagickSetBackgroundColor: function(wand: PMagickWand; const background: PPixelWand): MagickBooleanType; cdecl;
+
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/pixel-wand.php - pixel-wand.h'}
+    {$REGION 'https://imagemagick.org/api/pixel-wand.php - pixel-wand.h'}
 
     //NewPixelWand() returns a new pixel wand.
     //The format of the NewPixelWand method is:
@@ -671,7 +884,7 @@ type
 
     {$ENDREGION}
 
-    {$REGION 'https://www.imagemagick.org/api/drawing-wand.php - drawing-wand.h'}
+    {$REGION 'https://imagemagick.org/api/drawing-wand.php - drawing-wand.h'}
 
     //NewDrawingWand() returns a drawing wand required for all other methods in the API.
     //The format of the NewDrawingWand method is:
@@ -817,9 +1030,12 @@ begin
   MagickGetException := GetProcAddress(FlibMagickWand,'MagickGetException');
   MagickRelinquishMemory := GetProcAddress(FlibMagickWand,'MagickRelinquishMemory');
   MagickResetIterator := GetProcAddress(FlibMagickWand,'MagickResetIterator');
+  MagickSetLastIterator := GetProcAddress(FlibMagickWand,'MagickSetLastIterator');
   {$ENDREGION}
 
   {$REGION 'https://www.imagemagick.org/api/magick-image.php'}
+  MagickNewImage := GetProcAddress(FlibMagickWand,'MagickNewImage');
+  MagickAddImage := GetProcAddress(FlibMagickWand,'MagickAddImage');
   MagickNextImage := GetProcAddress(FlibMagickWand,'MagickNextImage');
   MagickReadImage := GetProcAddress(FlibMagickWand,'MagickReadImage');
   MagickWriteImage := GetProcAddress(FlibMagickWand,'MagickWriteImage');
@@ -841,6 +1057,11 @@ begin
   MagickSetImageCompressionQuality := GetProcAddress(FlibMagickWand,'MagickSetImageCompressionQuality');
   MagickAutoOrientImage := GetProcAddress(FlibMagickWand,'MagickAutoOrientImage');
   MagickDrawImage := GetProcAddress(FlibMagickWand,'MagickDrawImage');
+  MagickExtentImage := GetProcAddress(FlibMagickWand,'MagickExtentImage');
+  MagickSetImageAlphaChannel := GetProcAddress(FlibMagickWand,'MagickSetImageAlphaChannel');
+  MagickSetImageBackgroundColor := GetProcAddress(FlibMagickWand,'MagickSetImageBackgroundColor');
+  MagickCompositeImage := GetProcAddress(FlibMagickWand,'MagickCompositeImage');
+  MagickCompositeImageGravity := GetProcAddress(FlibMagickWand,'MagickCompositeImageGravity');
   {$ENDREGION}
 
   {$REGION 'https://www.imagemagick.org/api/magick-property.php'}
@@ -854,6 +1075,8 @@ begin
   MagickSetImageProfile := GetProcAddress(FlibMagickWand,'MagickSetImageProfile');
   MagickProfileImage := GetProcAddress(FlibMagickWand,'MagickProfileImage');
   MagickRemoveImageProfile := GetProcAddress(FlibMagickWand,'MagickRemoveImageProfile');
+  MagickGetBackgroundColor := GetProcAddress(FlibMagickWand,'MagickGetBackgroundColor');
+  MagickSetBackgroundColor := GetProcAddress(FlibMagickWand,'MagickSetBackgroundColor');
   {$ENDREGION}
 
   {$REGION 'https://www.imagemagick.org/api/pixel-wand.php'}

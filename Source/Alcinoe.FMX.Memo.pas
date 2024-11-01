@@ -151,6 +151,8 @@ type
     function getLineCount: integer; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALIosMemoTextView read GetNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
+    Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 {$endif}
 {$ENDREGION}
@@ -290,6 +292,8 @@ type
     function getLineCount: integer; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALMacMemoScrollView read GetNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
+    Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 
 {$endif}
@@ -945,6 +949,18 @@ begin
     result := result * textsettings.LineHeightMultiplier;
 end;
 
+{************************************************************************************}
+Procedure TALIosMemoControl.setSelection(const AStart: integer; const AStop: Integer);
+begin
+  NativeView.View.setSelectedRange(NSMakeRange(AStart, AStop-AStart));
+end;
+
+{**************************************************************}
+Procedure TALIosMemoControl.setSelection(const AIndex: integer);
+begin
+  NativeView.View.setSelectedRange(NSMakeRange(AIndex, 0));
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -1446,6 +1462,18 @@ begin
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
     result := result * textsettings.LineHeightMultiplier;
+end;
+
+{************************************************************************************}
+Procedure TALMacMemoControl.setSelection(const AStart: integer; const AStop: Integer);
+begin
+  FTextView.View.setSelectedRange(NSMakeRange(AStart, AStop-AStart));
+end;
+
+{**************************************************************}
+Procedure TALMacMemoControl.setSelection(const AIndex: integer);
+begin
+  FTextView.View.setSelectedRange(NSMakeRange(AIndex, 0));
 end;
 
 {$endif}

@@ -136,6 +136,8 @@ Type
     {$ELSEIF defined(MSWindows)}
     property NativeView: TALWinNativeView read GetNativeView;
     {$ENDIF}
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual; abstract;
+    Procedure SetSelection(const AIndex: integer); overload; virtual; abstract;
     property OnChange: TNotifyEvent read fOnChange write fOnChange;
     property OnReturnKey: TNotifyEvent read fOnReturnKey write fOnReturnKey;
     property ReturnKeyType: TReturnKeyType read GetReturnKeyType write SetReturnKeyType;
@@ -277,6 +279,8 @@ type
     destructor Destroy; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALAndroidEditText read GetNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
+    Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 
 {$endif}
@@ -380,6 +384,8 @@ type
     destructor Destroy; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALIosEditTextField read GetNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
+    Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 
 {$endif}
@@ -478,6 +484,8 @@ type
     destructor Destroy; override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALMacEditTextField read GetNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
+    Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 
 {$endif}
@@ -561,6 +569,8 @@ type
     constructor Create(AOwner: TComponent); override;
     function getLineHeight: Single; override; // It includes the line spacing
     property NativeView: TALWinEditView read GetNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; override;
+    Procedure SetSelection(const AIndex: integer); overload; override;
   end;
 
 {$endif}
@@ -939,6 +949,8 @@ type
     function HasNativeView: boolean;
     Procedure AddNativeView;
     Procedure RemoveNativeView;
+    Procedure SetSelection(const AStart: integer; const AStop: Integer); overload; virtual;
+    Procedure SetSelection(const AIndex: integer); overload; virtual;
     function getLineCount: integer;
     function getLineHeight: Single; // It includes the line spacing
     procedure MakeBufDrawable; override;
@@ -2027,6 +2039,18 @@ begin
   result := NativeView.view.getLineHeight / ALGetScreenScale;
 end;
 
+{****************************************************************************************}
+Procedure TALAndroidEditControl.setSelection(const AStart: integer; const AStop: Integer);
+begin
+  NativeView.View.setSelection(aStart, aStop);
+end;
+
+{******************************************************************}
+Procedure TALAndroidEditControl.setSelection(const AIndex: integer);
+begin
+  NativeView.view.setSelection(aindex);
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -2542,6 +2566,22 @@ begin
     result := result * textsettings.LineHeightMultiplier;
 end;
 
+{************************************************************************************}
+Procedure TALIosEditControl.setSelection(const AStart: integer; const AStop: Integer);
+begin
+  var LStartPosition: UITextPosition := NativeView.View.positionFromPosition(NativeView.View.beginningOfDocument, AStart);
+  var LEndPosition: UITextPosition := NativeView.View.positionFromPosition(LStartPosition, AStop - AStart);
+  NativeView.View.setSelectedTextRange(NativeView.View.textRangeFromPosition(LStartPosition, LEndPosition));
+end;
+
+{**************************************************************}
+Procedure TALIosEditControl.setSelection(const AIndex: integer);
+begin
+  var LStartPosition := NativeView.View.positionFromPosition(NativeView.View.beginningOfDocument, AIndex);
+  var LEndPosition := NativeView.View.positionFromPosition(LStartPosition, 0);
+  NativeView.View.setSelectedTextRange(NativeView.View.textRangeFromPosition(LStartPosition, LEndPosition));
+end;
+
 {$endif}
 {$ENDREGION}
 
@@ -2923,6 +2963,18 @@ begin
   result := -LfontMetrics.Ascent + LfontMetrics.Descent + LfontMetrics.Leading;
   if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
     result := result * textsettings.LineHeightMultiplier;
+end;
+
+{************************************************************************************}
+Procedure TALMacEditControl.setSelection(const AStart: integer; const AStop: Integer);
+begin
+  NativeView.View.currentEditor.setSelectedRange(NSMakeRange(AStart, AStop-AStart));
+end;
+
+{**************************************************************}
+Procedure TALMacEditControl.setSelection(const AIndex: integer);
+begin
+  NativeView.View.currentEditor.setSelectedRange(NSMakeRange(AIndex, 0));
 end;
 
 {$endif}
@@ -3393,6 +3445,18 @@ begin
   // The classic Edit control doesn't natively support line spacing adjustments
   // if not SameValue(textsettings.LineHeightMultiplier, 0, TEpsilon.Scale) then
   //   result := result * textsettings.LineHeightMultiplier;
+end;
+
+{************************************************************************************}
+Procedure TALWinEditControl.SetSelection(const AStart: integer; const AStop: Integer);
+begin
+  SendMessage(NativeView.Handle, EM_SETSEL, AStart, AStop);
+end;
+
+{**************************************************************}
+Procedure TALWinEditControl.SetSelection(const AIndex: integer);
+begin
+  SendMessage(NativeView.Handle, EM_SETSEL, AIndex, AIndex);
 end;
 
 {$endif}
@@ -6196,6 +6260,18 @@ begin
   FNativeViewRemoved := True;
   ResetFocus;
   EditControl.RemoveNativeView;
+end;
+
+{******************************************************************************}
+Procedure TALBaseEdit.SetSelection(const AStart: integer; const AStop: Integer);
+begin
+  EditControl.SetSelection(AStart, AStop);
+end;
+
+{********************************************************}
+Procedure TALBaseEdit.SetSelection(const AIndex: integer);
+begin
+  EditControl.SetSelection(AIndex);
 end;
 
 {*****************************************}

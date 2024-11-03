@@ -1114,12 +1114,19 @@ end;
 
 initialization
   RegisterClasses([TALColorAdjustEffect]);
-  // 'ColorAdjust' is the CATEGORY! Several filters can have the same category. This why 'ColorAdjust' and not 'ALColorAdjust'
-  // the name of the filter is defined in TALColorAdjustFilter.FilterAttr as 'ALColorAdjust'
   {$IF defined(ALDPK)}
   // When you compile Alcinoe.dpk inside the IDE and when Alcinoe.dpk is already installed, you could receive the error :
   // Cannot register filter. A filter with the same name "ALColorAdjust" already exists..
-  if TFilterManager.FilterByName('ALColorAdjust') = nil then
+  Try
+    if TFilterManager.FilterByName('ALColorAdjust') = nil then
   {$ENDIF}
-    TFilterManager.RegisterFilter('ColorAdjust', TALColorAdjustFilter);
+      // 'ColorAdjust' is the CATEGORY! Several filters can have the same category. This why 'ColorAdjust' and not 'ALColorAdjust'
+      // the name of the filter is defined in TALColorAdjustFilter.FilterAttr as 'ALColorAdjust'
+      TFilterManager.RegisterFilter('ColorAdjust', TALColorAdjustFilter);
+  {$IF defined(ALDPK)}
+  Except
+    // For an unknown reason, under Athens 12.2, when you compile Alcinoe.dpk inside the IDE,
+    // you receive an EAccessViolation when calling TFilterManager.FilterByName('ALColorAdjust').
+  end;
+  {$ENDIF}
 end.

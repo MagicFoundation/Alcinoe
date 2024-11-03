@@ -36,8 +36,18 @@ const
 
 type
 
-  {*************************************}
-  TALEditEditor = class(TComponentEditor)
+  {***********************************}
+  TALEditEditor = class(TDefaultEditor)
+  protected
+    procedure ApplyThemeClick(Sender: TObject); virtual;
+  public
+    function GetVerb(Index: Integer): string; override;
+    function GetVerbCount: Integer; override;
+    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
+  end;
+
+  {***********************************}
+  TALMemoEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public
@@ -47,7 +57,7 @@ type
   end;
 
   {*************************************}
-  TALMemoEditor = class(TComponentEditor)
+  TALButtonEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public
@@ -56,8 +66,8 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {**************************************}
-  TALButtonEditor = class(TComponentEditor)
+  {***************************************}
+  TALCheckBoxEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public
@@ -66,8 +76,8 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {*****************************************}
-  TALCheckBoxEditor = class(TComponentEditor)
+  {******************************************}
+  TALRadioButtonEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public
@@ -76,8 +86,8 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {********************************************}
-  TALRadioButtonEditor = class(TComponentEditor)
+  {*************************************}
+  TALSwitchEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public
@@ -86,18 +96,8 @@ type
     procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
   end;
 
-  {********************************************}
-  TALSwitchEditor = class(TComponentEditor)
-  protected
-    procedure ApplyThemeClick(Sender: TObject); virtual;
-  public
-    function GetVerb(Index: Integer): string; override;
-    function GetVerbCount: Integer; override;
-    procedure PrepareItem(Index: Integer; const AItem: IMenuItem); override;
-  end;
-
-  {********************************************}
-  TALTrackBarEditor = class(TComponentEditor)
+  {***************************************}
+  TALTrackBarEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public
@@ -107,7 +107,7 @@ type
   end;
 
   {********************************************}
-  TALRangeTrackBarEditor = class(TComponentEditor)
+  TALRangeTrackBarEditor = class(TDefaultEditor)
   protected
     procedure ApplyThemeClick(Sender: TObject); virtual;
   public

@@ -1525,6 +1525,7 @@ type
         procedure PressedChanged; override;
         procedure ValueRangeChanged(Sender: TObject); Virtual;
         procedure KeyDown(var Key: Word; var KeyChar: System.WideChar; Shift: TShiftState); override;
+        function HasCustomDraw: Boolean; override;
         procedure Paint; override;
       public
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
@@ -2045,9 +2046,8 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~}
-  [ComponentPlatforms($FFFF)]
-  TALScrollBar = class(TALCustomTrack)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCustomScrollBar = class(TALCustomTrack)
   protected
     function GetDefaultSize: TSizeF; override;
     procedure AlignThumb; override;
@@ -2056,11 +2056,17 @@ type
     function CreateValueIndicator(const AValueIndicatorClass: TALCustomTrack.TValueIndicatorClass = nil; Const AName: String = 'ValueIndicator'): TALCustomTrack.TValueIndicator; override;
   public
     constructor Create(AOwner: TComponent); override;
+    property CanFocus default False;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
+  TALScrollBar = class(TALCustomScrollBar)
   published
     //property Action;
     property Align;
     property Anchors;
-    property CanFocus default False;
+    property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property DoubleBuffered;
@@ -2874,6 +2880,19 @@ begin
   inherited;
   if FScrollCapturedByMe then
     FScrollCapturedByMe := False;
+end;
+
+{****************************************************}
+function TALCustomTrack.TThumb.HasCustomDraw: Boolean;
+begin
+  // We need the BufDrawableRect because in MakeBufDrawable we do:
+  //   var LMainDrawableRect := BufDrawableRect;
+  //   LMainDrawableRect.Offset(-LMainDrawableRect.Left, -LMainDrawableRect.Top);
+  //   var LCenteredRect := LStateStyle.BufDrawableRect.CenterAt(LMainDrawableRect);
+  //   LStateStyle.BufDrawableRect.Offset(LCenteredRect.Left, LCenteredRect.top);
+  // Additionally, in paint, if the current style has inherit=true, we do not
+  // fallback to the inherited paint.
+  Result := true;
 end;
 
 {***********************************************}
@@ -5445,8 +5464,8 @@ begin
   end;
 end;
 
-{**************************************************}
-constructor TALScrollBar.Create(AOwner: TComponent);
+{********************************************************}
+constructor TALCustomScrollBar.Create(AOwner: TComponent);
 begin
   inherited;
   CanFocus := False;
@@ -5485,14 +5504,14 @@ begin
   FThumb.StateStyles.Focused.StateLayer.YRadius := FThumb.DefaultYRadius;
 end;
 
-{*******************************************}
-function TALScrollBar.GetDefaultSize: TSizeF;
+{*************************************************}
+function TALCustomScrollBar.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(150, 18);
 end;
 
-{********************************}
-procedure TALScrollBar.AlignThumb;
+{**************************************}
+procedure TALCustomScrollBar.AlignThumb;
 begin
   if FThumb = nil then exit;
   if ViewportSize > 0 then begin
@@ -5522,20 +5541,20 @@ begin
   inherited;
 end;
 
-{***********************************************************************************************************************************************************************************}
-function TALScrollBar.CreateInactiveTrack(const AInactiveTrackClass: TALCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALCustomTrack.TInactiveTrack;
+{*****************************************************************************************************************************************************************************************}
+function TALCustomScrollBar.CreateInactiveTrack(const AInactiveTrackClass: TALCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALCustomTrack.TInactiveTrack;
 begin
   Result := Nil;
 end;
 
-{*************************************************************************************************************************************************************************}
-function TALScrollBar.CreateActiveTrack(const AActiveTrackClass: TALCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALCustomTrack.TActiveTrack;
+{*******************************************************************************************************************************************************************************}
+function TALCustomScrollBar.CreateActiveTrack(const AActiveTrackClass: TALCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALCustomTrack.TActiveTrack;
 begin
   Result := Nil;
 end;
 
-{****************************************************************************************************************************************************************************************}
-function TALScrollBar.CreateValueIndicator(const AValueIndicatorClass: TALCustomTrack.TValueIndicatorClass = nil; Const AName: String = 'ValueIndicator'): TALCustomTrack.TValueIndicator;
+{**********************************************************************************************************************************************************************************************}
+function TALCustomScrollBar.CreateValueIndicator(const AValueIndicatorClass: TALCustomTrack.TValueIndicatorClass = nil; Const AName: String = 'ValueIndicator'): TALCustomTrack.TValueIndicator;
 begin
   Result := Nil;
 end;

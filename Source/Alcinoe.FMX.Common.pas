@@ -404,6 +404,8 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALBaseTextSettings = class(TALPersistentObserver)
+  public
+    class var HorizontalEllipsis: String;
   private
     FFont: TALFont;
     FDecoration: TALTextDecoration;
@@ -2300,7 +2302,7 @@ begin
   FEllipsisSettings := TALEllipsisSettings.create;
   FEllipsisSettings.OnChanged := EllipsisSettingsChanged;
   //--
-  FDefaultEllipsis := '…';
+  FDefaultEllipsis := HorizontalEllipsis;
   FDefaultTrimming := TALTextTrimming.Word;
   FDefaultMaxLines := 65535;
   FDefaultHorzAlign := TALTextHorzAlign.Leading;
@@ -5908,6 +5910,7 @@ initialization
   {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
   TALFontManager.FCustomTypeFaces := TDictionary<String, JTypeFace>.Create;
   {$ENDIF}
+  TALBaseTextSettings.HorizontalEllipsis := '…';
 
 finalization
   AlFreeAndNil(ALFontMetricsCache);

@@ -53,7 +53,7 @@ type
     DecorationThicknessMultiplier: Single; // default = 1
     DecorationColor: TAlphaColor; // default = TAlphaColors.Null
     //--
-    EllipsisText: String; // default = '…';
+    EllipsisText: String; // default = TALBaseTextSettings.HorizontalEllipsis ('…');
     EllipsisInheritSettings: Boolean; // default = True;
     //--
     EllipsisFontFamily: String; // default = ''
@@ -346,7 +346,7 @@ begin
   DecorationThicknessMultiplier := 1;
   DecorationColor := TAlphaColors.Null;
   //--
-  EllipsisText := '…';
+  EllipsisText := TALBaseTextSettings.HorizontalEllipsis;
   EllipsisInheritSettings := True;
   //--
   EllipsisFontFamily := '';

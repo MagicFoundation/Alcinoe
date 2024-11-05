@@ -788,11 +788,11 @@ begin
   fMaxContentHeight := 0;
   fAnchoredContentOffset := TpointF.Create(0,0);
   //-----
-  //important FVScrollBar & FHScrollBar must be created BEFORE FContent (else FVScrollBar & FHScrollBar will be added to the TabList of FContent)
-  //https://github.com/pleriche/FastMM5/issues/31
+  // It is important that FVScrollBar and FHScrollBar are created AFTER FContent;
+  // otherwise, FVScrollBar and FHScrollBar will not be added to the TabList of FContent.
+  FContent := CreateContent;
   FVScrollBar := CreateScrollBar(Torientation.Vertical);
   FHScrollBar := CreateScrollBar(Torientation.Horizontal);
-  FContent := CreateContent;
   if FHScrollBar <> nil then FHScrollBar.BringToFront;
   if FVScrollBar <> nil then FVScrollBar.BringToFront;
   //-----
@@ -804,6 +804,11 @@ end;
 {************************************}
 destructor TALCustomScrollBox.Destroy;
 begin
+  // https://github.com/pleriche/FastMM5/issues/31
+  var LTabList := GetTabList;
+  If FVScrollBar <> nil then LTabList.Remove(FVScrollBar);
+  If FHScrollBar <> nil then LTabList.Remove(FHScrollBar);
+  LTabList := nil;
   TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   ALFreeAndNil(FScrollEngine);
   inherited Destroy;

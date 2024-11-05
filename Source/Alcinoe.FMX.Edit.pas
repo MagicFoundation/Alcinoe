@@ -513,6 +513,11 @@ type
     procedure WMLButtonUp(var Message: TWMLButtonUp); message WM_LBUTTONUP;
     procedure WMMouseMove(var Message: TWMMouseMove); message WM_MOUSEMOVE;
     procedure WMChar(var Message: TWMChar); message WM_CHAR;
+    procedure WMSetText(var Message: TWMSetText); message WM_SETTEXT;
+    procedure WMPaste(var Message: TWMPaste); message WM_PASTE;
+    procedure WMCut(var Message: TWMCut); message WM_CUT;
+    procedure WMClear(var Message: TWMClear); message WM_CLEAR;
+    procedure WMUndo(var Message: TWMUndo); message WM_UNDO;
     procedure WMTextColor(var Message: WinApi.Messages.TMessage); message CN_CTLCOLOREDIT;
     procedure WMPaint(var Message: TWMPaint); message WM_PAINT;
   protected
@@ -3115,6 +3120,46 @@ begin
   fEditControl.DoChange;
 end;
 
+{**********************************************************}
+procedure TALWinEditView.WMSetText(var Message: TWMSetText);
+begin
+  inherited;
+  invalidate;
+  fEditControl.DoChange;
+end;
+
+{******************************************************}
+procedure TALWinEditView.WMPaste(var Message: TWMPaste);
+begin
+  inherited;
+  invalidate;
+  fEditControl.DoChange;
+end;
+
+{**************************************************}
+procedure TALWinEditView.WMCut(var Message: TWMCut);
+begin
+  inherited;
+  invalidate;
+  fEditControl.DoChange;
+end;
+
+{******************************************************}
+procedure TALWinEditView.WMClear(var Message: TWMClear);
+begin
+  inherited;
+  invalidate;
+  fEditControl.DoChange;
+end;
+
+{****************************************************}
+procedure TALWinEditView.WMUndo(var Message: TWMUndo);
+begin
+  inherited;
+  invalidate;
+  fEditControl.DoChange;
+end;
+
 {**************************************************************************}
 procedure TALWinEditView.WMTextColor(var Message: WinApi.Messages.TMessage);
 begin
@@ -4215,7 +4260,11 @@ begin
   fBufSupportingTextDrawable := ALNullDrawable;
   //fBufSupportingTextDrawableRect
   //--
+  {$IF defined(MSWindows) or defined(ALMacOS)}
+  FocusOnMouseDown := True;
+  {$ELSE}
   FocusOnMouseUp := True;
+  {$ENDIF}
   Cursor := crIBeam;
   CanFocus := True;
   //--

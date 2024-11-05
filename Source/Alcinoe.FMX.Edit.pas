@@ -796,8 +796,6 @@ type
     FAutoTranslate: Boolean;
     fOnChange: TNotifyEvent;
     fOnReturnKey: TNotifyEvent;
-    fOnEnter: TNotifyEvent;
-    fOnExit: TNotifyEvent;
     FTextSettings: TTextSettings;
     FPromptText: String;
     FPromptTextColor: TAlphaColor;
@@ -843,8 +841,6 @@ type
     procedure OnChangeImpl(Sender: TObject);
     procedure OnReturnKeyImpl(Sender: TObject);
     procedure SetOnReturnKey(const Value: TNotifyEvent);
-    procedure OnEnterImpl(Sender: TObject);
-    procedure OnExitImpl(Sender: TObject);
     procedure setAutoCapitalizationType(const Value: TALAutoCapitalizationType);
     function GetAutoCapitalizationType: TALAutoCapitalizationType;
     procedure SetPassword(const Value: Boolean);
@@ -1038,8 +1034,8 @@ type
     property OnDragOver;
     property OnDragDrop;
     property OnDragEnd;
-    property OnEnter: TnotifyEvent Read fOnEnter Write fOnEnter;
-    property OnExit: TnotifyEvent Read fOnExit Write fOnExit;
+    property OnEnter;
+    property OnExit;
     property OnMouseEnter;
     property OnMouseLeave;
     property OnMouseDown;
@@ -4177,8 +4173,6 @@ begin
   FAutoTranslate := true;
   fOnChange := nil;
   FOnReturnKey := nil;
-  fOnEnter := nil;
-  fOnExit := nil;
   //--
   FTextSettings := CreateTextSettings;
   FTextSettings.Font.DefaultSize := 16;
@@ -4367,8 +4361,6 @@ begin
   FeditControl.OnReturnKey := nil; // noops operation
   fEditControl.Align := TAlignLayout.Client;
   FeditControl.OnChange := OnChangeImpl;
-  FeditControl.OnEnter := OnEnterImpl;
-  FeditControl.OnExit := OnExitImpl;
   fEditControl.Password := false; // noops operation
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
   fEditControl.KeyboardType := TVirtualKeyboardType.Default; // noops operation
@@ -5195,26 +5187,6 @@ begin
   fOnReturnKey := Value;
   if assigned(fOnReturnKey) then EditControl.onReturnKey := OnReturnKeyImpl
   else EditControl.onReturnKey := nil;
-end;
-
-{*************************************************}
-procedure TALBaseEdit.OnEnterImpl(Sender: TObject);
-begin
-  {$IF defined(DEBUG)}
-  if (csLoading in componentState) then raise Exception.Create('Error 7438D305-07BC-4CD9-80E3-4E0FCAA8D446');
-  {$ENDIF}
-  if assigned(fOnEnter) then
-    fOnEnter(self);
-end;
-
-{************************************************}
-procedure TALBaseEdit.OnExitImpl(Sender: TObject);
-begin
-  {$IF defined(DEBUG)}
-  if (csLoading in componentState) then raise Exception.Create('Error B36DA0AF-D894-466B-85ED-BD1D7A85627D');
-  {$ENDIF}
-  if assigned(fOnExit) then
-    fOnExit(self);
 end;
 
 {***********************************}

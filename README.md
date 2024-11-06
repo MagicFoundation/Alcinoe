@@ -32,12 +32,22 @@ FireMonkey applications with ease, showcasing advanced
 features and custom styling capabilities.
 
 <p align="left">
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
+  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo">
+    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
+  </a>
+  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo">
+    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
+  </a>
 </p>
 
 
 #### KisKis ####
+
+KisKis is a dating app crafted in Delphi using the Alcinoe framework, 
+offering a sleek, modern, and responsive platform for connecting people. 
+Leveraging Alcinoe's advanced UI controls and optimized performance 
+capabilities, KisKis delivers an engaging and seamless user experience, 
+making meaningful connections more accessible and enjoyable.
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtubekiskis.jpg?raw=true"/>

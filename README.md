@@ -31,15 +31,13 @@ build high-performance, visually stunning, and responsive
 FireMonkey applications with ease, showcasing advanced 
 features and custom styling capabilities.
 
-<p align="left">
-  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo">
+<a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo">
+  <p align="left">
     <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-  </a>
-  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo">
+    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" width="25" />
     <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-  </a>
-</p>
-
+  </p>
+</a>
 
 #### KisKis ####
 

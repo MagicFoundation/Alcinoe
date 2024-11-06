@@ -26,6 +26,7 @@ Example of an App Built with Alcinoe
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemoqrcodeplaystore.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogetitongoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
 </p>
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">

@@ -2828,8 +2828,10 @@ begin
   FOnElementMouseUp := nil;
   FOnElementMouseEnter := nil;
   FOnElementMouseLeave := nil;
-  FHoveredElement := TALTextElement.Empty;
-  FPressedElement := TALTextElement.Empty;
+  // No need to do this, as it was already initialized via InitInstance.
+  // It's a slightly expensive operation.
+  //FHoveredElement := TALTextElement.Empty;
+  //FPressedElement := TALTextElement.Empty;
   //-----
   fBufDrawable := ALNullDrawable;
   //-----

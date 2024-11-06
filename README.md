@@ -31,14 +31,12 @@ build high-performance, visually stunning, and responsive
 FireMonkey applications with ease, showcasing advanced 
 features and custom styling capabilities.
 
-<a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo">
-  <p align="left">
-    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" width="25" />
-    <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-  </p>
-</a>
-
+<p align="left">
+  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" /></a>
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/empty.png?raw=true" width="25" />
+  <a href="https://play.google.com/store/apps/details?id=io.magicfoundation.alcinoe.alfmxcontrolsdemo"><img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" /></a>
+</p>
+  
 #### KisKis ####
 
 KisKis is a dating app crafted in Delphi using the Alcinoe framework, 

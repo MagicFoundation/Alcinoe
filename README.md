@@ -23,11 +23,21 @@ visibility and growth.
 Example of an App Built with Alcinoe
 ------------------------------------
 
+#### Alcinoe Firemonkey Controls Demo ####
+
+The Alcinoe FireMonkey Controls Demo highlights the power and 
+flexibility of Alcinoe's UI components. It demonstrates how to 
+build high-performance, visually stunning, and responsive 
+FireMonkey applications with ease, showcasing advanced 
+features and custom styling capabilities.
+
 <p align="left">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemo.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemoqrcodeplaystore.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
-  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogetitongoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
+  <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/alfmxcontrolsdemogoogleplay.png?raw=true" alt="Alcinoe Firemonkey Controls Demo" />
 </p>
+
+
+#### KisKis ####
 
 <a href="https://www.youtube.com/watch?v=IJzEuZTSXDI&vq=hd2160">
   <img src="https://github.com/MagicFoundation/Alcinoe/blob/master/References/DocImages/youtubekiskis.jpg?raw=true"/>

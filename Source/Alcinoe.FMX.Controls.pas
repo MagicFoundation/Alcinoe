@@ -190,7 +190,6 @@ end;
 {******************************************}
 function TALControl.IsOwnerLoading: Boolean;
 begin
-  inherited;
   result := (Owner <> nil) and
             (csloading in Owner.ComponentState);
 end;

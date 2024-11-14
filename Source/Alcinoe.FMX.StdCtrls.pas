@@ -4459,8 +4459,8 @@ begin
   Result.Margins.Rect := Result.Margins.DefaultValue;
   Result.Margins.OnChange := LMarginsChange;
   //--
-  if Orientation = TOrientation.Horizontal then Result.Align := TalignLayout.vertical
-  else Result.Align := TalignLayout.horizontal;
+  if Orientation = TOrientation.Horizontal then Result.Align := TALAlignLayout.vertical
+  else Result.Align := TALAlignLayout.horizontal;
 end;
 
 {*********************************************************************************************************************************************}
@@ -4481,8 +4481,8 @@ begin
   Result.Margins.Rect := Result.Margins.DefaultValue;
   Result.Margins.OnChange := LMarginsChange;
   //--
-  if Orientation = TOrientation.Horizontal then Result.Align := TalignLayout.vertical
-  else Result.Align := TalignLayout.horizontal;
+  if Orientation = TOrientation.Horizontal then Result.Align := TALAlignLayout.vertical
+  else Result.Align := TALAlignLayout.horizontal;
 end;
 
 {***************************************************************************************************************}
@@ -4497,8 +4497,8 @@ begin
   Result.Name := AName; // Useful at design time in the IDE
   Result.Width := GetDefaultSize.Height; // 32 px width
   //--
-  if Orientation = TOrientation.Horizontal then Result.Align := TalignLayout.vertical
-  else Result.Align := TalignLayout.horizontal;
+  if Orientation = TOrientation.Horizontal then Result.Align := TALAlignLayout.vertical
+  else Result.Align := TALAlignLayout.horizontal;
 end;
 
 {************************************************************************************************************************************************************}
@@ -4824,11 +4824,11 @@ procedure TALCustomTrack.SetOrientation(const Value: TOrientation);
     Result.Bottom := ARect.Right;
   End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function SwapAlign(Const AAlign: TalignLayout): TalignLayout;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function SwapAlign(Const AAlign: TALAlignLayout): TALAlignLayout;
   Begin
-    If AAlign = TalignLayout.Vertical then result := TalignLayout.Horizontal
-    else If AAlign = TalignLayout.Horizontal then result := TalignLayout.Vertical
+    If AAlign = TALAlignLayout.Vertical then result := TALAlignLayout.Horizontal
+    else If AAlign = TALAlignLayout.Horizontal then result := TALAlignLayout.Vertical
     else result := AAlign;
   End;
 
@@ -5422,11 +5422,11 @@ procedure TALRangeTrackBar.SetOrientation(const Value: TOrientation);
     Result.Bottom := ARect.Right;
   End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  function SwapAlign(Const AAlign: TalignLayout): TalignLayout;
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function SwapAlign(Const AAlign: TALAlignLayout): TALAlignLayout;
   Begin
-    If AAlign = TalignLayout.Vertical then result := TalignLayout.Horizontal
-    else If AAlign = TalignLayout.Horizontal then result := TalignLayout.Vertical
+    If AAlign = TALAlignLayout.Vertical then result := TALAlignLayout.Horizontal
+    else If AAlign = TALAlignLayout.Horizontal then result := TALAlignLayout.Vertical
     else result := AAlign;
   End;
 
@@ -8326,7 +8326,7 @@ procedure TALSwitch.TThumb.TThumbStateStyles.TransitionAnimationProcess(Sender: 
 begin
   var LThumb := Parent;
   var LSwitch := TALSwitch(LThumb.ParentControl{Track}.ParentControl{Switch});
-  if (not LSwitch.Pressed) and (Lthumb.Align = TAlignLayout.None) then begin
+  if (not LSwitch.Pressed) and (Lthumb.Align = TALAlignLayout.None) then begin
     var LFloatAnimation := TALFloatAnimation(Sender);
     var LStopPositionX: Single;
     If LSwitch.Checked then LStopPositionX := LSwitch.GetMaxThumbPos
@@ -8419,7 +8419,7 @@ begin
   FTrack.Stored := False;
   FTrack.SetSubComponent(True);
   FTrack.Name := 'Track'; // Useful at design time in the IDE
-  FTrack.Align := TalignLayout.Client;
+  FTrack.Align := TALAlignLayout.Client;
   //--
   // Use 'self' instead of 'FTrack' to ensure that
   // 'Fthumb.loaded' is called.
@@ -8569,7 +8569,7 @@ procedure TALSwitch.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Si
 begin
   inherited;
   if Pressed then begin
-    fThumb.Align := TALignLayout.None;
+    fThumb.Align := TALALignLayout.None;
     FPressedThumbPos := FThumb.Position.Point;
   end;
 end;
@@ -8617,7 +8617,7 @@ begin
       if not Thumb.StateStyles.TransitionClickDelayed then
         DoChange;
     end;
-    fThumb.Align := TALignLayout.None;
+    fThumb.Align := TALALignLayout.None;
     StartTransition;
   end;
 end;
@@ -8640,7 +8640,7 @@ begin
       if not Thumb.StateStyles.TransitionClickDelayed then
         DoChange;
     end;
-    fThumb.Align := TALignLayout.None;
+    fThumb.Align := TALALignLayout.None;
     StartTransition;
   end;
 end;
@@ -8659,7 +8659,7 @@ begin
     var LChecked := not Checked;
     FTrack.Checked := LChecked;
     FThumb.Checked := LChecked;
-    fThumb.Align := TALignLayout.None;
+    fThumb.Align := TALALignLayout.None;
     StartTransition;
     exit;
   end
@@ -8668,7 +8668,7 @@ begin
     var LChecked := not Checked;
     FTrack.Checked := LChecked;
     FThumb.Checked := LChecked;
-    fThumb.Align := TALignLayout.None;
+    fThumb.Align := TALALignLayout.None;
     DoChange;
     inherited;
     StartTransition;
@@ -8718,8 +8718,8 @@ procedure TALSwitch.AlignThumb;
 begin
   If CsLoading in ComponentState then Exit;
   if pressed or fScrollCapturedByMe then exit;
-  If Checked then FThumb.Align := TALignLayout.right
-  else FThumb.Align := TALignLayout.left;
+  If Checked then FThumb.Align := TALAlignLayout.right
+  else FThumb.Align := TALAlignLayout.left;
 end;
 
 {*************************************}

@@ -4408,7 +4408,7 @@ begin
   FeditControl.SetSubComponent(True);
   FeditControl.Locked := True;
   FeditControl.OnReturnKey := nil; // noops operation
-  fEditControl.Align := TAlignLayout.Client;
+  fEditControl.Align := TALAlignLayout.Client;
   FeditControl.OnChange := OnChangeImpl;
   fEditControl.Password := false; // noops operation
   fEditControl.ReturnKeyType := tReturnKeyType.Default;  // noops operation
@@ -6330,14 +6330,14 @@ end;
 function TALEdit.HasUnconstrainedAutosizeY: Boolean;
 begin
   result := (GetAutoSize) and
-            (not (Align in [TAlignLayout.Client,
-                            TAlignLayout.Contents,
-                            TAlignLayout.Left,
-                            TAlignLayout.Right,
-                            TAlignLayout.MostLeft,
-                            TAlignLayout.MostRight,
-                            TAlignLayout.Vertical,
-                            TAlignLayout.HorzCenter]))
+            (not (Align in [TALAlignLayout.Client,
+                            TALAlignLayout.Contents,
+                            TALAlignLayout.Left,
+                            TALAlignLayout.Right,
+                            TALAlignLayout.MostLeft,
+                            TALAlignLayout.MostRight,
+                            TALAlignLayout.Vertical,
+                            TALAlignLayout.HorzCenter]))
 end;
 
 {**************************************************}

@@ -705,7 +705,7 @@ type
     FIsAdjustingSize: Boolean;
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
-    procedure SetAlign(const Value: TAlignLayout); override;
+    procedure SetAlign(const Value: TALAlignLayout); override;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
     function GetElementAtPos(const APos: TPointF): TALTextElement;
@@ -3292,8 +3292,8 @@ begin
   end;
 end;
 
-{********************************************************}
-procedure TALBaseText.SetAlign(const Value: TAlignLayout);
+{**********************************************************}
+procedure TALBaseText.SetAlign(const Value: TALAlignLayout);
 begin
   if Align <> Value then clearBufDrawable;
   inherited SetAlign(Value);
@@ -3309,28 +3309,28 @@ end;
 function TALBaseText.HasUnconstrainedAutosizeX: Boolean;
 begin
   Result := (GetAutoSize) and
-            (not (Align in [TAlignLayout.Client,
-                            TAlignLayout.Contents,
-                            TAlignLayout.Top,
-                            TAlignLayout.Bottom,
-                            TAlignLayout.MostTop,
-                            TAlignLayout.MostBottom,
-                            TAlignLayout.Horizontal,
-                            TAlignLayout.VertCenter]));
+            (not (Align in [TALAlignLayout.Client,
+                            TALAlignLayout.Contents,
+                            TALAlignLayout.Top,
+                            TALAlignLayout.Bottom,
+                            TALAlignLayout.MostTop,
+                            TALAlignLayout.MostBottom,
+                            TALAlignLayout.Horizontal,
+                            TALAlignLayout.VertCenter]));
 end;
 
 {******************************************************}
 function TALBaseText.HasUnconstrainedAutosizeY: Boolean;
 begin
   Result := (GetAutoSize) and
-            (not (Align in [TAlignLayout.Client,
-                            TAlignLayout.Contents,
-                            TAlignLayout.Left,
-                            TAlignLayout.Right,
-                            TAlignLayout.MostLeft,
-                            TAlignLayout.MostRight,
-                            TAlignLayout.Vertical,
-                            TAlignLayout.HorzCenter]));
+            (not (Align in [TALAlignLayout.Client,
+                            TALAlignLayout.Contents,
+                            TALAlignLayout.Left,
+                            TALAlignLayout.Right,
+                            TALAlignLayout.MostLeft,
+                            TALAlignLayout.MostRight,
+                            TALAlignLayout.Vertical,
+                            TALAlignLayout.HorzCenter]));
 end;
 
 {******************************************************}

@@ -387,6 +387,7 @@ uses
   DesignIntf,
   {$ENDIF}
   Alcinoe.FMX.Graphics,
+  Alcinoe.FMX.Controls,
   Alcinoe.Common;
 
 {$REGION ' Android'}
@@ -1657,14 +1658,14 @@ end;
 function TALMemo.HasUnconstrainedAutosizeY: Boolean;
 begin
   result := (FAutoSizeLineCount > 0) and
-            (not (Align in [TAlignLayout.Client,
-                            TAlignLayout.Contents,
-                            TAlignLayout.Left,
-                            TAlignLayout.Right,
-                            TAlignLayout.MostLeft,
-                            TAlignLayout.MostRight,
-                            TAlignLayout.Vertical,
-                            TAlignLayout.HorzCenter]));
+            (not (Align in [TALAlignLayout.Client,
+                            TALAlignLayout.Contents,
+                            TALAlignLayout.Left,
+                            TALAlignLayout.Right,
+                            TALAlignLayout.MostLeft,
+                            TALAlignLayout.MostRight,
+                            TALAlignLayout.Vertical,
+                            TALAlignLayout.HorzCenter]));
 end;
 
 {**************************************}

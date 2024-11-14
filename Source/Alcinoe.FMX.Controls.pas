@@ -16,6 +16,45 @@ type
 
   {**************************}
   {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
+  {$ENDIF}
+  TALAlignLayout = (
+    None,
+    Top,
+    Left,
+    Right,
+    Bottom,
+    MostTop,
+    MostBottom,
+    MostLeft,
+    MostRight,
+    Client,
+    Contents,
+    Center,
+    VertCenter,
+    HorzCenter,
+    Horizontal,
+    Vertical,
+    Scale,
+    Fit,
+    FitLeft,
+    FitRight,
+    TopCenter,    // Added from TAlignLayout - Works like TAlignLayout.Top, then centers the control horizontally
+    TopLeft,      // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the left.
+    TopRight,     // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the right.
+    LeftCenter,   // Added from TAlignLayout - Works like TAlignLayout.Left, then centers the control vertically.
+    LeftTop,      // Added from TAlignLayout - Works like TAlignLayout.Left, then aligns the control to the top.
+    LeftBottom,   // Added from TAlignLayout - Works like TAlignLayout.Left, then aligns the control to the bottom.
+    RightCenter,  // Added from TAlignLayout - Works like TAlignLayout.Right, then centers the control vertically.
+    RightTop,     // Added from TAlignLayout - Works like TAlignLayout.Right, then aligns the control to the top.
+    RightBottom,  // Added from TAlignLayout - Works like TAlignLayout.Right, then aligns the control to the bottom.
+    BottomCenter, // Added from TAlignLayout - Works like TAlignLayout.Bottom, then centers the control horizontally
+    BottomLeft,   // Added from TAlignLayout - Works like TAlignLayout.Bottom, then aligns the control to the left.
+    BottomRight); // Added from TAlignLayout - Works like TAlignLayout.Bottom, then aligns the control to the right.
+
+  {**************************}
+  {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
   TALControl = class(TControl)
@@ -28,6 +67,8 @@ type
     FDisableDoubleClickHandling: Boolean;
     FIsPixelAlignmentEnabled: Boolean;
     FFormerMarginsChangedHandler: TNotifyEvent;
+    FAlign: TALAlignLayout;
+    FIsAligning: Boolean;
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     procedure DelayOnResize(Sender: TObject);
@@ -54,6 +95,9 @@ type
     procedure Loaded; override;
     function IsOwnerLoading: Boolean;
     function IsSizeStored: Boolean; override;
+    function GetAlign: TALAlignLayout; Reintroduce;
+    procedure SetAlign(const Value: TALAlignLayout); Reintroduce; virtual;
+    procedure DoRealign; override;
   public
     constructor Create(AOwner: TComponent); override;
     procedure SetNewScene(AScene: IScene); override;
@@ -65,7 +109,9 @@ type
     {$ENDIF}
     property Pressed: Boolean read GetPressed write SetPressed;
     procedure AlignToPixel; virtual;
+    procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
     property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
+    property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
   end;
 
   {**************************************}
@@ -175,6 +221,8 @@ begin
   // mobile apps, leading to a more user-friendly experience.
   FDisableDoubleClickHandling := True;
   FIsPixelAlignmentEnabled := True;
+  FAlign := TALAlignLayout.None;
+  FIsAligning := False;
 end;
 
 {**************************}
@@ -202,6 +250,131 @@ begin
             (not SameValue(LDefaultSize.cy, Size.Size.cy, TEpsilon.Position));
 end;
 
+{*******************************************}
+function TALControl.GetAlign: TALAlignLayout;
+begin
+  Result := FAlign;
+end;
+
+{*********************************************************}
+procedure TALControl.SetAlign(const Value: TALAlignLayout);
+begin
+  If FAlign <> Value then begin
+    FAlign := Value;
+    var LLegacyAlign: TAlignLayout;
+    Case Value of
+      TALAlignLayout.None: LLegacyAlign := TAlignLayout.None;
+      TALAlignLayout.Top: LLegacyAlign := TAlignLayout.Top;
+      TALAlignLayout.Left: LLegacyAlign := TAlignLayout.Left;
+      TALAlignLayout.Right: LLegacyAlign := TAlignLayout.Right;
+      TALAlignLayout.Bottom: LLegacyAlign := TAlignLayout.Bottom;
+      TALAlignLayout.MostTop: LLegacyAlign := TAlignLayout.MostTop;
+      TALAlignLayout.MostBottom: LLegacyAlign := TAlignLayout.MostBottom;
+      TALAlignLayout.MostLeft: LLegacyAlign := TAlignLayout.MostLeft;
+      TALAlignLayout.MostRight: LLegacyAlign := TAlignLayout.MostRight;
+      TALAlignLayout.Client: LLegacyAlign := TAlignLayout.Client;
+      TALAlignLayout.Contents: LLegacyAlign := TAlignLayout.Contents;
+      TALAlignLayout.Center: LLegacyAlign := TAlignLayout.Center;
+      TALAlignLayout.VertCenter: LLegacyAlign := TAlignLayout.VertCenter;
+      TALAlignLayout.HorzCenter: LLegacyAlign := TAlignLayout.HorzCenter;
+      TALAlignLayout.Horizontal: LLegacyAlign := TAlignLayout.Horizontal;
+      TALAlignLayout.Vertical: LLegacyAlign := TAlignLayout.Vertical;
+      TALAlignLayout.Scale: LLegacyAlign := TAlignLayout.Scale;
+      TALAlignLayout.Fit: LLegacyAlign := TAlignLayout.Fit;
+      TALAlignLayout.FitLeft: LLegacyAlign := TAlignLayout.FitLeft;
+      TALAlignLayout.FitRight: LLegacyAlign := TAlignLayout.FitRight;
+      TALAlignLayout.TopCenter: LLegacyAlign := TAlignLayout.Top;
+      TALAlignLayout.TopLeft: LLegacyAlign := TAlignLayout.Top;
+      TALAlignLayout.TopRight: LLegacyAlign := TAlignLayout.Top;
+      TALAlignLayout.LeftCenter: LLegacyAlign := TAlignLayout.Left;
+      TALAlignLayout.LeftTop: LLegacyAlign := TAlignLayout.Left;
+      TALAlignLayout.LeftBottom: LLegacyAlign := TAlignLayout.Left;
+      TALAlignLayout.RightCenter: LLegacyAlign := TAlignLayout.Right;
+      TALAlignLayout.RightTop: LLegacyAlign := TAlignLayout.Right;
+      TALAlignLayout.RightBottom: LLegacyAlign := TAlignLayout.Right;
+      TALAlignLayout.BottomCenter: LLegacyAlign := TAlignLayout.Bottom;
+      TALAlignLayout.BottomLeft: LLegacyAlign := TAlignLayout.Bottom;
+      TALAlignLayout.BottomRight: LLegacyAlign := TAlignLayout.Bottom;
+      else Raise Exception.Create('Error D527A470-23AC-4E3C-BCC5-4C2DB578A691');
+    end;
+    Inherited SetAlign(LLegacyAlign);
+  end;
+end;
+
+{*****************************}
+procedure TALControl.DoRealign;
+begin
+  if not FNeedAlign then
+    Exit;
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if https://quality.embarcadero.com/browse/RSP-15768 was implemented and adjust the IFDEF'}
+  {$ENDIF}
+  var LOriginalSize: TPointF := Size.Size; // https://quality.embarcadero.com/browse/RSP-15768
+  FIsAligning := True;
+  Try
+    inherited;
+  finally
+    FIsAligning := False;
+  end;
+  if not LOriginalSize.EqualsTo(Size.Size) then DoRealign; // https://quality.embarcadero.com/browse/RSP-15768
+end;
+
+{************************************************************}
+procedure TALControl.SetBounds(X, Y, AWidth, AHeight: Single);
+begin
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
+  {$ENDIF}
+  If (FAlign in [TALAlignLayout.TopCenter,
+                 TALAlignLayout.TopLeft,
+                 TALAlignLayout.TopRight,
+                 TALAlignLayout.LeftCenter,
+                 TALAlignLayout.LeftTop,
+                 TALAlignLayout.LeftBottom,
+                 TALAlignLayout.RightCenter,
+                 TALAlignLayout.RightTop,
+                 TALAlignLayout.RightBottom,
+                 TALAlignLayout.BottomCenter,
+                 TALAlignLayout.BottomLeft,
+                 TALAlignLayout.BottomRight]) and
+     (ParentControl is TALControl) and
+     (TALControl(ParentControl).FIsAligning) then begin
+    case FAlign of
+      TALAlignLayout.TopCenter,
+      TALAlignLayout.BottomCenter: begin
+        X := X + ((AWidth - Width) / 2);
+        AWidth := Width;
+      end;
+      TALAlignLayout.TopLeft,
+      TALAlignLayout.BottomLeft: begin
+        AWidth := Width;
+      end;
+      TALAlignLayout.TopRight,
+      TALAlignLayout.BottomRight: begin
+        X := X + (AWidth - Width);
+        AWidth := Width;
+      end;
+      TALAlignLayout.LeftCenter,
+      TALAlignLayout.RightCenter: begin
+        Y := Y + ((AHeight - Height) / 2);
+        AHeight := Height;
+      end;
+      TALAlignLayout.LeftTop,
+      TALAlignLayout.RightTop: begin
+        AHeight := Height;
+      end;
+      TALAlignLayout.LeftBottom,
+      TALAlignLayout.RightBottom: begin
+        Y := Y + (AHeight - Height);
+        AHeight := Height;
+      end;
+      else
+        raise Exception.Create('Error 9431A388-3F2F-4F06-8296-210708F60C66');
+    end;
+  end;
+  inherited;
+end;
+
 {********************************}
 procedure TALControl.AlignToPixel;
 begin
@@ -220,32 +393,44 @@ begin
       Margins.Rect := ALAlignEdgesToPixelRound(Margins.Rect, ALGetScreenScale, TEpsilon.Position);
       Padding.Rect := ALAlignEdgesToPixelRound(Padding.Rect, ALGetScreenScale, TEpsilon.Position);
       case Align of
-        TAlignLayout.None,
-        TAlignLayout.Center:
+        TALAlignLayout.None,
+        TALAlignLayout.Center,
+        TALAlignLayout.TopCenter,
+        TALAlignLayout.TopLeft,
+        TALAlignLayout.TopRight,
+        TALAlignLayout.LeftCenter,
+        TALAlignLayout.LeftTop,
+        TALAlignLayout.LeftBottom,
+        TALAlignLayout.RightCenter,
+        TALAlignLayout.RightTop,
+        TALAlignLayout.RightBottom,
+        TALAlignLayout.BottomCenter,
+        TALAlignLayout.BottomLeft,
+        TALAlignLayout.BottomRight:
           Size.Size := ALAlignDimensionToPixelRound(Size.Size, ALGetScreenScale, TEpsilon.Position);
         //--
-        TAlignLayout.Top,
-        TAlignLayout.MostTop,
-        TAlignLayout.Bottom,
-        TAlignLayout.MostBottom,
-        TAlignLayout.Horizontal,
-        TAlignLayout.VertCenter:
+        TALAlignLayout.Top,
+        TALAlignLayout.MostTop,
+        TALAlignLayout.Bottom,
+        TALAlignLayout.MostBottom,
+        TALAlignLayout.Horizontal,
+        TALAlignLayout.VertCenter:
           Size.Height := ALAlignDimensionToPixelRound(Size.Height , ALGetScreenScale, TEpsilon.Position);
         //--
-        TAlignLayout.Left,
-        TAlignLayout.MostLeft,
-        TAlignLayout.Right,
-        TAlignLayout.MostRight,
-        TAlignLayout.Vertical,
-        TAlignLayout.HorzCenter:
+        TALAlignLayout.Left,
+        TALAlignLayout.MostLeft,
+        TALAlignLayout.Right,
+        TALAlignLayout.MostRight,
+        TALAlignLayout.Vertical,
+        TALAlignLayout.HorzCenter:
           Size.Width := ALAlignDimensionToPixelRound(Size.Width , ALGetScreenScale, TEpsilon.Position);
         //--
-        TAlignLayout.Client,
-        TAlignLayout.Contents,
-        TAlignLayout.Scale,
-        TAlignLayout.Fit,
-        TAlignLayout.FitLeft,
-        TAlignLayout.FitRight:;
+        TALAlignLayout.Client,
+        TALAlignLayout.Contents,
+        TALAlignLayout.Scale,
+        TALAlignLayout.Fit,
+        TALAlignLayout.FitLeft,
+        TALAlignLayout.FitRight:;
         //--
         else
           Raise Exception.Create('Error AC54DF90-F880-4BD5-8474-E62BD8D099FB')

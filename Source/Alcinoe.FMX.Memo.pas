@@ -328,7 +328,7 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALMemo = class(TALBaseEdit, IALAutosizeControl)
+  TALMemo = class(TALBaseEdit)
   public
     type
       // -------------
@@ -343,15 +343,14 @@ type
     procedure SetTextSettings(const Value: TMemoTextSettings);
   protected
     function GetDefaultSize: TSizeF; override;
+    function GetAutoSize: Boolean; override;
     procedure SetAutosizeLineCount(const Value: Integer); virtual;
     function CreateTextSettings: TALBaseEdit.TTextSettings; override;
     function CreateEditControl: TALBaseEditControl; override;
     procedure AdjustSize; override;
-    { IALAutosizeControl }
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
+    function HasUnconstrainedAutosizeX: Boolean; override;
   published
     property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
     property TextSettings: TMemoTextSettings read GetTextSettings write SetTextSettings;
@@ -379,13 +378,13 @@ uses
   Macapi.CoreText,
   FMX.Helpers.Mac,
   FMX.Consts,
-  Alcinoe.StringUtils,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.Windows,
   {$endif}
   {$IFDEF ALDPK}
   DesignIntf,
   {$ENDIF}
+  Alcinoe.StringUtils,
   Alcinoe.FMX.Graphics,
   Alcinoe.FMX.Controls,
   Alcinoe.Common;
@@ -1592,8 +1591,21 @@ procedure TALMemo.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
+     (scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
+
+      if isupdating then begin
+        FAdjustSizeOnEndUpdate := True;
+        Exit;
+      end
+      else
+        FAdjustSizeOnEndUpdate := False;
+
+      {$IF defined(debug)}
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      {$ENDIF}
+
       Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
       if LInlinedLabelText then MakeBufLabelTextDrawable;
 
@@ -1614,14 +1626,14 @@ begin
         if IsPixelAlignmentEnabled then LAdjustement := ALAlignDimensionToPixelRound(LAdjustement, ALGetScreenScale, TEpsilon.Position);
 
         If LInlinedLabelText then begin
-          SetBounds(
+          SetFixedSizeBounds(
             Position.X,
             Position.Y,
             Width,
             (LLineHeight * AutoSizeLineCount) + LAdjustement + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
         end
         else begin
-          SetBounds(
+          SetFixedSizeBounds(
             Position.X,
             Position.Y,
             Width,
@@ -1654,24 +1666,16 @@ begin
   result := False;
 end;
 
-{**************************************************}
-function TALMemo.HasUnconstrainedAutosizeY: Boolean;
-begin
-  result := (FAutoSizeLineCount > 0) and
-            (not (Align in [TALAlignLayout.Client,
-                            TALAlignLayout.Contents,
-                            TALAlignLayout.Left,
-                            TALAlignLayout.Right,
-                            TALAlignLayout.MostLeft,
-                            TALAlignLayout.MostRight,
-                            TALAlignLayout.Vertical,
-                            TALAlignLayout.HorzCenter]));
-end;
-
 {**************************************}
 function TALMemo.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(200, 75);
+end;
+
+{************************************}
+function TALMemo.GetAutoSize: Boolean;
+begin
+  result := FAutoSizeLineCount > 0;
 end;
 
 {***********************************************************}

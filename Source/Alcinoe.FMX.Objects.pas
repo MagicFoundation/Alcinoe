@@ -395,26 +395,15 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALRectangle = class(TALBaseRectangle, IALAutosizeControl)
-  private
-    FAutoSize: Boolean;
+  TALRectangle = class(TALBaseRectangle)
   protected
-    function GetAutoSize: Boolean; virtual;
-    procedure SetAutoSize(const Value: Boolean); virtual;
-    procedure DoRealign; override;
-    procedure AdjustSize; virtual;
-    { IALAutosizeControl }
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
-  public
-    constructor Create(AOwner: TComponent); override;
   published
     //property Action;
     property Align;
     property Anchors;
     // Dynamically adjusts the dimensions to accommodate child controls,
     // considering their sizes, positions, margins, and alignments.
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -657,7 +646,7 @@ type
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBaseText = class(TALShape, IALAutosizeControl, IALDoubleBufferedControl)
+  TALBaseText = class(TALShape, IALDoubleBufferedControl)
   public
     type
       TElementMouseEvent = procedure(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single; const Element: TALTextElement) of object;
@@ -689,7 +678,6 @@ type
     FXRadius: Single;
     FCorners: TCorners;
     FSides: TSides;
-    FAutoSize: Boolean;
     FDefaultXRadius: Single;
     FDefaultYRadius: Single;
     function IsCornersStored: Boolean;
@@ -702,12 +690,10 @@ type
     function IsXRadiusStored: Boolean;
     function IsYRadiusStored: Boolean;
   protected
-    FIsAdjustingSize: Boolean;
     function GetDoubleBuffered: boolean;
     procedure SetDoubleBuffered(const AValue: Boolean);
     procedure SetAlign(const Value: TALAlignLayout); override;
-    function GetAutoSize: Boolean; virtual;
-    procedure SetAutoSize(const Value: Boolean); virtual;
+    procedure SetAutoSize(const Value: Boolean); override;
     function GetElementAtPos(const APos: TPointF): TALTextElement;
     procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
     procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
@@ -734,8 +720,7 @@ type
     procedure SetData(const Value: TValue); override;
     procedure Loaded; override;
     procedure DoResized; override;
-    procedure DoEndUpdate; override;
-    procedure AdjustSize; virtual;
+    procedure AdjustSize; override;
     function GetMultiLineTextOptions(
                const AScale: Single;
                const AOpacity: Single;
@@ -807,18 +792,14 @@ type
     property OnElementMouseEnter: TElementNotifyEvent read FOnElementMouseEnter write FOnElementMouseEnter;
     property OnElementMouseLeave: TElementNotifyEvent read FOnElementMouseLeave write FOnElementMouseLeave;
     property TextSettings: TALBaseTextSettings read fTextSettings write SetTextSettings;
-    { IALAutosizeControl }
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
-    procedure SetNewScene(AScene: IScene); override;
     procedure MakeBufDrawable; virtual;
     procedure clearBufDrawable; virtual;
     function TextBroken: Boolean;
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    property AutoSize;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
     property HitTest default False;
@@ -939,6 +920,7 @@ uses
   system.SysUtils,
   system.Math,
   system.Math.Vectors,
+  FMX.utils,
   FMX.platform,
   {$IF defined(ALSkiaAvailable)}
   FMX.Skia,
@@ -2172,58 +2154,6 @@ begin
 
 end;
 
-{**************************************************}
-constructor TALRectangle.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  FAutoSize := False;
-end;
-
-{*****************************************}
-function TALRectangle.GetAutoSize: Boolean;
-begin
-  result := FAutoSize;
-end;
-
-{*******************************************************}
-function TALRectangle.HasUnconstrainedAutosizeX: Boolean;
-begin
-  result := GetAutoSize;
-end;
-
-{*******************************************************}
-function TALRectangle.HasUnconstrainedAutosizeY: Boolean;
-begin
-  result := GetAutoSize;
-end;
-
-{*******************************************************}
-procedure TALRectangle.SetAutoSize(const Value: Boolean);
-begin
-  if FAutoSize <> Value then
-  begin
-    FAutoSize := Value;
-    AdjustSize;
-    repaint;
-  end;
-end;
-
-{*******************************}
-procedure TALRectangle.DoRealign;
-begin
-  inherited DoRealign;
-  AdjustSize;
-end;
-
-{********************************}
-procedure TALRectangle.AdjustSize;
-begin
-  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
-     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (FAutoSize) then // if FAutoSize is false nothing to adjust
-    ALAutoSize(Self);
-end;
-
 {***********************************************}
 constructor TALCircle.Create(AOwner: TComponent);
 begin
@@ -2859,8 +2789,6 @@ begin
   HitTest := False;
   //-----
   FAutoTranslate := true;
-  FAutoSize := False;
-  FIsAdjustingSize := False;
   FMaxWidth := 65535;
   FMaxHeight := 65535;
   FText := '';
@@ -2881,7 +2809,6 @@ end;
 {***************************}
 procedure TALBaseText.Loaded;
 begin
-
   {$IF defined(ALBackwardCompatible)}
   if ALSametextW(TextSettings.Font.Family, 'sans-serif-thin') then begin
     TextSettings.Font.Family := 'sans-serif';
@@ -2921,8 +2848,6 @@ begin
     TextSettings.EllipsisSettings.Font.Family := ALConvertFontFamily(TextSettings.EllipsisSettings.Font.Family);
 
   inherited Loaded;
-
-  AdjustSize;
 end;
 
 {*********************************}
@@ -2939,33 +2864,15 @@ begin
   end;
 end;
 
-{************************************************}
-procedure TALBaseText.SetNewScene(AScene: IScene);
-begin
-  inherited SetNewScene(AScene);
-  // At design time, when a new TALBaseText control with AutoSize=true
-  // is added to the form, the size will not adjust and will remain
-  // at its default (200x50). Calling AdjustSize here will correct this.
-  AdjustSize;
-end;
-
 {******************************}
 procedure TALBaseText.DoResized;
 begin
   if not FIsAdjustingSize then begin
     ClearBufDrawable;
     inherited;
-    AdjustSize;
   end
   else
     inherited;
-end;
-
-{********************************}
-procedure TALBaseText.DoEndUpdate;
-begin
-  AdjustSize;
-  inherited DoEndUpdate;
 end;
 
 {*******************************}
@@ -2973,12 +2880,22 @@ procedure TALBaseText.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (not isupdating) and // DoEndUpdate will call again AdjustSize
      (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // if AutoSize is false nothing to adjust
      (Text <> '') and // if Text is empty do not do autosize
-     (scene <> nil) then begin // SetNewScene will call again AdjustSize
-    FIsAdjustingSize := True;
+     (scene <> nil) and // SetNewScene will call again AdjustSize
+     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
+
+      if isupdating then begin
+        FAdjustSizeOnEndUpdate := True;
+        Exit;
+      end
+      else
+        FAdjustSizeOnEndUpdate := False;
+
+      {$IF defined(debug)}
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      {$ENDIF}
 
       var R: TrectF;
       If {$IF not DEFINED(ALDPK)}DoubleBuffered{$ELSE}True{$ENDIF} then begin
@@ -3012,10 +2929,10 @@ begin
         r.height := height;
       end;
 
-      SetBounds(Position.X, Position.Y, R.Width, R.Height);
+      SetFixedSizeBounds(Position.X, Position.Y, R.Width, R.Height);
 
     finally
-      FIsAdjustingSize := False;
+      TNonReentrantHelper.LeaveSection(FIsAdjustingSize)
     end;
   end;
 end;
@@ -3118,7 +3035,6 @@ procedure TALBaseText.PaddingChanged;
 begin
   clearBufDrawable;
   inherited;
-  AdjustSize;
   Repaint;
 end;
 
@@ -3299,49 +3215,13 @@ begin
   inherited SetAlign(Value);
 end;
 
-{****************************************}
-function TALBaseText.GetAutoSize: Boolean;
-begin
-  Result := FAutoSize;
-end;
-
-{******************************************************}
-function TALBaseText.HasUnconstrainedAutosizeX: Boolean;
-begin
-  Result := (GetAutoSize) and
-            (not (Align in [TALAlignLayout.Client,
-                            TALAlignLayout.Contents,
-                            TALAlignLayout.Top,
-                            TALAlignLayout.Bottom,
-                            TALAlignLayout.MostTop,
-                            TALAlignLayout.MostBottom,
-                            TALAlignLayout.Horizontal,
-                            TALAlignLayout.VertCenter]));
-end;
-
-{******************************************************}
-function TALBaseText.HasUnconstrainedAutosizeY: Boolean;
-begin
-  Result := (GetAutoSize) and
-            (not (Align in [TALAlignLayout.Client,
-                            TALAlignLayout.Contents,
-                            TALAlignLayout.Left,
-                            TALAlignLayout.Right,
-                            TALAlignLayout.MostLeft,
-                            TALAlignLayout.MostRight,
-                            TALAlignLayout.Vertical,
-                            TALAlignLayout.HorzCenter]));
-end;
-
 {******************************************************}
 procedure TALBaseText.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
   begin
     clearBufDrawable;
-    FAutoSize := Value;
-    AdjustSize;
-    repaint;
+    inherited;
   end;
 end;
 
@@ -3946,23 +3826,25 @@ begin
   Inherited SetTextSettings(Value);
 end;
 
-{**************************************************}
-//unfortunatly the way the beginupdate/endupdate and
-//realign work is not very efficient for TALText.
-//because when we do endupdate then we will first
-//call endupdate to the most far away childreen:
-//  Control1
-//    Control2
-//      AlText1
-//So when we do Control1.endupdate we will do in this order :
-//      AlText1.endupdate => adjustsize and realign
-//    Control2.endupdate => realign and then maybe again AlText1.adjustsize
-//  Control1.endupdate => realign and then maybe again AlText1.adjustsize
-//this is a problem because we will calculate several time the BufDrawable
-//to mitigate this we can do
-//  ALLockTexts(Control1);
-//  Control1.endupdate;
-//  ALUnLockTexts(Control1);
+{*************************************************}
+// Unfortunately, the way BeginUpdate/EndUpdate and
+// Realign are implemented is not very efficient for TALText.
+// When calling EndUpdate, it first propagates to the most
+// deeply nested children in this hierarchy:
+//   Control1
+//     Control2
+//       AlText1
+// This means when Control1.EndUpdate is called,
+// it executes in the following order:
+//       AlText1.EndUpdate => AdjustSize and Realign
+//     Control2.EndUpdate => Realign and potentially calls AlText1.AdjustSize again
+//   Control1.EndUpdate => Realign and possibly triggers AlText1.AdjustSize once more
+// This poses a problem since the BufDrawable will be
+// recalculated multiple times.
+// To mitigate this, we can use:
+//   ALLockTexts(Control1);
+//   Control1.EndUpdate;
+//   ALUnLockTexts(Control1);
 procedure ALLockTexts(const aParentControl: Tcontrol);
 begin
   if aParentControl is TalText then begin

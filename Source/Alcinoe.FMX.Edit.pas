@@ -871,7 +871,6 @@ type
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
   protected
-    FIsAdjustingSize: Boolean;
     function CreateTextSettings: TTextSettings; virtual;
     function CreateEditControl: TALBaseEditControl; virtual;
     function GetEditControl: TALBaseEditControl; virtual;
@@ -902,8 +901,6 @@ type
     procedure StrokeChanged(Sender: TObject); override;
     procedure SetSides(const Value: TSides); override;
     procedure FillChanged(Sender: TObject); override;
-    procedure DoResized; override;
-    procedure AdjustSize; virtual; abstract;
     procedure Paint; override;
     Procedure CreateBufPromptTextDrawable(
                 var ABufDrawable: TALDrawable;
@@ -937,7 +934,6 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
-    procedure SetNewScene(AScene: IScene); override;
     {$IF defined(android)}
     property NativeView: TALAndroidNativeView read GetNativeView;
     {$ELSEIF defined(IOS)}
@@ -1063,20 +1059,14 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALEdit = class(TALBaseEdit, IALAutosizeControl)
-  private
-    FAutoSize: Boolean;
+  TALEdit = class(TALBaseEdit)
   protected
-    function GetAutoSize: Boolean; virtual;
-    procedure SetAutoSize(const Value: Boolean); virtual;
     procedure AdjustSize; override;
-    { IALAutosizeControl }
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
+    function HasUnconstrainedAutosizeX: Boolean; override;
   published
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default True;
+    property AutoSize default True;
     property Password;
   end;
 
@@ -1128,6 +1118,7 @@ uses
   {$ENDIF}
   Alcinoe.FMX.Memo,
   Alcinoe.FMX.BreakText,
+  Alcinoe.StringUtils,
   Alcinoe.Common;
 
 {********************************************************}
@@ -4251,7 +4242,6 @@ begin
   //--
   FIsTextEmpty := True;
   FNativeViewRemoved := False;
-  FIsAdjustingSize := False;
   //--
   fBufPromptTextDrawable := ALNullDrawable;
   //fBufPromptTextDrawableRect
@@ -4368,16 +4358,6 @@ begin
   end;
 end;
 
-{************************************************}
-procedure TALBaseEdit.SetNewScene(AScene: IScene);
-begin
-  inherited SetNewScene(AScene);
-  // At design time, when a new TEdit/TMemo is added to the form,
-  // the size will not adjust and will remain at its default (200x50).
-  // Calling AdjustSize here will correct this.
-  AdjustSize;
-end;
-
 {*****************************************************}
 function TALBaseEdit.CreateTextSettings: TTextSettings;
 begin
@@ -4457,8 +4437,19 @@ begin
   _ConvertFontFamily(StateStyles.Hovered);
   _ConvertFontFamily(StateStyles.Focused);
   //--
-  // remove csLoading from ComponentState
-  inherited;
+  // AdjustSize will be called in the following call to TextSettingsChanged(TextSettings)
+  // therefore, we must deactivate it in the inherited method to avoid calling it twice.
+  {$IF defined(debug)}
+  if FIsAdjustingSize then
+    Raise Exception.Create('Error D9247DBE-D093-415C-9537-11D7275EF141');
+  {$ENDIF}
+  FIsAdjustingSize := true;
+  Try
+    // remove csLoading from ComponentState
+    inherited;
+  Finally
+    FIsAdjustingSize := False;
+  End;
   //--
   if (AutoTranslate) and
      (PromptText <> '') and
@@ -4479,7 +4470,6 @@ begin
   //--
   TextSettingsChanged(TextSettings);
   //--
-  //AdjustSize; => Already called in TextSettingsChanged
   //UpdateEditControlStyle => Already called in TextSettingsChanged
   //--
   UpdateEditControlPromptText;
@@ -5250,9 +5240,8 @@ end;
 {***********************************}
 procedure TALBaseEdit.PaddingChanged;
 begin
-  Inherited;
   clearBufDrawable;
-  AdjustSize;
+  Inherited;
 end;
 
 {***************************************************}
@@ -5274,13 +5263,6 @@ procedure TALBaseEdit.FillChanged(Sender: TObject);
 begin
   inherited;
   UpdateEditControlStyle;
-end;
-
-{******************************}
-procedure TALBaseEdit.DoResized;
-begin
-  inherited;
-  AdjustSize;
 end;
 
 {************************************************}
@@ -6314,41 +6296,10 @@ begin
   FAutoSize := True;
 end;
 
-{************************************}
-function TALEdit.GetAutoSize: Boolean;
-begin
-  result := FAutoSize;
-end;
-
 {**************************************************}
 function TALEdit.HasUnconstrainedAutosizeX: Boolean;
 begin
   result := False;
-end;
-
-{**************************************************}
-function TALEdit.HasUnconstrainedAutosizeY: Boolean;
-begin
-  result := (GetAutoSize) and
-            (not (Align in [TALAlignLayout.Client,
-                            TALAlignLayout.Contents,
-                            TALAlignLayout.Left,
-                            TALAlignLayout.Right,
-                            TALAlignLayout.MostLeft,
-                            TALAlignLayout.MostRight,
-                            TALAlignLayout.Vertical,
-                            TALAlignLayout.HorzCenter]))
-end;
-
-{**************************************************}
-procedure TALEdit.SetAutoSize(const Value: Boolean);
-begin
-  if FAutoSize <> Value then
-  begin
-    FAutoSize := Value;
-    AdjustSize;
-    repaint;
-  end;
 end;
 
 {***************************}
@@ -6356,8 +6307,21 @@ procedure TALEdit.AdjustSize;
 begin
   if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
      (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
+     (scene <> nil) and // SetNewScene will call again AdjustSize
      (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
     try
+
+      if isupdating then begin
+        FAdjustSizeOnEndUpdate := True;
+        Exit;
+      end
+      else
+        FAdjustSizeOnEndUpdate := False;
+
+      {$IF defined(debug)}
+      //ALLog(ClassName + '.AdjustSize', 'Name: ' + Name + ' | HasUnconstrainedAutosize(X/Y) : '+ALBoolToStrW(HasUnconstrainedAutosizeX)+'/'+ALBoolToStrW(HasUnconstrainedAutosizeY));
+      {$ENDIF}
+
       Var LInlinedLabelText := (LabelText <> '') and (LabelTextSettings.Layout = TLabelTextLayout.Inline);
       if LInlinedLabelText then MakeBufLabelTextDrawable;
 
@@ -6375,14 +6339,14 @@ begin
         if IsPixelAlignmentEnabled then LLineHeight := ALAlignDimensionToPixelRound(LLineHeight, ALGetScreenScale, TEpsilon.Position);
 
         If LInlinedLabelText then begin
-          SetBounds(
+          SetFixedSizeBounds(
             Position.X,
             Position.Y,
             Width,
             LLineHeight + LStrokeSize.Top + LStrokeSize.bottom + padding.Top + padding.Bottom + BufLabelTextDrawableRect.Height + LabelTextSettings.Margins.Top + LabelTextSettings.Margins.bottom);
         end
         else begin
-          SetBounds(
+          SetFixedSizeBounds(
             Position.X,
             Position.Y,
             Width,

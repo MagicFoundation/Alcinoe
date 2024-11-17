@@ -143,13 +143,6 @@ type
     procedure MakeBufDrawable;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  IALAutosizeControl = interface
-    ['{464CDB70-9F76-4334-8774-5DD98605D6C1}']
-    function HasUnconstrainedAutosizeX: boolean;
-    function HasUnconstrainedAutosizeY: boolean;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALShapeControl = interface
     ['{7F0C732D-88CF-4FE4-ABCB-A990D103D7A8}']
@@ -997,7 +990,6 @@ function  ALGetResourceDirectory: String;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
 Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffered: Boolean = True);
-procedure ALAutoSize(const AControl: TControl);
 function  ALAlignEdgesToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
 function  ALAlignDimensionToPixelRound(const Size: TSizeF; const Scale: single; const Epsilon: Single = 0): TSizeF; overload;
 function  ALAlignDimensionToPixelRound(const Rect: TRectF; const Scale: single; const Epsilon: Single = 0): TRectF; overload;
@@ -5345,168 +5337,6 @@ begin
 
   for var LChild in aControl.Controls do
     ALMakeBufDrawables(LChild, AEnsureDoubleBuffered);
-end;
-
-{*********************************************}
-procedure ALAutoSize(const AControl: TControl);
-begin
-  var LSize := TSizeF.Create(0,0);
-  for var LChildControl in AControl.Controls do begin
-    if (csDesigning in AControl.ComponentState) and (LChildControl.ClassName = 'TGrabHandle.TGrabHandleRectangle') then
-      continue;
-
-    var LChildControlAlign: TALAlignLayout;
-    If (LChildControl is TALControl) then LChildControlAlign := TALControl(LChildControl).Align
-    else LChildControlAlign := TALAlignLayout(LChildControl.Align);
-
-    case LChildControlAlign of
-
-      //--
-      TALAlignLayout.None: begin
-        // Adjusts AControl size to ensure it contains
-        // the child control at its current position.
-        LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-        LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
-      end;
-
-      //--
-      TALAlignLayout.Center: begin
-        // Adjusts AControl size to ensure it contains the
-        // child control without considering its current position.
-        // !! Note: This may not work well if there is more than
-        //    one child control. !!
-        LSize.Width := Max(LSize.Width, LChildControl.Margins.left + AControl.padding.left + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-        LSize.height := Max(LSize.height, LChildControl.Margins.top + AControl.padding.top + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
-      end;
-
-      //--
-      TALAlignLayout.Top,
-      TALAlignLayout.MostTop,
-      TALAlignLayout.Bottom,
-      TALAlignLayout.MostBottom: begin
-        var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeX then
-          // If the child control has autosize enabled on the X-axis, adjusts
-          // AControl width to ensure it contains the child control at its
-          // current position. For example, TALText will never have
-          // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Top,
-          // but TALLayout/TRectangle will have it set to true if their
-          // autosize property is enabled.
-          LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
-        else
-          // Otherwise, do not adjust AControl width.
-          LSize.Width := Max(LSize.Width, AControl.Width);
-        // Adjusts AControl height to ensure it contains
-        // the child control at its current position.
-        LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
-      end;
-
-      //--
-      TALAlignLayout.TopCenter,
-      TALAlignLayout.TopLeft,
-      TALAlignLayout.TopRight,
-      TALAlignLayout.BottomCenter,
-      TALAlignLayout.BottomLeft,
-      TALAlignLayout.BottomRight: begin
-        // Adjusts AControl width to ensure it contains the
-        // child control without considering its current position.
-        // !! Note: This may not work well if there is another child control
-        //    that is not aligned to the top or bottom. !!
-        LSize.Width := Max(LSize.Width, LChildControl.Margins.left + AControl.padding.left + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-        // Adjusts AControl height to ensure it contains
-        // the child control at its current position.
-        LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
-      end;
-
-      //--
-      TALAlignLayout.Left,
-      TALAlignLayout.MostLeft,
-      TALAlignLayout.Right,
-      TALAlignLayout.MostRight: Begin
-        // Adjusts AControl width to ensure it contains
-        // the child control at its current position.
-        LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-        var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeY then
-          // If the child control has autosize enabled on the X-axis, adjusts
-          // AControl height to ensure it contains the child control at its
-          // current position. For example, TALText will never have
-          // HasUnconstrainedAutosizeX set to true with TALAlignLayout.Left,
-          // but TALLayout/TRectangle will have it set to true if their
-          // autosize property is enabled.
-          LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
-        else
-          // Otherwise, do not adjust AControl height.
-          LSize.height := Max(LSize.Height, AControl.Height);
-      End;
-
-      //--
-      TALAlignLayout.LeftCenter,
-      TALAlignLayout.LeftTop,
-      TALAlignLayout.LeftBottom,
-      TALAlignLayout.RightCenter,
-      TALAlignLayout.RightTop,
-      TALAlignLayout.RightBottom: begin
-        // Adjusts AControl width to ensure it contains
-        // the child control at its current position.
-        LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right);
-        // Adjusts AControl height to ensure it contains the
-        // child control without considering its current position.
-        // !! Note: This may not work well if there is another child control
-        //    that is not aligned to the left or right. !!
-        LSize.height := Max(LSize.height, LChildControl.Margins.top + AControl.padding.top + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom);
-      end;
-
-      //--
-      TALAlignLayout.Client,
-      TALAlignLayout.Contents,
-      TALAlignLayout.Scale,
-      TALAlignLayout.Fit,
-      TALAlignLayout.FitLeft,
-      TALAlignLayout.FitRight: Begin
-        var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) then begin
-          if LAutosizeControl.HasUnconstrainedAutosizeX then LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
-          else LSize.Width := Max(LSize.Width, AControl.Width);
-          if LAutosizeControl.HasUnconstrainedAutosizeY then LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
-          else LSize.height := Max(LSize.Height, AControl.Height);
-        end
-        else begin
-          LSize.Width := Max(LSize.Width, AControl.Width);
-          LSize.height := Max(LSize.Height, AControl.Height);
-        end;
-      End;
-
-      //--
-      TALAlignLayout.Horizontal,
-      TALAlignLayout.VertCenter: Begin
-        var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeX then
-          LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + AControl.padding.right)
-        else
-          LSize.Width := Max(LSize.Width, AControl.Width);
-      End;
-
-      //--
-      TALAlignLayout.Vertical,
-      TALAlignLayout.HorzCenter: Begin
-        var LAutosizeControl: IALAutosizeControl;
-        if Supports(LChildControl, IALAutosizeControl, LAutosizeControl) and LAutosizeControl.HasUnconstrainedAutosizeY then
-          LSize.height := Max(LSize.height, LChildControl.Position.Y + LChildControl.Height + LChildControl.Margins.bottom + AControl.padding.bottom)
-        else
-          LSize.height := Max(LSize.Height, AControl.Height);
-      End;
-
-      //--
-      else
-        raise Exception.Create('Error 431814A4-5A5F-462E-9491-88F1874210DC');
-
-    end;
-  end;
-
-  if LSize.Width = 0 then LSize.Width := AControl.Width;
-  if LSize.Height = 0 then LSize.Height := AControl.Height;
-  AControl.SetBounds(AControl.Position.X, AControl.Position.Y, LSize.Width, LSize.Height);
 end;
 
 {*************************************************************************************************************}

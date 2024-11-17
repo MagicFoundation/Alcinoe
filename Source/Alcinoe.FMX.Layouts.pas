@@ -26,26 +26,16 @@ type
 
   {*************************}
   [ComponentPlatforms($FFFF)]
-  TALLayout = class(TALControl, IALAutosizeControl)
+  TALLayout = class(TALControl)
   protected
-    FAutoSize: Boolean;
-    function GetAutoSize: Boolean; virtual;
-    procedure SetAutoSize(const Value: Boolean); virtual;
-    procedure DoRealign; override;
-    procedure AdjustSize; virtual;
     procedure Paint; override;
-    { IALAutosizeControl }
-    function HasUnconstrainedAutosizeX: Boolean; virtual;
-    function HasUnconstrainedAutosizeY: Boolean; virtual;
   public
     constructor Create(AOwner: TComponent); override;
   published
     //property Action;
     property Align;
     property Anchors;
-    // Dynamically adjusts the dimensions to accommodate child controls,
-    // considering their sizes, positions, margins, and alignments.
-    property AutoSize: Boolean read GetAutoSize write SetAutoSize default False;
+    property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -536,7 +526,6 @@ Type
 constructor TALLayout.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  FAutoSize := False;
   CanParentFocus := True;
   HitTest := False;
 end;
@@ -547,51 +536,6 @@ begin
   inherited;
   if (csDesigning in ComponentState) and not Locked then
     DrawDesignBorder;
-end;
-
-{****************************}
-procedure TALLayout.DoRealign;
-begin
-  inherited DoRealign;
-  AdjustSize;
-end;
-
-{*****************************}
-procedure TALLayout.AdjustSize;
-begin
-  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
-     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (FAutoSize) then // if FAutoSize is false nothing to adjust
-    ALAutoSize(Self);
-end;
-
-{**************************************}
-function TALLayout.GetAutoSize: Boolean;
-begin
-  result := FAutoSize;
-end;
-
-{****************************************************}
-function TALLayout.HasUnconstrainedAutosizeX: Boolean;
-begin
-  result := GetAutoSize;
-end;
-
-{****************************************************}
-function TALLayout.HasUnconstrainedAutosizeY: Boolean;
-begin
-  result := GetAutoSize;
-end;
-
-{****************************************************}
-procedure TALLayout.SetAutoSize(const Value: Boolean);
-begin
-  if FAutoSize <> Value then
-  begin
-    FAutoSize := Value;
-    AdjustSize;
-    repaint;
-  end;
 end;
 
 {*****************************************************************}
@@ -643,8 +587,7 @@ end;
 procedure TALCustomScrollBox.TContent.ContentChanged;
 begin
   inherited;
-  // if we are in csloading this will actually like a no-ops
-  if (not IsUpdating) then FScrollBox.Realign;
+  if (not IsUpdating) and (not FDisableAlign) then FScrollBox.Realign;
 end;
 
 {****************************************************************************************}
@@ -658,9 +601,12 @@ end;
 {***************************************************}
 procedure TALCustomScrollBox.TScrollEngine.DoChanged;
 begin
+  {$IF defined(debug)}
+  //ALLog(ClassName + '.TALCustomScrollBox.TScrollEngine.DoChanged');
+  {$ENDIF}
   if (not (csDestroying in FScrollBox.ComponentState)) then begin
 
-    //update FScrollBox.Content.Position
+    // Update the position of FScrollBox.Content
     if FScrollBox.Content <> nil then begin
       var LSaveDisableAlign := FScrollBox.FDisableAlign;
       FScrollBox.FDisableAlign := True;
@@ -673,11 +619,11 @@ begin
       end;
     end;
 
-    //update the opacity of the scrollBar
+    // Update the opacity of the scroll bar
     if FScrollBox.VScrollBar <> nil then FScrollBox.VScrollBar.Opacity := Opacity;
     if FScrollBox.HScrollBar <> nil then FScrollBox.HScrollBar.Opacity := Opacity;
 
-    //update the VScrollBar/HScrollBar
+    // Update the vertical and horizontal scroll bars (VScrollBar/HScrollBar)
     if not FScrollBox.fdisableScrollChange then begin
       FScrollBox.fdisableScrollChange := True;
       try
@@ -688,7 +634,7 @@ begin
       end;
     end;
 
-    //fire the OnViewportPositionChange
+    // Trigger the OnViewportPositionChange event
     var LNewViewportPosition := TpointF.Create(ViewportPosition.X, ViewportPosition.Y);
     if (assigned(FScrollBox.FOnViewportPositionChange)) and
        (not fLastViewportPosition.EqualsTo(LNewViewportPosition, TEpsilon.Position)) then

@@ -4568,9 +4568,11 @@ end;
 {***************************************************}
 procedure TALCustomTrack.SetMax(const Value: Double);
 begin
-  if compareValue(Value, Min) < 0 then min := Value;
-  FThumb.FValueRange.Max := Value;
-  ClearBufDrawable;
+  if not SameValue(GetMax, Value) then begin
+    if compareValue(Value, Min) < 0 then min := Value;
+    FThumb.FValueRange.Max := Value;
+    ClearBufDrawable;
+  end;
 end;
 
 {*************************************}
@@ -4582,9 +4584,11 @@ end;
 {***************************************************}
 procedure TALCustomTrack.SetMin(const Value: Double);
 begin
-  if compareValue(Value, Max) > 0 then max := Value;
-  FThumb.FValueRange.Min := Value;
-  ClearBufDrawable;
+  if not SameValue(GetMin, Value) then begin
+    if compareValue(Value, Max) > 0 then max := Value;
+    FThumb.FValueRange.Min := Value;
+    ClearBufDrawable;
+  end;
 end;
 
 {*******************************************}
@@ -4596,8 +4600,10 @@ end;
 {*********************************************************}
 procedure TALCustomTrack.SetFrequency(const Value: Double);
 begin
-  FThumb.FValueRange.Frequency := Value;
-  ClearBufDrawable;
+  if not SameValue(GetFrequency, Value) then begin
+    FThumb.FValueRange.Frequency := Value;
+    ClearBufDrawable;
+  end;
 end;
 
 {***************************************}
@@ -4609,7 +4615,8 @@ end;
 {***********************************************}
 procedure TALCustomTrack.SetValue(Value: Double);
 begin
-  FThumb.FValueRange.Value := Value;
+  if not SameValue(GetValue, Value) then
+    FThumb.FValueRange.Value := Value;
 end;
 
 {**********************************************}
@@ -4621,7 +4628,8 @@ end;
 {************************************************************}
 procedure TALCustomTrack.SetViewportSize(const Value: Double);
 begin
-  FThumb.FValueRange.ViewportSize := Value;
+  if not SameValue(GetViewportSize, Value) then
+    FThumb.FValueRange.ViewportSize := Value;
 end;
 
 {*************************************************}
@@ -5262,30 +5270,38 @@ end;
 {*****************************************************}
 procedure TALRangeTrackBar.SetMax(const Value: Double);
 begin
-  inherited;
-  FMaxThumb.FValueRange.Max := Value;
+  if not SameValue(GetMax, Value) then begin
+    inherited;
+    FMaxThumb.FValueRange.Max := Value;
+  end;
 end;
 
 {*****************************************************}
 procedure TALRangeTrackBar.SetMin(const Value: Double);
 begin
-  inherited;
-  FMaxThumb.FValueRange.Min := Value;
+  if not SameValue(GetMin, Value) then begin
+    inherited;
+    FMaxThumb.FValueRange.Min := Value;
+  end;
 end;
 
 {***********************************************************}
 procedure TALRangeTrackBar.SetFrequency(const Value: Double);
 begin
-  inherited;
-  FMaxThumb.FValueRange.Frequency := Value;
+  if not SameValue(GetFrequency, Value) then begin
+    inherited;
+    FMaxThumb.FValueRange.Frequency := Value;
+  end;
 end;
 
 {*************************************************}
 procedure TALRangeTrackBar.SetValue(Value: Double);
 begin
-  inherited;
-  if (not fThumb.Pressed) and
-     (GetValue > (max - Min) / 2) then fThumb.BringToFront;
+  if not SameValue(GetValue, Value) then begin
+    inherited;
+    if (not fThumb.Pressed) and
+       (GetValue > (max - Min) / 2) then fThumb.BringToFront;
+  end;
 end;
 
 {********************************************}
@@ -5297,16 +5313,20 @@ end;
 {****************************************************}
 procedure TALRangeTrackBar.SetMaxValue(Value: Double);
 begin
-  FMaxThumb.FValueRange.Value := Value;
-  if (not fMaxThumb.Pressed) and
-     (GetMaxValue < (max - Min) / 2) then fMaxThumb.BringToFront;
+  if not SameValue(GetMaxValue, Value) then begin
+    FMaxThumb.FValueRange.Value := Value;
+    if (not fMaxThumb.Pressed) and
+       (GetMaxValue < (max - Min) / 2) then fMaxThumb.BringToFront;
+  end;
 end;
 
 {**************************************************************}
 procedure TALRangeTrackBar.SetViewportSize(const Value: Double);
 begin
-  inherited;
-  FMaxThumb.FValueRange.ViewportSize := Value;
+  if not SameValue(GetViewportSize, Value) then begin
+    inherited;
+    FMaxThumb.FValueRange.ViewportSize := Value;
+  end;
 end;
 
 {******************************************************************}

@@ -40,18 +40,30 @@ type
     Fit,
     FitLeft,
     FitRight,
-    TopCenter,    // Added from TAlignLayout - Works like TAlignLayout.Top, then centers the control horizontally
-    TopLeft,      // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the left.
-    TopRight,     // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the right.
-    LeftCenter,   // Added from TAlignLayout - Works like TAlignLayout.Left, then centers the control vertically.
-    LeftTop,      // Added from TAlignLayout - Works like TAlignLayout.Left, then aligns the control to the top.
-    LeftBottom,   // Added from TAlignLayout - Works like TAlignLayout.Left, then aligns the control to the bottom.
-    RightCenter,  // Added from TAlignLayout - Works like TAlignLayout.Right, then centers the control vertically.
-    RightTop,     // Added from TAlignLayout - Works like TAlignLayout.Right, then aligns the control to the top.
-    RightBottom,  // Added from TAlignLayout - Works like TAlignLayout.Right, then aligns the control to the bottom.
-    BottomCenter, // Added from TAlignLayout - Works like TAlignLayout.Bottom, then centers the control horizontally
-    BottomLeft,   // Added from TAlignLayout - Works like TAlignLayout.Bottom, then aligns the control to the left.
-    BottomRight); // Added from TAlignLayout - Works like TAlignLayout.Bottom, then aligns the control to the right.
+    TopCenter,        // Added from TAlignLayout - Works like TAlignLayout.Top, then centers the control horizontally
+    TopLeft,          // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the left.
+    TopRight,         // Added from TAlignLayout - Works like TAlignLayout.Top, then aligns the control to the right.
+    LeftCenter,       // Added from TAlignLayout - Works like TAlignLayout.Left, then centers the control vertically.
+    LeftTop,          // Added from TAlignLayout - Works like TAlignLayout.Left, then aligns the control to the top.
+    LeftBottom,       // Added from TAlignLayout - Works like TAlignLayout.Left, then aligns the control to the bottom.
+    RightCenter,      // Added from TAlignLayout - Works like TAlignLayout.Right, then centers the control vertically.
+    RightTop,         // Added from TAlignLayout - Works like TAlignLayout.Right, then aligns the control to the top.
+    RightBottom,      // Added from TAlignLayout - Works like TAlignLayout.Right, then aligns the control to the bottom.
+    BottomCenter,     // Added from TAlignLayout - Works like TAlignLayout.Bottom, then centers the control horizontally
+    BottomLeft,       // Added from TAlignLayout - Works like TAlignLayout.Bottom, then aligns the control to the left.
+    BottomRight,      // Added from TAlignLayout - Works like TAlignLayout.Bottom, then aligns the control to the right.
+    MostTopCenter,    // Added from TAlignLayout - Works like TAlignLayout.MostTop, then centers the control horizontally
+    MostTopLeft,      // Added from TAlignLayout - Works like TAlignLayout.MostTop, then aligns the control to the left.
+    MostTopRight,     // Added from TAlignLayout - Works like TAlignLayout.MostTop, then aligns the control to the right.
+    MostLeftCenter,   // Added from TAlignLayout - Works like TAlignLayout.MostLeft, then centers the control vertically.
+    MostLeftTop,      // Added from TAlignLayout - Works like TAlignLayout.MostLeft, then aligns the control to the top.
+    MostLeftBottom,   // Added from TAlignLayout - Works like TAlignLayout.MostLeft, then aligns the control to the bottom.
+    MostRightCenter,  // Added from TAlignLayout - Works like TAlignLayout.MostRight, then centers the control vertically.
+    MostRightTop,     // Added from TAlignLayout - Works like TAlignLayout.MostRight, then aligns the control to the top.
+    MostRightBottom,  // Added from TAlignLayout - Works like TAlignLayout.MostRight, then aligns the control to the bottom.
+    MostBottomCenter, // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then centers the control horizontally
+    MostBottomLeft,   // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the left.
+    MostBottomRight); // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the right.
 
   {**************************}
   {$IFNDEF ALCompilerVersionSupported122}
@@ -324,6 +336,18 @@ begin
       TALAlignLayout.BottomCenter: LLegacyAlign := TAlignLayout.Bottom;
       TALAlignLayout.BottomLeft: LLegacyAlign := TAlignLayout.Bottom;
       TALAlignLayout.BottomRight: LLegacyAlign := TAlignLayout.Bottom;
+      TALAlignLayout.MostTopCenter: LLegacyAlign := TAlignLayout.MostTop;
+      TALAlignLayout.MostTopLeft: LLegacyAlign := TAlignLayout.MostTop;
+      TALAlignLayout.MostTopRight: LLegacyAlign := TAlignLayout.MostTop;
+      TALAlignLayout.MostLeftCenter: LLegacyAlign := TAlignLayout.MostLeft;
+      TALAlignLayout.MostLeftTop: LLegacyAlign := TAlignLayout.MostLeft;
+      TALAlignLayout.MostLeftBottom: LLegacyAlign := TAlignLayout.MostLeft;
+      TALAlignLayout.MostRightCenter: LLegacyAlign := TAlignLayout.MostRight;
+      TALAlignLayout.MostRightTop: LLegacyAlign := TAlignLayout.MostRight;
+      TALAlignLayout.MostRightBottom: LLegacyAlign := TAlignLayout.MostRight;
+      TALAlignLayout.MostBottomCenter: LLegacyAlign := TAlignLayout.MostBottom;
+      TALAlignLayout.MostBottomLeft: LLegacyAlign := TAlignLayout.MostBottom;
+      TALAlignLayout.MostBottomRight: LLegacyAlign := TAlignLayout.MostBottom;
       else Raise Exception.Create('Error D527A470-23AC-4E3C-BCC5-4C2DB578A691');
     end;
     Inherited SetAlign(LLegacyAlign);
@@ -383,47 +407,73 @@ begin
       {$IFNDEF ALCompilerVersionSupported122}
         {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
       {$ENDIF}
-      If (FAlign in [TALAlignLayout.TopCenter,
-                     TALAlignLayout.TopLeft,
-                     TALAlignLayout.TopRight,
-                     TALAlignLayout.LeftCenter,
-                     TALAlignLayout.LeftTop,
-                     TALAlignLayout.LeftBottom,
-                     TALAlignLayout.RightCenter,
-                     TALAlignLayout.RightTop,
-                     TALAlignLayout.RightBottom,
-                     TALAlignLayout.BottomCenter,
-                     TALAlignLayout.BottomLeft,
-                     TALAlignLayout.BottomRight]) and
+      //TALAlignLayout.TopCenter
+      //TALAlignLayout.TopLeft
+      //TALAlignLayout.TopRight
+      //TALAlignLayout.LeftCenter
+      //TALAlignLayout.LeftTop
+      //TALAlignLayout.LeftBottom
+      //TALAlignLayout.RightCenter
+      //TALAlignLayout.RightTop
+      //TALAlignLayout.RightBottom
+      //TALAlignLayout.BottomCenter
+      //TALAlignLayout.BottomLeft
+      //TALAlignLayout.BottomRight
+      //TALAlignLayout.MostTopCenter
+      //TALAlignLayout.MostTopLeft
+      //TALAlignLayout.MostTopRight
+      //TALAlignLayout.MostLeftCenter
+      //TALAlignLayout.MostLeftTop
+      //TALAlignLayout.MostLeftBottom
+      //TALAlignLayout.MostRightCenter
+      //TALAlignLayout.MostRightTop
+      //TALAlignLayout.MostRightBottom
+      //TALAlignLayout.MostBottomCenter
+      //TALAlignLayout.MostBottomLeft
+      //TALAlignLayout.MostBottomRight
+      If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
+         (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
          (ParentControl <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
          (_TControlAccessProtected(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
       then begin
         case FAlign of
           TALAlignLayout.TopCenter,
-          TALAlignLayout.BottomCenter: begin
+          TALAlignLayout.BottomCenter,
+          TALAlignLayout.MostTopCenter,
+          TALAlignLayout.MostBottomCenter: begin
             X := X + ((AWidth - Width) / 2);
             AWidth := Width;
           end;
           TALAlignLayout.TopLeft,
-          TALAlignLayout.BottomLeft: begin
+          TALAlignLayout.BottomLeft,
+          TALAlignLayout.MostTopLeft,
+          TALAlignLayout.MostBottomLeft: begin
             AWidth := Width;
           end;
           TALAlignLayout.TopRight,
-          TALAlignLayout.BottomRight: begin
+          TALAlignLayout.BottomRight,
+          TALAlignLayout.MostTopRight,
+          TALAlignLayout.MostBottomRight: begin
             X := X + (AWidth - Width);
             AWidth := Width;
           end;
           TALAlignLayout.LeftCenter,
-          TALAlignLayout.RightCenter: begin
+          TALAlignLayout.RightCenter,
+          TALAlignLayout.MostLeftCenter,
+          TALAlignLayout.MostRightCenter: begin
             Y := Y + ((AHeight - Height) / 2);
             AHeight := Height;
           end;
           TALAlignLayout.LeftTop,
-          TALAlignLayout.RightTop: begin
+          TALAlignLayout.RightTop,
+          TALAlignLayout.MostLeftTop,
+          TALAlignLayout.MostRightTop: begin
             AHeight := Height;
           end;
           TALAlignLayout.LeftBottom,
-          TALAlignLayout.RightBottom: begin
+          TALAlignLayout.RightBottom,
+          TALAlignLayout.MostLeftBottom,
+          TALAlignLayout.MostRightBottom: begin
             Y := Y + (AHeight - Height);
             AHeight := Height;
           end;
@@ -457,47 +507,73 @@ begin
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
   {$ENDIF}
-  If (FAlign in [TALAlignLayout.TopCenter,
-                 TALAlignLayout.TopLeft,
-                 TALAlignLayout.TopRight,
-                 TALAlignLayout.LeftCenter,
-                 TALAlignLayout.LeftTop,
-                 TALAlignLayout.LeftBottom,
-                 TALAlignLayout.RightCenter,
-                 TALAlignLayout.RightTop,
-                 TALAlignLayout.RightBottom,
-                 TALAlignLayout.BottomCenter,
-                 TALAlignLayout.BottomLeft,
-                 TALAlignLayout.BottomRight]) and
+  //TALAlignLayout.TopCenter
+  //TALAlignLayout.TopLeft
+  //TALAlignLayout.TopRight
+  //TALAlignLayout.LeftCenter
+  //TALAlignLayout.LeftTop
+  //TALAlignLayout.LeftBottom
+  //TALAlignLayout.RightCenter
+  //TALAlignLayout.RightTop
+  //TALAlignLayout.RightBottom
+  //TALAlignLayout.BottomCenter
+  //TALAlignLayout.BottomLeft
+  //TALAlignLayout.BottomRight
+  //TALAlignLayout.MostTopCenter
+  //TALAlignLayout.MostTopLeft
+  //TALAlignLayout.MostTopRight
+  //TALAlignLayout.MostLeftCenter
+  //TALAlignLayout.MostLeftTop
+  //TALAlignLayout.MostLeftBottom
+  //TALAlignLayout.MostRightCenter
+  //TALAlignLayout.MostRightTop
+  //TALAlignLayout.MostRightBottom
+  //TALAlignLayout.MostBottomCenter
+  //TALAlignLayout.MostBottomLeft
+  //TALAlignLayout.MostBottomRight
+  If (integer(FAlign) >= integer(TALAlignLayout.TopCenter)) and
+     (integer(FAlign) <= integer(TALAlignLayout.MostBottomRight)) and
      (ParentControl <> nil) and                              // FDisableAlign = true mean that SetBounds was called by
      (_TControlAccessProtected(ParentControl).FDisableAlign) // AlignObjects procedure inside inherited DoRealign
   then begin
     case FAlign of
       TALAlignLayout.TopCenter,
-      TALAlignLayout.BottomCenter: begin
+      TALAlignLayout.BottomCenter,
+      TALAlignLayout.MostTopCenter,
+      TALAlignLayout.MostBottomCenter: begin
         X := X + ((AWidth - Width) / 2);
         AWidth := Width;
       end;
       TALAlignLayout.TopLeft,
-      TALAlignLayout.BottomLeft: begin
+      TALAlignLayout.BottomLeft,
+      TALAlignLayout.MostTopLeft,
+      TALAlignLayout.MostBottomLeft: begin
         AWidth := Width;
       end;
       TALAlignLayout.TopRight,
-      TALAlignLayout.BottomRight: begin
+      TALAlignLayout.BottomRight,
+      TALAlignLayout.MostTopRight,
+      TALAlignLayout.MostBottomRight: begin
         X := X + (AWidth - Width);
         AWidth := Width;
       end;
       TALAlignLayout.LeftCenter,
-      TALAlignLayout.RightCenter: begin
+      TALAlignLayout.RightCenter,
+      TALAlignLayout.MostLeftCenter,
+      TALAlignLayout.MostRightCenter: begin
         Y := Y + ((AHeight - Height) / 2);
         AHeight := Height;
       end;
       TALAlignLayout.LeftTop,
-      TALAlignLayout.RightTop: begin
+      TALAlignLayout.RightTop,
+      TALAlignLayout.MostLeftTop,
+      TALAlignLayout.MostRightTop: begin
         AHeight := Height;
       end;
       TALAlignLayout.LeftBottom,
-      TALAlignLayout.RightBottom: begin
+      TALAlignLayout.RightBottom,
+      TALAlignLayout.MostLeftBottom,
+      TALAlignLayout.MostRightBottom: begin
         Y := Y + (AHeight - Height);
         AHeight := Height;
       end;
@@ -600,7 +676,13 @@ begin
           TALAlignLayout.TopRight,
           TALAlignLayout.BottomCenter,
           TALAlignLayout.BottomLeft,
-          TALAlignLayout.BottomRight: begin
+          TALAlignLayout.BottomRight,
+          TALAlignLayout.MostTopCenter,
+          TALAlignLayout.MostTopLeft,
+          TALAlignLayout.MostTopRight,
+          TALAlignLayout.MostBottomCenter,
+          TALAlignLayout.MostBottomLeft,
+          TALAlignLayout.MostBottomRight: begin
             // Adjusts AControl width to ensure it contains the
             // child control without considering its current position.
             // !! Note: This may not work well if there is another child control
@@ -638,7 +720,13 @@ begin
           TALAlignLayout.LeftBottom,
           TALAlignLayout.RightCenter,
           TALAlignLayout.RightTop,
-          TALAlignLayout.RightBottom: begin
+          TALAlignLayout.RightBottom,
+          TALAlignLayout.MostLeftCenter,
+          TALAlignLayout.MostLeftTop,
+          TALAlignLayout.MostLeftBottom,
+          TALAlignLayout.MostRightCenter,
+          TALAlignLayout.MostRightTop,
+          TALAlignLayout.MostRightBottom: begin
             // Adjusts AControl width to ensure it contains
             // the child control at its current position.
             LSize.Width := Max(LSize.Width, LChildControl.Position.X + LChildControl.width + LChildControl.Margins.right + padding.right);
@@ -735,7 +823,19 @@ begin
         TALAlignLayout.RightBottom,
         TALAlignLayout.BottomCenter,
         TALAlignLayout.BottomLeft,
-        TALAlignLayout.BottomRight:
+        TALAlignLayout.BottomRight,
+        TALAlignLayout.MostTopCenter,
+        TALAlignLayout.MostTopLeft,
+        TALAlignLayout.MostTopRight,
+        TALAlignLayout.MostLeftCenter,
+        TALAlignLayout.MostLeftTop,
+        TALAlignLayout.MostLeftBottom,
+        TALAlignLayout.MostRightCenter,
+        TALAlignLayout.MostRightTop,
+        TALAlignLayout.MostRightBottom,
+        TALAlignLayout.MostBottomCenter,
+        TALAlignLayout.MostBottomLeft,
+        TALAlignLayout.MostBottomRight:
           Size.Size := ALAlignDimensionToPixelRound(Size.Size, ALGetScreenScale, TEpsilon.Position);
         //--
         TALAlignLayout.Top,

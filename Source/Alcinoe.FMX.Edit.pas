@@ -954,10 +954,10 @@ type
     procedure MakeBufPromptTextDrawable; virtual;
     procedure MakeBufLabelTextDrawable; virtual;
     procedure MakeBufSupportingTextDrawable; virtual;
-    procedure clearBufDrawable; override;
-    procedure clearBufPromptTextDrawable; virtual;
-    procedure clearBufLabelTextDrawable; virtual;
-    procedure clearBufSupportingTextDrawable; virtual;
+    procedure ClearBufDrawable; override;
+    procedure ClearBufPromptTextDrawable; virtual;
+    procedure ClearBufLabelTextDrawable; virtual;
+    procedure ClearBufSupportingTextDrawable; virtual;
     property Password: Boolean read GetPassword write SetPassword default False;
   published
     // Android only - the name of an attribute in the current theme that contains a reference to
@@ -5871,7 +5871,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALBaseEdit.clearBufPromptTextDrawable;
+procedure TALBaseEdit.ClearBufPromptTextDrawable;
 begin
   ALFreeAndNilDrawable(fBufPromptTextDrawable);
   if FStateStyles <> nil then
@@ -5879,7 +5879,7 @@ begin
 end;
 
 {**********************************************}
-procedure TALBaseEdit.clearBufLabelTextDrawable;
+procedure TALBaseEdit.ClearBufLabelTextDrawable;
 begin
   ALFreeAndNilDrawable(fBufLabelTextDrawable);
   if FStateStyles <> nil then
@@ -5887,7 +5887,7 @@ begin
 end;
 
 {***************************************************}
-procedure TALBaseEdit.clearBufSupportingTextDrawable;
+procedure TALBaseEdit.ClearBufSupportingTextDrawable;
 begin
   if (FSupportingTextMarginBottomUpdated) and
      (not ALIsDrawableNull(fBufSupportingTextDrawable)) and

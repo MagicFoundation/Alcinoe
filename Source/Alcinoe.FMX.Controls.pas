@@ -91,6 +91,8 @@ type
     FAutoSize: Boolean;
     FIsAdjustingSize: Boolean;
     FAdjustSizeOnEndUpdate: Boolean;
+    function GetDoubleBuffered: boolean; virtual;
+    procedure SetDoubleBuffered(const AValue: Boolean); virtual;
     function GetAutoSize: Boolean; virtual;
     procedure SetAutoSize(const Value: Boolean); virtual;
     // Dynamically adjusts the dimensions to accommodate child controls,
@@ -127,6 +129,7 @@ type
     procedure SetFixedSizeBounds(X, Y, AWidth, AHeight: Single); Virtual;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
     procedure SetNewScene(AScene: IScene); override;
     function IsVisibleWithinFormBounds: Boolean;
     property Form: TCommonCustomForm read FForm;
@@ -139,6 +142,9 @@ type
     procedure SetBounds(X, Y, AWidth, AHeight: Single); override;
     function HasUnconstrainedAutosizeX: Boolean; virtual;
     function HasUnconstrainedAutosizeY: Boolean; virtual;
+    procedure MakeBufDrawable; virtual;
+    procedure ClearBufDrawable; virtual;
+    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default False;
     property IsPixelAlignmentEnabled: Boolean read GetIsPixelAlignmentEnabled write SetIsPixelAlignmentEnabled;
     property Align: TALAlignLayout read FAlign write SetAlign default TALAlignLayout.None;
     property ParentALControl: TALControl read FParentALControl;
@@ -263,6 +269,13 @@ begin
   FAutoSize := False;
   FIsAdjustingSize := False;
   FAdjustSizeOnEndUpdate := False;
+end;
+
+{****************************}
+destructor TALControl.Destroy;
+begin
+  ClearBufDrawable;
+  inherited;
 end;
 
 {**************************}
@@ -885,6 +898,18 @@ begin
   Include(TALControlAccessPrivate(Self).FDelayedEvents, TALControlAccessPrivate.TDelayedEvent.Resized);
 end;
 
+{*********************************************}
+function TALControl.GetDoubleBuffered: boolean;
+begin
+  result := False;
+end;
+
+{************************************************************}
+procedure TALControl.SetDoubleBuffered(const AValue: Boolean);
+begin
+  // Not supported
+end;
+
 {***************************************}
 function TALControl.GetAutoSize: Boolean;
 begin
@@ -936,6 +961,18 @@ begin
     if (not result) and (ParentALControl <> nil) then
       Result := ParentALControl.HasUnconstrainedAutosizeY;
   end;
+end;
+
+{***********************************}
+procedure TALControl.MakeBufDrawable;
+begin
+ // Virtual;
+end;
+
+{************************************}
+procedure TALControl.ClearBufDrawable;
+begin
+ // Virtual;
 end;
 
 {******************************************************}

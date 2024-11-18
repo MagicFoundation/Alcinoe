@@ -89,7 +89,7 @@ type
   // image. This leads me to conclude that the concept of multi-resolution
   // bitmaps is fundamentally flawed.
   [ComponentPlatforms($FFFF)]
-  TALImage = class(TALControl, IALDoubleBufferedControl)
+  TALImage = class(TALControl)
   private
     fExifOrientationInfo: TalExifOrientationInfo;
     fRotateAccordingToExifOrientation: Boolean;
@@ -100,17 +100,15 @@ type
     procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure setResourceName(const Value: String);
   protected
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
     procedure Paint; override;
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
   published
     //property Action;
     property Align;
@@ -338,8 +336,8 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBaseRectangle = class(TALShape, IALDoubleBufferedControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBaseRectangle = class(TALShape)
   private
     fDoubleBuffered: boolean;
     FXRadius: Single;
@@ -356,8 +354,8 @@ type
     function IsYRadiusStored: Boolean;
   protected
     function HasCustomDraw: Boolean; virtual;
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
     procedure SetCorners(const Value: TCorners); virtual;
@@ -381,10 +379,9 @@ type
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
+    property DoubleBuffered default true;
     property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
@@ -467,14 +464,14 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALCircle = class(TALShape, IALDoubleBufferedControl)
+  TALCircle = class(TALShape)
   private
     fDoubleBuffered: boolean;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
   protected
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
@@ -494,9 +491,8 @@ type
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
     function PointInObjectLocal(X, Y: Single): Boolean; override;
   published
     //property Action;
@@ -508,7 +504,7 @@ type
     property ClipChildren;
     //property ClipParent;
     property Cursor;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DoubleBuffered default true;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -564,7 +560,7 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALLine = class(TALShape, IALDoubleBufferedControl)
+  TALLine = class(TALShape)
   private
     fDoubleBuffered: boolean;
     FLineType: TALLineType;
@@ -572,8 +568,8 @@ type
     fBufDrawableRect: TRectF;
     procedure SetLineType(const Value: TALLineType);
   protected
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
     property BufDrawable: TALDrawable read fBufDrawable;
@@ -581,10 +577,9 @@ type
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
-    destructor Destroy; override;
     procedure Paint; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
   published
     //property Action;
     property Align;
@@ -595,7 +590,7 @@ type
     property ClipChildren;
     //property ClipParent;
     property Cursor;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DoubleBuffered default true;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -645,8 +640,8 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBaseText = class(TALShape, IALDoubleBufferedControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBaseText = class(TALShape)
   public
     type
       TElementMouseEvent = procedure(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single; const Element: TALTextElement) of object;
@@ -690,8 +685,8 @@ type
     function IsXRadiusStored: Boolean;
     function IsYRadiusStored: Boolean;
   protected
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetAlign(const Value: TALAlignLayout); override;
     procedure SetAutoSize(const Value: Boolean); override;
     function GetElementAtPos(const APos: TPointF): TALTextElement;
@@ -796,8 +791,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
     function TextBroken: Boolean;
     property AutoSize;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true;
@@ -809,7 +804,7 @@ type
     property Text: string read FText write SetText;
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DoubleBuffered default true;
     property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
     property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
   end;
@@ -1047,20 +1042,13 @@ begin
   SetAcceptsControls(False);
 end;
 
-{**************************}
-destructor TALImage.Destroy;
-begin
-  clearBufDrawable;
-  inherited;
-end;
-
 {**********************************}
-procedure TALImage.clearBufDrawable;
+procedure TALImage.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
 end;
@@ -1074,11 +1062,15 @@ begin
      //--- Do not create BufDrawable if fResourceName is empty
      (fResourceName = '')
   then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
 
   if (not ALIsDrawableNull(fBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
 
   var LFileName := ALGetResourceFilename(FResourceName);
 
@@ -1203,7 +1195,7 @@ end;
 procedure TALImage.SetWrapMode(const Value: TALImageWrapMode);
 begin
   if FWrapMode <> Value then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FWrapMode := Value;
     Repaint;
   end;
@@ -1213,7 +1205,7 @@ end;
 procedure TALImage.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FResourceName := Value;
     Repaint;
   end;
@@ -1230,12 +1222,6 @@ end;
 function TALImage.GetDoubleBuffered: boolean;
 begin
   result := True;
-end;
-
-{**********************************************************}
-procedure TALImage.SetDoubleBuffered(const AValue: Boolean);
-begin
-  // Not yet supported
 end;
 
 {***********************************************************************}
@@ -1854,13 +1840,6 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-{**********************************}
-destructor TALBaseRectangle.Destroy;
-begin
-  ClearBufDrawable;
-  inherited;
-end;
-
 {***********************************}
 procedure TALBaseRectangle.DoResized;
 begin
@@ -1869,12 +1848,12 @@ begin
 end;
 
 {******************************************}
-procedure TALBaseRectangle.clearBufDrawable;
+procedure TALBaseRectangle.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
 end;
@@ -1920,7 +1899,7 @@ procedure TALBaseRectangle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then clearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable;
   end;
 end;
 
@@ -1932,7 +1911,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FXRadius := NewValue;
     Repaint;
   end;
@@ -1946,7 +1925,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FYRadius := NewValue;
     Repaint;
   end;
@@ -1957,7 +1936,7 @@ procedure TALBaseRectangle.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then
   begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FCorners := Value;
     Repaint;
   end;
@@ -1968,7 +1947,7 @@ procedure TALBaseRectangle.SetSides(const Value: TSides);
 begin
   if FSides <> Value then
   begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FSides := Value;
     Repaint;
   end;
@@ -1977,21 +1956,21 @@ end;
 {******************************************************}
 procedure TALBaseRectangle.FillChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {********************************************************}
 procedure TALBaseRectangle.StrokeChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {********************************************************}
 procedure TALBaseRectangle.ShadowChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
@@ -2086,11 +2065,15 @@ begin
       ((not Fill.HasFill) or
        (Fill.Styles = [TALBrushStyle.solid])))
   then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
 
   if (not ALIsDrawableNull(FBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
 
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
@@ -2162,20 +2145,13 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-{***************************}
-destructor TALCircle.Destroy;
-begin
-  clearBufDrawable;
-  inherited;
-end;
-
 {***********************************}
-procedure TALCircle.clearBufDrawable;
+procedure TALCircle.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
 end;
@@ -2191,28 +2167,28 @@ procedure TALCircle.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then clearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable;
   end;
 end;
 
 {***********************************************}
 procedure TALCircle.FillChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {*************************************************}
 procedure TALCircle.StrokeChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {*************************************************}
 procedure TALCircle.ShadowChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
@@ -2288,11 +2264,15 @@ begin
      {$IF not DEFINED(ALDPK)}(not DoubleBuffered) or{$ENDIF}
      //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
 
   if (not ALIsDrawableNull(FBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
 
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
@@ -2370,20 +2350,13 @@ begin
   fBufDrawable := ALNullDrawable;
 end;
 
-{*************************}
-destructor TALLine.Destroy;
-begin
-  clearBufDrawable;
-  inherited;
-end;
-
 {*********************************}
-procedure TALLine.clearBufDrawable;
+procedure TALLine.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
 end;
@@ -2399,21 +2372,21 @@ procedure TALLine.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then clearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable;
   end;
 end;
 
 {*********************************************}
 procedure TALLine.FillChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {***********************************************}
 procedure TALLine.StrokeChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
@@ -2429,11 +2402,15 @@ begin
      (not (lineType in [TALLineType.TopLeftToBottomRight, TALLineType.BottomLeftToTopRight])) or
      //--- // Do not create BufDrawable if no stroke
      (Not Stroke.HasStroke) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
 
   if (not ALIsDrawableNull(fBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
 
   //init fBufDrawableRect / LRect
   case lineType of
@@ -2800,7 +2777,6 @@ end;
 {*****************************}
 destructor TALBaseText.Destroy;
 begin
-  ClearBufDrawable;
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FMultiLineTextOptions);
   inherited;
@@ -3033,7 +3009,7 @@ end;
 {***********************************}
 procedure TALBaseText.PaddingChanged;
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
   Repaint;
 end;
@@ -3041,21 +3017,21 @@ end;
 {*************************************************}
 procedure TALBaseText.FillChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {***************************************************}
 procedure TALBaseText.StrokeChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {***************************************************}
 procedure TALBaseText.ShadowChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
@@ -3075,7 +3051,7 @@ end;
 procedure TALBaseText.SetCorners(const Value: TCorners);
 begin
   if FCorners <> Value then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FCorners := Value;
     Repaint;
   end;
@@ -3089,7 +3065,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FXRadius := NewValue;
     Repaint;
   end;
@@ -3103,7 +3079,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FYRadius := NewValue;
     Repaint;
   end;
@@ -3113,7 +3089,7 @@ end;
 procedure TALBaseText.SetSides(const Value: TSides);
 begin
   if FSides <> Value then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FSides := Value;
     Repaint;
   end;
@@ -3204,14 +3180,14 @@ procedure TALBaseText.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then clearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable;
   end;
 end;
 
 {**********************************************************}
 procedure TALBaseText.SetAlign(const Value: TALAlignLayout);
 begin
-  if Align <> Value then clearBufDrawable;
+  if Align <> Value then ClearBufDrawable;
   inherited SetAlign(Value);
 end;
 
@@ -3220,7 +3196,7 @@ procedure TALBaseText.SetAutoSize(const Value: Boolean);
 begin
   if FAutoSize <> Value then
   begin
-    clearBufDrawable;
+    ClearBufDrawable;
     inherited;
   end;
 end;
@@ -3229,7 +3205,7 @@ end;
 procedure TALBaseText.SetText(const Value: string);
 begin
   if FText <> Value then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FText := Value;
     AdjustSize;
     Repaint;
@@ -3237,12 +3213,12 @@ begin
 end;
 
 {*************************************}
-procedure TALBaseText.clearBufDrawable;
+procedure TALBaseText.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
 end;
@@ -3667,11 +3643,15 @@ begin
 
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
 
   if (not ALIsDrawableNull(FBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
 
   CreateBufDrawable(
     FBufDrawable, // var ABufDrawable: TALDrawable;
@@ -3702,7 +3682,7 @@ end;
 procedure TALBaseText.SetMaxWidth(const Value: Single);
 begin
   if compareValue(fMaxWidth, Value, Tepsilon.position) <> 0 then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     fMaxWidth := Value;
     AdjustSize;
   end;
@@ -3712,7 +3692,7 @@ end;
 procedure TALBaseText.SetMaxHeight(const Value: Single);
 begin
   if compareValue(fMaxHeight, Value, Tepsilon.position) <> 0 then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     fMaxHeight := Value;
     AdjustSize;
   end;

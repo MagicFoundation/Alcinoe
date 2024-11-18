@@ -41,7 +41,7 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALAniIndicator = class(TALControl, IALDoubleBufferedControl)
+  TALAniIndicator = class(TALControl)
   private
     fTimer: TTimer;
     finterval: integer;
@@ -55,8 +55,7 @@ type
     procedure onTimer(sender: Tobject);
     function ResourceNameStored: Boolean;
   protected
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
     procedure Paint; override;
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
@@ -65,8 +64,8 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
   published
     //property Action;
     property Align;
@@ -128,8 +127,8 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALBaseCheckBox = class(TALShape, IALDoubleBufferedControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALBaseCheckBox = class(TALShape)
   public
     type
       // ---------------
@@ -341,8 +340,8 @@ type
     function IsYRadiusStored: Boolean;
   protected
     function CreateStateStyles: TStateStyles; virtual;
-    function GetDoubleBuffered: boolean; virtual;
-    procedure SetDoubleBuffered(const AValue: Boolean); virtual;
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
     procedure CheckMarkChanged(Sender: TObject); virtual;
@@ -380,13 +379,13 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure AlignToPixel; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
     property CanFocus default True;
     property Cursor default crHandPoint;
     property Checked: Boolean read GetChecked write SetChecked default False;
     property CheckMark: TCheckMarkBrush read FCheckMark write SetCheckMark;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DoubleBuffered default true;
     property StateStyles: TStateStyles read FStateStyles write SetStateStyles;
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
@@ -507,12 +506,12 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
-  TALSwitch = class(TALControl, IALDoubleBufferedControl)
+  TALSwitch = class(TALControl)
   public
     type
       // ------
       // TTrack
-      TTrack = class(TALShape, IALDoubleBufferedControl)
+      TTrack = class(TALShape)
       public
         type
           // ---------------
@@ -639,8 +638,8 @@ type
         function IsYRadiusStored: Boolean;
       protected
         function GetDefaultSize: TSizeF; override;
-        function GetDoubleBuffered: boolean;
-        procedure SetDoubleBuffered(const AValue: Boolean);
+        function GetDoubleBuffered: boolean; override;
+        procedure SetDoubleBuffered(const AValue: Boolean); override;
         procedure SetXRadius(const Value: Single); virtual;
         procedure SetYRadius(const Value: Single); virtual;
         procedure StateStylesChanged(Sender: TObject); virtual;
@@ -664,15 +663,15 @@ type
                     const AShadow: TALShadow); virtual;
         procedure Paint; override;
         property Checked: Boolean read GetChecked write SetChecked default False;
-        property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
       public
         constructor Create(AOwner: TComponent); override;
         destructor Destroy; override;
         procedure AlignToPixel; override;
-        procedure MakeBufDrawable; virtual;
-        procedure clearBufDrawable; virtual;
+        procedure MakeBufDrawable; override;
+        procedure ClearBufDrawable; override;
         property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
         property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+        property DoubleBuffered default true;
         property Position stored false;
       published
         //property Action;
@@ -839,8 +838,8 @@ type
     procedure AlignThumb;
   protected
     function GetDefaultSize: TSizeF; override;
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure StartTransition; virtual;
     procedure IsMouseOverChanged; override;
     procedure IsFocusedChanged; override;
@@ -860,8 +859,8 @@ type
     destructor Destroy; override;
     procedure AfterConstruction; override;
     procedure AlignToPixel; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
   published
     //property Action;
     property Align;
@@ -869,7 +868,7 @@ type
     property CanFocus default true;
     //property CanParentFocus;
     //property DisableFocusEffect;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    property DoubleBuffered default true;
     property Checked: Boolean read GetChecked write SetChecked default false;
     property ClipChildren;
     //property ClipParent;
@@ -1083,7 +1082,7 @@ type
     destructor Destroy; override;
     procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
-    procedure clearBufDrawable; override;
+    procedure ClearBufDrawable; override;
   published
     //property Action;
     property Align;
@@ -1156,8 +1155,8 @@ type
     property OnResized;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALCustomTrack = class(TALControl, IALDoubleBufferedControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALCustomTrack = class(TALControl)
   public
     type
       // ------
@@ -1333,7 +1332,7 @@ type
         destructor Destroy; override;
         procedure AlignToPixel; override;
         procedure MakeBufDrawable; override;
-        procedure clearBufDrawable; override;
+        procedure ClearBufDrawable; override;
         property HitTest default false;
         property Locked default True;
         property Position stored false;
@@ -1533,7 +1532,7 @@ type
         procedure AlignToPixel; override;
         function GetValue: Double;
         procedure MakeBufDrawable; override;
-        procedure clearBufDrawable; override;
+        procedure ClearBufDrawable; override;
         procedure MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
         procedure MouseMove(Shift: TShiftState; X, Y: Single); override;
         procedure MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single); override;
@@ -1750,8 +1749,8 @@ type
     ///   of the thumb can be positioned
     /// </summary>
     function GetTrackSize(Const AIncludeTrackPadding: Boolean = False): Single; virtual;
-    function GetDoubleBuffered: boolean; virtual;
-    procedure SetDoubleBuffered(const AValue: Boolean); virtual;
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
     function _GetCanFocus: Boolean; virtual;
     procedure _SetCanFocus(const Value: Boolean); virtual;
     procedure _SetTabStop(const Value: Boolean); virtual;
@@ -1790,9 +1789,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure AfterConstruction; override;
-    procedure MakeBufDrawable; virtual;
-    procedure clearBufDrawable; virtual;
-    property DoubleBuffered: Boolean read GetDoubleBuffered write SetDoubleBuffered default true;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
+    property DoubleBuffered default true;
     property CanFocus: Boolean read _GetCanFocus write _SetCanFocus default True;
     property TabStop: Boolean read FTabStop write _SetTabStop default True;
     property Min: Double read GetMin write SetMin stored MinStored nodefault;
@@ -1977,7 +1976,7 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure MakeBufDrawable; override;
-    procedure clearBufDrawable; override;
+    procedure ClearBufDrawable; override;
   published
     //property Action;
     property ActiveTrack;
@@ -2183,7 +2182,6 @@ end;
 destructor TALAniIndicator.Destroy;
 begin
   ALFreeAndNil(fTimer);
-  clearBufDrawable;
   inherited;
 end;
 
@@ -2201,12 +2199,12 @@ begin
 end;
 
 {*****************************************}
-procedure TALAniIndicator.clearBufDrawable;
+procedure TALAniIndicator.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
      (not ALIsDrawableNull(fBufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   ALFreeAndNilDrawable(fBufDrawable);
 end;
@@ -2220,11 +2218,15 @@ begin
      //--- Do not create BufDrawable if fResourceName is empty
      (fResourceName = '')
   then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
 
   if (not ALIsDrawableNull(fBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
 
   fBufDrawableRect := LocalRect;
   {$IFDEF ALDPK}
@@ -2292,12 +2294,6 @@ begin
   result := True;
 end;
 
-{*****************************************************************}
-procedure TALAniIndicator.SetDoubleBuffered(const AValue: Boolean);
-begin
-  // Not yet supported
-end;
-
 {***************************************************}
 function TALAniIndicator.ResourceNameStored: Boolean;
 begin
@@ -2308,7 +2304,7 @@ end;
 procedure TALAniIndicator.setResourceName(const Value: String);
 begin
   if FResourceName <> Value then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FResourceName := Value;
     Repaint;
   end;
@@ -2713,7 +2709,7 @@ end;
 {******************************************************************}
 procedure TALCustomTrack.TThumb.StateStylesChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   DisabledOpacity := StateStyles.Disabled.opacity;
   Repaint;
 end;
@@ -2898,7 +2894,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALCustomTrack.TThumb.clearBufDrawable;
+procedure TALCustomTrack.TThumb.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (FStateStyles <> nil) and
@@ -2908,11 +2904,11 @@ begin
       (not ALIsDrawableNull(FStateStyles.Hovered.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.Pressed.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.Focused.BufDrawable))) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   if FStateStyles <> nil then
     FStateStyles.ClearBufDrawable;
-  inherited clearBufDrawable;
+  inherited ClearBufDrawable;
 end;
 
 {**********************************************}
@@ -2920,7 +2916,7 @@ procedure TALCustomTrack.TThumb.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
   //--
@@ -2932,6 +2928,10 @@ begin
   if (not ALIsDrawableNull(LStateStyle.BufDrawable)) then exit;
   LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
+
+    {$IFDEF debug}
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    {$endif}
 
     // Create the BufDrawable
     CreateBufDrawable(
@@ -3350,7 +3350,7 @@ procedure TALCustomTrack.TValueIndicator.SetFormat(const Value: string);
 begin
   if FFormat <> Value then
   begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FFormat := Value;
   end;
 end;
@@ -4027,7 +4027,7 @@ end;
 {******************************************************************}
 procedure TALCustomTrack.TTrack.StateStylesChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   DisabledOpacity := StateStyles.Disabled.opacity;
   Repaint;
 end;
@@ -4048,7 +4048,7 @@ begin
 end;
 
 {***********************************************}
-procedure TALCustomTrack.TTrack.clearBufDrawable;
+procedure TALCustomTrack.TTrack.ClearBufDrawable;
 begin
   if FcustomTrack.FIsAligningTracks then exit;
   {$IFDEF debug}
@@ -4056,11 +4056,11 @@ begin
      (not (csDestroying in ComponentState)) and
      (ALIsDrawableNull(BufDrawable)) and // warn will be raise in inherited
      (not ALIsDrawableNull(FStateStyles.Disabled.BufDrawable)) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   if FStateStyles <> nil then
     FStateStyles.ClearBufDrawable;
-  inherited clearBufDrawable;
+  inherited ClearBufDrawable;
 end;
 
 {**********************************************}
@@ -4068,7 +4068,7 @@ procedure TALCustomTrack.TTrack.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
   //--
@@ -4080,6 +4080,10 @@ begin
   if (not ALIsDrawableNull(LStateStyle.BufDrawable)) then exit;
   LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
+
+    {$IFDEF debug}
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    {$endif}
 
     // Create the BufDrawable
     CreateBufDrawable(
@@ -4524,11 +4528,11 @@ begin
 end;
 
 {****************************************}
-procedure TALCustomTrack.clearBufDrawable;
+procedure TALCustomTrack.ClearBufDrawable;
 begin
-  if FInactiveTrack <> nil then FInactiveTrack.clearBufDrawable;
-  if FActiveTrack <> nil then FActiveTrack.clearBufDrawable;
-  if FThumb <> nil then FThumb.clearBufDrawable;
+  if FInactiveTrack <> nil then FInactiveTrack.ClearBufDrawable;
+  if FActiveTrack <> nil then FActiveTrack.ClearBufDrawable;
+  if FThumb <> nil then FThumb.ClearBufDrawable;
 end;
 
 {*******************************************}
@@ -4727,9 +4731,9 @@ procedure TALCustomTrack.DoResized;
 begin
   inherited;
   if FActiveTrack <> nil then
-    FActiveTrack.clearBufDrawable;
+    FActiveTrack.ClearBufDrawable;
   if FInactiveTrack <> nil then
-    FInactiveTrack.clearBufDrawable;
+    FInactiveTrack.ClearBufDrawable;
 end;
 
 {*********************************}
@@ -5248,11 +5252,11 @@ begin
 end;
 
 {******************************************}
-procedure TALRangeTrackBar.clearBufDrawable;
+procedure TALRangeTrackBar.ClearBufDrawable;
 begin
   inherited;
-  if FMaxInactiveTrack <> nil then FMaxInactiveTrack.clearBufDrawable;
-  if FMaxThumb <> nil then FMaxThumb.clearBufDrawable;
+  if FMaxInactiveTrack <> nil then FMaxInactiveTrack.ClearBufDrawable;
+  if FMaxThumb <> nil then FMaxThumb.ClearBufDrawable;
 end;
 
 {***************************************************************}
@@ -5388,7 +5392,7 @@ procedure TALRangeTrackBar.DoResized;
 begin
   inherited;
   if FMaxInactiveTrack <> nil then
-    FMaxInactiveTrack.clearBufDrawable;
+    FMaxInactiveTrack.ClearBufDrawable;
 end;
 
 {***********************************}
@@ -6465,7 +6469,7 @@ procedure TALBaseCheckBox.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then clearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable;
   end;
 end;
 
@@ -6518,7 +6522,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FXRadius := NewValue;
     Repaint;
   end;
@@ -6532,7 +6536,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FYRadius := NewValue;
     Repaint;
   end;
@@ -6541,35 +6545,35 @@ end;
 {**********************************************************}
 procedure TALBaseCheckBox.CheckMarkChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   Repaint;
 end;
 
 {*****************************************************}
 procedure TALBaseCheckBox.FillChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {*******************************************************}
 procedure TALBaseCheckBox.StrokeChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {*******************************************************}
 procedure TALBaseCheckBox.ShadowChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {************************************************************}
 procedure TALBaseCheckBox.StateStylesChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   if Checked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
   else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
   Repaint;
@@ -6638,7 +6642,7 @@ begin
 end;
 
 {*****************************************}
-procedure TALBaseCheckBox.clearBufDrawable;
+procedure TALBaseCheckBox.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (FStateStyles <> nil) and
@@ -6653,7 +6657,7 @@ begin
       (not ALIsDrawableNull(FStateStyles.UnChecked.Hovered.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.UnChecked.Pressed.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.UnChecked.Focused.BufDrawable))) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   if FStateStyles <> nil then
     FStateStyles.ClearBufDrawable;
@@ -6668,6 +6672,11 @@ procedure TALBaseCheckBox.MakeBufDrawable;
     if (not ALIsDrawableNull(AStateStyle.BufDrawable)) then exit(False);
     AStateStyle.SupersedeNoChanges(true{ASaveState});
     try
+
+      {$IFDEF debug}
+      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+      {$endif}
+
       CreateBufDrawable(
         AStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
         AStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
@@ -6699,7 +6708,7 @@ procedure TALBaseCheckBox.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
   //--
@@ -7876,7 +7885,7 @@ procedure TALSwitch.TTrack.SetDoubleBuffered(const AValue: Boolean);
 begin
   if AValue <> fDoubleBuffered then begin
     fDoubleBuffered := AValue;
-    if not fDoubleBuffered then clearBufDrawable;
+    if not fDoubleBuffered then ClearBufDrawable;
   end;
 end;
 
@@ -7923,7 +7932,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FXRadius := NewValue;
     Repaint;
   end;
@@ -7937,7 +7946,7 @@ begin
   if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
   else NewValue := Value;
   if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     FYRadius := NewValue;
     Repaint;
   end;
@@ -7946,28 +7955,28 @@ end;
 {******************************************************}
 procedure TALSwitch.TTrack.FillChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {********************************************************}
 procedure TALSwitch.TTrack.StrokeChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {********************************************************}
 procedure TALSwitch.TTrack.ShadowChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   inherited;
 end;
 
 {*************************************************************}
 procedure TALSwitch.TTrack.StateStylesChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   if Checked then DisabledOpacity := StateStyles.Checked.Disabled.opacity
   else DisabledOpacity := StateStyles.Unchecked.Disabled.opacity;
   Repaint;
@@ -8011,7 +8020,7 @@ begin
 end;
 
 {******************************************}
-procedure TALSwitch.TTrack.clearBufDrawable;
+procedure TALSwitch.TTrack.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (FStateStyles <> nil) and
@@ -8026,7 +8035,7 @@ begin
       (not ALIsDrawableNull(FStateStyles.UnChecked.Hovered.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.UnChecked.Pressed.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.UnChecked.Focused.BufDrawable))) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   if FStateStyles <> nil then
     FStateStyles.ClearBufDrawable;
@@ -8041,6 +8050,11 @@ procedure TALSwitch.TTrack.MakeBufDrawable;
     if (not ALIsDrawableNull(AStateStyle.BufDrawable)) then exit(False);
     AStateStyle.SupersedeNoChanges(true{ASaveState});
     try
+
+      {$IFDEF debug}
+      ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + AStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+      {$endif}
+
       CreateBufDrawable(
         AStateStyle.BufDrawable, // var ABufDrawable: TALDrawable;
         AStateStyle.BufDrawableRect, // var ABufDrawableRect: TRectF;
@@ -8071,7 +8085,7 @@ procedure TALSwitch.TTrack.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
   //--
@@ -8516,10 +8530,10 @@ begin
 end;
 
 {***********************************}
-procedure TALSwitch.clearBufDrawable;
+procedure TALSwitch.ClearBufDrawable;
 begin
-  Track.clearBufDrawable;
-  Thumb.clearBufDrawable;
+  Track.ClearBufDrawable;
+  Thumb.ClearBufDrawable;
 end;
 
 {****************************************}
@@ -9409,7 +9423,7 @@ end;
 {******************************************************}
 procedure TALButton.StateStylesChanged(Sender: TObject);
 begin
-  clearBufDrawable;
+  ClearBufDrawable;
   DisabledOpacity := StateStyles.Disabled.opacity;
   Repaint;
 end;
@@ -9448,7 +9462,7 @@ begin
 end;
 
 {***********************************}
-procedure TALButton.clearBufDrawable;
+procedure TALButton.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (FStateStyles <> nil) and
@@ -9458,11 +9472,11 @@ begin
       (not ALIsDrawableNull(FStateStyles.Hovered.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.Pressed.BufDrawable)) or
       (not ALIsDrawableNull(FStateStyles.Focused.BufDrawable))) then
-    ALLog(Classname + '.clearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
   if FStateStyles <> nil then
     FStateStyles.ClearBufDrawable;
-  inherited clearBufDrawable;
+  inherited ClearBufDrawable;
 end;
 
 {**********************************}
@@ -9470,7 +9484,7 @@ procedure TALButton.MakeBufDrawable;
 begin
   //--- Do not create BufDrawable if not DoubleBuffered
   if {$IF not DEFINED(ALDPK)}(not DoubleBuffered){$ELSE}False{$ENDIF} then begin
-    clearBufDrawable;
+    ClearBufDrawable;
     exit;
   end;
   //--
@@ -9482,6 +9496,10 @@ begin
   if (not ALIsDrawableNull(LStateStyle.BufDrawable)) then exit;
   LStateStyle.SupersedeNoChanges(true{ASaveState});
   try
+
+    {$IFDEF debug}
+    ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Style: ' + LStateStyle.ClassName + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+    {$endif}
 
     // Create the BufDrawable
     var LTextBroken: Boolean;

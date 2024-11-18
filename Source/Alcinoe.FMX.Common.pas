@@ -135,14 +135,6 @@ type
     function GetScrollEngine: TALScrollEngine;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  IALDoubleBufferedControl = interface
-    ['{26A0A593-D483-4AE2-881B-6CB930B5E863}']
-    function GetDoubleBuffered: boolean;
-    procedure SetDoubleBuffered(const AValue: Boolean);
-    procedure MakeBufDrawable;
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALNativeControl = interface
     ['{EB2063C4-CA1F-4415-97C3-4C161907F244}']
@@ -5313,11 +5305,11 @@ begin
   // Otherwise, the style will be released and reapplied shortly after.
   AControl.DisableDisappear := true;
 
-  var LDoubleBufferedControl: IALDoubleBufferedControl;
-  if Supports(AControl, IALDoubleBufferedControl, LDoubleBufferedControl) then begin
+  if AControl is TALControl then begin
+    var LControl := TALControl(AControl);
     if AEnsureDoubleBuffered then
-      LDoubleBufferedControl.SetDoubleBuffered(true);
-    LDoubleBufferedControl.MakeBufDrawable;
+      LControl.DoubleBuffered := true;
+    LControl.MakeBufDrawable;
   end;
 
   for var LChild in aControl.Controls do

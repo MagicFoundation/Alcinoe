@@ -972,6 +972,7 @@ type
     property Align;
     property Anchors;
     property AutoCapitalizationType: TALAutoCapitalizationType read GetAutoCapitalizationType write SetAutoCapitalizationType default TALAutoCapitalizationType.acNone;
+    //property AutoSize;
     property AutoTranslate: Boolean read FAutoTranslate write FAutoTranslate default true; // Just the PromptText
     property CanFocus default True;
     //property CanParentFocus;

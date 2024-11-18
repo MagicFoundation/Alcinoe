@@ -70,6 +70,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -414,6 +415,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -677,6 +679,7 @@ type
         //property Action;
         //property Align;
         //property Anchors;
+        //property AutoSize;
         //property CanFocus default False;
         //property CanParentFocus;
         //property DisableFocusEffect;
@@ -761,6 +764,7 @@ type
         //property Action;
         //property Align;
         //property Anchors;
+        //property AutoSize;
         //property CanFocus default False;
         //property CanParentFocus;
         //property DisableFocusEffect;
@@ -865,6 +869,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     property CanFocus default true;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -1340,6 +1345,7 @@ type
         //property Action;
         //property Align;
         //property Anchors;
+        //property AutoSize;
         //property CanFocus;
         //property CanParentFocus;
         //property DisableFocusEffect;
@@ -1544,6 +1550,7 @@ type
         //property Action;
         //property Align;
         //property Anchors;
+        //property AutoSize;
         //property CanFocus default true;
         //property CanParentFocus;
         //property DisableFocusEffect;
@@ -1812,6 +1819,7 @@ type
     property ActiveTrack;
     property Align;
     property Anchors;
+    //property AutoSize;
     property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -1982,6 +1990,7 @@ type
     property ActiveTrack;
     property Align;
     property Anchors;
+    //property AutoSize;
     property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -2067,6 +2076,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;

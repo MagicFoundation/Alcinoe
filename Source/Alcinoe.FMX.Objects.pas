@@ -113,6 +113,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -274,6 +275,7 @@ type
     property Align;
     property Anchors;
     property Animation: TAnimation read fAnimation write SetAnimation;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -398,8 +400,6 @@ type
     //property Action;
     property Align;
     property Anchors;
-    // Dynamically adjusts the dimensions to accommodate child controls,
-    // considering their sizes, positions, margins, and alignments.
     property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
@@ -498,6 +498,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -584,6 +585,7 @@ type
     //property Action;
     property Align;
     property Anchors;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;

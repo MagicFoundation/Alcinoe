@@ -149,6 +149,7 @@ type
         //property Action;
         //property Align;
         //property Anchors;
+        //property AutoSize;
         property CanFocus;
         //property CanParentFocus;
         //property DisableFocusEffect;
@@ -294,6 +295,7 @@ type
     property Align;
     property Anchors;
     property AutoHide;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -366,6 +368,7 @@ type
     property Align;
     property Anchors;
     property AutoHide;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -439,6 +442,7 @@ type
     property Align;
     property Anchors;
     property AutoHide;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;

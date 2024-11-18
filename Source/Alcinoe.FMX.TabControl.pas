@@ -64,6 +64,7 @@ type
     //property Action;
     //property Align;
     //property Anchors;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
@@ -213,6 +214,7 @@ type
     property Align;
     property Anchors;
     property AnimationEnabled: boolean read getAnimationEnabled write setAnimationEnabled default true;
+    //property AutoSize;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;

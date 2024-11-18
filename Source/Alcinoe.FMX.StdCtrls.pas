@@ -1771,6 +1771,7 @@ type
     ///   Return the center position of the thumb corresponding to AValue
     /// </summary>
     function GetThumbPos(const AValue: single): Single; virtual;
+    procedure DoResized; override;
     procedure DoRealign; override;
     procedure Loaded; override;
     procedure DoChanged; virtual;
@@ -1969,6 +1970,7 @@ type
     function CreateInactiveTrack(const AInactiveTrackClass: TALCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALCustomTrack.TInactiveTrack; override;
     function CreateActiveTrack(const AActiveTrackClass: TALCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALCustomTrack.TActiveTrack; override;
     function CreateThumb(const AThumbClass: TALCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALCustomTrack.TThumb; override;
+    procedure DoResized; override;
     procedure DoRealign; override;
     procedure AlignThumb; override;
     procedure AlignTracks; override;
@@ -4721,6 +4723,16 @@ begin
 end;
 
 {*********************************}
+procedure TALCustomTrack.DoResized;
+begin
+  inherited;
+  if FActiveTrack <> nil then
+    FActiveTrack.clearBufDrawable;
+  if FInactiveTrack <> nil then
+    FInactiveTrack.clearBufDrawable;
+end;
+
+{*********************************}
 procedure TALCustomTrack.DoRealign;
 begin
   inherited;
@@ -5369,6 +5381,14 @@ function TALRangeTrackBar.CreateThumb(const AThumbClass: TALCustomTrack.TThumbCl
 begin
   if AThumbClass = nil then Exit(CreateThumb(TRangeMinThumb, AName));
   result := Inherited;
+end;
+
+{***********************************}
+procedure TALRangeTrackBar.DoResized;
+begin
+  inherited;
+  if FMaxInactiveTrack <> nil then
+    FMaxInactiveTrack.clearBufDrawable;
 end;
 
 {***********************************}

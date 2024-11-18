@@ -42,6 +42,7 @@ type
     property ClipChildren;
     //property ClipParent;
     property Cursor;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -157,6 +158,7 @@ type
         //property ClipChildren;
         //property ClipParent;
         //property Cursor;
+        //property DoubleBuffered;
         //property DragMode;
         //property EnableDragHighlight;
         //property Enabled;
@@ -303,6 +305,7 @@ type
     //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -376,6 +379,7 @@ type
     //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -450,6 +454,7 @@ type
     //property ClipParent;
     property Cursor;
     property DisableMouseWheel;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;

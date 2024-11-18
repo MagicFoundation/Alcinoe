@@ -468,6 +468,7 @@ type
     //property ClipParent;
     property Corners;
     property Cursor;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;

@@ -983,6 +983,7 @@ type
     property Corners;
     property Cursor default crIBeam;
     //property DisableFocusEffect;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;

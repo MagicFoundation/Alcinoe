@@ -71,6 +71,7 @@ type
     property ClipChildren;
     //property ClipParent;
     property Cursor;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;
@@ -221,6 +222,7 @@ type
     //property ClipChildren;
     //property ClipParent;
     property Cursor;
+    //property DoubleBuffered;
     property DragMode;
     property EnableDragHighlight;
     property Enabled;

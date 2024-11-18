@@ -143,17 +143,6 @@ type
     procedure MakeBufDrawable;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  IALShapeControl = interface
-    ['{7F0C732D-88CF-4FE4-ABCB-A990D103D7A8}']
-    function GetFill: TALBrush;
-    procedure SetFill(const Value: TALBrush);
-    function GetStroke: TALStrokeBrush;
-    procedure SetStroke(const Value: TALStrokeBrush);
-    function GetShadow: TALShadow;
-    procedure SetShadow(const Value: TALShadow);
-  end;
-
   {~~~~~~~~~~~~~~~~~~~~~~~~~~}
   IALNativeControl = interface
     ['{EB2063C4-CA1F-4415-97C3-4C161907F244}']
@@ -4161,18 +4150,14 @@ begin
   inherited Create;
   //--
   FParent := AParent;
-  var LShapeControl: IALShapeControl;
-  if Supports(AParent, IALShapeControl, LShapeControl) then begin
-    {$IF defined(debug)}
-    if not (AParent is TALControl) then
-      raise Exception.Create('Parent object must be of type TALControl');
-    {$ENDIF}
+  if (AParent is TALShape) then begin
+    var LShapeControl := TALShape(AParent);
     FStateStyleParent := nil;
     FControlParent := TALControl(AParent);
-    FFill := TALInheritBrush.Create(LShapeControl.Getfill, TAlphaColors.White{ADefaultColor});
+    FFill := TALInheritBrush.Create(LShapeControl.fill, TAlphaColors.White{ADefaultColor});
     FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
-    FStroke := TALInheritStrokeBrush.Create(LShapeControl.GetStroke, TAlphaColors.Black{ADefaultColor});
-    FShadow := TALInheritShadow.Create(LShapeControl.GetShadow);
+    FStroke := TALInheritStrokeBrush.Create(LShapeControl.Stroke, TAlphaColors.Black{ADefaultColor});
+    FShadow := TALInheritShadow.Create(LShapeControl.Shadow);
   end
   else if (AParent is TALBaseStateStyle) then begin
     FStateStyleParent := TALBaseStateStyle(AParent);
@@ -4289,7 +4274,6 @@ procedure TALBaseStateStyle.Interpolate(const ATo: TALBaseStateStyle; const ANor
 begin
   BeginUpdate;
   Try
-    var LShapeControl: IALShapeControl;
     var LPrevStateLayerHasfill := StateLayer.HasFill;
     var LPrevStateLayerUseContentColor := StateLayer.UseContentColor;
     var LPrevStateLayerXRadius := StateLayer.XRadius;
@@ -4316,11 +4300,12 @@ begin
         FStateStyleParent.RestoreStateNoChanges;
       end;
     end
-    else if Supports(FControlParent, IALShapeControl, LShapeControl) then begin
-      Fill.Interpolate(LShapeControl.GetFill, ANormalizedTime);
+    else if (FControlParent is TALShape) then begin
+      var LShapeControl := TALShape(FControlParent);
+      Fill.Interpolate(LShapeControl.Fill, ANormalizedTime);
       StateLayer.Interpolate(nil, ANormalizedTime);
-      Stroke.Interpolate(LShapeControl.GetStroke, ANormalizedTime);
-      Shadow.Interpolate(LShapeControl.GetShadow, ANormalizedTime);
+      Stroke.Interpolate(LShapeControl.Stroke, ANormalizedTime);
+      Shadow.Interpolate(LShapeControl.Shadow, ANormalizedTime);
       Scale := InterpolateSingle(Scale{Start}, DefaultScale{Stop}, ANormalizedTime);
       //Transition
     end

@@ -42,8 +42,8 @@ uses
 
 type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALShape = class(TALControl, IALShapeControl)
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALShape = class(TALControl)
   strict private
     FFill: TALBrush;
     FStroke: TALStrokeBrush;

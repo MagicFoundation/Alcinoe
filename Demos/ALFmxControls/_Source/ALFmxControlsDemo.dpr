@@ -8,7 +8,7 @@ uses
   FMX.Types,
   FMX.Skia,
   Main in 'Main.pas' {MainForm},
-  ScrollBox in 'ScrollBox.pas' {ScrollBoxForm};
+  ScrollBoxDemo in 'ScrollBoxDemo.pas' {ScrollBoxDemoForm};
 
 {$R *.res}
 

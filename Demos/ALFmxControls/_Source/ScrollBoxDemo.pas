@@ -1,4 +1,4 @@
-unit ScrollBox;
+unit ScrollBoxDemo;
 
 interface
 
@@ -10,13 +10,13 @@ uses
   Alcinoe.FMX.Controls;
 
 type
-  TScrollBoxForm = class(TForm)
-    ALText1: TALText;
-    ButtonLaunchScrollBoxDemoAlcinoe: TALButton;
+  TScrollBoxDemoForm = class(TForm)
+    HeaderText: TALText;
+    ButtonClose: TALButton;
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
     procedure FormCreate(Sender: TObject);
-    procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
+    procedure ButtonCloseClick(Sender: TObject);
   private
     fDebugFpsStarted: Boolean;
     fDebugFpsCount: integer;
@@ -31,7 +31,7 @@ type
   end;
 
 var
-  ScrollBoxForm: TScrollBoxForm;
+  ScrollBoxDemoForm: TScrollBoxDemoForm;
 
 implementation
 
@@ -41,21 +41,21 @@ uses
 
 {$R *.fmx}
 
-{*************************************************************}
-procedure TScrollBoxForm.ButtonLaunchScrollBoxDemoAlcinoeClick(
+{********************************************}
+procedure TScrollBoxDemoForm.ButtonCloseClick(
             Sender: TObject);
 begin
   Close;
 end;
 
-{****************************************************************************}
-procedure TScrollBoxForm.FormClose(Sender: TObject; var Action: TCloseAction);
+{********************************************************************************}
+procedure TScrollBoxDemoForm.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   action := TcloseAction.caFree;
 end;
 
-{***************************************************}
-procedure TScrollBoxForm.FormCreate(Sender: TObject);
+{*******************************************************}
+procedure TScrollBoxDemoForm.FormCreate(Sender: TObject);
 begin
   fDebugFpsStarted := false;
   fDebugFpsCount := 0;
@@ -65,8 +65,8 @@ begin
   fDebugAverageFps := 0;
 end;
 
-{*********************************}
-procedure TScrollBoxForm.FormPaint(
+{*************************************}
+procedure TScrollBoxDemoForm.FormPaint(
             Sender: TObject;
             Canvas: TCanvas;
             const ARect: TRectF);
@@ -116,8 +116,8 @@ begin
         ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' + ' | ' +
         'average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps',
         TalLogType.verbose);
-      ALText1.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
-                      ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps)';
+      HeaderText.Text := ALFormatFloatW('0.##', (fDebugFpsCount / fDebugFpsStopWatch.Elapsed.totalMilliseconds) * 1000, ALDefaultFormatSettingsW) + ' fps' +
+                         ' (average: ' + ALFormatFloatW('0.##', fDebugAverageFps, ALDefaultFormatSettingsW) + ' fps)';
       fDebugFpsCount := 0;
       fDebugFpsStopWatch := TstopWatch.StartNew;
     end;

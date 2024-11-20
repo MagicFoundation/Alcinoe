@@ -153,7 +153,7 @@ type
     ALRangeTrackBar1: TALRangeTrackBar;
     ALTrackBar1: TALTrackBar;
     Text11: TALText;
-    Text8: TALText;
+    TextUpdateBat: TALText;
     ALVideoPlayerSurface1: TALVideoPlayerSurface;
     MonochromeEffect1: TMonochromeEffect;
     BandedSwirlEffect1: TBandedSwirlEffect;
@@ -174,61 +174,39 @@ type
     ButtonShowTALDatePickerDialog: TALButton;
     ButtonApplyEffectToVideo: TALButton;
     ALLayout7: TALLayout;
-    ALLayout8: TALLayout;
     ALButton6: TALButton;
-    ALLayout9: TALLayout;
     ALButton7: TALButton;
     ALLayout14: TALLayout;
-    ALLayout15: TALLayout;
     ALButton9: TALButton;
-    ALLayout16: TALLayout;
     ALButton10: TALButton;
     ALLayout17: TALLayout;
-    ALLayout18: TALLayout;
     ALButton11: TALButton;
-    ALLayout19: TALLayout;
     ALButton12: TALButton;
     ALLayout20: TALLayout;
-    ALLayout21: TALLayout;
     ALButton13: TALButton;
-    ALLayout22: TALLayout;
     ALButton14: TALButton;
     ALLayout26: TALLayout;
-    ALLayout27: TALLayout;
     ALButton17: TALButton;
-    ALLayout28: TALLayout;
     ALButton18: TALButton;
     ALRectangle2: TALRectangle;
     ALLayout2: TALLayout;
-    ALLayout3: TALLayout;
     ALButton1: TALButton;
-    ALLayout4: TALLayout;
     ALButton2: TALButton;
     ALLayout5: TALLayout;
-    ALLayout6: TALLayout;
     ALButton3: TALButton;
-    ALLayout10: TALLayout;
     ALButton4: TALButton;
     ALLayout11: TALLayout;
-    ALLayout12: TALLayout;
     ALButton5: TALButton;
-    ALLayout13: TALLayout;
     ALButton8: TALButton;
     ALLayout23: TALLayout;
-    ALLayout24: TALLayout;
     ALButton15: TALButton;
-    ALLayout25: TALLayout;
     ALButton16: TALButton;
     ALLayout29: TALLayout;
-    ALLayout30: TALLayout;
     ALButton19: TALButton;
-    ALLayout31: TALLayout;
     ALButton20: TALButton;
     ALText29: TALText;
     ALLayout41: TALLayout;
-    ALLayout42: TALLayout;
     ALButton23: TALButton;
-    ALLayout43: TALLayout;
     ALButton24: TALButton;
     ALText17: TALText;
     MainTitle: TALText;
@@ -246,7 +224,6 @@ type
     ALLayout33: TALLayout;
     ALLayout34: TALLayout;
     ALText25: TALText;
-    ALLayout35: TALLayout;
     ALAniIndicator1: TALAniIndicator;
     ALText26: TALText;
     ALText28: TALText;
@@ -267,9 +244,7 @@ type
     ALText37: TALText;
     ALEdit1: TALEdit;
     ALLayout38: TALLayout;
-    ALLayout39: TALLayout;
     ALButton21: TALButton;
-    ALLayout40: TALLayout;
     ALButton22: TALButton;
     ALMemo1: TALMemo;
     ALLayout46: TALLayout;
@@ -288,7 +263,7 @@ type
     ALLayout50: TALLayout;
     ALEdit4: TALEdit;
     ALMemo2: TALMemo;
-    ALRectangle3: TALRectangle;
+    DarkThemeEditBackground: TALRectangle;
     ALText20: TALText;
     ALEdit5: TALEdit;
     ALImage6: TALImage;
@@ -316,11 +291,9 @@ type
     ALImage11: TALImage;
     ALText42: TALText;
     ALText43: TALText;
-    ALLayout57: TALLayout;
-    ALLayout58: TALLayout;
-    ALText45: TALText;
-    ALLayout59: TALLayout;
-    ALImage12: TALImage;
+    ALAutoSizeLayout1: TALLayout;
+    ALAutoSizeLayoutText: TALText;
+    ALAutoSizeLayoutImage: TALImage;
     ALRectangle4: TALRectangle;
     ALText51: TALText;
     ALText52: TALText;
@@ -333,33 +306,25 @@ type
     ALAnimatedImage3: TALAnimatedImage;
     ALText56: TALText;
     ALText57: TALText;
-    ALLayout68: TALLayout;
     ALAnimatedImage2: TALAnimatedImage;
     ALText59: TALText;
-    ALLayout69: TALLayout;
     ALText58: TALText;
     ALImage13: TALImage;
     ALText60: TALText;
     ALText61: TALText;
     ALText62: TALText;
     ALLayout72: TALLayout;
-    ALLayout73: TALLayout;
     ALText63: TALText;
     ALLayout74: TALLayout;
     Image1: TImage;
     ALLayout75: TALLayout;
-    ALLayout76: TALLayout;
-    ALLayout77: TALLayout;
     ALLayout70: TALLayout;
-    ALLayout71: TALLayout;
-    ALLayout78: TALLayout;
     Text2: TALText;
     ALText64: TALText;
     ALImage14: TALImage;
     ALImage15: TALImage;
     ALText65: TALText;
     ALText66: TALText;
-    ALLayout79: TALLayout;
     ALSwitchAnimatedImage: TALAnimatedImage;
     ALLayout80: TALLayout;
     ALButton25: TALButton;
@@ -372,82 +337,57 @@ type
     ALButton31: TALButton;
     ALButton32: TALButton;
     ALText67: TALText;
-    ALLayout82: TALLayout;
-    ALLayout83: TALLayout;
     ALButton33: TALButton;
     ALLayout84: TALLayout;
-    ALLayout85: TALLayout;
     ALCheckBox3: TALCheckBox;
     ALText40: TALText;
     ALLayout86: TALLayout;
-    ALLayout87: TALLayout;
     ALCheckBox4: TALCheckBox;
     ALText50: TALText;
     ALRectangle7: TALRectangle;
     ALText68: TALText;
     ALLayout94: TALLayout;
-    ALLayout95: TALLayout;
     ALCheckBox5: TALCheckBox;
     ALText69: TALText;
     ALLayout96: TALLayout;
-    ALLayout97: TALLayout;
     ALCheckBox6: TALCheckBox;
     ALText70: TALText;
     ALLayout88: TALLayout;
-    ALLayout89: TALLayout;
     ALText71: TALText;
     ALLayout44: TALLayout;
-    ALLayout60: TALLayout;
     ALText47: TALText;
-    ALLayout90: TALLayout;
-    ALLayout91: TALLayout;
-    ALText48: TALText;
     ALRadioButton1: TALRadioButton;
     ALRadioButton2: TALRadioButton;
     ALRectangle8: TALRectangle;
     ALText72: TALText;
     ALLayout92: TALLayout;
-    ALLayout93: TALLayout;
     ALText73: TALText;
     ALLayout98: TALLayout;
-    ALLayout99: TALLayout;
     ALText74: TALText;
     ALRadioButton3: TALRadioButton;
     ALRadioButton4: TALRadioButton;
-    RadioButton1: TRadioButton;
     ALRectangle10: TALRectangle;
     ALText75: TALText;
     ALLayout100: TALLayout;
-    ALLayout101: TALLayout;
     ALText76: TALText;
     ALSwitch2: TALSwitch;
     ALLayout104: TALLayout;
-    ALLayout105: TALLayout;
     ALSwitch1: TALSwitch;
     ALText78: TALText;
     ALLayout102: TALLayout;
-    ALLayout103: TALLayout;
     ALSwitch3: TALSwitch;
     ALText77: TALText;
     ALLayout106: TALLayout;
-    ALLayout107: TALLayout;
     ALSwitch4: TALSwitch;
     ALText79: TALText;
     ALLayout108: TALLayout;
-    ALLayout109: TALLayout;
     ALSwitch5: TALSwitch;
     ALText80: TALText;
-    ALLayout110: TALLayout;
-    ALLayout111: TALLayout;
-    ALText81: TALText;
-    Switch1: TSwitch;
     ALTrackBar2: TALTrackBar;
-    TrackBar1: TTrackBar;
     ALTrackBar3: TALTrackBar;
     ALText82: TALText;
     ALText83: TALText;
     ALText84: TALText;
-    ALText85: TALText;
     ALTrackBar4: TALTrackBar;
     ALText86: TALText;
     ALRectangle11: TALRectangle;
@@ -513,8 +453,11 @@ type
     fCircle: TCircleStopWatch;
     FVirtualKeyboardOpen: boolean;
     FCurrentTextElements: TDictionary<TObject, TALTextElement>;
+    FMakeBufDrawablesOnFirstPaint: Boolean;
+  protected
+    procedure PaintBackground; override;
   public
-    constructor Create(AOwner: TComponent); override;
+    procedure InitializeNewForm; override;
   end;
 
 var
@@ -527,22 +470,29 @@ uses
   system.threading,
   system.Math,
   system.DateUtils,
+  system.Math.Vectors,
   fmx.DialogService,
   Alcinoe.FMX.ScrollEngine,
   Alcinoe.Common,
-  ScrollBox;
+  ScrollBoxDemo;
 
 {$R *.fmx}
 
-{***********************************************}
-constructor TMainForm.Create(AOwner: TComponent);
+{************************************}
+procedure TMainForm.InitializeNewForm;
 begin
   TALFontManager.RegisterTypefaceFromResource('GoodDogPlain', 'GoodDog Plain');
   TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular', 'Ma Shan Zheng');
+  FMakeBufDrawablesOnFirstPaint := True;
   inherited;
+  {$IF defined(ANDROID) or defined(IOS)}
+  beginupdate;
+  {$ENDIF}
 end;
 
-{**********************************************}
+{************************************************************}
+// FormCreate is called in TCommonCustomForm.AfterConstruction
+// once all child components are fully loaded.
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
   TALErrorReporting.Instance;
@@ -590,7 +540,7 @@ begin
     //fALRectangle.DoubleBuffered := False;
     fALRectangle.Fill.Color := $FFf1ecff;
     fALRectangle.Stroke.Color := $FFbea7fb;
-    fALRectangle.Align := TalignLayout.Top;
+    fALRectangle.Align := TALalignLayout.Top;
     fALRectangle.Margins.Left := 16;
     fALRectangle.Margins.Top := 8;
     fALRectangle.Margins.Right := 16;
@@ -602,7 +552,7 @@ begin
     var LText := TalText.Create(fALRectangle);
     LText.Parent := fALRectangle;
     LText.AutoSize := true;
-    LText.Align := TAlignLayout.Center;
+    LText.Align := TALAlignLayout.Center;
     LText.TextSettings.Font.Size := 16;
     LText.Text := 'TALRectangle';
     LText.HitTest := false;
@@ -624,7 +574,7 @@ begin
     LText := TalText.Create(fRectangle);
     LText.Parent := fRectangle;
     LText.AutoSize := true;
-    LText.Align := TAlignLayout.Center;
+    LText.Align := TALAlignLayout.Center;
     LText.TextSettings.Font.Size := 16;
     LText.Text := 'TRectangle';
     LText.HitTest := false;
@@ -642,7 +592,7 @@ begin
     LText := TalText.Create(fALCircle);
     LText.Parent := fALCircle;
     LText.AutoSize := true;
-    LText.Align := TAlignLayout.Center;
+    LText.Align := TALAlignLayout.Center;
     LText.TextSettings.Font.Size := 16;
     LText.Text := 'TALCircle';
     LText.HitTest := False;
@@ -659,7 +609,7 @@ begin
     LText := TalText.Create(fCircle);
     LText.Parent := fCircle;
     LText.AutoSize := true;
-    LText.Align := TAlignLayout.Center;
+    LText.Align := TALAlignLayout.Center;
     LText.TextSettings.Font.Size := 16;
     LText.Text := 'TCircle';
     LText.HitTest := False;
@@ -670,7 +620,7 @@ begin
     fALText.TextSettings.HorzAlign := TALTextHorzAlign.Center;
     fALText.TextSettings.Font.Size := 18;
     fALText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
-    fALText.Align := TalignLayout.Top;
+    fALText.Align := TALalignLayout.Top;
     fALText.Margins.Top := 12;
     fALText.Margins.left := 16;
     fALText.Margins.Right := 16;
@@ -714,8 +664,6 @@ begin
     fline.Stroke.Thickness := 3;
     fline.LineType := TLineType.Diagonal;
     fline.HitTest := False;
-    //-----
-    ALMakeBufDrawables(ALVertScrollBox1, False{AEnsureDoubleBuffered});
   finally
     endupdate;
   end;
@@ -726,7 +674,47 @@ end;
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   ALFreeAndNil(FCurrentTextElements);
-  ALLog('FormDestroy');
+end;
+
+{**********************************}
+procedure TMainForm.PaintBackground;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  function _IsParentDarkThemeEditBackground(const aParent: TFmxObject): Boolean;
+  begin
+    if aParent = nil then exit(false);
+    result := aParent = DarkThemeEditBackground;
+    if not result then result := _IsParentDarkThemeEditBackground(aParent.parent);
+
+  end;
+
+begin
+  inherited;
+  If FMakeBufDrawablesOnFirstPaint then begin
+    {$IF defined(ANDROID) or defined(IOS)}
+    ALLockTexts(ALVertScrollBox1);
+    EndUpdate;
+    ALUnLockTexts(ALVertScrollBox1);
+    ALMakeBufDrawables(ALVertScrollBox1, False{AEnsureDoubleBuffered});
+    {$ENDIF}
+    FMakeBufDrawablesOnFirstPaint := False;
+  end;
+  if (CompareValue(AlVertScrollBox1.margins.Bottom, 0, TEpsilon.position) > 0) and
+     (Focused <> nil) and
+     ((_IsParentDarkThemeEditBackground(Focused.parent)) or
+      (DarkThemeEditBackground.Position.y < ALVertScrollBox1.ScrollEngine.ViewportPosition.Y + ALVertScrollBox1.height)) then begin
+    Canvas.Fill.Kind := TBrushKind.Solid;
+    Canvas.fill.Color := DarkThemeEditBackground.Fill.Color;
+    // Width+1 because of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+    Canvas.FillRect(TRectF.Create(TpointF.create(0,height-AlVertScrollBox1.margins.Bottom), Width+1, AlVertScrollBox1.margins.Bottom+1), 1{AOpacity})
+  end
+  else if ALVertScrollBox1.ScrollEngine.ViewportPosition.Y > ALVertScrollBox1.ScrollEngine.MaxScrollLimit.y then begin
+    var LOverScrollDistance := ALVertScrollBox1.ScrollEngine.ViewportPosition.Y - ALVertScrollBox1.ScrollEngine.MaxScrollLimit.y;
+    Canvas.Fill.Kind := TBrushKind.Solid;
+    Canvas.fill.Color := DarkThemeEditBackground.Fill.Color;
+    // Width+1 because of https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+    Canvas.FillRect(TRectF.Create(TpointF.create(0,height-LOverScrollDistance), Width+1, LOverScrollDistance+1), 1{AOpacity})
+  end;
 end;
 
 {**************************************************************}
@@ -1001,19 +989,19 @@ end;
 {*************************************************************************}
 procedure TMainForm.ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
 begin
-  var LScrollBoxForm := TScrollBoxForm.Create(nil);
-  var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxForm);
-  LVertScrollBox.Parent := LScrollBoxForm;
+  var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
+  var LVertScrollBox := TalVertScrollBox.Create(LScrollBoxDemoForm);
+  LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
-  LVertScrollBox.Align := TalignLayout.Client;
+  LVertScrollBox.Align := TALalignLayout.Client;
   LVertScrollBox.ScrollEngine.MinEdgeSpringbackEnabled := False;
   LVertScrollBox.ScrollEngine.MaxEdgeSpringbackEnabled := False;
-  LScrollBoxForm.fScrollEngine := LVertScrollBox.ScrollEngine;
-  LScrollBoxForm.fvertScrollBox := LVertScrollBox;
+  LScrollBoxDemoForm.fScrollEngine := LVertScrollBox.ScrollEngine;
+  LScrollBoxDemoForm.fvertScrollBox := LVertScrollBox;
   for var I := 1 to 150 do begin
     var LRectangle := TALRectangle.Create(LVertScrollBox);
     LRectangle.Parent := LVertScrollBox;
-    LRectangle.Align := TalignLayout.Top;
+    LRectangle.Align := TALalignLayout.Top;
     Lrectangle.Fill.Color := $FFf7f2fa;
     LRectangle.Stroke.Color := $FFe4e1e7;
     LRectangle.Margins.Left := 15;
@@ -1027,7 +1015,7 @@ begin
     //-----
     var LText := TALText.Create(self);
     LText.Parent := LRectangle;
-    LText.Align := TalignLayout.left;
+    LText.Align := TALalignLayout.left;
     LText.Text := 'Alcinoe';
     LText.Margins.Left := 15;
     LText.TextSettings.MaxLines := 1;
@@ -1035,7 +1023,7 @@ begin
     //-----
     var LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1048,7 +1036,7 @@ begin
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1061,7 +1049,7 @@ begin
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1074,7 +1062,7 @@ begin
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1087,7 +1075,7 @@ begin
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1100,7 +1088,7 @@ begin
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1113,7 +1101,7 @@ begin
     //-----
     LChildRectangle := TALRectangle.Create(LRectangle);
     LChildRectangle.Parent := LRectangle;
-    LChildRectangle.Align := TalignLayout.right;
+    LChildRectangle.Align := TALalignLayout.right;
     LChildRectangle.Margins.Left := 0;
     LChildRectangle.Margins.Top := 10;
     LChildRectangle.Margins.Right := random(15);
@@ -1125,21 +1113,21 @@ begin
     LChildRectangle.Fill.Color := $FFffd8e4;
   end;
   LVertScrollBox.endUpdate;
-  LScrollBoxForm.Show;
+  LScrollBoxDemoForm.Show;
   ALMakeBufDrawables(LVertScrollBox);
 end;
 
 {************************************************************************}
 procedure TMainForm.ButtonLaunchScrollBoxDemoDelphiClick(Sender: TObject);
 begin
-  var LScrollBoxForm := TScrollBoxForm.Create(nil);
-  var LVertScrollBox := TVertScrollBox.Create(LScrollBoxForm);
-  LVertScrollBox.Parent := LScrollBoxForm;
+  var LScrollBoxDemoForm := TScrollBoxDemoForm.Create(nil);
+  var LVertScrollBox := TVertScrollBox.Create(LScrollBoxDemoForm);
+  LVertScrollBox.Parent := LScrollBoxDemoForm;
   LVertScrollBox.BeginUpdate;
   LVertScrollBox.Align := TalignLayout.Client;
   LVertScrollBox.AniCalculations.BoundsAnimation := False;
-  LScrollBoxForm.fAniCalculations := LVertScrollBox.AniCalculations;
-  LScrollBoxForm.fvertScrollBox := LVertScrollBox;
+  LScrollBoxDemoForm.fAniCalculations := LVertScrollBox.AniCalculations;
+  LScrollBoxDemoForm.fvertScrollBox := LVertScrollBox;
   for var I := 1 to 150 do begin
     var LRectangle := TRectangle.Create(LVertScrollBox);
     LRectangle.Parent := LVertScrollBox;
@@ -1255,7 +1243,7 @@ begin
     LChildRectangle.Fill.Color := $FFffd8e4;
   end;
   LVertScrollBox.endUpdate;
-  LScrollBoxForm.Show;
+  LScrollBoxDemoForm.Show;
 end;
 
 {**********************************************************************}
@@ -1305,9 +1293,9 @@ begin
   ALLog('FormVirtualKeyboardShown');
   FVirtualKeyboardOpen := True;
   AlVertScrollBox1.margins.Bottom := Bounds.height;
-  if (Self.Focused <> nil) and
-     (AlVertScrollBox1.ScreenToLocal(Self.Focused.LocalToScreen(TPointF.Create(0,0))).y > AlVertScrollBox1.Height - Tcontrol(Self.Focused.GetObject).Height - 16) then
-    AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.Content.ScreenToLocal(Self.Focused.LocalToScreen(TPointF.Create(0,0))).y - AlVertScrollBox1.Height + Tcontrol(Self.Focused.GetObject).Height + Tcontrol(Self.Focused.GetObject).Margins.Bottom + 16;
+  if (Focused <> nil) and
+     (AlVertScrollBox1.ScreenToLocal(Focused.LocalToScreen(TPointF.Create(0,0))).y > AlVertScrollBox1.Height - Tcontrol(Focused.GetObject).Height - 16) then
+    AlVertScrollBox1.VScrollBar.Value := AlVertScrollBox1.Content.ScreenToLocal(Focused.LocalToScreen(TPointF.Create(0,0))).y - AlVertScrollBox1.Height + Tcontrol(Focused.GetObject).Height + Tcontrol(Focused.GetObject).Margins.Bottom + 16;
 end;
 
 {*********************************************************}

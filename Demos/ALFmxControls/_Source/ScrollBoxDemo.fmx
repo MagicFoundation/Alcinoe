@@ -1,4 +1,4 @@
-object ScrollBoxForm: TScrollBoxForm
+object ScrollBoxDemoForm: TScrollBoxDemoForm
   Left = 0
   Top = 0
   ClientHeight = 480
@@ -12,7 +12,7 @@ object ScrollBoxForm: TScrollBoxForm
   OnClose = FormClose
   OnPaint = FormPaint
   DesignerMasterStyle = 0
-  object ALText1: TALText
+  object HeaderText: TALText
     Align = Top
     AutoSize = True
     Margins.Top = 10.000000000000000000
@@ -24,7 +24,7 @@ object ScrollBoxForm: TScrollBoxForm
     Text = 'Analyzing...'
     TextSettings.HorzAlign = Center
   end
-  object ButtonLaunchScrollBoxDemoAlcinoe: TALButton
+  object ButtonClose: TALButton
     Align = Top
     Fill.Color = xFF6750A4
     Margins.Left = 16.000000000000000000
@@ -64,6 +64,6 @@ object ScrollBoxForm: TScrollBoxForm
     TextSettings.IsHtml = True
     XRadius = -50.000000000000000000
     YRadius = -50.000000000000000000
-    OnClick = ButtonLaunchScrollBoxDemoAlcinoeClick
+    OnClick = ButtonCloseClick
   end
 end

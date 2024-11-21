@@ -17,6 +17,7 @@ object MainForm: TMainForm
     VScrollBar.Size.Width = 4.000000000000000000
     VScrollBar.Size.Height = 755.000000000000000000
     VScrollBar.Size.PlatformDefault = False
+    VScrollBar.TabOrder = 0
     VScrollBar.Thumb.Size.Width = 4.000000000000000000
     VScrollBar.Thumb.Size.Height = 438.000000000000000000
     VScrollBar.Thumb.Size.PlatformDefault = False
@@ -84,7 +85,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.210000038146973000
-      TabOrder = 4
+      TabOrder = 6
       Text = 'Recreate Buffers'
       TextSettings.Font.Size = 17.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -134,7 +135,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.210000038146973000
-      TabOrder = 3
+      TabOrder = 5
       Text = 'Test FPS'
       TextSettings.Font.Size = 17.000000000000000000
       TextSettings.Font.Color = claWhite

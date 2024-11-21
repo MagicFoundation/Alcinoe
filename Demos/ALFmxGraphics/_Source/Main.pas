@@ -208,7 +208,7 @@ begin
   FScrollBoxDrawables[high(FScrollBoxDrawables)] := ALNullDrawable;
   var LLayout1 := TALLayout.Create(MainScrollBox);
   LLayout1.parent := MainScrollBox;
-  LLayout1.Align := TALignLayout.Top;
+  LLayout1.Align := TALALignLayout.Top;
   LLayout1.Position.Y := aIdx;
   LLayout1.Margins.Top := 24;
   LLayout1.Size.Height := 150;
@@ -223,11 +223,11 @@ begin
   var LLayout2 := TALLayout.create(LLayout1);
   LLayout2.parent := LLayout1;
   LPaintBox.TagObject := LLayout2;
-  LLayout2.Align := TALignLayout.Client;
+  LLayout2.Align := TALALignLayout.Client;
   LLayout2.Margins.Right := 12;
   var LText1 := TALText.create(LLayout2);
   LText1.parent := LLayout2;
-  LText1.Align := TALignLayout.Top;
+  LText1.Align := TALALignLayout.Top;
   Ltext1.Margins.Bottom := 8;
   LText1.AutoSize := True;
   LText1.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');

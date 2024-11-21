@@ -47,13 +47,33 @@ begin
         // Load the source image into the MagickWand
         if ALImageMagickLib.MagickReadImage(LWand, pansiChar(AnsiString(aSrcIconFilename))) <> MagickTrue then RaiseLastMagickWandError(LWand);
 
+        // Ensure the source image is square by adding transparent padding if needed
+        if (ALImageMagickLib.MagickGetImageWidth(LWand) <> ALImageMagickLib.MagickGetImageHeight(LWand)) then begin
+          if ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent') <> MagickTrue then RaiseLastPixelWandError(LPixelWand);
+          if ALImageMagickLib.MagickSetImageBackgroundColor(LWand, LPixelWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
+          var LTargetSize: integer;
+          var LOffsetX: Integer;
+          var LOffsetY: Integer;
+          if ALImageMagickLib.MagickGetImageWidth(LWand) > ALImageMagickLib.MagickGetImageHeight(LWand) then begin
+            LTargetSize := ALImageMagickLib.MagickGetImageWidth(LWand);
+            LOffsetX := 0;
+            LOffsetY := (integer(ALImageMagickLib.MagickGetImageHeight(LWand)) - LTargetSize) div 2;
+          end
+          else begin
+            LTargetSize := ALImageMagickLib.MagickGetImageHeight(LWand);
+            LOffsetX := (integer(ALImageMagickLib.MagickGetImageWidth(LWand)) - LTargetSize) div 2;
+            LOffsetY := 0;
+          end;
+          if ALImageMagickLib.MagickExtentImage(LWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY) <> MagickTrue then RaiseLastMagickWandError(LWand);
+        end;
+
         // Resize the image to the specified icon size
         if (ALImageMagickLib.MagickGetImageWidth(LWand) < aDstIconSizes[I]) or
            (ALImageMagickLib.MagickGetImageHeight(LWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small for the requested resize operation');
         if ALImageMagickLib.MagickResizeImage(LWand, aDstIconSizes[I], aDstIconSizes[I], Lanczos2SharpFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
 
         // Set the background color of the image
-        If ALImageMagickLib.PixelSetColor(LPixelWand, PAnsiChar(AnsiString(aDstBackGroundColor))) <> MagickTrue then RaiseLastPixelWandError(LWand);
+        If ALImageMagickLib.PixelSetColor(LPixelWand, PAnsiChar(AnsiString(aDstBackGroundColor))) <> MagickTrue then RaiseLastPixelWandError(LPixelWand);
         if ALImageMagickLib.MagickSetImageBackgroundColor(LWand, LPixelWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
 
         // Adjust the image canvas size to the destination size
@@ -150,7 +170,7 @@ begin
 
         // Set transparent background for the squircle mask
         var LPixelWand := ALImageMagickLib.MagickGetBackgroundColor(LSquircleWand);
-        if ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent') <> MagickTrue then RaiseLastPixelWandError(LSquircleWand);
+        if ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent') <> MagickTrue then RaiseLastPixelWandError(LPixelWand);
         if ALImageMagickLib.MagickSetBackgroundColor(LSquircleWand, LPixelWand) <> MagickTrue then RaiseLastMagickWandError(LSquircleWand);
 
         // Load the SVG squircle mask with the specified background color
@@ -164,12 +184,32 @@ begin
         if ALImageMagickLib.MagickResizeImage(LSquircleWand, aDstImgSizes[I], aDstImgSizes[I], LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LSquircleWand);
 
         // Load the source icon image
-        if ALImageMagickLib.MagickReadImage(LIconWand, pansiChar(AnsiString(aSrcIconFilename))) <> MagickTrue then RaiseLastMagickWandError(LSquircleWand);
+        if ALImageMagickLib.MagickReadImage(LIconWand, pansiChar(AnsiString(aSrcIconFilename))) <> MagickTrue then RaiseLastMagickWandError(LIconWand);
+
+        // Ensure the source image is square by adding transparent padding if needed
+        if (ALImageMagickLib.MagickGetImageWidth(LIconWand) <> ALImageMagickLib.MagickGetImageHeight(LIconWand)) then begin
+          if ALImageMagickLib.PixelSetColor(LPixelWand, 'transparent') <> MagickTrue then RaiseLastPixelWandError(LPixelWand);
+          if ALImageMagickLib.MagickSetImageBackgroundColor(LIconWand, LPixelWand) <> MagickTrue then RaiseLastMagickWandError(LIconWand);
+          var LTargetSize: integer;
+          var LOffsetX: Integer;
+          var LOffsetY: Integer;
+          if ALImageMagickLib.MagickGetImageWidth(LIconWand) > ALImageMagickLib.MagickGetImageHeight(LIconWand) then begin
+            LTargetSize := ALImageMagickLib.MagickGetImageWidth(LIconWand);
+            LOffsetX := 0;
+            LOffsetY := (integer(ALImageMagickLib.MagickGetImageHeight(LIconWand)) - LTargetSize) div 2;
+          end
+          else begin
+            LTargetSize := ALImageMagickLib.MagickGetImageHeight(LIconWand);
+            LOffsetX := (integer(ALImageMagickLib.MagickGetImageWidth(LIconWand)) - LTargetSize) div 2;
+            LOffsetY := 0;
+          end;
+          if ALImageMagickLib.MagickExtentImage(LIconWand, LTargetSize, LTargetSize, LOffsetX, LOffsetY) <> MagickTrue then RaiseLastMagickWandError(LIconWand);
+        end;
 
         // Ensure the icon is large enough for resizing
         if (ALImageMagickLib.MagickGetImageWidth(LIconWand) < aDstIconSizes[I]) or
            (ALImageMagickLib.MagickGetImageHeight(LIconWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small for the requested resize operation');
-        if ALImageMagickLib.MagickResizeImage(LIconWand, aDstIconSizes[I], aDstIconSizes[I], LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LSquircleWand);
+        if ALImageMagickLib.MagickResizeImage(LIconWand, aDstIconSizes[I], aDstIconSizes[I], LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LIconWand);
 
         // Composite the resized icon onto the squircle mask with centered alignment
         if ALImageMagickLib.MagickCompositeImageGravity(LSquircleWand, LIconWand, OverCompositeOp, CenterGravity) <> MagickTrue then RaiseLastMagickWandError(LSquircleWand);
@@ -249,7 +289,7 @@ begin
     if (TFile.Exists(aDstImgFilename)) then Raise Exception.Create('Destination file already exists');
 
     // Create a new image with the specified background color and dimensions
-    If ALImageMagickLib.PixelSetColor(LPixelWand, PansiChar(AnsiString(aDstImgBackGroundColor))) <> MagickTrue then RaiseLastPixelWandError(LWand);
+    If ALImageMagickLib.PixelSetColor(LPixelWand, PansiChar(AnsiString(aDstImgBackGroundColor))) <> MagickTrue then RaiseLastPixelWandError(LPixelWand);
     if ALImageMagickLib.MagickNewImage(LWand, aDstImgSize, aDstImgSize, LPixelWand) <> MagickTrue then RaiseLastMagickWandError(LWand);
 
     // Define the output image format as PNG
@@ -453,12 +493,14 @@ begin
          LOutputDir + '\android\res\values\colors.xml');
 
        // values-night/colors.xml
-       ALSaveStringTofile(
-         '<?xml version="1.0" encoding="utf-8"?>'+#13#10+
-         '<resources xmlns:android="http://schemas.android.com/apk/res/android">'+#13#10+
-         '  <color name="splashscreen_background">'+ansiString(LDarkModeSplashscreenBackgroundColorStr)+'</color>'+#13#10+
-         '</resources>',
-         LOutputDir + '\android\res\values-night\colors.xml');
+       if LDarkModesplashscreenBackgroundColorStr <> '' then begin
+         ALSaveStringTofile(
+           '<?xml version="1.0" encoding="utf-8"?>'+#13#10+
+           '<resources xmlns:android="http://schemas.android.com/apk/res/android">'+#13#10+
+           '  <color name="splashscreen_background">'+ansiString(LDarkModeSplashscreenBackgroundColorStr)+'</color>'+#13#10+
+           '</resources>',
+           LOutputDir + '\android\res\values-night\colors.xml');
+        end;
 
          // styles.xml
        ALSaveStringTofile(
@@ -496,25 +538,53 @@ begin
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\iphone_setting_icon_87x87.png',            'png'{aDstImgformat},   87{aDstImgSize},  GetReducedSizeByPadding(87, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\iphone_notification_icon_40x40.png',       'png'{aDstImgformat},   40{aDstImgSize},  GetReducedSizeByPadding(40, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\iphone_notification_icon_60x60.png',       'png'{aDstImgformat},   60{aDstImgSize},  GetReducedSizeByPadding(60, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_application_icon_152x152.png',    'png'{aDstImgformat},  152{aDstImgSize},  GetReducedSizeByPadding(152, LLauncherIconPaddingPercentInt){aDstIconSize},  LLauncherIconBackgroundColorStr{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_application_icon_167x167.png',    'png'{aDstImgformat},  167{aDstImgSize},  GetReducedSizeByPadding(167, LLauncherIconPaddingPercentInt){aDstIconSize},  LLauncherIconBackgroundColorStr{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_spotlight_search_icon_80x80.png', 'png'{aDstImgformat},   80{aDstImgSize},  GetReducedSizeByPadding(80, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_setting_icon_58x58.png',          'png'{aDstImgformat},   58{aDstImgSize},  GetReducedSizeByPadding(58, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_notification_icon_40x40.png',     'png'{aDstImgformat},   40{aDstImgSize},  GetReducedSizeByPadding(40, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_application_icon_152x152.png',        'png'{aDstImgformat},  152{aDstImgSize},  GetReducedSizeByPadding(152, LLauncherIconPaddingPercentInt){aDstIconSize},  LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_application_icon_167x167.png',        'png'{aDstImgformat},  167{aDstImgSize},  GetReducedSizeByPadding(167, LLauncherIconPaddingPercentInt){aDstIconSize},  LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_spotlight_search_icon_80x80.png',     'png'{aDstImgformat},   80{aDstImgSize},  GetReducedSizeByPadding(80, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_setting_icon_58x58.png',              'png'{aDstImgformat},   58{aDstImgSize},  GetReducedSizeByPadding(58, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\ios\ipad_notification_icon_40x40.png',         'png'{aDstImgformat},   40{aDstImgSize},  GetReducedSizeByPadding(40, LLauncherIconPaddingPercentInt){aDstIconSize},   LLauncherIconBackgroundColorStr{aDstBackGroundColor});
 
-       ResizeIconSquareBackGround(LsplashscreenIconFilename,         LOutputDir + '\ios\iphone_launch_image_2x.png',        'png'{aDstImgformat},  192*2{aDstImgSize},  192*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LsplashscreenIconFilename,         LOutputDir + '\ios\iphone_launch_image_3x.png',        'png'{aDstImgformat},  192*3{aDstImgSize},  192*3{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LsplashscreenIconFilename,         LOutputDir + '\ios\ipad_launch_image_2x.png',      'png'{aDstImgformat},  347*2{aDstImgSize},  347*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_2x.png',   'png'{aDstImgformat},  192*2{aDstImgSize},  192*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_3x.png',   'png'{aDstImgformat},  192*3{aDstImgSize},  192*3{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\ipad_launch_image_dark_2x.png', 'png'{aDstImgformat},  347*2{aDstImgSize},  347*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LsplashscreenIconFilename,         LOutputDir + '\ios\iphone_launch_image_2x.png',  'png'{aDstImgformat},  192*2{aDstImgSize},  192*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LsplashscreenIconFilename,         LOutputDir + '\ios\iphone_launch_image_3x.png',  'png'{aDstImgformat},  192*3{aDstImgSize},  192*3{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LsplashscreenIconFilename,         LOutputDir + '\ios\ipad_launch_image_2x.png',    'png'{aDstImgformat},  347*2{aDstImgSize},  347*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+       if LDarkModesplashscreenIconFilename <> '' then begin
+         ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_2x.png',  'png'{aDstImgformat},  192*2{aDstImgSize},  192*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+         ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_3x.png',  'png'{aDstImgformat},  192*3{aDstImgSize},  192*3{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+         ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\ipad_launch_image_dark_2x.png',    'png'{aDstImgformat},  347*2{aDstImgSize},  347*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+        end;
 
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'app.ico', 'ico'{aDstImgformat},  [16, 24, 32, 48, 64, 128, 256, 512, 1024]{aDstImgSize}, [16, 24, 32, 48, 64, 128, 256, 512, 1024]{aDstIconSizes}, 'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'app.ico', 'ico'{aDstImgformat},  [16, 24, 32, 48, 64, 128, 256]{aDstImgSize}, [16, 24, 32, 48, 64, 128, 256]{aDstIconSizes}, 'transparent'{aDstBackGroundColor});
+
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_16x16.png',      'png'{aDstImgformat},    16{aDstImgSize},   16{aDstIconSize},   'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_32x32.png',      'png'{aDstImgformat},    32{aDstImgSize},   32{aDstIconSize},   'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_64x64.png',      'png'{aDstImgformat},    64{aDstImgSize},   64{aDstIconSize},   'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_128x128.png',    'png'{aDstImgformat},   128{aDstImgSize},  128{aDstIconSize},   'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_256x256.png',    'png'{aDstImgformat},   256{aDstImgSize},  256{aDstIconSize},   'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_512x512.png',    'png'{aDstImgformat},   512{aDstImgSize},  512{aDstIconSize},   'transparent'{aDstBackGroundColor});
+
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_16x16@2x.png',   'png'{aDstImgformat},    32{aDstImgSize},    32{aDstIconSize},  'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_32x32@2x.png',   'png'{aDstImgformat},    64{aDstImgSize},    64{aDstIconSize},  'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_64x64@2x.png',   'png'{aDstImgformat},   128{aDstImgSize},   128{aDstIconSize},  'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_128x128@2x.png', 'png'{aDstImgformat},   256{aDstImgSize},   256{aDstIconSize},  'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_256x256@2x.png', 'png'{aDstImgformat},   512{aDstImgSize},   512{aDstIconSize},  'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + '\icon.iconset\icon_512x512@2x.png', 'png'{aDstImgformat},  1024{aDstImgSize},  1024{aDstIconSize},  'transparent'{aDstBackGroundColor});
 
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'uwp_logo_150x150.png', 'png'{aDstImgformat}, 150{aDstImgSize}, 150{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'uwp_logo_44x44.png',   'png'{aDstImgformat}, 44{aDstImgSize},  44{aDstIconSize},  'transparent'{aDstBackGroundColor});
+       ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'uwp_logo_44x44.png',   'png'{aDstImgformat},  44{aDstImgSize},  44{aDstIconSize}, 'transparent'{aDstBackGroundColor});
 
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'play_store_512.png', 'png'{aDstImgformat}, 512{aDstImgSize},  GetReducedSizeByPadding(512, LLauncherIconPaddingPercentInt){aDstIconSize}, LLauncherIconBackgroundColorStr{aDstBackGroundColor});
+
+       ALSaveStringTofile(
+         'Generating an .icns File'+#13#10+
+         '------------------------'+#13#10+
+         ''+#13#10+
+         'On macOS, open a terminal and run:'+#13#10+
+         ''+#13#10+
+         'iconutil -c icns icon.iconset'+#13#10+
+         ''+#13#10+
+         'This will generate the .icns file'+#13#10+
+         'in the same directory as icon.iconset.',
+         LOutputDir + '\Readme.txt');
 
        Writeln('');
        Writeln('Finished');
@@ -528,7 +598,10 @@ begin
 
   except
     on E: Exception do begin
+      Writeln('');
       Writeln(E.Message);
+      Writeln('Press <Enter> key to quit');
+      Readln;
       ExitCode := 1;
     end;
   end;

@@ -6,7 +6,7 @@
     <item name="android:forceDarkAllowed">false</item>
     <item name="android:editTextStyle">@style/AppThemeEditTextStyle</item>
     <item name="android:colorAccent">#ff0288d1</item>
-    <item name="android:windowSplashScreenBackground">#ff151515</item>
+    <item name="android:windowSplashScreenBackground">@color/splashscreen_background</item>
     <item name="android:windowSplashScreenAnimatedIcon">@drawable/splashscreen_icon</item>
     <item name="Material3LightFilledEditTextStyle">@style/Material3LightFilledEditTextStyle</item>
     <item name="Material3LightOutlinedEditTextStyle">@style/Material3LightOutlinedEditTextStyle</item>

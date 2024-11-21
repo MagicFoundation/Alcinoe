@@ -1,6 +1,6 @@
 program ALFmxControlsDemo;
 
-{$R *.dres}
+{$R 'Resources.res' 'Resources\Resources.rc'}
 
 uses
   System.StartUpCopy,

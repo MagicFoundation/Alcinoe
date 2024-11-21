@@ -369,12 +369,12 @@ call "%ALBaseDir%\Tools\DProjVersioning\DProjVersioning.exe" -DProj="%~1\%~2\%~3
 IF ERRORLEVEL 1 goto ERROR
 
 Call :BUILD_VCL_DEMO "%~1" "%~2" "%~3"
-Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android"
+REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android"
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "Android64"
 Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSDevice64"
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "iOSSimARM64"
 REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSX64"
-REM Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSXARM64"
+Call :BUILD_PROJECT "%~1" "%~2" "%~3" "OSXARM64"
 
 EXIT /B 0
 

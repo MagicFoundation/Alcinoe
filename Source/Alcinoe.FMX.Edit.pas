@@ -1106,7 +1106,6 @@ uses
   FMX.Helpers.Mac,
   FMX.Consts,
   Alcinoe.Macapi.Foundation,
-  Alcinoe.StringUtils,
   {$ELSEIF defined(MSWINDOWS)}
   Winapi.CommCtrl,
   Fmx.Forms,

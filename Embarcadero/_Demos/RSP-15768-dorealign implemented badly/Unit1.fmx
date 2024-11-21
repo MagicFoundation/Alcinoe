@@ -11,14 +11,18 @@ object Form6: TForm6
   object Rectangle1: TRectangle
     Align = Center
     Fill.Color = claGold
+    Padding.Left = 10.000000000000000000
+    Padding.Top = 10.000000000000000000
+    Padding.Right = 10.000000000000000000
+    Padding.Bottom = 10.000000000000000000
     Size.Width = 206.000000000000000000
     Size.Height = 113.000000000000000000
     Size.PlatformDefault = False
     object Rectangle2: TRectangle
       Align = Client
       Fill.Color = claBlack
-      Size.Width = 206.000000000000000000
-      Size.Height = 113.000000000000000000
+      Size.Width = 186.000000000000000000
+      Size.Height = 93.000000000000000000
       Size.PlatformDefault = False
       OnResize = Rectangle2Resize
     end
@@ -28,6 +32,7 @@ object Form6: TForm6
     Position.Y = 104.000000000000000000
     TabOrder = 1
     Text = 'Button1'
+    TextSettings.Trimming = None
     OnClick = Button1Click
   end
 end

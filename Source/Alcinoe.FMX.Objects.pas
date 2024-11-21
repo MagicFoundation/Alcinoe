@@ -3831,7 +3831,7 @@ end;
 //   ALUnLockTexts(Control1);
 procedure ALLockTexts(const aParentControl: Tcontrol);
 begin
-  if aParentControl is TalText then begin
+  if aParentControl is TALBaseText then begin
     aParentControl.BeginUpdate;
     exit;
   end;
@@ -3842,7 +3842,7 @@ end;
 {******************************************************}
 procedure ALUnLockTexts(const aParentControl: Tcontrol);
 begin
-  if aParentControl is TalText then begin
+  if aParentControl is TALBaseText then begin
     aParentControl.EndUpdate;
     exit;
   end;

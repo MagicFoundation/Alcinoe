@@ -1315,17 +1315,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  function TControl.GetLeft: Single;
  begin
    Result := Position.X;
-@@ -3970,7 +3982,9 @@
- begin
-   if not FNeedAlign then
-     Exit;
-+  var LOriginalSize: TPointF := Size.Size; // https://quality.embarcadero.com/browse/RSP-15768
-   AlignObjects(Self, FPadding, FSize.Width, FSize.Height, FLastWidth, FLastHeight, FDisableAlign);
-+  if not LOriginalSize.EqualsTo(Size.Size) then DoRealign; // https://quality.embarcadero.com/browse/RSP-15768
- end;
- 
- procedure TControl.Realign;
-@@ -4158,6 +4172,7 @@
+@@ -4158,6 +4170,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseEnter) then
      FOnMouseEnter(Self);
@@ -1333,7 +1323,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.DoMouseLeave;
-@@ -4167,6 +4182,7 @@
+@@ -4167,6 +4180,7 @@
    ApplyTriggerEffect(Self, 'IsMouseOver');
    if Assigned(FOnMouseLeave) then
      FOnMouseLeave(Self);
@@ -1341,7 +1331,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  function TControl.GetCanFocus: Boolean;
-@@ -4227,34 +4243,34 @@
+@@ -4227,34 +4241,34 @@
    if not Assigned(AConsumer) or (FScene = nil) or (ControlsCount = 0)then
      Exit;
  
@@ -1402,7 +1392,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
        end;
  
        if AllowPaint then
-@@ -4643,6 +4659,7 @@
+@@ -4643,6 +4657,7 @@
  
    if Assigned(FOnMouseDown) then
      FOnMouseDown(Self, Button, Shift, X, Y);
@@ -1410,7 +1400,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
    if FAutoCapture then
      Capture;
    if Button = TMouseButton.mbLeft then
-@@ -4665,6 +4682,7 @@
+@@ -4665,6 +4680,7 @@
  begin
    if Assigned(FOnMouseMove) then
      FOnMouseMove(Self, Shift, X, Y);
@@ -1418,7 +1408,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
  end;
  
  procedure TControl.MouseUp(Button: TMouseButton; Shift: TShiftState; X, Y: Single);
-@@ -4673,6 +4691,7 @@
+@@ -4673,6 +4689,7 @@
  
    if Assigned(FOnMouseUp) then
      FOnMouseUp(Self, Button, Shift, X, Y);
@@ -1426,7 +1416,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Controls.pas b/Embarcadero/Athens/fmx/FM
    if FPressed then
    begin
      FPressed := False;
-@@ -4687,6 +4706,41 @@
+@@ -4687,6 +4704,41 @@
      FOnMouseWheel(Self, Shift, WheelDelta, Handled)
  end;
  
@@ -1587,6 +1577,63 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
 +    FCanvas := TCanvasManager.CreateFromWindow(Handle, LSize.X, LSize.Y, FQuality); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
    end;
  end;
+ 
+@@ -6523,7 +6535,24 @@
+   end;
+ end;
+ 
++// https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388
++type
++  TControlProtectedAccess = class(Tcontrol);
++
+ procedure TCustomForm.DoAddObject(const AObject: TFmxObject);
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388
++  procedure SetUpdatingState(const AControl: TControl);
++  var
++    I: Integer;
++  begin
++    for I := TControlProtectedAccess(AControl).FUpdating downto FUpdating + 1 do
++      AControl.EndUpdate;
++
++    for I := TControlProtectedAccess(AControl).FUpdating to FUpdating - 1 do
++      AControl.BeginUpdate;
++  end;
++
+ begin
+   inherited;
+   if AObject = nil then
+@@ -6530,6 +6559,8 @@
+     Exit;
+   if AObject is TControl then
+   begin
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388
++    SetUpdatingState(TControl(AObject));
+     TControl(AObject).SetNewScene(Self);
+ 
+     TOpenControl(AObject).RecalcOpacity;
+@@ -6557,10 +6588,22 @@
+ end;
+ 
+ procedure TCustomForm.DoRemoveObject(const AObject: TFmxObject);
++
++  // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388
++  procedure ResetUpdatingState(const AControl: TControl);
++  var
++    I: Integer;
++  begin
++    for I := 1 to TControlProtectedAccess(AControl).FUpdating do
++      AControl.EndUpdate;
++  end;
++
+ begin
+   inherited;
+   if AObject is TControl then
+   begin
++    // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388
++    ResetUpdatingState(TControl(AObject));
+     if FControls <> nil  then
+       FControls.Remove(TControl(AObject));
  
 Index: Embarcadero/Athens/fmx/FMX.Forms3D.pas
 ===================================================================
@@ -1794,7 +1841,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
-@@ -2898,7 +2898,7 @@
+@@ -2906,7 +2906,7 @@
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);
    AtomicIncrement(FRefCount);
@@ -1803,7 +1850,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    AtomicDecrement(FRefCount);
    inherited;
  end;
-@@ -2908,7 +2908,7 @@
+@@ -2916,7 +2916,7 @@
    if not FIsNeededUpdate then
    begin
      FIsNeededUpdate := True;
@@ -1812,7 +1859,7 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
    end;
  end;
  
-@@ -2916,7 +2916,7 @@
+@@ -2924,7 +2924,7 @@
  begin
  end;
  

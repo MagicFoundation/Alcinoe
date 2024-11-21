@@ -70,7 +70,6 @@ forced to apply patches to the original Delphi source files:
 * [Allow TTexture to Define a GL_TEXTURE_EXTERNAL_OES Target](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1550)
 * [Make CanvasHelper of TCanvasGpu public](https://quality.embarcadero.com/browse/RSP-18797)
 * [Allow TTexture to Define a Material (GLSL Shader) to Use](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1549)
-* [dorealign implemented badly](https://quality.embarcadero.com/browse/RSP-15768)
 * [On iOS we need to pass options: PNSDictionary with the message TApplicationEvent.FinishedLaunching](https://quality.embarcadero.com/browse/RSP-40351)
 * [AVPlayerItem miss the function addOutput](https://quality.embarcadero.com/browse/RSP-16853)
 * [CLVisit is missing from the implementation of CLLocationManager](https://quality.embarcadero.com/browse/RSP-18621)
@@ -100,7 +99,8 @@ forced to apply patches to the original Delphi source files:
 * [Missing Method Declarations in UITextView and UITextField Interfaces in iOSapi.UIKit.pas](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1941)
 * [Incorrect External Declarations in System.Skia.API for Android Linking in Athens 12.2](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1997)
 * [Add Additional Notification Icon Sizes for iOS 16+](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2171)
-
+* [Update TAlignLayout to Include New Alignment Options for Centering Controls](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342)
+* [Enhance TCustomForm.DoAddObject to Properly Handle FUpdating State for Controls](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388)
 
 Install Alcinoe
 ---------------

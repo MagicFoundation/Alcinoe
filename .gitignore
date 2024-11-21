@@ -26,10 +26,12 @@ Dcu
 /Demos/**/Win64/Release
 /Embarcadero/Alexandria/rtl
 /Embarcadero/Alexandria/fmx
+/Embarcadero/Alexandria/data
 /Embarcadero/Alexandria/internet
 /Embarcadero/Alexandria/Indy10
 /Embarcadero/Athens/rtl
 /Embarcadero/Athens/fmx
+/Embarcadero/Athens/data
 /Embarcadero/Athens/internet
 /Embarcadero/Athens/Indy10
 /Libraries/bpl
@@ -59,3 +61,4 @@ Dcu
 /Tools/AndroidLibScanner/Output
 /Tools/NativeBridgeFileGenerator/OutputAndroid
 /Tools/NativeBridgeFileGenerator/OutputIOS
+/Tools/AppIconGenerator/Output

@@ -1569,6 +1569,15 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Forms.pas b/Embarcadero/Athens/fmx/FMX.F
    begin
      if FActiveControl <> nil then
        FActiveControl.RemoveFreeNotify(Self);
+@@ -6208,7 +6220,7 @@
+   if (FCanvas <> nil) and (ClientWidth > 0) and (ClientHeight > 0) then
+   begin
+     LSize := FWinService.GetClientSize(Self);
+-    FCanvas.SetSize(Round(LSize.X), Round(LSize.Y));
++    FCanvas.SetSize(LSize.X, LSize.Y); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+     Realign;
+   end;
+ end;
 @@ -6232,7 +6244,7 @@
    if Handle <> nil then
    begin
@@ -1841,6 +1850,15 @@ diff --git a/Embarcadero/Athens/fmx/FMX.Platform.UI.Android.pas b/Embarcadero/At
  end;
  
  function TAndroidWindowHandle.TFormViewListener.onTouchEvent(event: JMotionEvent): Boolean;
+@@ -1253,7 +1253,7 @@
+       StatusBarOffset := Ceil(PlatformAndroid.WindowService.StatusBarHeight)
+     else
+       StatusBarOffset := 0;
+-    FForm.SetBoundsF(0, StatusBarOffset, Round(Screen.Width), Round(Screen.Height - StatusBarOffset));
++    FForm.SetBoundsF(0, StatusBarOffset, Screen.Width, Screen.Height - StatusBarOffset); // https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-1723
+   end;
+ 
+   // Creates Form's view
 @@ -2906,7 +2906,7 @@
  begin
    TMessageManager.DefaultManager.Unsubscribe(TApplicationEventMessage, ApplicationEventHandler);

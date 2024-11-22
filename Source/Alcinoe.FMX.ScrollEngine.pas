@@ -630,7 +630,9 @@ uses
   System.Math,
   System.Math.Vectors,
   {$IFDEF IOS}
+  Macapi.Helpers,
   Macapi.ObjCRuntime,
+  Alcinoe.iOSapi.QuartzCore,
   {$ENDIF}
   FMX.Platform,
   Alcinoe.FMX.Common,
@@ -2678,6 +2680,19 @@ begin
   if fDisplayLink = nil then begin
     fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
     fDisplayLink.retain;
+    if GlobalUseMetal then begin
+      // In OpenGL, the animation appears more jerky when using
+      // a high frame rate
+      if TOSVersion.Check(17) then begin
+        var LFrameRateRange: CAFrameRateRange;
+        LFrameRateRange.minimum := ALMinimumFramesPerSecond;
+        LFrameRateRange.maximum := ALMaximumFramesPerSecond;
+        LFrameRateRange.preferred := ALPreferredFramesPerSecond;
+        TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFrameRateRange(LFrameRateRange);
+      end
+      else
+        TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
+    end;
     fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.currentRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
   end;
   fDisplayLink.setPaused(False);

@@ -69,7 +69,7 @@ begin
 
         // Resize the image to the specified icon size
         if (ALImageMagickLib.MagickGetImageWidth(LWand) < aDstIconSizes[I]) or
-           (ALImageMagickLib.MagickGetImageHeight(LWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small for the requested resize operation');
+           (ALImageMagickLib.MagickGetImageHeight(LWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(ALImageMagickLib.MagickGetImageWidth(LWand))+'x'+AlIntToStrW(ALImageMagickLib.MagickGetImageHeight(LWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');
         if ALImageMagickLib.MagickResizeImage(LWand, aDstIconSizes[I], aDstIconSizes[I], Lanczos2SharpFilter) <> MagickTrue then RaiseLastMagickWandError(LWand);
 
         // Set the background color of the image
@@ -208,7 +208,7 @@ begin
 
         // Ensure the icon is large enough for resizing
         if (ALImageMagickLib.MagickGetImageWidth(LIconWand) < aDstIconSizes[I]) or
-           (ALImageMagickLib.MagickGetImageHeight(LIconWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small for the requested resize operation');
+           (ALImageMagickLib.MagickGetImageHeight(LIconWand) < aDstIconSizes[I]) then raise Exception.Create('Icon dimensions are too small ('+AlIntToStrW(ALImageMagickLib.MagickGetImageWidth(LIconWand))+'x'+AlIntToStrW(ALImageMagickLib.MagickGetImageHeight(LIconWand))+') for the requested resize operation ('+AlIntToStrW(aDstIconSizes[I])+'x'+AlIntToStrW(aDstIconSizes[I])+')');
         if ALImageMagickLib.MagickResizeImage(LIconWand, aDstIconSizes[I], aDstIconSizes[I], LanczosFilter) <> MagickTrue then RaiseLastMagickWandError(LIconWand);
 
         // Composite the resized icon onto the squircle mask with centered alignment
@@ -373,6 +373,9 @@ begin
       while (not ALSameTextW(LSplashscreenIconHaveBackground, 'Y')) and
             (not ALSameTextW(LSplashscreenIconHaveBackground, 'N')) do begin
         Writeln('');
+        Writeln('https://developer.android.com/develop/ui/views/launch/splash-screen');
+        Writeln('* App icon with an icon background: Resize the icon to 240×240 dp');
+        Writeln('* App icon without an icon background: Resize the icon to 288×288 dp');
         Writeln('Does the splashscreen icon have a background (Y/N)?');
         readln(LSplashscreenIconHaveBackground);
       end;
@@ -394,6 +397,9 @@ begin
         while (not ALSameTextW(LDarkModeSplashscreenIconHaveBackground, 'Y')) and
               (not ALSameTextW(LDarkModeSplashscreenIconHaveBackground, 'N')) do begin
           Writeln('');
+          Writeln('https://developer.android.com/develop/ui/views/launch/splash-screen');
+          Writeln('* App icon with an icon background: Resize the icon to 240×240 dp');
+          Writeln('* App icon without an icon background: Resize the icon to 288×288 dp');
           Writeln('Does the splashscreen icon for dark mode have a background (Y/N)?');
           readln(LDarkModeSplashscreenIconHaveBackground);
         end;
@@ -551,7 +557,12 @@ begin
          ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_2x.png',  'png'{aDstImgformat},  192*2{aDstImgSize},  192*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
          ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_3x.png',  'png'{aDstImgformat},  192*3{aDstImgSize},  192*3{aDstIconSize}, 'transparent'{aDstBackGroundColor});
          ResizeIconSquareBackGround(LDarkModesplashscreenIconFilename, LOutputDir + '\ios\ipad_launch_image_dark_2x.png',    'png'{aDstImgformat},  347*2{aDstImgSize},  347*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
-        end;
+       end
+       else begin
+         ResizeIconSquareBackGround(LsplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_2x.png',  'png'{aDstImgformat},  192*2{aDstImgSize},  192*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+         ResizeIconSquareBackGround(LsplashscreenIconFilename, LOutputDir + '\ios\iphone_launch_image_dark_3x.png',  'png'{aDstImgformat},  192*3{aDstImgSize},  192*3{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+         ResizeIconSquareBackGround(LsplashscreenIconFilename, LOutputDir + '\ios\ipad_launch_image_dark_2x.png',    'png'{aDstImgformat},  347*2{aDstImgSize},  347*2{aDstIconSize}, 'transparent'{aDstBackGroundColor});
+       end;
 
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'app.ico', 'ico'{aDstImgformat},  [16, 24, 32, 48, 64, 128, 256]{aDstImgSize}, [16, 24, 32, 48, 64, 128, 256]{aDstIconSizes}, 'transparent'{aDstBackGroundColor});
 
@@ -575,8 +586,8 @@ begin
        ResizeIconSquareBackGround(LLauncherIconFilename, LOutputDir + 'play_store_512.png', 'png'{aDstImgformat}, 512{aDstImgSize},  GetReducedSizeByPadding(512, LLauncherIconPaddingPercentInt){aDstIconSize}, LLauncherIconBackgroundColorStr{aDstBackGroundColor});
 
        ALSaveStringTofile(
-         'Generating an .icns File'+#13#10+
-         '------------------------'+#13#10+
+         'How to Generate an .icns File'+#13#10+
+         '-----------------------------'+#13#10+
          ''+#13#10+
          'On macOS, open a terminal and run:'+#13#10+
          ''+#13#10+

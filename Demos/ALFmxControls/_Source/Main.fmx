@@ -32,6 +32,7 @@ object MainForm: TMainForm
     Size.PlatformDefault = False
     TabOrder = 0
     OnClick = ALVertScrollBox1Click
+    OnResized = ALVertScrollBox1Resized
     OnViewportPositionChange = ALVertScrollBox1ViewportPositionChange
     object ButtonLaunchScrollBoxDemoDelphi: TALButton
       Align = Top
@@ -44,7 +45,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 1255.000000000000000000
+      Position.Y = 1175.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -95,7 +96,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 1165.000000000000000000
+      Position.Y = 1085.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -146,7 +147,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 5253.000000000000000000
+      Position.Y = 5173.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -196,7 +197,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 1844.000000000000000000
+      Position.Y = 1764.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -239,7 +240,7 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 8.000000000000000000
-      Position.Y = 1906.000000000000000000
+      Position.Y = 1826.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 2.000000000000000000
       Size.PlatformDefault = False
@@ -256,7 +257,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 1778.000000000000000000
+      Position.Y = 1698.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -306,7 +307,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 5319.000000000000000000
+      Position.Y = 5239.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -352,7 +353,7 @@ object MainForm: TMainForm
       Margins.Top = 8.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 5381.000000000000000000
+      Position.Y = 5301.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 2.000000000000000000
       Size.PlatformDefault = False
@@ -369,7 +370,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 20.000000000000000000
-      Position.Y = 3761.000000000000000000
+      Position.Y = 3681.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -412,7 +413,7 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 8.000000000000000000
-      Position.Y = 3823.000000000000000000
+      Position.Y = 3743.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 2.000000000000000000
       Size.PlatformDefault = False
@@ -429,7 +430,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 3695.000000000000000000
+      Position.Y = 3615.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -475,7 +476,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 16462.000000000000000000
+      Position.Y = 16382.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -491,7 +492,7 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 8.000000000000000000
-      Position.Y = 3296.000000000000000000
+      Position.Y = 3216.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 2.000000000000000000
       Size.PlatformDefault = False
@@ -508,7 +509,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 3234.000000000000000000
+      Position.Y = 3154.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -538,7 +539,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = xFF79747E
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 203
+      TabOrder = 211
       Text = 'Bench TCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -558,7 +559,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 3168.000000000000000000
+      Position.Y = 3088.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -588,7 +589,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 225
+      TabOrder = 235
       Text = 'Bench TALCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -601,7 +602,7 @@ object MainForm: TMainForm
       Align = Top
       Fill.Color = claWhite
       Margins.Top = 12.000000000000000000
-      Position.Y = 16564.000000000000000000
+      Position.Y = 16484.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -820,11 +821,11 @@ object MainForm: TMainForm
       Thumb.TouchTargetExpansion.Right = 22.000000000000000000
       Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14508.000000000000000000
+      Position.Y = 14428.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 248
+      TabOrder = 258
       Value = 25.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.ShowOnInteraction = True
@@ -838,7 +839,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17051.000000000000000000
+      Position.Y = 16971.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 416.000000000000000000
       Size.PlatformDefault = False
@@ -863,7 +864,7 @@ object MainForm: TMainForm
     object TextUpdateBat: TALText
       Align = Top
       AutoSize = True
-      Fill.Color = xFFF3EDF7
+      Fill.Color = claCoral
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 24.000000000000000000
@@ -897,7 +898,7 @@ object MainForm: TMainForm
       Fill.Color = xFF141218
       Margins.Top = 8.000000000000000000
       Margins.Bottom = 8.000000000000000000
-      Position.Y = 15458.000000000000000000
+      Position.Y = 15378.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -982,7 +983,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14996.000000000000000000
+      Position.Y = 14916.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 442.000000000000000000
       Size.PlatformDefault = False
@@ -1011,7 +1012,7 @@ object MainForm: TMainForm
       Margins.Top = 8.000000000000000000
       Margins.Right = 30.000000000000000000
       Position.X = 30.000000000000000000
-      Position.Y = 1982.000000000000000000
+      Position.Y = 1902.000000000000000000
       Shadow.blur = 12.000000000000000000
       Shadow.OffsetX = 12.000000000000000000
       Shadow.OffsetY = 12.000000000000000000
@@ -1033,7 +1034,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 10383.000000000000000000
+      Position.Y = 10303.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -1048,7 +1049,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 10510.000000000000000000
+      Position.Y = 10430.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 312.000000000000000000
       Size.PlatformDefault = False
@@ -1074,11 +1075,11 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 21.000000000000000000
-      Position.Y = 11000.000000000000000000
+      Position.Y = 10920.000000000000000000
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 139
+      TabOrder = 146
       object ALText53: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1131,11 +1132,11 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 10850.000000000000000000
+      Position.Y = 10770.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 135
+      TabOrder = 142
       object ALText49: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1251,7 +1252,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 11302.000000000000000000
+      Position.Y = 11222.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -1266,7 +1267,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 11429.000000000000000000
+      Position.Y = 11349.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 156.000000000000000000
       Size.PlatformDefault = False
@@ -1293,7 +1294,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 16221.000000000000000000
+      Position.Y = 16141.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -1323,7 +1324,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 325
+      TabOrder = 337
       Text = 'Show dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1343,7 +1344,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 15778.000000000000000000
+      Position.Y = 15698.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -1373,7 +1374,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 330
+      TabOrder = 342
       Text = 'Apply Effect to the Video'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1386,11 +1387,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 8.000000000000000000
-      Position.Y = 8967.000000000000000000
+      Position.Y = 8887.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 335
+      TabOrder = 347
       object ALButton6: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -1489,11 +1490,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9247.000000000000000000
+      Position.Y = 9167.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 341
+      TabOrder = 353
       object ALButton10: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1592,11 +1593,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9177.000000000000000000
+      Position.Y = 9097.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 344
+      TabOrder = 356
       object ALButton11: TALButton
         Align = LeftCenter
         Fill.Color = xFFF7F2FA
@@ -1703,11 +1704,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9107.000000000000000000
+      Position.Y = 9027.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 348
+      TabOrder = 360
       object ALButton14: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1794,11 +1795,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9037.000000000000000000
+      Position.Y = 8957.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 352
+      TabOrder = 364
       object ALButton17: TALButton
         Align = LeftCenter
         Fill.Color = claNull
@@ -1900,7 +1901,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 9471.000000000000000000
+      Position.Y = 9391.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 576.000000000000000000
       Size.PlatformDefault = False
@@ -2716,7 +2717,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 8329.000000000000000000
+      Position.Y = 8249.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 618.000000000000000000
       Size.PlatformDefault = False
@@ -2782,7 +2783,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 806.000000000000000000
+      Position.Y = 726.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2797,7 +2798,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 1520.000000000000000000
+      Position.Y = 1440.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 234.000000000000000000
       Size.PlatformDefault = False
@@ -2825,7 +2826,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 2776.000000000000000000
+      Position.Y = 2696.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2841,7 +2842,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 1938.000000000000000000
+      Position.Y = 1858.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 24.000000000000000000
       Size.PlatformDefault = False
@@ -2865,7 +2866,7 @@ object MainForm: TMainForm
       Padding.Right = 12.000000000000000000
       Padding.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 4420.000000000000000000
+      Position.Y = 4340.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 727.000000000000000000
       Size.PlatformDefault = False
@@ -2923,7 +2924,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 5780.000000000000000000
+      Position.Y = 5700.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2941,7 +2942,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 11957.000000000000000000
+      Position.Y = 11877.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2959,7 +2960,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 8202.000000000000000000
+      Position.Y = 8122.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2973,7 +2974,7 @@ object MainForm: TMainForm
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 4012.000000000000000000
+      Position.Y = 3932.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 390.000000000000000000
       Size.PlatformDefault = False
@@ -3004,11 +3005,11 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 3105.000000000000000000
+      Position.Y = 3025.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 43.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 409
+      TabOrder = 421
       object ALLayout33: TALLayout
         Align = Left
         AutoSize = True
@@ -3032,7 +3033,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2903.000000000000000000
+      Position.Y = 2823.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -3055,7 +3056,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7807.000000000000000000
+      Position.Y = 7727.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -3075,7 +3076,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12084.000000000000000000
+      Position.Y = 12004.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -3101,7 +3102,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 3358.000000000000000000
+      Position.Y = 3278.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3119,7 +3120,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 14869.000000000000000000
+      Position.Y = 14789.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3137,7 +3138,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 16335.000000000000000000
+      Position.Y = 16255.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3155,7 +3156,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 12886.000000000000000000
+      Position.Y = 12806.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3173,7 +3174,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 15892.000000000000000000
+      Position.Y = 15812.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3191,7 +3192,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 16924.000000000000000000
+      Position.Y = 16844.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3209,7 +3210,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 14223.000000000000000000
+      Position.Y = 14143.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3225,11 +3226,11 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 3609.000000000000000000
+      Position.Y = 3529.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 66.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 432
+      TabOrder = 444
       object ALLayout36: TALLayout
         Align = Left
         AutoSize = True
@@ -3273,7 +3274,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 3485.000000000000000000
+      Position.Y = 3405.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 104.000000000000000000
       Size.PlatformDefault = False
@@ -3293,7 +3294,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13013.000000000000000000
+      Position.Y = 12933.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 364.000000000000000000
       Size.PlatformDefault = False
@@ -3322,7 +3323,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14350.000000000000000000
+      Position.Y = 14270.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 130.000000000000000000
       Size.PlatformDefault = False
@@ -3343,7 +3344,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 16019.000000000000000000
+      Position.Y = 15939.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -3368,7 +3369,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 3885.000000000000000000
+      Position.Y = 3805.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3395,7 +3396,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17499.000000000000000000
+      Position.Y = 17419.000000000000000000
       PromptTextColor = xFF49454F
       Sides = [Bottom]
       Size.Width = 348.000000000000000000
@@ -3440,7 +3441,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 446
+      TabOrder = 458
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3463,11 +3464,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9317.000000000000000000
+      Position.Y = 9237.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 448
+      TabOrder = 460
       object ALButton21: TALButton
         Align = LeftCenter
         Fill.Color = xFFE8DEF8
@@ -3583,7 +3584,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17726.500000000000000000
+      Position.Y = 17646.500000000000000000
       PromptTextColor = xFF49454F
       Sides = [Bottom]
       Size.Width = 348.000000000000000000
@@ -3628,7 +3629,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 450
+      TabOrder = 462
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3639,11 +3640,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 32.000000000000000000
-      Position.Y = 17601.000000000000000000
+      Position.Y = 17521.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 93.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 452
+      TabOrder = 464
       object ALLayout47: TALLayout
         Align = Left
         AutoSize = True
@@ -3825,7 +3826,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17868.742187500000000000
+      Position.Y = 17788.742187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 60.000000000000000000
@@ -3869,7 +3870,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 455
+      TabOrder = 467
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3892,11 +3893,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 40.000000000000000000
-      Position.Y = 18060.742187500000000000
+      Position.Y = 17980.742187500000000000
       Size.Width = 380.000000000000000000
       Size.Height = 83.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 456
+      TabOrder = 468
       object ALLayout49: TALLayout
         Align = Left
         AutoSize = True
@@ -4064,7 +4065,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18176.242187500000000000
+      Position.Y = 18096.242187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 99.242500305175780000
@@ -4108,7 +4109,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 458
+      TabOrder = 470
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4123,7 +4124,7 @@ object MainForm: TMainForm
       Margins.Top = 24.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 18401.484375000000000000
+      Position.Y = 18321.484375000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 888.484985351562500000
       Size.PlatformDefault = False
@@ -4872,7 +4873,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17960.742187500000000000
+      Position.Y = 17880.742187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 60.000000000000000000
@@ -4916,7 +4917,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 461
+      TabOrder = 473
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4944,7 +4945,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 5177.000000000000000000
+      Position.Y = 5097.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 52.000000000000000000
       Size.PlatformDefault = False
@@ -4981,7 +4982,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 5443.000000000000000000
+      Position.Y = 5363.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -4992,11 +4993,11 @@ object MainForm: TMainForm
     object ALAutoSizeLayout1: TALLayout
       Align = Top
       AutoSize = True
-      Position.Y = 5570.000000000000000000
+      Position.Y = 5490.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 213
+      TabOrder = 222
       object ALAutoSizeLayoutImage: TALImage
         Align = MostLeftTop
         ResourceName = 'autosize'
@@ -5047,7 +5048,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 30.000000000000000000
       Position.X = 30.000000000000000000
-      Position.Y = 2148.000000000000000000
+      Position.Y = 2068.000000000000000000
       Shadow.blur = 12.000000000000000000
       Shadow.Color = x96000000
       Size.Width = 320.000000000000000000
@@ -5065,7 +5066,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2072.000000000000000000
+      Position.Y = 1992.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 48.000000000000000000
       Size.PlatformDefault = False
@@ -5083,7 +5084,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2328.000000000000000000
+      Position.Y = 2248.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 96.000000000000000000
       Size.PlatformDefault = False
@@ -5110,7 +5111,7 @@ object MainForm: TMainForm
       Margins.Top = 8.000000000000000000
       Margins.Right = 30.000000000000000000
       Position.X = 30.000000000000000000
-      Position.Y = 2444.000000000000000000
+      Position.Y = 2364.000000000000000000
       Shadow.OffsetX = 12.000000000000000000
       Shadow.OffsetY = 12.000000000000000000
       Size.Width = 320.000000000000000000
@@ -5138,7 +5139,7 @@ object MainForm: TMainForm
       Margins.Top = 8.000000000000000000
       Margins.Right = 30.000000000000000000
       Position.X = 30.000000000000000000
-      Position.Y = 2641.000000000000000000
+      Position.Y = 2561.000000000000000000
       Shadow.OffsetX = 12.000000000000000000
       Shadow.OffsetY = 12.000000000000000000
       Size.Width = 320.000000000000000000
@@ -5156,7 +5157,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 2549.000000000000000000
+      Position.Y = 2469.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 72.000000000000000000
       Size.PlatformDefault = False
@@ -5177,7 +5178,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7961.000000000000000000
+      Position.Y = 7881.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -5196,11 +5197,11 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 8059.000000000000000000
+      Position.Y = 7979.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 339
+      TabOrder = 351
       object ALAnimatedImage1: TALAnimatedImage
         Align = Left
         Animation.Enabled = True
@@ -5230,7 +5231,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 7680.000000000000000000
+      Position.Y = 7600.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -5245,7 +5246,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7104.000000000000000000
+      Position.Y = 7024.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 338.000000000000000000
       Size.PlatformDefault = False
@@ -5271,7 +5272,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 5907.000000000000000000
+      Position.Y = 5827.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -5298,7 +5299,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 6977.000000000000000000
+      Position.Y = 6897.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -5316,7 +5317,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 1393.000000000000000000
+      Position.Y = 1313.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -5327,37 +5328,46 @@ object MainForm: TMainForm
     object ALText61: TALText
       Align = Top
       AutoSize = True
+      Fill.Color = xFFF3EDF7
       Margins.Left = 16.000000000000000000
       Margins.Right = 16.000000000000000000
-      Margins.Bottom = 12.000000000000000000
+      Padding.Left = 8.000000000000000000
+      Padding.Top = 8.000000000000000000
+      Padding.Right = 8.000000000000000000
+      Padding.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
       Position.Y = 266.000000000000000000
+      Shadow.blur = 6.000000000000000000
+      Shadow.OffsetX = 2.000000000000000000
+      Shadow.OffsetY = 2.000000000000000000
+      Shadow.Color = x4C000000
       Size.Width = 348.000000000000000000
-      Size.Height = 468.000000000000000000
+      Size.Height = 400.000000000000000000
       Size.PlatformDefault = False
+      Stroke.Color = x19000000
       Text = 
-        'You must compile this demo in <b>Release</b> configuration to ob' +
-        'tain accurate statistics.'#13#10'The demo can be run in various config' +
-        'urations.'#13#10'Currently, it operates with a regular Canvas '#13#10'(<span' +
-        ' background-color="#e3e6e8" font-weight=500>TCanvasD2D</span>/<s' +
-        'pan background-color="#e3e6e8" font-weight=500>TCanvasGdiPlus</s' +
-        'pan>/<span background-color="#e3e6e8" font-weight=500>TCanvasGpu' +
-        '</span>), using the '#13#10'internal Alcinoe graphic engine backed by ' +
-        'the '#13#10'Skia Engine. Alternatively, you have the option '#13#10'to run i' +
-        't on a Skia Canvas (<span background-color="#e3e6e8" font-weight' +
-        '=500>TVKCanvas</span>/<span background-color="#e3e6e8" font-weig' +
-        'ht=500>TGlCanvas</span>/<span background-color="#e3e6e8" font-we' +
-        'ight=500>TMtlCanvas</span>/<span background-color="#e3e6e8" font' +
-        '-weight=500>TSkRasterCanvas</span>). '#13#10'To switch to a Skia Canva' +
-        's, go to the project '#13#10'options, replace the definition "<b>ALSki' +
-        'aEngine</b>" '#13#10'with "<b>SKIA</b>", and in the DPR file, add the ' +
-        'line '#13#10'"<span background-color="#e3e6e8" font-weight=500>GlobalU' +
-        'seSkia := True</span>". For more details about '#13#10'the performance' +
-        ' of each configuration, refer '#13#10'to the <b>ALFmxGraphics</b> Demo' +
-        '.'
+        'The app can be run in various configurations.'#13#10'Currently, it ope' +
+        'rates with a regular Canvas '#13#10'(<span background-color="#e3e6e8" ' +
+        'font-weight=500>TCanvasD2D</span>/<span background-color="#e3e6e' +
+        '8" font-weight=500>TCanvasGdiPlus</span>/<span background-color=' +
+        '"#e3e6e8" font-weight=500>TCanvasGpu</span>), using the '#13#10'intern' +
+        'al Alcinoe graphic engine backed by the '#13#10'Skia Engine. Alternati' +
+        'vely, you have the option '#13#10'to run it on a Skia Canvas (<span ba' +
+        'ckground-color="#e3e6e8" font-weight=500>TVKCanvas</span>/<span ' +
+        'background-color="#e3e6e8" font-weight=500>TGlCanvas</span>/<spa' +
+        'n background-color="#e3e6e8" font-weight=500>TMtlCanvas</span>/<' +
+        'span background-color="#e3e6e8" font-weight=500>TSkRasterCanvas<' +
+        '/span>). '#13#10'To switch to a Skia Canvas, go to the project '#13#10'optio' +
+        'ns, replace the definition "<b>ALSkiaEngine</b>" '#13#10'with "<b>SKIA' +
+        '</b>", and in the DPR file, add the line '#13#10'"<span background-col' +
+        'or="#e3e6e8" font-weight=500>GlobalUseSkia := True</span>". For ' +
+        'more details about '#13#10'the performance of each configuration, refe' +
+        'r '#13#10'to the <b>ALFmxGraphics</b> Demo.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
+      TextSettings.HorzAlign = Center
       TextSettings.IsHtml = True
+      XRadius = 12.000000000000000000
+      YRadius = 12.000000000000000000
     end
     object ALText62: TALText
       Align = Top
@@ -5367,7 +5377,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 6279.000000000000000000
+      Position.Y = 6199.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 104.000000000000000000
       Size.PlatformDefault = False
@@ -5383,11 +5393,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 6419.000000000000000000
+      Position.Y = 6339.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 112
+      TabOrder = 119
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = True
@@ -7908,11 +7918,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 6593.000000000000000000
+      Position.Y = 6513.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 104
+      TabOrder = 111
       object ALImage14: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -7956,7 +7966,7 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 6767.000000000000000000
+      Position.Y = 6687.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
@@ -8007,7 +8017,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 933.000000000000000000
+      Position.Y = 853.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 208.000000000000000000
       Size.PlatformDefault = False
@@ -8033,7 +8043,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12670.000000000000000000
+      Position.Y = 12590.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -8048,11 +8058,11 @@ object MainForm: TMainForm
     object ALLayout80: TALLayout
       Align = Top
       Margins.Top = 24.000000000000000000
-      Position.Y = 9395.000000000000000000
+      Position.Y = 9315.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 263
+      TabOrder = 266
       object ALButton25: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -8230,7 +8240,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 10067.000000000000000000
+      Position.Y = 9987.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -8251,7 +8261,7 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 21.000000000000000000
-      Position.Y = 10946.000000000000000000
+      Position.Y = 10866.000000000000000000
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
@@ -8299,7 +8309,7 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 10898.000000000000000000
+      Position.Y = 10818.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -8416,7 +8426,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 11064.000000000000000000
+      Position.Y = 10984.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 178.000000000000000000
       Size.PlatformDefault = False
@@ -8681,7 +8691,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 11613.000000000000000000
+      Position.Y = 11533.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -8795,7 +8805,7 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 11661.000000000000000000
+      Position.Y = 11581.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -8906,7 +8916,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 11719.000000000000000000
+      Position.Y = 11639.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 178.000000000000000000
       Size.PlatformDefault = False
@@ -9162,7 +9172,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 12458.000000000000000000
+      Position.Y = 12378.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 188.000000000000000000
       Size.PlatformDefault = False
@@ -9496,7 +9506,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 12294.000000000000000000
+      Position.Y = 12214.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9647,7 +9657,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 12342.000000000000000000
+      Position.Y = 12262.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9799,7 +9809,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 12390.000000000000000000
+      Position.Y = 12310.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9879,11 +9889,11 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13405.000000000000000000
+      Position.Y = 13325.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 226
+      TabOrder = 228
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -9944,11 +9954,11 @@ object MainForm: TMainForm
       Margins.Top = 32.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13520.000000000000000000
+      Position.Y = 13440.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 214
+      TabOrder = 215
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -9980,7 +9990,7 @@ object MainForm: TMainForm
       Margins.Top = 32.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13750.000000000000000000
+      Position.Y = 13670.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9998,7 +10008,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13457.000000000000000000
+      Position.Y = 13377.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10015,7 +10025,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13687.000000000000000000
+      Position.Y = 13607.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10032,7 +10042,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13790.000000000000000000
+      Position.Y = 13710.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10077,7 +10087,7 @@ object MainForm: TMainForm
       Margins.Top = 32.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13635.000000000000000000
+      Position.Y = 13555.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
@@ -10115,7 +10125,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13572.000000000000000000
+      Position.Y = 13492.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10131,7 +10141,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 13857.000000000000000000
+      Position.Y = 13777.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 306.000000000000000000
       Size.PlatformDefault = False
@@ -10326,7 +10336,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14560.000000000000000000
+      Position.Y = 14480.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10391,7 +10401,7 @@ object MainForm: TMainForm
       Thumb.TouchTargetExpansion.Right = 22.000000000000000000
       Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14623.000000000000000000
+      Position.Y = 14543.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
@@ -10410,7 +10420,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14675.000000000000000000
+      Position.Y = 14595.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10438,7 +10448,7 @@ object MainForm: TMainForm
       Thumb.Size.Height = 32.000000000000000000
       Thumb.Size.PlatformDefault = False
       Position.X = 16.000000000000000000
-      Position.Y = 14738.000000000000000000
+      Position.Y = 14658.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -10452,7 +10462,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14778.000000000000000000
+      Position.Y = 14698.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
@@ -10477,7 +10487,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18307.484375000000000000
+      Position.Y = 18227.484375000000000000
       PromptTextColor = xFF465A69
       Size.Width = 348.000000000000000000
       Size.Height = 70.000000000000000000
@@ -10536,7 +10546,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 6109.000000000000000000
+      Position.Y = 6029.000000000000000000
       ResourceName = 'house'
       Size.Width = 150.000000000000000000
       Size.Height = 150.000000000000000000
@@ -10553,7 +10563,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 10269.000000000000000000
+      Position.Y = 10189.000000000000000000
       Size.Width = 193.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -10604,7 +10614,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12768.000000000000000000
+      Position.Y = 12688.000000000000000000
       ResourceName = 'lottieswitch'
       Size.Width = 107.000000000000000000
       Size.Height = 50.000000000000000000
@@ -10619,7 +10629,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7462.000000000000000000
+      Position.Y = 7382.000000000000000000
       ResourceName = 'lottiesample'
       Size.Width = 150.000000000000000000
       Size.Height = 150.000000000000000000
@@ -10632,7 +10642,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7905.000000000000000000
+      Position.Y = 7825.000000000000000000
     end
   end
 end

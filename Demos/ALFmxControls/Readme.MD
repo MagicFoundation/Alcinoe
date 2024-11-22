@@ -12,4 +12,4 @@ To Deploy on macOS App Store
 
 * Deploy the application from the IDE.
 * Use the following command to upload the app to the App Store:
-  xcrun altool --upload-app --type macos --file "/Users/<username>/PAServer/scratch-dir/zeus-VMWare/ALFmxControlsDemo.pkg" --username "<AppStoreUsername>" --password "<AppStorePassword>"
+  xcrun altool --upload-app --type macos --file "/Users/<username>/PAServer/scratch-dir/<username>-VMWare/ALFmxControlsDemo.pkg" --username "<AppStoreUsername>" --password "<AppStorePassword>"

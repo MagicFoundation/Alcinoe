@@ -61,6 +61,17 @@ uses
   {$ENDIF}
   FMX.Types;
 
+var
+  // https://developer.apple.com/documentation/quartzcore/optimizing_promotion_refresh_rates_for_iphone_13_pro_and_ipad_pro?language=objc
+  // Important: Be selective when requesting the maximum frame rate. If your animation
+  // requests 120Hz but can’t keep up, it may render poorly. But the same
+  // animation may be able to maintain a steady cadence at a lower rate.
+  // => That's pure bullsheet! How are we supposed to know if the hardware will
+  // even support 120Hz?
+  ALMinimumFramesPerSecond: Integer = 80;
+  ALMaximumFramesPerSecond: Integer = 120;
+  ALPreferredFramesPerSecond: Integer = 120;
+
 type
 
   {~~~~~~~~~~~~~~~~~~~}
@@ -700,7 +711,9 @@ uses
   System.math,
   System.Math.Vectors,
   {$IFDEF IOS}
+  Macapi.Helpers,
   Macapi.ObjCRuntime,
+  Alcinoe.iOSapi.QuartzCore,
   {$ENDIF}
   FMX.Ani,
   FMX.Utils,
@@ -944,6 +957,19 @@ begin
   fDisplayLinkListener := TDisplayLinkListener.Create(self);
   fDisplayLink := TCADisplayLink.Wrap(TCADisplayLink.OCClass.displayLinkWithTarget(fDisplayLinkListener.GetObjectID, sel_getUid('displayLinkUpdated')));
   fDisplayLink.retain;
+  if GlobalUseMetal then begin
+    // In OpenGL, the animation appears more jerky when using
+    // a high frame rate
+    if TOSVersion.Check(17) then begin
+      var LFrameRateRange: CAFrameRateRange;
+      LFrameRateRange.minimum := ALMinimumFramesPerSecond;
+      LFrameRateRange.maximum := ALMaximumFramesPerSecond;
+      LFrameRateRange.preferred := ALPreferredFramesPerSecond;
+      TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFrameRateRange(LFrameRateRange);
+    end
+    else
+      TALCADisplayLink.Wrap(NSObjectToID(fDisplayLink)).setPreferredFramesPerSecond(ALPreferredFramesPerSecond);
+  end;
   fDisplayLink.addToRunLoop(TNSRunLoop.Wrap(TNSRunLoop.OCClass.currentRunLoop), NSRunLoopCommonModes); // I don't really know with is the best, NSDefaultRunLoopMode or NSRunLoopCommonModes
   fDisplayLink.setPaused(true);
   FTimerEvent := nil;

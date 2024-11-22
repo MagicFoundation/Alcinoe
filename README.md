@@ -101,6 +101,7 @@ forced to apply patches to the original Delphi source files:
 * [Add Additional Notification Icon Sizes for iOS 16+](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2171)
 * [Update TAlignLayout to Include New Alignment Options for Centering Controls](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342)
 * [Enhance TCustomForm.DoAddObject to Properly Handle FUpdating State for Controls](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2388)
+* [Add the CAFrameRateRange record and preferredFramesPerSecond/preferredFrameRateRange to CADisplayLink](https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2424)
 
 Install Alcinoe
 ---------------

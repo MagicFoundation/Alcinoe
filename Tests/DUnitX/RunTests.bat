@@ -55,6 +55,10 @@ goto BUILD_TESTS
 
 :DO_BUILD_TESTS
 
+SET FileName=%ALBaseDir%\Tests\DUnitX\dbgout.log
+del "%FileName%" /s
+if exist "%FileName%" goto ERROR
+
 SET FileName=%ALBaseDir%\Tests\DUnitX\*.identcache
 del "%FileName%" /s
 if exist "%FileName%" goto ERROR

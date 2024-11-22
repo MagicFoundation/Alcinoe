@@ -441,6 +441,7 @@ type
     procedure ALTextEllipsisElementMouseEnter(Sender: TObject; const Element: TALTextElement);
     procedure ALTextEllipsisElementMouseLeave(Sender: TObject; const Element: TALTextElement);
     procedure ALSwitchAnimatedImageClick(Sender: TObject);
+    procedure ALVertScrollBox1Resized(Sender: TObject);
   private
     FDatePickerDialog: TALDatePickerDialog;
     fLine: TLineStopWatch;
@@ -453,7 +454,6 @@ type
     fCircle: TCircleStopWatch;
     FVirtualKeyboardOpen: boolean;
     FCurrentTextElements: TDictionary<TObject, TALTextElement>;
-    FMakeBufDrawablesOnFirstPaint: Boolean;
   protected
     procedure PaintBackground; override;
   public
@@ -481,13 +481,15 @@ uses
 {************************************}
 procedure TMainForm.InitializeNewForm;
 begin
+  ALLog('TMainForm.InitializeNewForm', 'begin');
+  // We can not call RegisterTypefaceFromResource in FormCreate because FormCreate is
+  // called in TCommonCustomForm.AfterConstruction once all child components are
+  // already fully loaded.
   TALFontManager.RegisterTypefaceFromResource('GoodDogPlain', 'GoodDog Plain');
   TALFontManager.RegisterTypefaceFromResource('MaShanZhengRegular', 'Ma Shan Zheng');
-  FMakeBufDrawablesOnFirstPaint := True;
   inherited;
-  {$IF defined(ANDROID) or defined(IOS)}
-  beginupdate;
-  {$ENDIF}
+  BeginUpdate;
+  ALLog('TMainForm.InitializeNewForm', 'end | Form.size: ' + FloatToStr(width) + 'x' + FloatToStr(height));
 end;
 
 {************************************************************}
@@ -495,6 +497,7 @@ end;
 // once all child components are fully loaded.
 procedure TMainForm.FormCreate(Sender: TObject);
 begin
+  ALLog('TMainForm.FormCreate', 'begin');
   TALErrorReporting.Instance;
   //ALVertScrollBox1.ScrollEngine.TouchTracking := [ttVertical];
   //special case for windows
@@ -507,173 +510,195 @@ begin
   FCurrentTextElements := TDictionary<TObject, TALTextElement>.Create;
   fDatePickerDialog := nil;
   FVirtualKeyboardOpen := False;
-  beginupdate;
-  try
-    var LTitle: String := MainForm.Canvas.ClassName;
-    {$IF defined(Android) and defined(SKIA)}
-    if GlobalUseVulkan then LTitle := LTitle + ' - Vulkan'
-    else LTitle := LTitle + ' - OpenGL';
-    {$ELSEIF defined(Android)}
-    LTitle := LTitle + ' - OpenGL';
-    {$ELSEIF defined(AlAppleOS)}
-    if GlobalUseMetal then LTitle := LTitle + ' - Metal'
-    else LTitle := LTitle + ' - OpenGL';
-    {$ENDIF}
-    MainTitle.Text := LTitle;
 
-    {$IF defined(ALSkiaCanvas)}
-    SubTitle.Text := 'sk_surface_t (ALSkiaCanvas)';
-    {$ELSEIF defined(ALSkiaEngine)}
-    SubTitle.Text := 'sk_surface_t (ALSkiaEngine)';
-    {$ELSEIF defined(Android)}
-    SubTitle.Text := 'Jbitmap';
-    {$ELSEIF defined(AlAppleOS)}
-    SubTitle.Text := 'CGContextRef';
-    {$ELSE}
-    SubTitle.Text := 'Tbitmap';
-    {$ENDIF}
-    //-----
-    ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
-    //-----
-    fALRectangle := TALRectangleStopWatch.Create(self);
-    fALRectangle.Parent := ALVertScrollBox1;
-    //fALRectangle.DoubleBuffered := False;
-    fALRectangle.Fill.Color := $FFf1ecff;
-    fALRectangle.Stroke.Color := $FFbea7fb;
-    fALRectangle.Align := TALalignLayout.Top;
-    fALRectangle.Margins.Left := 16;
-    fALRectangle.Margins.Top := 8;
-    fALRectangle.Margins.Right := 16;
-    fALRectangle.Position.Y := ButtonBenchTALRectangle.Position.Y - ButtonBenchTALRectangle.Margins.Top;
-    fALRectangle.Size.Height := 50;
-    fALRectangle.XRadius := 12;
-    fALRectangle.YRadius := 12;
-    fALRectangle.HitTest := False;
-    var LText := TalText.Create(fALRectangle);
-    LText.Parent := fALRectangle;
-    LText.AutoSize := true;
-    LText.Align := TALAlignLayout.Center;
-    LText.TextSettings.Font.Size := 16;
-    LText.Text := 'TALRectangle';
-    LText.HitTest := false;
-    //-----
-    fRectangle := TRectangleStopWatch.Create(self);
-    fRectangle.Parent := ALVertScrollBox1;
-    fRectangle.Align := TalignLayout.Top;
-    fRectangle.Fill.Color := $FFf1ecff;
-    fRectangle.Stroke.Color := $FFbea7fb;
-    fRectangle.Margins.Left := 16;
-    fRectangle.Margins.Top := 12;
-    fRectangle.Margins.Right := 16;
-    fRectangle.Margins.Bottom := 8;
-    fRectangle.Position.Y := ButtonBenchTALRectangle.Position.Y - ButtonBenchTALRectangle.Margins.Top;
-    fRectangle.Size.Height := 50;
-    fRectangle.XRadius := 12;
-    fRectangle.YRadius := 12;
-    fRectangle.HitTest := false;
-    LText := TalText.Create(fRectangle);
-    LText.Parent := fRectangle;
-    LText.AutoSize := true;
-    LText.Align := TALAlignLayout.Center;
-    LText.TextSettings.Font.Size := 16;
-    LText.Text := 'TRectangle';
-    LText.HitTest := false;
-    //-----
-    fALCircle := TALCircleStopWatch.Create(ALLayout33);
-    fALCircle.Parent := ALLayout33;
-    //fALCircle.DoubleBuffered := False;
-    fALCircle.Fill.Color := $FFf1ecff;
-    fALCircle.Stroke.Color := $FFbea7fb;
-    fALCircle.Margins.Left := 15;
-    fALCircle.Margins.Right := 15;
-    fALCircle.Size.Height := 100;
-    fALCircle.Size.Width := 100;
-    fALCircle.HitTest := False;
-    LText := TalText.Create(fALCircle);
-    LText.Parent := fALCircle;
-    LText.AutoSize := true;
-    LText.Align := TALAlignLayout.Center;
-    LText.TextSettings.Font.Size := 16;
-    LText.Text := 'TALCircle';
-    LText.HitTest := False;
-    //-----
-    fCircle := TCircleStopWatch.Create(ALLayout34);
-    fCircle.Parent := ALLayout34;
-    fCircle.Fill.Color := $FFf1ecff;
-    fCircle.Stroke.Color := $FFbea7fb;
-    fCircle.Margins.Left := 15;
-    fCircle.Margins.Right := 15;
-    fCircle.Size.Height := 100;
-    fCircle.Size.Width := 100;
-    fCircle.HitTest := False;
-    LText := TalText.Create(fCircle);
-    LText.Parent := fCircle;
-    LText.AutoSize := true;
-    LText.Align := TALAlignLayout.Center;
-    LText.TextSettings.Font.Size := 16;
-    LText.Text := 'TCircle';
-    LText.HitTest := False;
-    //-----
-    fALText := TALTextStopWatch.Create(self);
-    fALText.Parent := ALVertScrollBox1;
-    //fALText.DoubleBuffered := False;
-    fALText.TextSettings.HorzAlign := TALTextHorzAlign.Center;
-    fALText.TextSettings.Font.Size := 18;
-    fALText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
-    fALText.Align := TALalignLayout.Top;
-    fALText.Margins.Top := 12;
-    fALText.Margins.left := 16;
-    fALText.Margins.Right := 16;
-    fALText.Position.Y := ButtonBenchTALText.Position.Y - ButtonBenchTALText.Margins.Top;
-    fALText.Size.Height := 80;
-    fALText.Text := 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
-    fALText.HitTest := False;
-    //-----
-    fText := TTextStopWatch.Create(self);
-    fText.Parent := ALVertScrollBox1;
-    fText.TextSettings.WordWrap := True;
-    fText.TextSettings.HorzAlign := TTextAlign.Center;
-    fText.TextSettings.Font.Size := 18;
-    fText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
-    fText.Align := TalignLayout.Top;
-    fText.Margins.Top := 8;
-    fText.Margins.left := 16;
-    fText.Margins.Right := 16;
-    fText.Position.Y := ButtonBenchTALText.Position.Y - ButtonBenchTALText.Margins.Top;
-    fText.Size.Height := 80;
-    fText.Text := 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
-    FText.HitTest := False;
-    //-----
-    fALline := TALLineStopWatch.Create(ALLayout36);
-    fALline.Parent := ALLayout36;
-    //fALline.DoubleBuffered := False;
-    fALline.Margins.right := 15;
-    fALline.Margins.left := 15;
-    fALline.Size.Height := 100;
-    fALline.Size.Width := 100;
-    fALline.Stroke.Thickness := 3;
-    fALline.LineType := TALLineType.TopLeftToBottomRight;
-    fALline.HitTest := False;
-    //-----
-    fline := TLineStopWatch.Create(ALLayout37);
-    fline.Parent := ALLayout37;
-    fline.Margins.right := 15;
-    fline.Margins.left := 15;
-    fline.Size.Height := 100;
-    fline.Size.Width := 100;
-    fline.Stroke.Thickness := 3;
-    fline.LineType := TLineType.Diagonal;
-    fline.HitTest := False;
-  finally
-    endupdate;
-  end;
+  TextUpdateBat.Visible := False;
+
+  var LTitle: String := MainForm.Canvas.ClassName;
+  {$IF defined(Android) and defined(SKIA)}
+  if GlobalUseVulkan then LTitle := LTitle + ' - Vulkan'
+  else LTitle := LTitle + ' - OpenGL';
+  {$ELSEIF defined(Android)}
+  LTitle := LTitle + ' - OpenGL';
+  {$ELSEIF defined(AlAppleOS)}
+  if GlobalUseMetal then LTitle := LTitle + ' - Metal'
+  else LTitle := LTitle + ' - OpenGL';
+  {$ENDIF}
+  MainTitle.Text := LTitle;
+
+  {$IF defined(ALSkiaCanvas)}
+  SubTitle.Text := 'sk_surface_t (ALSkiaCanvas)';
+  {$ELSEIF defined(ALSkiaEngine)}
+  SubTitle.Text := 'sk_surface_t (ALSkiaEngine)';
+  {$ELSEIF defined(Android)}
+  SubTitle.Text := 'Jbitmap';
+  {$ELSEIF defined(AlAppleOS)}
+  SubTitle.Text := 'CGContextRef';
+  {$ELSE}
+  SubTitle.Text := 'Tbitmap';
+  {$ENDIF}
+  //-----
+  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+  //-----
+  fALRectangle := TALRectangleStopWatch.Create(self);
+  fALRectangle.Parent := ALVertScrollBox1;
+  //fALRectangle.DoubleBuffered := False;
+  fALRectangle.Fill.Color := $FFf1ecff;
+  fALRectangle.Stroke.Color := $FFbea7fb;
+  fALRectangle.Align := TALalignLayout.Top;
+  fALRectangle.Margins.Left := 16;
+  fALRectangle.Margins.Top := 8;
+  fALRectangle.Margins.Right := 16;
+  fALRectangle.Position.Y := ButtonBenchTALRectangle.Position.Y - ButtonBenchTALRectangle.Margins.Top;
+  fALRectangle.Size.Height := 50;
+  fALRectangle.XRadius := 12;
+  fALRectangle.YRadius := 12;
+  fALRectangle.HitTest := False;
+  var LText := TalText.Create(fALRectangle);
+  LText.Parent := fALRectangle;
+  LText.AutoSize := true;
+  LText.Align := TALAlignLayout.Center;
+  LText.TextSettings.Font.Size := 16;
+  LText.Text := 'TALRectangle';
+  LText.HitTest := false;
+  //-----
+  fRectangle := TRectangleStopWatch.Create(self);
+  fRectangle.Parent := ALVertScrollBox1;
+  fRectangle.Align := TalignLayout.Top;
+  fRectangle.Fill.Color := $FFf1ecff;
+  fRectangle.Stroke.Color := $FFbea7fb;
+  fRectangle.Margins.Left := 16;
+  fRectangle.Margins.Top := 12;
+  fRectangle.Margins.Right := 16;
+  fRectangle.Margins.Bottom := 8;
+  fRectangle.Position.Y := ButtonBenchTALRectangle.Position.Y - ButtonBenchTALRectangle.Margins.Top;
+  fRectangle.Size.Height := 50;
+  fRectangle.XRadius := 12;
+  fRectangle.YRadius := 12;
+  fRectangle.HitTest := false;
+  LText := TalText.Create(fRectangle);
+  LText.Parent := fRectangle;
+  LText.AutoSize := true;
+  LText.Align := TALAlignLayout.Center;
+  LText.TextSettings.Font.Size := 16;
+  LText.Text := 'TRectangle';
+  LText.HitTest := false;
+  //-----
+  fALCircle := TALCircleStopWatch.Create(ALLayout33);
+  fALCircle.Parent := ALLayout33;
+  //fALCircle.DoubleBuffered := False;
+  fALCircle.Fill.Color := $FFf1ecff;
+  fALCircle.Stroke.Color := $FFbea7fb;
+  fALCircle.Margins.Left := 15;
+  fALCircle.Margins.Right := 15;
+  fALCircle.Size.Height := 100;
+  fALCircle.Size.Width := 100;
+  fALCircle.HitTest := False;
+  LText := TalText.Create(fALCircle);
+  LText.Parent := fALCircle;
+  LText.AutoSize := true;
+  LText.Align := TALAlignLayout.Center;
+  LText.TextSettings.Font.Size := 16;
+  LText.Text := 'TALCircle';
+  LText.HitTest := False;
+  //-----
+  fCircle := TCircleStopWatch.Create(ALLayout34);
+  fCircle.Parent := ALLayout34;
+  fCircle.Fill.Color := $FFf1ecff;
+  fCircle.Stroke.Color := $FFbea7fb;
+  fCircle.Margins.Left := 15;
+  fCircle.Margins.Right := 15;
+  fCircle.Size.Height := 100;
+  fCircle.Size.Width := 100;
+  fCircle.HitTest := False;
+  LText := TalText.Create(fCircle);
+  LText.Parent := fCircle;
+  LText.AutoSize := true;
+  LText.Align := TALAlignLayout.Center;
+  LText.TextSettings.Font.Size := 16;
+  LText.Text := 'TCircle';
+  LText.HitTest := False;
+  //-----
+  fALText := TALTextStopWatch.Create(self);
+  fALText.Parent := ALVertScrollBox1;
+  //fALText.DoubleBuffered := False;
+  fALText.TextSettings.HorzAlign := TALTextHorzAlign.Center;
+  fALText.TextSettings.Font.Size := 18;
+  fALText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
+  fALText.Align := TALalignLayout.Top;
+  fALText.Margins.Top := 12;
+  fALText.Margins.left := 16;
+  fALText.Margins.Right := 16;
+  fALText.Position.Y := ButtonBenchTALText.Position.Y - ButtonBenchTALText.Margins.Top;
+  fALText.Size.Height := 80;
+  fALText.Text := 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+  fALText.HitTest := False;
+  //-----
+  fText := TTextStopWatch.Create(self);
+  fText.Parent := ALVertScrollBox1;
+  fText.TextSettings.WordWrap := True;
+  fText.TextSettings.HorzAlign := TTextAlign.Center;
+  fText.TextSettings.Font.Size := 18;
+  fText.TextSettings.Font.Family := ALConvertFontFamily('sans-serif');
+  fText.Align := TalignLayout.Top;
+  fText.Margins.Top := 8;
+  fText.Margins.left := 16;
+  fText.Margins.Right := 16;
+  fText.Position.Y := ButtonBenchTALText.Position.Y - ButtonBenchTALText.Margins.Top;
+  fText.Size.Height := 80;
+  fText.Text := 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+  FText.HitTest := False;
+  //-----
+  fALline := TALLineStopWatch.Create(ALLayout36);
+  fALline.Parent := ALLayout36;
+  //fALline.DoubleBuffered := False;
+  fALline.Margins.right := 15;
+  fALline.Margins.left := 15;
+  fALline.Size.Height := 100;
+  fALline.Size.Width := 100;
+  fALline.Stroke.Thickness := 3;
+  fALline.LineType := TALLineType.TopLeftToBottomRight;
+  fALline.HitTest := False;
+  //-----
+  fline := TLineStopWatch.Create(ALLayout37);
+  fline.Parent := ALLayout37;
+  fline.Margins.right := 15;
+  fline.Margins.left := 15;
+  fline.Size.Height := 100;
+  fline.Size.Width := 100;
+  fline.Stroke.Thickness := 3;
+  fline.LineType := TLineType.Diagonal;
+  fline.HitTest := False;
+
+  ALLog('TMainForm.FormCreate', 'EndUpdate begin');
+  ALLockTexts(ALVertScrollBox1);
+  EndUpdate;
+  ALUnLockTexts(ALVertScrollBox1);
+  ALLog('TMainForm.FormCreate', 'EndUpdate end');
+
   ALTabControl1Resized(nil);
+  ALVertScrollBox1Resized(nil);
+  ALLog('TMainForm.FormCreate', 'end | Form.size: ' + FloatToStr(width) + 'x' + FloatToStr(height));
 end;
 
 {***********************************************}
 procedure TMainForm.FormDestroy(Sender: TObject);
 begin
   ALFreeAndNil(FCurrentTextElements);
+end;
+
+{**********************************************}
+procedure TMainForm.FormResize(Sender: TObject);
+begin
+  ALLog('TMainForm.FormResize', 'Form.size: ' + FloatToStr(width) + 'x' + FloatToStr(height));
+  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
+end;
+
+{***********************************************************}
+procedure TMainForm.ALVertScrollBox1Resized(Sender: TObject);
+begin
+  ALLog('TMainForm.ALVertScrollBox1Resized', 'ALVertScrollBox1.size: ' + FloatToStr(ALVertScrollBox1.width) + 'x' + FloatToStr(ALVertScrollBox1.height));
+  if FUpdating <= 0 then
+    ALMakeBufDrawables(ALVertScrollBox1, False{AEnsureDoubleBuffered});
 end;
 
 {**********************************}
@@ -685,20 +710,10 @@ procedure TMainForm.PaintBackground;
     if aParent = nil then exit(false);
     result := aParent = DarkThemeEditBackground;
     if not result then result := _IsParentDarkThemeEditBackground(aParent.parent);
-
   end;
 
 begin
   inherited;
-  If FMakeBufDrawablesOnFirstPaint then begin
-    {$IF defined(ANDROID) or defined(IOS)}
-    ALLockTexts(ALVertScrollBox1);
-    EndUpdate;
-    ALUnLockTexts(ALVertScrollBox1);
-    ALMakeBufDrawables(ALVertScrollBox1, False{AEnsureDoubleBuffered});
-    {$ENDIF}
-    FMakeBufDrawablesOnFirstPaint := False;
-  end;
   if (CompareValue(AlVertScrollBox1.margins.Bottom, 0, TEpsilon.position) > 0) and
      (Focused <> nil) and
      ((_IsParentDarkThemeEditBackground(Focused.parent)) or
@@ -1260,19 +1275,6 @@ begin
     MonthOf(now), // const aMonth: integer;
     DayOfTheMonth(now)); // const aDayOfMonth: integer);
 
-end;
-
-{**********************************************}
-procedure TMainForm.FormResize(Sender: TObject);
-begin
-  ALLog('FormResize', 'width: ' + FloatToStr(width) + ' | ' + FloatToStr(height));
-  ALVideoPlayerSurface1.Height := (width / 1920) * 1080;
-
-  {$IF Defined(ANDROID)}
-  //handle the action bar under lollipop
-  if FVirtualKeyboardOpen then
-    AlVertScrollBox1.ScrollEngine.ViewportPosition := AlVertScrollBox1.ScrollEngine.MaxScrollLimit;
-  {$ENDIF}
 end;
 
 {********************************************}

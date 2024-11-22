@@ -1064,6 +1064,15 @@
       <RemoteDir>ALFmxControlsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl3_light_outlined_error.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable\notification_bg.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -3332,6 +3341,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControlsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl3_light_outlined_error.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable\notification_bg.xml">
       <DeployClass>File</DeployClass>
@@ -5603,6 +5621,15 @@
       <RemoteCommand/>
       <RemoteDir>ALFmxControlsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl3_light_outlined_error.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
     </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include="Android\Merged\res\drawable\notification_bg.xml">
       <DeployClass>File</DeployClass>
@@ -7882,6 +7909,15 @@
       <RemoteDir>ALFmxControlsDemo\res\drawable-xxhdpi\</RemoteDir>
       <RemoteName>text_select_handle_right_mtrl3_light_outlined_error.png</RemoteName>
     </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable-xxxhdpi\splashscreen_icon.png">
+      <DeployClass>File</DeployClass>
+      <LocalCommand/>
+      <Operation>0</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo\res\drawable-xxxhdpi\</RemoteDir>
+      <RemoteName>splashscreen_icon.png</RemoteName>
+    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include="Android\Merged\res\drawable\notification_bg.xml">
       <DeployClass>File</DeployClass>
       <LocalCommand/>
@@ -9335,7 +9371,7 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\ipad_launch_image_2x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\ipad_launch_image_dark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -9407,15 +9443,6 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_2x.png">
-      <DeployClass>iPhone_LaunchDark2x</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
-      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
@@ -9425,7 +9452,16 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -9552,7 +9588,7 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\ipad_launch_image_2x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\ipad_launch_image_dark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -9624,15 +9660,6 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_2x.png">
-      <DeployClass>iPhone_LaunchDark2x</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
-      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
@@ -9642,7 +9669,16 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -9780,7 +9816,7 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\ipad_launch_image_2x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\ipad_launch_image_dark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -9852,15 +9888,6 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_2x.png">
-      <DeployClass>iPhone_LaunchDark2x</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
-      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
@@ -9870,7 +9897,16 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Debug&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -9997,7 +10033,7 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPad@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\ipad_launch_image_2x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\ipad_launch_image_dark_2x.png">
       <DeployClass>iPad_LaunchDark2x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>
@@ -10069,15 +10105,6 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@2x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_2x.png">
-      <DeployClass>iPhone_LaunchDark2x</DeployClass>
-      <LocalCommand/>
-      <Operation>1</Operation>
-      <Overwrite>True</Overwrite>
-      <RemoteCommand/>
-      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
-      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
-    </DeployFile>
     <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
       <DeployClass>iPhone_Launch3x</DeployClass>
       <LocalCommand/>
@@ -10087,7 +10114,16 @@
       <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
       <RemoteName>FM_LaunchScreenImage_iPhone@3x.png</RemoteName>
     </DeployFile>
-    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_3x.png">
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_2x.png">
+      <DeployClass>iPhone_LaunchDark2x</DeployClass>
+      <LocalCommand/>
+      <Operation>1</Operation>
+      <Overwrite>True</Overwrite>
+      <RemoteCommand/>
+      <RemoteDir>ALFmxControlsDemo.app\..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset\</RemoteDir>
+      <RemoteName>FM_LaunchScreenImage_iPhoneDark@2x.png</RemoteName>
+    </DeployFile>
+    <DeployFile Condition="&#39;$(Config)&#39;==&#39;Release&#39;" Include=".\iOS\Icons\iphone_launch_image_dark_3x.png">
       <DeployClass>iPhone_LaunchDark3x</DeployClass>
       <LocalCommand/>
       <Operation>1</Operation>

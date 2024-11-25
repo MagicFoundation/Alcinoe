@@ -200,10 +200,10 @@ function ALGetShapeSurfaceRect(
            const AShadow: TALShadow): TRectF; overload;
 function ALCreateEmptyDrawable1x1: TALDrawable;
 
-////////////////////////////////////////////////////////////////////////////////
-/// THE CODE BELOW (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
-/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////
+/// THE CODE BELOW WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
 
 {$REGION ' Load and FitInto'}
 // Resize the src image to make that one side fit w or h keeping the other side equal or lower than w or h
@@ -776,10 +776,10 @@ function ALLoadFromResourceToDrawable(const AResName: String): TALDrawable;
 function ALLoadFromFileToDrawable(const AFileName: String): TALDrawable;
 {$ENDREGION}
 
-////////////////////////////////////////////////////////////////////////////////
-/// THE CODE ABOVE (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
-/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////
+/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
 
 {************************}
 procedure ALDrawRectangle(
@@ -1177,10 +1177,10 @@ end;
 
 
 
-////////////////////////////////////////////////////////////////////////////////
-/// THE CODE BELOW (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
-/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////
+/// THE CODE BELOW WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
@@ -9368,10 +9368,10 @@ begin
   {$ENDIF}
 end;
 
-////////////////////////////////////////////////////////////////////////////////
-/// THE CODE ABOVE (INTERFACE + IMPLEMENTATION) WAS AUTO-GENERATED FROM      ///
-/// <ALCINOE>\References\FMXGraphicsBuilder.                                 ///
-////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////
+/// THE CODE ABOVE WAS AUTO-GENERATED FROM ///
+/// <ALCINOE>\Tools\CodeBuilder.           ///
+//////////////////////////////////////////////
 
 
 {*****************************************************}

@@ -147,7 +147,7 @@ type
   TASAuthorizationAppleIDCredential = class(TOCGenericImport<ASAuthorizationAppleIDCredentialClass, ASAuthorizationAppleIDCredential>)  end;
   PASAuthorizationAppleIDCredential = Pointer;
 
-  {*************************************************************************}
+  {************************************************************************}
   //@interface ASAuthorizationRequest : NSObject <NSCopying, NSSecureCoding>
   ASAuthorizationRequestClass = interface(NSObjectClass)
     ['{5AD0FB7E-FF24-4865-B718-524C0CC7DDEF}']

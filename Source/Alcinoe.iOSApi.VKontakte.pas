@@ -46,7 +46,7 @@ type
   end;
   TVKObject = class(TOCGenericImport<VKObjectClass, VKObject>) end;
 
-  {******************************}
+  {*****************************}
   //@interface VKError : VKObject
   VKErrorClass = interface(VKObjectClass)
   ['{B33FC424-445C-4F10-AFEA-23A82935E562}']

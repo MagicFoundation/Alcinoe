@@ -2617,7 +2617,7 @@ begin
   end;
 end;
 
-{*************************************************************************************}
+{***********************************************************************************}
 //https://m3.material.io/components/switch/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
 procedure ALApplyMaterial3LightSwitchTheme(const ASwitch: TALSwitch; const AHeight: Single = 32);
 begin
@@ -2742,7 +2742,7 @@ begin
   end;
 end;
 
-{*************************************************************************************}
+{***********************************************************************************}
 //https://m3.material.io/components/switch/specs#e27a8630-f5e0-481a-ad24-0e8ebb8a8619
 procedure ALApplyMaterial3DarkSwitchTheme(const ASwitch: TALSwitch; const AHeight: Single = 32);
 begin

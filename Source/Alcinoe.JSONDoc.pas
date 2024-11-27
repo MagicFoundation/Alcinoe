@@ -3149,7 +3149,7 @@ begin
   setNodeValue(Value, nstText);
 end;
 
-{***********************************}
+{******************************************************************************}
 // By default json (ie: javascript) treats all numbers as floating-point values.
 // To let other system (ie: mongoDB) understand the type of the number
 // we provide the helper functions NumberLong() to handle 64-bit integers
@@ -3598,7 +3598,7 @@ begin
     FParentNode := Value;
 end;
 
-{*******************************************************************}
+{********************************************************************}
 {Returns the JSON that corresponds to the subtree rooted at this node.
  GetJSON returns the JSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNodeA.GetJSON: AnsiString;
@@ -3606,14 +3606,14 @@ begin
   SaveToJSONString(result);
 end;
 
-{************************************************}
+{*************************************************}
 {SetJSON reload the node with the new given value }
 procedure TALJSONNodeA.SetJSON(const Value: AnsiString);
 Begin
   LoadFromJSONString(Value);
 end;
 
-{*******************************************************************}
+{********************************************************************}
 {Returns the BSON that corresponds to the subtree rooted at this node.
  GetBSON returns the BSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNodeA.GetBSON: AnsiString;
@@ -3621,7 +3621,7 @@ begin
   SaveToBSONString(result);
 end;
 
-{************************************************}
+{*************************************************}
 {SetBSON reload the node with the new given value }
 procedure TALJSONNodeA.SetBSON(const Value: AnsiString);
 Begin
@@ -3770,7 +3770,7 @@ begin
   Result := ALCreateJSONNodeA(NodeName, NodeType);
 end;
 
-{******************************************}
+{********************************************}
 {Returns the next child of this node’s parent.
  NextSibling returns the node that follows this one in the parent node’s ChildNodes property list.
  If this node is the last node in its parent’s child list, NextSibling raises an exception.}
@@ -6268,7 +6268,7 @@ begin
   SaveToJson(Stream, buffer, Options);
 end;
 
-{******************************}
+{*******************************}
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
  AFileName is the name of the file to save.}
@@ -6305,7 +6305,7 @@ begin
   SaveToJSONFile(String(FileName), Options);
 end;
 
-{************************************************}
+{*************************************************}
 {Saves the JSON document to a string-type variable.
  Call SaveToJSON to save the contents of the JSON document to the string-type variable specified by JSON. SaveToJSON writes the contents of JSON document
  using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the JSON parameter.
@@ -10274,7 +10274,7 @@ begin
     FParentNode := Value;
 end;
 
-{*******************************************************************}
+{********************************************************************}
 {Returns the JSON that corresponds to the subtree rooted at this node.
  GetJSON returns the JSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNodeW.GetJSON: String;
@@ -10282,14 +10282,14 @@ begin
   SaveToJSONString(result);
 end;
 
-{************************************************}
+{*************************************************}
 {SetJSON reload the node with the new given value }
 procedure TALJSONNodeW.SetJSON(const Value: String);
 Begin
   LoadFromJSONString(Value);
 end;
 
-{*******************************************************************}
+{********************************************************************}
 {Returns the BSON that corresponds to the subtree rooted at this node.
  GetBSON returns the BSON that corresponds to this node and any child nodes it contains.}
 function TALJSONNodeW.GetBSON: Tbytes;
@@ -10297,7 +10297,7 @@ begin
   SaveToBSONBytes(result);
 end;
 
-{************************************************}
+{*************************************************}
 {SetBSON reload the node with the new given value }
 procedure TALJSONNodeW.SetBSON(const Value: Tbytes);
 Begin
@@ -12795,7 +12795,7 @@ begin
   SaveToJSONStream(Stream, TEncoding.UTF8, Options);
 end;
 
-{******************************}
+{*******************************}
 {Saves the JSON document to disk.
  Call SaveToFile to save any modifications you have made to the parsed JSON document.
  AFileName is the name of the file to save.}
@@ -12832,7 +12832,7 @@ begin
   SaveToJSONFile(FileName, TEncoding.UTF8, Options);
 end;
 
-{************************************************}
+{*************************************************}
 {Saves the JSON document to a string-type variable.
  Call SaveToJSON to save the contents of the JSON document to the string-type variable specified by JSON. SaveToJSON writes the contents of JSON document
  using 8 bits char (utf-8, iso-8859-1, etc) as an encoding system, depending on the type of the JSON parameter.

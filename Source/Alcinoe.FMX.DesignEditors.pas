@@ -194,7 +194,7 @@ type
     procedure SetValue(const AValue: string); override;
   end;
 
-  {*************************************************}
+  {************************************************}
   TALGradientPropertyEditor = class(TPropertyEditor)
   protected
     function GetIsDefault: Boolean; override;

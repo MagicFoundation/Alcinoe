@@ -736,7 +736,7 @@ type
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALStateTransition = class(TALPersistentObserver)
   private
     FAnimationType: TAnimationType;
@@ -4863,7 +4863,7 @@ begin
 
 end;
 
-{****************************************************}
+{******************************************************}
 {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
 class function TALFontManager.GetCustomTypeFace(const AFamilyName: string): JTypeFace;
 begin

@@ -1949,7 +1949,7 @@ type
   TRTCRtpSender = class(TOCGenericImport<RTCRtpSenderClass, RTCRtpSender>) end;
   PRTCRtpSender = Pointer;
 
-  {*************************}
+  {*************************************************************************}
   //The RTCRtpTransceiver maps to the RTCRtpTransceiver defined by the WebRTC
   //specification. A transceiver represents a combination of an RTCRtpSender
   //and an RTCRtpReceiver that share a common mid. As defined in JSEP, an
@@ -2078,7 +2078,7 @@ type
   TRTCSessionDescription = class(TOCGenericImport<RTCSessionDescriptionClass, RTCSessionDescription>) end;
   PRTCSessionDescription = Pointer;
 
-  {***********************************************}
+  {***************************************}
   //@interface RTCPeerConnection : NSObject
   RTCPeerConnectionClass = interface(NSObjectClass)
     ['{72035A56-D3E9-42F0-BA42-986BC2E10196}']

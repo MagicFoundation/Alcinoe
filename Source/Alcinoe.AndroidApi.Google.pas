@@ -55,7 +55,7 @@ type
   end;
   TJGoogleApi = class(TJavaGenericImport<JGoogleApiClass, JGoogleApi>) end;
 
-  {************************************************}
+  {*************************************************}
   JGoogleSignInAccountClass = interface(JObjectClass)
     ['{3DE5F05F-B748-4A49-A3DD-E92A3F895AA4}']
   end;
@@ -88,7 +88,7 @@ type
   end;
   TJGoogleSignInClient = class(TJavaGenericImport<JGoogleSignInClientClass, JGoogleSignInClient>) end;
 
-  {************************************************}
+  {*************************************************}
   JGoogleSignInOptionsClass = interface(JObjectClass)
     ['{13E258D6-50CD-4712-9B07-FD6FA4D34096}']
     {class} function _GetDEFAULT_GAMES_SIGN_IN: JGoogleSignInOptions; cdecl;

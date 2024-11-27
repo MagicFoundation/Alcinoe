@@ -692,7 +692,7 @@ begin
   ALst.Text := ALTrim(ALNNTPClientExtractTextFromMultilineResponse(NewNews(NewsGroups, FromGMTDate, distributions)));
 end;
 
-{*********}
+{********}
 {GROUP ggg
 
  The required parameter ggg is the name of the newsgroup to be
@@ -1141,7 +1141,7 @@ begin
   HeaderContent := ALNNTPClientExtractTextFromMultilineResponse(XHDR(HeaderName));
 end;
 
-{******************************************************************}
+{*****************************************************************}
 {The internally maintained "current article pointer" is advanced to
  the next article in the current newsgroup.  If no more articles
  remain in the current group, an error message is returned and the
@@ -1185,7 +1185,7 @@ begin
   end;
 end;
 
-{*****************************************************************}
+{****************************************************************}
 {The internally maintained "current article pointer" is set to the
  previous article in the current newsgroup.  If already positioned at
  the first article of the newsgroup, an error message is returned and
@@ -1403,7 +1403,7 @@ begin
   end;
 end;
 
-{*******************************************************************}
+{****************************************************************}
 {Indicates to the server that this client connection is to a slave
  server, rather than a user.
 
@@ -1483,7 +1483,7 @@ begin
   InternalGetInteger(@aResponse[1], Result);
 end;
 
-{**************************************************************}
+{*************************************************************}
 {Commands consist of a command word, which in some cases may be
  followed by a parameter.  Commands with parameters must separate the
  parameters from each other and from the command by one or more space
@@ -1527,7 +1527,7 @@ begin
   Result := GetResponse(OkResponses, MultilineResponse);
 end;
 
-{**********************************************}
+{*********************************************}
 {Responses are of two kinds, textual and status
 
  ///Text Responses///

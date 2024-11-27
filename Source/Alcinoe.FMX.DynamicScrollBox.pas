@@ -72,7 +72,7 @@ type
   TALDynamicScrollBoxView = class;
   TALDynamicScrollBox = class;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicScrollBoxDownloadMaterialExtData = Class(Tobject)
   public
     type
@@ -713,7 +713,7 @@ type
   //*  destructor Destroy; override;
   //*End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   // TALDynamicScrollBoxText defines 2D text objects.
   // This class is a clone of TALText
   TALDynamicScrollBoxText = Class(TALDynamicScrollBoxControl)
@@ -773,7 +773,7 @@ type
     destructor Destroy; override;
   End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   // TALDynamicScrollBoxImage defines 2D image components.
   // Use TALDynamicScrollBoxImage to display a graphical image on a control.
   // This class is a clone of TALImage
@@ -856,7 +856,7 @@ type
     destructor Destroy; override;
   End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicScrollBoxPreloadEphemeralLayoutExtData = Class(Tobject)
   private
     FComparekey: integer;
@@ -865,7 +865,7 @@ type
     Property Comparekey: integer read FComparekey;
   End;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALDynamicScrollBoxItemEphemeralLayout = class(TALDynamicScrollBoxLayout)
   public
     constructor Create(const AOwner: TALDynamicScrollBoxItem); reintroduce; virtual;
@@ -1058,7 +1058,7 @@ type
     procedure Prepare; virtual;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   //*TALDynamicScrollBoxViewActionBar = Class(TALDynamicScrollBoxRectangle)
   //
   //*{$REGION 'MouseEvents'}
@@ -3047,7 +3047,7 @@ begin
 
 end;
 
-{**************************}
+{**********************************************}
 //**procedure TALDynamicScrollBoxControl.Loaded;
 //**begin
 //**  {$IF not DEFINED(ALDPK)}
@@ -3057,14 +3057,14 @@ end;
 //**  Inherited;
 //**end;
 
-{******************************************}
+{**************************************************************}
 //**function TALDynamicScrollBoxControl.IsOwnerLoading: Boolean;
 //**begin
 //**  result := (Owner <> nil) and
 //**            (csloading in Owner.ComponentState);
 //**end;
 
-{****************************************}
+{************************************************************}
 //**function TALDynamicScrollBoxControl.IsSizeStored: Boolean;
 //**begin
 //**  var LDefaultSize := GetDefaultSize;
@@ -3131,13 +3131,13 @@ begin
   end;
 end;
 
-{**************************************************}
+{**********************************************************************}
 //**procedure TALDynamicScrollBoxControl.DelayOnResize(Sender: TObject);
 //**begin
 //**  Include(TALDynamicScrollBoxControlAccessPrivate(Self).FDelayedEvents, TALDynamicScrollBoxControlAccessPrivate.TDelayedEvent.Resize);
 //**end;
 
-{***************************************************}
+{***********************************************************************}
 //**procedure TALDynamicScrollBoxControl.DelayOnResized(Sender: TObject);
 //**begin
 //**  Include(TALDynamicScrollBoxControlAccessPrivate(Self).FDelayedEvents, TALDynamicScrollBoxControlAccessPrivate.TDelayedEvent.Resized);
@@ -3155,7 +3155,7 @@ begin
   FIsPixelAlignmentEnabled := AValue;
 end;
 
-{*****************************************************}
+{*************************************************************************}
 //**function TALDynamicScrollBoxControl.IsVisibleWithinFormBounds: Boolean;
 //**begin
 //**  Result := GetParentedVisible;
@@ -3164,7 +3164,7 @@ end;
 //**    Result := FForm.ClientRect.IntersectsWith(LocalToAbsolute(LocalRect));
 //**end;
 
-{***********************************************}
+{*******************************************************************}
 //**procedure TALDynamicScrollBoxControl.SetNewScene(AScene: IScene);
 //**begin
 //**  {$IFNDEF ALCompilerVersionSupported122}
@@ -3348,7 +3348,7 @@ end;
 //**  {$ENDIF}
 //**end;
 
-{*********************************}
+{*****************************************************}
 //**procedure TALDynamicScrollBoxControl.DoRootChanged;
 //**begin
 //**  inherited;
@@ -4181,7 +4181,7 @@ begin
   end;
 end;
 
-{********************************************************************************************}
+{*************************************************************************************}
 procedure TALDynamicScrollBoxControl.SetOwner(const Value: TALDynamicScrollBoxControl);
 begin
   if Value <> fOwner then begin
@@ -5035,21 +5035,21 @@ begin
   FOnMouseLeave := AValue;
 end;
 
-{*************************************************************************************}
+{**********************************************************************************}
 //*procedure TALDynamicScrollBoxControl.SetOnMouseDown(const AValue: TALMouseEvent);
 //*begin
 //*  HitTest := True;
 //*  FOnMouseDown := AValue;
 //*end;
 
-{***********************************************************************************}
+{********************************************************************************}
 //*procedure TALDynamicScrollBoxControl.SetOnMouseUp(const AValue: TALMouseEvent);
 //*begin
 //*  HitTest := True;
 //*  FOnMouseUp := AValue;
 //*end;
 
-{*********************************************************************************}
+{******************************************************************************}
 //*procedure TALDynamicScrollBoxControl.SetOnClick(const AValue: TALMouseEvent);
 //*begin
 //*  HitTest := True;
@@ -5057,7 +5057,7 @@ end;
 //*  FOnClick := AValue;
 //*end;
 
-{***********************************************************************************}
+{*********************************************************************************}
 //*procedure TALDynamicScrollBoxControl.SetOnDblClick(const AValue: TALMouseEvent);
 //*begin
 //*  HitTest := True;
@@ -5065,14 +5065,14 @@ end;
 //*  FOnDblClick := AValue;
 //*end;
 
-{*************************************************************************************}
+{**********************************************************************************}
 //*procedure TALDynamicScrollBoxControl.SetOnMouseMove(const AValue: TALMouseEvent);
 //*begin
 //*  HitTest := True;
 //*  FOnMouseMove := AValue;
 //*end;
 
-{***********************************************************************************}
+{**********************************************************************************}
 //*procedure TALDynamicScrollBoxControl.SetOnLongPress(const AValue: TALMouseEvent);
 //*begin
 //*  HitTest := True;
@@ -5141,7 +5141,7 @@ begin
 //*    fOnLongPress(Sender, AMousePos);
 end;
 
-{************************************************************************}
+{*******************************************************************************************}
 //*constructor TALDynamicScrollBoxRectangle.Create(const AOwner: TALDynamicScrollBoxControl);
 //*begin
 //*  inherited Create(AOwner);
@@ -5178,7 +5178,7 @@ end;
 //*  ALFreeAndNilDrawable(fBufBitmap);
 //*end;
 
-{*********************************************************************}
+{******************************************************************}
 //*function TALDynamicScrollBoxRectangle.MakeBufBitmap: TALDrawable;
 //*begin
 //*
@@ -5887,7 +5887,7 @@ end;
 //*  end;
 //*end;
 
-{**************************************************************************************************}
+{***********************************************************************************************}
 //*constructor TALDynamicScrollBoxViewActionBar.Create(const AOwner: TALDynamicScrollBoxControl);
 //*begin
 //*  inherited Create(AOwner);
@@ -9832,7 +9832,7 @@ begin
   OwnerScrollBox.repaint;
 end;
 
-{***************************************************************************************}
+{************************************************************************************}
 //*function TALDynamicScrollBoxView.CreateActionBar: TALDynamicScrollBoxViewActionBar;
 //*begin
 //*  result := nil;
@@ -9988,7 +9988,7 @@ begin
   {$ENDIF}
 end;
 
-{**********************************************************}
+{*****************************************************}
 //*function TALDynamicScrollBox.GetCanPreload: Boolean;
 //*begin
 //*  result := (inherited GetCanPreload) and
@@ -9996,7 +9996,7 @@ end;
 //*             (TALGeoPositionSensor.Instance.IsListeningGeoPositionUpdates));
 //*end;
 
-{***********************************************}
+{******************************************}
 //*procedure TALDynamicScrollBox.Initialize;
 //*begin
 //*  inherited Initialize; // will set Initialized to true
@@ -10037,7 +10037,7 @@ begin
   end;
 end;
 
-{**************************************************}
+{*********************************************}
 //*procedure TALDynamicScrollBox.BeforeDestroy;
 //*begin
 //*  inherited BeforeDestroy;
@@ -10065,7 +10065,7 @@ end;
 //*  fMainView.AsyncDestroy;
 //*end;
 
-{*******************************************}
+{**************************************}
 //*procedure TALDynamicScrollBox.OnHide;
 //*begin
 //*  inherited OnHide;
@@ -10081,7 +10081,7 @@ end;
 //*  {$ENDIF}
 //*end;
 
-{*******************************************}
+{**************************************}
 //*procedure TALDynamicScrollBox.OnShow;
 //*begin
 //*  inherited;
@@ -10196,7 +10196,7 @@ begin
   FWaitGeoPositionEvent.SetEvent;
 end;
 
-{****************************************************************************************************************}
+{***********************************************************************************************************}
 //*procedure TALDynamicScrollBox.HandleNotificationReceivedMessage(const Sender: TObject; const M: TMessage);
 //*begin
 //*  //*if IsDestroying then exit;
@@ -10237,13 +10237,13 @@ end;
 //*    raise Exception.Create('Error 4BE9987B-D82F-47B1-AF4E-DD9ACD6E57FC');
 //*end;
 
-{*********************************************************************}
+{****************************************************************}
 //*function TALDynamicScrollBox.GetCanRefreshByScrolling: Boolean;
 //*begin
 //*  result := (not fRefreshByScrollingDisabled) and fCanRefreshByScrolling;
 //*end;
 
-{****************************************************************************************}
+{***********************************************************************************}
 //*procedure TALDynamicScrollBox.RefreshCreateRefreshedFrameOnTimer(Sender: TObject);
 //*begin
 //*  RefreshTimer.tag := RefreshTimer.tag + 1;
@@ -10260,7 +10260,7 @@ end;
 //*  inherited RefreshCreateRefreshedFrameOnTimer(sender);
 //*end;
 
-{****************************************************************}
+{***********************************************************}
 //*procedure TALDynamicScrollBox.RefreshCreateRefreshedFrame;
 //*begin
 //*  //refreshFrame is created in descendant overriden procedure
@@ -10273,7 +10273,7 @@ end;
 //*  inherited RefreshCreateRefreshedFrame;
 //*end;
 
-{************************************************************************************}
+{*******************************************************************************}
 //*procedure TALDynamicScrollBox.RefreshCheckReadyToSwapOnTimer(Sender: TObject);
 //*begin
 //*  Var LRefreshedDynamicScrollBoxFrame := TALDynamicScrollBox(RefreshedFrame);
@@ -11774,26 +11774,26 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************}
+{************************************************************************}
 //*function TALDynamicScrollBox.CreateProgressFrame: TALBaseProgressFrame;
 //*begin
 //*  result := nil;
 //*end;
 
-{*********************************************************************************}
+{****************************************************************************}
 //*function TALDynamicScrollBox.CreateProgressFrameStopAnimationEvent: TEvent;
 //*begin
 //*  result := nil;
 //*end;
 
-{****************************************************************}
+{***********************************************************}
 //*procedure TALDynamicScrollBox.StartProgressFrameAnimation;
 //*begin
 //*  if ProgressFrame <> nil then
 //*    ProgressFrame.StartAnimation;
 //*end;
 
-{******************************************************************************************}
+{*************************************************************************************}
 //*procedure TALDynamicScrollBox.StopProgressFrameAnimation(const AImmediate: boolean);
 //*begin
 //*  if AImmediate or isdestroying then begin
@@ -11811,13 +11811,13 @@ end;
 //*  end;
 //*end;
 
-{***************************************************************}
+{**********************************************************}
 //*procedure TALDynamicScrollBox.StopProgressFrameAnimation;
 //*begin
 //*  StopProgressFrameAnimation(False{AImmediate});
 //*end;
 
-{*******************************************************************}
+{**************************************************************}
 //*function TALDynamicScrollBox.CanRemoveProgressFrame: Boolean;
 //*begin
 //*  //by default (can be overriden) we remove the progress frame when
@@ -11830,7 +11830,7 @@ end;
 //*            (MainView.GrowItemsExecutedAtLeastOnce);
 //*end;
 
-{********************************************************}
+{***************************************************}
 //*procedure TALDynamicScrollBox.RemoveProgressFrame;
 //*begin
 //*  if not CanRemoveProgressFrame then exit;
@@ -11891,7 +11891,7 @@ begin
   repaint;
 end;
 
-{**************************************************}
+{*********************************************}
 //*procedure TALDynamicScrollBox.InitActionBar;
 //*begin
 //*  if not IsMainFrame then exit;

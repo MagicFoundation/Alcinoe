@@ -1047,7 +1047,7 @@ begin
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
-{************************************************************************}
+{***********************************************************************}
 // "add" means "store this data, but only if the server *doesn't* already
 // hold data for this key".
 procedure TAlBaseMemCachedClient.DoAdd(
@@ -1141,7 +1141,7 @@ begin
   if LResultCode <> 'STORED' then raise EAlMemCachedClientException.Create(LResultCode);
 end;
 
-{*********************************************************************}
+{********************************************************************}
 // "cas" is a check and set operation which means "store this data but
 // only if no one else has updated since I last fetched it."
 function TAlBaseMemCachedClient.DoCas(
@@ -1689,7 +1689,7 @@ begin
   CheckError(setsockopt(aSocketDescriptor,SOL_SOCKET,SO_RCVTIMEO,PAnsiChar(@Value),SizeOf(Value))=SOCKET_ERROR);
 end;
 
-{***********************************************************************************************************************}
+{**********************************************************************************************************************}
 // // http://blogs.technet.com/b/nettracer/archive/2010/06/03/things-that-you-may-want-to-know-about-tcp-keepalives.aspx
 procedure TAlBaseMemCachedClient.DoSetKeepAlive(aSocketDescriptor: TSocket; const Value: boolean);
 var LIntBool: integer;

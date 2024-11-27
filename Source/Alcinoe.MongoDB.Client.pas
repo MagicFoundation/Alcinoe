@@ -956,7 +956,7 @@ type
       property Port: integer read fPort;
     end;
 
-    {-------------------------------------------------------------------------------------------------------}
+    {--------------------------------------------------------------------------------------------------------}
     TAlMongoDBTailMonitoringThreadEvent = reference to Procedure (Sender: TObject; JSONRowData: TALJSONNodeA);
     TAlMongoDBTailMonitoringThreadException = reference to procedure (Sender: TObject; Error: Exception);
 

@@ -53,7 +53,7 @@ type
   {------------------------------------------------------------------------------}
   TALWinInetFTPClientInternetOptionSet = Set of TAlWinInetFTPClientInternetOption;
 
-  {------------------------------------}
+  {-----------------------------------}
   {TAlWinInetFTPClientStatusChangeEvent
 
    InternetStatus

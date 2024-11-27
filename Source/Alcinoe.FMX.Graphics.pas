@@ -1079,7 +1079,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALCreateTextureFromCGContextRef(const aCGContextRef: CGContextRef): TTexture;
 begin
@@ -1095,7 +1095,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALCreateBitmapFromCGContextRef(const aCGContextRef: CGContextRef): TBitmap;
 begin
@@ -1109,7 +1109,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 procedure ALUpdateTextureFromCGContextRef(const aCGContextRef: CGContextRef; const ATexture: TTexture);
 begin
@@ -1117,7 +1117,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 procedure ALUpdateBitmapFromCGContextRef(const aCGContextRef: CGContextRef; const ABitmap: TBitmap);
 begin
@@ -14378,7 +14378,7 @@ begin
   end;
 end;
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetGlobalSkPaint(const AOpacity: Single): sk_paint_t;
 begin
@@ -14400,7 +14400,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALSkCheckHandle(const AHandle: sk_handle_t): sk_handle_t;
 begin
@@ -14410,7 +14410,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALSkCheckCanvas(const ACanvas: TCanvas);
 begin
@@ -14432,7 +14432,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterGetLengthProc(context: Pointer): size_t;
 begin
@@ -14440,7 +14440,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterGetPositionProc(context: Pointer): size_t;
 begin
@@ -14448,7 +14448,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterReadProc(context: Pointer; buffer: Pointer; size: size_t): size_t;
 begin
@@ -14456,7 +14456,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALSkStreamAdapterSeekProc(context: Pointer; position: size_t): _bool;
 begin
@@ -14465,7 +14465,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 begin
@@ -14484,7 +14484,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateSkSurface(Const W, H: integer): sk_surface_t;
 begin
@@ -14547,7 +14547,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
 begin
@@ -14563,7 +14563,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
 begin
@@ -14576,7 +14576,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
 begin
@@ -14589,7 +14589,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALUpdateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
 begin
@@ -14626,7 +14626,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALUpdateBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
 begin
@@ -14639,7 +14639,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALUpdateBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
 begin
@@ -14652,7 +14652,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateSkImageFromSkSurface(Const ASurface: sk_surface_t): sk_image_t;
 begin
@@ -14687,7 +14687,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateTextureFromSkSurface(Const ASurface: sk_surface_t): TTexture;
 begin
@@ -14709,7 +14709,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateTextureFromSkImage(Const AImage: sk_image_t): TTexture;
 begin
@@ -14731,7 +14731,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALUpdateTextureFromSkPixmap(Const APixmap: sk_pixmap_t; const ATexture: TTexture);
 begin
@@ -14746,7 +14746,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALUpdateTextureFromSkSurface(Const ASurface: sk_surface_t; const ATexture: TTexture);
 begin
@@ -14759,7 +14759,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 procedure ALUpdateTextureFromSkImage(Const AImage: sk_image_t; const ATexture: TTexture);
 begin
@@ -14772,7 +14772,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetCubicMitchellNetravaliSkSamplingoptions: sk_samplingoptions_t;
 begin
@@ -14790,7 +14790,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetLinearSkSamplingoptions: sk_samplingoptions_t;
 begin
@@ -14806,7 +14806,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetNearestSkSamplingoptions: sk_samplingoptions_t;
 begin
@@ -14822,7 +14822,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALCreateDisplayP3SkColorSpace: sk_colorspace_t;
 begin
@@ -14865,7 +14865,7 @@ begin
 end;
 {$ENDIF}
 
-{*************************}
+{****************************}
 {$IF defined(ALSkiaAvailable)}
 function ALGetGlobalSkColorSpace: sk_colorspace_t;
 begin
@@ -14950,7 +14950,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{********************}
 {$IF defined(ANDROID)}
 function ALGetGlobalJColorSpace: JColorSpace;
 begin
@@ -14984,7 +14984,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALGetGlobalCGColorSpace: CGColorSpaceRef;
 begin
@@ -15048,7 +15048,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALCreateCGContextRef(const W, H: integer; const AData: Pointer = nil; const ABytesPerRow: Integer = -1): CGContextRef;
 begin
@@ -15144,7 +15144,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALOSImageGetCgImage(const AImage: ALOSImage): cgImageRef;
 begin
@@ -15156,7 +15156,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALOSImageGetWidth(const AImage: ALOSImage): Integer; inline;
 begin
@@ -15168,7 +15168,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALOSImageGetHeight(const AImage: ALOSImage): Integer; inline;
 begin
@@ -15180,7 +15180,7 @@ begin
 end;
 {$ENDIF}
 
-{****************}
+{**********************}
 {$IF defined(ALAppleOS)}
 //static void ALGradientEvaluateCallback(void *info, const float *in, float *out)
 //{

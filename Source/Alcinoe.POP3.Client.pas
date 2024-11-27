@@ -201,7 +201,7 @@ begin
   end;
 end;
 
-{*********}
+{********}
 {USER name
 
  Arguments:
@@ -514,7 +514,7 @@ Begin
   end;
 end;
 
-{********}
+{*******}
 {RETR msg
 
  Arguments:
@@ -627,7 +627,7 @@ begin
   Result := SendCmd('NOOP', False);
 end;
 
-{********}
+{*******}
 {DELE msg
 
  Arguments:
@@ -719,7 +719,7 @@ begin
   Result := SendCmd('RSET', False);
 end;
 
-{**************************************************************}
+{*************************************************************}
 {Commands consist of a command word, which in some cases may be
  followed by a parameter.  Commands with parameters must separate the
  parameters from each other and from the command by one or more space

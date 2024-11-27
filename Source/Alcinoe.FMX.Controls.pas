@@ -14,7 +14,7 @@ uses
 
 type
 
-  {**************************}
+  {*************************************}
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Types.TAlignLayout was not updated and adjust the IFDEF'}
     {$MESSAGE WARN 'Check if https://embt.atlassian.net/servicedesk/customer/portal/1/RSS-2342 was implemented and adjust the IFDEF'}
@@ -65,7 +65,7 @@ type
     MostBottomLeft,   // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the left.
     MostBottomRight); // Added from TAlignLayout - Works like TAlignLayout.MostBottom, then aligns the control to the right.
 
-  {**************************}
+  {*************************************}
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Controls.TControl was not updated and adjust the IFDEF'}
   {$ENDIF}
@@ -150,7 +150,7 @@ type
     property ParentALControl: TALControl read FParentALControl;
   end;
 
-  {**************************************}
+  {*************************************}
   {$IFNDEF ALCompilerVersionSupported122}
     {$MESSAGE WARN 'Check if FMX.Controls.TContent was not updated and adjust the IFDEF'}
   {$ENDIF}

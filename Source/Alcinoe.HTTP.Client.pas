@@ -1636,7 +1636,7 @@ Begin
 
 end;
 
-{*************************************************************}
+{************************************************************}
 {Sun, 06 Nov 1994 08:49:37 GMT  ; RFC 822, updated by RFC 1123
  the function allow also date like "Sun, 06-Nov-1994 08:49:37 GMT"
  to be compatible with cookies field (http://wp.netscape.com/newsref/std/cookie_spec.html)}
@@ -1724,7 +1724,7 @@ Begin
 
 End;
 
-{********************************************************************************}
+{*******************************************************************************}
 {This function calculates ending IPv4-address for a given start of IPv4 range and
  length of subnetwork mask.
  Calculation is described in RFC: http://tools.ietf.org/html/rfc1878,

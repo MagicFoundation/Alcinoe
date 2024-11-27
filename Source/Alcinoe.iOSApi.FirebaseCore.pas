@@ -39,7 +39,7 @@ type
 
 implementation
 
-{*******************************************************************************************}
+{*************************}
 {$IF Defined(IOSSIMULATOR)}
 procedure libclangrtiosLoader; cdecl; external '/usr/lib/clang/lib/darwin/libclang_rt.iossim.a';
 {$ELSE}

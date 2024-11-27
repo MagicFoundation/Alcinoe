@@ -11,7 +11,7 @@ uses
 
 type
 
-  {*******************************************************************}
+  {*****************************************************************}
   TALCanvasExternalOESTextureMaterial = class(TCanvasTextureMaterial)
   private
   protected
@@ -32,7 +32,7 @@ type
     property ShaderVariables: TALColorAdjustShaderVariables read fShaderVariables;
   end;
 
-  {************************************************************************************}
+  {**********************************************************************************}
   TALCanvas420YpCbCr8BiPlanarVideoRangeTextureMaterial = class(TCanvasTextureMaterial)
   private
     function getCbCrTexture: TTexture;
@@ -56,7 +56,7 @@ type
     property ShaderVariables: TALColorAdjustShaderVariables read fShaderVariables;
   end;
 
-  {************************************************************************}
+  {**********************************************************************}
   TALCanvas420YpCbCr8PlanarTextureMaterial = class(TCanvasTextureMaterial)
   private
     function getCbTexture: TTexture;

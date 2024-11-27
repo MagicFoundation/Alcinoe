@@ -2311,7 +2311,7 @@ begin
   Result := true;
 end;
 
-{*************************************************************************}
+{**************************************************************************}
 // Start scrolling by providing a starting point and the distance to travel.
 // @param startX Starting horizontal scroll offset in pixels. Positive numbers will scroll the content to the left.
 // @param startY Starting vertical scroll offset in pixels. Positive numbers will scroll the content up.

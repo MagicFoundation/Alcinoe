@@ -18,7 +18,7 @@ type
     ['{1BDEF5E8-0076-4FDE-965A-602B3D130724}']
   end;
 
-  {**********************************************************************}
+  {*************************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/installreferrer/ALInstallReferrerListener')]
   JALInstallReferrerListener = interface(IJavaInstance)
     ['{AA8674DA-EE8D-4324-97FB-4810EBDDD30B}']
@@ -33,7 +33,7 @@ type
     {class} function init(context: JContext): JALInstallReferrer; cdecl;
   end;
 
-  {**************************************************************}
+  {*****************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/installreferrer/ALInstallReferrer')]
   JALInstallReferrer = interface(JObject)
     ['{8E2550A4-C4B9-425F-A09A-5F397F1542AA}']

@@ -190,7 +190,7 @@ type
     ['{90F484CB-D786-42A5-BF8F-E2F1A4339D19}']
   end;
 
-  {*****************************************************}
+  {********************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC$Listener')]
   JALWebRTC_Listener = interface(IJavaInstance)
     ['{C758A92B-AE93-4291-BFD5-1EBB83041CC9}']
@@ -210,7 +210,7 @@ type
     {class} function init: JALWebRTC_PeerConnectionParameters; cdecl;
   end;
 
-  {*********************************************************************}
+  {************************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC$PeerConnectionParameters')]
   JALWebRTC_PeerConnectionParameters = interface(JObject)
     ['{AF3349B3-C8B9-4CA4-8D64-7E8711E7A2F4}']
@@ -285,7 +285,7 @@ type
     {class} function init(appContext: JContext; eglContext: Jopengl_EGLContext; iceServers: JList; peerConnectionParameters: JALWebRTC_PeerConnectionParameters): JALWebRTC; cdecl;
   end;
 
-  {********************************************}
+  {***********************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/webrtc/ALWebRTC')]
   JALWebRTC = interface(JObject)
     ['{45B6132D-E7E4-4D39-A150-E489495FC19D}']

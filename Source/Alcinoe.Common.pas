@@ -3167,7 +3167,7 @@ begin
   Result := IncMilliSecond(UnixDateDelta, aValue);
 end;
 
-{********************************************************}
+{*******************************************************}
 {Returns UNIX-time as the count of milliseconds since the
  UNIX epoch. Can be very useful for the purposes of
  special precision.}

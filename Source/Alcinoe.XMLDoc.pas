@@ -1908,7 +1908,7 @@ Begin
   FDocument := nil;
 end;
 
-{*************************************************************}
+{************************************************************}
 {CloneNode returns a copy of this node that has no parent. Any
  attributes of this node are copied as well, including attribute
  nodes that represent default values.
@@ -2125,7 +2125,7 @@ begin
   end;
 end;
 
-{******************************************}
+{********************************************}
 {Returns the next child of this node’s parent.
  NextSibling returns the node that follows this one in the parent node’s ChildNodes property list.
  If this node is the last node in its parent’s child list, NextSibling raises an exception.}
@@ -3636,7 +3636,7 @@ begin
   if Result >= 0 then Delete(Result);
 end;
 
-{************************************************************}
+{***********************************************************}
 {Removes a specified object from the list without freeing it.
  Call Extract to remove an object from the list without freeing the object itself.
  After an object is removed, all the objects that follow it are moved up in index position and Count is decremented.}

@@ -67,7 +67,7 @@ type
     property Shadow: TALShadow read GetShadow write SetShadow;
   end;
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   // In Delphi, multi-resolution bitmaps for TImage or TGlyph allow us to
   // provide different bitmap sizes for various screen scales. For example, a
   // screen scale of 1 might use a 100x100 bitmap, while a scale of 1.5 uses a

@@ -53,7 +53,7 @@ type
     {class} function createFileFromURI(context: JContext; uri: Jnet_Uri; fileName: Jstring): boolean; cdecl;
   end;
 
-  {********************************************}
+  {***********************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/util/ALFileUtil')]
   JALFileUtil = interface(JObject)
     ['{5F130085-03D3-4436-87BB-84A3BB9F22E0}']
@@ -65,7 +65,7 @@ type
     ['{3EDC638B-74FD-40D8-A09C-B92919C9D85B}']
   end;
 
-  {******************************************************************}
+  {*********************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialogListener')]
   JALDatePickerDialogListener = interface(IJavaInstance)
     ['{9A145783-462B-4E51-AAFC-48F68C79C3EA}']
@@ -84,7 +84,7 @@ type
                        title: JCharSequence): JALDatePickerDialog; cdecl;
   end;
 
-  {**********************************************************}
+  {*************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/datepicker/ALDatePickerDialog')]
   JALDatePickerDialog = interface(JObject)
     ['{DF4E7117-15AA-4063-9150-EEEC2356FCD7}']
@@ -101,7 +101,7 @@ type
     ['{E01C70E2-4BBF-47CB-8713-5A73344E9EA9}']
   end;
 
-  {*********************************************************}
+  {************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/edittext/ALKeyPreImeListener')]
   JALKeyPreImeListener = interface(IJavaInstance)
     ['{343578E2-962A-461E-ADD7-47A1E4BAA1D9}']
@@ -118,7 +118,7 @@ type
     {class} function init(context: JContext; attrs: JAttributeSet; defStyleAttr: Integer; defStyleRes: Integer): JALEditText; cdecl; overload;
   end;
 
-  {************************************************}
+  {***************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/edittext/ALEditText')]
   JALEditText = interface(JEditText)
     ['{A3E765A1-44EB-45C0-9AA5-19A38C029CE5}']
@@ -242,7 +242,7 @@ type
     ['{64D38904-11AB-4B0E-B9C1-D5038273BC0D}']
   end;
 
-  {****************************************************************}
+  {*******************************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiverListener')]
   JALBroadcastReceiverListener = interface(IJavaInstance)
     ['{8AD95D78-A7FC-4613-8D94-55CC19EB1565}']
@@ -256,7 +256,7 @@ type
     {class} function init: JALBroadcastReceiver; cdecl;
   end;
 
-  {********************************************************}
+  {***********************************************************************}
   [JavaSignature('io/magicfoundation/alcinoe/content/ALBroadcastReceiver')]
   JALBroadcastReceiver = interface(JBroadcastReceiver)
     ['{42427B26-C270-4832-8645-F788FCB549CB}']
@@ -565,7 +565,7 @@ type
   end;
   TJScriptIntrinsicBlur = class(TJavaGenericImport<JScriptIntrinsicBlurClass, JScriptIntrinsicBlur>) end;
 
-  {***************************************************}
+  {**************************************}
   JElementClass = interface(JBaseObjClass)
     ['{19D75D2F-CF5B-4EFE-9A01-A69F51A1685D}']
     {class} function ALLOCATION(rs: JRenderScript): JElement; cdecl;

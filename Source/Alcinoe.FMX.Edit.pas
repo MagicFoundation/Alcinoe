@@ -1142,7 +1142,7 @@ begin
   inherited Destroy;
 end;
 
-{**********************}
+{********************}
 {$IF defined(android)}
 function TALBaseEditControl.GetNativeView: TALAndroidNativeView;
 begin
@@ -1150,7 +1150,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************}
+{****************}
 {$IF defined(IOS)}
 function TALBaseEditControl.GetNativeView: TALIosNativeView;
 begin
@@ -1158,7 +1158,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************}
+{********************}
 {$IF defined(ALMacOS)}
 function TALBaseEditControl.GetNativeView: TALMacNativeView;
 begin
@@ -4561,7 +4561,7 @@ begin
 end;
 {$ENDIF}
 
-{******************}
+{********************}
 {$IF defined(ALMacOS)}
 function TALBaseEdit.GetEditControl: TALBaseEditControl;
 begin
@@ -4573,7 +4573,7 @@ begin
 end;
 {$ENDIF}
 
-{******************}
+{********************}
 {$IF defined(ALMacOS)}
 function TALBaseEdit.GetNativeView: TALMacNativeView;
 begin

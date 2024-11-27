@@ -592,15 +592,15 @@ procedure TALPhpFastCgiRunnerEngine.Execute(
       Tam    : word;
   begin
 
-    {----------}
+    {----------------------}
     Len[0] := length(aName);
     if Len[0] <= 127 then Format[0] := 1
     else Format[0] := 4;
-    {----------}
+    {-----------------------}
     Len[1] := length(aValue);
     if Len[1] <= 127 then Format[1] := 1
     else Format[1] := 4;
-    {----------}
+    {---------------------------------------------}
     Tam := Len[0] + Format[0] + Len[1] + Format[1];
     aStr := aStr +#1             +#4          +#0          +#1          +AnsiChar(hi(Tam)) +AnsiChar(lo(Tam)) +#0            +#0;
     //           +FCGI_VERSION_1 +FCGI_PARAMS +requestIdB1 +requestIdB0 +contentLengthB1   +contentLengthB0   +paddingLength +reserved
@@ -687,7 +687,7 @@ begin
     InternalAddServerVariables +
     LFormatedRequestStr);
 
-  {----------}
+  {---------------------------}
   LResponseStr := ReadResponse;
   P1 := ALPosA(#13#10#13#10,LResponseStr);
   if P1 <= 0 then raise Exception.Create('The Php has encountered an error while processing the request!');

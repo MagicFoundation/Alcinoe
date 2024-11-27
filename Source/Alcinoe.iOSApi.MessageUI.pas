@@ -37,7 +37,7 @@ type
   {*************************************************}
   MFMessageComposeViewControllerDelegate = interface;
 
-  {*****************************************************************}
+  {******************************************************************}
   //@interface MFMessageComposeViewController : UINavigationController
   //@class       MFMessageComposeViewController
   //@abstract    The MFMessageComposeViewController class provides an interface for editing and sending a message.

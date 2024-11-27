@@ -785,7 +785,7 @@ begin
   end;
 end;
 
-{************************************************************}
+{**********************************************************}
 {The Service Manager will try to restart the service waiting
  between the attempting "aTimeToRestartInSec" seconds. In the
  case of three consistent fails it will try to wait "aTimeToResetInSec"

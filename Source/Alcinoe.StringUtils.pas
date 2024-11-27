@@ -9701,7 +9701,7 @@ end;
 
 {**************************************************************************************}
 {same as ALExtractHeaderFields except the it take care or escaped quote (like '' or "")}
-{$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+{$ZEROBASEDSTRINGS OFF}
 {$WARN SYMBOL_DEPRECATED OFF}
 procedure ALExtractHeaderFieldsWithQuoteEscaped(
             Separators,

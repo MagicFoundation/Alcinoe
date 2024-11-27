@@ -49,7 +49,6 @@ uses
 Procedure AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest: TALWebRequest; ServerVariables: TALStringsA);
 Begin
   ServerVariables.Clear;
-  {----------}
   ServerVariables.Add('HTTPS=off');                                                                     //HTTPS=off
   ServerVariables.Add('HTTP_UA_CPU='+           WebRequest.GetFieldByName('HTTP_UA_CPU'));              //HTTP_UA_CPU=x86
   ServerVariables.Add('HTTP_CONNECTION=Keep-Alive');                                                    //HTTP_CONNECTION=Keep-Alive | Whether to close the connection when done
@@ -60,7 +59,6 @@ Begin
   ServerVariables.Add('REMOTE_HOST='+           WebRequest.GetFieldByName('REMOTE_HOST'));              //REMOTE_HOST=88.167.177.200 | Client Host Name
   ServerVariables.Add('REMOTE_ADDR='+           WebRequest.GetFieldByName('REMOTE_ADDR'));              //REMOTE_ADDR=88.167.177.200 | Client IP Number
   ServerVariables.Add('HTTP_HOST='+             WebRequest.GetFieldByName('HTTP_HOST'));                //HTTP_HOST=www.mywebsite.com | Requested Host
-  {----------}
   ServerVariables.Add('HTTP_USER_AGENT='+       WebRequest.GetFieldByName('HTTP_USER_AGENT'));          //HTTP_USER_AGENT=Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) | Client Software you are using
   ServerVariables.Add('HTTP_ACCEPT=*/*');                                                               //HTTP_ACCEPT=*/* | List of acceptable content type
 end;
@@ -74,7 +72,6 @@ Procedure AlCGIInitDefaultServerVariablesFromWebRequest(
             const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables);
-  {----------}
   ServerVariables.Values['URL']             := Url;                //URL=/vbseo.php?vbseourl=forum4/discussion98851/showthread.php&bleubleu=24
   ServerVariables.Values['PATH_INFO']       := ScriptName;         //PATH_INFO=/vbseo.php
   ServerVariables.Values['PATH_TRANSLATED'] := ScriptFileName;     //PATH_TRANSLATED=D:\wwwroot\www.mywebsite.com\vbseo.php
@@ -88,7 +85,6 @@ end;
 Procedure ALCGIInitDefaultServerVariables(ServerVariables: TALStringsA);
 Begin
   ServerVariables.Clear;
-  {----------}
   ServerVariables.Add('HTTPS=off');                          //HTTPS=off
   ServerVariables.Add('HTTP_UA_CPU=x86');                    //HTTP_UA_CPU=x86
   ServerVariables.Add('HTTP_CONNECTION=Keep-Alive');         //HTTP_CONNECTION=Keep-Alive | Whether to close the connection when done
@@ -99,7 +95,6 @@ Begin
   ServerVariables.Add('REMOTE_HOST=127.0.0.1');              //REMOTE_HOST=88.167.177.200 | Client Host Name
   ServerVariables.Add('REMOTE_ADDR=127.0.0.1');              //REMOTE_ADDR=88.167.177.200 | Client IP Number
   ServerVariables.Add('HTTP_HOST=127.0.0.1');                //HTTP_HOST=www.mywebsite.com | Requested Host
-  {----------}
   ServerVariables.Add('HTTP_USER_AGENT=Mozilla/4.0 (compatible)');  //HTTP_USER_AGENT=Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) | Client Software you are using
   ServerVariables.Add('HTTP_ACCEPT=*/*');                           //HTTP_ACCEPT=*/* | List of acceptable content type
 end;
@@ -112,7 +107,6 @@ Procedure AlCGIInitDefaultServerVariables(
             const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariables(ServerVariables);
-  {----------}
   ServerVariables.Values['URL']             := Url;                //URL=/vbseo.php?vbseourl=forum4/discussion98851/showthread.php&bleubleu=24
   ServerVariables.Values['PATH_INFO']       := ScriptName;         //PATH_INFO=/vbseo.php
   ServerVariables.Values['PATH_TRANSLATED'] := ScriptFileName;     //PATH_TRANSLATED=D:\wwwroot\www.mywebsite.com\vbseo.php
@@ -131,7 +125,6 @@ Procedure AlCGIInitServerVariablesFromWebRequest(
             const Url: AnsiString);
 Begin
   AlCGIInitDefaultServerVariablesFromWebRequest(WebRequest, ServerVariables, ScriptName, ScriptFileName, Url);
-  {----------}
   ServerVariables.Add('REQUEST_METHOD='+        WebRequest.GetFieldByName('REQUEST_METHOD'));           //REQUEST_METHOD=GET | Either GET (normal for HTML docs) or POST (normal for forms)
   ServerVariables.Add('CONTENT_TYPE='+          WebRequest.GetFieldByName('CONTENT_TYPE'));             //CONTENT_TYPE=application/x-www-form-urlencoded
   ServerVariables.Add('CONTENT_LENGTH='+        WebRequest.GetFieldByName('CONTENT_LENGTH'));           //CONTENT_LENGTH=207
@@ -139,9 +132,7 @@ Begin
   ServerVariables.Add('HTTP_CONTENT_VERSION='+  WebRequest.GetFieldByName('HTTP_CONTENT_VERSION'));     //HTTP_CONTENT_VERSION=
   ServerVariables.Add('QUERY_STRING='+          WebRequest.GetFieldByName('QUERY_STRING'));             //QUERY_STRING=goto=newpost&t=1 | Query String: The characters appended to the URL after a question mark.
   ServerVariables.Add('HTTP_COOKIE='+           WebRequest.GetFieldByName('HTTP_COOKIE'));              //HTTP_COOKIE=bblastvisit=1155301716; bblastactivity=0 | Cookies: information that has been stored on your machine (in the file cookies.txt or MagicCookie) by our server
-  {----------}
   ServerVariables.Add('HTTP_REFERER='+          WebRequest.GetFieldByName('HTTP_REFERER'));             //HTTP_REFERER=http://127.0.0.1/usa/forum/ | Address of the document you linked from
-  {----------}
   //ServerVariables.Add('HTTP_ACCEPT_ENCODING='+  WebRequest.GetFieldByName('HTTP_ACCEPT_ENCODING'));   //HTTP_ACCEPT_ENCODING=gzip, deflate
   //ServerVariables.Add('HTTP_ACCEPT_LANGUAGE='+  WebRequest.GetFieldByName('HTTP_ACCEPT_LANGUAGE'));   //HTTP_ACCEPT_LANGUAGE=en-us
   //ServerVariables.Add('HTTP_CACHE_CONTROL='+    WebRequest.GetFieldByName('HTTP_CACHE_CONTROL'));     //HTTP_CACHE_CONTROL=
@@ -188,7 +179,6 @@ begin
   else FreeRequestContentStream := False;
   Try
 
-    {----------}
     ScriptFileName := ServerVariables.Values['SCRIPT_FILENAME'];
 
     {For securty issue... if content_length badly set then cpu can go to 100%}
@@ -197,7 +187,6 @@ begin
     {init GATEWAY_INTERFACE}
     ServerVariables.Values['GATEWAY_INTERFACE'] := 'CGI/1.1';
 
-    {----------}
     Environment := AlGetEnvironmentStringA; //=C:=C:\Program Files\Borland\Delphi7\Projects
                                             //ALLUSERSPROFILE=C:\Documents and Settings\All Users
                                             //APPDATA=C:\Documents and Settings\loki\Application Data
@@ -232,14 +221,11 @@ begin
                                             //USERPROFILE=C:\Documents and Settings\loki
                                             //windir=C:\WINDOWS
 
-    {----------}
     For I := 0 to serverVariables.Count - 1 do
       Environment := Environment + ALFormatA(EnvironmentTemplate,[ServerVariables.Names[I], ServerVariables.ValueFromIndex[I]]);
 
-    {----------}
     Environment := Environment + #0;
 
-    {----------}
     ALWinExecA(
       ALQuotedStr(InterpreterFilename,'"') + ' ' + ScriptFileName,
       ALExtractFileDir(InterpreterFilename),
@@ -247,7 +233,6 @@ begin
       RequestContentStream,
       LStream);
 
-    {----------}
     S1 := LStream.DataString;
     P1 := ALPosA(#13#10#13#10,S1);
     ResponseHeader.RawHeaderText := AlCopyStr(S1,1,P1-1);

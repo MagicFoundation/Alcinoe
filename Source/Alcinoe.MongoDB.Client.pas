@@ -61,21 +61,21 @@ end;
 Exemple tail monitoring :
 
 aMongoDBTailMonitoringThread := TAlMongoDBTailMonitoringThread.Create(
-                                  aDBHost,
-                                  aDBPort,
-                                  'test.cappedCollectionExemple'
-                                  '{}', // the query
-                                  '{fieldA:1, fieldB:1}', // the return fields selector
+  aDBHost,
+  aDBPort,
+  'test.cappedCollectionExemple'
+  '{}', // the query
+  '{fieldA:1, fieldB:1}', // the return fields selector
 
-                                  Procedure (Sender: TObject; JSONRowData: TALJSONNodeA)
-                                  begin
-                                    writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
-                                  end,
+  Procedure (Sender: TObject; JSONRowData: TALJSONNodeA)
+  begin
+    writeln('New item added in cappedCollectionExemple: ' + JSONRowData.childnodes['fieldA'].text);
+  end,
 
-                                  procedure (Sender: TObject; Error: Exception)
-                                  begin
-                                    writeln(Error.message);
-                                  end);
+  procedure (Sender: TObject; Error: Exception)
+  begin
+    writeln(Error.message);
+  end);
 ....
 aMongoDBTailMonitoringThread.free;
 *******************************************************************************)
@@ -132,42 +132,47 @@ type
     //                            read all the data unless it closes the connection.
     // 7	      Partial	          Get partial results from a mongos if some shards are down (instead of throwing an error)
     // 8-31	                      Reserved	Must be set to 0.
-    TALMongoDBClientSelectDataFlags = set of (sfTailMonitoring,  // it's TailableCursor + AwaitData option. If we are at the end of the data, wait for new data rather than returning no data
-                                                                 // a good explanation can be found here: http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/
-                                                                 //                                       http://shtylman.com/post/the-tail-of-mongodb/
-                                                                 // use only with TALMongoDBClientSelectDataOnNewRowFunct
-                                              sfSlaveOk,         // Allow query of replica slave.
-                                                                 // Note that you should use this flag even if you do not use the automatic routing to secondaries.
-                                                                 // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
-                                                                 // the database that you are aware that you might be getting older data and you're okay with that.
-                                                                 // If you do not call this, you'll get "not master" errors when you try to query.
-                                              sfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
-                                                                 // Set this option to prevent that.
-                                              sfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
+    TALMongoDBClientSelectDataFlags = set of (
+      sfTailMonitoring,  // it's TailableCursor + AwaitData option. If we are at the end of the data, wait for new data rather than returning no data
+                         // a good explanation can be found here: http://docs.mongodb.org/manual/tutorial/create-tailable-cursor/
+                         //                                       http://shtylman.com/post/the-tail-of-mongodb/
+                         // use only with TALMongoDBClientSelectDataOnNewRowFunct
+      sfSlaveOk,         // Allow query of replica slave.
+                         // Note that you should use this flag even if you do not use the automatic routing to secondaries.
+                         // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
+                         // the database that you are aware that you might be getting older data and you're okay with that.
+                         // If you do not call this, you'll get "not master" errors when you try to query.
+      sfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
+                         // Set this option to prevent that.
+      sfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
 
-    {--------------------------------------------------}
-    TALMongoDBClientRunCommandFlags = set of (cfSlaveOk,         // Allow query of replica slave.
-                                                                 // Note that you should use this flag even if you do not use the automatic routing to secondaries.
-                                                                 // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
-                                                                 // the database that you are aware that you might be getting older data and you're okay with that.
-                                                                 // If you do not call this, you'll get "not master" errors when you try to query.
-                                              cfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
-                                                                 // Set this option to prevent that.
-                                              cfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
+    {----------------------------------------}
+    TALMongoDBClientRunCommandFlags = set of (
+      cfSlaveOk,         // Allow query of replica slave.
+                         // Note that you should use this flag even if you do not use the automatic routing to secondaries.
+                         // If you connect directly to a secondary in a replica set, you still need to set this flag, which basically tells
+                         // the database that you are aware that you might be getting older data and you're okay with that.
+                         // If you do not call this, you'll get "not master" errors when you try to query.
+      cfNoCursorTimeout, // The server normally times out idle cursors after an inactivity period (10 minutes) to prevent excess memory use.
+                         // Set this option to prevent that.
+      cfPartial);        // Get partial results from a mongos if some shards are down (instead of throwing an error)
 
-    {-------------------------------------------------}
-    TALMongoDBClientUpdateDataFlags = set of (ufUpsert,       // If set, the database will insert the supplied object into the collection if no matching document is found.
-                                              ufMultiUpdate); // If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
+    {----------------------------------------}
+    TALMongoDBClientUpdateDataFlags = set of (
+      ufUpsert,       // If set, the database will insert the supplied object into the collection if no matching document is found.
+      ufMultiUpdate); // If set, the database will update all matching objects in the collection. Otherwise only updates first matching doc.
 
-    {-----------------------------------------------------------}
-    TALMongoDBClientInsertDataFlags = set of (ifContinueOnError); // If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
-                                                                  // This makes bulk insert behave similarly to a series of single inserts, except lastError will be set
-                                                                  // if any insert fails, not just the last one. If multiple errors occur, only the most recent will be
-                                                                  // reported by getLastError. (new in 1.9.1)
+    {----------------------------------------}
+    TALMongoDBClientInsertDataFlags = set of (
+      ifContinueOnError); // If set, the database will not stop processing a bulk insert if one fails (eg due to duplicate IDs).
+                          // This makes bulk insert behave similarly to a series of single inserts, except lastError will be set
+                          // if any insert fails, not just the last one. If multiple errors occur, only the most recent will be
+                          // reported by getLastError. (new in 1.9.1)
 
-    {--------------------------------------------------------}
-    TALMongoDBClientDeleteDataFlags = set of (dfSingleRemove); // If set, the database will remove only the first matching document in the
-                                                               // collection. Otherwise all matching documents will be removed.
+    {----------------------------------------}
+    TALMongoDBClientDeleteDataFlags = set of (
+      dfSingleRemove); // If set, the database will remove only the first matching document in the
+                       // collection. Otherwise all matching documents will be removed.
 
     {---------------------------------------------}
     EAlMongoDBClientException = class(EALException)

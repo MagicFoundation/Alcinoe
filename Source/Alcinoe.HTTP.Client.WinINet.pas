@@ -32,57 +32,59 @@ const
 
 type
 
-  {-----------------------------------------------------}
-  TALWinInetHttpInternetOpenAccessType = (wHttpAt_Direct,                       {Resolves all host names locally.}
-                                          wHttpAt_Preconfig,                    {Retrieves the proxy or direct configuration from the registry.}
-                                          wHttpAt_Preconfig_with_no_autoproxy,  {Retrieves the proxy or direct configuration from the registry and
-                                                                                 prevents the use of a startup Microsoft JScript or Internet Setup
-                                                                                 (INS) file.}
-                                          wHttpAt_Proxy);                       {Passes requests to the proxy unless a proxy bypass list is supplied
-                                                                                 and the name to be resolved bypasses the proxy. In this case, the
-                                                                                 function uses Ioat_Direct.}
+  {--------------------------------------}
+  TALWinInetHttpInternetOpenAccessType = (
+    wHttpAt_Direct, // Resolves all host names locally.
+    wHttpAt_Preconfig, // Retrieves the proxy or direct configuration from the registry.
+    wHttpAt_Preconfig_with_no_autoproxy, // Retrieves the proxy or direct configuration from the registry and
+                                         // prevents the use of a startup Microsoft JScript or Internet Setup
+                                         // (INS) file.
+    wHttpAt_Proxy); // Passes requests to the proxy unless a proxy bypass list is supplied
+                    // and the name to be resolved bypasses the proxy. In this case, the
+                    // function uses Ioat_Direct.
 
 
-  {--------------------------------------------------}
-  TAlWininetHttpClientInternetOption = (wHttpIo_Async,                     {NOT SUPPORTED YET!
-                                                                            Makes only asynchronous requests on handles descended from the handle
-                                                                            returned from InternetOpen function.}
-                                        wHttpIo_From_Cache,                {Does not make network requests. All entities are returned from the cache.
-                                                                            If the requested item is not in the cache, a suitable error, such as
-                                                                            ERROR_FILE_NOT_FOUND, is returned.}
-                                        wHttpIo_Offline,                   {Identical to Hcio_From_Cache. Does not make network requests.
-                                                                            All entities are returned from the cache. If the requested item is not
-                                                                            in the cache, a suitable error, such as ERROR_FILE_NOT_FOUND, is returned.}
-                                        wHttpIo_Cache_if_net_fail,         {Returns the resource from the cache if the network request for the resource
-                                                                            fails due to an ERROR_INTERNET_CONNECTION_RESET (the connection with the
-                                                                            server has been reset) or ERROR_INTERNET_CANNOT_CONNECT (the attempt to
-                                                                            connect to the server failed).}
-                                        wHttpIo_Hyperlink,                 {Forces a reload if there was no Expires time and no LastModified time returned
-                                                                            from the server when determining whether to reload the item from the network.}
-                                        wHttpIo_Ignore_cert_cn_invalid,    {Disables checking of SSL/PCT-based certificates that are returned from the server
-                                                                            against the host name given in the request. WinINet functions use a simple check
-                                                                            against certificates by comparing for matching host names and simple wildcarding rules.}
-                                        wHttpIo_Ignore_cert_date_invalid,  {Disables checking of SSL/PCT-based certificates for proper validity dates.}
-                                        wHttpIo_Ignore_redirect_to_http,   {Disables detection of this special type of redirect. When this flag is used, WinINet functions
-                                                                            transparently allow redirects from HTTPS to HTTP URLs.}
-                                        wHttpIo_Ignore_redirect_to_https,  {Disables detection of this special type of redirect. When this flag is used, WinINet functions
-                                                                            transparently allow redirects from HTTP to HTTPS URLs.}
-                                        wHttpIo_Keep_connection,           {Uses keep-alive semantics, if available, for the connection. This flag is required for Microsoft
-                                                                            Network (MSN), NT LAN Manager (NTLM), and other types of authentication.}
-                                        wHttpIo_Need_file,                 {Causes a temporary file to be created if the file cannot be cached.}
-                                        wHttpIo_No_auth,                   {Does not attempt authentication automatically.}
-                                        wHttpIo_No_auto_redirect,          {Does not automatically handle redirection in HttpSendRequest.}
-                                        wHttpIo_No_cache_write,            {Does not add the returned entity to the cache.}
-                                        wHttpIo_No_cookies,                {Does not automatically add cookie headers to requests, and does not automatically add returned
-                                                                            cookies to the cookie database.}
-                                        wHttpIo_No_ui,                     {Disables the cookie dialog box.}
-                                        wHttpIo_Pragma_nocache,            {Forces the request to be resolved by the origin server, even if a cached copy exists on the proxy.}
-                                        wHttpIo_Reload,                    {Forces a download of the requested file, object, or directory listing from the origin
-                                                                           server, not from the cache.}
-                                        wHttpIo_Resynchronize,             {Reloads HTTP resources if the resource has been modified since the last time it was downloaded.
-                                                                           All FTP and Gopher resources are reloaded.}
-                                        wHttpIo_Secure);                   {Uses secure transaction semantics. This translates to using Secure Sockets Layer/Private
-                                                                           Communications Technology (SSL/PCT) and is only meaningful in HTTP requests.}
+  {------------------------------------}
+  TAlWininetHttpClientInternetOption = (
+    wHttpIo_Async, // NOT SUPPORTED YET!
+                   // Makes only asynchronous requests on handles descended from the handle
+                   // returned from InternetOpen function.
+    wHttpIo_From_Cache, // Does not make network requests. All entities are returned from the cache.
+                        // If the requested item is not in the cache, a suitable error, such as
+                        // ERROR_FILE_NOT_FOUND, is returned.
+    wHttpIo_Offline, // Identical to Hcio_From_Cache. Does not make network requests.
+                     // All entities are returned from the cache. If the requested item is not
+                     // in the cache, a suitable error, such as ERROR_FILE_NOT_FOUND, is returned.
+    wHttpIo_Cache_if_net_fail, // Returns the resource from the cache if the network request for the resource
+                               // fails due to an ERROR_INTERNET_CONNECTION_RESET (the connection with the
+                               // server has been reset) or ERROR_INTERNET_CANNOT_CONNECT (the attempt to
+                               // connect to the server failed).
+    wHttpIo_Hyperlink, // Forces a reload if there was no Expires time and no LastModified time returned
+                       // from the server when determining whether to reload the item from the network.
+    wHttpIo_Ignore_cert_cn_invalid, // Disables checking of SSL/PCT-based certificates that are returned from the server
+                                    // against the host name given in the request. WinINet functions use a simple check
+                                    // against certificates by comparing for matching host names and simple wildcarding rules.
+    wHttpIo_Ignore_cert_date_invalid, // Disables checking of SSL/PCT-based certificates for proper validity dates.
+    wHttpIo_Ignore_redirect_to_http, // Disables detection of this special type of redirect. When this flag is used, WinINet functions
+                                     // transparently allow redirects from HTTPS to HTTP URLs.
+    wHttpIo_Ignore_redirect_to_https, // Disables detection of this special type of redirect. When this flag is used, WinINet functions
+                                      // transparently allow redirects from HTTP to HTTPS URLs.
+    wHttpIo_Keep_connection, // Uses keep-alive semantics, if available, for the connection. This flag is required for Microsoft
+                             // Network (MSN), NT LAN Manager (NTLM), and other types of authentication.
+    wHttpIo_Need_file, // Causes a temporary file to be created if the file cannot be cached.
+    wHttpIo_No_auth, // Does not attempt authentication automatically.
+    wHttpIo_No_auto_redirect, // Does not automatically handle redirection in HttpSendRequest.
+    wHttpIo_No_cache_write, // Does not add the returned entity to the cache.
+    wHttpIo_No_cookies, // Does not automatically add cookie headers to requests, and does not automatically add returned
+                        // cookies to the cookie database.
+    wHttpIo_No_ui, // Disables the cookie dialog box.
+    wHttpIo_Pragma_nocache, // Forces the request to be resolved by the origin server, even if a cached copy exists on the proxy.
+    wHttpIo_Reload, // Forces a download of the requested file, object, or directory listing from the origin
+                    // server, not from the cache.
+    wHttpIo_Resynchronize, // Reloads HTTP resources if the resource has been modified since the last time it was downloaded.
+                           // All FTP and Gopher resources are reloaded.
+    wHttpIo_Secure); // Uses secure transaction semantics. This translates to using Secure Sockets Layer/Private
+                     // Communications Technology (SSL/PCT) and is only meaningful in HTTP requests.
 
   {--------------------------------------------------------------------------------}
   TALWininetHttpClientInternetOptionSet = Set of TAlWininetHttpClientInternetOption;

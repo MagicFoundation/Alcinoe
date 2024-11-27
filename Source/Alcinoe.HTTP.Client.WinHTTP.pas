@@ -31,43 +31,45 @@ uses
 
 type
 
-  {---------------------------------------------------------}
-  TALWinHttpClientInternetOpenAccessType = (wHttpAt_NO_PROXY,                    {Resolves all host names locally.}
-                                            wHttpAt_DEFAULT_PROXY,               {Retrieves the static proxy or direct configuration from the registry.
-                                                                                  WINHTTP_ACCESS_TYPE_DEFAULT_PROXY does not inherit browser proxy settings.
-                                                                                  WinHTTP does not share any proxy settings with Internet Explorer. This option
-                                                                                  picks up the WinHTTP proxy configuration set by the WinHTTP Proxycfg.exe utility.}
-                                            wHttpAt_NAMED_PROXY);                {Passes requests to the proxy unless a proxy bypass list is supplied and the name
-                                                                                  to be resolved bypasses the proxy. In this case, this function uses
-                                                                                  WINHTTP_ACCESS_TYPE_NAMED_PROXY.}
+  {----------------------------------------}
+  TALWinHttpClientInternetOpenAccessType = (
+    wHttpAt_NO_PROXY, // Resolves all host names locally.
+    wHttpAt_DEFAULT_PROXY, // Retrieves the static proxy or direct configuration from the registry.
+                           // WINHTTP_ACCESS_TYPE_DEFAULT_PROXY does not inherit browser proxy settings.
+                           // WinHTTP does not share any proxy settings with Internet Explorer. This option
+                           // picks up the WinHTTP proxy configuration set by the WinHTTP Proxycfg.exe utility.
+    wHttpAt_NAMED_PROXY); // Passes requests to the proxy unless a proxy bypass list is supplied and the name
+                          // to be resolved bypasses the proxy. In this case, this function uses
+                          // WINHTTP_ACCESS_TYPE_NAMED_PROXY.
 
 
-  {----------------------------------------------}
-  TAlWinHttpClientInternetOption = (wHttpIo_Async,                     {NOT SUPPORTED YET!
-                                                                        Use the WinHTTP functions asynchronously. By default, all WinHTTP functions that use
-                                                                        the returned HINTERNET handle are performed synchronously.}
-                                    wHttpIo_BYPASS_PROXY_CACHE,        {This flag provides the same behavior as WINHTTP_FLAG_REFRESH.}
-                                    wHttpIo_ESCAPE_DISABLE,            {Unsafe characters in the URL passed in for pwszObjectName are not converted to
-                                                                        escape sequences.}
-                                    wHttpIo_ESCAPE_DISABLE_QUERY,      {Unsafe characters in the query component of the URL passed in for pwszObjectName are not
-                                                                        converted to escape sequences.}
-                                    wHttpIo_ESCAPE_PERCENT,            {The string passed in for pwszObjectName is converted from an LPCWSTR to an LPSTR.
-                                                                        All unsafe characters are converted to an escape sequence including the percent symbol.
-                                                                        By default, all unsafe characters except the percent symbol are converted to an escape
-                                                                        sequence.}
-                                    wHttpIo_NULL_CODEPAGE,             {The string passed in for pwszObjectName is assumed to consist of valid ANSI characters
-                                                                        represented by WCHARs. No check are done for unsafe characters.}
-                                    wHttpIo_REFRESH,                    {Indicates that the request should be forwarded to the originating server rather than
-                                                                        sending a cached version of a resource from a proxy server. When this flag is used,
-                                                                        a "Pragma: no-cache" header is added to the request handle. When creating an HTTP/1.1
-                                                                        request header, a "Cache-Control: no-cache" is also added.}
-                                    wHttpIo_SECURE,                    {Uses secure transaction semantics. This translates to using Secure Sockets Layer
-                                                                        (SSL)/Transport Layer Security (TLS).}
-                                    wHttpIo_Keep_connection,           {Uses keep-alive semantics, if available, for the connection. This flag is required for Microsoft
-                                                                        Network (MSN), NT LAN Manager (NTLM), and other types of authentication.}
-                                    wHttpIo_No_cookies,                {Does not automatically add cookie headers to requests, and does not automatically add returned
-                                                                        cookies to the cookie database.}
-                                    wHttpIo_No_auto_redirect);         {Does not automatically handle redirection in HttpSendRequest.}
+  {--------------------------------}
+  TAlWinHttpClientInternetOption = (
+    wHttpIo_Async, // NOT SUPPORTED YET!
+                   // Use the WinHTTP functions asynchronously. By default, all WinHTTP functions that use
+                   // the returned HINTERNET handle are performed synchronously.
+    wHttpIo_BYPASS_PROXY_CACHE, // This flag provides the same behavior as WINHTTP_FLAG_REFRESH.
+    wHttpIo_ESCAPE_DISABLE, // Unsafe characters in the URL passed in for pwszObjectName are not converted to
+                            // escape sequences.
+    wHttpIo_ESCAPE_DISABLE_QUERY, // Unsafe characters in the query component of the URL passed in for pwszObjectName are not
+                                  // converted to escape sequences.
+    wHttpIo_ESCAPE_PERCENT, // The string passed in for pwszObjectName is converted from an LPCWSTR to an LPSTR.
+                            // All unsafe characters are converted to an escape sequence including the percent symbol.
+                            // By default, all unsafe characters except the percent symbol are converted to an escape
+                            // sequence.
+    wHttpIo_NULL_CODEPAGE, // The string passed in for pwszObjectName is assumed to consist of valid ANSI characters
+                           // represented by WCHARs. No check are done for unsafe characters.
+    wHttpIo_REFRESH, // Indicates that the request should be forwarded to the originating server rather than
+                     // sending a cached version of a resource from a proxy server. When this flag is used,
+                     // a "Pragma: no-cache" header is added to the request handle. When creating an HTTP/1.1
+                     // request header, a "Cache-Control: no-cache" is also added.
+    wHttpIo_SECURE, // Uses secure transaction semantics. This translates to using Secure Sockets Layer
+                    // (SSL)/Transport Layer Security (TLS).
+    wHttpIo_Keep_connection, // Uses keep-alive semantics, if available, for the connection. This flag is required for Microsoft
+                             // Network (MSN), NT LAN Manager (NTLM), and other types of authentication.
+    wHttpIo_No_cookies, // Does not automatically add cookie headers to requests, and does not automatically add returned
+                        // cookies to the cookie database.
+    wHttpIo_No_auto_redirect); // Does not automatically handle redirection in HttpSendRequest.
 
   {------------------------------------------------------------------------}
   TALWinHttpClientInternetOptionSet = Set of TALWinHttpClientInternetOption;

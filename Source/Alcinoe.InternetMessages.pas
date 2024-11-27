@@ -668,7 +668,7 @@ begin
 end;
 
 {*********************}
-{$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+{$ZEROBASEDSTRINGS OFF}
 {$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: AnsiString): boolean;
 
@@ -754,7 +754,7 @@ end;
 {$IFEND}
 
 {*********************}
-{$ZEROBASEDSTRINGS OFF} // << the guy who introduce zero base string in delphi is just a mix of a Monkey and a Donkey !
+{$ZEROBASEDSTRINGS OFF}
 {$WARN SYMBOL_DEPRECATED OFF}
 function AlIsValidEmail(const Value: String): boolean;
 

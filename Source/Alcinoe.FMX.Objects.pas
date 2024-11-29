@@ -655,7 +655,6 @@ type
     fDoubleBuffered: boolean;
     FMultiLineTextOptions: TALMultiLineTextOptions;
     FOnElementClick: TElementNotifyEvent;
-    FOnElementDblClick: TElementNotifyEvent;
     FOnElementMouseDown: TElementMouseEvent;
     FOnElementMouseMove: TElementMouseMoveEvent;
     FOnElementMouseUp: TElementMouseEvent;
@@ -700,7 +699,6 @@ type
     procedure DoMouseEnter; override;
     procedure DoMouseLeave; override;
     procedure Click; override;
-    procedure DblClick; override;
     property BufDrawable: TALDrawable read FBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
     procedure PaddingChanged; override;
@@ -715,8 +713,6 @@ type
     procedure SetTextSettings(const Value: TALBaseTextSettings); virtual;
     function CreateTextSettings: TALBaseTextSettings; virtual; abstract;
     procedure Paint; override;
-    function GetData: TValue; override;
-    procedure SetData(const Value: TValue); override;
     procedure Loaded; override;
     procedure DoResized; override;
     procedure AdjustSize; override;
@@ -784,7 +780,6 @@ type
                 const AShadow: TALShadow);
     property Elements: TALTextElements read fElements;
     property OnElementClick: TElementNotifyEvent read FOnElementClick write FOnElementClick;
-    property OnElementDblClick: TElementNotifyEvent read FOnElementDblClick write FOnElementDblClick;
     property OnElementMouseDown: TElementMouseEvent read FOnElementMouseDown write FOnElementMouseDown;
     property OnElementMouseMove: TElementMouseMoveEvent read FOnElementMouseMove write FOnElementMouseMove;
     property OnElementMouseUp: TElementMouseEvent read FOnElementMouseUp write FOnElementMouseUp;
@@ -884,7 +879,6 @@ type
     property OnDragDrop;
     property OnDragEnd;
     property OnElementClick;
-    //property OnElementDblClick;
     property OnElementMouseDown;
     property OnElementMouseMove;
     property OnElementMouseUp;
@@ -1304,8 +1298,13 @@ begin
     if Inverse then Result := StopProgress * Duration
     else Result := StartProgress * Duration;
   end
-  else
-    Result := CurrentProgress * Duration
+  else begin
+    {$IFDEF ALDPK}
+    Result := StartProgress * Duration;
+    {$ELSE}
+    Result := CurrentProgress * Duration;
+    {$ENDIF}
+  end;
 end;
 
 {*****************************************************}
@@ -2733,7 +2732,6 @@ begin
   FMultiLineTextOptions := TALMultiLineTextOptions.Create;
   //-----
   FOnElementClick := nil;
-  FOnElementDblClick := nil;
   FOnElementMouseDown := nil;
   FOnElementMouseMove := nil;
   FOnElementMouseUp := nil;
@@ -2934,8 +2932,7 @@ procedure TALBaseText.MouseDown(Button: TMouseButton; Shift: TShiftState; X, Y: 
 begin
   if assigned(FOnElementMouseDown) or
      assigned(FOnElementMouseUp) or
-     assigned(FOnElementClick) or
-     assigned(FOnElementDblClick) then begin
+     assigned(FOnElementClick) then begin
 
     FPressedElement := GetElementAtPos(TPointF.Create(X, Y));
     if assigned(FOnElementMouseDown) and (FPressedElement.ID <> '') then
@@ -3000,14 +2997,6 @@ begin
   inherited Click;
   if assigned(FOnElementClick) and (FPressedElement.ID <> '') then
     FOnElementClick(Self, FPressedElement);
-end;
-
-{*****************************}
-procedure TALBaseText.DblClick;
-begin
-  inherited DblClick;
-  if assigned(FOnElementDblClick) and (FPressedElement.ID <> '') then
-    FOnElementDblClick(Self, FPressedElement);
 end;
 
 {***********************************}
@@ -3111,18 +3100,6 @@ end;
 procedure TALBaseText.SetTextSettings(const Value: TALBaseTextSettings);
 begin
   FTextSettings.Assign(Value);
-end;
-
-{***********************************}
-function TALBaseText.GetData: TValue;
-begin
-  Result := Text;
-end;
-
-{*************************************************}
-procedure TALBaseText.SetData(const Value: TValue);
-begin
-  Text := Value.ToString;
 end;
 
 {**************************}

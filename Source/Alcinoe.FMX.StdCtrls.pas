@@ -43,22 +43,23 @@ type
   [ComponentPlatforms($FFFF)]
   TALAniIndicator = class(TALControl)
   private
-    fTimer: TTimer;
-    finterval: integer;
+    FTimer: TALDisplayTimer;
+    FInterval: Single;
     FFrameCount: Integer;
     FRowCount: Integer;
-    fResourceName: String;
-    fFrameIndex: TSmallPoint;
-    fBufDrawable: TALDrawable;
-    fBufDrawableRect: TRectF;
-    procedure setResourceName(const Value: String);
-    procedure onTimer(sender: Tobject);
-    function ResourceNameStored: Boolean;
+    FResourceName: String;
+    FFrameIndex: TSmallPoint;
+    FBufDrawable: TALDrawable;
+    FBufDrawableRect: TRectF;
+    procedure SetResourceName(const Value: String);
+    procedure DoTimerProcess(sender: Tobject);
+    function IsResourceNameStored: Boolean;
+    function IsIntervalStored: Boolean;
   protected
     function GetDoubleBuffered: boolean; override;
     procedure Paint; override;
-    property BufDrawable: TALDrawable read fBufDrawable;
-    property BufDrawableRect: TRectF read fBufDrawableRect;
+    property BufDrawable: TALDrawable read FBufDrawable;
+    property BufDrawableRect: TRectF read FBufDrawableRect;
     function GetDefaultSize: TSizeF; override;
     procedure DoResized; override;
   public
@@ -92,10 +93,10 @@ type
     property Padding;
     property PopupMenu;
     property Position;
-    property ResourceName: String read fResourceName write setResourceName stored ResourceNameStored nodefault;
+    property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
     property FrameCount: Integer read FFrameCount write FFrameCount default 20;
     property RowCount: Integer read FRowCount write FRowCount default 4;
-    property Interval: integer read finterval write finterval default 50;
+    property Interval: Single read FInterval write FInterval Stored IsIntervalStored noDefault;
     property RotationAngle;
     property RotationCenter;
     property Scale;
@@ -2183,23 +2184,23 @@ uses
 constructor TALAniIndicator.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
-  finterval := 50;
+  FInterval := 0.05;
   FFrameCount := 20;
   FRowCount := 4;
-  fResourceName := 'aniindicator_540x432';
-  fFrameIndex := TSmallPoint.Create(0,0);
-  fTimer := TTimer.Create(self);
-  fTimer.Enabled := False;
-  fTimer.Interval := finterval;
-  fTimer.OnTimer := onTimer;
-  fBufDrawable := ALNullDrawable;
+  FResourceName := 'aniindicator_540x432';
+  FFrameIndex := TSmallPoint.Create(0,0);
+  FTimer := TALDisplayTimer.Create;
+  FTimer.Enabled := False;
+  FTimer.Interval := FInterval;
+  FTimer.OnProcess := DoTimerProcess;
+  FBufDrawable := ALNullDrawable;
   SetAcceptsControls(False);
 end;
 
 {*********************************}
 destructor TALAniIndicator.Destroy;
 begin
-  ALFreeAndNil(fTimer);
+  ALFreeAndNil(FTimer);
   inherited;
 end;
 
@@ -2221,10 +2222,10 @@ procedure TALAniIndicator.ClearBufDrawable;
 begin
   {$IFDEF debug}
   if (not (csDestroying in ComponentState)) and
-     (not ALIsDrawableNull(fBufDrawable)) then
+     (not ALIsDrawableNull(FBufDrawable)) then
     ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
-  ALFreeAndNilDrawable(fBufDrawable);
+  ALFreeAndNilDrawable(FBufDrawable);
 end;
 
 {****************************************}
@@ -2234,19 +2235,19 @@ begin
   if //--- Do not create BufDrawable if the size is 0
      (Size.Size.IsZero) or
      //--- Do not create BufDrawable if fResourceName is empty
-     (fResourceName = '')
+     (FResourceName = '')
   then begin
     ClearBufDrawable;
     exit;
   end;
 
-  if (not ALIsDrawableNull(fBufDrawable)) then exit;
+  if (not ALIsDrawableNull(FBufDrawable)) then exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
   {$endif}
 
-  fBufDrawableRect := LocalRect;
+  FBufDrawableRect := LocalRect;
   {$IFDEF ALDPK}
   try
     var LFileName := ALGetResourceFilename(FResourceName);
@@ -2256,23 +2257,23 @@ begin
     fBufDrawable := ALNullDrawable;
   end;
   {$ELSE}
-  fBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(fResourceName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale);
+  FBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(FResourceName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale);
   {$ENDIF}
 
 end;
 
-{*************************************************}
-procedure TALAniIndicator.onTimer(sender: Tobject);
+{********************************************************}
+procedure TALAniIndicator.DoTimerProcess(sender: Tobject);
 begin
   if not IsVisibleWithinFormBounds then begin
     FTimer.Enabled := False;
     exit;
   end;
-  inc(fFrameIndex.x);
-  if fFrameIndex.x >= FFrameCount div FRowCount then begin
-    fFrameIndex.x := 0;
-    inc(fFrameIndex.Y);
-    if fFrameIndex.Y >= FRowCount then fFrameIndex.Y := 0;
+  inc(FFrameIndex.x);
+  if FFrameIndex.x >= FFrameCount div FRowCount then begin
+    FFrameIndex.x := 0;
+    inc(FFrameIndex.Y);
+    if FFrameIndex.Y >= FRowCount then FFrameIndex.Y := 0;
   end;
   repaint;
 end;
@@ -2312,10 +2313,16 @@ begin
   result := True;
 end;
 
-{***************************************************}
-function TALAniIndicator.ResourceNameStored: Boolean;
+{*****************************************************}
+function TALAniIndicator.IsResourceNameStored: Boolean;
 begin
   result := fResourceName <> 'aniindicator_540x432';
+end;
+
+{*************************************************}
+function TALAniIndicator.IsIntervalStored: Boolean;
+begin
+  result := Not SameValue(Finterval, 0.05);
 end;
 
 {*************************************************************}

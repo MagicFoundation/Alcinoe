@@ -94,8 +94,9 @@ type
     FTimerEvent: TNotifyEvent;
     FInterval: Cardinal;
     FEnabled: Boolean;
-    procedure SetEnabled(const Value: Boolean);
-    procedure SetInterval(const Value: Cardinal);
+  protected
+    procedure SetEnabled(Value: Boolean); virtual;
+    procedure SetInterval(Value: Cardinal); virtual;
   public
     constructor Create(AOwner: TComponent); virtual;
     destructor Destroy; override;
@@ -129,8 +130,9 @@ type
     FTimerEvent: TNotifyEvent;
     FInterval: Cardinal;
     FEnabled: Boolean;
-    procedure SetEnabled(const Value: Boolean);
-    procedure SetInterval(const Value: Cardinal);
+  protected
+    procedure SetEnabled(Value: Boolean); virtual;
+    procedure SetInterval(Value: Cardinal); virtual;
   public
     constructor Create(AOwner: TComponent); virtual;
     destructor Destroy; override;
@@ -145,7 +147,6 @@ type
   private
     FAniList: TList<TALAnimation>;
     FTime: Double;
-    procedure OneStep;
     procedure DoSyncTimer(Sender: TObject);
   public
     constructor Create; reintroduce;
@@ -159,6 +160,9 @@ type
   public const
     DefaultAniFrameRate = 60;
   public class var
+    // The AniFrameRate property is unnecessary on Android and iOS since
+    // the animation is synchronized with the system's Choreographer (Android)
+    // or DisplayLink (iOS)
     AniFrameRate: Integer;
   private class var
     FAniThread: TALAniThread;
@@ -220,6 +224,19 @@ type
     procedure Start; override;
     procedure Stop; override;
     procedure StopAtCurrent; override;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  TALDisplayTimer = class(TALDisplayAnimation)
+  private
+    FInterval: Single;
+    FIntervalTimeLeft: Single;
+  protected
+    procedure ProcessTick(const ATime, ADeltaTime: Double); override;
+  public
+    constructor Create; override;
+    procedure Start; override;
+    property Interval: Single read FInterval write FInterval;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~}
@@ -904,8 +921,8 @@ begin
   inherited;
 end;
 
-{****************************************************************}
-procedure TALChoreographerThread.SetEnabled(const Value: Boolean);
+{**********************************************************}
+procedure TALChoreographerThread.SetEnabled(Value: Boolean);
 begin
   if FEnabled <> Value then begin
     FEnabled := Value;
@@ -914,10 +931,10 @@ begin
   end;
 end;
 
-{******************************************************************}
-procedure TALChoreographerThread.SetInterval(const Value: Cardinal);
+{************************************************************}
+procedure TALChoreographerThread.SetInterval(Value: Cardinal);
 begin
-  FInterval := Max(Value, 1);
+  FInterval := Value;
 end;
 
 {$ENDIF}
@@ -989,8 +1006,8 @@ begin
   inherited;
 end;
 
-{**************************************************************}
-procedure TALDisplayLinkThread.SetEnabled(const Value: Boolean);
+{********************************************************}
+procedure TALDisplayLinkThread.SetEnabled(Value: Boolean);
 begin
   if FEnabled <> Value then begin
     FEnabled := Value;
@@ -999,10 +1016,10 @@ begin
   end;
 end;
 
-{****************************************************************}
-procedure TALDisplayLinkThread.SetInterval(const Value: Cardinal);
+{**********************************************************}
+procedure TALDisplayLinkThread.SetInterval(Value: Cardinal);
 begin
-  FInterval := Max(Value, 1);
+  FInterval := Value;
 end;
 
 {$ENDIF}
@@ -1011,7 +1028,7 @@ end;
 constructor TALAniThread.Create;
 begin
   inherited Create(nil);
-  TALAnimation.AniFrameRate := EnsureRange(TALAnimation.AniFrameRate, 5, 100);
+  TALAnimation.AniFrameRate := EnsureRange(TALAnimation.AniFrameRate, 5, 120);
   Interval := Trunc(1000 / TALAnimation.AniFrameRate / 10) * 10;
   if (Interval <= 0) then
     Interval := 1;
@@ -1050,16 +1067,7 @@ end;
 {**************************************************}
 procedure TALAniThread.DoSyncTimer(Sender: TObject);
 begin
-  OneStep;
-  if TALAnimation.AniFrameRate < 5 then
-    TALAnimation.AniFrameRate := 5;
-  Interval := Trunc(1000 / TALAnimation.AniFrameRate / 10) * 10;
-  if (Interval <= 0) then Interval := 1;
-end;
-
-{*****************************}
-procedure TALAniThread.OneStep;
-begin
+  {$IF not defined(ALDPK)}
   var NewTime := ALElapsedTimeSecondsAsDouble;
   var LDeltaTime := NewTime - FTime;
   FTime := NewTime;
@@ -1075,6 +1083,7 @@ begin
         I := FAniList.Count - 1;
     end;
   end;
+  {$ENDIF}
 end;
 
 {******************************}
@@ -1213,6 +1222,70 @@ begin
 
   FRunning := False;
   DoFinish;
+end;
+
+{*********************************}
+constructor TALDisplayTimer.Create;
+begin
+  inherited Create;
+  FInterval := 0.05;
+end;
+
+{*********************************************************************}
+procedure TALDisplayTimer.ProcessTick(const ATime, ADeltaTime: Double);
+begin
+  if (not FRunning) or FPause then
+    Exit;
+
+  if (FDelay > 0) and (FDelayTimeLeft <> 0) then begin
+    FDelayTimeLeft := FDelayTimeLeft - ADeltaTime;
+    if FDelayTimeLeft <= 0 then begin
+      FDelayTimeLeft := 0;
+      FirstFrame;
+      ProcessAnimation;
+      DoProcess;
+    end;
+    Exit;
+  end;
+
+  FIntervalTimeLeft := FIntervalTimeLeft - ADeltaTime;
+  if CompareValue(FIntervalTimeLeft, 0, 0.001) > 0 then exit;
+  FIntervalTimeLeft := FInterval;
+
+  FTime := FTime + ADeltaTime;
+
+  ProcessAnimation;
+  DoProcess;
+
+  if not FRunning then begin
+    if AniThread <> nil then
+      AniThread.RemoveAnimation(Self);
+    DoFinish;
+  end;
+end;
+
+{******************************}
+procedure TALDisplayTimer.Start;
+begin
+  if (FRunning) then
+    Exit;
+  FEnabled := True;
+  FRunning := True;
+  FTime := 0;
+  FIntervalTimeLeft := FInterval;
+  FDelayTimeLeft := FDelay;
+  if FDelay = 0 then begin
+    FirstFrame;
+    ProcessAnimation;
+    DoProcess;
+  end;
+
+  if AniThread = nil then
+    FAniThread := TALAniThread.Create;
+
+  AniThread.AddAnimation(Self);
+  if not AniThread.Enabled then
+    Stop;
 end;
 
 {******************************************}

@@ -5272,6 +5272,7 @@ begin
     if not TFile.Exists(Result) then begin
       if TFile.Exists(Result + '.png') then Result := Result + '.png'
       else if TFile.Exists(Result + '.jpg') then Result := Result + '.jpg'
+      else if TFile.Exists(Result + '.json') then Result := Result + '.json' // Skottie - Lottie Animation
       else Result := '';
     end;
   end;

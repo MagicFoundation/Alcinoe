@@ -13900,22 +13900,6 @@ begin
 
   {$IF DEFINED(ALSkiaCanvas)}
 
-  {$IF DEFINED(ALDPK)}
-
-  var LBufferBitmap := ALCreateBitmapFromSkImage(ADrawable);
-  try
-    ACanvas.DrawBitmap(
-      LBufferBitmap,
-      LSrcRect, {SrcRect}
-      LDstRect, {DestRect}
-      AOpacity, {opacity}
-      true{highSpeed});
-  finally
-    ALFreeAndNil(LBufferBitmap);
-  end;
-
-  {$ELSE}
-
   {$IF defined(DEBUG)}
   ALSkCheckCanvas(ACanvas);
   {$ENDIF}
@@ -13930,8 +13914,6 @@ begin
     @LSamplingoptions, // const sampling: psk_samplingoptions_t;
     LPaint, // const paint: sk_paint_t;
     FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
-
-  {$ENDIF}
 
   {$ELSEIF DEFINED(ALGpuCanvas)}
 
@@ -13970,22 +13952,6 @@ begin
 
   {$IF DEFINED(ALSkiaCanvas)}
 
-  {$IF DEFINED(ALDPK)}
-
-  var LBufferBitmap := ALCreateBitmapFromSkImage(ADrawable);
-  try
-    ACanvas.DrawBitmap(
-      LBufferBitmap,
-      ASrcRect, {SrcRect}
-      LDstRect, {DestRect}
-      AOpacity, {opacity}
-      true{highSpeed});
-  finally
-    ALFreeAndNil(LBufferBitmap);
-  end;
-
-  {$ELSE}
-
   {$IF defined(DEBUG)}
   ALSkCheckCanvas(ACanvas);
   {$ENDIF}
@@ -14005,8 +13971,6 @@ begin
     @LSamplingoptions, // const sampling: psk_samplingoptions_t;
     LPaint, // const paint: sk_paint_t;
     FAST_SK_SRCRECTCONSTRAINT); // constraint: sk_srcrectconstraint_t)
-
-  {$ENDIF}
 
   {$ELSEIF DEFINED(ALGpuCanvas)}
 

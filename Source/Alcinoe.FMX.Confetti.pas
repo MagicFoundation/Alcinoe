@@ -54,9 +54,9 @@ Type
     FOriginalOnPaint: TOnPaintEvent;
     FOnFinish: TNotifyEvent;
     FParticules: TList<TParticule>;
-    FTimer: {$IF defined(ANDROID)}TALChoreographerThread{$ELSEIF defined(IOS)}TALDisplayLinkThread{$ELSE}TTimer{$ENDIF};
-    function updateParticule(const ACanvas: TCanvas; const ARect: TRectF; var AParticule: TParticule): boolean;
-    function randomPhysics(
+    FDisplayAnimation: TALDisplayAnimation;
+    function UpdateParticule(const ACanvas: TCanvas; const ARect: TRectF; var AParticule: TParticule): boolean;
+    function RandomPhysics(
                const AX: Single;
                const AY: Single;
                const AAngle: Single;
@@ -69,9 +69,9 @@ Type
                const AGravity: Single;
                const ADrift: Single;
                const AScalar: Single): TParticule;
-    procedure onTimer(Sender: TObject);
-    procedure onPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
-    function getParticuleCount: integer;
+    procedure OnDisplayAnimationProcess(Sender: TObject);
+    procedure OnPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
+    function GetParticuleCount: integer;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -90,7 +90,7 @@ Type
                 const AGravity: Single = 1; // How quickly the particles are pulled down. 1 is full gravity, 0.5 is half gravity, etc., but there are no limits. You can even make particles go up if you'd like.
                 const ADrift: Single = 0; // How much to the side the confetti will drift. The default is 0, meaning that they will fall straight down. Use a negative number for left and positive number for right.
                 const AScalar: Single = 1); // Scale factor for each confetti particle. Use decimals to make the confetti smaller. Go on, try teeny tiny confetti, they are adorable!
-    Property ParticuleCount: integer read getParticuleCount;
+    Property ParticuleCount: integer read GetParticuleCount;
   published
     property OnFinish: TNotifyEvent read FOnFinish write FOnFinish;
   End;
@@ -111,29 +111,21 @@ begin
   FOriginalOnPaint := nil;
   FOnFinish := nil;
   Fparticules := TList<TParticule>.create;
-  {$IF defined(ANDROID)}
-  FTimer := TALChoreographerThread.Create(nil);
-  {$ELSEIF defined(IOS)}
-  FTimer := TALDisplayLinkThread.Create(nil);
-  {$ELSE}
-  FTimer := TTimer.Create(nil);
-  {$ENDIF}
-  FTimer.Enabled := False;
-  Ftimer.Interval := Trunc(1000 / TALAnimation.AniFrameRate / 10) * 10;
-  if (Ftimer.Interval <= 0) then Ftimer.Interval := 1;
-  FTimer.OnTimer := OnTimer;
+  FDisplayAnimation := TALDisplayAnimation.Create;
+  FDisplayAnimation.Enabled := False;
+  FDisplayAnimation.OnProcess := OnDisplayAnimationProcess;
 end;
 
 {*****************************}
 destructor TALConfetti.Destroy;
 begin
   AlFreeAndNil(FParticules);
-  AlFreeAndNil(FTimer);
+  AlFreeAndNil(FDisplayAnimation);
   inherited;
 end;
 
 {*********************************************************************************************************************}
-function TALConfetti.updateParticule(const ACanvas: TCanvas; const ARect: TRectF; Var AParticule: TParticule): boolean;
+function TALConfetti.UpdateParticule(const ACanvas: TCanvas; const ARect: TRectF; Var AParticule: TParticule): boolean;
 begin
   AParticule.x := AParticule.x + (Cos(AParticule.angle2D) * AParticule.velocity + AParticule.drift);
   AParticule.y := AParticule.y + (Sin(AParticule.angle2D) * AParticule.velocity + AParticule.gravity);
@@ -243,15 +235,15 @@ begin
   Result.scalar := Ascalar;
 end;
 
-{*********************************************}
-procedure TALConfetti.onTimer(Sender: TObject);
+{***************************************************************}
+procedure TALConfetti.OnDisplayAnimationProcess(Sender: TObject);
 begin
   if Parent is TCustomForm then TCustomForm(Parent).Invalidate
   else if Parent is Tcontrol then Tcontrol(Parent).Repaint;
 end;
 
 {***********************************************************************************}
-procedure TALConfetti.onPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
+procedure TALConfetti.OnPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
 begin
   if assigned(FOriginalOnPaint) then FOriginalOnPaint(Sender, Canvas, ARect);
   for var i := FParticules.Count - 1 downto 0 do begin
@@ -260,8 +252,8 @@ begin
     else FParticules[i] := LParticule;
   end;
   if FParticules.Count = 0 then begin
-    onTimer(nil);
-    Ftimer.Enabled := false;
+    OnDisplayAnimationProcess(nil);
+    FDisplayAnimation.Enabled := false;
     if Parent is TCustomForm then TCustomForm(Parent).OnPaint := FOriginalOnPaint
     else if Parent is Tcontrol then Tcontrol(Parent).OnPaint := FOriginalOnPaint;
     FOriginalOnPaint := nil;
@@ -292,7 +284,7 @@ begin
     var LCustomForm := TCustomForm(Parent);
     if not isRunning then begin
       FOriginalOnPaint := LCustomForm.OnPaint;
-      LCustomForm.OnPaint := onPaint;
+      LCustomForm.OnPaint := OnPaint;
     end;
     LStartX := LCustomForm.width * AOriginX;
     LStartY := LCustomForm.height * AOriginY;
@@ -301,7 +293,7 @@ begin
     var LControl := Tcontrol(Parent);
     if not isRunning then begin
       FOriginalOnPaint := LControl.OnPaint;
-      LControl.OnPaint := onPaint;
+      LControl.OnPaint := OnPaint;
     end;
     LStartX := LControl.width * AOriginX;
     LStartY := LControl.height * AOriginY;
@@ -342,7 +334,7 @@ begin
         ADrift, // const ADrift: Single;
         AScalar)); // const AScalar: Single)
 
-  FTimer.Enabled := true;
+  FDisplayAnimation.Enabled := true;
 
 end;
 
@@ -355,7 +347,7 @@ end;
 {**************************************}
 function TALConfetti.isRunning: Boolean;
 begin
-  result := FTimer.Enabled;
+  result := FDisplayAnimation.Enabled;
 end;
 
 {*****************}

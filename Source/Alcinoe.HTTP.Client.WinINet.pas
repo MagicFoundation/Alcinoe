@@ -161,6 +161,7 @@ type
     FInetConnect: HINTERNET;
     FOnStatus: TAlWinInetHTTPClientStatusEvent;
     FIgnoreSecurityErrors: Boolean;
+    FAllowHttp2Protocol: Boolean;
     procedure SetAccessType(const Value: TALWinInetHttpInternetOpenAccessType);
     procedure SetInternetOptions(const Value: TAlWininetHTTPClientInternetOptionSet);
     procedure SetOnStatus(const Value: TAlWinInetHTTPClientStatusEvent);
@@ -196,6 +197,7 @@ type
     property  InternetOptions: TAlWininetHTTPClientInternetOptionSet read FInternetOptions write SetInternetOptions default [wHttpIo_Keep_connection];
     property  OnStatus: TAlWinInetHTTPClientStatusEvent read FOnStatus write SetOnStatus;
     property  IgnoreSecurityErrors: Boolean read FIgnoreSecurityErrors write FIgnoreSecurityErrors;
+    property  AllowHttp2Protocol: Boolean read FAllowHttp2Protocol write FAllowHttp2Protocol;
   end;
 
 Function ALCreateWininetHTTPClient(Const aAllowcookies: Boolean = False): TALWininetHTTPClient;
@@ -336,6 +338,7 @@ begin
   FInternetOptions := [wHttpIo_Keep_connection];
   RequestHeader.UserAgent := 'Mozilla/3.0 (compatible; TALWinInetHTTPClient)';
   FIgnoreSecurityErrors := False;
+  FAllowHttp2Protocol := False;
 end;
 
 {**************************************}
@@ -468,17 +471,36 @@ procedure TALWinInetHTTPClient.Connect;
     if whttpIo_Offline in InternetOptions then Result := result or INTERNET_FLAG_OFFLINE;
   end;
 
+  Function InternalGetInternetSecurityFlags: DWord;
+  Begin
+    Result := 0;
+    if FURLScheme = INTERNET_SCHEME_HTTPS then begin
+      if FIgnoreSecurityErrors then begin
+        Result := Result or SECURITY_SET_MASK;
+      end else begin
+        if whttpIo_IGNORE_CERT_CN_INVALID in InternetOptions then
+          Result := Result or SECURITY_FLAG_IGNORE_CERT_CN_INVALID;
+        if whttpIo_IGNORE_CERT_DATE_INVALID in InternetOptions then
+          Result := Result or SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
+      end;
+    end;
+  end;
+
 const
   AccessTypeArr: Array[TALWinInetHttpInternetOpenAccessType] of DWord = (INTERNET_OPEN_TYPE_DIRECT,
                                                                          INTERNET_OPEN_TYPE_PRECONFIG,
                                                                          INTERNET_OPEN_TYPE_PRECONFIG_WITH_NO_AUTOPROXY,
                                                                          INTERNET_OPEN_TYPE_PROXY);
+const
+  HTTP_PROTOCOL_FLAG_HTTP2 = 2;
+  INTERNET_OPTION_ENABLE_HTTP_PROTOCOL = 148;
 
 var
   LSetStatusCallbackResult: PFNInternetStatusCallback;
-  ProxyStr: AnsiString;
-  ProxyPtr: PAnsiChar;
-
+  LProxyStr: AnsiString;
+  LProxyPtr: PAnsiChar;
+  LUserAgent: AnsiString;
+  LOption: DWORD;
 begin
   { Yes, but what if we're connected to a different Host/Port?? }
   { So take advantage of a cached handle, we'll assume that
@@ -489,20 +511,22 @@ begin
   { Also, could switch to new API introduced in IE4/Preview2}
   if InternetAttemptConnect(0) <> ERROR_SUCCESS then System.SysUtils.Abort;
 
-  ProxyStr := InternalGetProxyServerName;
-  if ProxyStr <> '' then begin
-    ProxyPtr := PAnsiChar(ProxyStr);
+  LProxyStr := InternalGetProxyServerName;
+  if LProxyStr <> '' then begin
+    LProxyPtr := PAnsiChar(LProxyStr);
   end else begin
-    ProxyPtr := nil;
+    LProxyPtr := nil;
   end;
+
+  LUserAgent := RequestHeader.UserAgent;
 
   {init FInetRoot}
   FInetRoot := InternetOpenA(
-                 PAnsiChar(RequestHeader.UserAgent),
+                 PAnsiChar(LUserAgent),
                  AccessTypeArr[FAccessType],
-                 ProxyPtr,
+                 LProxyPtr,
                  InternalGetProxyBypass,
-                 InternalGetInternetOpenFlags);
+                 InternalGetInternetOpenFlags or InternalGetInternetSecurityFlags);
   CheckError(not Assigned(FInetRoot));
 
   try
@@ -511,6 +535,13 @@ begin
     if assigned(OnStatus) or assigned(OnRedirect) then begin
       LSetStatusCallbackResult := InternetSetStatusCallback(FInetRoot, @ALWininetHTTPCLientStatusCallback);
       CheckError(LSetStatusCallbackResult = pointer(INTERNET_INVALID_STATUS_CALLBACK));
+    end;
+
+    {Enable HTTP/2 protocol (for Windows 10 and later)}
+    if FAllowHttp2Protocol and (FURLScheme = INTERNET_SCHEME_HTTPS) then begin
+      LOption := HTTP_PROTOCOL_FLAG_HTTP2;
+      // ignore any errors, because this protocol is optional
+      InternetSetOptionA(FInetRoot, INTERNET_OPTION_ENABLE_HTTP_PROTOCOL, Pointer(@LOption), SizeOf(LOption));
     end;
 
     {init FInetConnect}
@@ -556,8 +587,6 @@ function TALWinInetHTTPClient.Send(
     Result := 0;
     if whttpIo_CACHE_IF_NET_FAIL in InternetOptions then Result := result or INTERNET_FLAG_CACHE_IF_NET_FAIL;
     if whttpIo_HYPERLINK in InternetOptions then Result := result or INTERNET_FLAG_HYPERLINK;
-    if whttpIo_IGNORE_CERT_CN_INVALID in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_CERT_CN_INVALID;
-    if whttpIo_IGNORE_CERT_DATE_INVALID in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_CERT_DATE_INVALID;
     if whttpIo_IGNORE_REDIRECT_TO_HTTP in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTP;
     if whttpIo_IGNORE_REDIRECT_TO_HTTPS in InternetOptions then Result := result or INTERNET_FLAG_IGNORE_REDIRECT_TO_HTTPS;
     if whttpIo_KEEP_CONNECTION in InternetOptions then Result := result or INTERNET_FLAG_KEEP_CONNECTION;
@@ -597,11 +626,11 @@ function TALWinInetHTTPClient.Send(
   end;
 
 var LNumberOfBytesWritten: DWord;
-    LDwFlags: DWORD;
-    LBuffLen: Cardinal;
     LBuffSize, LLen: cardinal;
     LINBuffer: INTERNET_BUFFERSA;
     LBuffer: TMemoryStream;
+    LAccept: AnsiString;
+    LReferrer: AnsiString;
     LAcceptTypes: array of PAnsiChar;
     LHeader: AnsiString;
     LOption: DWord;
@@ -611,8 +640,11 @@ begin
   { Connect }
   Connect;
 
+  LAccept := RequestHeader.Accept;
+  LReferrer := RequestHeader.Referer;
+
   SetLength(LAcceptTypes, 2);
-  LAcceptTypes[0] := PAnsiChar(RequestHeader.Accept);
+  LAcceptTypes[0] := PAnsiChar(LAccept);
   LAcceptTypes[1] := nil;
 
   Result := HttpOpenRequestA(
@@ -620,23 +652,12 @@ begin
               InternalGetHttpOpenRequestVerb,
               PAnsiChar(FURLPath),
               InternalGetHttpProtocolVersion,
-              PAnsiChar(requestHeader.Referer),
+              PAnsiChar(LReferrer),
               Pointer(LAcceptTypes),
               InternalGetHttpOpenRequestFlags,
               DWORD_PTR(Self));
   CheckError(not Assigned(Result));
   try
-
-    if FIgnoreSecurityErrors and (FURLScheme = INTERNET_SCHEME_HTTPS) then begin
-      LBuffLen := SizeOf(LDwFlags);
-      CheckError(not InternetQueryOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@LDwFlags), LBuffLen));
-      LDwFlags := LDwFlags or
-        SECURITY_FLAG_IGNORE_REVOCATION or
-        SECURITY_FLAG_IGNORE_UNKNOWN_CA or
-        SECURITY_FLAG_IGNORE_WRONG_USAGE;
-      CheckError(not InternetSetOptionA(Result, INTERNET_OPTION_SECURITY_FLAGS, Pointer(@LDwFlags), SizeOf(LDwFlags)));
-    end;
-
     { Timeouts }
     if ConnectTimeout > 0 then begin
       LOption := ConnectTimeout;

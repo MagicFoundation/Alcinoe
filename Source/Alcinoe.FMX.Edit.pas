@@ -596,14 +596,22 @@ type
       // ------------------
       // TLabelTextSettings
       TLabelTextSettings = class(TALBaseTextSettings)
+      protected
+        Type
+          TMargins = class(TALBounds)
+          protected
+            function GetDefaultValue: TRectF; override;
+          end;
       private
-        FMargins: TBounds;
+        FMargins: TALBounds;
         FLayout: TLabelTextLayout;
         FAnimation: TLabelTextAnimation;
-        procedure SetMargins(const Value: TBounds);
+        procedure SetMargins(const Value: TALBounds);
         procedure SetLayout(const Value: TLabelTextLayout);
         procedure SetAnimation(const Value: TLabelTextAnimation);
         procedure MarginsChanged(Sender: TObject);
+      protected
+        function CreateMargins: TALBounds; virtual;
       public
         constructor Create; override;
         destructor Destroy; override;
@@ -618,7 +626,7 @@ type
         property LineHeightMultiplier;
         property LetterSpacing;
         property IsHtml;
-        property Margins: TBounds read FMargins write SetMargins;
+        property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TLabelTextLayout read FLayout write SetLayout default TLabelTextLayout.Floating;
         property Animation: TLabelTextAnimation read FAnimation write SetAnimation default TLabelTextAnimation.Translation;
       end;
@@ -628,12 +636,20 @@ type
       // -----------------------
       // TSupportingTextSettings
       TSupportingTextSettings = class(TALBaseTextSettings)
+      protected
+        Type
+          TMargins = class(TALBounds)
+          protected
+            function GetDefaultValue: TRectF; override;
+          end;
       private
-        FMargins: TBounds;
+        FMargins: TALBounds;
         FLayout: TSupportingTextLayout;
-        procedure SetMargins(const Value: TBounds);
+        procedure SetMargins(const Value: TALBounds);
         procedure SetLayout(const Value: TSupportingTextLayout);
         procedure MarginsChanged(Sender: TObject);
+      protected
+        function CreateMargins: TALBounds; virtual;
       public
         constructor Create; override;
         destructor Destroy; override;
@@ -648,7 +664,7 @@ type
         property LineHeightMultiplier;
         property LetterSpacing;
         property IsHtml;
-        property Margins: TBounds read FMargins write SetMargins;
+        property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TSupportingTextLayout read FLayout write SetLayout default TSupportingTextLayout.Floating;
       end;
       // -----------------------
@@ -3495,11 +3511,17 @@ end;
 {$endif}
 {$ENDREGION}
 
+{************************************************************************************}
+function TALBaseEdit.TLabelTextSettings.TMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(0,0,0,-4);
+end;
+
 {************************************************}
 constructor TALBaseEdit.TLabelTextSettings.Create;
 begin
   inherited create;
-  FMargins := TBounds.Create(TRectF.Create(0,0,0,-4));
+  FMargins := CreateMargins;
   FMargins.OnChange := MarginsChanged;
   FLayout := TLabelTextLayout.Floating;
   FAnimation := TLabelTextAnimation.Translation;
@@ -3510,6 +3532,12 @@ destructor TALBaseEdit.TLabelTextSettings.Destroy;
 begin
   ALFreeAndNil(FMargins);
   Inherited Destroy;
+end;
+
+{*******************************************************************}
+function TALBaseEdit.TLabelTextSettings.CreateMargins: TALBounds;
+begin
+  Result := TMargins.Create;
 end;
 
 {*******************************************************************}
@@ -3557,7 +3585,7 @@ begin
 end;
 
 {************************************************************************}
-procedure TALBaseEdit.TLabelTextSettings.SetMargins(const Value: TBounds);
+procedure TALBaseEdit.TLabelTextSettings.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;
@@ -3586,11 +3614,17 @@ begin
   Change;
 end;
 
+{****************************************************************************}
+function TALBaseEdit.TSupportingTextSettings.TMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(0,4,0,0);
+end;
+
 {*****************************************************}
 constructor TALBaseEdit.TSupportingTextSettings.Create;
 begin
   inherited create;
-  FMargins := TBounds.Create(TRectF.Create(0,4,0,0));
+  FMargins := CreateMargins;
   FMargins.OnChange := MarginsChanged;
   FLayout := TSupportingTextLayout.Floating;
 end;
@@ -3600,6 +3634,12 @@ destructor TALBaseEdit.TSupportingTextSettings.Destroy;
 begin
   ALFreeAndNil(FMargins);
   Inherited Destroy;
+end;
+
+{********************************************************************}
+function TALBaseEdit.TSupportingTextSettings.CreateMargins: TALBounds;
+begin
+  Result := TMargins.Create;
 end;
 
 {************************************************************************}
@@ -3645,7 +3685,7 @@ begin
 end;
 
 {*****************************************************************************}
-procedure TALBaseEdit.TSupportingTextSettings.SetMargins(const Value: TBounds);
+procedure TALBaseEdit.TSupportingTextSettings.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;

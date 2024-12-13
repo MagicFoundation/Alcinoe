@@ -174,6 +174,51 @@ type
     property IsChanged: Boolean read FIsChanged write FIsChanged;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if FMX.Types.TBounds was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  TALBounds = class(TPersistent)
+  private
+    FLeft: Single;
+    FTop: Single;
+    FRight: Single;
+    FBottom: Single;
+    FOnChange: TNotifyEvent;
+    function GetRect: TRectF;
+    procedure SetRect(const Value: TRectF);
+    procedure SetBottom(const Value: Single);
+    procedure SetLeft(const Value: Single);
+    procedure SetRight(const Value: Single);
+    procedure SetTop(const Value: Single);
+    function IsBottomStored: Boolean;
+    function IsLeftStored: Boolean;
+    function IsRightStored: Boolean;
+    function IsTopStored: Boolean;
+  protected
+    function GetDefaultValue: TRectF; virtual;
+    procedure DoChange; virtual;
+  public
+    constructor Create; virtual;
+    procedure Assign(Source: TPersistent); override;
+    function Equals(Obj: TObject): Boolean; override;
+    function PaddingRect(const R: TRectF): TRectF;
+    function MarginRect(const R: TRectF): TRectF;
+    function Width: Single;
+    function Height: Single;
+    property Rect: TRectF read GetRect write SetRect;
+    property DefaultValue: TRectF read GetDefaultValue;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+    function Empty: Boolean;
+    function MarginEmpty: Boolean;
+    function ToString: string; override;
+  published
+    property Left: Single read FLeft write SetLeft stored IsLeftStored nodefault;
+    property Top: Single read FTop write SetTop stored IsTopStored nodefault;
+    property Right: Single read FRight write SetRight stored IsRightStored nodefault;
+    property Bottom: Single read FBottom write SetBottom stored IsBottomStored nodefault;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALShadow = class(TALPersistentObserver)
   private
@@ -550,8 +595,8 @@ type
     FGradient: TALGradient;
     FResourceName: String;
     FWrapMode: TALImageWrapMode;
-    FBackgroundMargins: TBounds;
-    FImageMargins: TBounds;
+    FBackgroundMargins: TALBounds;
+    FImageMargins: TALBounds;
     FDefaultColor: TAlphaColor;
     FDefaultResourceName: String;
     FDefaultWrapMode: TALImageWrapMode;
@@ -559,8 +604,8 @@ type
     procedure SetGradient(const Value: TALGradient);
     procedure SetResourceName(const Value: String);
     procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure SetBackgroundMargins(const Value: TBounds);
-    procedure SetImageMargins(const Value: TBounds);
+    procedure SetBackgroundMargins(const Value: TALBounds);
+    procedure SetImageMargins(const Value: TALBounds);
     procedure GradientChanged(Sender: TObject); virtual;
     procedure BackgroundMarginsChanged(Sender: TObject); virtual;
     procedure ImageMarginsChanged(Sender: TObject); virtual;
@@ -575,6 +620,8 @@ type
   {$ENDIF}
   protected
     function CreateSavedState: TALPersistentObserver; override;
+    function CreateBackgroundMargins: TALBounds; virtual;
+    function CreateImageMargins: TALBounds; virtual;
   public
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     destructor Destroy; override;
@@ -593,8 +640,8 @@ type
     property Gradient: TALGradient read FGradient write SetGradient;
     property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
-    property BackgroundMargins: TBounds read FBackgroundMargins write SetBackgroundMargins;
-    property ImageMargins: TBounds read FImageMargins write SetImageMargins;
+    property BackgroundMargins: TALBounds read FBackgroundMargins write SetBackgroundMargins;
+    property ImageMargins: TALBounds read FImageMargins write SetImageMargins;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -686,7 +733,7 @@ type
     FOpacity: Single;
     FColor: TAlphaColor;
     FUseContentColor: Boolean;
-    FMargins: TBounds;
+    FMargins: TALBounds;
     FXRadius: Single;
     FYRadius: Single;
     FDefaultOpacity: Single;
@@ -697,7 +744,7 @@ type
     procedure SetOpacity(const Value: Single);
     procedure SetColor(const Value: TAlphaColor);
     procedure SetUseContentColor(const Value: Boolean);
-    procedure SetMargins(const Value: TBounds);
+    procedure SetMargins(const Value: TALBounds);
     procedure SetXRadius(const Value: Single);
     procedure SetYRadius(const Value: Single);
     procedure MarginsChanged(Sender: TObject); virtual;
@@ -708,6 +755,7 @@ type
     function IsYRadiusStored: Boolean;
   protected
     function CreateSavedState: TALPersistentObserver; override;
+    function CreateMargins: TALBounds; virtual;
   public
     constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
     destructor Destroy; override;
@@ -731,7 +779,7 @@ type
     ///   label's text.
     /// </summary>
     property UseContentColor: Boolean read FUseContentColor write SetUseContentColor stored IsUseContentColorStored;
-    property Margins: TBounds read FMargins write SetMargins;
+    property Margins: TALBounds read FMargins write SetMargins;
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
   end;
@@ -799,6 +847,10 @@ type
     BufDrawable: TALDrawable;
     BufDrawableRect: TRectF;
     function CreateSavedState: TALPersistentObserver; override;
+    function CreateFill(const AParent: TALBrush): TALInheritBrush; virtual;
+    function CreateStateLayer: TALStateLayer; virtual;
+    function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; virtual;
+    function CreateShadow(const AParent: TALShadow): TALInheritShadow; virtual;
     function GetInherit: Boolean; virtual;
     procedure DoSupersede; virtual;
     property Fill: TALInheritBrush read FFill write SetFill;
@@ -1373,6 +1425,182 @@ begin
       FIsChanged := False;
     end;
   end;
+end;
+
+{***************************}
+constructor TALBounds.Create;
+begin
+  inherited Create;
+  var LDefaultValue := DefaultValue;
+  FLeft := LDefaultValue.Left;
+  FTop := LDefaultValue.Top;
+  FRight := LDefaultValue.Right;
+  FBottom := LDefaultValue.Bottom;
+end;
+
+{***************************}
+procedure TALBounds.Assign(Source: TPersistent);
+begin
+  if Source is TALBounds then
+    Rect := TALBounds(Source).Rect
+  else if Source is TBounds then
+    Rect := TBounds(Source).Rect
+  else if Source = nil then
+    Rect := DefaultValue
+  else
+    inherited
+end;
+
+{***************************}
+function TALBounds.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Empty;
+end;
+
+{***************************}
+function TALBounds.GetRect: TRectF;
+begin
+  Result := TRectF.Create(FLeft, FTop, FRight, FBottom);
+end;
+
+{***************************}
+procedure TALBounds.SetRect(const Value: TRectF);
+begin
+  if Rect <> Value then
+  begin
+    FLeft := Value.Left;
+    FTop := Value.Top;
+    FRight := Value.Right;
+    FBottom := Value.Bottom;
+    DoChange;
+  end;
+end;
+
+{***************************}
+function TALBounds.PaddingRect(const R: TRectF): TRectF;
+begin
+  Result := TRectF.Create(R.Left + FLeft, R.Top + FTop, R.Right - FRight, R.Bottom - FBottom);
+end;
+
+{***************************}
+function TALBounds.MarginRect(const R: TRectF): TRectF;
+begin
+  Result := TRectF.Create(R.Left - FLeft, R.Top - FTop, R.Right + FRight, R.Bottom + FBottom);
+end;
+
+{***************************}
+function TALBounds.Width: Single;
+begin
+  Result := Rect.Width;
+end;
+
+{***************************}
+function TALBounds.Height: Single;
+begin
+  Result := Rect.Height;
+end;
+
+{***************************}
+function TALBounds.IsBottomStored: Boolean;
+begin
+  Result := not SameValue(FBottom, DefaultValue.Bottom, Epsilon);
+end;
+
+{***************************}
+function TALBounds.IsLeftStored: Boolean;
+begin
+  Result := not SameValue(FLeft, DefaultValue.Left, Epsilon);
+end;
+
+{***************************}
+function TALBounds.IsRightStored: Boolean;
+begin
+  Result := not SameValue(FRight, DefaultValue.Right, Epsilon);
+end;
+
+{***************************}
+function TALBounds.IsTopStored: Boolean;
+begin
+  Result := not SameValue(FTop, DefaultValue.Top, Epsilon);
+end;
+
+{***************************}
+function TALBounds.MarginEmpty: Boolean;
+begin
+  Result := SameValue(FLeft, 0, Epsilon) and
+            SameValue(FTop, 0, Epsilon) and
+            SameValue(FRight, 0, Epsilon) and
+            SameValue(FBottom, 0, Epsilon);
+end;
+
+{***************************}
+function TALBounds.Empty: Boolean;
+begin
+  Result := System.Types.IsRectEmpty(Rect)
+end;
+
+{***************************}
+function TALBounds.Equals(Obj: TObject): Boolean;
+begin
+  if (Obj is TALBounds) then
+    Result := TALBounds(Obj).Rect = Rect
+  else if (Obj is TBounds) then
+    Result := TBounds(Obj).Rect = Rect
+  else
+    Result := inherited;
+end;
+
+{***************************}
+procedure TALBounds.SetBottom(const Value: Single);
+begin
+  if not SameValue(FBottom, Value, Epsilon) then
+  begin
+    FBottom := Value;
+    DoChange;
+  end;
+end;
+
+{***************************}
+procedure TALBounds.SetLeft(const Value: Single);
+begin
+  if not SameValue(FLeft, Value, Epsilon) then
+  begin
+    FLeft := Value;
+    DoChange;
+  end;
+end;
+
+{***************************}
+procedure TALBounds.SetRight(const Value: Single);
+begin
+  if not SameValue(FRight, Value, Epsilon) then
+  begin
+    FRight := Value;
+    DoChange;
+  end;
+end;
+
+{***************************}
+procedure TALBounds.SetTop(const Value: Single);
+begin
+  if not SameValue(FTop, Value, Epsilon) then
+  begin
+    FTop := Value;
+    DoChange;
+  end;
+end;
+
+{***************************}
+function TALBounds.ToString: string;
+begin
+  Result := Format('%s (%4.2f,%4.2f)-(%4.2f,%4.2f)', [inherited ToString, FLeft, FTop, FRight, FBottom]);
+end;
+
+{***************************}
+procedure TALBounds.DoChange;
+begin
+  if Assigned(OnChange) then
+    OnChange(Self);
 end;
 
 {***************************}
@@ -3210,10 +3438,10 @@ begin
   FGradient := TALGradient.Create;
   FGradient.OnChanged := GradientChanged;
   //--
-  FBackgroundMargins := TBounds.Create(TRectF.Empty);
+  FBackgroundMargins := CreateBackgroundMargins;
   FBackgroundMargins.OnChange := BackgroundMarginsChanged;
   //--
-  FImageMargins := TBounds.Create(TRectF.Empty);
+  FImageMargins := CreateImageMargins;
   FImageMargins.OnChange := ImageMarginsChanged;
 end;
 
@@ -3232,6 +3460,18 @@ type
   TALBrushClass = class of TALBrush;
 begin
   result := TALBrushClass(classtype).Create(DefaultColor);
+end;
+
+{********************************************************}
+function TALBrush.CreateBackgroundMargins: TALBounds;
+begin
+  Result := TALBounds.Create;
+end;
+
+{********************************************************}
+function TALBrush.CreateImageMargins: TALBounds;
+begin
+  Result := TALBounds.Create;
 end;
 
 {*********************************}
@@ -3417,13 +3657,13 @@ begin
 end;
 
 {************************************************************}
-procedure TALBrush.SetBackgroundMargins(const Value: TBounds);
+procedure TALBrush.SetBackgroundMargins(const Value: TALBounds);
 begin
   FBackgroundMargins.Assign(Value);
 end;
 
 {*******************************************************}
-procedure TALBrush.SetImageMargins(const Value: TBounds);
+procedure TALBrush.SetImageMargins(const Value: TALBounds);
 begin
   FImageMargins.Assign(Value);
 end;
@@ -3811,7 +4051,7 @@ begin
   FXRadius := FDefaultXRadius;
   FYRadius := FDefaultYRadius;
   //--
-  FMargins := TBounds.Create(TRectF.Empty);
+  FMargins := CreateMargins;
   FMargins.OnChange := MarginsChanged;
 end;
 
@@ -3828,6 +4068,12 @@ type
   TALStateLayerClass = class of TALStateLayer;
 begin
   result := TALStateLayerClass(classtype).Create(DefaultColor);
+end;
+
+{***********************************************}
+function TALStateLayer.CreateMargins: TALBounds;
+begin
+  Result := TALBounds.Create;
 end;
 
 {**************************************************}
@@ -3986,7 +4232,7 @@ begin
 end;
 
 {*******************************************************}
-procedure TALStateLayer.SetMargins(const Value: TBounds);
+procedure TALStateLayer.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;
@@ -4146,18 +4392,18 @@ begin
     var LShapeControl := TALShape(AParent);
     FStateStyleParent := nil;
     FControlParent := TALControl(AParent);
-    FFill := TALInheritBrush.Create(LShapeControl.fill, TAlphaColors.White{ADefaultColor});
-    FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
-    FStroke := TALInheritStrokeBrush.Create(LShapeControl.Stroke, TAlphaColors.Black{ADefaultColor});
-    FShadow := TALInheritShadow.Create(LShapeControl.Shadow);
+    FFill := CreateFill(LShapeControl.fill);
+    FStateLayer := CreateStateLayer;
+    FStroke := CreateStroke(LShapeControl.Stroke);
+    FShadow := CreateShadow(LShapeControl.Shadow);
   end
   else if (AParent is TALBaseStateStyle) then begin
     FStateStyleParent := TALBaseStateStyle(AParent);
     FControlParent := nil;
-    FFill := TALInheritBrush.Create(FStateStyleParent.fill, TAlphaColors.White{ADefaultColor});
-    FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
-    FStroke := TALInheritStrokeBrush.Create(FStateStyleParent.Stroke, TAlphaColors.Black{ADefaultColor});
-    FShadow := TALInheritShadow.Create(FStateStyleParent.Shadow);
+    FFill := CreateFill(FStateStyleParent.fill);
+    FStateLayer := CreateStateLayer;
+    FStroke := CreateStroke(FStateStyleParent.Stroke);
+    FShadow := CreateShadow(FStateStyleParent.Shadow);
   end
   else begin
     {$IF defined(debug)}
@@ -4166,10 +4412,10 @@ begin
     {$ENDIF}
     FStateStyleParent := nil;
     FControlParent := nil;
-    FFill := TALInheritBrush.Create(nil, TAlphaColors.White{ADefaultColor});
-    FStateLayer := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
-    FStroke := TALInheritStrokeBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
-    FShadow := TALInheritShadow.Create(nil);
+    FFill := CreateFill(nil);
+    FStateLayer := CreateStateLayer;
+    FStroke := CreateStroke(nil);
+    FShadow := CreateShadow(nil);
   end;
   FFill.OnChanged := FillChanged;
   FStateLayer.OnChanged := StateLayerChanged;
@@ -4202,6 +4448,30 @@ type
   TALBaseStateStyleClass = class of TALBaseStateStyle;
 begin
   result := TALBaseStateStyleClass(classtype).Create(nil{AParent});
+end;
+
+{******************************************************************************}
+function TALBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TALInheritBrush.Create(AParent, TAlphaColors.White{ADefaultColor})
+end;
+
+{*****************************************************************}
+function TALBaseStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TALStateLayer.Create(TAlphaColors.Null{ADefaultColor});
+end;
+
+{*****************************************************************}
+function TALBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TALInheritStrokeBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{*****************************************************************}
+function TALBaseStateStyle.CreateShadow(const AParent: TALShadow): TALInheritShadow;
+begin
+  Result := TALInheritShadow.Create(AParent);
 end;
 
 {******************************************************}

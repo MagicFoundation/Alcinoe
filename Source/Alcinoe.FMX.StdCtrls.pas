@@ -137,12 +137,18 @@ type
       // ---------------
       // TCheckMarkBrush
       TCheckMarkBrush = class(TALPersistentObserver)
+      protected
+        Type
+          TMargins = class(TALBounds)
+          protected
+            function GetDefaultValue: TRectF; override;
+          end;
       private
         FColor: TAlphaColor;
         FResourceName: String;
         FWrapMode: TALImageWrapMode;
         FThickness: Single;
-        FMargins: TBounds;
+        FMargins: TALBounds;
         FDefaultColor: TAlphaColor;
         FDefaultResourceName: String;
         FDefaultWrapMode: TALImageWrapMode;
@@ -151,7 +157,7 @@ type
         procedure SetResourceName(const Value: String);
         procedure SetWrapMode(const Value: TALImageWrapMode);
         procedure SetThickness(const Value: Single);
-        procedure SetMargins(const Value: TBounds);
+        procedure SetMargins(const Value: TALBounds);
         procedure MarginsChanged(Sender: TObject); virtual;
         function IsColorStored: Boolean;
         function IsResourceNameStored: Boolean;
@@ -159,6 +165,7 @@ type
         function IsThicknessStored: Boolean;
       protected
         function CreateSavedState: TALPersistentObserver; override;
+        function CreateMargins: TALBounds; virtual;
       public
         constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
         destructor Destroy; override;
@@ -177,7 +184,7 @@ type
         property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
         property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
         property Thickness: Single read FThickness write SetThickness stored IsThicknessStored nodefault;
-        property Margins: TBounds read FMargins write SetMargins;
+        property Margins: TALBounds read FMargins write SetMargins;
       end;
       // ----------------------
       // TInheritCheckMarkBrush
@@ -204,6 +211,18 @@ type
       // ---------------
       // TBaseStateStyle
       TBaseStateStyle = class(TALBaseStateStyle)
+      protected
+        type
+          TStateLayer = class(TALStateLayer)
+          protected
+            Type
+              TMargins = class(TALBounds)
+              protected
+                function GetDefaultValue: TRectF; override;
+              end;
+          protected
+            function CreateMargins: TALBounds; override;
+          end;
       private
         FCheckMark: TInheritCheckMarkBrush;
         function GetStateStyleParent: TBaseStateStyle;
@@ -211,6 +230,8 @@ type
         procedure SetCheckMark(const AValue: TInheritCheckMarkBrush);
         procedure CheckMarkChanged(ASender: TObject);
       protected
+        function CreateStateLayer: TALStateLayer; override;
+        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; virtual;
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
@@ -287,6 +308,11 @@ type
         procedure FocusedChanged(ASender: TObject);
       protected
         function CreateSavedState: TALPersistentObserver; override;
+        function CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle; virtual;
+        function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
+        function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; virtual;
+        function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; virtual;
+        function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
       public
         constructor Create(const AParent: TALBaseCheckBox); reintroduce; virtual;
         destructor Destroy; override;
@@ -314,6 +340,8 @@ type
         procedure UncheckedChanged(ASender: TObject);
       protected
         function CreateSavedState: TALPersistentObserver; override;
+        function CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; virtual;
+        function CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; virtual;
       public
         constructor Create(const AParent: TALBaseCheckBox); reintroduce; virtual;
         destructor Destroy; override;
@@ -343,6 +371,7 @@ type
     function IsYRadiusStored: Boolean;
   protected
     function CreateStateStyles: TStateStyles; virtual;
+    function CreateCheckMark: TCheckMarkBrush; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
     procedure SetXRadius(const Value: Single); virtual;
@@ -484,6 +513,79 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALRadioButton = class(TALCheckBox)
+  public
+    type
+      // --------------------------
+      // TRadioButtonCheckMarkBrush
+      TRadioButtonCheckMarkBrush = class(TCheckMarkBrush)
+      protected
+        Type
+          TRadioButtonMargins = class(TMargins)
+          protected
+            function GetDefaultValue: TRectF; override;
+          end;
+      protected
+        function CreateMargins: TALBounds; override;
+      end;
+      // ---------------------------------
+      // TRadioButtonInheritCheckMarkBrush
+      TRadioButtonInheritCheckMarkBrush = class(TInheritCheckMarkBrush)
+      protected
+        Type
+          TRadioButtonMargins = class(TMargins)
+          protected
+            function GetDefaultValue: TRectF; override;
+          end;
+      protected
+        function CreateMargins: TALBounds; override;
+      end;
+      // -----------------------------
+      // TRadioButtonDefaultStateStyle
+      TRadioButtonDefaultStateStyle = class(TDefaultStateStyle)
+      protected
+        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+      end;
+      // ------------------------------
+      // TRadioButtonDisabledStateStyle
+      TRadioButtonDisabledStateStyle = class(TDisabledStateStyle)
+      protected
+        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+      end;
+      // -----------------------------
+      // TRadioButtonHoveredStateStyle
+      TRadioButtonHoveredStateStyle = class(THoveredStateStyle)
+      protected
+        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+      end;
+      // -----------------------------
+      // TRadioButtonPressedStateStyle
+      TRadioButtonPressedStateStyle = class(TPressedStateStyle)
+      protected
+        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+      end;
+      // -----------------------------
+      // TRadioButtonFocusedStateStyle
+      TRadioButtonFocusedStateStyle = class(TFocusedStateStyle)
+      protected
+        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+      end;
+      // ----------------------------
+      // TRadioButtonCheckStateStyles
+      TRadioButtonCheckStateStyles = class(TCheckStateStyles)
+      protected
+        function CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle; override;
+        function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; override;
+        function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; override;
+        function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; override;
+        function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; override;
+      end;
+      // -----------------------
+      // TRadioButtonStateStyles
+      TRadioButtonStateStyles = class(TCheckBoxStateStyles)
+      protected
+        function CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
+        function CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
+      end;
   private
     FGroupName: string;
     fMandatory: boolean;
@@ -492,6 +594,8 @@ type
     function GroupNameStored: Boolean;
     procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
   protected
+    function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
+    function CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush; override;
     procedure SetChecked(const Value: Boolean); override;
     function GetDefaultSize: TSizeF; override;
     procedure DrawCheckMark(
@@ -746,12 +850,78 @@ type
       TThumb = class(TALBaseCheckBox)
       public
         type
+          // --------------------
+          // TThumbCheckMarkBrush
+          TThumbCheckMarkBrush = class(TCheckMarkBrush)
+          protected
+            Type
+              TThumbMargins = class(TMargins)
+              protected
+                function GetDefaultValue: TRectF; override;
+              end;
+          protected
+            function CreateMargins: TALBounds; override;
+          end;
+          // ---------------------------
+          // TThumbInheritCheckMarkBrush
+          TThumbInheritCheckMarkBrush = class(TInheritCheckMarkBrush)
+          protected
+            Type
+              TThumbMargins = class(TMargins)
+              protected
+                function GetDefaultValue: TRectF; override;
+              end;
+          protected
+            function CreateMargins: TALBounds; override;
+          end;
+          // -----------------------
+          // TThumbDefaultStateStyle
+          TThumbDefaultStateStyle = class(TDefaultStateStyle)
+          protected
+            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+          end;
+          // ------------------------
+          // TThumbDisabledStateStyle
+          TThumbDisabledStateStyle = class(TDisabledStateStyle)
+          protected
+            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+          end;
+          // -----------------------
+          // TThumbHoveredStateStyle
+          TThumbHoveredStateStyle = class(THoveredStateStyle)
+          protected
+            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+          end;
+          // -----------------------
+          // TThumbPressedStateStyle
+          TThumbPressedStateStyle = class(TPressedStateStyle)
+          protected
+            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+          end;
+          // -----------------------
+          // TThumbFocusedStateStyle
+          TThumbFocusedStateStyle = class(TFocusedStateStyle)
+          protected
+            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+          end;
+          // ----------------------
+          // TThumbCheckStateStyles
+          TThumbCheckStateStyles = class(TCheckStateStyles)
+          protected
+            function CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle; override;
+            function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; override;
+            function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; override;
+            function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; override;
+            function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; override;
+          end;
           // ------------
           // TStateStyles
           TThumbStateStyles = class(TALBaseCheckBox.TStateStyles)
           private
             FStartPositionX: Single;
           protected
+            function CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
+            function CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
             procedure StartTransition; override;
             procedure TransitionAnimationProcess(Sender: TObject); override;
             procedure TransitionAnimationFinish(Sender: TObject); override;
@@ -759,6 +929,7 @@ type
       protected
         function GetDefaultSize: TSizeF; override;
         function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
+        function CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush; override;
         procedure Click; override;
       public
         constructor Create(AOwner: TComponent); override;
@@ -5628,6 +5799,12 @@ begin
   Result := Nil;
 end;
 
+{************************************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(3,3,3,3);
+end;
+
 {***********************************************************************************}
 constructor TALBaseCheckBox.TCheckMarkBrush.Create(const ADefaultColor: TAlphaColor);
 begin
@@ -5643,7 +5820,7 @@ begin
   FWrapMode := FDefaultWrapMode;
   FThickness := FDefaultThickness;
   //--
-  FMargins := TBounds.Create(TRectF.Create(3,3,3,3));
+  FMargins := CreateMargins;
   FMargins.OnChange := MarginsChanged;
 end;
 
@@ -5660,6 +5837,12 @@ type
   TCheckMarkBrushClass = class of TCheckMarkBrush;
 begin
   result := TCheckMarkBrushClass(classtype).Create(DefaultColor);
+end;
+
+{****************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.CreateMargins: TALBounds;
+begin
+  Result := TMargins.Create;
 end;
 
 {********************************************************************}
@@ -5819,7 +6002,7 @@ begin
 end;
 
 {*************************************************************************}
-procedure TALBaseCheckBox.TCheckMarkBrush.SetMargins(const Value: TBounds);
+procedure TALBaseCheckBox.TCheckMarkBrush.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
 end;
@@ -5932,18 +6115,27 @@ begin
   end;
 end;
 
+{************************************************************************************}
+function TALBaseCheckBox.TBaseStateStyle.TStateLayer.TMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(-12,-12,-12,-12);
+end;
+
+{****************************************************************************}
+function TALBaseCheckBox.TBaseStateStyle.TStateLayer.CreateMargins: TALBounds;
+begin
+  Result := TMargins.Create;
+end;
+
 {*************************************************************************}
 constructor TALBaseCheckBox.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   //--
-  if StateStyleParent <> nil then FCheckMark := TInheritCheckMarkBrush.Create(StateStyleParent.CheckMark, TAlphaColors.Black{ADefaultColor})
-  else if ControlParent <> nil then FCheckMark := TInheritCheckMarkBrush.Create(ControlParent.CheckMark, TAlphaColors.Black{ADefaultColor})
-  else FCheckMark := TInheritCheckMarkBrush.Create(nil, TAlphaColors.Black{ADefaultColor});
+  if StateStyleParent <> nil then FCheckMark := CreateCheckMark(StateStyleParent.CheckMark)
+  else if ControlParent <> nil then FCheckMark := CreateCheckMark(ControlParent.CheckMark)
+  else FCheckMark := CreateCheckMark(nil);
   FCheckMark.OnChanged := CheckMarkChanged;
-  //--
-  StateLayer.Margins.DefaultValue := TRectF.Create(-12,-12,-12,-12);
-  StateLayer.Margins.Rect := StateLayer.Margins.DefaultValue;
   //--
   StateLayer.DefaultXRadius := -50;
   StateLayer.DefaultYRadius := -50;
@@ -5956,6 +6148,18 @@ destructor TALBaseCheckBox.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FCheckMark);
   inherited Destroy;
+end;
+
+{********************************************************************}
+function TALBaseCheckBox.TBaseStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create(TAlphaColors.Null{ADefaultColor});
+end;
+
+{***************************************************************************************************************}
+function TALBaseCheckBox.TBaseStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
 end;
 
 {********************************************************************}
@@ -6135,19 +6339,19 @@ constructor TALBaseCheckBox.TCheckStateStyles.Create(const AParent: TALBaseCheck
 begin
   inherited Create;
   //--
-  FDefault := TDefaultStateStyle.Create(AParent);
+  FDefault := CreateDefaultStateStyle(AParent);
   FDefault.OnChanged := DefaultChanged;
   //--
-  FDisabled := TDisabledStateStyle.Create(FDefault);
+  FDisabled := CreateDisabledStateStyle(FDefault);
   FDisabled.OnChanged := DisabledChanged;
   //--
-  FHovered := THoveredStateStyle.Create(FDefault);
+  FHovered := CreateHoveredStateStyle(FDefault);
   FHovered.OnChanged := HoveredChanged;
   //--
-  FPressed := TPressedStateStyle.Create(FDefault);
+  FPressed := CreatePressedStateStyle(FDefault);
   FPressed.OnChanged := PressedChanged;
   //--
-  FFocused := TFocusedStateStyle.Create(FDefault);
+  FFocused := CreateFocusedStateStyle(FDefault);
   FFocused.OnChanged := FocusedChanged;
 end;
 
@@ -6168,6 +6372,36 @@ type
   TCheckStateStylesClass = class of TCheckStateStyles;
 begin
   result := TCheckStateStylesClass(classtype).Create(nil{AParent});
+end;
+
+{**********************************************************************}
+function TALBaseCheckBox.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
+begin
+  Result := TDefaultStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALBaseCheckBox.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+begin
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALBaseCheckBox.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALBaseCheckBox.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALBaseCheckBox.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
 end;
 
 {**********************************************************************}
@@ -6295,10 +6529,10 @@ constructor TALBaseCheckBox.TStateStyles.Create(const AParent: TALBaseCheckBox);
 begin
   inherited Create(AParent);
   //--
-  FChecked := TCheckStateStyles.Create(AParent);
+  FChecked := CreateCheckedStateStyles(AParent);
   FChecked.OnChanged := CheckedChanged;
   //--
-  FUnchecked := TCheckStateStyles.Create(AParent);
+  FUnchecked := CreateUnCheckedStateStyles(AParent);
   FUnchecked.OnChanged := UncheckedChanged;
 end;
 
@@ -6316,6 +6550,18 @@ type
   TStateStylesClass = class of TStateStyles;
 begin
   result := TStateStylesClass(classtype).Create(nil{AParent});
+end;
+
+{*****************************************************************}
+function TALBaseCheckBox.TStateStyles.CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
+end;
+
+{*****************************************************************}
+function TALBaseCheckBox.TStateStyles.CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
 end;
 
 {*****************************************************************}
@@ -6439,7 +6685,7 @@ begin
   Stroke.Color := Stroke.DefaultColor;
   stroke.OnChanged := LStrokeChanged;
   //--
-  FCheckMark := TCheckMarkBrush.Create(TAlphaColors.Black);
+  FCheckMark := CreateCheckMark;
   FCheckMark.OnChanged := CheckMarkChanged;
   //--
   FChecked := False;
@@ -6481,6 +6727,12 @@ end;
 function TALBaseCheckBox.CreateStateStyles: TStateStyles;
 begin
   Result := TStateStyles.Create(self);
+end;
+
+{********************************************************}
+function TALBaseCheckBox.CreateCheckMark: TCheckMarkBrush;
+begin
+  Result := TCheckMarkBrush.Create(TAlphaColors.Black);
 end;
 
 {**************************************************}
@@ -7281,19 +7533,104 @@ begin
   Result := TCheckBoxStateStyles.Create(Self);
 end;
 
+{********}
+function TALRadioButton.TRadioButtonCheckMarkBrush.TRadioButtonMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(5,5,5,5);
+end;
+
+{********}
+function TALRadioButton.TRadioButtonCheckMarkBrush.CreateMargins: TALBounds;
+begin
+  Result := TRadioButtonMargins.Create;
+end;
+
+{********}
+function TALRadioButton.TRadioButtonInheritCheckMarkBrush.TRadioButtonMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(5,5,5,5);
+end;
+
+{********}
+function TALRadioButton.TRadioButtonInheritCheckMarkBrush.CreateMargins: TALBounds;
+begin
+  Result := TRadioButtonMargins.Create;
+end;
+
+{********}
+function TALRadioButton.TRadioButtonDefaultStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALRadioButton.TRadioButtonDisabledStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALRadioButton.TRadioButtonHoveredStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALRadioButton.TRadioButtonPressedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALRadioButton.TRadioButtonFocusedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{**********************************************************************}
+function TALRadioButton.TRadioButtonCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
+begin
+  Result := TRadioButtonDefaultStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALRadioButton.TRadioButtonCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+begin
+  Result := TRadioButtonDisabledStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALRadioButton.TRadioButtonCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+begin
+  Result := TRadioButtonHoveredStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALRadioButton.TRadioButtonCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+begin
+  Result := TRadioButtonPressedStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALRadioButton.TRadioButtonCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+begin
+  Result := TRadioButtonFocusedStateStyle.Create(AParent);
+end;
+
+{*****************************************************************}
+function TALRadioButton.TRadioButtonStateStyles.CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+begin
+  Result := TRadioButtonCheckStateStyles.Create(AParent);
+end;
+
+{*****************************************************************}
+function TALRadioButton.TRadioButtonStateStyles.CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+begin
+  Result := TRadioButtonCheckStateStyles.Create(AParent);
+end;
+
 {****************************************************}
 constructor TALRadioButton.Create(AOwner: TComponent);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure _UpdateCheckMark(const aCheckMark: TCheckMarkBrush);
-  begin
-    var LCheckMarkChanged: TNotifyEvent := ACheckMark.OnChanged;
-    ACheckMark.OnChanged := nil;
-    ACheckMark.Margins.DefaultValue := TRectF.Create(5,5,5,5);
-    ACheckMark.Margins.Rect := CheckMark.Margins.DefaultValue;
-    ACheckMark.OnChanged := LCheckMarkChanged;
-  end;
-
 begin
   inherited;
   FGroupName := '';
@@ -7302,17 +7639,6 @@ begin
   DefaultYRadius := -50;
   FXRadius := DefaultXRadius;
   FYRadius := DefaultYRadius;
-  _UpdateCheckMark(CheckMark);
-  _UpdateCheckMark(StateStyles.Checked.Default.CheckMark);
-  _UpdateCheckMark(StateStyles.Checked.Disabled.CheckMark);
-  _UpdateCheckMark(StateStyles.Checked.Hovered.CheckMark);
-  _UpdateCheckMark(StateStyles.Checked.Pressed.CheckMark);
-  _UpdateCheckMark(StateStyles.Checked.Focused.CheckMark);
-  _UpdateCheckMark(StateStyles.UnChecked.Default.CheckMark);
-  _UpdateCheckMark(StateStyles.UnChecked.Disabled.CheckMark);
-  _UpdateCheckMark(StateStyles.UnChecked.Hovered.CheckMark);
-  _UpdateCheckMark(StateStyles.UnChecked.Pressed.CheckMark);
-  _UpdateCheckMark(StateStyles.UnChecked.Focused.CheckMark);
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
@@ -7321,6 +7647,18 @@ destructor TALRadioButton.Destroy;
 begin
   TMessageManager.DefaultManager.Unsubscribe(TRadioButtonGroupMessage, GroupMessageCall);
   inherited;
+end;
+
+{********************************************************}
+function TALRadioButton.CreateStateStyles: TALBaseCheckBox.TStateStyles;
+begin
+  Result := TRadioButtonStateStyles.Create(self);
+end;
+
+{********************************************************}
+function TALRadioButton.CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush;
+begin
+  Result := TRadioButtonCheckMarkBrush.Create(TAlphaColors.Black);
 end;
 
 {********************************************************}
@@ -8391,6 +8729,102 @@ begin
 
 end;
 
+{********}
+function TALSwitch.TThumb.TThumbCheckMarkBrush.TThumbMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(6,6,6,6);
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbCheckMarkBrush.CreateMargins: TALBounds;
+begin
+  Result := TThumbMargins.Create;
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbInheritCheckMarkBrush.TThumbMargins.GetDefaultValue: TRectF;
+begin
+  Result := TRectF.Create(6,6,6,6);
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbInheritCheckMarkBrush.CreateMargins: TALBounds;
+begin
+  Result := TThumbMargins.Create;
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbDefaultStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbDisabledStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbHoveredStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbPressedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{********}
+function TALSwitch.TThumb.TThumbFocusedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+begin
+  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+end;
+
+{**********************************************************************}
+function TALSwitch.TThumb.TThumbCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
+begin
+  Result := TThumbDefaultStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALSwitch.TThumb.TThumbCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+begin
+  Result := TThumbDisabledStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALSwitch.TThumb.TThumbCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+begin
+  Result := TThumbHoveredStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALSwitch.TThumb.TThumbCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+begin
+  Result := TThumbPressedStateStyle.Create(AParent);
+end;
+
+{**********************************************************************}
+function TALSwitch.TThumb.TThumbCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+begin
+  Result := TThumbFocusedStateStyle.Create(AParent);
+end;
+
+{*****************************************************************}
+function TALSwitch.TThumb.TThumbStateStyles.CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+begin
+  Result := TThumbCheckStateStyles.Create(AParent);
+end;
+
+{*****************************************************************}
+function TALSwitch.TThumb.TThumbStateStyles.CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+begin
+  Result := TThumbCheckStateStyles.Create(AParent);
+end;
+
 {***********************************************************}
 procedure TALSwitch.TThumb.TThumbStateStyles.StartTransition;
 begin
@@ -8443,12 +8877,6 @@ begin
   Stroke.Color := Stroke.DefaultColor;
   stroke.OnChanged := LStrokeChanged;
   //--
-  var LCheckMarkChanged: TNotifyEvent := CheckMark.OnChanged;
-  CheckMark.OnChanged := Nil;
-  CheckMark.Margins.DefaultValue := TRectF.Create(6,6,6,6);
-  CheckMark.Margins.Rect := CheckMark.Margins.DefaultValue;
-  CheckMark.OnChanged := LCheckMarkChanged;
-  //--
   Margins.DefaultValue := TRectF.Create(4,4,4,4);
   Margins.Rect := Margins.DefaultValue;
 end;
@@ -8463,6 +8891,12 @@ end;
 function TALSwitch.TThumb.CreateStateStyles: TALBaseCheckBox.TStateStyles;
 begin
   result := TThumbStateStyles.Create(Self);
+end;
+
+{************}
+function TALSwitch.TThumb.CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush;
+begin
+  Result := TThumbCheckMarkBrush.Create(TAlphaColors.Black);
 end;
 
 {*******************************}

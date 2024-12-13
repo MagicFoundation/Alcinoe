@@ -226,10 +226,6 @@ type
     FOffsetX: Single;
     FOffsetY: Single;
     FColor: TAlphaColor;
-    FDefaultBlur: Single;
-    FDefaultOffsetX: Single;
-    FDefaultOffsetY: Single;
-    FDefaultColor: TAlphaColor;
     procedure setblur(const Value: Single);
     procedure setOffsetX(const Value: Single);
     procedure setOffsetY(const Value: Single);
@@ -244,6 +240,11 @@ type
   protected
     procedure DefineProperties(Filer: TFiler); override;
   {$ENDIF}
+  protected
+    function GetDefaultblur: Single; virtual;
+    function GetDefaultOffsetX: Single; virtual;
+    function GetDefaultOffsetY: Single; virtual;
+    function GetDefaultColor: TAlphaColor; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
@@ -252,10 +253,10 @@ type
     procedure Interpolate(const ATo: TALShadow; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALShadow; const ANormalizedTime: Single);
     function HasShadow: boolean; virtual;
-    property Defaultblur: Single read fDefaultblur write fDefaultblur;
-    property DefaultOffsetX: Single read fDefaultOffsetX write fDefaultOffsetX;
-    property DefaultOffsetY: Single read fDefaultOffsetY write fDefaultOffsetY;
-    property DefaultColor: TAlphaColor read fDefaultColor write fDefaultColor;
+    property Defaultblur: Single read GetDefaultblur;
+    property DefaultOffsetX: Single read GetDefaultOffsetX;
+    property DefaultOffsetY: Single read GetDefaultOffsetY;
+    property DefaultColor: TAlphaColor read GetDefaultColor;
   published
     property blur: Single read fblur write setblur stored IsblurStored nodefault;
     property OffsetX: Single read fOffsetX write setOffsetX stored IsOffsetXStored nodefault;
@@ -296,6 +297,8 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALFont = class(TALPersistentObserver)
+  public
+    class var SansSerifFamily: String;
   private
     FFamily: TFontName;
     FSize: Single;
@@ -303,28 +306,18 @@ type
     FSlant: TFontSlant;
     FStretch: TFontStretch;
     FColor: TAlphaColor;
-    FAutoConvert: Boolean;
-    FDefaultFamily: TFontName;
-    FDefaultSize: Single;
-    FDefaultWeight: TFontWeight;
-    FDefaultSlant: TFontSlant;
-    FDefaultStretch: TFontStretch;
-    FDefaultColor: TAlphaColor;
-    FDefaultAutoConvert: Boolean;
     procedure SetFamily(const AValue: TFontName);
     procedure SetSize(const AValue: Single);
     procedure SetWeight(const AValue: TFontWeight);
     procedure SetSlant(const AValue: TFontSlant);
     procedure SetStretch(const AValue: TFontStretch);
     procedure SetColor(const AValue: TAlphaColor);
-    procedure SetAutoConvert(const AValue: Boolean);
     function IsFamilyStored: Boolean;
     function IsSizeStored: Boolean;
     function IsWeightStored: Boolean;
     function IsSlantStored: Boolean;
     function IsStretchStored: Boolean;
     function IsColorStored: Boolean;
-    function IsAutoConvertStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadStyleExt(AStream: TStream);
@@ -333,6 +326,12 @@ type
   {$ENDIF}
   protected
     procedure AssignTo(Dest: TPersistent); override;
+    function GetDefaultFamily: TFontName; virtual;
+    function GetDefaultSize: Single; virtual;
+    function GetDefaultWeight: TFontWeight; virtual;
+    function GetDefaultSlant: TFontSlant; virtual;
+    function GetDefaultStretch: TFontStretch; virtual;
+    function GetDefaultColor: TAlphaColor; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
@@ -340,13 +339,12 @@ type
     procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALFont; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALFont; const ANormalizedTime: Single);
-    property DefaultFamily: TFontName read FDefaultFamily write FDefaultFamily;
-    property DefaultSize: Single read FDefaultSize write FDefaultSize;
-    property DefaultWeight: TFontWeight read FDefaultWeight write FDefaultWeight;
-    property DefaultSlant: TFontSlant read FDefaultSlant write FDefaultSlant;
-    property DefaultStretch: TFontStretch read FDefaultStretch write FDefaultStretch;
-    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
-    property DefaultAutoConvert: Boolean read FDefaultAutoConvert write FDefaultAutoConvert;
+    property DefaultFamily: TFontName read GetDefaultFamily;
+    property DefaultSize: Single read GetDefaultSize;
+    property DefaultWeight: TFontWeight read GetDefaultWeight;
+    property DefaultSlant: TFontSlant read GetDefaultSlant;
+    property DefaultStretch: TFontStretch read GetDefaultStretch;
+    property DefaultColor: TAlphaColor read GetDefaultColor;
   published
     property Family: TFontName read FFamily write SetFamily stored IsFamilyStored nodefault;
     property Size: Single read FSize write SetSize stored IsSizeStored nodefault;
@@ -354,7 +352,6 @@ type
     property Slant: TFontSlant read FSlant write SetSlant stored IsSlantStored;
     property Stretch: TFontStretch read FStretch write SetStretch stored IsStretchStored;
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
-    property AutoConvert: Boolean read FAutoConvert write SetAutoConvert stored IsAutoConvertStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -364,10 +361,6 @@ type
     FStyle: TALTextDecorationStyle;
     FThicknessMultiplier: Single;
     FColor: TAlphaColor;
-    FDefaultKinds: TALTextDecorationKinds;
-    FDefaultStyle: TALTextDecorationStyle;
-    FDefaultThicknessMultiplier: Single;
-    FDefaultColor: TAlphaColor;
     procedure SetKinds(const AValue: TALTextDecorationKinds);
     procedure SetStyle(const AValue: TALTextDecorationStyle);
     procedure SetThicknessMultiplier(const AValue: Single);
@@ -376,16 +369,21 @@ type
     function IsStyleStored: Boolean;
     function IsThicknessMultiplierStored: Boolean;
     function IsColorStored: Boolean;
+  protected
+    function GetDefaultKinds: TALTextDecorationKinds; virtual;
+    function GetDefaultStyle: TALTextDecorationStyle; virtual;
+    function GetDefaultThicknessMultiplier: Single; virtual;
+    function GetDefaultColor: TAlphaColor; virtual;
   public
     constructor Create; override;
     procedure Assign(Source: TPersistent); override;
     procedure Reset; override;
     procedure Interpolate(const ATo: TALTextDecoration; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALTextDecoration; const ANormalizedTime: Single);
-    property DefaultKinds: TALTextDecorationKinds read FDefaultKinds write FDefaultKinds;
-    property DefaultStyle: TALTextDecorationStyle read FDefaultStyle write FDefaultStyle;
-    property DefaultThicknessMultiplier: Single read FDefaultThicknessMultiplier write FDefaultThicknessMultiplier;
-    property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
+    property DefaultKinds: TALTextDecorationKinds read GetDefaultKinds;
+    property DefaultStyle: TALTextDecorationStyle read GetDefaultStyle;
+    property DefaultThicknessMultiplier: Single read GetDefaultThicknessMultiplier;
+    property DefaultColor: TAlphaColor read GetDefaultColor;
   published
     property Kinds: TALTextDecorationKinds read FKinds write SetKinds Stored IsKindsStored;
     property Style: TALTextDecorationStyle read FStyle write SetStyle Stored IsStyleStored;
@@ -399,13 +397,16 @@ type
     FInherit: Boolean;
     FFont: TALFont;
     FDecoration: TALTextDecoration;
-    FDefaultInherit: Boolean;
     procedure SetInherit(const AValue: Boolean);
     procedure SetFont(const AValue: TALFont);
     procedure SetDecoration(const AValue: TALTextDecoration);
     procedure FontChanged(ASender: TObject);
     procedure DecorationChanged(ASender: TObject);
     function IsInheritStored: Boolean;
+  protected
+    function CreateFont: TALFont; virtual;
+    function CreateDecoration: TALTextDecoration; virtual;
+    function GetDefaultInherit: Boolean; virtual;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -414,7 +415,7 @@ type
     procedure AlignToPixel; virtual;
     procedure Interpolate(const ATo: TALEllipsisSettings; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALEllipsisSettings; const ANormalizedTime: Single);
-    property DefaultInherit: Boolean read FDefaultInherit write FDefaultInherit;
+    property DefaultInherit: Boolean read GetDefaultInherit;
   published
     property Inherit: Boolean read FInherit write SetInherit stored IsInheritStored;
     property Font: TALFont read FFont write SetFont;
@@ -437,14 +438,6 @@ type
     FLineHeightMultiplier: Single;
     FLetterSpacing: Single;
     FIsHtml: Boolean;
-    FDefaultEllipsis: String;
-    FDefaultTrimming: TALTextTrimming;
-    FDefaultMaxLines: integer;
-    FDefaultHorzAlign: TALTextHorzAlign;
-    FDefaultVertAlign: TALTextVertAlign;
-    FDefaultLineHeightMultiplier: Single;
-    FDefaultLetterSpacing: Single;
-    FDefaultIsHtml: Boolean;
     procedure SetFont(const AValue: TALFont);
     procedure SetDecoration(const AValue: TALTextDecoration);
     procedure SetEllipsis(const AValue: String);
@@ -475,7 +468,18 @@ type
     procedure DefineProperties(Filer: TFiler); override;
   {$ENDIF}
   protected
+    function CreateFont: TALFont; virtual;
+    function CreateDecoration: TALTextDecoration; virtual;
+    function CreateEllipsisSettings: TALEllipsisSettings; virtual;
     procedure AssignTo(Dest: TPersistent); override;
+    function GetDefaultEllipsis: String; virtual;
+    function GetDefaultTrimming: TALTextTrimming; virtual;
+    function GetDefaultMaxLines: Integer; virtual;
+    function GetDefaultHorzAlign: TALTextHorzAlign; virtual;
+    function GetDefaultVertAlign: TALTextVertAlign; virtual;
+    function GetDefaultLineHeightMultiplier: Single; virtual;
+    function GetDefaultLetterSpacing: Single; virtual;
+    function GetDefaultIsHtml: Boolean; virtual;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -485,14 +489,14 @@ type
     procedure Interpolate(const ATo: TALBaseTextSettings; const ANormalizedTime: Single); virtual;
     procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
     //--
-    property DefaultEllipsis: String read FDefaultEllipsis write FDefaultEllipsis;
-    property DefaultTrimming: TALTextTrimming read FDefaultTrimming write FDefaultTrimming;
-    property DefaultMaxLines: Integer read FDefaultMaxLines write FDefaultMaxLines;
-    property DefaultHorzAlign: TALTextHorzAlign read FDefaultHorzAlign write FDefaultHorzAlign;
-    property DefaultVertAlign: TALTextVertAlign read FDefaultVertAlign write FDefaultVertAlign;
-    property DefaultLineHeightMultiplier: Single read FDefaultLineHeightMultiplier write FDefaultLineHeightMultiplier;
-    property DefaultLetterSpacing: Single read FDefaultLetterSpacing write FDefaultLetterSpacing;
-    property DefaultIsHtml: Boolean read FDefaultIsHtml write FDefaultIsHtml;
+    property DefaultEllipsis: String read GetDefaultEllipsis;
+    property DefaultTrimming: TALTextTrimming read GetDefaultTrimming;
+    property DefaultMaxLines: Integer read GetDefaultMaxLines;
+    property DefaultHorzAlign: TALTextHorzAlign read GetDefaultHorzAlign;
+    property DefaultVertAlign: TALTextVertAlign read GetDefaultVertAlign;
+    property DefaultLineHeightMultiplier: Single read GetDefaultLineHeightMultiplier;
+    property DefaultLetterSpacing: Single read GetDefaultLetterSpacing;
+    property DefaultIsHtml: Boolean read GetDefaultIsHtml;
     //--
     property Font: TALFont read FFont write SetFont;
     property Decoration: TALTextDecoration read FDecoration write SetDecoration;
@@ -1607,16 +1611,10 @@ end;
 constructor TALShadow.Create;
 begin
   inherited Create;
-  //--
-  FDefaultblur := 0; // 12
-  FDefaultOffsetX := 0;
-  FDefaultOffsetY := 0;
-  FDefaultColor := TAlphaColors.null; // $96000000;
-  //--
-  Fblur := FDefaultBlur;
-  FOffsetX := FDefaultOffsetX;
-  FOffsetY := FDefaultOffsetY;
-  FColor := FDefaultColor;
+  Fblur := DefaultBlur;
+  FOffsetX := DefaultOffsetX;
+  FOffsetY := DefaultOffsetY;
+  FColor := DefaultColor;
 end;
 
 {*********************************}
@@ -1725,25 +1723,49 @@ end;
 {***************************************}
 function TALShadow.IsblurStored: Boolean;
 begin
-  result := not SameValue(fBlur, FDefaultBlur, Tepsilon.vector);
+  result := not SameValue(fBlur, DefaultBlur, Tepsilon.vector);
 end;
 
 {******************************************}
 function TALShadow.IsOffsetXStored: Boolean;
 begin
-  result := not SameValue(fOffsetX, FDefaultOffsetX, Tepsilon.Position);
+  result := not SameValue(fOffsetX, DefaultOffsetX, Tepsilon.Position);
 end;
 
 {******************************************}
 function TALShadow.IsOffsetYStored: Boolean;
 begin
-  result := not SameValue(fOffsetY, FDefaultOffsetY, Tepsilon.Position);
+  result := not SameValue(fOffsetY, DefaultOffsetY, Tepsilon.Position);
 end;
 
 {****************************************}
 function TALShadow.IsColorStored: Boolean;
 begin
-  result := FColor <> FDefaultColor;
+  result := FColor <> DefaultColor;
+end;
+
+{****************************************}
+function TALShadow.GetDefaultblur: Single;
+begin
+  Result := 0; // 12
+end;
+
+{****************************************}
+function TALShadow.GetDefaultOffsetX: Single;
+begin
+  Result := 0;
+end;
+
+{****************************************}
+function TALShadow.GetDefaultOffsetY: Single;
+begin
+  Result := 0;
+end;
+
+{****************************************}
+function TALShadow.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null; // $96000000;
 end;
 
 {***********************************************}
@@ -1888,22 +1910,12 @@ end;
 constructor TALFont.Create;
 begin
   inherited Create;
-
-  FDefaultFamily := 'sans-serif';
-  FDefaultSize := 14;
-  FDefaultWeight := TFontWeight.Regular;
-  FDefaultSlant := TFontSlant.Regular;
-  FDefaultStretch := TFontStretch.Regular;
-  FDefaultColor := TAlphaColorRec.Black;
-  FDefaultAutoConvert := True;
-
-  FFamily := FDefaultFamily;
-  FSize := FDefaultSize;
-  FWeight := FDefaultWeight;
-  FSlant := FDefaultSlant;
-  FStretch := FDefaultStretch;
-  FColor := FDefaultColor;
-  FAutoConvert := FDefaultAutoConvert;
+  FFamily := DefaultFamily;
+  FSize := DefaultSize;
+  FWeight := DefaultWeight;
+  FSlant := DefaultSlant;
+  FStretch := DefaultStretch;
+  FColor := DefaultColor;
 end;
 
 {*********************************}
@@ -1959,7 +1971,6 @@ begin
       Slant       := TALFont(Source).Slant;
       Stretch     := TALFont(Source).Stretch;
       Color       := TALFont(Source).Color;
-      AutoConvert := TALFont(Source).AutoConvert;
     Finally
       EndUpdate;
     End;
@@ -1973,7 +1984,6 @@ begin
       Slant       := TFont(Source).StyleExt.Slant;
       Stretch     := TFont(Source).StyleExt.Stretch;
       Color       := DefaultColor;
-      AutoConvert := DefaultAutoConvert;
     Finally
       EndUpdate;
     End;
@@ -1994,7 +2004,6 @@ begin
     Slant := DefaultSlant;
     Stretch := DefaultStretch;
     Color := DefaultColor;
-    AutoConvert := DefaultAutoConvert;
   finally
     EndUpdate;
   end;
@@ -2018,7 +2027,6 @@ begin
   BeginUpdate;
   Try
     if ATo <> nil then begin
-      AutoConvert := ATo.AutoConvert;
       Family := ATo.Family;
       Size := InterpolateSingle(Size{Start}, ATo.Size{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
@@ -2029,9 +2037,7 @@ begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
     end
     else begin
-      AutoConvert := DefaultAutoConvert;
-      if AutoConvert then Family := ALConvertFontFamily(DefaultFamily)
-      else Family := DefaultFamily;
+      Family := ALConvertFontFamily(DefaultFamily);
       Size := InterpolateSingle(Size{Start}, DefaultSize{Stop}, ANormalizedTime);
       //TFontWeight = (Thin, UltraLight, Light, SemiLight, Regular, Medium, Semibold, Bold, UltraBold, Black, UltraBlack)
       Weight := TFontWeight(round(InterpolateSingle(integer(Weight), integer(DefaultWeight), ANormalizedTime)));
@@ -2059,43 +2065,73 @@ end;
 {***************************************}
 function TALFont.IsFamilyStored: Boolean;
 begin
-  Result := FFamily <> FDefaultFamily;
+  Result := FFamily <> DefaultFamily;
 end;
 
 {*************************************}
 function TALFont.IsSizeStored: Boolean;
 begin
-  Result := not SameValue(FSize, FDefaultSize, TEpsilon.FontSize);
+  Result := not SameValue(FSize, DefaultSize, TEpsilon.FontSize);
 end;
 
 {***************************************}
 function TALFont.IsWeightStored: Boolean;
 begin
-  result := FWeight <> FDefaultWeight;
+  result := FWeight <> DefaultWeight;
 end;
 
 {**************************************}
 function TALFont.IsSlantStored: Boolean;
 begin
-  result := FSlant <> FDefaultSlant;
+  result := FSlant <> DefaultSlant;
 end;
 
 {****************************************}
 function TALFont.IsStretchStored: Boolean;
 begin
-  result := FStretch <> FDefaultStretch;
+  result := FStretch <> DefaultStretch;
 end;
 
 {**************************************}
 function TALFont.IsColorStored: Boolean;
 begin
-  result := FColor <> FDefaultColor;
+  result := FColor <> DefaultColor;
 end;
 
 {********************************************}
-function TALFont.IsAutoConvertStored: Boolean;
+function TALFont.GetDefaultFamily: TFontName;
 begin
-  result := FAutoConvert <> FDefaultAutoConvert;
+  result := SansSerifFamily;
+end;
+
+{********************************************}
+function TALFont.GetDefaultSize: Single;
+begin
+  result := 14;
+end;
+
+{********************************************}
+function TALFont.GetDefaultWeight: TFontWeight;
+begin
+  result := TFontWeight.Regular;
+end;
+
+{********************************************}
+function TALFont.GetDefaultSlant: TFontSlant;
+begin
+  result := TFontSlant.Regular;
+end;
+
+{********************************************}
+function TALFont.GetDefaultStretch: TFontStretch;
+begin
+  result := TFontStretch.Regular;
+end;
+
+{********************************************}
+function TALFont.GetDefaultColor: TAlphaColor;
+begin
+  result := TAlphaColorRec.Black;
 end;
 
 {***************************************************}
@@ -2174,29 +2210,14 @@ begin
   end;
 end;
 
-{******************************************************}
-procedure TALFont.SetAutoConvert(const AValue: Boolean);
-begin
-  if FAutoConvert <> AValue then begin
-    FAutoConvert := AValue;
-    change;
-  end;
-end;
-
 {***********************************}
 constructor TALTextDecoration.Create;
 begin
   inherited Create;
-
-  FDefaultKinds := [];
-  FDefaultStyle := TALTextDecorationStyle.Solid;
-  FDefaultThicknessMultiplier := 1;
-  FDefaultColor := TAlphaColors.Null;
-
-  FKinds := FDefaultKinds;
-  FStyle := FDefaultStyle;
-  FThicknessMultiplier := FDefaultThicknessMultiplier;
-  FColor := FDefaultColor;
+  FKinds := DefaultKinds;
+  FStyle := DefaultStyle;
+  FThicknessMultiplier := DefaultThicknessMultiplier;
+  FColor := DefaultColor;
 end;
 
 {******************************************************}
@@ -2276,25 +2297,49 @@ end;
 {************************************************}
 function TALTextDecoration.IsKindsStored: Boolean;
 begin
-  result := FKinds <> FDefaultKinds
+  result := FKinds <> DefaultKinds
 end;
 
 {************************************************}
 function TALTextDecoration.IsStyleStored: Boolean;
 begin
-  result := FStyle <> FDefaultStyle
+  result := FStyle <> DefaultStyle
 end;
 
 {**************************************************************}
 function TALTextDecoration.IsThicknessMultiplierStored: Boolean;
 begin
-  Result := not SameValue(FThicknessMultiplier, FDefaultThicknessMultiplier, TEpsilon.Scale);
+  Result := not SameValue(FThicknessMultiplier, DefaultThicknessMultiplier, TEpsilon.Scale);
 end;
 
 {************************************************}
 function TALTextDecoration.IsColorStored: Boolean;
 begin
-  result := FColor <> FDefaultColor
+  result := FColor <> DefaultColor
+end;
+
+{*************************************************************************}
+function TALTextDecoration.GetDefaultKinds: TALTextDecorationKinds;
+begin
+  Result := [];
+end;
+
+{*************************************************************************}
+function TALTextDecoration.GetDefaultStyle: TALTextDecorationStyle;
+begin
+  Result := TALTextDecorationStyle.Solid;
+end;
+
+{*************************************************************************}
+function TALTextDecoration.GetDefaultThicknessMultiplier: Single;
+begin
+  Result := 1;
+end;
+
+{*************************************************************************}
+function TALTextDecoration.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
 end;
 
 {*************************************************************************}
@@ -2337,11 +2382,10 @@ end;
 constructor TALEllipsisSettings.Create;
 begin
   inherited Create;
-  FDefaultInherit := True;
-  FInherit := FDefaultInherit;
-  FFont := TALFont.Create;
+  FInherit := DefaultInherit;
+  FFont := CreateFont;
   FFont.OnChanged := FontChanged;
-  FDecoration := TALTextDecoration.Create;
+  FDecoration := CreateDecoration;
   FDecoration.OnChanged := DecorationChanged;
 end;
 
@@ -2351,6 +2395,18 @@ begin
   ALFreeAndNil(FFont);
   ALFreeAndNil(FDecoration);
   inherited Destroy;
+end;
+
+{********************************************************}
+function TALEllipsisSettings.CreateFont: TALFont;
+begin
+  Result := TALFont.Create;
+end;
+
+{********************************************************}
+function TALEllipsisSettings.CreateDecoration: TALTextDecoration;
+begin
+  Result := TALTextDecoration.Create;
 end;
 
 {********************************************************}
@@ -2467,7 +2523,13 @@ end;
 {****************************************************}
 function TALEllipsisSettings.IsInheritStored: Boolean;
 begin
-  Result := FInherit <> FDefaultInherit;
+  Result := FInherit <> DefaultInherit;
+end;
+
+{******************************************************}
+function TALEllipsisSettings.GetDefaultInherit: Boolean;
+begin
+  Result := True;
 end;
 
 {**************************************************************}
@@ -2496,30 +2558,21 @@ constructor TALBaseTextSettings.Create;
 begin
   inherited Create;
   //--
-  FFont := TALFont.Create;
+  FFont := CreateFont;
   FFont.OnChanged := FontChanged;
-  FDecoration := TALTextDecoration.Create;
+  FDecoration := CreateDecoration;
   FDecoration.OnChanged := DecorationChanged;
-  FEllipsisSettings := TALEllipsisSettings.create;
+  FEllipsisSettings := CreateEllipsisSettings;
   FEllipsisSettings.OnChanged := EllipsisSettingsChanged;
   //--
-  FDefaultEllipsis := HorizontalEllipsis;
-  FDefaultTrimming := TALTextTrimming.Word;
-  FDefaultMaxLines := 65535;
-  FDefaultHorzAlign := TALTextHorzAlign.Leading;
-  FDefaultVertAlign := TALTextVertAlign.Center;
-  FDefaultLineHeightMultiplier := 0;
-  FDefaultLetterSpacing := 0;
-  FDefaultIsHtml := False;
-  //--
-  FEllipsis := FDefaultEllipsis;
-  FTrimming := FDefaultTrimming;
-  FMaxLines := FDefaultMaxLines;
-  FHorzAlign := FDefaultHorzAlign;
-  FVertAlign := FDefaultVertAlign;
-  FLineHeightMultiplier := FDefaultLineHeightMultiplier;
-  FLetterSpacing := FDefaultLetterSpacing;
-  FIsHtml := FDefaultIsHtml;
+  FEllipsis := DefaultEllipsis;
+  FTrimming := DefaultTrimming;
+  FMaxLines := DefaultMaxLines;
+  FHorzAlign := DefaultHorzAlign;
+  FVertAlign := DefaultVertAlign;
+  FLineHeightMultiplier := DefaultLineHeightMultiplier;
+  FLetterSpacing := DefaultLetterSpacing;
+  FIsHtml := DefaultIsHtml;
 end;
 
 {*************************************}
@@ -2529,6 +2582,24 @@ begin
   ALFreeAndNil(FDecoration);
   ALFreeAndNil(FEllipsisSettings);
   inherited Destroy;
+end;
+
+{*************************************}
+function TALBaseTextSettings.CreateFont: TALFont;
+begin
+  Result := TALFont.Create;
+end;
+
+{*************************************}
+function TALBaseTextSettings.CreateDecoration: TALTextDecoration;
+begin
+  Result := TALTextDecoration.Create;
+end;
+
+{*************************************}
+function TALBaseTextSettings.CreateEllipsisSettings: TALEllipsisSettings;
+begin
+  Result := TALEllipsisSettings.create;
 end;
 
 {*********************************}
@@ -2767,49 +2838,97 @@ end;
 {*****************************************************}
 function TALBaseTextSettings.IsEllipsisStored: Boolean;
 begin
-  Result := FEllipsis <> FDefaultEllipsis;
+  Result := FEllipsis <> DefaultEllipsis;
 end;
 
 {*****************************************************}
 function TALBaseTextSettings.IsTrimmingStored: Boolean;
 begin
-  Result := FTrimming <> FDefaultTrimming;
+  Result := FTrimming <> DefaultTrimming;
 end;
 
 {*****************************************************}
 function TALBaseTextSettings.IsMaxLinesStored: Boolean;
 begin
-  Result := FMaxLines <> FDefaultMaxLines;
+  Result := FMaxLines <> DefaultMaxLines;
 end;
 
 {******************************************************}
 function TALBaseTextSettings.IsHorzAlignStored: Boolean;
 begin
-  Result := FHorzAlign <> FDefaultHorzAlign;
+  Result := FHorzAlign <> DefaultHorzAlign;
 end;
 
 {******************************************************}
 function TALBaseTextSettings.IsVertAlignStored: Boolean;
 begin
-  Result := FVertAlign <> FDefaultVertAlign;
+  Result := FVertAlign <> DefaultVertAlign;
 end;
 
 {*****************************************************************}
 function TALBaseTextSettings.IsLineHeightMultiplierStored: Boolean;
 begin
-  Result := not SameValue(FLineHeightMultiplier, FDefaultLineHeightMultiplier, TEpsilon.Scale);
+  Result := not SameValue(FLineHeightMultiplier, DefaultLineHeightMultiplier, TEpsilon.Scale);
 end;
 
 {**********************************************************}
 function TALBaseTextSettings.IsLetterSpacingStored: Boolean;
 begin
-  Result := not SameValue(FLetterSpacing, FDefaultLetterSpacing, TEpsilon.FontSize);
+  Result := not SameValue(FLetterSpacing, DefaultLetterSpacing, TEpsilon.FontSize);
 end;
 
 {***************************************************}
 function TALBaseTextSettings.IsIsHtmlStored: Boolean;
 begin
-  Result := FIsHtml <> FDefaultIsHtml;
+  Result := FIsHtml <> DefaultIsHtml;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultEllipsis: String;
+begin
+  Result := HorizontalEllipsis;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultTrimming: TALTextTrimming;
+begin
+  Result := TALTextTrimming.Word;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultMaxLines: Integer;
+begin
+  Result := 65535;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
+begin
+  Result := TALTextHorzAlign.Leading;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+begin
+  Result := TALTextVertAlign.Center;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultLineHeightMultiplier: Single;
+begin
+  Result := 0;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultLetterSpacing: Single;
+begin
+  Result := 0;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.GetDefaultIsHtml: Boolean;
+begin
+  Result := False;
 end;
 
 {***********************************************************}
@@ -6051,6 +6170,7 @@ initialization
   {$IF (not defined(ALSkiaEngine)) and (defined(Android))}
   TALFontManager.FCustomTypeFaces := TDictionary<String, JTypeFace>.Create;
   {$ENDIF}
+  TALFont.SansSerifFamily := 'sans-serif';
   TALBaseTextSettings.HorizontalEllipsis := '…';
 
 finalization

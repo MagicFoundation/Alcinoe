@@ -2815,13 +2815,11 @@ begin
      (not (csDesigning in ComponentState)) then
     Text := ALTranslate(Text);
 
-  if (TextSettings.Font.AutoConvert) and
-     (TextSettings.Font.Family <> '') and
+  if (TextSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
     TextSettings.Font.Family := ALConvertFontFamily(TextSettings.Font.Family);
 
-  if (TextSettings.EllipsisSettings.Font.AutoConvert) and
-     (TextSettings.EllipsisSettings.Font.Family <> '') and
+  if (TextSettings.EllipsisSettings.Font.Family <> '') and
      (not (csDesigning in ComponentState)) then
     TextSettings.EllipsisSettings.Font.Family := ALConvertFontFamily(TextSettings.EllipsisSettings.Font.Family);
 

@@ -137,7 +137,7 @@ type
       // ---------------
       // TCheckMarkBrush
       TCheckMarkBrush = class(TALPersistentObserver)
-      protected
+      public
         Type
           TMargins = class(TALBounds)
           protected
@@ -211,10 +211,10 @@ type
       // ---------------
       // TBaseStateStyle
       TBaseStateStyle = class(TALBaseStateStyle)
-      protected
+      public
         type
           TStateLayer = class(TALStateLayer)
-          protected
+          public
             Type
               TMargins = class(TALBounds)
               protected
@@ -518,7 +518,7 @@ type
       // --------------------------
       // TRadioButtonCheckMarkBrush
       TRadioButtonCheckMarkBrush = class(TCheckMarkBrush)
-      protected
+      public
         Type
           TRadioButtonMargins = class(TMargins)
           protected
@@ -530,7 +530,7 @@ type
       // ---------------------------------
       // TRadioButtonInheritCheckMarkBrush
       TRadioButtonInheritCheckMarkBrush = class(TInheritCheckMarkBrush)
-      protected
+      public
         Type
           TRadioButtonMargins = class(TMargins)
           protected
@@ -853,7 +853,7 @@ type
           // --------------------
           // TThumbCheckMarkBrush
           TThumbCheckMarkBrush = class(TCheckMarkBrush)
-          protected
+          public
             Type
               TThumbMargins = class(TMargins)
               protected
@@ -865,7 +865,7 @@ type
           // ---------------------------
           // TThumbInheritCheckMarkBrush
           TThumbInheritCheckMarkBrush = class(TInheritCheckMarkBrush)
-          protected
+          public
             Type
               TThumbMargins = class(TMargins)
               protected
@@ -1223,6 +1223,15 @@ type
       // -------------
       // TTextSettings
       TTextSettings = class(TALBaseTextSettings)
+      public
+        Type
+          TFont = Class(TALFont)
+          protected
+            function GetDefaultWeight: TFontWeight; override;
+          End;
+      protected
+        function CreateFont: TALFont; override;
+        function GetDefaultHorzAlign: TALTextHorzAlign; override;
       published
         property Font;
         property Decoration;
@@ -1793,6 +1802,20 @@ type
       TValueIndicator = class(TALBaseText)
       public
         type
+          // -------------
+          // TTextSettings
+          TTextSettings = Class(TALTextSettings)
+          public
+            Type
+              TFont = Class(TALFont)
+              protected
+                function GetDefaultWeight: TFontWeight; override;
+                function GetDefaultColor: TAlphaColor; override;
+              End;
+          protected
+            function CreateFont: TALFont; override;
+            function GetDefaultHorzAlign: TALTextHorzAlign; override;
+          End;
           // ----------
           // TAnimation
           TAnimation = (None, ScaleInOut, Opacity);
@@ -3334,6 +3357,30 @@ begin
 end;
 
 {************************************************************************************}
+function TALCustomTrack.TValueIndicator.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
+begin
+  Result := TFontWeight.medium;
+end;
+
+{************************************************************************************}
+function TALCustomTrack.TValueIndicator.TTextSettings.TFont.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.White;
+end;
+
+{************************************************************************************}
+function TALCustomTrack.TValueIndicator.TTextSettings.CreateFont: TALFont;
+begin
+  Result := TFont.Create;
+end;
+
+{************************************************************************************}
+function TALCustomTrack.TValueIndicator.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
+begin
+  Result := TALTextHorzAlign.center;
+end;
+
+{************************************************************************************}
 constructor TALCustomTrack.TValueIndicator.Create(const ACustomTrack: TALCustomTrack);
 begin
   inherited create(ACustomTrack);
@@ -3366,16 +3413,6 @@ begin
   Stroke.DefaultColor := TAlphaColors.Null;
   Stroke.Color := Stroke.DefaultColor;
   stroke.OnChanged := LStrokeChanged;
-  //--
-  var LTextSettingsChanged: TNotifyEvent := TextSettings.OnChanged;
-  TextSettings.OnChanged := nil;
-  TextSettings.Font.DefaultColor := TAlphaColors.White;
-  TextSettings.Font.Color := TextSettings.Font.DefaultColor;
-  TextSettings.Font.DefaultWeight := TFontWeight.medium;
-  TextSettings.Font.Weight := TextSettings.Font.DefaultWeight;
-  TextSettings.DefaultHorzAlign := TALTextHorzAlign.center;
-  TextSettings.HorzAlign := TextSettings.DefaultHorzAlign;
-  TextSettings.OnChanged := LTextSettingsChanged;
   //--
   var LMarginsChange: TNotifyEvent := Margins.OnChange;
   Margins.OnChange := nil;
@@ -3526,7 +3563,7 @@ end;
 {******************************************************************************}
 function TALCustomTrack.TValueIndicator.CreateTextSettings: TALBaseTextSettings;
 begin
-  Result := TALTextSettings.Create;
+  Result := TTextSettings.Create;
 end;
 
 {***********************************************************************}
@@ -9646,6 +9683,24 @@ begin
   Change;
 end;
 
+{************************************************************************************}
+function TALButton.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
+begin
+  Result := TFontWeight.medium;
+end;
+
+{************************************************************************************}
+function TALButton.TTextSettings.CreateFont: TALFont;
+begin
+  Result := TFont.Create;
+end;
+
+{************************************************************************************}
+function TALButton.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
+begin
+  Result := TALTextHorzAlign.center;
+end;
+
 {***********************************************}
 constructor TALButton.Create(AOwner: TComponent);
 begin
@@ -9672,14 +9727,6 @@ begin
   Stroke.DefaultColor := $ffadadad;
   Stroke.Color := Stroke.DefaultColor;
   stroke.OnChanged := LStrokeChanged;
-  //--
-  var LTextSettingsChanged: TNotifyEvent := TextSettings.OnChanged;
-  TextSettings.OnChanged := nil;
-  TextSettings.Font.DefaultWeight := TFontWeight.medium;
-  TextSettings.Font.Weight := TextSettings.Font.DefaultWeight;
-  TextSettings.DefaultHorzAlign := TALTextHorzAlign.center;
-  TextSettings.HorzAlign := TextSettings.DefaultHorzAlign;
-  TextSettings.OnChanged := LTextSettingsChanged;
   //--
   var LPaddingChange: TNotifyEvent := Padding.OnChange;
   Padding.OnChange := nil;
@@ -9711,8 +9758,7 @@ procedure TALButton.Loaded;
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   procedure _ConvertFontFamily(const AStateStyle: TBaseStateStyle);
   begin
-    if (AStateStyle.TextSettings.Font.AutoConvert) and
-       (AStateStyle.TextSettings.Font.Family <> '') and
+    if (AStateStyle.TextSettings.Font.Family <> '') and
        (not (csDesigning in ComponentState)) then
       AStateStyle.TextSettings.Font.Family := ALConvertFontFamily(AStateStyle.TextSettings.Font.Family);
   end;

@@ -433,7 +433,7 @@ type
     type
       // ------------
       // TStateStyles
-      TCheckBoxStateStyles = class(TALBaseCheckBox.TStateStyles)
+      TCheckBoxStateStyles = class(TStateStyles)
       published
         property Transition;
       end;
@@ -1109,9 +1109,41 @@ type
   TALButton = class(TALBaseText)
   public
     type
+      // -------------
+      // TTextSettings
+      TTextSettings = class(TALBaseTextSettings)
+      public
+        Type
+          TFont = Class(TALFont)
+          protected
+            function GetDefaultWeight: TFontWeight; override;
+          End;
+      protected
+        function CreateFont: TALFont; override;
+        function GetDefaultHorzAlign: TALTextHorzAlign; override;
+      published
+        property Font;
+        property Decoration;
+        property Trimming;
+        property MaxLines;
+        property Ellipsis;
+        property HorzAlign;
+        property VertAlign;
+        property LineHeightMultiplier;
+        property LetterSpacing;
+        property IsHtml;
+      end;
       // -----------------------
       // TStateStyleTextSettings
       TStateStyleTextSettings = class(TALInheritBaseTextSettings)
+      public
+        Type
+          TFont = Class(TALFont)
+          protected
+            function GetDefaultWeight: TFontWeight; override;
+          End;
+      protected
+        function CreateFont: TALFont; override;
       published
         property Font;
         property Decoration;
@@ -1219,30 +1251,6 @@ type
         property Pressed: TPressedStateStyle read FPressed write SetPressed;
         property Focused: TFocusedStateStyle read FFocused write SetFocused;
         property Transition;
-      end;
-      // -------------
-      // TTextSettings
-      TTextSettings = class(TALBaseTextSettings)
-      public
-        Type
-          TFont = Class(TALFont)
-          protected
-            function GetDefaultWeight: TFontWeight; override;
-          End;
-      protected
-        function CreateFont: TALFont; override;
-        function GetDefaultHorzAlign: TALTextHorzAlign; override;
-      published
-        property Font;
-        property Decoration;
-        property Trimming;
-        property MaxLines;
-        property Ellipsis;
-        property HorzAlign;
-        property VertAlign;
-        property LineHeightMultiplier;
-        property LetterSpacing;
-        property IsHtml;
       end;
   private
     {$IF defined(ALDPK)}
@@ -9289,6 +9297,36 @@ begin
   end;
 end;
 
+{************************************************************************************}
+function TALButton.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
+begin
+  Result := TFontWeight.medium;
+end;
+
+{************************************************************************************}
+function TALButton.TTextSettings.CreateFont: TALFont;
+begin
+  Result := TFont.Create;
+end;
+
+{************************************************************************************}
+function TALButton.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
+begin
+  Result := TALTextHorzAlign.center;
+end;
+
+{************************************************************************************}
+function TALButton.TStateStyleTextSettings.TFont.GetDefaultWeight: TFontWeight;
+begin
+  Result := TFontWeight.medium;
+end;
+
+{************************************************************************************}
+function TALButton.TStateStyleTextSettings.CreateFont: TALFont;
+begin
+  Result := TFont.Create;
+end;
+
 {*******************************************************************}
 constructor TALButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
@@ -9681,24 +9719,6 @@ end;
 procedure TALButton.TStateStyles.FocusedChanged(ASender: TObject);
 begin
   Change;
-end;
-
-{************************************************************************************}
-function TALButton.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
-begin
-  Result := TFontWeight.medium;
-end;
-
-{************************************************************************************}
-function TALButton.TTextSettings.CreateFont: TALFont;
-begin
-  Result := TFont.Create;
-end;
-
-{************************************************************************************}
-function TALButton.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
-begin
-  Result := TALTextHorzAlign.center;
 end;
 
 {***********************************************}

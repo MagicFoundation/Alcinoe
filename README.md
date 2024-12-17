@@ -1033,3 +1033,16 @@ exclusively in your code, even when handling UTF-8 content.
 Always ensure that **AnsiString** is paired with 
 `SetMultiByteConversionCodePage(CP_UTF8)` to prevent 
 undesired conversions. 
+
+History
+=======
+
+#### 12/15/2024 #### 
+
+- **Default Fill Color Change**  
+  The default fill color of `TALBrush` has been updated to **white** (previously `$FFE0E0E0`).  
+  This change affects the default fill color of components such as `TALRectangle` and `TALCircle`.  
+
+- **Removal of `TALFont.AutoConvert` Property**  
+  The `AutoConvert` property has been removed from `TALFont`.  
+  Its behavior is now always **enabled** (equivalent to `AutoConvert = True`).

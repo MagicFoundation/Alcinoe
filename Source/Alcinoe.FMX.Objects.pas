@@ -55,6 +55,9 @@ type
     function GetShadow: TALShadow;
     procedure SetShadow(const Value: TALShadow);
   protected
+    function CreateFill: TALBrush; virtual;
+    function CreateStroke: TALStrokeBrush; virtual;
+    function CreateShadow: TALShadow; virtual;
     procedure FillChanged(Sender: TObject); virtual;
     procedure StrokeChanged(Sender: TObject); virtual;
     procedure ShadowChanged(Sender: TObject); virtual;
@@ -219,7 +222,7 @@ type
         procedure doProcess(Sender: TObject);
         procedure doFinish(Sender: TObject);
       public
-        constructor Create(AOwner: TALAnimatedImage); reintroduce; virtual;
+        constructor Create(const AOwner: TALAnimatedImage); reintroduce; virtual;
         destructor Destroy; override;
         procedure Start; virtual;
         procedure Stop; virtual;
@@ -348,8 +351,6 @@ type
     FYRadius: Single;
     FCorners: TCorners;
     FSides: TSides;
-    FDefaultXRadius: Single;
-    FDefaultYRadius: Single;
     fBufDrawable: TALDrawable;
     fBufDrawableRect: TRectF;
     function IsCornersStored: Boolean;
@@ -360,6 +361,8 @@ type
     function HasCustomDraw: Boolean; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
+    function GetDefaultXRadius: Single; virtual;
+    function GetDefaultYRadius: Single; virtual;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
     procedure SetCorners(const Value: TCorners); virtual;
@@ -390,8 +393,8 @@ type
     property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
-    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
-    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+    property DefaultXRadius: Single read GetDefaultXRadius;
+    property DefaultYRadius: Single read GetDefaultYRadius;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -648,6 +651,16 @@ type
   TALBaseText = class(TALShape)
   public
     type
+      TFill = class(TALBrush)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
+      TStroke = class(TALStrokeBrush)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
+  public
+    type
       TElementMouseEvent = procedure(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single; const Element: TALTextElement) of object;
       TElementMouseMoveEvent = procedure(Sender: TObject; Shift: TShiftState; X, Y: Single; const Element: TALTextElement) of object;
       TElementNotifyEvent = procedure(Sender: TObject; const Element: TALTextElement) of object;
@@ -676,8 +689,6 @@ type
     FXRadius: Single;
     FCorners: TCorners;
     FSides: TSides;
-    FDefaultXRadius: Single;
-    FDefaultYRadius: Single;
     function IsCornersStored: Boolean;
     function IsSidesStored: Boolean;
     procedure SetText(const Value: string);
@@ -706,12 +717,16 @@ type
     procedure FillChanged(Sender: TObject); override;
     procedure StrokeChanged(Sender: TObject); override;
     procedure ShadowChanged(Sender: TObject); override;
+    function GetDefaultXRadius: Single; virtual;
+    function GetDefaultYRadius: Single; virtual;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
     procedure SetCorners(const Value: TCorners); virtual;
     procedure SetSides(const Value: TSides); virtual;
     procedure SetTextSettings(const Value: TALBaseTextSettings); virtual;
     function CreateTextSettings: TALBaseTextSettings; virtual; abstract;
+    function CreateFill: TALBrush; override;
+    function CreateStroke: TALStrokeBrush; override;
     procedure Paint; override;
     procedure Loaded; override;
     procedure DoResized; override;
@@ -804,8 +819,8 @@ type
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
     property DoubleBuffered default true;
-    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
-    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+    property DefaultXRadius: Single read GetDefaultXRadius;
+    property DefaultYRadius: Single read GetDefaultYRadius;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -943,11 +958,11 @@ uses
 constructor TALShape.Create(AOwner: TComponent);
 begin
   inherited;
-  FFill := TALBrush.Create($FFE0E0E0);
+  FFill := CreateFill;
   FFill.OnChanged := FillChanged;
-  FStroke := TALStrokeBrush.Create($FF000000);
+  FStroke := CreateStroke;
   FStroke.OnChanged := StrokeChanged;
-  fShadow := TALShadow.Create;
+  fShadow := CreateShadow;
   fShadow.OnChanged := ShadowChanged;
 end;
 
@@ -958,6 +973,24 @@ begin
   ALFreeAndNil(FFill);
   ALFreeAndNil(fShadow);
   inherited;
+end;
+
+{*************************************}
+function TALShape.CreateFill: TALBrush;
+begin
+  Result := TALBrush.Create;
+end;
+
+{*********************************************}
+function TALShape.CreateStroke: TALStrokeBrush;
+begin
+  Result := TALStrokeBrush.Create;
+end;
+
+{****************************************}
+function TALShape.CreateShadow: TALShadow;
+begin
+  Result := TALShadow.Create;
 end;
 
 {******************************}
@@ -1222,8 +1255,8 @@ begin
   result := True;
 end;
 
-{***********************************************************************}
-constructor TALAnimatedImage.TAnimation.Create(AOwner: TALAnimatedImage);
+{*****************************************************************************}
+constructor TALAnimatedImage.TAnimation.Create(const AOwner: TALAnimatedImage);
 begin
   inherited create;
   fOwner := AOwner;
@@ -1834,10 +1867,8 @@ constructor TALBaseRectangle.Create(AOwner: TComponent);
 begin
   inherited;
   fDoubleBuffered := true;
-  FDefaultXRadius := 0;
-  FDefaultYRadius := 0;
-  FXRadius := FDefaultXRadius;
-  FYRadius := FDefaultYRadius;
+  FXRadius := DefaultXRadius;
+  FYRadius := DefaultYRadius;
   FCorners := AllCorners;
   FSides := AllSides;
   fBufDrawable := ALNullDrawable;
@@ -1876,13 +1907,13 @@ end;
 {*************************************************}
 function TALBaseRectangle.IsXRadiusStored: Boolean;
 begin
-  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+  Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
 {*************************************************}
 function TALBaseRectangle.IsYRadiusStored: Boolean;
 begin
-  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
+  Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
 {***********************************************}
@@ -1904,6 +1935,18 @@ begin
     fDoubleBuffered := AValue;
     if not fDoubleBuffered then ClearBufDrawable;
   end;
+end;
+
+{**************************************************}
+function TALBaseRectangle.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{**************************************************}
+function TALBaseRectangle.GetDefaultYRadius: Single;
+begin
+  Result := 0;
 end;
 
 {*********************************************************}
@@ -2723,6 +2766,18 @@ begin
   end;
 end;
 
+{******************************************************}
+function TALBaseText.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
+{********************************************************}
+function TALBaseText.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
 {*************************************************}
 constructor TALBaseText.Create(AOwner: TComponent);
 begin
@@ -2748,21 +2803,9 @@ begin
   fAllTextDrawn := False;
   SetLength(fElements, 0);
   //-----
-  var LPrevFillOnchanged := Fill.OnChanged;
-  Fill.OnChanged := nil;
-  Fill.DefaultColor := TAlphaColors.Null;
-  Fill.Color := Fill.DefaultColor;
-  Fill.OnChanged := LPrevFillOnchanged;
-  var LPrevStrokeOnchanged := Stroke.OnChanged;
-  Stroke.OnChanged := nil;
-  Stroke.DefaultColor := TAlphaColors.Null;
-  Stroke.Color := Stroke.DefaultColor;
-  Stroke.OnChanged := LPrevStrokeOnchanged;
   FCorners := AllCorners;
-  FDefaultXRadius := 0;
-  FDefaultYRadius := 0;
-  FXRadius := FDefaultXRadius;
-  FYRadius := FDefaultYRadius;
+  FXRadius := DefaultXRadius;
+  FYRadius := DefaultYRadius;
   FSides := AllSides;
   //-----
   HitTest := False;
@@ -2782,6 +2825,18 @@ begin
   ALFreeAndNil(FTextSettings);
   ALFreeAndNil(FMultiLineTextOptions);
   inherited;
+end;
+
+{****************************************}
+function TALBaseText.CreateFill: TALBrush;
+begin
+  result := TFill.Create;
+end;
+
+{************************************************}
+function TALBaseText.CreateStroke: TALStrokeBrush;
+begin
+  result := TStroke.Create;
 end;
 
 {***************************}
@@ -3046,6 +3101,18 @@ begin
     FCorners := Value;
     Repaint;
   end;
+end;
+
+{*********************************************}
+function TALBaseText.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*********************************************}
+function TALBaseText.GetDefaultYRadius: Single;
+begin
+  Result := 0;
 end;
 
 {****************************************************}
@@ -3692,13 +3759,13 @@ end;
 {********************************************}
 function TALBaseText.IsXRadiusStored: Boolean;
 begin
-  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+  Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
 {********************************************}
 function TALBaseText.IsYRadiusStored: Boolean;
 begin
-  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
+  Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
 end;
 
 {*********************************}

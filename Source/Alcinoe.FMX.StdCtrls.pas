@@ -39,6 +39,217 @@ uses
 
 type
 
+  // TALShape = class(TALControl)
+  //
+  // TALImage = class(TALControl)
+  //
+  // TALAnimatedImage = class(TALControl)
+  //   TAnimation = class(TALPersistentObserver)
+  //
+  // TALBaseRectangle = class(TALShape)
+  //
+  // TALRectangle = class(TALBaseRectangle)
+  //
+  // TALCircle = class(TALShape)
+  //
+  // TALLine = class(TALShape)
+  //
+  // TALBaseText = class(TALShape)
+  //   TFill = class(TALBrush) // TAlphaColors.Null
+  //   TStroke = class(TALStrokeBrush) // TAlphaColors.Null
+  //
+  // TALText = class(TALBaseText)
+  //
+  // TALVideoPlayer = class(TObject)
+  //
+  // TALVideoPlayerHost = class(TALBaseRectangle)
+  //   TFill = class(TALBrush) // TAlphacolors.Black
+  //   TStroke = class(TALStrokeBrush) // TalphaColors.null
+  //
+  // TALAniIndicator = class(TALControl)
+  //
+  // TALBaseCheckBox = class(TALShape)
+  //   TCheckMarkBrush = class(TALPersistentObserver)
+  //     TMargins = class(TALBounds) // TRectF.Create(3,3,3,3)
+  //   TInheritCheckMarkBrush = class(TCheckMarkBrush)
+  //   TBaseStateStyle = class(TALBaseStateStyle)
+  //     TStateLayer = class(TALStateLayer) // -50, -50
+  //       TMargins = class(TALBounds) // TRectF.Create(-12,-12,-12,-12)
+  //   TDefaultStateStyle = class(TBaseStateStyle);
+  //   TDisabledStateStyle = class(TBaseStateStyle)
+  //   THoveredStateStyle = class(TBaseStateStyle)
+  //   TPressedStateStyle = class(TBaseStateStyle)
+  //   TFocusedStateStyle = class(TBaseStateStyle)
+  //   TCheckStateStyles = class(TALPersistentObserver)
+  //   TStateStyles = class(TALBaseStateStyles)
+  //
+  // TALCheckBox = class(TALBaseCheckBox)
+  //   TStateStyles = class(TALBaseCheckBox.TStateStyles)
+  //
+  // TALRadioButton = class(TALCheckBox)
+  //   TCheckMarkBrush = class(TALCheckBox.TCheckMarkBrush)
+  //     TMargins = class(TALCheckBox.TCheckMarkBrush.TMargins) // TRectF.Create(5,5,5,5);
+  //   TInheritCheckMarkBrush = class(TALCheckBox.TInheritCheckMarkBrush)
+  //     TMargins = class(TALCheckBox.TInheritCheckMarkBrush.TMargins) // TRectF.Create(5,5,5,5);
+  //   TDefaultStateStyle = class(TALCheckBox.TDefaultStateStyle)
+  //   TDisabledStateStyle = class(TALCheckBox.TDisabledStateStyle)
+  //   THoveredStateStyle = class(TALCheckBox.THoveredStateStyle)
+  //   TPressedStateStyle = class(TALCheckBox.TPressedStateStyle)
+  //   TFocusedStateStyle = class(TALCheckBox.TFocusedStateStyle)
+  //   TCheckStateStyles = class(TALCheckBox.TCheckStateStyles)
+  //   TStateStyles = class(TALCheckBox.TStateStyles)
+  //
+  // TALSwitch = class(TALControl)
+  //   TTrack = class(TALShape)
+  //     TFill = class(TALBrush) // $ffc5c5c5
+  //     TStroke = class(TALStrokeBrush) // TAlphaColors.null
+  //     TBaseStateStyle = class(TALBaseStateStyle)
+  //       TFill = class(TALInheritBrush) // $ffc5c5c5
+  //       TStroke = class(TALInheritStrokeBrush) // TAlphaColors.null
+  //       TStateLayer = class(TALStateLayer) // -50, -50
+  //     TDefaultStateStyle = class(TBaseStateStyle);
+  //     TDisabledStateStyle = class(TBaseStateStyle)
+  //     THoveredStateStyle = class(TBaseStateStyle)
+  //     TPressedStateStyle = class(TBaseStateStyle)
+  //     TFocusedStateStyle = class(TBaseStateStyle)
+  //     TCheckStateStyles = class(TALPersistentObserver)
+  //     TStateStyles = class(TALBaseStateStyles)
+  //   TThumb = class(TALBaseCheckBox)
+  //     TStroke = class(TALStrokeBrush) // TAlphaColors.null
+  //     TCheckMarkBrush = class(TALBaseCheckBox.TCheckMarkBrush)
+  //       TMargins = class(TALBaseCheckBox.TCheckMarkBrush.TMargins) // TRectF.Create(6,6,6,6)
+  //     TInheritCheckMarkBrush = class(TALBaseCheckBox.TInheritCheckMarkBrush)
+  //       TMargins = class(TALBaseCheckBox.TInheritCheckMarkBrush.TMargins) // TRectF.Create(6,6,6,6)
+  //     TDefaultStateStyle = class(TALBaseCheckBox.TDefaultStateStyle)
+  //       TStroke = class(TALInheritStrokeBrush) // TAlphaColors.null
+  //     TDisabledStateStyle = class(TALBaseCheckBox.TDisabledStateStyle)
+  //       TStroke = class(TALInheritStrokeBrush) // TAlphaColors.null
+  //     THoveredStateStyle = class(TALBaseCheckBox.THoveredStateStyle)
+  //       TStroke = class(TALInheritStrokeBrush) // TAlphaColors.null
+  //     TPressedStateStyle = class(TALBaseCheckBox.TPressedStateStyle)
+  //       TStroke = class(TALInheritStrokeBrush) // TAlphaColors.null
+  //     TFocusedStateStyle = class(TALBaseCheckBox.TFocusedStateStyle)
+  //       TStroke = class(TALInheritStrokeBrush) // TAlphaColors.null
+  //     TCheckStateStyles = class(TALBaseCheckBox.TCheckStateStyles)
+  //     TStateStyles = class(TALBaseCheckBox.TStateStyles)
+  //
+  // TALButton = class(TALBaseText)
+  //   TFill = class(TALBaseText.TFill) // $ffe1e1e1
+  //   TStroke = class(TALBaseText.TStroke) // $ffadadad
+  //   TTextSettings = class(TALBaseTextSettings)
+  //     TFont = Class(TALFont) // TFontWeight.medium
+  //   TBaseStateStyle = class(TALBaseStateStyle)
+  //     TFill = class(TALInheritBrush) // $FFE1E1E1
+  //     TStroke = class(TALInheritStrokeBrush) // $FFADADAD
+  //     TTextSettings = class(TALInheritBaseTextSettings)
+  //       TFont = Class(TALFont) // TFontWeight.medium
+  //   TDisabledStateStyle = class(TBaseStateStyle)
+  //   THoveredStateStyle = class(TBaseStateStyle)
+  //   TPressedStateStyle = class(TBaseStateStyle)
+  //   TFocusedStateStyle = class(TBaseStateStyle)
+  //   TStateStyles = class(TALBaseStateStyles)
+  //
+  // TALCustomTrack = class(TALControl)
+  //   TTrack = class(TALBaseRectangle)
+  //     TFill = class(TALBrush) // $ffc5c5c5
+  //     TStroke = class(TALStrokeBrush) // TAlphaColors.Null
+  //     TStopIndicatorBrush = class(TALPersistentObserver)
+  //     TInheritStopIndicatorBrush = class(TStopIndicatorBrush)
+  //     TBaseStateStyle = class(TALBaseStateStyle)
+  //       TFill = class(TALInheritBrush) // $ffc5c5c5
+  //       TStroke = class(TALInheritStrokeBrush) // TalphaColors.Null
+  //       TStateLayer = class(TALStateLayer) // -50, -50
+  //     TDisabledStateStyle = class(TBaseStateStyle)
+  //     TStateStyles = class(TALBaseStateStyles)
+  //   TInactiveTrack = class(TTrack)
+  //   TActiveTrack = class(TTrack)
+  //     TFill = class(TTrack.TFill) // $ff167efc
+  //     TDisabledStateStyle = class(TTrack.TDisabledStateStyle)
+  //       TFill = class(TTrack.TDisabledStateStyle.TFill) // $ff167efc
+  //     TStateStyles = class(TTrack.TStateStyles)
+  //   TThumb = class(TALBaseRectangle)
+  //     TStroke = class(TALStrokeBrush) // $ffd5d5d5
+  //     TBaseStateStyle = class(TALBaseStateStyle)
+  //       TStroke = class(TALInheritStrokeBrush) // $ffd5d5d5
+  //       TStateLayer = class(TALStateLayer) // -50, -50
+  //     TDisabledStateStyle = class(TBaseStateStyle)
+  //     THoveredStateStyle = class(TBaseStateStyle)
+  //     TPressedStateStyle = class(TBaseStateStyle)
+  //     TFocusedStateStyle = class(TBaseStateStyle)
+  //     TStateStyles = class(TALBaseStateStyles)
+  //   TValueIndicator = class(TALBaseText)
+  //     TFill = class(TALBaseText.TFill) // TAlphacolors.Black
+  //     TTextSettings = Class(TALTextSettings)
+  //       TFont = Class(TALFont) // TFontWeight.medium, TAlphaColors.White
+  //
+  // TALTrackBar = class(TALCustomTrack)
+  //
+  // TALRangeTrackBar = class(TALCustomTrack)
+  //   TMinInactiveTrack = class(TALCustomTrack.TInactiveTrack)
+  //   TMaxInactiveTrack = class(TALCustomTrack.TInactiveTrack)
+  //   TActiveTrack = class(TALCustomTrack.TActiveTrack)
+  //   TMinThumb = class(TALCustomTrack.TThumb)
+  //   TMaxThumb = class(TALCustomTrack.TThumb)
+  //
+  // TALCustomScrollBar = class(TALCustomTrack)
+  //   TThumb = class(TALCustomTrack.TThumb)
+  //     TFill = class(TALBrush) // $47000000
+  //     TStroke = class(TALCustomTrack.TThumb.TStroke) // Talphacolors.Null
+  //     TDisabledStateStyle = class(TALCustomTrack.TThumb.TDisabledStateStyle)
+  //       TFill = class(TALInheritBrush) // $47000000
+  //       TStroke = class(TALCustomTrack.TThumb.TDisabledStateStyle.TStroke) // Talphacolors.Null
+  //       TStateLayer = class(TALCustomTrack.TThumb.TDisabledStateStyle.TStateLayer) // 0, 0
+  //     THoveredStateStyle = class(TALCustomTrack.TThumb.THoveredStateStyle)
+  //       TFill = class(TALInheritBrush) // $47000000
+  //       TStroke = class(TALCustomTrack.TThumb.THoveredStateStyle.TStroke) // Talphacolors.Null
+  //       TStateLayer = class(TALCustomTrack.TThumb.THoveredStateStyle.TStateLayer) // 0, 0
+  //     TPressedStateStyle = class(TALCustomTrack.TThumb.TPressedStateStyle)
+  //       TFill = class(TALInheritBrush) // $47000000
+  //       TStroke = class(TALCustomTrack.TThumb.TPressedStateStyle.TStroke) // Talphacolors.Null
+  //       TStateLayer = class(TALCustomTrack.TThumb.TPressedStateStyle.TStateLayer) // 0, 0
+  //     TFocusedStateStyle = class(TALCustomTrack.TThumb.TFocusedStateStyle)
+  //       TFill = class(TALInheritBrush) // $47000000
+  //       TStroke = class(TALCustomTrack.TThumb.TFocusedStateStyle.TStroke) // Talphacolors.Null
+  //       TStateLayer = class(TALCustomTrack.TThumb.TFocusedStateStyle.TStateLayer) // 0, 0
+  //     TStateStyles = class(TALCustomTrack.TThumb.TStateStyles)
+  //
+  // TALScrollBar = class(TALCustomScrollBar)
+  //
+  // TALBaseEdit = class(TALBaseRectangle, IVirtualKeyboardControl, IControlTypeSupportable, IALNativeControl)
+  //   TStroke = class(TALStrokeBrush) // $FF7a7a7a
+  //   TTextSettings = class(TALBaseTextSettings)
+  //     TFont = Class(TALFont) // 16
+  //   TLabelTextSettings = class(TALBaseTextSettings)
+  //     TMargins = class(TALBounds) // TRectF.Create(0,0,0,-4)
+  //     TFont = Class(TALFont) // 12
+  //   TSupportingTextSettings = class(TALBaseTextSettings)
+  //     TMargins = class(TALBounds) // TRectF.Create(0,4,0,0)
+  //     TFont = Class(TALFont) // 12
+  //   TBaseStateStyle = class(TALBaseStateStyle)
+  //     TStroke = class(TALInheritStrokeBrush) // $FF7a7a7a
+  //     TTextSettings = class(TALInheritBaseTextSettings)
+  //       TFont = Class(TALFont) // 16
+  //     TLabelTextSettings = class(TALInheritBaseTextSettings)
+  //       TFont = Class(TALFont) // 12
+  //     TSupportingTextSettings = class(TALInheritBaseTextSettings)
+  //       TFont = Class(TALFont) // 12
+  //   TDisabledStateStyle = class(TBaseStateStyle)
+  //   THoveredStateStyle = class(TBaseStateStyle)
+  //   TFocusedStateStyle = class(TBaseStateStyle)
+  //   TStateStyles = class(TALBaseStateStyles)
+  //
+  // TALEdit = class(TALBaseEdit)
+  //
+  // TALMemo = class(TALBaseEdit)
+  //   TTextSettings = class(TALBaseEdit.TTextSettings) // TALTextVertAlign.Leading
+  //   TDisabledStateStyle = class(TALBaseEdit.TDisabledStateStyle)
+  //     TTextSettings = class(TALBaseEdit.TDisabledStateStyle.TTextSettings) // TALTextVertAlign.Leading
+  //   THoveredStateStyle = class(TALBaseEdit.THoveredStateStyle)
+  //     TTextSettings = class(TALBaseEdit.THoveredStateStyle.TTextSettings) // TALTextVertAlign.Leading
+  //   TFocusedStateStyle = class(TALBaseEdit.TFocusedStateStyle)
+  //     TTextSettings = class(TALBaseEdit.TFocusedStateStyle.TTextSettings) // TALTextVertAlign.Leading
+  //   TStateStyles = class(TALBaseEdit.TStateStyles)
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALAniIndicator = class(TALControl)
@@ -149,10 +360,6 @@ type
         FWrapMode: TALImageWrapMode;
         FThickness: Single;
         FMargins: TALBounds;
-        FDefaultColor: TAlphaColor;
-        FDefaultResourceName: String;
-        FDefaultWrapMode: TALImageWrapMode;
-        FDefaultThickness: Single;
         procedure SetColor(const Value: TAlphaColor);
         procedure SetResourceName(const Value: String);
         procedure SetWrapMode(const Value: TALImageWrapMode);
@@ -164,10 +371,13 @@ type
         function IsWrapModeStored: Boolean;
         function IsThicknessStored: Boolean;
       protected
-        function CreateSavedState: TALPersistentObserver; override;
         function CreateMargins: TALBounds; virtual;
+        function GetDefaultColor: TAlphaColor; virtual;
+        function GetDefaultResourceName: String; virtual;
+        function GetDefaultWrapMode: TALImageWrapMode; virtual;
+        function GetDefaultThickness: Single; virtual;
       public
-        constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+        constructor Create; override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
@@ -175,10 +385,10 @@ type
         procedure Interpolate(const ATo: TCheckMarkBrush; const ANormalizedTime: Single); virtual;
         procedure InterpolateNoChanges(const ATo: TCheckMarkBrush; const ANormalizedTime: Single);
         function HasCheckMark: boolean;
-        property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
-        property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
-        property DefaultWrapMode: TALImageWrapMode read FDefaultWrapMode write FDefaultWrapMode;
-        property DefaultThickness: Single read FDefaultThickness write FDefaultThickness;
+        property DefaultColor: TAlphaColor read GetDefaultColor;
+        property DefaultResourceName: String read GetDefaultResourceName;
+        property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
+        property DefaultThickness: Single read GetDefaultThickness;
       published
         property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
         property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
@@ -198,7 +408,7 @@ type
         function CreateSavedState: TALPersistentObserver; override;
         procedure DoSupersede; virtual;
       public
-        constructor Create(const AParent: TCheckMarkBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
+        constructor Create(const AParent: TCheckMarkBrush); reintroduce; virtual;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
         procedure Supersede(Const ASaveState: Boolean = False); virtual;
@@ -222,6 +432,8 @@ type
               end;
           protected
             function CreateMargins: TALBounds; override;
+            function GetDefaultXRadius: Single; override;
+            function GetDefaultYRadius: Single; override;
           end;
       private
         FCheckMark: TInheritCheckMarkBrush;
@@ -314,7 +526,7 @@ type
         function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; virtual;
         function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
       public
-        constructor Create(const AParent: TALBaseCheckBox); reintroduce; virtual;
+        constructor Create(const AParent: TALControl); reintroduce; virtual;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
@@ -339,11 +551,10 @@ type
         procedure CheckedChanged(ASender: TObject);
         procedure UncheckedChanged(ASender: TObject);
       protected
-        function CreateSavedState: TALPersistentObserver; override;
-        function CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; virtual;
-        function CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; virtual;
+        function CreateCheckedStateStyles(const AParent: TALControl): TCheckStateStyles; virtual;
+        function CreateUncheckedStateStyles(const AParent: TALControl): TCheckStateStyles; virtual;
       public
-        constructor Create(const AParent: TALBaseCheckBox); reintroduce; virtual;
+        constructor Create(const AParent: TALControl); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
@@ -363,17 +574,17 @@ type
     FXRadius: Single;
     FYRadius: Single;
     FOnChange: TNotifyEvent;
-    FDefaultXRadius: Single;
-    FDefaultYRadius: Single;
     procedure SetCheckMark(const Value: TCheckMarkBrush);
     procedure SetStateStyles(const AValue: TStateStyles);
     function IsXRadiusStored: Boolean;
     function IsYRadiusStored: Boolean;
   protected
-    function CreateStateStyles: TStateStyles; virtual;
     function CreateCheckMark: TCheckMarkBrush; virtual;
+    function CreateStateStyles: TStateStyles; virtual;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
+    function GetDefaultXRadius: Single; virtual;
+    function GetDefaultYRadius: Single; virtual;
     procedure SetXRadius(const Value: Single); virtual;
     procedure SetYRadius(const Value: Single); virtual;
     procedure CheckMarkChanged(Sender: TObject); virtual;
@@ -422,8 +633,8 @@ type
     property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
     property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
     property OnChange: TNotifyEvent read FOnChange write FOnChange;
-    property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
-    property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+    property DefaultXRadius: Single read GetDefaultXRadius;
+    property DefaultYRadius: Single read GetDefaultYRadius;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -433,13 +644,13 @@ type
     type
       // ------------
       // TStateStyles
-      TCheckBoxStateStyles = class(TStateStyles)
+      TStateStyles = class(TALBaseCheckBox.TStateStyles)
       published
         property Transition;
       end;
   private
-    function GetStateStyles: TCheckBoxStateStyles;
-    procedure SetStateStyles(const AValue: TCheckBoxStateStyles);
+    function GetStateStyles: TStateStyles;
+    procedure SetStateStyles(const AValue: TStateStyles);
   protected
     function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
   published
@@ -476,7 +687,7 @@ type
     property Scale;
     property Shadow;
     property Size;
-    property StateStyles: TCheckBoxStateStyles read GetStateStyles write SetStateStyles;
+    property StateStyles: TStateStyles read GetStateStyles write SetStateStyles;
     property Stroke;
     property TabOrder;
     property TabStop;
@@ -515,76 +726,76 @@ type
   TALRadioButton = class(TALCheckBox)
   public
     type
-      // --------------------------
-      // TRadioButtonCheckMarkBrush
-      TRadioButtonCheckMarkBrush = class(TCheckMarkBrush)
+      // ---------------
+      // TCheckMarkBrush
+      TCheckMarkBrush = class(TALCheckBox.TCheckMarkBrush)
       public
         Type
-          TRadioButtonMargins = class(TMargins)
+          TMargins = class(TALCheckBox.TCheckMarkBrush.TMargins)
           protected
             function GetDefaultValue: TRectF; override;
           end;
       protected
         function CreateMargins: TALBounds; override;
       end;
-      // ---------------------------------
-      // TRadioButtonInheritCheckMarkBrush
-      TRadioButtonInheritCheckMarkBrush = class(TInheritCheckMarkBrush)
+      // ----------------------
+      // TInheritCheckMarkBrush
+      TInheritCheckMarkBrush = class(TALCheckBox.TInheritCheckMarkBrush)
       public
         Type
-          TRadioButtonMargins = class(TMargins)
+          TMargins = class(TALCheckBox.TInheritCheckMarkBrush.TMargins)
           protected
             function GetDefaultValue: TRectF; override;
           end;
       protected
         function CreateMargins: TALBounds; override;
       end;
-      // -----------------------------
-      // TRadioButtonDefaultStateStyle
-      TRadioButtonDefaultStateStyle = class(TDefaultStateStyle)
+      // ------------------
+      // TDefaultStateStyle
+      TDefaultStateStyle = class(TALCheckBox.TDefaultStateStyle)
       protected
-        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+        function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
       end;
-      // ------------------------------
-      // TRadioButtonDisabledStateStyle
-      TRadioButtonDisabledStateStyle = class(TDisabledStateStyle)
+      // -------------------
+      // TDisabledStateStyle
+      TDisabledStateStyle = class(TALCheckBox.TDisabledStateStyle)
       protected
-        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+        function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
       end;
-      // -----------------------------
-      // TRadioButtonHoveredStateStyle
-      TRadioButtonHoveredStateStyle = class(THoveredStateStyle)
+      // ------------------
+      // THoveredStateStyle
+      THoveredStateStyle = class(TALCheckBox.THoveredStateStyle)
       protected
-        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+        function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
       end;
-      // -----------------------------
-      // TRadioButtonPressedStateStyle
-      TRadioButtonPressedStateStyle = class(TPressedStateStyle)
+      // ------------------
+      // TPressedStateStyle
+      TPressedStateStyle = class(TALCheckBox.TPressedStateStyle)
       protected
-        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+        function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
       end;
-      // -----------------------------
-      // TRadioButtonFocusedStateStyle
-      TRadioButtonFocusedStateStyle = class(TFocusedStateStyle)
+      // ------------------
+      // TFocusedStateStyle
+      TFocusedStateStyle = class(TALCheckBox.TFocusedStateStyle)
       protected
-        function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
+        function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
       end;
-      // ----------------------------
-      // TRadioButtonCheckStateStyles
-      TRadioButtonCheckStateStyles = class(TCheckStateStyles)
+      // -----------------
+      // TCheckStateStyles
+      TCheckStateStyles = class(TALCheckBox.TCheckStateStyles)
       protected
-        function CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle; override;
-        function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; override;
-        function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; override;
-        function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; override;
-        function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; override;
+        function CreateDefaultStateStyle(const AParent: TObject): TALBaseCheckBox.TDefaultStateStyle; override;
+        function CreateDisabledStateStyle(const AParent: TObject): TALBaseCheckBox.TDisabledStateStyle; override;
+        function CreateHoveredStateStyle(const AParent: TObject): TALBaseCheckBox.THoveredStateStyle; override;
+        function CreatePressedStateStyle(const AParent: TObject): TALBaseCheckBox.TPressedStateStyle; override;
+        function CreateFocusedStateStyle(const AParent: TObject): TALBaseCheckBox.TFocusedStateStyle; override;
       end;
-      // -----------------------
-      // TRadioButtonStateStyles
-      TRadioButtonStateStyles = class(TCheckBoxStateStyles)
+      // ------------
+      // TStateStyles
+      TStateStyles = class(TALCheckBox.TStateStyles)
       protected
-        function CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
-        function CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
+        function CreateCheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles; override;
+        function CreateUncheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles; override;
       end;
   private
     FGroupName: string;
@@ -594,9 +805,11 @@ type
     function GroupNameStored: Boolean;
     procedure GroupMessageCall(const Sender : TObject; const M : TMessage);
   protected
-    function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
     function CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush; override;
+    function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
     procedure SetChecked(const Value: Boolean); override;
+    function GetDefaultXRadius: Single; override;
+    function GetDefaultYRadius: Single; override;
     function GetDefaultSize: TSizeF; override;
     procedure DrawCheckMark(
                 const ACanvas: TALCanvas;
@@ -622,11 +835,40 @@ type
       TTrack = class(TALShape)
       public
         type
+          // -----
+          // TFill
+          TFill = class(TALBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          // -------
+          // TStroke
+          TStroke = class(TALStrokeBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
           // ---------------
           // TBaseStateStyle
           TBaseStateStyle = class(TALBaseStateStyle)
           public
-            constructor Create(const AParent: TObject); override;
+            type
+              TFill = class(TALInheritBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
+          protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
           published
             property Fill;
             // When the track is scaled, the thumb is no longer aligned with the track.
@@ -693,8 +935,13 @@ type
             procedure FocusedChanged(ASender: TObject);
           protected
             function CreateSavedState: TALPersistentObserver; override;
+            function CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle; virtual;
+            function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
+            function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; virtual;
+            function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; virtual;
+            function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
           public
-            constructor Create(const AParent: TTrack); reintroduce; virtual;
+            constructor Create(const AParent: TALControl); reintroduce; virtual;
             destructor Destroy; override;
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
@@ -719,9 +966,10 @@ type
             procedure CheckedChanged(ASender: TObject);
             procedure UncheckedChanged(ASender: TObject);
           protected
-            function CreateSavedState: TALPersistentObserver; override;
+            function CreateCheckedStateStyles(const AParent: TALControl): TCheckStateStyles; virtual;
+            function CreateUncheckedStateStyles(const AParent: TALControl): TCheckStateStyles; virtual;
           public
-            constructor Create(const AParent: TTrack); reintroduce; virtual;
+            constructor Create(const AParent: TALControl); override;
             destructor Destroy; override;
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
@@ -739,15 +987,18 @@ type
         FDoubleBuffered: boolean;
         FXRadius: Single;
         FYRadius: Single;
-        FDefaultXRadius: Single;
-        FDefaultYRadius: Single;
         procedure SetStateStyles(const AValue: TStateStyles);
         function IsXRadiusStored: Boolean;
         function IsYRadiusStored: Boolean;
       protected
+        function CreateFill: TALBrush; override;
+        function CreateStroke: TALStrokeBrush; override;
+        function CreateStateStyles: TStateStyles; virtual;
         function GetDefaultSize: TSizeF; override;
         function GetDoubleBuffered: boolean; override;
         procedure SetDoubleBuffered(const AValue: Boolean); override;
+        function GetDefaultXRadius: Single; virtual;
+        function GetDefaultYRadius: Single; virtual;
         procedure SetXRadius(const Value: Single); virtual;
         procedure SetYRadius(const Value: Single); virtual;
         procedure StateStylesChanged(Sender: TObject); virtual;
@@ -777,8 +1028,8 @@ type
         procedure AlignToPixel; override;
         procedure MakeBufDrawable; override;
         procedure ClearBufDrawable; override;
-        property DefaultXRadius: Single read FDefaultXRadius write FDefaultXRadius;
-        property DefaultYRadius: Single read FDefaultYRadius write FDefaultYRadius;
+        property DefaultXRadius: Single read GetDefaultXRadius;
+        property DefaultYRadius: Single read GetDefaultYRadius;
         property DoubleBuffered default true;
         property Position stored false;
       published
@@ -850,86 +1101,130 @@ type
       TThumb = class(TALBaseCheckBox)
       public
         type
+          // -------
+          // TStroke
+          TStroke = class(TALStrokeBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
           // --------------------
-          // TThumbCheckMarkBrush
-          TThumbCheckMarkBrush = class(TCheckMarkBrush)
+          // TCheckMarkBrush
+          TCheckMarkBrush = class(TALBaseCheckBox.TCheckMarkBrush)
           public
             Type
-              TThumbMargins = class(TMargins)
+              TMargins = class(TALBaseCheckBox.TCheckMarkBrush.TMargins)
               protected
                 function GetDefaultValue: TRectF; override;
               end;
           protected
             function CreateMargins: TALBounds; override;
-          end;
-          // ---------------------------
-          // TThumbInheritCheckMarkBrush
-          TThumbInheritCheckMarkBrush = class(TInheritCheckMarkBrush)
-          public
-            Type
-              TThumbMargins = class(TMargins)
-              protected
-                function GetDefaultValue: TRectF; override;
-              end;
-          protected
-            function CreateMargins: TALBounds; override;
-          end;
-          // -----------------------
-          // TThumbDefaultStateStyle
-          TThumbDefaultStateStyle = class(TDefaultStateStyle)
-          protected
-            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
-          end;
-          // ------------------------
-          // TThumbDisabledStateStyle
-          TThumbDisabledStateStyle = class(TDisabledStateStyle)
-          protected
-            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
-          end;
-          // -----------------------
-          // TThumbHoveredStateStyle
-          TThumbHoveredStateStyle = class(THoveredStateStyle)
-          protected
-            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
-          end;
-          // -----------------------
-          // TThumbPressedStateStyle
-          TThumbPressedStateStyle = class(TPressedStateStyle)
-          protected
-            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
-          end;
-          // -----------------------
-          // TThumbFocusedStateStyle
-          TThumbFocusedStateStyle = class(TFocusedStateStyle)
-          protected
-            function CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush; override;
           end;
           // ----------------------
-          // TThumbCheckStateStyles
-          TThumbCheckStateStyles = class(TCheckStateStyles)
+          // TInheritCheckMarkBrush
+          TInheritCheckMarkBrush = class(TALBaseCheckBox.TInheritCheckMarkBrush)
+          public
+            Type
+              TMargins = class(TALBaseCheckBox.TInheritCheckMarkBrush.TMargins)
+              protected
+                function GetDefaultValue: TRectF; override;
+              end;
           protected
-            function CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle; override;
-            function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; override;
-            function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; override;
-            function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; override;
-            function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; override;
+            function CreateMargins: TALBounds; override;
+          end;
+          // ------------------
+          // TDefaultStateStyle
+          TDefaultStateStyle = class(TALBaseCheckBox.TDefaultStateStyle)
+          public
+            type
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
+          end;
+          // -------------------
+          // TDisabledStateStyle
+          TDisabledStateStyle = class(TALBaseCheckBox.TDisabledStateStyle)
+          public
+            type
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
+          end;
+          // ------------------
+          // THoveredStateStyle
+          THoveredStateStyle = class(TALBaseCheckBox.THoveredStateStyle)
+          public
+            type
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
+          end;
+          // ------------------
+          // TPressedStateStyle
+          TPressedStateStyle = class(TALBaseCheckBox.TPressedStateStyle)
+          public
+            type
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
+          end;
+          // ------------------
+          // TFocusedStateStyle
+          TFocusedStateStyle = class(TALBaseCheckBox.TFocusedStateStyle)
+          public
+            type
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush; override;
+          end;
+          // -----------------
+          // TCheckStateStyles
+          TCheckStateStyles = class(TALBaseCheckBox.TCheckStateStyles)
+          protected
+            function CreateDefaultStateStyle(const AParent: TObject): TALBaseCheckBox.TDefaultStateStyle; override;
+            function CreateDisabledStateStyle(const AParent: TObject): TALBaseCheckBox.TDisabledStateStyle; override;
+            function CreateHoveredStateStyle(const AParent: TObject): TALBaseCheckBox.THoveredStateStyle; override;
+            function CreatePressedStateStyle(const AParent: TObject): TALBaseCheckBox.TPressedStateStyle; override;
+            function CreateFocusedStateStyle(const AParent: TObject): TALBaseCheckBox.TFocusedStateStyle; override;
           end;
           // ------------
           // TStateStyles
-          TThumbStateStyles = class(TALBaseCheckBox.TStateStyles)
+          TStateStyles = class(TALBaseCheckBox.TStateStyles)
           private
             FStartPositionX: Single;
           protected
-            function CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
-            function CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles; override;
+            function CreateCheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles; override;
+            function CreateUncheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles; override;
             procedure StartTransition; override;
             procedure TransitionAnimationProcess(Sender: TObject); override;
             procedure TransitionAnimationFinish(Sender: TObject); override;
           end;
       protected
-        function GetDefaultSize: TSizeF; override;
-        function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
+        function CreateStroke: TALStrokeBrush; override;
         function CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush; override;
+        function CreateStateStyles: TALBaseCheckBox.TStateStyles; override;
+        function GetDefaultXRadius: Single; override;
+        function GetDefaultYRadius: Single; override;
+        function GetDefaultSize: TSizeF; override;
         procedure Click; override;
       public
         constructor Create(AOwner: TComponent); override;
@@ -1015,6 +1310,8 @@ type
     function GetMaxThumbPos: Single;
     procedure AlignThumb;
   protected
+    function CreateTrack: TTrack; virtual;
+    function CreateThumb: TThumb; virtual;
     function GetDefaultSize: TSizeF; override;
     function GetDoubleBuffered: boolean; override;
     procedure SetDoubleBuffered(const AValue: Boolean); override;
@@ -1109,6 +1406,18 @@ type
   TALButton = class(TALBaseText)
   public
     type
+      // -----
+      // TFill
+      TFill = class(TALBaseText.TFill)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
+      // -------
+      // TStroke
+      TStroke = class(TALBaseText.TStroke)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
       // -------------
       // TTextSettings
       TTextSettings = class(TALBaseTextSettings)
@@ -1133,36 +1442,47 @@ type
         property LetterSpacing;
         property IsHtml;
       end;
-      // -----------------------
-      // TStateStyleTextSettings
-      TStateStyleTextSettings = class(TALInheritBaseTextSettings)
-      public
-        Type
-          TFont = Class(TALFont)
-          protected
-            function GetDefaultWeight: TFontWeight; override;
-          End;
-      protected
-        function CreateFont: TALFont; override;
-      published
-        property Font;
-        property Decoration;
-      end;
       // ---------------
       // TBaseStateStyle
       TBaseStateStyle = class(TALBaseStateStyle)
+      public
+        type
+          TFill = class(TALInheritBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          TStroke = class(TALInheritStrokeBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          TTextSettings = class(TALInheritBaseTextSettings)
+          public
+            Type
+              TFont = Class(TALFont)
+              protected
+                function GetDefaultWeight: TFontWeight; override;
+              End;
+          protected
+            function CreateFont: TALFont; override;
+          published
+            property Font;
+            property Decoration;
+          end;
       private
         FText: String;
-        FTextSettings: TStateStyleTextSettings;
-        FDefaultText: String;
+        FTextSettings: TBaseStateStyle.TTextSettings;
         FPriorSupersedeText: String;
         function GetStateStyleParent: TBaseStateStyle;
         function GetControlParent: TALButton;
         procedure SetText(const Value: string);
-        procedure SetTextSettings(const AValue: TStateStyleTextSettings);
+        procedure SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
         procedure TextSettingsChanged(ASender: TObject);
         function IsTextStored: Boolean;
       protected
+        function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+        function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings; virtual;
+        function GetDefaultText: String; virtual;
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
@@ -1174,14 +1494,14 @@ type
         procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALButton read GetControlParent;
-        property DefaultText: String read FDefaultText write FDefaultText;
+        property DefaultText: String read GetDefaultText;
       published
         property Fill;
         property Scale;
         property Shadow;
         property Stroke;
         property Text: string read FText write SetText stored IsTextStored nodefault;
-        property TextSettings: TStateStyleTextSettings read fTextSettings write SetTextSettings;
+        property TextSettings: TBaseStateStyle.TTextSettings read fTextSettings write SetTextSettings;
       end;
       // -------------------
       // TDisabledStateStyle
@@ -1235,9 +1555,12 @@ type
         procedure PressedChanged(ASender: TObject);
         procedure FocusedChanged(ASender: TObject);
       protected
-        function CreateSavedState: TALPersistentObserver; override;
+        function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
+        function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; virtual;
+        function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; virtual;
+        function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
       public
-        constructor Create(const AParent: TALButton); reintroduce; virtual;
+        constructor Create(const AParent: TALControl); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
@@ -1260,7 +1583,10 @@ type
     function GetTextSettings: TTextSettings;
     procedure SetStateStyles(const AValue: TStateStyles);
   protected
+    function CreateFill: TALBrush; override;
+    function CreateStroke: TALStrokeBrush; override;
     function CreateTextSettings: TALBaseTextSettings; override;
+    function CreateStateStyles: TStateStyles; virtual;
     procedure SetTextSettings(const Value: TTextSettings); reintroduce;
     procedure SetName(const Value: TComponentName); override;
     procedure TextSettingsChanged(Sender: TObject); override;
@@ -1361,6 +1687,18 @@ type
       TTrack = class(TALBaseRectangle)
       public
         type
+          // -----
+          // TFill
+          TFill = class(TALBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          // -------
+          // TStroke
+          TStroke = class(TALStrokeBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
           // -------------------
           // TStopIndicatorBrush
           TStopIndicatorBrush = class(TALPersistentObserver)
@@ -1369,10 +1707,6 @@ type
             FResourceName: String;
             FWrapMode: TALImageWrapMode;
             FSize: Single;
-            FDefaultColor: TAlphaColor;
-            FDefaultResourceName: String;
-            FDefaultWrapMode: TALImageWrapMode;
-            FDefaultSize: Single;
             procedure SetColor(const Value: TAlphaColor);
             procedure SetResourceName(const Value: String);
             procedure SetWrapMode(const Value: TALImageWrapMode);
@@ -1382,19 +1716,22 @@ type
             function IsWrapModeStored: Boolean;
             function IsSizeStored: Boolean;
           protected
-            function CreateSavedState: TALPersistentObserver; override;
+            function GetDefaultColor: TAlphaColor; virtual;
+            function GetDefaultResourceName: String; virtual;
+            function GetDefaultWrapMode: TALImageWrapMode; virtual;
+            function GetDefaultSize: Single; virtual;
           public
-            constructor Create(const ADefaultColor: TAlphaColor); reintroduce; virtual;
+            constructor Create; override;
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure AlignToPixel; virtual;
             procedure Interpolate(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single); virtual;
             procedure InterpolateNoChanges(const ATo: TStopIndicatorBrush; const ANormalizedTime: Single);
             function hasStopIndicator: Boolean;
-            property DefaultColor: TAlphaColor read FDefaultColor write FDefaultColor;
-            property DefaultResourceName: String read FDefaultResourceName write FDefaultResourceName;
-            property DefaultWrapMode: TALImageWrapMode read FDefaultWrapMode write FDefaultWrapMode;
-            property DefaultSize: Single read FDefaultSize write FDefaultSize;
+            property DefaultColor: TAlphaColor read GetDefaultColor;
+            property DefaultResourceName: String read GetDefaultResourceName;
+            property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
+            property DefaultSize: Single read GetDefaultSize;
           published
             property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
             property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
@@ -1413,7 +1750,7 @@ type
             function CreateSavedState: TALPersistentObserver; override;
             procedure DoSupersede; virtual;
           public
-            constructor Create(const AParent: TStopIndicatorBrush; const ADefaultColor: TAlphaColor); reintroduce; virtual;
+            constructor Create(const AParent: TStopIndicatorBrush); reintroduce; virtual;
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
             procedure Supersede(Const ASaveState: Boolean = False); virtual;
@@ -1426,12 +1763,31 @@ type
           // ---------------
           // TBaseStateStyle
           TBaseStateStyle = class(TALBaseStateStyle)
+          public
+            type
+              TFill = class(TALInheritBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
           private
             FStopIndicator: TInheritStopIndicatorBrush;
             function GetControlParent: TTrack;
             procedure SetStopIndicator(const AValue: TInheritStopIndicatorBrush);
             procedure StopIndicatorChanged(ASender: TObject);
           protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
+            function CreateStopIndicator(const AParent: TStopIndicatorBrush): TInheritStopIndicatorBrush; virtual;
             procedure DoSupersede; override;
             function GetInherit: Boolean; override;
           public
@@ -1472,9 +1828,9 @@ type
             procedure SetDisabled(const AValue: TDisabledStateStyle);
             procedure DisabledChanged(ASender: TObject);
           protected
-            function CreateSavedState: TALPersistentObserver; override;
+            function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
           public
-            constructor Create(const AParent: TTrack); reintroduce; virtual;
+            constructor Create(const AParent: TALControl); override;
             destructor Destroy; override;
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
@@ -1495,6 +1851,10 @@ type
         procedure SetStateStyles(const AValue: TStateStyles);
         procedure SetStopIndicator(const Value: TStopIndicatorBrush);
       protected
+        function CreateFill: TALBrush; override;
+        function CreateStroke: TALStrokeBrush; override;
+        function CreateStopIndicator: TStopIndicatorBrush; virtual;
+        function CreateStateStyles: TStateStyles; virtual;
         procedure SetXRadius(const Value: Single); override;
         procedure SetYRadius(const Value: Single); override;
         procedure StateStylesChanged(Sender: TObject); virtual;
@@ -1605,27 +1965,69 @@ type
       TInactiveTrack = class(TTrack)
       protected
         function GetBufDrawableSrcRect: TRectF; override;
-      public
-        constructor Create(const ACustomTrack: TALCustomTrack); override;
       end;
       // ------------
       // TActiveTrack
       TActiveTrack = class(TTrack)
-      protected
-        function GetBufDrawableSrcRect: TRectF; override;
       public
-        constructor Create(const ACustomTrack: TALCustomTrack); override;
+        type
+          // -----
+          // TFill
+          TFill = class(TTrack.TFill)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          // -------------------
+          // TDisabledStateStyle
+          TDisabledStateStyle = class(TTrack.TDisabledStateStyle)
+          public
+            type
+              TFill = class(TTrack.TDisabledStateStyle.TFill)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+          protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+          end;
+          // ------------
+          // TStateStyles
+          TStateStyles = class(TTrack.TStateStyles)
+          protected
+            function CreateDisabledStateStyle(const AParent: TObject): TTrack.TDisabledStateStyle; override;
+          end;
+      protected
+        function CreateFill: TALBrush; override;
+        function CreateStateStyles: TTrack.TStateStyles; override;
+        function GetBufDrawableSrcRect: TRectF; override;
       end;
       // ------
       // TThumb
       TThumb = class(TALBaseRectangle)
       public
         type
+          // -------
+          // TStroke
+          TStroke = class(TALStrokeBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
           // ---------------
           // TBaseStateStyle
           TBaseStateStyle = class(TALBaseStateStyle)
           public
-            constructor Create(const AParent: TObject); override;
+            type
+              TStroke = class(TALInheritStrokeBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
+          protected
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
           published
             property Fill;
             property Scale;
@@ -1684,9 +2086,12 @@ type
             procedure PressedChanged(ASender: TObject);
             procedure FocusedChanged(ASender: TObject);
           protected
-            function CreateSavedState: TALPersistentObserver; override;
+            function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
+            function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; virtual;
+            function CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle; virtual;
+            function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
           public
-            constructor Create(const AParent: TThumb); reintroduce; virtual;
+            constructor Create(const AParent: TALControl); override;
             destructor Destroy; override;
             procedure Assign(Source: TPersistent); override;
             procedure Reset; override;
@@ -1713,8 +2118,12 @@ type
         procedure SetStateStyles(const AValue: TStateStyles);
         procedure ScrollCapturedByOtherHandler(const Sender: TObject; const M: TMessage);
       protected
+        function CreateStroke: TALStrokeBrush; override;
+        function CreateStateStyles: TStateStyles; virtual;
         procedure DoBeginUpdate; override;
         procedure DoEndUpdate; override;
+        function GetDefaultXRadius: Single; override;
+        function GetDefaultYRadius: Single; override;
         procedure SetXRadius(const Value: Single); override;
         procedure SetYRadius(const Value: Single); override;
         procedure StateStylesChanged(Sender: TObject); virtual;
@@ -1809,7 +2218,15 @@ type
       // TValueIndicator
       TValueIndicator = class(TALBaseText)
       public
+        class var Format0: String;
+      public
         type
+          // -----
+          // TFill
+          TFill = class(TALBaseText.TFill)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
           // -------------
           // TTextSettings
           TTextSettings = Class(TALTextSettings)
@@ -1827,13 +2244,12 @@ type
           // ----------
           // TAnimation
           TAnimation = (None, ScaleInOut, Opacity);
-          // ----------
-          // TAnimation
+          // ------------------
+          // TCustomFormatEvent
           TCustomFormatEvent = procedure(ASender: TObject; const AValue: Double; Var AText: String) of object;
       private
         FCustomTrack: TALCustomTrack;
         FFormat: String;
-        FDefaultFormat: String;
         FOnCustomFormat: TCustomFormatEvent;
         FFloatAnimation: TALFloatAnimation;
         FAnimation: TAnimation;
@@ -1845,13 +2261,17 @@ type
         procedure AnimationFinish(Sender: TObject);
         procedure AdjustPosition(const AThumb: TThumb);
       protected
+        function CreateFill: TALBrush; override;
         function CreateTextSettings: TALBaseTextSettings; override;
         procedure SetTextSettings(const Value: TALTextSettings); reintroduce;
+        function GetDefaultXRadius: Single; override;
+        function GetDefaultYRadius: Single; override;
+        function GetDefaultFormat: String; virtual;
       public
         constructor Create(const ACustomTrack: TALCustomTrack); reintroduce; virtual;
         destructor Destroy; override;
         procedure Refresh(const AThumb: TThumb);
-        property DefaultFormat: String read FDefaultFormat write FDefaultFormat;
+        property DefaultFormat: String read GetDefaultFormat;
         property Visible default false;
       published
         //property Action;
@@ -2097,9 +2517,9 @@ type
   TALRangeTrackBar = class(TALCustomTrack)
   public
     Type
-      // ----------------------
-      // TRangeMinInactiveTrack
-      TRangeMinInactiveTrack = class(TInactiveTrack)
+      // -----------------
+      // TMinInactiveTrack
+      TMinInactiveTrack = class(TALCustomTrack.TInactiveTrack)
       private
         function _GetOpacity: Single;
         procedure _SetOpacity(const AValue: Single);
@@ -2117,21 +2537,21 @@ type
       published
         property Opacity: Single read _GetOpacity write _SetOpacity stored _IsOpacityStored nodefault;
       end;
-      // ----------------------
-      // TRangeMaxInactiveTrack
-      TRangeMaxInactiveTrack = class(TInactiveTrack)
-      protected
-        function GetBufDrawableSrcRect: TRectF; override;
-      end;
       // -----------------
-      // TRangeActiveTrack
-      TRangeActiveTrack = class(TActiveTrack)
+      // TMaxInactiveTrack
+      TMaxInactiveTrack = class(TALCustomTrack.TInactiveTrack)
       protected
         function GetBufDrawableSrcRect: TRectF; override;
       end;
-      // --------------
-      // TRangeMinThumb
-      TRangeMinThumb = class(TThumb)
+      // ------------
+      // TActiveTrack
+      TActiveTrack = class(TALCustomTrack.TActiveTrack)
+      protected
+        function GetBufDrawableSrcRect: TRectF; override;
+      end;
+      // ---------
+      // TMinThumb
+      TMinThumb = class(TALCustomTrack.TThumb)
       private
         FFormerTouchTargetExpansionChangedHandler: TNotifyEvent;
         function _GetOpacity: Single;
@@ -2157,9 +2577,9 @@ type
         property Opacity: Single read _GetOpacity write _SetOpacity stored _IsOpacityStored nodefault;
         property Cursor: TCursor read _GetCursor write _SetCursor default crHandPoint;
       end;
-      // --------------
-      // TRangeMaxThumb
-      TRangeMaxThumb = class(TThumb)
+      // ---------
+      // TMaxThumb
+      TMaxThumb = class(TALCustomTrack.TThumb)
       public
         constructor Create(const ACustomTrack: TALCustomTrack); override;
       end;
@@ -2268,12 +2688,140 @@ type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALCustomScrollBar = class(TALCustomTrack)
+  public
+    type
+      // ------
+      // TThumb
+      TThumb = class(TALCustomTrack.TThumb)
+      public
+        type
+          // -----
+          // TFill
+          TFill = class(TALBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          // -------
+          // TStroke
+          TStroke = class(TALCustomTrack.TThumb.TStroke)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          // -------------------
+          // TDisabledStateStyle
+          TDisabledStateStyle = class(TALCustomTrack.TThumb.TDisabledStateStyle)
+          public
+            type
+              TFill = class(TALInheritBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALCustomTrack.TThumb.TDisabledStateStyle.TStroke)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALCustomTrack.TThumb.TDisabledStateStyle.TStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
+          protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
+          end;
+          // ------------------
+          // THoveredStateStyle
+          THoveredStateStyle = class(TALCustomTrack.TThumb.THoveredStateStyle)
+          public
+            type
+              TFill = class(TALInheritBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALCustomTrack.TThumb.THoveredStateStyle.TStroke)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALCustomTrack.TThumb.THoveredStateStyle.TStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
+          protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
+          end;
+          // ------------------
+          // TPressedStateStyle
+          TPressedStateStyle = class(TALCustomTrack.TThumb.TPressedStateStyle)
+          public
+            type
+              TFill = class(TALInheritBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALCustomTrack.TThumb.TPressedStateStyle.TStroke)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALCustomTrack.TThumb.TPressedStateStyle.TStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
+          protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
+          end;
+          // ------------------
+          // TFocusedStateStyle
+          TFocusedStateStyle = class(TALCustomTrack.TThumb.TFocusedStateStyle)
+          public
+            type
+              TFill = class(TALInheritBrush)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStroke = class(TALCustomTrack.TThumb.TFocusedStateStyle.TStroke)
+              protected
+                function GetDefaultColor: TAlphaColor; override;
+              end;
+              TStateLayer = class(TALCustomTrack.TThumb.TFocusedStateStyle.TStateLayer)
+              protected
+                function GetDefaultXRadius: Single; override;
+                function GetDefaultYRadius: Single; override;
+              end;
+          protected
+            function CreateFill(const AParent: TALBrush): TALInheritBrush; override;
+            function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+            function CreateStateLayer: TALStateLayer; override;
+          end;
+          // ------------
+          // TStateStyles
+          TStateStyles = class(TALCustomTrack.TThumb.TStateStyles)
+          protected
+            function CreateDisabledStateStyle(const AParent: TObject): TALCustomTrack.TThumb.TDisabledStateStyle; override;
+            function CreateHoveredStateStyle(const AParent: TObject): TALCustomTrack.TThumb.THoveredStateStyle; override;
+            function CreatePressedStateStyle(const AParent: TObject): TALCustomTrack.TThumb.TPressedStateStyle; override;
+            function CreateFocusedStateStyle(const AParent: TObject): TALCustomTrack.TThumb.TFocusedStateStyle; override;
+          end;
+      protected
+        function CreateFill: TALBrush; override;
+        function CreateStroke: TALStrokeBrush; override;
+        function CreateStateStyles: TALCustomTrack.TThumb.TStateStyles; override;
+        function GetDefaultXRadius: Single; override;
+        function GetDefaultYRadius: Single; override;
+      end;
   protected
     function GetDefaultSize: TSizeF; override;
     procedure AlignThumb; override;
     function CreateInactiveTrack(const AInactiveTrackClass: TALCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALCustomTrack.TInactiveTrack; override;
     function CreateActiveTrack(const AActiveTrackClass: TALCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALCustomTrack.TActiveTrack; override;
     function CreateValueIndicator(const AValueIndicatorClass: TALCustomTrack.TValueIndicatorClass = nil; Const AName: String = 'ValueIndicator'): TALCustomTrack.TValueIndicator; override;
+    function CreateThumb(const AThumbClass: TALCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALCustomTrack.TThumb; override;
   public
     constructor Create(AOwner: TComponent); override;
     property CanFocus default False;
@@ -2537,21 +3085,40 @@ begin
   end;
 end;
 
-{*******************************************************************************}
-constructor TALCustomTrack.TThumb.TBaseStateStyle.Create(const AParent: TObject);
+{******************************************************************}
+function TALCustomTrack.TThumb.TStroke.GetDefaultColor: TAlphaColor;
 begin
-  inherited Create(AParent);
-  //--
-  Fill.DefaultColor := TAlphaColors.White;
-  Fill.Color := Fill.DefaultColor;
-  //--
-  Stroke.DefaultColor := $ffd5d5d5;
-  Stroke.Color := Stroke.DefaultColor;
-  //--
-  StateLayer.DefaultXRadius := -50;
-  StateLayer.DefaultYRadius := -50;
-  StateLayer.XRadius := StateLayer.DefaultXRadius;
-  StateLayer.YRadius := StateLayer.DefaultYRadius;
+  Result := $ffd5d5d5;
+end;
+
+{**********************************************************************************}
+function TALCustomTrack.TThumb.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ffd5d5d5;
+end;
+
+{***********************************************************************************}
+function TALCustomTrack.TThumb.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{***********************************************************************************}
+function TALCustomTrack.TThumb.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := -50;
+end;
+
+{****************************************************************************************************************}
+function TALCustomTrack.TThumb.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{*****************************************************************************}
+function TALCustomTrack.TThumb.TBaseStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
 end;
 
 {**************************************************************************}
@@ -2612,21 +3179,21 @@ begin
   Result := inherited GetInherit;
 end;
 
-{******************************************************************************************}
-constructor TALCustomTrack.TThumb.TStateStyles.Create(const AParent: TALCustomTrack.TThumb);
+{*******************************************************************************}
+constructor TALCustomTrack.TThumb.TStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create(AParent);
   //--
-  FDisabled := TDisabledStateStyle.Create(AParent);
+  FDisabled := CreateDisabledStateStyle(AParent);
   FDisabled.OnChanged := DisabledChanged;
   //--
-  FHovered := THoveredStateStyle.Create(AParent);
+  FHovered := CreateHoveredStateStyle(AParent);
   FHovered.OnChanged := HoveredChanged;
   //--
-  FPressed := TPressedStateStyle.Create(AParent);
+  FPressed := CreatePressedStateStyle(AParent);
   FPressed.OnChanged := PressedChanged;
   //--
-  FFocused := TFocusedStateStyle.Create(AParent);
+  FFocused := CreateFocusedStateStyle(AParent);
   FFocused.OnChanged := FocusedChanged;
 end;
 
@@ -2640,12 +3207,28 @@ begin
   inherited Destroy;
 end;
 
-{**********************************************************************************}
-function TALCustomTrack.TThumb.TStateStyles.CreateSavedState: TALPersistentObserver;
-type
-  TThumbStateStylesClass = class of TStateStyles;
+{****************************************************************************************************************}
+function TALCustomTrack.TThumb.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
-  result := TThumbStateStylesClass(classtype).Create(nil{AParent});
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALCustomTrack.TThumb.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALCustomTrack.TThumb.TStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALCustomTrack.TThumb.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
 end;
 
 {***********************************************************************}
@@ -2804,28 +3387,11 @@ begin
   fScrollCapturedByMe := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := TAlphaColors.White;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := $ffd5d5d5;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
-  DefaultXRadius := -50;
-  DefaultYRadius := -50;
-  XRadius := DefaultXRadius;
-  YRadius := DefaultYRadius;
-  //--
   {$IF defined(ALDPK)}
   FPrevStateStyles := TStateStyles.Create(nil);
   {$ENDIF}
   //--
-  FStateStyles := TStateStyles.Create(self);
+  FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
@@ -2839,6 +3405,18 @@ begin
   TMessageManager.DefaultManager.Unsubscribe(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   ALFreeAndNil(FValueRange);
   inherited;
+end;
+
+{**********************************************************}
+function TALCustomTrack.TThumb.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{*************************************************************}
+function TALCustomTrack.TThumb.CreateStateStyles: TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
 end;
 
 {********************************************}
@@ -2877,6 +3455,18 @@ end;
 procedure TALCustomTrack.TThumb.SetStateStyles(const AValue: TStateStyles);
 begin
   FStateStyles.Assign(AValue);
+end;
+
+{*******************************************************}
+function TALCustomTrack.TThumb.GetDefaultXRadius: Single;
+begin
+  result := -50;
+end;
+
+{*******************************************************}
+function TALCustomTrack.TThumb.GetDefaultYRadius: Single;
+begin
+  result := -50;
 end;
 
 {**************************************************************}
@@ -3364,25 +3954,31 @@ begin
 
 end;
 
-{************************************************************************************}
+{*************************************************************************}
+function TALCustomTrack.TValueIndicator.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphacolors.Black;
+end;
+
+{****************************************************************************************}
 function TALCustomTrack.TValueIndicator.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-{************************************************************************************}
+{***************************************************************************************}
 function TALCustomTrack.TValueIndicator.TTextSettings.TFont.GetDefaultColor: TAlphaColor;
 begin
   Result := TAlphaColors.White;
 end;
 
-{************************************************************************************}
+{************************************************************************}
 function TALCustomTrack.TValueIndicator.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-{************************************************************************************}
+{******************************************************************************************}
 function TALCustomTrack.TValueIndicator.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
 begin
   Result := TALTextHorzAlign.center;
@@ -3395,8 +3991,7 @@ begin
   AutoSize := True;
   Visible := False;
   FCustomTrack := ACustomTrack;
-  FDefaultFormat := '0';
-  FFormat := FDefaultFormat;
+  FFormat := DefaultFormat;
   FOnCustomFormat := nil;
   FAnimation := TAnimation.ScaleInOut;
   FShowOnInteraction := False;
@@ -3410,18 +4005,6 @@ begin
   FFloatAnimation.OnProcess := AnimationProcess;
   FFloatAnimation.OnFinish := AnimationFinish;
   //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := TAlphacolors.Black;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := TAlphaColors.Null;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
   var LMarginsChange: TNotifyEvent := Margins.OnChange;
   Margins.OnChange := nil;
   Margins.DefaultValue := TRectF.create(6{Left}, 4{Top}, 6{Right}, 4{Bottom});
@@ -3433,11 +4016,6 @@ begin
   Padding.DefaultValue := TRectF.create(16{Left}, 12{Top}, 16{Right}, 12{Bottom});
   Padding.Rect := Padding.DefaultValue;
   padding.OnChange := LPaddingChange;
-  //--
-  DefaultXRadius := -50;
-  DefaultYRadius := -50;
-  XRadius := DefaultXRadius;
-  YRadius := DefaultYRadius;
 end;
 
 {************************************************}
@@ -3568,6 +4146,12 @@ begin
   end;
 end;
 
+{***********************************************************}
+function TALCustomTrack.TValueIndicator.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
 {******************************************************************************}
 function TALCustomTrack.TValueIndicator.CreateTextSettings: TALBaseTextSettings;
 begin
@@ -3586,6 +4170,24 @@ begin
   Inherited SetTextSettings(Value);
 end;
 
+{****************************************************************}
+function TALCustomTrack.TValueIndicator.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{****************************************************************}
+function TALCustomTrack.TValueIndicator.GetDefaultYRadius: Single;
+begin
+  Result := -50;
+end;
+
+{***************************************************************}
+function TALCustomTrack.TValueIndicator.GetDefaultFormat: String;
+begin
+  Result := Format0;
+end;
+
 {**********************************************************************}
 procedure TALCustomTrack.TValueIndicator.SetFormat(const Value: string);
 begin
@@ -3599,31 +4201,53 @@ end;
 {**************************************************************}
 function TALCustomTrack.TValueIndicator.IsFormatStored: Boolean;
 begin
-  Result := FFormat <> FDefaultFormat;
+  Result := FFormat <> DefaultFormat;
 end;
 
-{*********************************************************************************************}
-constructor TALCustomTrack.TTrack.TStopIndicatorBrush.Create(const ADefaultColor: TAlphaColor);
+{****************************************************************}
+function TALCustomTrack.TTrack.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ffc5c5c5;
+end;
+
+{******************************************************************}
+function TALCustomTrack.TTrack.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
+{***********************************************************}
+constructor TALCustomTrack.TTrack.TStopIndicatorBrush.Create;
 begin
   inherited Create;
-  //--
-  FDefaultColor := ADefaultColor;
-  FDefaultResourceName := '';
-  FDefaultWrapMode := TALImageWrapMode.Fit;
-  FDefaultSize := 4;
-  //--
-  FColor := FDefaultColor;
-  FResourceName := FDefaultResourceName;
-  FWrapMode := FDefaultWrapMode;
-  FSize := FDefaultSize;
+  FColor := DefaultColor;
+  FResourceName := DefaultResourceName;
+  FWrapMode := DefaultWrapMode;
+  FSize := DefaultSize;
 end;
 
-{*****************************************************************************************}
-function TALCustomTrack.TTrack.TStopIndicatorBrush.CreateSavedState: TALPersistentObserver;
-type
-  TStopIndicatorBrushClass = class of TStopIndicatorBrush;
+{******************************************************************************}
+function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultColor: TAlphaColor;
 begin
-  result := TStopIndicatorBrushClass(classtype).Create(DefaultColor);
+  Result := TAlphaColors.Null;
+end;
+
+{********************************************************************************}
+function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultResourceName: String;
+begin
+  Result := '';
+end;
+
+{**************************************************************************************}
+function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultWrapMode: TALImageWrapMode;
+begin
+  Result := TALImageWrapMode.Fit;
+end;
+
+{************************************************************************}
+function TALCustomTrack.TTrack.TStopIndicatorBrush.GetDefaultSize: Single;
+begin
+  Result := 4;
 end;
 
 {******************************************************************************}
@@ -3714,25 +4338,25 @@ end;
 {************************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.IsColorStored: Boolean;
 begin
-  result := FColor <> FDefaultColor;
+  result := FColor <> DefaultColor;
 end;
 
 {*******************************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.IsResourceNameStored: Boolean;
 begin
-  result := FResourceName <> FDefaultResourceName;
+  result := FResourceName <> DefaultResourceName;
 end;
 
 {***************************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.IsWrapModeStored: Boolean;
 begin
-  result := FWrapMode <> FDefaultWrapMode;
+  result := FWrapMode <> DefaultWrapMode;
 end;
 
 {***********************************************************************}
 function TALCustomTrack.TTrack.TStopIndicatorBrush.IsSizeStored: Boolean;
 begin
-  result := not SameValue(fSize, FDefaultSize, Tepsilon.Position);
+  result := not SameValue(fSize, DefaultSize, Tepsilon.Position);
 end;
 
 {*************************************************************************************}
@@ -3771,10 +4395,10 @@ begin
   end;
 end;
 
-{****************************************************************************************************************************************}
-constructor TALCustomTrack.TTrack.TInheritStopIndicatorBrush.Create(const AParent: TStopIndicatorBrush; const ADefaultColor: TAlphaColor);
+{******************************************************************************************************}
+constructor TALCustomTrack.TTrack.TInheritStopIndicatorBrush.Create(const AParent: TStopIndicatorBrush);
 begin
-  inherited create(ADefaultColor);
+  inherited create;
   FParent := AParent;
   FInherit := True;
   fSuperseded := False;
@@ -3785,7 +4409,7 @@ function TALCustomTrack.TTrack.TInheritStopIndicatorBrush.CreateSavedState: TALP
 type
   TInheritStopIndicatorBrushClass = class of TInheritStopIndicatorBrush;
 begin
-  result := TInheritStopIndicatorBrushClass(classtype).Create(nil{AParent}, DefaultColor);
+  result := TInheritStopIndicatorBrushClass(classtype).Create(nil{AParent});
 end;
 
 {*******************************************************************************************}
@@ -3873,23 +4497,38 @@ begin
   end;
 end;
 
+{********************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ffc5c5c5;
+end;
+
+{**********************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TalphaColors.Null;
+end;
+
+{***********************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{***********************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := -50;
+end;
+
 {*******************************************************************************}
 constructor TALCustomTrack.TTrack.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
-  //--
   if StateStyleParent <> nil then Raise Exception.create('Error 19ACDBF0-E33C-49D2-B199-5C232A0A71DB')
-  else if ControlParent <> nil then FStopIndicator := TInheritStopIndicatorBrush.Create(ControlParent.StopIndicator, TAlphaColors.null)
-  else FStopIndicator := TInheritStopIndicatorBrush.Create(nil, TAlphaColors.null);
+  else if ControlParent <> nil then FStopIndicator := CreateStopIndicator(ControlParent.StopIndicator)
+  else FStopIndicator := CreateStopIndicator(nil);
   FStopIndicator.OnChanged := StopIndicatorChanged;
-  //--
-  Stroke.DefaultColor := TalphaColors.Null;
-  Stroke.Color := Stroke.DefaultColor;
-  //--
-  StateLayer.DefaultXRadius := -50;
-  StateLayer.DefaultYRadius := -50;
-  StateLayer.XRadius := StateLayer.DefaultXRadius;
-  StateLayer.YRadius := StateLayer.DefaultYRadius;
 end;
 
 {*******************************************************}
@@ -3897,6 +4536,30 @@ destructor TALCustomTrack.TTrack.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FStopIndicator);
   inherited Destroy;
+end;
+
+{**************************************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{****************************************************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{*****************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
+end;
+
+{*********************************************************************************************************************************}
+function TALCustomTrack.TTrack.TBaseStateStyle.CreateStopIndicator(const AParent: TStopIndicatorBrush): TInheritStopIndicatorBrush;
+begin
+  Result := TInheritStopIndicatorBrush.Create(AParent);
 end;
 
 {**************************************************************************}
@@ -4055,12 +4718,11 @@ begin
   Result := inherited GetInherit;
 end;
 
-{******************************************************************************************}
-constructor TALCustomTrack.TTrack.TStateStyles.Create(const AParent: TALCustomTrack.TTrack);
+{*******************************************************************************}
+constructor TALCustomTrack.TTrack.TStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create(AParent);
-  //--
-  FDisabled := TDisabledStateStyle.Create(AParent);
+  FDisabled := CreateDisabledStateStyle(AParent);
   FDisabled.OnChanged := DisabledChanged;
 end;
 
@@ -4071,12 +4733,10 @@ begin
   inherited Destroy;
 end;
 
-{**********************************************************************************}
-function TALCustomTrack.TTrack.TStateStyles.CreateSavedState: TALPersistentObserver;
-type
-  TTrackStateStylesClass = class of TStateStyles;
+{****************************************************************************************************************}
+function TALCustomTrack.TTrack.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
-  result := TTrackStateStylesClass(classtype).Create(nil{AParent});
+  Result := TDisabledStateStyle.Create(AParent);
 end;
 
 {***********************************************************************}
@@ -4161,7 +4821,7 @@ begin
   //--
   inherited Create(ACustomTrack);
   FCustomTrack := ACustomTrack;
-  FStopIndicator := TStopIndicatorBrush.Create(TAlphaColors.Null);
+  FStopIndicator := CreateStopIndicator;
   FStopIndicator.OnChanged := StopIndicatorChanged;
   Locked := True;
   HitTest := False;
@@ -4171,7 +4831,7 @@ begin
   FPrevStateStyles := TStateStyles.Create(nil);
   {$ENDIF}
   //--
-  FStateStyles := TStateStyles.Create(self);
+  FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
@@ -4184,6 +4844,30 @@ begin
   ALFreeAndNil(FStateStyles);
   ALFreeAndNil(FStopIndicator);
   inherited;
+end;
+
+{**************************************************}
+function TALCustomTrack.TTrack.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
+{**********************************************************}
+function TALCustomTrack.TTrack.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{**********************************************************************}
+function TALCustomTrack.TTrack.CreateStopIndicator: TStopIndicatorBrush;
+begin
+  Result := TStopIndicatorBrush.Create;
+end;
+
+{*************************************************************}
+function TALCustomTrack.TTrack.CreateStateStyles: TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
 end;
 
 {*******************************************}
@@ -4579,24 +5263,6 @@ begin
 
 end;
 
-{***********************************************************************************}
-constructor TALCustomTrack.TInactiveTrack.Create(const ACustomTrack: TALCustomTrack);
-begin
-  inherited Create(ACustomTrack);
-  //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := $ffc5c5c5;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := TAlphaColors.Null;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-end;
-
 {*******************************************************************}
 function TALCustomTrack.TInactiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
@@ -4617,22 +5283,40 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-{*********************************************************************************}
-constructor TALCustomTrack.TActiveTrack.Create(const ACustomTrack: TALCustomTrack);
+{**********************************************************************}
+function TALCustomTrack.TActiveTrack.TFill.GetDefaultColor: TAlphaColor;
 begin
-  inherited Create(ACustomTrack);
-  //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := $ff167efc;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := TAlphaColors.Null;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
+  Result := $ff167efc;
+end;
+
+{******************************************************************************************}
+function TALCustomTrack.TActiveTrack.TDisabledStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ff167efc;
+end;
+
+{************************************************************************************************************}
+function TALCustomTrack.TActiveTrack.TDisabledStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{*****************************************************************************************************************************}
+function TALCustomTrack.TActiveTrack.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TTrack.TDisabledStateStyle;
+begin
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{********************************************************}
+function TALCustomTrack.TActiveTrack.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
+{**************************************************************************}
+function TALCustomTrack.TActiveTrack.CreateStateStyles: TTrack.TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
 end;
 
 {*****************************************************************}
@@ -5146,8 +5830,8 @@ begin
   Result := TSizeF.Create(150, 32);
 end;
 
-{********************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.SetXRadius(const Value: Single);
+{***************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.SetXRadius(const Value: Single);
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5155,8 +5839,8 @@ begin
     LMaxInactiveTrack.SetXRadius(Value);
 end;
 
-{********************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.SetYRadius(const Value: Single);
+{***************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.SetYRadius(const Value: Single);
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5164,8 +5848,8 @@ begin
     LMaxInactiveTrack.SetYRadius(Value);
 end;
 
-{**********************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.SetCorners(const Value: TCorners);
+{*****************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.SetCorners(const Value: TCorners);
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5173,8 +5857,8 @@ begin
     LMaxInactiveTrack.SetCorners(Value);
 end;
 
-{***************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.MarginsChanged;
+{**********************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.MarginsChanged;
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5182,8 +5866,8 @@ begin
     LMaxInactiveTrack.Margins.Rect := Margins.Rect;
 end;
 
-{***************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.PaddingChanged;
+{**********************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.PaddingChanged;
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5191,8 +5875,8 @@ begin
     LMaxInactiveTrack.Padding.Rect := Padding.Rect;
 end;
 
-{**************************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.StopIndicatorChanged(Sender: TObject);
+{*********************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.StopIndicatorChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5200,8 +5884,8 @@ begin
     LMaxInactiveTrack.StopIndicator.Assign(StopIndicator);
 end;
 
-{*****************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.FillChanged(Sender: TObject);
+{************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.FillChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5209,8 +5893,8 @@ begin
     LMaxInactiveTrack.Fill.Assign(Fill);
 end;
 
-{*******************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack.StrokeChanged(Sender: TObject);
+{**************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack.StrokeChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5218,14 +5902,14 @@ begin
     LMaxInactiveTrack.Stroke.Assign(Stroke);
 end;
 
-{*******************************************************************}
-function TALRangeTrackBar.TRangeMinInactiveTrack._GetOpacity: Single;
+{**************************************************************}
+function TALRangeTrackBar.TMinInactiveTrack._GetOpacity: Single;
 begin
   Result := Inherited Opacity;
 end;
 
-{**********************************************************************************}
-procedure TALRangeTrackBar.TRangeMinInactiveTrack._SetOpacity(const AValue: Single);
+{*****************************************************************************}
+procedure TALRangeTrackBar.TMinInactiveTrack._SetOpacity(const AValue: Single);
 begin
   Inherited Opacity := AValue;
   var LMaxInactiveTrack := TALRangeTrackBar(FCustomTrack).FMaxInactiveTrack;
@@ -5233,14 +5917,14 @@ begin
     LMaxInactiveTrack.Opacity := AValue;
 end;
 
-{*************************************************************************}
-function TALRangeTrackBar.TRangeMinInactiveTrack._IsOpacityStored: boolean;
+{********************************************************************}
+function TALRangeTrackBar.TMinInactiveTrack._IsOpacityStored: boolean;
 begin
   Result := not SameValue(FOpacity, 1);
 end;
 
-{*****************************************************************************}
-function TALRangeTrackBar.TRangeMinInactiveTrack.GetBufDrawableSrcRect: TRectF;
+{************************************************************************}
+function TALRangeTrackBar.TMinInactiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(BufDrawable) then Exit(TRectF.Empty);
   Result := TRectF.Create(0, 0, ALGetDrawableWidth(BufDrawable), ALGetDrawableHeight(BufDrawable));
@@ -5251,8 +5935,8 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-{*****************************************************************************}
-function TALRangeTrackBar.TRangeMaxInactiveTrack.GetBufDrawableSrcRect: TRectF;
+{************************************************************************}
+function TALRangeTrackBar.TMaxInactiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(BufDrawable) then Exit(TRectF.Empty);
   Result := TRectF.Create(0, 0, ALGetDrawableWidth(BufDrawable), ALGetDrawableHeight(BufDrawable));
@@ -5271,8 +5955,8 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-{************************************************************************}
-function TALRangeTrackBar.TRangeActiveTrack.GetBufDrawableSrcRect: TRectF;
+{*******************************************************************}
+function TALRangeTrackBar.TActiveTrack.GetBufDrawableSrcRect: TRectF;
 begin
   if ALIsDrawableNull(BufDrawable) then Exit(TRectF.Empty);
   Result := TRectF.Create(0, 0, ALGetDrawableWidth(BufDrawable), ALGetDrawableHeight(BufDrawable));
@@ -5297,22 +5981,22 @@ begin
   Result := ALAlignToPixelRound(Result, TMatrix.Identity, ALGetScreenScale{Scale}, TEpsilon.Position);
 end;
 
-{*************************************************************************************}
-constructor TALRangeTrackBar.TRangeMinThumb.Create(const ACustomTrack: TALCustomTrack);
+{********************************************************************************}
+constructor TALRangeTrackBar.TMinThumb.Create(const ACustomTrack: TALCustomTrack);
 begin
   inherited;
   FFormerTouchTargetExpansionChangedHandler := TouchTargetExpansion.OnChange;
   TouchTargetExpansion.OnChange := TouchTargetExpansionChanged;
 end;
 
-{***********************************************************}
-function TALRangeTrackBar.TRangeMinThumb._GetOpacity: Single;
+{******************************************************}
+function TALRangeTrackBar.TMinThumb._GetOpacity: Single;
 begin
   Result := Inherited Opacity;
 end;
 
-{**************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb._SetOpacity(const AValue: Single);
+{*********************************************************************}
+procedure TALRangeTrackBar.TMinThumb._SetOpacity(const AValue: Single);
 begin
   Inherited Opacity := AValue;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5320,14 +6004,14 @@ begin
     LMaxThumb.Opacity := AValue;
 end;
 
-{***********************************************************}
-function TALRangeTrackBar.TRangeMinThumb._GetCursor: TCursor;
+{******************************************************}
+function TALRangeTrackBar.TMinThumb._GetCursor: TCursor;
 begin
   Result := Inherited Cursor;
 end;
 
-{**************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb._SetCursor(const AValue: TCursor);
+{*********************************************************************}
+procedure TALRangeTrackBar.TMinThumb._SetCursor(const AValue: TCursor);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5335,14 +6019,14 @@ begin
     LMaxThumb.Cursor := AValue;
 end;
 
-{*****************************************************************}
-function TALRangeTrackBar.TRangeMinThumb._IsOpacityStored: boolean;
+{************************************************************}
+function TALRangeTrackBar.TMinThumb._IsOpacityStored: boolean;
 begin
   Result := not SameValue(FOpacity, 1);
 end;
 
-{************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.SetXRadius(const Value: Single);
+{*******************************************************************}
+procedure TALRangeTrackBar.TMinThumb.SetXRadius(const Value: Single);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5350,8 +6034,8 @@ begin
     LMaxThumb.XRadius := Value;
 end;
 
-{************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.SetYRadius(const Value: Single);
+{*******************************************************************}
+procedure TALRangeTrackBar.TMinThumb.SetYRadius(const Value: Single);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5359,8 +6043,8 @@ begin
     LMaxThumb.YRadius := Value;
 end;
 
-{**************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.SetCorners(const Value: TCorners);
+{*********************************************************************}
+procedure TALRangeTrackBar.TMinThumb.SetCorners(const Value: TCorners);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5368,8 +6052,8 @@ begin
     LMaxThumb.Corners := Value;
 end;
 
-{*******************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.MarginsChanged;
+{**************************************************}
+procedure TALRangeTrackBar.TMinThumb.MarginsChanged;
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5377,8 +6061,8 @@ begin
     LMaxThumb.Margins.rect := Margins.rect;
 end;
 
-{*******************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.PaddingChanged;
+{**************************************************}
+procedure TALRangeTrackBar.TMinThumb.PaddingChanged;
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5386,8 +6070,8 @@ begin
     LMaxThumb.Padding.rect := Padding.rect;
 end;
 
-{*********************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.FillChanged(Sender: TObject);
+{****************************************************************}
+procedure TALRangeTrackBar.TMinThumb.FillChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5395,8 +6079,8 @@ begin
     LMaxThumb.Fill.Assign(Fill);
 end;
 
-{***********************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.StrokeChanged(Sender: TObject);
+{******************************************************************}
+procedure TALRangeTrackBar.TMinThumb.StrokeChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5404,8 +6088,8 @@ begin
     LMaxThumb.Stroke.Assign(Stroke);
 end;
 
-{***********************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.ShadowChanged(Sender: TObject);
+{******************************************************************}
+procedure TALRangeTrackBar.TMinThumb.ShadowChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5413,8 +6097,8 @@ begin
     LMaxThumb.Shadow.Assign(Shadow);
 end;
 
-{****************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.StateStylesChanged(Sender: TObject);
+{***********************************************************************}
+procedure TALRangeTrackBar.TMinThumb.StateStylesChanged(Sender: TObject);
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5422,8 +6106,8 @@ begin
     LMaxThumb.StateStyles.Assign(StateStyles);
 end;
 
-{*************************************************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.TouchTargetExpansionChanged(Sender: TObject);
+{********************************************************************************}
+procedure TALRangeTrackBar.TMinThumb.TouchTargetExpansionChanged(Sender: TObject);
 begin
   Inherited;
   if Assigned(FFormerTouchTargetExpansionChangedHandler) then
@@ -5433,8 +6117,8 @@ begin
     LMaxThumb.TouchTargetExpansion.assign(TouchTargetExpansion);
 end;
 
-{**************************************************}
-procedure TALRangeTrackBar.TRangeMinThumb.DoResized;
+{*********************************************}
+procedure TALRangeTrackBar.TMinThumb.DoResized;
 begin
   Inherited;
   var LMaxThumb := TALRangeTrackBar(FCustomTrack).FMaxThumb;
@@ -5442,8 +6126,8 @@ begin
     LMaxThumb.size.size := size.size;
 end;
 
-{*************************************************************************************}
-constructor TALRangeTrackBar.TRangeMaxThumb.Create(const ACustomTrack: TALCustomTrack);
+{********************************************************************************}
+constructor TALRangeTrackBar.TMaxThumb.Create(const ACustomTrack: TALCustomTrack);
 begin
   inherited;
   var LValueRangeChanged := FValueRange.OnChanged;
@@ -5461,8 +6145,8 @@ begin
   //--
   inherited;
   //--
-  FMaxInactiveTrack := CreateInactiveTrack(TRangeMaxInactiveTrack, 'MaxInactiveTrack');
-  FMaxThumb := CreateThumb(TRangeMaxThumb, 'MaxThumb');
+  FMaxInactiveTrack := CreateInactiveTrack(TMaxInactiveTrack, 'MaxInactiveTrack');
+  FMaxThumb := CreateThumb(TMaxThumb, 'MaxThumb');
   //--
   FThumb.TabOrder := 0;
   FMaxThumb.TabOrder := 1;
@@ -5610,21 +6294,21 @@ end;
 {***************************************************************************************************************************************************************************************}
 function TALRangeTrackBar.CreateInactiveTrack(const AInactiveTrackClass: TALCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALCustomTrack.TInactiveTrack;
 begin
-  if AInactiveTrackClass = nil then Exit(CreateInactiveTrack(TRangeMinInactiveTrack, AName));
+  if AInactiveTrackClass = nil then Exit(CreateInactiveTrack(TMinInactiveTrack, AName));
   result := Inherited;
 end;
 
 {*****************************************************************************************************************************************************************************}
 function TALRangeTrackBar.CreateActiveTrack(const AActiveTrackClass: TALCustomTrack.TActiveTrackClass = nil; Const AName: String = 'ActiveTrack'): TALCustomTrack.TActiveTrack;
 begin
-  if AActiveTrackClass = nil then Exit(CreateActiveTrack(TRangeActiveTrack, AName));
+  if AActiveTrackClass = nil then Exit(CreateActiveTrack(TActiveTrack, AName));
   result := Inherited;
 end;
 
 {***********************************************************************************************************************************************}
 function TALRangeTrackBar.CreateThumb(const AThumbClass: TALCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALCustomTrack.TThumb;
 begin
-  if AThumbClass = nil then Exit(CreateThumb(TRangeMinThumb, AName));
+  if AThumbClass = nil then Exit(CreateThumb(TMinThumb, AName));
   result := Inherited;
 end;
 
@@ -5749,44 +6433,245 @@ begin
   end;
 end;
 
+{********************************************************************}
+function TALCustomScrollBar.TThumb.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $47000000;
+end;
+
+{**********************************************************************}
+function TALCustomScrollBar.TThumb.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.Null;
+end;
+
+{****************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $47000000;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.Null;
+end;
+
+{*******************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*******************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := 0;
+end;
+
+{**********************************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{************************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{*************************************************************************************}
+function TALCustomScrollBar.TThumb.TDisabledStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
+end;
+
+{***************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $47000000;
+end;
+
+{*****************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.Null;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*********************************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{***********************************************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{************************************************************************************}
+function TALCustomScrollBar.TThumb.THoveredStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
+end;
+
+{***************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $47000000;
+end;
+
+{*****************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.Null;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*********************************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{***********************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{************************************************************************************}
+function TALCustomScrollBar.TThumb.TPressedStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
+end;
+
+{***************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $47000000;
+end;
+
+{*****************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := Talphacolors.Null;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{******************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*********************************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{***********************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{************************************************************************************}
+function TALCustomScrollBar.TThumb.TFocusedStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
+end;
+
+{******************************************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALCustomTrack.TThumb.TDisabledStateStyle;
+begin
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALCustomTrack.TThumb.THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TStateStyles.CreatePressedStateStyle(const AParent: TObject): TALCustomTrack.TThumb.TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************************}
+function TALCustomScrollBar.TThumb.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALCustomTrack.TThumb.TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
+end;
+
+{******************************************************}
+function TALCustomScrollBar.TThumb.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
+{**************************************************************}
+function TALCustomScrollBar.TThumb.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{***************************************************************************************}
+function TALCustomScrollBar.TThumb.CreateStateStyles: TALCustomTrack.TThumb.TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
+end;
+
+{***********************************************************}
+function TALCustomScrollBar.TThumb.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{***********************************************************}
+function TALCustomScrollBar.TThumb.GetDefaultYRadius: Single;
+begin
+  Result := 0;
+end;
+
 {********************************************************}
 constructor TALCustomScrollBar.Create(AOwner: TComponent);
 begin
   inherited;
   CanFocus := False;
-  //--
-  var LFillChanged: TNotifyEvent := FThumb.fill.OnChanged;
-  FThumb.fill.OnChanged := nil;
-  FThumb.Fill.DefaultColor := $47000000;
-  FThumb.Fill.Color := FThumb.Fill.DefaultColor;
-  FThumb.fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := FThumb.stroke.OnChanged;
-  FThumb.stroke.OnChanged := Nil;
-  FThumb.Stroke.DefaultColor := Talphacolors.Null;
-  FThumb.Stroke.Color := FThumb.Stroke.DefaultColor;
-  FThumb.stroke.OnChanged := LStrokeChanged;
-  //--
-  FThumb.DefaultXRadius := 0;
-  FThumb.DefaultYRadius := 0;
-  FThumb.XRadius := FThumb.DefaultXRadius;
-  FThumb.YRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Disabled.StateLayer.DefaultXRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Disabled.StateLayer.DefaultYRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Hovered.StateLayer.DefaultXRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Hovered.StateLayer.DefaultYRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Pressed.StateLayer.DefaultXRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Pressed.StateLayer.DefaultYRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Focused.StateLayer.DefaultXRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Focused.StateLayer.DefaultYRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Disabled.StateLayer.XRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Disabled.StateLayer.YRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Hovered.StateLayer.XRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Hovered.StateLayer.YRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Pressed.StateLayer.XRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Pressed.StateLayer.YRadius := FThumb.DefaultYRadius;
-  FThumb.StateStyles.Focused.StateLayer.XRadius := FThumb.DefaultXRadius;
-  FThumb.StateStyles.Focused.StateLayer.YRadius := FThumb.DefaultYRadius;
 end;
 
 {*************************************************}
@@ -5826,6 +6711,13 @@ begin
   inherited;
 end;
 
+{*************************************************************************************************************************************************}
+function TALCustomScrollBar.CreateThumb(const AThumbClass: TALCustomTrack.TThumbClass = nil; Const AName: String = 'Thumb'): TALCustomTrack.TThumb;
+begin
+  if AThumbClass = nil then Exit(CreateThumb(TThumb, AName));
+  result := Inherited;
+end;
+
 {*****************************************************************************************************************************************************************************************}
 function TALCustomScrollBar.CreateInactiveTrack(const AInactiveTrackClass: TALCustomTrack.TInactiveTrackClass = nil; Const AName: String = 'InactiveTrack'): TALCustomTrack.TInactiveTrack;
 begin
@@ -5844,26 +6736,21 @@ begin
   Result := Nil;
 end;
 
-{************************************************************************************}
+{************************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(3,3,3,3);
 end;
 
-{***********************************************************************************}
-constructor TALBaseCheckBox.TCheckMarkBrush.Create(const ADefaultColor: TAlphaColor);
+{*************************************************}
+constructor TALBaseCheckBox.TCheckMarkBrush.Create;
 begin
   inherited Create;
   //--
-  FDefaultColor := ADefaultColor;
-  FDefaultResourceName := '';
-  FDefaultWrapMode := TALImageWrapMode.Fit;
-  FDefaultThickness := 2;
-  //--
-  FColor := FDefaultColor;
-  FResourceName := FDefaultResourceName;
-  FWrapMode := FDefaultWrapMode;
-  FThickness := FDefaultThickness;
+  FColor := DefaultColor;
+  FResourceName := DefaultResourceName;
+  FWrapMode := DefaultWrapMode;
+  FThickness := DefaultThickness;
   //--
   FMargins := CreateMargins;
   FMargins.OnChange := MarginsChanged;
@@ -5876,18 +6763,34 @@ begin
   inherited;
 end;
 
-{*******************************************************************************}
-function TALBaseCheckBox.TCheckMarkBrush.CreateSavedState: TALPersistentObserver;
-type
-  TCheckMarkBrushClass = class of TCheckMarkBrush;
-begin
-  result := TCheckMarkBrushClass(classtype).Create(DefaultColor);
-end;
-
 {****************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
+end;
+
+{********************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Black;
+end;
+
+{**********************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.GetDefaultResourceName: String;
+begin
+  Result := '';
+end;
+
+{****************************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.GetDefaultWrapMode: TALImageWrapMode;
+begin
+  Result := TALImageWrapMode.Fit;
+end;
+
+{*******************************************************************}
+function TALBaseCheckBox.TCheckMarkBrush.GetDefaultThickness: Single;
+begin
+  Result := 2;
 end;
 
 {********************************************************************}
@@ -5989,25 +6892,25 @@ end;
 {**************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.IsColorStored: Boolean;
 begin
-  result := FColor <> FDefaultColor;
+  result := FColor <> DefaultColor;
 end;
 
 {*********************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.IsResourceNameStored: Boolean;
 begin
-  result := FResourceName <> FDefaultResourceName;
+  result := FResourceName <> DefaultResourceName;
 end;
 
 {*****************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.IsWrapModeStored: Boolean;
 begin
-  result := FWrapMode <> FDefaultWrapMode;
+  result := FWrapMode <> DefaultWrapMode;
 end;
 
 {******************************************************************}
 function TALBaseCheckBox.TCheckMarkBrush.IsThicknessStored: Boolean;
 begin
-  result := not SameValue(FThickness, FDefaultThickness, TEpsilon.Vector);
+  result := not SameValue(FThickness, DefaultThickness, TEpsilon.Vector);
 end;
 
 {***************************************************************************}
@@ -6046,7 +6949,7 @@ begin
   end;
 end;
 
-{*************************************************************************}
+{***************************************************************************}
 procedure TALBaseCheckBox.TCheckMarkBrush.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
@@ -6058,10 +6961,10 @@ begin
   change;
 end;
 
-{**************************************************************************************************************************}
-constructor TALBaseCheckBox.TInheritCheckMarkBrush.Create(const AParent: TCheckMarkBrush; const ADefaultColor: TAlphaColor);
+{****************************************************************************************}
+constructor TALBaseCheckBox.TInheritCheckMarkBrush.Create(const AParent: TCheckMarkBrush);
 begin
-  inherited create(ADefaultColor);
+  inherited create;
   FParent := AParent;
   FInherit := True;
   fSuperseded := False;
@@ -6072,7 +6975,7 @@ function TALBaseCheckBox.TInheritCheckMarkBrush.CreateSavedState: TALPersistentO
 type
   TInheritCheckMarkBrushClass = class of TInheritCheckMarkBrush;
 begin
-  result := TInheritCheckMarkBrushClass(classtype).Create(nil{AParent}, DefaultColor);
+  result := TInheritCheckMarkBrushClass(classtype).Create(nil{AParent});
 end;
 
 {*********************************************************************************}
@@ -6172,20 +7075,26 @@ begin
   Result := TMargins.Create;
 end;
 
+{*****************************************************************************}
+function TALBaseCheckBox.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{*****************************************************************************}
+function TALBaseCheckBox.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := -50;
+end;
+
 {*************************************************************************}
 constructor TALBaseCheckBox.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
-  //--
   if StateStyleParent <> nil then FCheckMark := CreateCheckMark(StateStyleParent.CheckMark)
   else if ControlParent <> nil then FCheckMark := CreateCheckMark(ControlParent.CheckMark)
   else FCheckMark := CreateCheckMark(nil);
   FCheckMark.OnChanged := CheckMarkChanged;
-  //--
-  StateLayer.DefaultXRadius := -50;
-  StateLayer.DefaultYRadius := -50;
-  StateLayer.XRadius := StateLayer.DefaultXRadius;
-  StateLayer.YRadius := StateLayer.DefaultYRadius;
 end;
 
 {*************************************************}
@@ -6195,16 +7104,16 @@ begin
   inherited Destroy;
 end;
 
-{********************************************************************}
+{***********************************************************************}
 function TALBaseCheckBox.TBaseStateStyle.CreateStateLayer: TALStateLayer;
 begin
-  Result := TStateLayer.Create(TAlphaColors.Null{ADefaultColor});
+  Result := TStateLayer.Create;
 end;
 
 {***************************************************************************************************************}
 function TALBaseCheckBox.TBaseStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
 begin
-  Result := TInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
 {********************************************************************}
@@ -6379,8 +7288,8 @@ begin
   Result := inherited GetInherit;
 end;
 
-{***********************************************************************************}
-constructor TALBaseCheckBox.TCheckStateStyles.Create(const AParent: TALBaseCheckBox);
+{******************************************************************************}
+constructor TALBaseCheckBox.TCheckStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create;
   //--
@@ -6419,31 +7328,31 @@ begin
   result := TCheckStateStylesClass(classtype).Create(nil{AParent});
 end;
 
-{**********************************************************************}
+{*************************************************************************************************************}
 function TALBaseCheckBox.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
 begin
   Result := TDefaultStateStyle.Create(AParent);
 end;
 
-{**********************************************************************}
+{***************************************************************************************************************}
 function TALBaseCheckBox.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   Result := TDisabledStateStyle.Create(AParent);
 end;
 
-{**********************************************************************}
+{*************************************************************************************************************}
 function TALBaseCheckBox.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
 begin
   Result := THoveredStateStyle.Create(AParent);
 end;
 
-{**********************************************************************}
+{*************************************************************************************************************}
 function TALBaseCheckBox.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
 begin
   Result := TPressedStateStyle.Create(AParent);
 end;
 
-{**********************************************************************}
+{*************************************************************************************************************}
 function TALBaseCheckBox.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
@@ -6569,8 +7478,8 @@ begin
   Change;
 end;
 
-{******************************************************************************}
-constructor TALBaseCheckBox.TStateStyles.Create(const AParent: TALBaseCheckBox);
+{*************************************************************************}
+constructor TALBaseCheckBox.TStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create(AParent);
   //--
@@ -6589,22 +7498,14 @@ begin
   inherited Destroy;
 end;
 
-{****************************************************************************}
-function TALBaseCheckBox.TStateStyles.CreateSavedState: TALPersistentObserver;
-type
-  TStateStylesClass = class of TStateStyles;
-begin
-  result := TStateStylesClass(classtype).Create(nil{AParent});
-end;
-
-{*****************************************************************}
-function TALBaseCheckBox.TStateStyles.CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+{***********************************************************************************************************}
+function TALBaseCheckBox.TStateStyles.CreateCheckedStateStyles(const AParent: TALControl): TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
 
-{*****************************************************************}
-function TALBaseCheckBox.TStateStyles.CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+{*************************************************************************************************************}
+function TALBaseCheckBox.TStateStyles.CreateUncheckedStateStyles(const AParent: TALControl): TCheckStateStyles;
 begin
   Result := TCheckStateStyles.Create(AParent);
 end;
@@ -6718,27 +7619,13 @@ begin
   CanFocus := True;
   Cursor := crHandPoint;
   //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := TAlphaColors.White;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := TAlphaColors.Black;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
   FCheckMark := CreateCheckMark;
   FCheckMark.OnChanged := CheckMarkChanged;
   //--
   FChecked := False;
   FDoubleBuffered := true;
-  FDefaultXRadius := 0;
-  FDefaultYRadius := 0;
-  FXRadius := FDefaultXRadius;
-  FYRadius := FDefaultYRadius;
+  FXRadius := DefaultXRadius;
+  FYRadius := DefaultYRadius;
   FOnChange := nil;
   //--
   // Must be created at the end because it requires FCheckMark to
@@ -6755,6 +7642,18 @@ begin
   inherited;
 end;
 
+{********************************************************}
+function TALBaseCheckBox.CreateCheckMark: TCheckMarkBrush;
+begin
+  Result := TCheckMarkBrush.Create;
+end;
+
+{*******************************************************}
+function TALBaseCheckBox.CreateStateStyles: TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
+end;
+
 {*************************************}
 procedure TALBaseCheckBox.AlignToPixel;
 begin
@@ -6766,18 +7665,6 @@ begin
   finally
     EndUpdate;
   end;
-end;
-
-{*******************************************************}
-function TALBaseCheckBox.CreateStateStyles: TStateStyles;
-begin
-  Result := TStateStyles.Create(self);
-end;
-
-{********************************************************}
-function TALBaseCheckBox.CreateCheckMark: TCheckMarkBrush;
-begin
-  Result := TCheckMarkBrush.Create(TAlphaColors.Black);
 end;
 
 {**************************************************}
@@ -6827,13 +7714,25 @@ end;
 {************************************************}
 function TALBaseCheckBox.IsXRadiusStored: Boolean;
 begin
-  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+  Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
 {************************************************}
 function TALBaseCheckBox.IsYRadiusStored: Boolean;
 begin
-  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
+  Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
+end;
+
+{*************************************************}
+function TALBaseCheckBox.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*************************************************}
+function TALBaseCheckBox.GetDefaultYRadius: Single;
+begin
+  Result := 0;
 end;
 
 {********************************************************}
@@ -7560,14 +8459,14 @@ begin
 
 end;
 
-{********************************************************}
-function TALCheckBox.GetStateStyles: TCheckBoxStateStyles;
+{************************************************}
+function TALCheckBox.GetStateStyles: TStateStyles;
 begin
-  Result := TCheckBoxStateStyles(inherited StateStyles);
+  Result := TStateStyles(inherited StateStyles);
 end;
 
-{***********************************************************************}
-procedure TALCheckBox.SetStateStyles(const AValue: TCheckBoxStateStyles);
+{***************************************************************}
+procedure TALCheckBox.SetStateStyles(const AValue: TStateStyles);
 begin
   inherited StateStyles := AValue;
 end;
@@ -7575,103 +8474,103 @@ end;
 {*******************************************************************}
 function TALCheckBox.CreateStateStyles: TALBaseCheckBox.TStateStyles;
 begin
-  Result := TCheckBoxStateStyles.Create(Self);
+  Result := TStateStyles.Create(Self);
 end;
 
-{********}
-function TALRadioButton.TRadioButtonCheckMarkBrush.TRadioButtonMargins.GetDefaultValue: TRectF;
+{***********************************************************************}
+function TALRadioButton.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(5,5,5,5);
 end;
 
-{********}
-function TALRadioButton.TRadioButtonCheckMarkBrush.CreateMargins: TALBounds;
+{***************************************************************}
+function TALRadioButton.TCheckMarkBrush.CreateMargins: TALBounds;
 begin
-  Result := TRadioButtonMargins.Create;
+  Result := TMargins.Create;
 end;
 
-{********}
-function TALRadioButton.TRadioButtonInheritCheckMarkBrush.TRadioButtonMargins.GetDefaultValue: TRectF;
+{******************************************************************************}
+function TALRadioButton.TInheritCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(5,5,5,5);
 end;
 
-{********}
-function TALRadioButton.TRadioButtonInheritCheckMarkBrush.CreateMargins: TALBounds;
-begin
-  Result := TRadioButtonMargins.Create;
-end;
-
-{********}
-function TALRadioButton.TRadioButtonDefaultStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
-begin
-  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
-end;
-
-{********}
-function TALRadioButton.TRadioButtonDisabledStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
-begin
-  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
-end;
-
-{********}
-function TALRadioButton.TRadioButtonHoveredStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
-begin
-  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
-end;
-
-{********}
-function TALRadioButton.TRadioButtonPressedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
-begin
-  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
-end;
-
-{********}
-function TALRadioButton.TRadioButtonFocusedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
-begin
-  Result := TRadioButtonInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
-end;
-
 {**********************************************************************}
-function TALRadioButton.TRadioButtonCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
+function TALRadioButton.TInheritCheckMarkBrush.CreateMargins: TALBounds;
 begin
-  Result := TRadioButtonDefaultStateStyle.Create(AParent);
+  Result := TMargins.Create;
 end;
 
-{**********************************************************************}
-function TALRadioButton.TRadioButtonCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+{*************************************************************************************************************************************************}
+function TALRadioButton.TDefaultStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TRadioButtonDisabledStateStyle.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALRadioButton.TRadioButtonCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+{**************************************************************************************************************************************************}
+function TALRadioButton.TDisabledStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TRadioButtonHoveredStateStyle.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALRadioButton.TRadioButtonCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+{*************************************************************************************************************************************************}
+function TALRadioButton.THoveredStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TRadioButtonPressedStateStyle.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALRadioButton.TRadioButtonCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+{*************************************************************************************************************************************************}
+function TALRadioButton.TPressedStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TRadioButtonFocusedStateStyle.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{*****************************************************************}
-function TALRadioButton.TRadioButtonStateStyles.CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+{*************************************************************************************************************************************************}
+function TALRadioButton.TFocusedStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TRadioButtonCheckStateStyles.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{*****************************************************************}
-function TALRadioButton.TRadioButtonStateStyles.CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+{****************************************************************************************************************************}
+function TALRadioButton.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TALBaseCheckBox.TDefaultStateStyle;
 begin
-  Result := TRadioButtonCheckStateStyles.Create(AParent);
+  Result := TDefaultStateStyle.Create(AParent);
+end;
+
+{******************************************************************************************************************************}
+function TALRadioButton.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALBaseCheckBox.TDisabledStateStyle;
+begin
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************}
+function TALRadioButton.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALBaseCheckBox.THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************}
+function TALRadioButton.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TALBaseCheckBox.TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************}
+function TALRadioButton.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALBaseCheckBox.TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************************}
+function TALRadioButton.TStateStyles.CreateCheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
+end;
+
+{****************************************************************************************************************************}
+function TALRadioButton.TStateStyles.CreateUncheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
 end;
 
 {****************************************************}
@@ -7680,10 +8579,6 @@ begin
   inherited;
   FGroupName := '';
   fMandatory := false;
-  DefaultXRadius := -50;
-  DefaultYRadius := -50;
-  FXRadius := DefaultXRadius;
-  FYRadius := DefaultYRadius;
   TMessageManager.DefaultManager.SubscribeToMessage(TRadioButtonGroupMessage, GroupMessageCall);
 end;
 
@@ -7694,16 +8589,16 @@ begin
   inherited;
 end;
 
-{********************************************************}
-function TALRadioButton.CreateStateStyles: TALBaseCheckBox.TStateStyles;
-begin
-  Result := TRadioButtonStateStyles.Create(self);
-end;
-
-{********************************************************}
+{***********************************************************************}
 function TALRadioButton.CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush;
 begin
-  Result := TRadioButtonCheckMarkBrush.Create(TAlphaColors.Black);
+  Result := TCheckMarkBrush.Create;
+end;
+
+{**********************************************************************}
+function TALRadioButton.CreateStateStyles: TALBaseCheckBox.TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
 end;
 
 {********************************************************}
@@ -7720,6 +8615,18 @@ begin
       end;
     end;
   end;
+end;
+
+{************************************************}
+function TALRadioButton.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{************************************************}
+function TALRadioButton.GetDefaultYRadius: Single;
+begin
+  Result := -50;
 end;
 
 {*********************************************}
@@ -7865,15 +8772,58 @@ begin
 
 end;
 
-{**************************************************************************}
-constructor TALSwitch.TTrack.TBaseStateStyle.Create(const AParent: TObject);
+{***********************************************************}
+function TALSwitch.TTrack.TFill.GetDefaultColor: TAlphaColor;
 begin
-  inherited Create(AParent);
-  //--
-  StateLayer.DefaultXRadius := -50;
-  StateLayer.DefaultYRadius := -50;
-  StateLayer.XRadius := StateLayer.DefaultXRadius;
-  StateLayer.YRadius := StateLayer.DefaultYRadius;
+  Result := $ffc5c5c5;
+end;
+
+{*************************************************************}
+function TALSwitch.TTrack.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null;
+end;
+
+{***************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ffc5c5c5;
+end;
+
+{*****************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null;
+end;
+
+{******************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.TStateLayer.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{******************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.TStateLayer.GetDefaultYRadius: Single;
+begin
+  Result := -50;
+end;
+
+{*********************************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{***********************************************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{************************************************************************}
+function TALSwitch.TTrack.TBaseStateStyle.CreateStateLayer: TALStateLayer;
+begin
+  Result := TStateLayer.Create;
 end;
 
 {*********************************************************************}
@@ -7934,24 +8884,24 @@ begin
   Result := inherited GetInherit;
 end;
 
-{*************************************************************************************}
-constructor TALSwitch.TTrack.TCheckStateStyles.Create(const AParent: TALSwitch.TTrack);
+{*******************************************************************************}
+constructor TALSwitch.TTrack.TCheckStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create;
   //--
-  FDefault := TDefaultStateStyle.Create(AParent);
+  FDefault := CreateDefaultStateStyle(AParent);
   FDefault.OnChanged := DefaultChanged;
   //--
-  FDisabled := TDisabledStateStyle.Create(FDefault);
+  FDisabled := CreateDisabledStateStyle(FDefault);
   FDisabled.OnChanged := DisabledChanged;
   //--
-  FHovered := THoveredStateStyle.Create(FDefault);
+  FHovered := CreateHoveredStateStyle(FDefault);
   FHovered.OnChanged := HoveredChanged;
   //--
-  FPressed := TPressedStateStyle.Create(FDefault);
+  FPressed := CreatePressedStateStyle(FDefault);
   FPressed.OnChanged := PressedChanged;
   //--
-  FFocused := TFocusedStateStyle.Create(FDefault);
+  FFocused := CreateFocusedStateStyle(FDefault);
   FFocused.OnChanged := FocusedChanged;
 end;
 
@@ -7972,6 +8922,36 @@ type
   TCheckStateStylesClass = class of TCheckStateStyles;
 begin
   result := TCheckStateStylesClass(classtype).Create(nil{AParent});
+end;
+
+{**************************************************************************************************************}
+function TALSwitch.TTrack.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
+begin
+  Result := TDefaultStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************}
+function TALSwitch.TTrack.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+begin
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALSwitch.TTrack.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALSwitch.TTrack.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALSwitch.TTrack.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
 end;
 
 {***********************************************************************}
@@ -8094,15 +9074,15 @@ begin
   Change;
 end;
 
-{********************************************************************************}
-constructor TALSwitch.TTrack.TStateStyles.Create(const AParent: TALSwitch.TTrack);
+{**************************************************************************}
+constructor TALSwitch.TTrack.TStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create(AParent);
   //--
-  FChecked := TCheckStateStyles.Create(AParent);
+  FChecked := CreateCheckedStateStyles(AParent);
   FChecked.OnChanged := CheckedChanged;
   //--
-  FUnchecked := TCheckStateStyles.Create(AParent);
+  FUnchecked := CreateUnCheckedStateStyles(AParent);
   FUnchecked.OnChanged := UncheckedChanged;
 end;
 
@@ -8114,12 +9094,16 @@ begin
   inherited Destroy;
 end;
 
-{*****************************************************************************}
-function TALSwitch.TTrack.TStateStyles.CreateSavedState: TALPersistentObserver;
-type
-  TStateStylesClass = class of TStateStyles;
+{************************************************************************************************************}
+function TALSwitch.TTrack.TStateStyles.CreateCheckedStateStyles(const AParent: TALControl): TCheckStateStyles;
 begin
-  result := TStateStylesClass(classtype).Create(nil{AParent});
+  Result := TCheckStateStyles.Create(AParent);
+end;
+
+{**************************************************************************************************************}
+function TALSwitch.TTrack.TStateStyles.CreateUncheckedStateStyles(const AParent: TALControl): TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
 end;
 
 {******************************************************************}
@@ -8232,28 +9216,14 @@ begin
   Locked := True;
   HitTest := False;
   //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := $ffc5c5c5;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := TAlphaColors.null;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
   FChecked := False;
   FDoubleBuffered := true;
-  FDefaultXRadius := -50;
-  FDefaultYRadius := -50;
-  FXRadius := FDefaultXRadius;
-  FYRadius := FDefaultYRadius;
+  FXRadius := DefaultXRadius;
+  FYRadius := DefaultYRadius;
   //--
   // Must be created at the end because it requires FCheckMark to
   // be already created.
-  FStateStyles := TStateStyles.Create(self);
+  FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
@@ -8262,6 +9232,24 @@ destructor TALSwitch.TTrack.Destroy;
 begin
   ALFreeAndNil(FStateStyles);
   inherited;
+end;
+
+{*********************************************}
+function TALSwitch.TTrack.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
+{*****************************************************}
+function TALSwitch.TTrack.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{********************************************************}
+function TALSwitch.TTrack.CreateStateStyles: TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
 end;
 
 {**************************************}
@@ -8323,13 +9311,25 @@ end;
 {*************************************************}
 function TALSwitch.TTrack.IsXRadiusStored: Boolean;
 begin
-  Result := not SameValue(FXRadius, FDefaultXRadius, TEpsilon.Vector);
+  Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
 end;
 
 {*************************************************}
 function TALSwitch.TTrack.IsYRadiusStored: Boolean;
 begin
-  Result := not SameValue(FYRadius, FDefaultYRadius, TEpsilon.Vector);
+  Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
+end;
+
+{**************************************************}
+function TALSwitch.TTrack.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{**************************************************}
+function TALSwitch.TTrack.GetDefaultYRadius: Single;
+begin
+  Result := -50;
 end;
 
 {*********************************************************}
@@ -8774,104 +9774,170 @@ begin
 
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbCheckMarkBrush.TThumbMargins.GetDefaultValue: TRectF;
+{*************************************************************}
+function TALSwitch.TThumb.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null;
+end;
+
+{*************************************************************************}
+function TALSwitch.TThumb.TCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(6,6,6,6);
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbCheckMarkBrush.CreateMargins: TALBounds;
+{*****************************************************************}
+function TALSwitch.TThumb.TCheckMarkBrush.CreateMargins: TALBounds;
 begin
-  Result := TThumbMargins.Create;
+  Result := TMargins.Create;
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbInheritCheckMarkBrush.TThumbMargins.GetDefaultValue: TRectF;
+{********************************************************************************}
+function TALSwitch.TThumb.TInheritCheckMarkBrush.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(6,6,6,6);
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbInheritCheckMarkBrush.CreateMargins: TALBounds;
+{************************************************************************}
+function TALSwitch.TThumb.TInheritCheckMarkBrush.CreateMargins: TALBounds;
 begin
-  Result := TThumbMargins.Create;
+  Result := TMargins.Create;
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbDefaultStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+{********************************************************************************}
+function TALSwitch.TThumb.TDefaultStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
-  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+  Result := TAlphaColors.null;
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbDisabledStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+{**************************************************************************************************************}
+function TALSwitch.TThumb.TDefaultStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
-  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+  Result := TStroke.Create(AParent);
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbHoveredStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+{***************************************************************************************************************************************************}
+function TALSwitch.TThumb.TDefaultStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbPressedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+{*********************************************************************************}
+function TALSwitch.TThumb.TDisabledStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
-  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+  Result := TAlphaColors.null;
 end;
 
-{********}
-function TALSwitch.TThumb.TThumbFocusedStateStyle.CreateCheckMark(const AParent: TCheckMarkBrush): TInheritCheckMarkBrush;
+{***************************************************************************************************************}
+function TALSwitch.TThumb.TDisabledStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
-  Result := TThumbInheritCheckMarkBrush.Create(AParent, TAlphaColors.Black{ADefaultColor});
+  Result := TStroke.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALSwitch.TThumb.TThumbCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TDefaultStateStyle;
+{****************************************************************************************************************************************************}
+function TALSwitch.TThumb.TDisabledStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TThumbDefaultStateStyle.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALSwitch.TThumb.TThumbCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+{********************************************************************************}
+function TALSwitch.TThumb.THoveredStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
-  Result := TThumbDisabledStateStyle.Create(AParent);
+  Result := TAlphaColors.null;
 end;
 
-{**********************************************************************}
-function TALSwitch.TThumb.TThumbCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+{**************************************************************************************************************}
+function TALSwitch.TThumb.THoveredStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
-  Result := TThumbHoveredStateStyle.Create(AParent);
+  Result := TStroke.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALSwitch.TThumb.TThumbCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+{***************************************************************************************************************************************************}
+function TALSwitch.TThumb.THoveredStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TThumbPressedStateStyle.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{**********************************************************************}
-function TALSwitch.TThumb.TThumbCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+{********************************************************************************}
+function TALSwitch.TThumb.TPressedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
 begin
-  Result := TThumbFocusedStateStyle.Create(AParent);
+  Result := TAlphaColors.null;
 end;
 
-{*****************************************************************}
-function TALSwitch.TThumb.TThumbStateStyles.CreateCheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+{**************************************************************************************************************}
+function TALSwitch.TThumb.TPressedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
-  Result := TThumbCheckStateStyles.Create(AParent);
+  Result := TStroke.Create(AParent);
 end;
 
-{*****************************************************************}
-function TALSwitch.TThumb.TThumbStateStyles.CreateUncheckedStateStyles(const AParent: TALBaseCheckBox): TCheckStateStyles;
+{***************************************************************************************************************************************************}
+function TALSwitch.TThumb.TPressedStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
 begin
-  Result := TThumbCheckStateStyles.Create(AParent);
+  Result := TInheritCheckMarkBrush.Create(AParent);
 end;
 
-{***********************************************************}
-procedure TALSwitch.TThumb.TThumbStateStyles.StartTransition;
+{********************************************************************************}
+function TALSwitch.TThumb.TFocusedStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.null;
+end;
+
+{**************************************************************************************************************}
+function TALSwitch.TThumb.TFocusedStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{***************************************************************************************************************************************************}
+function TALSwitch.TThumb.TFocusedStateStyle.CreateCheckMark(const AParent: TALBaseCheckBox.TCheckMarkBrush): TALBaseCheckBox.TInheritCheckMarkBrush;
+begin
+  Result := TInheritCheckMarkBrush.Create(AParent);
+end;
+
+{******************************************************************************************************************************}
+function TALSwitch.TThumb.TCheckStateStyles.CreateDefaultStateStyle(const AParent: TObject): TALBaseCheckBox.TDefaultStateStyle;
+begin
+  Result := TDefaultStateStyle.Create(AParent);
+end;
+
+{********************************************************************************************************************************}
+function TALSwitch.TThumb.TCheckStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALBaseCheckBox.TDisabledStateStyle;
+begin
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{******************************************************************************************************************************}
+function TALSwitch.TThumb.TCheckStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALBaseCheckBox.THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{******************************************************************************************************************************}
+function TALSwitch.TThumb.TCheckStateStyles.CreatePressedStateStyle(const AParent: TObject): TALBaseCheckBox.TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{******************************************************************************************************************************}
+function TALSwitch.TThumb.TCheckStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALBaseCheckBox.TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
+end;
+
+{****************************************************************************************************************************}
+function TALSwitch.TThumb.TStateStyles.CreateCheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
+end;
+
+{******************************************************************************************************************************}
+function TALSwitch.TThumb.TStateStyles.CreateUncheckedStateStyles(const AParent: TALControl): TALBaseCheckBox.TCheckStateStyles;
+begin
+  Result := TCheckStateStyles.Create(AParent);
+end;
+
+{******************************************************}
+procedure TALSwitch.TThumb.TStateStyles.StartTransition;
 begin
   FStartPositionX := Parent{Thumb}.Position.x;
   inherited;
@@ -8879,8 +9945,8 @@ begin
     TALSwitch(Parent{Thumb}.ParentControl{Track}.ParentControl{Switch}).AlignThumb;
 end;
 
-{***************************************************************************************}
-procedure TALSwitch.TThumb.TThumbStateStyles.TransitionAnimationProcess(Sender: TObject);
+{**********************************************************************************}
+procedure TALSwitch.TThumb.TStateStyles.TransitionAnimationProcess(Sender: TObject);
 begin
   var LThumb := Parent;
   var LSwitch := TALSwitch(LThumb.ParentControl{Track}.ParentControl{Switch});
@@ -8894,8 +9960,8 @@ begin
   inherited;
 end;
 
-{**************************************************************************************}
-procedure TALSwitch.TThumb.TThumbStateStyles.TransitionAnimationFinish(Sender: TObject);
+{*********************************************************************************}
+procedure TALSwitch.TThumb.TStateStyles.TransitionAnimationFinish(Sender: TObject);
 begin
   TALSwitch(Parent{Thumb}.ParentControl{Track}.ParentControl{Switch}).AlignThumb;
   inherited;
@@ -8911,37 +9977,44 @@ begin
   Locked := True;
   HitTest := False;
   //--
-  FDefaultXRadius := -50;
-  FDefaultYRadius := -50;
-  FXRadius := FDefaultXRadius;
-  FYRadius := FDefaultYRadius;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := TAlphaColors.null;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
   Margins.DefaultValue := TRectF.Create(4,4,4,4);
   Margins.Rect := Margins.DefaultValue;
+end;
+
+{*****************************************************}
+function TALSwitch.TThumb.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{*************************************************************************}
+function TALSwitch.TThumb.CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush;
+begin
+  Result := TCheckMarkBrush.Create;
+end;
+
+{************************************************************************}
+function TALSwitch.TThumb.CreateStateStyles: TALBaseCheckBox.TStateStyles;
+begin
+  result := TStateStyles.Create(Self);
+end;
+
+{**************************************************}
+function TALSwitch.TThumb.GetDefaultXRadius: Single;
+begin
+  Result := -50;
+end;
+
+{**************************************************}
+function TALSwitch.TThumb.GetDefaultYRadius: Single;
+begin
+  Result := -50;
 end;
 
 {***********************************************}
 function TALSwitch.TThumb.GetDefaultSize: TSizeF;
 begin
   Result := TSizeF.Create(24, 24);
-end;
-
-{************************************************************************}
-function TALSwitch.TThumb.CreateStateStyles: TALBaseCheckBox.TStateStyles;
-begin
-  result := TThumbStateStyles.Create(Self);
-end;
-
-{************}
-function TALSwitch.TThumb.CreateCheckMark: TALBaseCheckBox.TCheckMarkBrush;
-begin
-  Result := TThumbCheckMarkBrush.Create(TAlphaColors.Black);
 end;
 
 {*******************************}
@@ -8969,10 +10042,10 @@ begin
   fScrollCapturedByMe := False;
   TMessageManager.DefaultManager.SubscribeToMessage(TALScrollCapturedMessage, ScrollCapturedByOtherHandler);
   //--
-  FTransition := TALStateTransition.Create(0.16{ADefaultDuration});
+  FTransition := TALStateTransition.Create;
   FTransition.OnChanged := TransitionChanged;
   //--
-  FTrack := TTrack.Create(self);
+  FTrack := CreateTrack;
   FTrack.Parent := self;
   FTrack.Stored := False;
   FTrack.SetSubComponent(True);
@@ -8981,7 +10054,7 @@ begin
   //--
   // Use 'self' instead of 'FTrack' to ensure that
   // 'Fthumb.loaded' is called.
-  FThumb := TThumb.Create(self);
+  FThumb := CreateThumb;
   FThumb.Parent := FTrack;
   FThumb.Stored := False;
   FThumb.SetSubComponent(True);
@@ -9002,6 +10075,18 @@ begin
   inherited;
   if not IsOwnerLoading then
     AlignThumb;
+end;
+
+{*************************************}
+function TALSwitch.CreateTrack: TTrack;
+begin
+  Result := TTrack.Create(self);
+end;
+
+{*************************************}
+function TALSwitch.CreateThumb: TThumb;
+begin
+  Result := TThumb.Create(self);
 end;
 
 {*************************}
@@ -9297,32 +10382,56 @@ begin
   end;
 end;
 
-{************************************************************************************}
+{****************************************************}
+function TALButton.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ffe1e1e1;
+end;
+
+{******************************************************}
+function TALButton.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := $ffadadad;
+end;
+
+{*******************************************************************}
 function TALButton.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-{************************************************************************************}
+{***************************************************}
 function TALButton.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
 
-{************************************************************************************}
+{*********************************************************************}
 function TALButton.TTextSettings.GetDefaultHorzAlign: TALTextHorzAlign;
 begin
   Result := TALTextHorzAlign.center;
 end;
 
-{************************************************************************************}
-function TALButton.TStateStyleTextSettings.TFont.GetDefaultWeight: TFontWeight;
+{********************************************************************}
+function TALButton.TBaseStateStyle.TFill.GetDefaultColor: TAlphaColor;
+begin
+  Result := $FFE1E1E1;
+end;
+
+{**********************************************************************}
+function TALButton.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := $FFADADAD;
+end;
+
+{***********************************************************************************}
+function TALButton.TBaseStateStyle.TTextSettings.TFont.GetDefaultWeight: TFontWeight;
 begin
   Result := TFontWeight.medium;
 end;
 
-{************************************************************************************}
-function TALButton.TStateStyleTextSettings.CreateFont: TALFont;
+{*******************************************************************}
+function TALButton.TBaseStateStyle.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.Create;
 end;
@@ -9331,19 +10440,12 @@ end;
 constructor TALButton.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
-  FDefaultText := '';
-  FText := FDefaultText;
+  FText := DefaultText;
   //--
-  if StateStyleParent <> nil then FTextSettings := TStateStyleTextSettings.Create(StateStyleParent.TextSettings)
-  else if ControlParent <> nil then FTextSettings := TStateStyleTextSettings.Create(ControlParent.TextSettings)
-  else FTextSettings := TStateStyleTextSettings.Create(nil);
+  if StateStyleParent <> nil then FTextSettings := CreateTextSettings(StateStyleParent.TextSettings)
+  else if ControlParent <> nil then FTextSettings := CreateTextSettings(ControlParent.TextSettings)
+  else FTextSettings := CreateTextSettings(nil);
   FTextSettings.OnChanged := TextSettingsChanged;
-  //--
-  Fill.DefaultColor := $FFE1E1E1;
-  Fill.Color := Fill.DefaultColor;
-  //--
-  Stroke.DefaultColor := $FFADADAD;
-  Stroke.Color := Stroke.DefaultColor;
   //--
   //FPriorSupersedeText
 end;
@@ -9353,6 +10455,24 @@ destructor TALButton.TBaseStateStyle.Destroy;
 begin
   ALFreeAndNil(FTextSettings);
   inherited Destroy;
+end;
+
+{**************************************************************************************}
+function TALButton.TBaseStateStyle.CreateFill(const AParent: TALBrush): TALInheritBrush;
+begin
+  Result := TFill.Create(AParent);
+end;
+
+{****************************************************************************************************}
+function TALButton.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
+begin
+  Result := TStroke.Create(AParent);
+end;
+
+{***********************************************************************************************************************}
+function TALButton.TBaseStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings;
+begin
+  Result := TTextSettings.Create(AParent);
 end;
 
 {**************************************************************}
@@ -9478,10 +10598,16 @@ begin
   end;
 end;
 
-{*****************************************************************************************}
-procedure TALButton.TBaseStateStyle.SetTextSettings(const AValue: TStateStyleTextSettings);
+{***********************************************************************************************}
+procedure TALButton.TBaseStateStyle.SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
 begin
   FTextSettings.Assign(AValue);
+end;
+
+{********************************************************}
+function TALButton.TBaseStateStyle.GetDefaultText: String;
+begin
+  Result := '';
 end;
 
 {*****************************************************}
@@ -9501,7 +10627,7 @@ end;
 {*******************************************************}
 function TALButton.TBaseStateStyle.IsTextStored: Boolean;
 begin
-  Result := FText <> FDefaultText;
+  Result := FText <> DefaultText;
 end;
 
 {**************************************************************}
@@ -9562,21 +10688,21 @@ begin
   Result := inherited GetInherit;
 end;
 
-{******************************************************************}
-constructor TALButton.TStateStyles.Create(const AParent: TALButton);
+{*******************************************************************}
+constructor TALButton.TStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create(AParent);
   //--
-  FDisabled := TDisabledStateStyle.Create(AParent);
+  FDisabled := CreateDisabledStateStyle(AParent);
   FDisabled.OnChanged := DisabledChanged;
   //--
-  FHovered := THoveredStateStyle.Create(AParent);
+  FHovered := CreateHoveredStateStyle(AParent);
   FHovered.OnChanged := HoveredChanged;
   //--
-  FPressed := TPressedStateStyle.Create(AParent);
+  FPressed := CreatePressedStateStyle(AParent);
   FPressed.OnChanged := PressedChanged;
   //--
-  FFocused := TFocusedStateStyle.Create(AParent);
+  FFocused := CreateFocusedStateStyle(AParent);
   FFocused.OnChanged := FocusedChanged;
 end;
 
@@ -9590,12 +10716,28 @@ begin
   inherited Destroy;
 end;
 
-{**********************************************************************}
-function TALButton.TStateStyles.CreateSavedState: TALPersistentObserver;
-type
-  TALButtonStateStylesClass = class of TStateStyles;
+{****************************************************************************************************}
+function TALButton.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
-  result := TALButtonStateStylesClass(classtype).Create(nil{AParent});
+  Result := TDisabledStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************}
+function TALButton.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+begin
+  Result := THoveredStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************}
+function TALButton.TStateStyles.CreatePressedStateStyle(const AParent: TObject): TPressedStateStyle;
+begin
+  Result := TPressedStateStyle.Create(AParent);
+end;
+
+{**************************************************************************************************}
+function TALButton.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
 end;
 
 {***********************************************************}
@@ -9736,18 +10878,6 @@ begin
   AutoSize := True;
   Cursor := crHandPoint;
   //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  Fill.DefaultColor := $ffe1e1e1;
-  Fill.Color := Fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  Stroke.DefaultColor := $ffadadad;
-  Stroke.Color := Stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
   var LPaddingChange: TNotifyEvent := Padding.OnChange;
   Padding.OnChange := nil;
   Padding.DefaultValue := TRectF.create(12{Left}, 6{Top}, 12{Right}, 6{Bottom});
@@ -9758,7 +10888,7 @@ begin
   FPrevStateStyles := TStateStyles.Create(nil);
   {$ENDIF}
   //--
-  FStateStyles := TStateStyles.Create(self);
+  FStateStyles := CreateStateStyles;
   FStateStyles.OnChanged := StateStylesChanged;
 end;
 
@@ -9803,10 +10933,28 @@ begin
   end;
 end;
 
+{**************************************}
+function TALButton.CreateFill: TALBrush;
+begin
+  Result := TFill.Create;
+end;
+
+{**********************************************}
+function TALButton.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
 {*********************************************************}
 function TALButton.CreateTextSettings: TALBaseTextSettings;
 begin
   Result := TTextSettings.Create;
+end;
+
+{*************************************************}
+function TALButton.CreateStateStyles: TStateStyles;
+begin
+  Result := TStateStyles.Create(self);
 end;
 
 {************************************************}
@@ -9854,7 +11002,6 @@ procedure TALButton.TextSettingsChanged(Sender: TObject);
       if APrevStateStyle.TextSettings.font.Slant = AToStateStyle.TextSettings.font.Slant then AToStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
       if APrevStateStyle.TextSettings.font.Stretch = AToStateStyle.TextSettings.font.Stretch then AToStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
       if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
-      if APrevStateStyle.TextSettings.font.AutoConvert = AToStateStyle.TextSettings.font.AutoConvert then AToStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
 
       if APrevStateStyle.TextSettings.Decoration.Kinds = AToStateStyle.TextSettings.Decoration.Kinds then AToStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
       if APrevStateStyle.TextSettings.Decoration.Style = AToStateStyle.TextSettings.Decoration.Style then AToStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
@@ -9869,7 +11016,6 @@ procedure TALButton.TextSettingsChanged(Sender: TObject);
     APrevStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
     APrevStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
     APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
-    APrevStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
 
     APrevStateStyle.TextSettings.Decoration.Kinds := TextSettings.Decoration.Kinds;
     APrevStateStyle.TextSettings.Decoration.Style := TextSettings.Decoration.Style;
@@ -10350,6 +11496,7 @@ begin
 end;
 
 initialization
+  TALCustomTrack.TValueIndicator.Format0 := '0';
   RegisterFmxClasses(
     [TALAniIndicator, TALScrollBar, TALTrackBar,
      TALRangeTrackBar, TALCheckBox, TALRadioButton,

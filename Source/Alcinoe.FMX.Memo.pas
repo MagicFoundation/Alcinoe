@@ -331,50 +331,62 @@ type
   TALMemo = class(TALBaseEdit)
   public
     type
-      // -----------------
-      // TMemoTextSettings
-      TMemoTextSettings = class(TTextSettings)
+      // -------------
+      // TTextSettings
+      TTextSettings = class(TALBaseEdit.TTextSettings)
       protected
         function GetDefaultVertAlign: TALTextVertAlign; override;
       published
         property LineHeightMultiplier;
       end;
-      // ---------------------------
-      // TMemoStateStyleTextSettings
-      TMemoStateStyleTextSettings = class(TStateStyleTextSettings)
+      // -------------------
+      // TDisabledStateStyle
+      TDisabledStateStyle = class(TALBaseEdit.TDisabledStateStyle)
+      public
+        type
+          TTextSettings = class(TALBaseEdit.TDisabledStateStyle.TTextSettings)
+          protected
+            function GetDefaultVertAlign: TALTextVertAlign; override;
+          end;
       protected
-        function GetDefaultVertAlign: TALTextVertAlign; override;
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
       end;
-      // -----------------------
-      // TMemoDisabledStateStyle
-      TMemoDisabledStateStyle = class(TDisabledStateStyle)
+      // ------------------
+      // THoveredStateStyle
+      THoveredStateStyle = class(TALBaseEdit.THoveredStateStyle)
+      public
+        type
+          TTextSettings = class(TALBaseEdit.THoveredStateStyle.TTextSettings)
+          protected
+            function GetDefaultVertAlign: TALTextVertAlign; override;
+          end;
       protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings; override;
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
       end;
-      // ----------------------
-      // TMemoHoveredStateStyle
-      TMemoHoveredStateStyle = class(THoveredStateStyle)
+      // ------------------
+      // TFocusedStateStyle
+      TFocusedStateStyle = class(TALBaseEdit.TFocusedStateStyle)
+      public
+        type
+          TTextSettings = class(TALBaseEdit.TFocusedStateStyle.TTextSettings)
+          protected
+            function GetDefaultVertAlign: TALTextVertAlign; override;
+          end;
       protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings; override;
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings; override;
       end;
-      // ----------------------
-      // TMemoFocusedStateStyle
-      TMemoFocusedStateStyle = class(TFocusedStateStyle)
+      // ------------
+      // TStateStyles
+      TStateStyles = class(TALBaseEdit.TStateStyles)
       protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings; override;
-      end;
-      // ----------------
-      // TMemoStateStyles
-      TMemoStateStyles = class(TStateStyles)
-      protected
-        function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; override;
-        function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; override;
-        function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; override;
+        function CreateDisabledStateStyle(const AParent: TObject): TALBaseEdit.TDisabledStateStyle; override;
+        function CreateHoveredStateStyle(const AParent: TObject): TALBaseEdit.THoveredStateStyle; override;
+        function CreateFocusedStateStyle(const AParent: TObject): TALBaseEdit.TFocusedStateStyle; override;
       end;
   private
     FAutosizeLineCount: Integer;
-    function GetTextSettings: TMemoTextSettings;
-    procedure SetTextSettings(const Value: TMemoTextSettings);
+    function GetTextSettings: TTextSettings;
+    procedure SetTextSettings(const Value: TTextSettings);
   protected
     function GetDefaultSize: TSizeF; override;
     function GetAutoSize: Boolean; override;
@@ -388,7 +400,7 @@ type
     function HasUnconstrainedAutosizeX: Boolean; override;
   published
     property AutoSizeLineCount: Integer read FAutosizeLineCount write SetAutosizeLineCount Default 0;
-    property TextSettings: TMemoTextSettings read GetTextSettings write SetTextSettings;
+    property TextSettings: TTextSettings read GetTextSettings write SetTextSettings;
   end;
 
 procedure Register;
@@ -1567,50 +1579,62 @@ end;
 {$endif}
 {$ENDREGION}
 
-{*********************************************}
-function TALMemo.TMemoStateStyleTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+{***************************************************************************************}
+function TALMemo.TDisabledStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
 begin
   Result := TALTextVertAlign.Leading;
 end;
 
-{*********************************************}
-function TALMemo.TMemoDisabledStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings;
+{*************************************************************************************************************************************}
+function TALMemo.TDisabledStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
 begin
-  Result := TMemoStateStyleTextSettings.Create(AParent);
+  Result := TTextSettings.Create(AParent);
 end;
 
-{*********************************************}
-function TALMemo.TMemoHoveredStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings;
+{**************************************************************************************}
+function TALMemo.THoveredStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
 begin
-  Result := TMemoStateStyleTextSettings.Create(AParent);
+  Result := TALTextVertAlign.Leading;
 end;
 
-{*********************************************}
-function TALMemo.TMemoFocusedStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings;
+{************************************************************************************************************************************}
+function TALMemo.THoveredStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
 begin
-  Result := TMemoStateStyleTextSettings.Create(AParent);
+  Result := TTextSettings.Create(AParent);
 end;
 
-{*********************************************}
-function TALMemo.TMemoStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
+{**************************************************************************************}
+function TALMemo.TFocusedStateStyle.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
 begin
-  result := TMemoDisabledStateStyle.Create(AParent);
+  Result := TALTextVertAlign.Leading;
 end;
 
-{*********************************************}
-function TALMemo.TMemoStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
+{************************************************************************************************************************************}
+function TALMemo.TFocusedStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TALBaseEdit.TBaseStateStyle.TTextSettings;
 begin
-  result := TMemoHoveredStateStyle.Create(AParent);
+  Result := TTextSettings.Create(AParent);
 end;
 
-{*********************************************}
-function TALMemo.TMemoStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
+{**************************************************************************************************************}
+function TALMemo.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TALBaseEdit.TDisabledStateStyle;
 begin
-  Result := TMemoFocusedStateStyle.Create(AParent);
+  result := TDisabledStateStyle.Create(AParent);
 end;
 
-{*********************************************}
-function TALMemo.TMemoTextSettings.GetDefaultVertAlign: TALTextVertAlign;
+{************************************************************************************************************}
+function TALMemo.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): TALBaseEdit.THoveredStateStyle;
+begin
+  result := THoveredStateStyle.Create(AParent);
+end;
+
+{************************************************************************************************************}
+function TALMemo.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TALBaseEdit.TFocusedStateStyle;
+begin
+  Result := TFocusedStateStyle.Create(AParent);
+end;
+
+{*******************************************************************}
+function TALMemo.TTextSettings.GetDefaultVertAlign: TALTextVertAlign;
 begin
   result := TALTextVertAlign.Leading;
 end;
@@ -1625,13 +1649,13 @@ end;
 {***********************************************************}
 function TALMemo.CreateStateStyles: TALBaseEdit.TStateStyles;
 begin
-  Result := TMemoStateStyles.Create(self);
+  Result := TStateStyles.Create(self);
 end;
 
 {*************************************************************}
 function TALMemo.CreateTextSettings: TALBaseEdit.TTextSettings;
 begin
-  result := TMemoTextSettings.Create;
+  result := TTextSettings.Create;
 end;
 
 {*****************************************************}
@@ -1648,14 +1672,14 @@ begin
   {$ENDIF}
 end;
 
-{**************************************************}
-function TALMemo.GetTextSettings: TMemoTextSettings;
+{**********************************************}
+function TALMemo.GetTextSettings: TTextSettings;
 begin
-  result := TMemoTextSettings(inherited TextSettings);
+  result := TTextSettings(inherited TextSettings);
 end;
 
-{****************************************************************}
-procedure TALMemo.SetTextSettings(const Value: TMemoTextSettings);
+{************************************************************}
+procedure TALMemo.SetTextSettings(const Value: TTextSettings);
 begin
   inherited TextSettings := Value;
 end;

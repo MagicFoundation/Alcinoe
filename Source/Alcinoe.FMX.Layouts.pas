@@ -561,10 +561,25 @@ end;
 function TALCustomScrollBox.TContent.IsVisibleObject(const AObject: TControl): Boolean;
 begin
   if AObject.Visible then begin
-    Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
-              (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > -Position.Y) and
-              (AObject.Position.X < -Position.X + FscrollBox.Width) and
-              (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > Position.X);
+
+    If Height > ScrollBox.Height then
+      Result := (AObject.Position.Y < -Position.Y + FscrollBox.Height) and
+                (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > -Position.Y)
+    else
+      // Handle the maxContentHeight
+      Result := (AObject.Position.Y < Height) and
+                (AObject.Position.Y + (AObject.Height * _TControlAccessProtected(AObject).scale.y) > 0);
+
+    If Width > ScrollBox.Width then
+      Result := Result and
+                (AObject.Position.X < -Position.X + FscrollBox.Width) and
+                (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > Position.X)
+    else
+      // Handle the maxContentWidth
+      Result := Result and
+                (AObject.Position.X < Width) and
+                (AObject.Position.X + (AObject.Width * _TControlAccessProtected(AObject).scale.x) > 0);
+
   end
   else
     result := False;

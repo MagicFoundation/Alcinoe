@@ -587,6 +587,12 @@ type
   TALBaseEdit = class(TALBaseRectangle, IVirtualKeyboardControl, IControlTypeSupportable, IALNativeControl)
   public
     type
+      // -------
+      // TStroke
+      TStroke = class(TALStrokeBrush)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
       // -------------
       // TTextSettings
       TTextSettings = class(TALBaseTextSettings)
@@ -692,77 +698,78 @@ type
         property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TSupportingTextLayout read FLayout write SetLayout default TSupportingTextLayout.Floating;
       end;
-      // -----------------------
-      // TStateStyleTextSettings
-      TStateStyleTextSettings = class(TALInheritBaseTextSettings)
-      public
-        type
-          TFont = Class(TALFont)
-          protected
-            function GetDefaultSize: Single; override;
-          End;
-      protected
-        function CreateFont: TALFont; override;
-      published
-        property Font;
-      end;
-      // ----------------------------
-      // TStateStyleLabelTextSettings
-      TStateStyleLabelTextSettings = class(TALInheritBaseTextSettings)
-      public
-        type
-          TFont = Class(TALFont)
-          protected
-            function GetDefaultSize: Single; override;
-          End;
-      protected
-        function CreateFont: TALFont; override;
-      published
-        property Font;
-      end;
-      // ---------------------------------
-      // TStateStyleSupportingTextSettings
-      TStateStyleSupportingTextSettings = class(TALInheritBaseTextSettings)
-      public
-        type
-          TFont = Class(TALFont)
-          protected
-            function GetDefaultSize: Single; override;
-          End;
-      protected
-        function CreateFont: TALFont; override;
-      published
-        property Font;
-      end;
       // ---------------
       // TBaseStateStyle
       TBaseStateStyle = class(TALBaseStateStyle)
+      public
+        type
+          TStroke = class(TALInheritStrokeBrush)
+          protected
+            function GetDefaultColor: TAlphaColor; override;
+          end;
+          TTextSettings = class(TALInheritBaseTextSettings)
+          public
+            type
+              TFont = Class(TALFont)
+              protected
+                function GetDefaultSize: Single; override;
+              End;
+          protected
+            function CreateFont: TALFont; override;
+          published
+            property Font;
+          end;
+          TLabelTextSettings = class(TALInheritBaseTextSettings)
+          public
+            type
+              TFont = Class(TALFont)
+              protected
+                function GetDefaultSize: Single; override;
+              End;
+          protected
+            function CreateFont: TALFont; override;
+          published
+            property Font;
+          end;
+          TSupportingTextSettings = class(TALInheritBaseTextSettings)
+          public
+            type
+              TFont = Class(TALFont)
+              protected
+                function GetDefaultSize: Single; override;
+              End;
+          protected
+            function CreateFont: TALFont; override;
+          published
+            property Font;
+          end;
       private
         FPromptTextColor: TalphaColor;
         FTintColor: TalphaColor;
-        FTextSettings: TStateStyleTextSettings;
-        FLabelTextSettings: TStateStyleLabelTextSettings;
-        FSupportingTextSettings: TStateStyleSupportingTextSettings;
-        FDefaultPromptTextColor: TalphaColor;
-        FDefaultTintColor: TalphaColor;
+        FTextSettings: TBaseStateStyle.TTextSettings;
+        FLabelTextSettings: TBaseStateStyle.TLabelTextSettings;
+        FSupportingTextSettings: TBaseStateStyle.TSupportingTextSettings;
         FPriorSupersedePromptTextColor: TalphaColor;
         FPriorSupersedeTintColor: TalphaColor;
         function GetStateStyleParent: TBaseStateStyle;
         function GetControlParent: TALBaseEdit;
         procedure SetPromptTextColor(const AValue: TAlphaColor);
         procedure SetTintColor(const AValue: TAlphaColor);
-        procedure SetTextSettings(const AValue: TStateStyleTextSettings);
-        procedure SetLabelTextSettings(const AValue: TStateStyleLabelTextSettings);
-        procedure SetSupportingTextSettings(const AValue: TStateStyleSupportingTextSettings);
+        procedure SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
+        procedure SetLabelTextSettings(const AValue: TBaseStateStyle.TLabelTextSettings);
+        procedure SetSupportingTextSettings(const AValue: TBaseStateStyle.TSupportingTextSettings);
         procedure TextSettingsChanged(ASender: TObject);
         procedure LabelTextSettingsChanged(ASender: TObject);
         procedure SupportingTextSettingsChanged(ASender: TObject);
         function IsPromptTextColorStored: Boolean;
         function IsTintColorStored: Boolean;
       protected
-        function CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings; virtual;
-        function CreateLabelTextSettings(const AParent: TALBaseTextSettings): TStateStyleLabelTextSettings; virtual;
-        function CreateSupportingTextSettings(const AParent: TALBaseTextSettings): TStateStyleSupportingTextSettings; virtual;
+        function CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush; override;
+        function CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings; virtual;
+        function CreateLabelTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TLabelTextSettings; virtual;
+        function CreateSupportingTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TSupportingTextSettings; virtual;
+        function GetDefaultPromptTextColor: TalphaColor; virtual;
+        function GetDefaultTintColor: TalphaColor; virtual;
         function GetInherit: Boolean; override;
         procedure DoSupersede; override;
       public
@@ -785,13 +792,13 @@ type
         procedure Interpolate(const ATo: TALBaseStateStyle; const ANormalizedTime: Single); override;
         property StateStyleParent: TBaseStateStyle read GetStateStyleParent;
         property ControlParent: TALBaseEdit read GetControlParent;
-        property DefaultPromptTextColor: TalphaColor read FDefaultPromptTextColor write FDefaultPromptTextColor;
-        property DefaultTintColor: TalphaColor read FDefaultTintColor write FDefaultTintColor;
+        property DefaultPromptTextColor: TalphaColor read GetDefaultPromptTextColor;
+        property DefaultTintColor: TalphaColor read GetDefaultTintColor;
       published
-        property LabelTextSettings: TStateStyleLabelTextSettings read fLabelTextSettings write SetLabelTextSettings;
+        property LabelTextSettings: TBaseStateStyle.TLabelTextSettings read fLabelTextSettings write SetLabelTextSettings;
         property PromptTextColor: TAlphaColor read FPromptTextColor write SetPromptTextColor stored IsPromptTextColorStored;
-        property SupportingTextSettings: TStateStyleSupportingTextSettings read fSupportingTextSettings write SetSupportingTextSettings;
-        property TextSettings: TStateStyleTextSettings read fTextSettings write SetTextSettings;
+        property SupportingTextSettings: TBaseStateStyle.TSupportingTextSettings read fSupportingTextSettings write SetSupportingTextSettings;
+        property TextSettings: TBaseStateStyle.TTextSettings read fTextSettings write SetTextSettings;
         property TintColor: TAlphaColor read FTintColor write SetTintColor stored IsTintColorStored;
       end;
       // -------------------
@@ -846,7 +853,6 @@ type
         procedure HoveredChanged(ASender: TObject);
         procedure FocusedChanged(ASender: TObject);
       protected
-        function CreateSavedState: TALPersistentObserver; override;
         function CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle; virtual;
         function CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle; virtual;
         function CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle; virtual;
@@ -854,7 +860,7 @@ type
         procedure TransitionAnimationProcess(Sender: TObject); override;
         procedure TransitionAnimationFinish(Sender: TObject); override;
       public
-        constructor Create(const AParent: TALBaseEdit); reintroduce; virtual;
+        constructor Create(const AParent: TALControl); override;
         destructor Destroy; override;
         procedure Assign(Source: TPersistent); override;
         procedure Reset; override;
@@ -947,10 +953,11 @@ type
     function GetControlType: TControlType;
     procedure SetControlType(const Value: TControlType);
   protected
-    function CreateStateStyles: TStateStyles; virtual;
+    function CreateStroke: TALStrokeBrush; override;
     function CreateTextSettings: TTextSettings; virtual;
     function CreateLabelTextSettings: TLabelTextSettings; virtual;
     function CreateSupportingTextSettings: TSupportingTextSettings; virtual;
+    function CreateStateStyles: TStateStyles; virtual;
     function CreateEditControl: TALBaseEditControl; virtual;
     function GetEditControl: TALBaseEditControl; virtual;
     property EditControl: TALBaseEditControl read GetEditControl;
@@ -3574,25 +3581,31 @@ end;
 {$endif}
 {$ENDREGION}
 
-{**************}
+{********************************************************}
+function TALBaseEdit.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := $FF7a7a7a;
+end;
+
+{**************************************************************}
 function TALBaseEdit.TTextSettings.TFont.GetDefaultSize: Single;
 begin
   Result := 16;
 end;
 
-{**************}
+{*****************************************************}
 function TALBaseEdit.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.create;
 end;
 
-{************************************************************************************}
+{***********************************************************************}
 function TALBaseEdit.TLabelTextSettings.TMargins.GetDefaultValue: TRectF;
 begin
   Result := TRectF.Create(0,0,0,-4);
 end;
 
-{**************}
+{*******************************************************************}
 function TALBaseEdit.TLabelTextSettings.TFont.GetDefaultSize: Single;
 begin
   Result := 12;
@@ -3615,13 +3628,13 @@ begin
   Inherited Destroy;
 end;
 
-{*******************************************************************}
+{***************************************************************}
 function TALBaseEdit.TLabelTextSettings.CreateMargins: TALBounds;
 begin
   Result := TMargins.Create;
 end;
 
-{**************}
+{**********************************************************}
 function TALBaseEdit.TLabelTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.create;
@@ -3671,7 +3684,7 @@ begin
   end;
 end;
 
-{************************************************************************}
+{**************************************************************************}
 procedure TALBaseEdit.TLabelTextSettings.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
@@ -3707,7 +3720,7 @@ begin
   Result := TRectF.Create(0,4,0,0);
 end;
 
-{**************}
+{************************************************************************}
 function TALBaseEdit.TSupportingTextSettings.TFont.GetDefaultSize: Single;
 begin
   Result := 12;
@@ -3735,7 +3748,7 @@ begin
   Result := TMargins.Create;
 end;
 
-{**************}
+{***************************************************************}
 function TALBaseEdit.TSupportingTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.create;
@@ -3783,7 +3796,7 @@ begin
   end;
 end;
 
-{*****************************************************************************}
+{*******************************************************************************}
 procedure TALBaseEdit.TSupportingTextSettings.SetMargins(const Value: TALBounds);
 begin
   FMargins.Assign(Value);
@@ -3804,38 +3817,44 @@ begin
   Change;
 end;
 
-{**************}
-function TALBaseEdit.TStateStyleTextSettings.TFont.GetDefaultSize: Single;
+{************************************************************************}
+function TALBaseEdit.TBaseStateStyle.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := $FF7a7a7a;
+end;
+
+{******************************************************************************}
+function TALBaseEdit.TBaseStateStyle.TTextSettings.TFont.GetDefaultSize: Single;
 begin
   Result := 16;
 end;
 
-{**************}
-function TALBaseEdit.TStateStyleTextSettings.CreateFont: TALFont;
+{*********************************************************************}
+function TALBaseEdit.TBaseStateStyle.TTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.create;
 end;
 
-{**************}
-function TALBaseEdit.TStateStyleLabelTextSettings.TFont.GetDefaultSize: Single;
+{***********************************************************************************}
+function TALBaseEdit.TBaseStateStyle.TLabelTextSettings.TFont.GetDefaultSize: Single;
 begin
   Result := 12;
 end;
 
-{**************}
-function TALBaseEdit.TStateStyleLabelTextSettings.CreateFont: TALFont;
+{**************************************************************************}
+function TALBaseEdit.TBaseStateStyle.TLabelTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.create;
 end;
 
-{**************}
-function TALBaseEdit.TStateStyleSupportingTextSettings.TFont.GetDefaultSize: Single;
+{****************************************************************************************}
+function TALBaseEdit.TBaseStateStyle.TSupportingTextSettings.TFont.GetDefaultSize: Single;
 begin
   Result := 12;
 end;
 
-{**************}
-function TALBaseEdit.TStateStyleSupportingTextSettings.CreateFont: TALFont;
+{*******************************************************************************}
+function TALBaseEdit.TBaseStateStyle.TSupportingTextSettings.CreateFont: TALFont;
 begin
   Result := TFont.create;
 end;
@@ -3845,11 +3864,8 @@ constructor TALBaseEdit.TBaseStateStyle.Create(const AParent: TObject);
 begin
   inherited Create(AParent);
   //--
-  FDefaultPromptTextColor := TalphaColors.Null;
-  FDefaultTintColor := TalphaColors.Null;
-  //--
-  FPromptTextColor := FDefaultPromptTextColor;
-  FTintColor := FDefaultTintColor;
+  FPromptTextColor := DefaultPromptTextColor;
+  FTintColor := DefaultTintColor;
   //--
   if StateStyleParent <> nil then begin
     FTextSettings := CreateTextSettings(StateStyleParent.TextSettings);
@@ -3866,9 +3882,6 @@ begin
     FLabelTextSettings := CreateLabelTextSettings(nil);
     FSupportingTextSettings := CreateSupportingTextSettings(nil);
   end;
-  //--
-  Stroke.DefaultColor := $FF7a7a7a;
-  Stroke.Color := Stroke.DefaultColor;
   //--
   FTextSettings.OnChanged := TextSettingsChanged;
   FLabelTextSettings.OnChanged := LabelTextSettingsChanged;
@@ -3894,22 +3907,28 @@ begin
   inherited Destroy;
 end;
 
-{********************************************************}
-function TALBaseEdit.TBaseStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TStateStyleTextSettings;
+{******************************************************************************************************}
+function TALBaseEdit.TBaseStateStyle.CreateStroke(const AParent: TALStrokeBrush): TALInheritStrokeBrush;
 begin
-  result := TStateStyleTextSettings.Create(AParent);
+  Result := TStroke.Create(AParent);
 end;
 
-{********************************************************}
-function TALBaseEdit.TBaseStateStyle.CreateLabelTextSettings(const AParent: TALBaseTextSettings): TStateStyleLabelTextSettings;
+{*************************************************************************************************************************}
+function TALBaseEdit.TBaseStateStyle.CreateTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TTextSettings;
 begin
-  result := TStateStyleLabelTextSettings.Create(AParent);
+  result := TTextSettings.Create(AParent);
 end;
 
-{********************************************************}
-function TALBaseEdit.TBaseStateStyle.CreateSupportingTextSettings(const AParent: TALBaseTextSettings): TStateStyleSupportingTextSettings;
+{***********************************************************************************************************************************}
+function TALBaseEdit.TBaseStateStyle.CreateLabelTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TLabelTextSettings;
 begin
-  result := TStateStyleSupportingTextSettings.Create(AParent);
+  result := TLabelTextSettings.Create(AParent);
+end;
+
+{*********************************************************************************************************************************************}
+function TALBaseEdit.TBaseStateStyle.CreateSupportingTextSettings(const AParent: TALBaseTextSettings): TBaseStateStyle.TSupportingTextSettings;
+begin
+  result := TSupportingTextSettings.Create(AParent);
 end;
 
 {****************************************************************}
@@ -4084,22 +4103,34 @@ begin
   end;
 end;
 
-{*******************************************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.SetTextSettings(const AValue: TStateStyleTextSettings);
+{*************************************************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.SetTextSettings(const AValue: TBaseStateStyle.TTextSettings);
 begin
   FTextSettings.Assign(AValue);
 end;
 
-{************************************************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.SetLabelTextSettings(const AValue: TStateStyleLabelTextSettings);
+{***********************************************************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.SetLabelTextSettings(const AValue: TBaseStateStyle.TLabelTextSettings);
 begin
   FLabelTextSettings.Assign(AValue);
 end;
 
-{*****************************************************************************************************}
-procedure TALBaseEdit.TBaseStateStyle.SetSupportingTextSettings(const AValue: TStateStyleSupportingTextSettings);
+{*********************************************************************************************************************}
+procedure TALBaseEdit.TBaseStateStyle.SetSupportingTextSettings(const AValue: TBaseStateStyle.TSupportingTextSettings);
 begin
   FSupportingTextSettings.Assign(AValue);
+end;
+
+{**************************************************************************}
+function TALBaseEdit.TBaseStateStyle.GetDefaultPromptTextColor: TalphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
+{********************************************************************}
+function TALBaseEdit.TBaseStateStyle.GetDefaultTintColor: TalphaColor;
+begin
+  Result := TAlphaColors.Null;
 end;
 
 {*******************************************************}
@@ -4134,13 +4165,13 @@ end;
 {********************************************************************}
 function TALBaseEdit.TBaseStateStyle.IsPromptTextColorStored: Boolean;
 begin
-  result := FPromptTextColor <> FDefaultPromptTextColor;
+  result := FPromptTextColor <> DefaultPromptTextColor;
 end;
 
 {**************************************************************}
 function TALBaseEdit.TBaseStateStyle.IsTintColorStored: Boolean;
 begin
-  result := FTintColor <> FDefaultTintColor;
+  result := FTintColor <> DefaultTintColor;
 end;
 
 {****************************************************************}
@@ -4201,8 +4232,8 @@ begin
   Result := inherited GetInherit;
 end;
 
-{**********************************************************************}
-constructor TALBaseEdit.TStateStyles.Create(const AParent: TALBaseEdit);
+{*********************************************************************}
+constructor TALBaseEdit.TStateStyles.Create(const AParent: TALControl);
 begin
   inherited Create(AParent);
   //--
@@ -4225,27 +4256,19 @@ begin
   inherited Destroy;
 end;
 
-{************************************************************************}
-function TALBaseEdit.TStateStyles.CreateSavedState: TALPersistentObserver;
-type
-  TStateStylesClass = class of TStateStyles;
-begin
-  result := TStateStylesClass(classtype).Create(nil{AParent});
-end;
-
-{*************************************************}
+{******************************************************************************************************}
 function TALBaseEdit.TStateStyles.CreateDisabledStateStyle(const AParent: TObject): TDisabledStateStyle;
 begin
   result := TDisabledStateStyle.Create(AParent);
 end;
 
-{*************************************************}
+{****************************************************************************************************}
 function TALBaseEdit.TStateStyles.CreateHoveredStateStyle(const AParent: TObject): THoveredStateStyle;
 begin
   result := THoveredStateStyle.Create(AParent);
 end;
 
-{*************************************************}
+{****************************************************************************************************}
 function TALBaseEdit.TStateStyles.CreateFocusedStateStyle(const AParent: TObject): TFocusedStateStyle;
 begin
   Result := TFocusedStateStyle.Create(AParent);
@@ -4455,18 +4478,6 @@ begin
   Cursor := crIBeam;
   CanFocus := True;
   //--
-  var LFillChanged: TNotifyEvent := fill.OnChanged;
-  fill.OnChanged := nil;
-  fill.DefaultColor := $ffffffff;
-  fill.Color := fill.DefaultColor;
-  fill.OnChanged := LFillChanged;
-  //--
-  var LStrokeChanged: TNotifyEvent := stroke.OnChanged;
-  stroke.OnChanged := Nil;
-  stroke.DefaultColor := $FF7a7a7a;
-  stroke.Color := stroke.DefaultColor;
-  stroke.OnChanged := LStrokeChanged;
-  //--
   var LPaddingChange: TNotifyEvent := Padding.OnChange;
   Padding.OnChange := nil;
   Padding.DefaultValue := TRectF.create(8{Left}, 8{Top}, 8{Right}, 8{Bottom});
@@ -4555,10 +4566,10 @@ begin
   end;
 end;
 
-{*****************************************************}
-function TALBaseEdit.CreateStateStyles: TStateStyles;
+{************************************************}
+function TALBaseEdit.CreateStroke: TALStrokeBrush;
 begin
-  Result := TStateStyles.Create(Self);
+  Result := TStroke.Create;
 end;
 
 {*****************************************************}
@@ -4567,16 +4578,22 @@ begin
   result := TTextSettings.Create;
 end;
 
-{*****************************************************}
+{***************************************************************}
 function TALBaseEdit.CreateLabelTextSettings: TLabelTextSettings;
 begin
   result := TLabelTextSettings.Create;
 end;
 
-{*****************************************************}
+{*************************************************************************}
 function TALBaseEdit.CreateSupportingTextSettings: TSupportingTextSettings;
 begin
   result := TSupportingTextSettings.Create;
+end;
+
+{***************************************************}
+function TALBaseEdit.CreateStateStyles: TStateStyles;
+begin
+  Result := TStateStyles.Create(Self);
 end;
 
 {*********************************************************}
@@ -5004,7 +5021,6 @@ procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
       if APrevStateStyle.TextSettings.font.Slant = AToStateStyle.TextSettings.font.Slant then AToStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
       if APrevStateStyle.TextSettings.font.Stretch = AToStateStyle.TextSettings.font.Stretch then AToStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
       if APrevStateStyle.TextSettings.font.Color = AToStateStyle.TextSettings.font.Color then AToStateStyle.TextSettings.font.Color := TextSettings.font.Color;
-      if APrevStateStyle.TextSettings.font.AutoConvert = AToStateStyle.TextSettings.font.AutoConvert then AToStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
 
     end;
 
@@ -5014,7 +5030,6 @@ procedure TALBaseEdit.TextSettingsChanged(Sender: TObject);
     APrevStateStyle.TextSettings.font.Slant := TextSettings.font.Slant;
     APrevStateStyle.TextSettings.font.Stretch := TextSettings.font.Stretch;
     APrevStateStyle.TextSettings.font.Color := TextSettings.font.Color;
-    APrevStateStyle.TextSettings.font.AutoConvert := TextSettings.font.AutoConvert;
 
   end;
   {$ENDIF}
@@ -5108,7 +5123,6 @@ procedure TALBaseEdit.LabelTextSettingsChanged(Sender: TObject);
       if APrevStateStyle.LabelTextSettings.font.Slant = AToStateStyle.LabelTextSettings.font.Slant then AToStateStyle.LabelTextSettings.font.Slant := LabelTextSettings.font.Slant;
       if APrevStateStyle.LabelTextSettings.font.Stretch = AToStateStyle.LabelTextSettings.font.Stretch then AToStateStyle.LabelTextSettings.font.Stretch := LabelTextSettings.font.Stretch;
       if APrevStateStyle.LabelTextSettings.font.Color = AToStateStyle.LabelTextSettings.font.Color then AToStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
-      if APrevStateStyle.LabelTextSettings.font.AutoConvert = AToStateStyle.LabelTextSettings.font.AutoConvert then AToStateStyle.LabelTextSettings.font.AutoConvert := LabelTextSettings.font.AutoConvert;
 
     end;
 
@@ -5118,7 +5132,6 @@ procedure TALBaseEdit.LabelTextSettingsChanged(Sender: TObject);
     APrevStateStyle.LabelTextSettings.font.Slant := LabelTextSettings.font.Slant;
     APrevStateStyle.LabelTextSettings.font.Stretch := LabelTextSettings.font.Stretch;
     APrevStateStyle.LabelTextSettings.font.Color := LabelTextSettings.font.Color;
-    APrevStateStyle.LabelTextSettings.font.AutoConvert := LabelTextSettings.font.AutoConvert;
 
   end;
   {$ENDIF}
@@ -5162,7 +5175,6 @@ procedure TALBaseEdit.SupportingTextSettingsChanged(Sender: TObject);
       if APrevStateStyle.SupportingTextSettings.font.Slant = AToStateStyle.SupportingTextSettings.font.Slant then AToStateStyle.SupportingTextSettings.font.Slant := SupportingTextSettings.font.Slant;
       if APrevStateStyle.SupportingTextSettings.font.Stretch = AToStateStyle.SupportingTextSettings.font.Stretch then AToStateStyle.SupportingTextSettings.font.Stretch := SupportingTextSettings.font.Stretch;
       if APrevStateStyle.SupportingTextSettings.font.Color = AToStateStyle.SupportingTextSettings.font.Color then AToStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
-      if APrevStateStyle.SupportingTextSettings.font.AutoConvert = AToStateStyle.SupportingTextSettings.font.AutoConvert then AToStateStyle.SupportingTextSettings.font.AutoConvert := SupportingTextSettings.font.AutoConvert;
 
     end;
 
@@ -5172,7 +5184,6 @@ procedure TALBaseEdit.SupportingTextSettingsChanged(Sender: TObject);
     APrevStateStyle.SupportingTextSettings.font.Slant := SupportingTextSettings.font.Slant;
     APrevStateStyle.SupportingTextSettings.font.Stretch := SupportingTextSettings.font.Stretch;
     APrevStateStyle.SupportingTextSettings.font.Color := SupportingTextSettings.font.Color;
-    APrevStateStyle.SupportingTextSettings.font.AutoConvert := SupportingTextSettings.font.AutoConvert;
 
   end;
   {$ENDIF}

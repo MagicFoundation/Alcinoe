@@ -2918,6 +2918,7 @@ begin
       InactiveTrack.Shadow.Reset;
       InactiveTrack.stopIndicator.Reset;
       InactiveTrack.stopIndicator.Size := RoundTo(InactiveTrack.stopIndicator.DefaultSize * LRatio, -2);
+      InactiveTrack.StateStyles.Reset;
       //--
       ActiveTrack.Margins.Rect := ALScaleRect(ActiveTrack.Margins.DefaultValue, LRatio).RoundTo(-2);
       ActiveTrack.Padding.Rect := ALScaleRect(ActiveTrack.Padding.DefaultValue, LRatio).RoundTo(-2);
@@ -2934,6 +2935,7 @@ begin
       ActiveTrack.Shadow.Reset;
       ActiveTrack.stopIndicator.Reset;
       ActiveTrack.stopIndicator.Size := RoundTo(ActiveTrack.stopIndicator.DefaultSize * LRatio, -2);
+      ActiveTrack.StateStyles.Reset;
       //--
       Thumb.Margins.Rect := ALScaleRect(Thumb.Margins.DefaultValue, LRatio).RoundTo(-2);
       Thumb.Padding.Rect := ALScaleRect(Thumb.Padding.DefaultValue, LRatio).RoundTo(-2);

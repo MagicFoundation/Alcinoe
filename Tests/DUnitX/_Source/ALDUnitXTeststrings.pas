@@ -119,7 +119,7 @@ begin
   fStopWatchDELPHI := TStopwatch.Create;
 end;
 
-{**********************************}
+{****************************************}
 //procedure TALDUnitXTestStrings.TearDown;
 //begin
 //end;

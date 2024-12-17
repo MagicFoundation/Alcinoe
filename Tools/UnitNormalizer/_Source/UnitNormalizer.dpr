@@ -427,7 +427,7 @@ begin
         end;
         {$ENDREGION}
 
-        {$REGION 'Add *** on the top of procedure/function/contructor/destructor'}
+        {$REGION 'Add comment block border (***/~~~) on the top of procedure/function/contructor/destructor'}
         Var LSourceLst := TALStringListA.create;
         Try
           LSourceLst.text := LSourceStr;
@@ -481,6 +481,39 @@ begin
               end;
             end;
             inc(i);
+          end;
+          LSourceStr := ALTrim(LSourceLst.text) + #13#10;
+        Finally
+          ALFreeAndNil(LSourceLst);
+        End;
+        {$ENDREGION}
+
+        {$REGION 'Normalize comment block border (***/~~~/---)'}
+        LSourceLst := TALStringListA.create;
+        Try
+          LSourceLst.text := LSourceStr;
+          For var I := 0 to LSourceLst.Count - 2 do begin
+            Var LSourceLine := ALTrim(LSourceLst[i]);
+            if LSourceLine = '' then continue;
+            Var LAsterisk: AnsiChar;
+            if (ALPosA('{*', LSourceLine) = 1) and (ALPosA('*}', LSourceLine) = length(LSourceLine)-1) then LAsterisk := '*'
+            else if (ALPosA('{~', LSourceLine) = 1) and (ALPosA('~}', LSourceLine) = length(LSourceLine)-1) then LAsterisk := '~'
+            else if (ALPosA('{-', LSourceLine) = 1) and (ALPosA('-}', LSourceLine) = length(LSourceLine)-1) then LAsterisk := '-'
+            else continue;
+            LSourceLine := AlStringReplaceA(LSourceLine, '{', '', []);
+            LSourceLine := AlStringReplaceA(LSourceLine, '}', '', []);
+            LSourceLine := AlStringReplaceA(LSourceLine, LAsterisk, '', [RfReplaceAll]);
+            if LSourceLine <> '' then continue;
+            var LNewSourceLine: AnsiString;
+            var LNextSourceLine := LSourceLst[i+1];
+            if ALTrim(LNextSourceLine) = '' then continue;
+            setlength(LNewSourceLine, length(ALTrim(LNextSourceLine)));
+            FillChar(LNewSourceLine[low(LNewSourceLine)], length(LNewSourceLine), LAsterisk);
+            LNewSourceLine[low(LNewSourceLine)] := '{';
+            LNewSourceLine[high(LNewSourceLine)] := '}';
+            while length(LNewSourceLine) < length(LNextSourceLine) do
+              LNewSourceLine := ' ' + LNewSourceLine;
+            LSourceLst[i] := LNewSourceLine;
           end;
           LSourceStr := ALTrim(LSourceLst.text) + #13#10;
         Finally

@@ -850,7 +850,7 @@ procedure ALDrawRectangle(
             const ASides: TSides;
             const ACorners: TCorners;
             const AXRadius: Single;
-            const AYRadius: Single); overload;
+            const AYRadius: Single); inline; overload;
 procedure ALDrawRectangle(
             const ACanvas: TALCanvas;
             const AScale: Single;
@@ -867,7 +867,7 @@ procedure ALDrawRectangle(
             const ASides: TSides;
             const ACorners: TCorners;
             const AXRadius: Single;
-            const AYRadius: Single); overload;
+            const AYRadius: Single); inline; overload;
 
 {*********************}
 procedure ALDrawCircle(
@@ -899,7 +899,7 @@ procedure ALDrawCircle(
             const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
             const AShadowBlur: Single;
             const AShadowOffsetX: Single;
-            const AShadowOffsetY: Single); overload;
+            const AShadowOffsetY: Single); inline; overload;
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
@@ -928,7 +928,7 @@ procedure ALDrawCircle(
             const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
             const AShadowBlur: Single;
             const AShadowOffsetX: Single;
-            const AShadowOffsetY: Single); overload;
+            const AShadowOffsetY: Single); inline; overload;
 procedure ALDrawCircle(
             const ACanvas: TALCanvas;
             const AScale: Single;
@@ -941,7 +941,82 @@ procedure ALDrawCircle(
             const AStateLayerContentColor: TAlphaColor;
             const ADrawStateLayerOnTop: Boolean;
             const AStroke: TALStrokeBrush;
-            const AShadow: TALShadow); overload; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+            const AShadow: TALShadow); inline; overload; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+
+{*********************}
+procedure ALDrawEllipse(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillResourceName: String;
+            const AFillResourceStream: TStream;
+            Const AFillBackgroundMarginsRect: TRectF;
+            Const AFillImageMarginsRect: TRectF;
+            Const AFillImageNoRadius: Boolean;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStateLayerOpacity: Single;
+            const AStateLayerColor: TAlphaColor;
+            Const AStateLayerMarginsRect: TRectF;
+            const AStateLayerXRadius: Single;
+            const AStateLayerYRadius: Single;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single); inline; overload;
+procedure ALDrawEllipse(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientAngle: Single;
+            const AFillResourceName: String;
+            const AFillResourceStream: TStream;
+            Const AFillBackgroundMarginsRect: TRectF;
+            Const AFillImageMarginsRect: TRectF;
+            Const AFillImageNoRadius: Boolean;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStateLayerOpacity: Single;
+            const AStateLayerColor: TAlphaColor;
+            Const AStateLayerMarginsRect: TRectF;
+            const AStateLayerXRadius: Single;
+            const AStateLayerYRadius: Single;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single); inline; overload;
+procedure ALDrawEllipse(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AFill: TALBrush;
+            const AFillResourceStream: TStream;
+            const AStateLayer: TALStateLayer;
+            const AStateLayerContentColor: TAlphaColor;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow); inline; overload; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+
 
 {************************}
 Procedure ALCreateSurface(
@@ -10050,23 +10125,45 @@ var
       else LScaledXRadius := LScaledXRadius * AScale;
       if LScaledYRadius < 0 then LScaledYRadius := (LRect.Height/100)*abs(LScaledYRadius)
       else LScaledYRadius := LScaledYRadius* AScale;
-      var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
-      LScaledXRadius := min(LScaledXRadius, LMaxRadius);
-      LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+      if (AXRadius < 0) or (AYRadius < 0) then begin
+        var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
+        LScaledXRadius := min(LScaledXRadius, LMaxRadius);
+        LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+      end;
     end
     else begin
       LScaledXRadius := 0;
       LScaledYRadius := 0;
     end;
 
-    // use drawRoundRect
-    if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
-        (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
-       (ACorners<>[]) and
-       (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+    // use drawcircle
+    if SameValue(LRect.Width, LRect.Height, TEpsilon.position) and
+       SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
+       SameValue(LScaledYRadius, LRect.Height / 2, TEpsilon.position) and
+       (ACorners = AllCorners) and
+       (ASides=AllSides) then begin
 
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
+      var LCenterPoint := LRect.CenterPoint;
+      sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, aPaint);
+
+    end
+
+    // use drawRoundRect
+    else if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
+             (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
+            (ACorners<>[]) and
+            (ASides=AllSides) then begin
+
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
           LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
         else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
@@ -10103,10 +10200,10 @@ var
     else if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
              (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
              (ACorners=[])) and
-            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+            (ASides=AllSides) then begin
 
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
           LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
         else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
@@ -10124,19 +10221,19 @@ var
       try
         var LHalfStrokeThickness: Single := 0;
         if (LStrokeColor <> TalphaColorRec.Null) then begin
-          var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
           if (aDrawOnlyBorder) or
              ((LRectIsEqualsToStrokeRect) and
               (LShadowcolor = TalphaColorRec.Null) and
-              (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-              (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right])) then begin
+              (ACorners=AllCorners) and
+              (ASides=AllSides)) then begin
             LHalfStrokeThickness := LScaledStrokeThickness / 2;
             LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
           end
           else if (LRectIsEqualsToStrokeRect) and
                   (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) and
-                  (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-                  (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+                  (ACorners=AllCorners) and
+                  (ASides=AllSides) then begin
             LHalfStrokeThickness := 1;
             LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
           end;
@@ -10347,25 +10444,82 @@ var
       else LScaledXRadius := LScaledXRadius * AScale;
       if LScaledYRadius < 0 then LScaledYRadius := (LRect.Height/100)*abs(LScaledYRadius)
       else LScaledYRadius := LScaledYRadius* AScale;
-      var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
-      LScaledXRadius := min(LScaledXRadius, LMaxRadius);
-      LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+      if (AXRadius < 0) or (AYRadius < 0) then begin
+        var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
+        LScaledXRadius := min(LScaledXRadius, LMaxRadius);
+        LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+      end;
     end
     else begin
       LScaledXRadius := 0;
       LScaledYRadius := 0;
     end;
 
+    // use drawcircle/addCircle+drawPath
+    if SameValue(LRect.Width, LRect.Height, TEpsilon.position) and
+       SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
+       SameValue(LScaledYRadius, LRect.Height / 2, TEpsilon.position) and
+       (ACorners = AllCorners) and
+       (ASides=AllSides) then begin
+
+      // use drawcircle
+      if (not aForceDrawPath) and
+         (not aClipPath) then begin
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
+            LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+          else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
+            LRect.Inflate(-1, -1);
+        end;
+        //--
+        aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, aPaint);
+      end
+
+      // use addCircle+drawPath
+      else begin
+        var LPath := TJPath.Create;
+        //--
+        if (LStrokeColor <> TalphaColorRec.Null) then begin
+          var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+          if (aDrawOnlyBorder) or
+             ((LRectIsEqualsToStrokeRect) and
+              (LShadowcolor = TalphaColorRec.Null)) then begin
+            LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
+          end
+          else if (LRectIsEqualsToStrokeRect) and
+                  (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then begin
+            LRect.Inflate(-1, -1);
+          end;
+        end;
+        //--
+        LPath.addCircle(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius}, TJPath_Direction.JavaClass.CW{dir});
+        //--
+        if aPaint <> nil then aCanvas.drawPath(LPath,aPaint);
+        if aClipPath then begin
+          aCanvas.save;
+          aCanvas.clipPath(LPath);
+          {$IF defined(DEBUG)}
+          if LPathClipped then
+            raise Exception.Create('Error 2001FF24-310A-48D3-9D9C-34B8C3358130');
+          {$ENDIF}
+          LPathClipped := True;
+        end;
+        LPath := nil;
+      end;
+
+    end
+
     // use drawRoundRect
-    if (not aForceDrawPath) and
-       (not aClipPath) and
-       ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
-        (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
-       (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-       (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+    else if (not aForceDrawPath) and
+            (not aClipPath) and
+            ((compareValue(LScaledXRadius, 0, TEpsilon.Position) > 0) and
+             (compareValue(LScaledYRadius, 0, TEpsilon.position) > 0)) and
+            (ACorners=AllCorners) and
+            (ASides=AllSides) then begin
 
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
           LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
         else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
@@ -10388,10 +10542,10 @@ var
             ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
              (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
              (ACorners=[])) and
-            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+            (ASides=AllSides) then begin
 
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
           LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
         else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
@@ -10414,19 +10568,19 @@ var
       //--
       var LHalfStrokeThickness: Single := 0;
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if (aDrawOnlyBorder) or
            ((LRectIsEqualsToStrokeRect) and
             (LShadowcolor = TalphaColorRec.Null) and
-            (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right])) then begin
+            (ACorners=AllCorners) and
+            (ASides=AllSides)) then begin
           LHalfStrokeThickness := LScaledStrokeThickness / 2;
           LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
         end
         else if (LRectIsEqualsToStrokeRect) and
                 (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) and
-                (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-                (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+                (ACorners=AllCorners) and
+                (ASides=AllSides) then begin
           LHalfStrokeThickness := 1;
           LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
         end;
@@ -10678,23 +10832,56 @@ var
       else LScaledXRadius := LScaledXRadius * AScale;
       if LScaledYRadius < 0 then LScaledYRadius := (LRect.Height/100)*abs(LScaledYRadius)
       else LScaledYRadius := LScaledYRadius* AScale;
-      var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
-      LScaledXRadius := min(LScaledXRadius, LMaxRadius);
-      LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+      if (AXRadius < 0) or (AYRadius < 0) then begin
+        var LMaxRadius := Min(LRect.Width / 2, LRect.Height / 2);
+        LScaledXRadius := min(LScaledXRadius, LMaxRadius);
+        LScaledYRadius := min(LScaledYRadius, LMaxRadius);
+      end;
     end
     else begin
       LScaledXRadius := 0;
       LScaledYRadius := 0;
     end;
 
-    // use drawRect
-    if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
-        (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
-        (ACorners=[])) and
-       (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+    // use AddEllipseInRect
+    if SameValue(LRect.Width, LRect.Height, TEpsilon.position) and
+       SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
+       SameValue(LScaledYRadius, LRect.Height / 2, TEpsilon.position) and
+       (ACorners = AllCorners) and
+       (ASides=AllSides) then begin
 
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
+          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
+        else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
+          LRect.Inflate(-1, -1);
+      end;
+      //--
+      if aClipPath then CGContextSaveGState(ACanvas);
+      CGContextBeginPath(ACanvas);
+      CGContextAddEllipseInRect(
+        ACanvas,
+        ALLowerLeftCGRect(
+          LRect.TopLeft,
+          LRect.Width,
+          LRect.Height,
+          AGridHeight));
+      CGContextClosePath(ACanvas);
+      if aClipPath then CGContextClip(ACanvas)
+      else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
+      else CGContextStrokePath(ACanvas);
+
+    end
+
+    // use AddRect
+    else if ((compareValue(LScaledXRadius, 0, TEpsilon.Position) = 0) or
+             (compareValue(LScaledYRadius, 0, TEpsilon.position) = 0) or
+             (ACorners=[])) and
+            (ASides=AllSides) then begin
+
+      if (LStrokeColor <> TalphaColorRec.Null) then begin
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
           LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
         else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
@@ -10725,19 +10912,19 @@ var
       //--
       var LHalfStrokeThickness: Single := 0;
       if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
+        var LRectIsEqualsToStrokeRect := LRect.EqualsTo(LScaledDstRect, TEpsilon.position);
         if (aDrawOnlyBorder) or
            ((LRectIsEqualsToStrokeRect) and
             (LShadowcolor = TalphaColorRec.Null) and
-            (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-            (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right])) then begin
+            (ACorners=AllCorners) and
+            (ASides=AllSides)) then begin
           LHalfStrokeThickness := LScaledStrokeThickness / 2;
           LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
         end
         else if (LRectIsEqualsToStrokeRect) and
                 (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) and
-                (ACorners=[TCorner.TopLeft, TCorner.TopRight, TCorner.BottomLeft, TCorner.BottomRight]) and
-                (ASides=[TSide.Top, TSide.Left, TSide.Bottom, TSide.Right]) then begin
+                (ACorners=AllCorners) and
+                (ASides=AllSides) then begin
           LHalfStrokeThickness := 1;
           LRect.Inflate(-LHalfStrokeThickness, -LHalfStrokeThickness);
         end;
@@ -11236,45 +11423,6 @@ begin
   LPathClipped := False;
   {$ENDIF}
 
-  if SameValue(LScaledDstRect.Width, LScaledDstRect.Height, TEpsilon.position) and
-     SameValue(LScaledBackgroundDstRect.Width, LScaledBackgroundDstRect.Height, TEpsilon.position) and
-     SameValue(LScaledImageDstRect.Width, LScaledImageDstRect.Height, TEpsilon.position) and
-     SameValue(AXRadius, -50, TEpsilon.position) and
-     SameValue(AYRadius, -50, TEpsilon.position) and
-     ((not LFillWithImage) or (not AFillImageNoRadius)) then begin
-    ALDrawCircle(
-      ACanvas, // const ACanvas: TALCanvas;
-      AScale, // const AScale: Single;
-      AAlignToPixel, // const AAlignToPixel: Boolean;
-      ADstRect, // const ADstRect: TrectF;
-      AOpacity, //const AOpacity: Single;
-      AFillColor, // const AFillColor: TAlphaColor;
-      AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-      AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-      AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-      AFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      AFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      AFillResourceName, // const AFillResourceName: String;
-      AFillResourceStream, // const AFillResourceStream: TStream;
-      AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-      AFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
-      AFillImageNoRadius, // Const AFillImageNoRadius: Boolean;
-      AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-      AStateLayerOpacity, // const AStateLayerOpacity: Single;
-      AStateLayerColor, // const AStateLayerColor: TAlphaColor;
-      AStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
-      AStateLayerXRadius, // const AStateLayerXRadius: Single;
-      AStateLayerYRadius, // const AStateLayerYRadius: Single;
-      ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
-      AStrokeColor, // const AStrokeColor: TalphaColor;
-      AStrokeThickness, // const AStrokeThickness: Single;
-      AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
-      AShadowBlur, // const AShadowBlur: Single;
-      AShadowOffsetX, // const AShadowOffsetX: Single;
-      AShadowOffsetY); // const AShadowOffsetY: Single)
-    exit;
-  end;
-
   {$REGION 'SKIA'}
   {$IF defined(ALSkiaEngine)}
 
@@ -11542,6 +11690,7 @@ begin
                         LFillColor, // const AFillColor: TAlphaColor;
                         LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                         LFillResourceName, // const AFillResourceName: String;
+                        AFillResourceStream, // const AFillResourceStream: TStream;
                         LScaledFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
                         LScaledFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
                         AStateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -11831,6 +11980,7 @@ begin
                         LFillColor, // const AFillColor: TAlphaColor;
                         LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                         LFillResourceName, // const AFillResourceName: String;
+                        AFillResourceStream, // const AFillResourceStream: TStream;
                         LScaledFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
                         LScaledFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
                         AStateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -12188,20 +12338,26 @@ procedure ALDrawRectangle(
 begin
   var LFillGradientStartPoint: TPointF;
   var LFillGradientEndPoint: TPointF;
-  case AFillGradientStyle of
-    TGradientStyle.Linear: begin
-      ALGetLinearGradientCoordinates(
-        ADstRect.Size, // const ASize: TSizeF;
-        AFillGradientAngle, // const AAngle: Single;
-        LFillGradientStartPoint, // out AStartPoint: TPointF;
-        LFillGradientEndPoint); // out AEndPoint: TPointF;
+  if length(AFillGradientColors) > 0 then begin
+    case AFillGradientStyle of
+      TGradientStyle.Linear: begin
+        ALGetLinearGradientCoordinates(
+          ADstRect.Size, // const ASize: TSizeF;
+          AFillGradientAngle, // const AAngle: Single;
+          LFillGradientStartPoint, // out AStartPoint: TPointF;
+          LFillGradientEndPoint); // out AEndPoint: TPointF;
+      end;
+      TGradientStyle.Radial: begin
+        LFillGradientStartPoint := ADstRect.CenterPoint;
+        LFillGradientEndPoint := ADstRect.TopLeft;
+      end
+      else
+        Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
     end;
-    TGradientStyle.Radial: begin
-      LFillGradientStartPoint := ADstRect.CenterPoint;
-      LFillGradientEndPoint := ADstRect.TopLeft;
-    end
-    else
-      Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
+  end
+  else begin
+    LFillGradientStartPoint := TPointF.Zero;
+    LFillGradientEndPoint := TPointF.Zero;
   end;
   ALDrawRectangle(
     ACanvas, // const ACanvas: TALCanvas;
@@ -12413,1267 +12569,42 @@ procedure ALDrawCircle(
             const AShadowBlur: Single;
             const AShadowOffsetX: Single;
             const AShadowOffsetY: Single);
-
-var
-  LScaledDstRect: TRectF;
-  LScaledStrokeThickness: Single;
-  LFillGradientColors: TArray<TAlphaColor>;
-  LStrokeColor: TalphaColor;
-  {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
-  LShadowColor: TalphaColor;
-  LScaledShadowBlur: Single;
-  LScaledShadowOffsetX: Single;
-  LScaledShadowOffsetY: Single;
-  {$ENDIF}
-  LStateLayerColor: TAlphaColor;
-  LScaledStateLayerDstRect: TrectF;
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
-  LPathClipped: Boolean;
-  {$ENDIF}
-
-  {$REGION '_DrawCircle (SKIA)'}
-  {$IF defined(ALSkiaEngine)}
-  procedure _DrawCircle(
-              const aCanvas: sk_canvas_t;
-              const aPaint: sk_Paint_t;
-              const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean);
-  begin
-
-    var LRect := aRect;
-    if (LStrokeColor <> TalphaColorRec.Null) then begin
-      var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
-      if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
-        LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
-      else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
-        LRect.Inflate(-1, -1);
-    end;
-    //--
-    var LCenterPoint := LRect.CenterPoint;
-    sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, aPaint);
-
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_DrawCircle (ANDROID)'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
-  procedure _DrawCircle(
-              const aCanvas: Jcanvas;
-              const aPaint: JPaint;
-              const aRect: TrectF;
-              const aDrawOnlyBorder: Boolean;
-              const aForceDrawPath: Boolean;
-              const aClipPath: Boolean);
-  begin
-
-    // Init LRect
-    var LRect := aRect;
-
-    // use drawRoundRect
-    if (not aForceDrawPath) and
-       (not aClipPath) then begin
-
-      if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
-        if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
-          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
-        else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
-          LRect.Inflate(-1, -1);
-      end;
-      //--
-      aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, aPaint);
-
-    end
-
-    // use drawPath
-    else begin
-
-      var LPath := TJPath.Create;
-      //--
-      if (LStrokeColor <> TalphaColorRec.Null) then begin
-        var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
-        if (aDrawOnlyBorder) or
-           ((LRectIsEqualsToStrokeRect) and
-            (LShadowcolor = TalphaColorRec.Null)) then begin
-          LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
-        end
-        else if (LRectIsEqualsToStrokeRect) and
-                (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then begin
-          LRect.Inflate(-1, -1);
-        end;
-      end;
-      //--
-      LPath.addCircle(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius}, TJPath_Direction.JavaClass.CW{dir});
-      //--
-      if aPaint <> nil then aCanvas.drawPath(LPath,aPaint);
-      if aClipPath then begin
-        aCanvas.save;
-        aCanvas.clipPath(LPath);
-        {$IF defined(DEBUG)}
-        if LPathClipped then
-          raise Exception.Create('Error 2001FF24-310A-48D3-9D9C-34B8C3358130');
-        {$ENDIF}
-        LPathClipped := True;
-      end;
-      LPath := nil;
-
-    end;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_DrawCircle (APPLEOS)'}
-  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
-  procedure _DrawCircle(
-              const aCanvas: CGContextRef;
-              const aGridHeight: Integer;
-              const aRect: TrectF;
-              Const aDrawOnlyBorder: Boolean;
-              const aClipPath: Boolean);
-  begin
-    var LRect := aRect;
-    if (LStrokeColor <> TalphaColorRec.Null) then begin
-      var LRectIsEqualsToStrokeRect := ARect.EqualsTo(LScaledDstRect, TEpsilon.position);
-      if aDrawOnlyBorder or (LRectIsEqualsToStrokeRect and (LShadowcolor = TalphaColorRec.Null)) then
-        LRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2))
-      else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
-        LRect.Inflate(-1, -1);
-    end;
-    //--
-    if aClipPath then CGContextSaveGState(ACanvas);
-    CGContextBeginPath(ACanvas);
-    CGContextAddEllipseInRect(
-      ACanvas,
-      ALLowerLeftCGRect(
-        LRect.TopLeft,
-        LRect.Width,
-        LRect.Height,
-        AGridHeight));
-    CGContextClosePath(ACanvas);
-    if aClipPath then CGContextClip(ACanvas)
-    else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
-    else CGContextStrokePath(ACanvas);
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_SetShadow (SKIA)'}
-  {$IF defined(ALSkiaEngine)}
-  procedure _SetShadow(const aPaint: sk_Paint_t);
-  begin
-    //In skia we can use this to convert from the (legacy) idea of specify
-    //the blur "radius" to the standard notion of specifying its sigma.
-    //  static const SkScalar kBLUR_SIGMA_SCALE = 0.57735f;
-    //  SkScalar SkBlurMask::ConvertRadiusToSigma(SkScalar radius) {
-    //     return radius > 0 ? 0.57735f * radius + 0.5f : 0.0f;
-    //  }
-    //But it's not very good, I think that a better value is just Shadow.blur / 2
-    if (LShadowColor <> TalphaColorRec.Null) then begin
-      var LImagefilter := ALSkCheckHandle(
-                            sk4d_imagefilter_make_drop_shadow(
-                              LScaledShadowOffsetX, // dx,
-                              LScaledShadowOffsetY, // dy,
-                              LScaledShadowBlur / 2, // sigma_x,
-                              LScaledShadowBlur / 2, // sigma_y: float;
-                              LShadowColor, // color: sk_color_t;
-                              0, // input: sk_imagefilter_t;
-                              nil)); // const crop_rect: psk_rect_t)
-      try
-        // Sets SkImageFilter to imageFilter, decreasing SkRefCnt of the previous SkImageFilter. Increments imageFilter SkRefCnt by one.
-        sk4d_paint_set_image_filter(aPaint, LImagefilter);
-      finally
-        sk4d_refcnt_unref(LImagefilter);
-      end;
-    end;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_SetShadow (ANDROID)'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
-  procedure _SetShadow(const aPaint: JPaint);
-  begin
-    if LShadowColor <> TalphaColorRec.Null then
-      APaint.setShadowLayer(
-        LScaledShadowBlur{radius},
-        LScaledShadowOffsetX{dx},
-        LScaledShadowOffsetY{dy},
-        integer(LShadowColor){shadowColor});
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_SetShadow (APPLEOS)'}
-  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
-  procedure _SetShadow(const aCanvas: CGContextRef);
-  begin
-    if LShadowColor <> TalphaColorRec.Null then begin
-      var LShadowColorF := TAlphaColorCGFloat.Create(LShadowColor);
-      var LShadowColorCG := CGColorCreate(ALGetGlobalCGColorSpace, @LShadowColorF);
-      try
-        CGContextSetShadowWithColor(
-          ACanvas,
-          CGSizeMake(LScaledShadowOffsetX, -LScaledShadowOffsetY), // offset
-          LScaledShadowBlur, // blur
-          LShadowColorCG); // color
-      finally
-        CGColorRelease(LShadowColorCG);
-      end;
-    end;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_ClearShadow (SKIA)'}
-  {$IF defined(ALSkiaEngine)}
-  procedure _ClearShadow(const aPaint: sk_Paint_t);
-  begin
-    if LShadowColor <> TalphaColorRec.Null then
-      sk4d_paint_set_image_filter(aPaint, 0);
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_ClearShadow (ANDROID)'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
-  procedure _ClearShadow(const aPaint: JPaint);
-  begin
-      if LShadowColor <> TalphaColorRec.Null then
-        APaint.clearShadowLayer;
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_ClearShadow (APPLEOS)'}
-  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
-  procedure _ClearShadow(const aCanvas: CGContextRef);
-  begin
-    if LShadowColor <> TalphaColorRec.Null then
-      CGContextSetShadowWithColor(
-        ACanvas,
-        CGSizeMake(0, 0), // offset
-        0, // blur
-        nil); // color
-  end;
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION '_FillGradientIsTransparent'}
-  function _FillGradientIsTransparent: boolean;
-  begin
-    if length(LFillGradientColors) = 0 then exit(true);
-    Result := False;
-    for var I := Low(LFillGradientColors) to High(LFillGradientColors) do begin
-      Result := TAlphaColorRec(LFillGradientColors[i]).A < 255;
-      if Result then exit;
-    end;
-  end;
-  {$ENDREGION}
-
-  {$REGION '_DrawStateLayer'}
-  procedure _DrawStateLayer;
-  begin
-    if LStateLayerColor = TAlphaColors.Null then exit;
-
-    var LScaledStateLayerXRadius: Single := AStateLayerXRadius;
-    var LScaledStateLayerYRadius: Single := AStateLayerYRadius;
-    if LScaledStateLayerXRadius > 0 then LScaledStateLayerXRadius := LScaledStateLayerXRadius * AScale;
-    if LScaledStateLayerYRadius > 0 then LScaledStateLayerYRadius := LScaledStateLayerYRadius* AScale;
-
-    ALDrawRectangle(
-      ACanvas, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      AAlignToPixel, // const AAlignToPixel: Boolean;
-      LScaledStateLayerDstRect, // const ADstRect: TrectF;
-      AStateLayerOpacity, // const AOpacity: Single;
-      LStateLayerColor, // const AFillColor: TAlphaColor;
-      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
-      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      '', // const AFillResourceName: String;
-      nil, // const AFillResourceStream: TStream;
-      TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
-      TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
-      False, // Const AFillImageNoRadius: Boolean;
-      TALImageWrapMode.Fit, // Const AFillWrapMode: TALImageWrapMode;
-      0, // const AStateLayerOpacity: Single;
-      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
-      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
-      0, // const AStateLayerXRadius: Single;
-      0, // const AStateLayerYRadius: Single;
-      False, // const ADrawStateLayerOnTop: Boolean;
-      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
-      0, // const AStrokeThickness: Single;
-      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
-      0, // const AShadowBlur: Single;
-      0, // onst AShadowOffsetX: Single;
-      0, // const AShadowOffsetY: Single;
-      AllSides, // const ASides: TSides;
-      AllCorners, // const ACorners: TCorners;
-      LScaledStateLayerXRadius, // const AXRadius: Single;
-      LScaledStateLayerYRadius); // const AYRadius: Single)
-  end;
-  {$ENDREGION}
-
 begin
 
-  if CompareValue(AOpacity, 0, TEpsilon.Scale) <= 0 then exit;
-  //--
-  var LCanvasMatrix: TMatrix;
-  var LCanvasScale: Single;
-  if AAlignToPixel then ALExtractMatrixFromCanvas(Acanvas, LCanvasMatrix, LCanvasScale)
-  else begin
-    LCanvasMatrix := TMatrix.Identity;
-    LCanvasScale := 1;
-  end;
-  //--
-  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
-  var LGridHeight := CGBitmapContextGetHeight(ACanvas);
-  {$ENDIF}
-  //--
-  LScaledDstRect := ADstRect;
-  LScaledDstRect.Top := LScaledDstRect.Top * AScale;
-  LScaledDstRect.right := LScaledDstRect.right * AScale;
-  LScaledDstRect.left := LScaledDstRect.left * AScale;
-  LScaledDstRect.bottom := LScaledDstRect.bottom * AScale;
-  LScaledDstRect := TRectF.Create(0, 0, 1, 1).FitInto(LScaledDstRect);
-  if AAlignToPixel then
-    LScaledDstRect := ALAlignToPixelRound(LScaledDstRect, LCanvasMatrix, LCanvasScale, TEpsilon.Position);
-  //--
-  LScaledStrokeThickness := AStrokeThickness * AScale;
-  if AAlignToPixel then
-    LScaledStrokeThickness := ALAlignDimensionToPixelRound(LScaledStrokeThickness, LCanvasScale, TEpsilon.Position);
-  //--
-  {$IF (defined(ANDROID)) or (defined(ALAppleOS)) or (defined(ALSkiaEngine))}
-  LScaledShadowBlur := AShadowBlur * AScale;
-  LScaledShadowOffsetX := AShadowOffsetX * AScale;
-  LScaledShadowOffsetY := AShadowOffsetY * AScale;
-  if AAlignToPixel then begin
-    LScaledShadowBlur := ALAlignDimensionToPixelRound(LScaledShadowBlur, LCanvasScale, Tepsilon.Vector);
-    LScaledShadowOffsetX := ALAlignDimensionToPixelRound(LScaledShadowOffsetX, LCanvasScale, TEpsilon.Position);
-    LScaledShadowOffsetY := ALAlignDimensionToPixelRound(LScaledShadowOffsetY, LCanvasScale, TEpsilon.Position);
-  end;
-  LShadowColor := AShadowColor;
-  if CompareValue(LScaledShadowBlur, 0, TEpsilon.position) <= 0 then
-    LShadowColor := TAlphaColors.Null;
-  {$ENDIF}
-  //--
-  LStrokeColor := AStrokeColor;
-  if CompareValue(LScaledStrokeThickness, 0, TEpsilon.position) <= 0 then
-    LStrokeColor := TAlphaColors.Null;
-  //--
-  if length(AFillGradientColors) = 1 then
-    raise Exception.Create('Invalid gradient: A gradient requires at least two colors');
-  var LFillGradientOffsets := AFillGradientOffsets;
-  if (length(LFillGradientOffsets) = 0) and (length(AFillGradientColors) > 0) then begin
-    setlength(LFillGradientOffsets, length(AFillGradientColors));
-    for Var I := 0 to length(AFillGradientColors) - 1 do
-      LFillGradientOffsets[i] := I * (1 / (length(AFillGradientColors) - 1));
-  end
-  else if (length(LFillGradientOffsets) <> length(AFillGradientColors)) then
-    raise Exception.Create('Invalid gradient: The number of gradient offsets does not match the number of gradient colors');
-  //--
-  var LScaledFillGradientStartPoint := AFillGradientStartPoint;
-  LScaledFillGradientStartPoint.X := LScaledFillGradientStartPoint.X * AScale;
-  LScaledFillGradientStartPoint.Y := LScaledFillGradientStartPoint.Y * AScale;
-  var LScaledFillGradientEndPoint := AFillGradientEndPoint;
-  LScaledFillGradientEndPoint.X := LScaledFillGradientEndPoint.X * AScale;
-  LScaledFillGradientEndPoint.Y := LScaledFillGradientEndPoint.Y * AScale;
-  //--
-  var LScaledFillBackgroundMarginsRect: TRectF;
-  if (AFillColor <> TalphaColorRec.Null) or
-     (length(AFillGradientColors) > 0) then begin
-    LScaledFillBackgroundMarginsRect := AFillBackgroundMarginsRect;
-    LScaledFillBackgroundMarginsRect.Top := LScaledFillBackgroundMarginsRect.Top * AScale;
-    LScaledFillBackgroundMarginsRect.right := LScaledFillBackgroundMarginsRect.right * AScale;
-    LScaledFillBackgroundMarginsRect.left := LScaledFillBackgroundMarginsRect.left * AScale;
-    LScaledFillBackgroundMarginsRect.bottom := LScaledFillBackgroundMarginsRect.bottom * AScale;
-    if AAlignToPixel then
-      LScaledFillBackgroundMarginsRect := ALAlignEdgesToPixelRound(LScaledFillBackgroundMarginsRect, LCanvasScale, TEpsilon.Position);
-  end
-  else
-    LScaledFillBackgroundMarginsRect := TRectF.Empty;
-  //--
-  var LFillResourceName := AFillResourceName;
-  if ALIsHttpOrHttpsUrl(LFillResourceName) then LFillResourceName := '';
-  var LFillWithImage := (LFillResourceName <> '') or (AFillResourceStream <> nil);
-  //--
-  var LScaledFillImageMarginsRect: TRectF;
-  if LFillWithImage then begin
-    LScaledFillImageMarginsRect := AFillImageMarginsRect;
-    LScaledFillImageMarginsRect.Top := LScaledFillImageMarginsRect.Top * AScale;
-    LScaledFillImageMarginsRect.right := LScaledFillImageMarginsRect.right * AScale;
-    LScaledFillImageMarginsRect.left := LScaledFillImageMarginsRect.left * AScale;
-    LScaledFillImageMarginsRect.bottom := LScaledFillImageMarginsRect.bottom * AScale;
-    if AAlignToPixel then
-      LScaledFillImageMarginsRect := ALAlignEdgesToPixelRound(LScaledFillImageMarginsRect, LCanvasScale, TEpsilon.Position);
-  end
-  else
-    LScaledFillImageMarginsRect := TRectF.Empty;
-  //--
-  var LScaledBackgroundDstRect := LScaledDstRect;
-  LScaledBackgroundDstRect.Inflate(-LScaledFillBackgroundMarginsRect.Left, -LScaledFillBackgroundMarginsRect.Top, -LScaledFillBackgroundMarginsRect.Right, -LScaledFillBackgroundMarginsRect.Bottom);
-  LScaledBackgroundDstRect := TRectF.Create(0, 0, 1, 1).FitInto(LScaledBackgroundDstRect);
-  if (CompareValue(LScaledBackgroundDstRect.Width, 0, TEpsilon.Position) <= 0) or
-     (CompareValue(LScaledBackgroundDstRect.height, 0, TEpsilon.Position) <= 0) then
-    LScaledBackgroundDstRect := TRectf.Empty;
-  //--
-  var LScaledImageDstRect := LScaledDstRect;
-  LScaledImageDstRect.Inflate(-LScaledFillImageMarginsRect.Left, -LScaledFillImageMarginsRect.Top, -LScaledFillImageMarginsRect.Right, -LScaledFillImageMarginsRect.Bottom);
-  LScaledImageDstRect := TRectF.Create(0, 0, 1, 1).FitInto(LScaledImageDstRect);
-  if (CompareValue(LScaledImageDstRect.Width, 0, TEpsilon.Position) <= 0) or
-     (CompareValue(LScaledImageDstRect.height, 0, TEpsilon.Position) <= 0) then
-    LScaledImageDstRect := TRectf.Empty;
-  //--
-  var LFillColor := AFillColor;
-  LFillGradientColors := AFillGradientColors;
-  if LScaledBackgroundDstRect.IsEmpty then begin
-    LFillColor := TALphaColors.Null;
-    setlength(LFillGradientColors, 0);
-    setlength(LFillGradientOffsets, 0);
-  end;
-  //--
-  if LScaledImageDstRect.IsEmpty then LFillResourceName := '';
-  LFillWithImage := (LFillResourceName <> '') or (AFillResourceStream <> nil);
-  //--
-  var LScaledStateLayerMarginsRect: TRectF;
-  if (AStateLayerColor <> TalphaColorRec.Null) and
-     (CompareValue(AStatelayerOpacity, 0, TEpsilon.Scale) > 0) then begin
-    LScaledStateLayerMarginsRect := AStateLayerMarginsRect;
-    LScaledStateLayerMarginsRect.Top := LScaledStateLayerMarginsRect.Top * AScale;
-    LScaledStateLayerMarginsRect.right := LScaledStateLayerMarginsRect.right * AScale;
-    LScaledStateLayerMarginsRect.left := LScaledStateLayerMarginsRect.left * AScale;
-    LScaledStateLayerMarginsRect.bottom := LScaledStateLayerMarginsRect.bottom * AScale;
-    if AAlignToPixel then
-      LScaledStateLayerMarginsRect := ALAlignEdgesToPixelRound(LScaledStateLayerMarginsRect, LCanvasScale, TEpsilon.Position);
-  end
-  else
-    LScaledStateLayerMarginsRect := TRectF.Empty;
-  //--
-  LScaledStateLayerDstRect := LScaledDstRect;
-  LScaledStateLayerDstRect.Inflate(-LScaledStateLayerMarginsRect.Left, -LScaledStateLayerMarginsRect.Top, -LScaledStateLayerMarginsRect.Right, -LScaledStateLayerMarginsRect.Bottom);
-  if (CompareValue(LScaledStateLayerDstRect.Width, 0, TEpsilon.Position) <= 0) or
-     (CompareValue(LScaledStateLayerDstRect.height, 0, TEpsilon.Position) <= 0) then
-    LScaledStateLayerDstRect := TRectf.Empty;
-  //--
-  LStateLayerColor := AStateLayerColor;
-  if (LScaledStateLayerDstRect.IsEmpty) or
-     (CompareValue(AStatelayerOpacity, 0, TEpsilon.Scale) <= 0) then
-    LStateLayerColor := TALphaColors.Null;
-  //--
-  if (LStateLayerColor <> TALphaColors.Null) and
-     (CompareValue(AStatelayerOpacity, 0, TEpsilon.Scale) > 0) and
-     (LScaledStateLayerDstRect.EqualsTo(LScaledBackgroundDstRect)) and
-     (LScaledStateLayerDstRect.EqualsTo(LScaledDstRect)) and
-     (sameValue(AStateLayerXRadius, -50, TEpsilon.Vector)) and
-     (sameValue(AStateLayerYRadius, -50, TEpsilon.Vector)) then begin
-    LFillColor := ALblendColor(LfillColor, LStateLayerColor, AStatelayerOpacity);
-    if (ADrawStateLayerOnTop) and
-       (LStrokeColor <> TAlphaColors.Null) then
-      LStrokeColor := ALblendColor(LStrokeColor, LStateLayerColor, AStatelayerOpacity);
-    LStateLayerColor := TALphaColors.Null;
-  end;
-  //--
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
-  LPathClipped := False;
-  {$ENDIF}
-
-  if LFillWithImage and AfillImageNoRadius then begin
-    ALDrawRectangle(
-      ACanvas, // const ACanvas: TALCanvas;
-      AScale, // const AScale: Single;
-      AAlignToPixel, // const AAlignToPixel: Boolean;
-      ADstRect, // const ADstRect: TrectF;
-      AOpacity, // const AOpacity: Single;
-      AFillColor, // const AFillColor: TAlphaColor;
-      AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-      AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-      AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-      AFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      AFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      AFillResourceName, // const AFillResourceName: String;
-      AFillResourceStream, // const AFillResourceStream: TStream;
-      AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-      AFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
-      AFillImageNoRadius, // Const AFillImageNoRadius: Boolean;
-      AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-      AStateLayerOpacity, // const AStateLayerOpacity: Single;
-      AStateLayerColor, // const AStateLayerColor: TAlphaColor;
-      AStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
-      AStateLayerXRadius, // const AStateLayerXRadius: Single;
-      AStateLayerYRadius, // const AStateLayerYRadius: Single;
-      ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
-      AStrokeColor, // const AStrokeColor: TalphaColor;
-      AStrokeThickness, // const AStrokeThickness: Single;
-      AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
-      AShadowBlur, // const AShadowBlur: Single;
-      AShadowOffsetX, // const AShadowOffsetX: Single;
-      AShadowOffsetY, // const AShadowOffsetY: Single;
-      ALLSides, // const ASides: TSides;
-      ALLCorners, // const ACorners: TCorners;
-      -50, // const AXRadius: Single;
-      -50); // const AYRadius: Single);
-    exit;
-  end;
-
-  {$REGION 'SKIA'}
-  {$IF defined(ALSkiaEngine)}
-
-  // Create the alpha layer
-  if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then begin
-    var LLayerRect := ALGetShapeSurfaceRect(
-                        LScaledDstRect, // const ARect: TrectF;
-                        LFillColor, // const AFillColor: TAlphaColor;
-                        LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                        LFillResourceName, // const AFillResourceName: String;
-                        AFillResourceStream, // const AFillResourceStream: TStream;
-                        LScaledFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-                        LScaledFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
-                        AStateLayerOpacity, // const AStateLayerOpacity: Single;
-                        LStateLayerColor, // const AStateLayerColor: TAlphaColor;
-                        false, // const AStateLayerUseContentColor: Boolean;
-                        LScaledStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
-                        LShadowColor, // const AShadowColor: TAlphaColor;
-                        LScaledShadowBlur, // const AShadowBlur: Single;
-                        LScaledShadowOffsetX, // const AShadowOffsetX: Single;
-                        LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
-  end;
-  try
-
-    // Create LPaint
-    var LPaint := ALSkCheckHandle(sk4d_paint_create);
-    try
-
-      // Requests, but does not require, that edge pixels draw opaque or with partial transparency.
-      sk4d_paint_set_antialias(LPaint, true);
-      // Requests, but does not require, to distribute color error.
-      sk4d_paint_set_dither(LPaint, true);
-
-      // Fill the circle
-      if (LFillColor <> TalphaColorRec.Null) or
-         (length(LFillGradientColors) > 0) or
-         (LFillWithImage) or
-         (LShadowColor <> TalphaColorRec.Null) then begin
-
-        // FILL_SK_PAINTSTYLE
-        sk4d_paint_set_style(LPaint, sk_paintstyle_t.FILL_SK_PAINTSTYLE);
-
-        // Init LDrawnWithSolidColor
-        var LDrawnWithSolidColor := False;
-
-        // Fill with transparent solid color and shadow
-        if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
-           (TAlphaColorRec(LFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
-           (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
-           ((not LFillWithImage) or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
-            (LFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
-            (length(LFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
-            (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
-
-          // First pass draw the shadow
-          sk4d_paint_set_color(LPaint, ALSetColorAlpha(LFillColor, 1{AOpacity}));
-          _SetShadow(LPaint);
-          _DrawCircle(ACanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder});
-          _ClearShadow(LPaint);
-
-          // Second pass fill the rect
-          var LBlender := ALSkCheckHandle(
-                            sk4d_blender_make_mode(
-                              sk_blendmode_t.SRC_SK_BLENDMODE));
-          try
-            sk4d_paint_set_blender(LPaint, LBlender);
-            sk4d_paint_set_color(LPaint, LFillColor);
-            _DrawCircle(ACanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder});
-            sk4d_paint_set_blender(LPaint, 0);
-          finally
-            sk4d_refcnt_unref(LBlender)
-          end;
-          LDrawnWithSolidColor := True;
-
-        end
-
-        // Fill with solid color
-        else if (LFillColor <> TalphaColors.Null) then begin
-          sk4d_paint_set_color(LPaint, LFillColor);
-          _SetShadow(LPaint);
-          _DrawCircle(ACanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder});
-          _ClearShadow(LPaint);
-          LDrawnWithSolidColor := True;
-        end;
-
-        // Fill with gradient
-        if length(LFillGradientColors) > 0 then begin
-          case AFillGradientStyle of
-            TGradientStyle.Linear: begin
-              var LPoints: array[0..1] of sk_point_t;
-              LPoints[0].x := LScaledFillGradientStartPoint.X;
-              LPoints[0].y := LScaledFillGradientStartPoint.Y;
-              LPoints[1].x := LScaledFillGradientEndPoint.X;
-              LPoints[1].y := LScaledFillGradientEndPoint.Y;
-              var LShader := ALSkCheckHandle(
-                               sk4d_shader_make_gradient_linear(
-                                 @LPoints[0], // const points: psk_point_t;
-                                 @LFillGradientColors[0], // const colors: psk_color_t;
-                                 @LFillGradientOffsets[0], // const positions: pfloat;
-                                 Length(LFillGradientColors), // count: int32_t;
-                                 sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                 nil)); // const local_matrix: psk_matrix_t
-              try
-                // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                sk4d_paint_set_shader(LPaint, LShader);
-              finally
-                sk4d_refcnt_unref(LShader);
-              end;
-            end;
-            TGradientStyle.Radial: begin
-              var LShader := ALSkCheckHandle(
-                               sk4d_shader_make_gradient_radial(
-                                 @LScaledFillGradientStartPoint, // const center: psk_point_t;
-                                 LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint), // radius: float;
-                                 @LFillGradientColors[0], // const colors: psk_color_t;
-                                 @LFillGradientOffsets[0], // const positions: pfloat;
-                                 Length(LFillGradientColors), // count: int32_t;
-                                 sk_tilemode_t.CLAMP_SK_TILEMODE, // tile_mode: sk_tilemode_t;
-                                 nil));// const local_matrix: psk_matrix_t
-              try
-                // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                sk4d_paint_set_shader(LPaint, LShader);
-              finally
-                sk4d_refcnt_unref(LShader);
-              end;
-            end;
-            else
-              raise Exception.Create('Error EADEA97C-5440-46F0-A44A-47BCF4CFAC2F');
-          end;
-          if not LDrawnWithSolidColor then _SetShadow(LPaint);
-          _DrawCircle(ACanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder});
-          if not LDrawnWithSolidColor then _ClearShadow(LPaint);
-          sk4d_paint_set_shader(LPaint, 0);
-          LDrawnWithSolidColor := True;
-        end;
-
-        // Draw the StateLayer
-        if not ADrawStateLayerOnTop then
-          _DrawStateLayer;
-
-        // Fill with image
-        if LFillWithImage then begin
-          var LImage: sk_image_t;
-          {$IFDEF ALDPK}
-          try
-          {$ENDIF}
-            if AFillResourceStream <> nil then LImage := ALLoadFromStreamAndWrapToSkImage(AFillResourceStream, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height)
-            else begin
-              var LFileName := ALGetResourceFilename(LFillResourceName);
-              if LFileName <> '' then LImage := ALLoadFromFileAndWrapToSkImage(LFileName, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height)
-              else LImage := {$IFDEF ALDPK}0{$ELSE}ALLoadFromResourceAndWrapToSkImage(LFillResourceName, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height){$ENDIF};
-            end;
-          {$IFDEF ALDPK}
-          except
-            LImage := 0;
-          end;
-          If LImage <> 0 then
-          {$ENDIF}
-            try
-
-              var LDestRect := TrectF.Create(0,0, sk4d_image_get_width(LImage), sk4d_image_get_Height(LImage)).CenterAt(LScaledImageDstRect);
-              var LSamplingoptions := ALGetCubicMitchellNetravaliSkSamplingoptions;
-              var Lshader: sk_shader_t;
-              var LMatrix := TMatrix.CreateTranslation(LScaledImageDstRect.Left + LDestRect.Left - LScaledImageDstRect.Left, LScaledImageDstRect.Top + LDestRect.Top - LScaledImageDstRect.Top);
-              Lshader := ALSkCheckHandle(
-                           sk4d_image_make_shader(
-                             LImage, // const self: sk_image_t;
-                             sk_tilemode_t.DECAL_SK_TILEMODE, // tile_mode_x,
-                             sk_tilemode_t.DECAL_SK_TILEMODE,// tile_mode_y: sk_tilemode_t;
-                             @LSamplingoptions, // const sampling: psk_samplingoptions_t;
-                             @LMatrix)); // const local_matrix: psk_matrix_t)
-              try
-                // Sets SkShader to shader, decreasing SkRefCnt of the previous SkShader. Increments shader SkRefCnt by one.
-                sk4d_paint_set_shader(LPaint, LShader);
-              finally
-                sk4d_refcnt_unref(LShader);
-              end;
-
-              // Specify an opaque color to ensure the image is drawn without the
-              // transparency effect of the current color.
-              sk4d_paint_set_color(LPaint, $FFFFFFFF);
-              if not LDrawnWithSolidColor then _SetShadow(LPaint);
-              _DrawCircle(ACanvas, LPaint, LScaledImageDstRect, false{aDrawOnlyBorder});
-              if not LDrawnWithSolidColor then _ClearShadow(LPaint);
-              sk4d_paint_set_shader(LPaint, 0);
-
-            finally
-              sk4d_refcnt_unref(LImage);
-            end;
-        end;
-
-      end
-
-      // Draw the StateLayer
-      else if not ADrawStateLayerOnTop then
-        _DrawStateLayer;
-
-      // Stroke the circle
-      if LStrokeColor <> TalphaColorRec.Null then begin
-        sk4d_paint_set_style(LPaint, sk_paintstyle_t.STROKE_SK_PAINTSTYLE);
-        sk4d_paint_set_stroke_width(LPaint, LScaledStrokeThickness);
-        sk4d_paint_set_color(LPaint, LStrokeColor);
-        _DrawCircle(ACanvas, LPaint, LScaledDstRect, true{aDrawOnlyBorder});
-      end;
-
-      // Draw the StateLayer
-      if ADrawStateLayerOnTop then
-        _DrawStateLayer;
-
-    finally
-      sk4d_paint_destroy(LPaint);
-    end;
-
-  finally
-    // Remove the alpha layer
-    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      ALEndTransparencyLayer(ACanvas);
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'ANDROID'}
-  {$IF (defined(ANDROID)) and (not defined(ALSkiaEngine))}
-
-  // Create the alpha layer
-  if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then begin
-    var LLayerRect := ALGetShapeSurfaceRect(
-                        LScaledDstRect, // const ARect: TrectF;
-                        LFillColor, // const AFillColor: TAlphaColor;
-                        LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                        LFillResourceName, // const AFillResourceName: String;
-                        LScaledFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-                        LScaledFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
-                        AStateLayerOpacity, // const AStateLayerOpacity: Single;
-                        LStateLayerColor, // const AStateLayerColor: TAlphaColor;
-                        false, // const AStateLayerUseContentColor: Boolean;
-                        LScaledStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
-                        LShadowColor, // const AShadowColor: TAlphaColor;
-                        LScaledShadowBlur, // const AShadowBlur: Single;
-                        LScaledShadowOffsetX, // const AShadowOffsetX: Single;
-                        LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
-  end;
-  try
-
-    //create the canvas and the paint
-    var LPaint := TJPaint.JavaClass.init;
-    LPaint.setAntiAlias(true); // Enabling this flag will cause all draw operations that support antialiasing to use it.
-    LPaint.setFilterBitmap(True); // enable bilinear sampling on scaled bitmaps. If cleared, scaled bitmaps will be drawn with nearest neighbor sampling, likely resulting in artifacts.
-    LPaint.setDither(true); // Enabling this flag applies a dither to any blit operation where the target's colour space is more constrained than the source.
-
-    // Fill the circle
-    if (LFillColor <> TalphaColorRec.Null) or
-       (length(LFillGradientColors) > 0) or
-       (LFillWithImage) or
-       (LShadowColor <> TalphaColorRec.Null) then begin
-
-      //init LPaint
-      LPaint.setStyle(TJPaint_Style.JavaClass.FILL); // FILL_AND_STROCK it's absolutely useless, because it's will fill on the full LScaledDstRect + StrokeThickness :( this result&ing in border if the fill is for exemple black and border white
-
-      // Init LDrawnWithSolidColor
-      var LDrawnWithSolidColor := False;
-
-      // Fill with transparent solid color and shadow
-      if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
-         (TAlphaColorRec(LFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
-         (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
-         ((not LFillWithImage) or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
-          (LFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
-          (length(LFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
-          (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
-
-        // First pass draw the shadow
-        LPaint.setColor(integer(ALSetColorAlpha(LFillColor, 1{AOpacity})));
-        _SetShadow(LPaint);
-        _DrawCircle(aCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, false{aClipPath});
-        _ClearShadow(LPaint);
-
-        // Second pass fill the rect
-        var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC);
-        LPaint.setXfermode(LPorterDuffXfermode);
-        LPaint.setColor(integer(LFillColor));
-        _DrawCircle(aCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, (LFillWithImage) and (length(LFillGradientColors) = 0) and (LScaledBackgroundDstRect.EqualsTo(LScaledImageDstRect, TEpsilon.position)){aClipPath});
-        LPaint.setXfermode(nil);
-        LPorterDuffXfermode := nil;
-        LDrawnWithSolidColor := True;
-
-      end
-
-      // Fill with solid color
-      else if (LFillColor <> TalphaColors.Null) then begin
-        LPaint.setColor(integer(LFillColor));
-        _SetShadow(LPaint);
-        _DrawCircle(aCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, (LFillWithImage) and (length(LFillGradientColors) = 0) and (LScaledBackgroundDstRect.EqualsTo(LScaledImageDstRect, TEpsilon.position)){aClipPath});
-        _ClearShadow(LPaint);
-        LDrawnWithSolidColor := True;
-      end;
-
-      //fill with gradient
-      if length(LFillGradientColors) > 0 then begin
-
-        // First pass draw the shadow if not already drawn
-        // We must do this because else the shadow will be drawn with
-        // the color of the gradient :(
-        if not LDrawnWithSolidColor then begin
-          LPaint.setColor(integer(ALSetColorAlpha(LFillColor, 1{AOpacity})));
-          _SetShadow(LPaint);
-          _DrawCircle(aCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, false{aClipPath});
-          _ClearShadow(LPaint);
-        end;
-
-        // Second pass fill the rect
-        var LJColors := TJavaArray<Integer>.Create(length(LFillGradientColors));
-        var LJOffsets := TJavaArray<Single>.Create(length(LFillGradientOffsets));
-        Try
-          for var i := low(LFillGradientColors) to high(LFillGradientColors) do begin
-            LJColors[i] := integer(LFillGradientColors[i]);
-            LJOffsets[i] := LFillGradientOffsets[i];
-          end;
-          var LShader: JShader;
-          case AFillGradientStyle of
-            TGradientStyle.Linear: begin
-              LShader := TJLinearGradient.JavaClass.init(
-                           LScaledFillGradientStartPoint.X{x0},
-                           LScaledFillGradientStartPoint.Y{y0},
-                           LScaledFillGradientEndPoint.X{x1},
-                           LScaledFillGradientEndPoint.Y{y1},
-                           LJColors{colors},
-                           LJOffsets{positions},
-                           TJShader_TileMode.JavaClass.CLAMP{tile});
-            end;
-            TGradientStyle.Radial: begin
-              LShader := TJRadialGradient.JavaClass.init(
-                           LScaledFillGradientStartPoint.X{x},
-                           LScaledFillGradientStartPoint.Y{y},
-                           LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint){radius},
-                           LJColors{colors},
-                           LJOffsets{positions},
-                           TJShader_TileMode.JavaClass.CLAMP{tile});
-            end;
-            else
-              raise Exception.Create('Error EAB4DED3-CF02-495B-9CB8-8F82479D2839');
-          end;
-          LPaint.setShader(LShader);
-          _DrawCircle(aCanvas, LPaint, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, (LFillWithImage) and (LScaledBackgroundDstRect.EqualsTo(LScaledImageDstRect, TEpsilon.position)){aClipPath});
-          LPaint.setShader(nil);
-          LShader := nil;
-          LDrawnWithSolidColor := True;
-        finally
-          ALfreeandNil(LJColors);
-          ALfreeandNil(LJOffsets);
-        end;
-      end;
-
-      // Draw the StateLayer
-      if not ADrawStateLayerOnTop then
-        _DrawStateLayer;
-
-      // Fill with image
-      if LFillWithImage then begin
-        var LBitmap: JBitmap;
-        if AFillResourceStream <> nil then LBitmap := ALLoadFromStreamAndWrapToJBitmap(AFillResourceStream, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height)
-        else begin
-          var LFileName := ALGetResourceFilename(LFillResourceName);
-          if LFileName <> '' then LBitmap := ALLoadFromFileAndWrapToJBitmap(LFileName, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height)
-          else LBitmap := ALLoadFromResourceAndWrapToJBitmap(LFillResourceName, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height);
-        end;
-        try
-
-          // On android the bitmap is drawed with the opacity of the paint color
-          // so set the color to black to make the bitmap fully opaque
-          LPaint.setColor(integer(TAlphaColors.Black));
-
-          // The shadow is made directly on the bitmap
-          if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
-
-            // Draw the shape of the rect in LDestBitmap
-            var LDestRect := TRectF.Create(0,0,LScaledImageDstRect.Width,LScaledImageDstRect.height);
-            var LDestBitmap := TJBitmap.JavaClass.createBitmap(Round(LDestRect.Width), round(LDestRect.Height), TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
-            var LDestCanvas := TJCanvas.JavaClass.init(LDestBitmap);
-            _DrawCircle(LDestCanvas, LPaint, LDestRect, false{aDrawOnlyBorder}, False{aForceDrawPath}, False{aClipPath});
-            // Copy LBitmap in LSrcBitmap and extend LSrcBitmap to the size of LDestBitmap
-            var LSrcBitmap := TJBitmap.JavaClass.createBitmap(LDestBitmap.getWidth, LDestBitmap.getHeight, TJBitmap_Config.JavaClass.ARGB_8888, true{hasAlpha}, ALGetGlobalJColorSpace);
-            var LSrcCanvas := TJCanvas.JavaClass.init(LSrcBitmap);
-            LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(TRectF.Create(0,0,LDestBitmap.getWidth,LDestBitmap.getHeight));
-            var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
-            var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
-            LSrcCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
-            // draw the LSrcBitmap onto the LDestBitmap with SRC_IN
-            LJDestRectf := TJRectf.JavaClass.init(0, 0, LSrcBitmap.getWidth, LSrcBitmap.getheight);
-            LJSrcRect := TJRect.JavaClass.init(0, 0, LSrcBitmap.getWidth, LSrcBitmap.getheight);
-            var LPorterDuffXfermode := TJPorterDuffXfermode.JavaClass.init(TJPorterDuff_Mode.JavaClass.SRC_IN);
-            LPaint.setXfermode(LPorterDuffXfermode);
-            LDestCanvas.drawBitmap(LSrcBitmap, LJSrcRect, LJDestRectf, LPaint);
-            LPaint.setXfermode(nil);
-            LPorterDuffXfermode := nil;
-            // swap LDestBitmap with LBitmap
-            LJSrcRect := nil;
-            LJDestRectf := nil;
-            LSrcCanvas := nil;
-            LDestCanvas := nil;
-            if not LBitmap.equals(LDestBitmap) then LBitmap.recycle;
-            if not LSrcBitmap.equals(LDestBitmap) then LSrcBitmap.recycle;
-            LBitmap := LDestBitmap;
-            LSrcBitmap := nil;
-            LDestBitmap := nil;
-
-            LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(LScaledImageDstRect);
-            LDestRect.Offset(LScaledShadowOffsetX, LScaledShadowOffsetY);
-            LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
-            LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
-            //--
-            var LBlurMaskFilter := TJBlurMaskFilter.JavaClass.init(AShadowblur*2.5, TJBlurMaskFilter_Blur.JavaClass.NORMAL);
-            LPaint.setColor(integer(LShadowColor));
-            LPaint.setMaskFilter(LBlurMaskFilter);
-            aCanvas.drawBitmap(LBitmap.extractAlpha, LJSrcRect, LJDestRectf, LPaint);
-            LPaint.setMaskFilter(nil);
-            LDestRect.Offset(-LScaledShadowOffsetX, -LScaledShadowOffsetY);
-            LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
-            LPaint.setColor(integer(TAlphaColors.Black));
-            aCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
-
-          end
-
-          // The shadow is made on the circle shape
-          else begin
-            If not LPathClipped then _DrawCircle(aCanvas, nil{APaint}, LScaledImageDstRect, false{aDrawOnlyBorder}, true{aForceDrawPath}, true{aClipPath});
-            var LDestRect := TrectF.Create(0,0, LBitmap.getWidth, LBitmap.getheight).CenterAt(LScaledImageDstRect);
-            var LJDestRectf := TJRectf.JavaClass.init(LDestRect.left, LDestRect.top, LDestRect.right, LDestRect.bottom);
-            var LJSrcRect := TJRect.JavaClass.init(0, 0, LBitmap.getWidth, LBitmap.getheight);
-            aCanvas.drawBitmap(LBitmap, LJSrcRect, LJDestRectf, LPaint);
-            aCanvas.restore;
-            LJSrcRect := nil;
-            LJDestRectf := nil;
-          end;
-
-        finally
-          LBitmap.recycle;
-          LBitmap := nil;
-        end;
-      end;
-
-    end
-
-    // Draw the StateLayer
-    else if not ADrawStateLayerOnTop then
-      _DrawStateLayer;
-
-    //stroke the circle
-    if LStrokeColor <> TalphaColorRec.Null then begin
-      LPaint.setStyle(TJPaint_Style.JavaClass.STROKE);
-      LPaint.setStrokeWidth(LScaledStrokeThickness);
-      LPaint.setColor(integer(LStrokeColor));
-      _DrawCircle(aCanvas, LPaint, LScaledDstRect, true{aDrawOnlyBorder}, LFillWithImage{aForceDrawPath}, False{aClipPath});
-    end;
-
-    // Draw the StateLayer
-    if ADrawStateLayerOnTop then
-      _DrawStateLayer;
-
-    //free the paint and the canvas
-    LPaint := nil;
-
-  finally
-    // Remove the alpha layer
-    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      ALEndTransparencyLayer(ACanvas);
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'APPLEOS'}
-  {$IF (defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
-
-  // Create the alpha layer
-  if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then begin
-    var LLayerRect := ALGetShapeSurfaceRect(
-                        LScaledDstRect, // const ARect: TrectF;
-                        LFillColor, // const AFillColor: TAlphaColor;
-                        LFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                        LFillResourceName, // const AFillResourceName: String;
-                        LScaledFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
-                        LScaledFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
-                        AStateLayerOpacity, // const AStateLayerOpacity: Single;
-                        LStateLayerColor, // const AStateLayerColor: TAlphaColor;
-                        false, // const AStateLayerUseContentColor: Boolean;
-                        LScaledStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
-                        LShadowColor, // const AShadowColor: TAlphaColor;
-                        LScaledShadowBlur, // const AShadowBlur: Single;
-                        LScaledShadowOffsetX, // const AShadowOffsetX: Single;
-                        LScaledShadowOffsetY); // const AShadowOffsetY: Single);
-    ALBeginTransparencyLayer(ACanvas, LLayerRect, AOpacity);
-  end;
-  try
-
-    // Fill the circle
-    if (LFillColor <> TalphaColorRec.Null) or
-       (length(LFillGradientColors) > 0) or
-       (LFillWithImage) or
-       (LShadowColor <> TalphaColorRec.Null) then begin
-
-      // Init LDrawnWithSolidColor
-      var LDrawnWithSolidColor := False;
-
-      // Fill with transparent solid color and shadow
-      if (LShadowColor <> TalphaColorRec.Null) and // If null, skip drawing the shadow
-         (TAlphaColorRec(LFillColor).A < 255) and // Else, fill with solid color and shadow in one pass
-         (_FillGradientIsTransparent) and // Else, fill with gradient and shadow in one pass
-         ((not LFillWithImage) or // If no image, no opaque fill color and no opaque gradient is present, then draw the shadow in two passes
-          (LFillColor <> TalphaColors.Null) or // If there is an image and a transparent fill color, then draw the shadow in two passes
-          (length(LFillGradientColors) > 0) or // If there is an image and a transparent gradient, draw the shadow in two passes
-          (LStrokeColor <> TalphaColorRec.Null)) then begin // If there is an image and a stroke, draw the shadow in two passes
-
-        // First pass draw the shadow
-        var LFillColorF := TAlphaColorCGFloat.Create(LFillColor);
-        CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
-        _SetShadow(aCanvas);
-        _DrawCircle(aCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, false{aClipPath});
-        _ClearShadow(aCanvas);
-
-        // Second pass fill the rect
-        CGContextSetBlendMode(ACanvas, kCGBlendModeCopy);
-        CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, LFillColorF.A);
-        _DrawCircle(aCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, false{aClipPath});
-        CGContextSetBlendMode(ACanvas, kCGBlendModeNormal);
-        LDrawnWithSolidColor := True;
-
-      end
-
-      // Fill with solid color
-      else if (LFillColor <> TalphaColors.Null) then begin
-        var LFillColorF := TAlphaColorCGFloat.Create(LFillColor);
-        CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, LFillColorF.A);
-        _SetShadow(aCanvas);
-        _DrawCircle(aCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, false{aClipPath});
-        _ClearShadow(aCanvas);
-        LDrawnWithSolidColor := True;
-      end;
-
-      //fill with gradient
-      if length(LFillGradientColors) > 0 then begin
-
-        // First pass draw the shadow if not already drawn
-        // We must do this because else the shadow will not be drawn
-        if not LDrawnWithSolidColor then begin
-          var LFillColorF := TAlphaColorCGFloat.Create(LFillColor);
-          CGContextSetRGBFillColor(ACanvas, LFillColorF.R, LFillColorF.G, LFillColorF.B, 1{A});
-          _SetShadow(aCanvas);
-          _DrawCircle(aCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, false{aClipPath});
-          _ClearShadow(aCanvas);
-        end;
-
-        // Second pass fill the rect
-        var LGradient := TALGradient.create;
-        try
-          LGradient.Colors := LFillGradientColors;
-          LGradient.Offsets := LFillGradientOffsets;
-          var LDefaultInputRange: array[0..1] of CGFloat;
-          LDefaultInputRange[0] := 0;
-          LDefaultInputRange[1] := 1;
-          var LCallback: CGFunctionCallbacks;
-          LCallback.version := 0;
-          LCallback.evaluate := @ALGradientEvaluateCallback;
-          LCallback.releaseInfo := nil;
-          var LFunc := CGFunctionCreate(
-                         LGradient, // info - A pointer to user-defined storage for data that you want to pass to your callbacks.
-                         1, // domainDimension - The number of inputs.
-                         @LDefaultInputRange, // domain - An array of (2*domainDimension) floats used to specify the valid intervals of input values
-                         4, // rangeDimension - The number of outputs.
-                         nil, // range - An array of (2*rangeDimension) floats that specifies the valid intervals of output values
-                         @LCallback); // callbacks - A pointer to a callback function table.
-          try
-            var LShading: CGShadingRef;
-            case AFillGradientStyle of
-              TGradientStyle.Linear: begin
-                LShading := CGShadingCreateAxial(
-                              ALGetGlobalCGColorSpace, // colorspace
-                              CGPointMake(
-                                LScaledFillGradientStartPoint.X,
-                                LGridHeight - LScaledFillGradientStartPoint.y), // start - The starting point of the axis, in the shading's target coordinate space.
-                              CGPointMake(
-                                LScaledFillGradientEndPoint.x,
-                                LGridHeight - LScaledFillGradientEndPoint.y), // end - The ending point of the axis, in the shading's target coordinate space.
-                              LFunc, // function
-                              True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting point of the axis.
-                              True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending point of the axis.
-              end;
-              TGradientStyle.Radial: begin
-                LShading := CGShadingCreateRadial(
-                              ALGetGlobalCGColorSpace, // colorspace
-                              CGPoint.Create(TPointF.Create(LScaledFillGradientStartPoint.X, LGridHeight - LScaledFillGradientStartPoint.Y)), // start - The center of the starting circle, in the shading's target coordinate space.
-                              0, // startRadius - The radius of the starting circle, in the shading's target coordinate space.
-                              CGPoint.Create(TPointF.Create(LScaledFillGradientStartPoint.X, LGridHeight - LScaledFillGradientStartPoint.Y)), // end - The center of the ending circle, in the shading's target coordinate space.
-                              LScaledFillGradientStartPoint.Distance(LScaledFillGradientEndPoint), // endRadius - The radius of the ending circle, in the shading's target coordinate space.
-                              LFunc, // function
-                              True, // extendStart - A Boolean value that specifies whether to extend the shading beyond the starting circle.
-                              True); // extendEnd - A Boolean value that specifies whether to extend the shading beyond the ending circle.
-              end;
-              else
-                raise Exception.Create('Error 23128453-626D-49A6-AD49-D6CA8AC35ACF');
-            end;
-            try
-              _DrawCircle(aCanvas, LGridHeight, LScaledBackgroundDstRect, false{aDrawOnlyBorder}, true{aClipPath});
-              CGContextDrawShading(ACanvas, LShading);
-              CGContextRestoreGState(ACanvas);
-              LDrawnWithSolidColor := True;
-            finally
-              CGShadingRelease(LShading);
-            end;
-          finally
-            CGFunctionRelease(LFunc);
-          end;
-        finally
-          ALFreeAndNil(LGradient);
-        end;
-      end;
-
-      // Draw the StateLayer
-      if not ADrawStateLayerOnTop then
-        _DrawStateLayer;
-
-      // Fill with image
-      if LFillWithImage then begin
-        var LImage: CGImageRef;
-        if AFillResourceStream <> nil then LImage := ALLoadFromStreamAndWrapToCGImageRef(AFillResourceStream, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height)
-        else begin
-          var LFileName := ALGetResourceFilename(LFillResourceName);
-          if LFileName <> '' then LImage := ALLoadFromFileAndWrapToCGImageRef(LFileName, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height)
-          else LImage := ALLoadFromResourceAndWrapToCGImageRef(LFillResourceName, AFillWrapMode, LScaledImageDstRect.Width, LScaledImageDstRect.Height);
-        end;
-        try
-
-          // The shadow is made directly on the bitmap
-          if (not LDrawnWithSolidColor) and (LShadowColor <> TalphaColorRec.Null) then begin
-
-            // Their is corners so remove them from the LBitmap
-            var LTmpRect := TRectF.Create(0,0,LScaledImageDstRect.Width,LScaledImageDstRect.height).Round;
-            var LTmpCGContextRef := ALCreateCGContextRef(LTmpRect.Width, LTmpRect.Height);
-            try
-              _DrawCircle(LTmpCGContextRef, LTmpRect.Height, LTmpRect, false{aDrawOnlyBorder}, true{aClipPath});
-              var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LTmpRect);
-              CGContextDrawImage(
-                LTmpCGContextRef, // c: The graphics context in which to draw the image.
-                ALLowerLeftCGRect(
-                  LDestRect.TopLeft,
-                  LDestRect.Width,
-                  LDestRect.Height,
-                  LTmpRect.Height), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-                LImage); // image The image to draw.
-              CGContextRestoreGState(LTmpCGContextRef);
-              var LTmpImage := CGBitmapContextCreateImage(LTmpCGContextRef);
-              if LTmpImage = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
-              CGImageRelease(LImage);
-              LImage := LTmpImage;
-            finally
-              CGContextRelease(LTmpCGContextRef);
-            end;
-
-            _SetShadow(aCanvas);
-            var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LScaledImageDstRect);
-            CGContextDrawImage(
-              ACanvas, // c: The graphics context in which to draw the image.
-              ALLowerLeftCGRect(
-                LDestRect.TopLeft,
-                LDestRect.Width,
-                LDestRect.Height,
-                LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-              LImage); // image The image to draw.
-             _ClearShadow(aCanvas);
-
-          end
-
-          // The shadow is made on the circle shape
-          else begin
-            _DrawCircle(aCanvas, LGridHeight, LScaledImageDstRect, false{aDrawOnlyBorder}, true{aClipPath});
-            var LDestRect := TrectF.Create(0,0, CGImageGetWidth(LImage), CGImageGetHeight(LImage)).CenterAt(LScaledImageDstRect);
-            CGContextDrawImage(
-              ACanvas, // c: The graphics context in which to draw the image.
-              ALLowerLeftCGRect(
-                LDestRect.TopLeft,
-                LDestRect.Width,
-                LDestRect.Height,
-                LGridHeight), // rect The location and dimensions in user space of the bounding box in which to draw the image.
-              LImage); // image The image to draw.
-            CGContextRestoreGState(ACanvas);
-          end;
-
-        finally
-          CGImageRelease(LImage);
-        end;
-      end;
-
-    end
-
-    // Draw the StateLayer
-    else if not ADrawStateLayerOnTop then
-      _DrawStateLayer;
-
-    //stroke the circle
-    if LStrokeColor <> TalphaColorRec.Null then begin
-      CGContextSetLineWidth(ACanvas, LScaledStrokeThickness);
-      var LStrokeColorF := TAlphaColorCGFloat.Create(LStrokeColor);
-      CGContextSetRGBStrokeColor(ACanvas, LStrokeColorF.R, LStrokeColorF.G, LStrokeColorF.B, LStrokeColorF.A);
-      _DrawCircle(aCanvas, LGridHeight, LScaledDstRect, True{aDrawOnlyBorder}, false);
-    end;
-
-    // Draw the StateLayer
-    if ADrawStateLayerOnTop then
-      _DrawStateLayer;
-
-  finally
-    // Remove the alpha layer
-    if compareValue(AOpacity, 1, Tepsilon.Scale) < 0 then
-      ALEndTransparencyLayer(ACanvas);
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
-
-  {$REGION 'MSWINDOWS'}
-  {$IF (not defined(ANDROID)) and (not defined(ALAppleOS)) and (not defined(ALSkiaEngine))}
-
-  var LSaveState := ACanvas.SaveState;
-  try
-
-    if LFillColor <> TAlphaColorRec.Null then begin
-      ACanvas.Fill.Kind := TBrushKind.Solid;
-      ACanvas.Fill.Color := LFillColor;
-    end
-    else ACanvas.Fill.Kind := TBrushKind.None;
-    If LStrokeColor <> TalphaColorRec.Null then begin
-      ACanvas.Stroke.Kind := TBrushKind.Solid;
-      ACanvas.Stroke.Color := LStrokeColor;
-      ACanvas.Stroke.Thickness := LScaledStrokeThickness;
-    end
-    else ACanvas.Stroke.Kind := TBrushKind.None;
-
-    if LStrokeColor <> TalphaColorRec.Null then
-      LScaledDstRect.Inflate(-(LScaledStrokeThickness / 2), -(LScaledStrokeThickness / 2));
-
-    if LFillColor <> TAlphaColorRec.Null then begin
-      aCanvas.FillEllipse(LScaledDstRect, AOpacity, ACanvas.Fill);
-    end;
-    If LStrokeColor <> TalphaColorRec.Null then
-      aCanvas.DrawEllipse(LScaledDstRect, AOpacity, ACanvas.Stroke);
-
-  finally
-    ACanvas.RestoreState(LSaveState)
-  end;
-
-  {$ENDIF}
-  {$ENDREGION}
+  ALDrawRectangle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    TRectF.Create(0, 0, 1, 1).FitInto(ADstRect), // const ADstRect: TrectF;
+    AOpacity, // const AOpacity: Single;
+    AFillColor, // const AFillColor: TAlphaColor;
+    AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+    AFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillResourceName, // const AFillResourceName: String;
+    AFillResourceStream, // const AFillResourceStream: TStream;
+    AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
+    AFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
+    AFillImageNoRadius, // Const AFillImageNoRadius: Boolean;
+    AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStateLayerOpacity, // const AStateLayerOpacity: Single;
+    AStateLayerColor, // const AStateLayerColor: TAlphaColor;
+    AStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
+    AStateLayerXRadius, // const AStateLayerXRadius: Single;
+    AStateLayerYRadius, // const AStateLayerYRadius: Single;
+    ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
+    AStrokeColor, // const AStrokeColor: TalphaColor;
+    AStrokeThickness, // const AStrokeThickness: Single;
+    AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    AShadowBlur, // const AShadowBlur: Single;
+    AShadowOffsetX, // const AShadowOffsetX: Single;
+    AShadowOffsetY, // const AShadowOffsetY: Single;
+    ALLSides, // const ASides: TSides;
+    ALLCorners, // const ACorners: TCorners;
+    -50, // const AXRadius: Single;
+    -50); // const AYRadius: Single);
 
 end;
 
@@ -13710,20 +12641,26 @@ procedure ALDrawCircle(
 begin
   var LFillGradientStartPoint: TPointF;
   var LFillGradientEndPoint: TPointF;
-  case AFillGradientStyle of
-    TGradientStyle.Linear: begin
-      ALGetLinearGradientCoordinates(
-        ADstRect.Size, // const ASize: TSizeF;
-        AFillGradientAngle, // const AAngle: Single;
-        LFillGradientStartPoint, // out AStartPoint: TPointF;
-        LFillGradientEndPoint); // out AEndPoint: TPointF;
+  if length(AFillGradientColors) > 0 then begin
+    case AFillGradientStyle of
+      TGradientStyle.Linear: begin
+        ALGetLinearGradientCoordinates(
+          ADstRect.Size, // const ASize: TSizeF;
+          AFillGradientAngle, // const AAngle: Single;
+          LFillGradientStartPoint, // out AStartPoint: TPointF;
+          LFillGradientEndPoint); // out AEndPoint: TPointF;
+      end;
+      TGradientStyle.Radial: begin
+        LFillGradientStartPoint := ADstRect.CenterPoint;
+        LFillGradientEndPoint := ADstRect.TopLeft;
+      end
+      else
+        Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
     end;
-    TGradientStyle.Radial: begin
-      LFillGradientStartPoint := ADstRect.CenterPoint;
-      LFillGradientEndPoint := ADstRect.TopLeft;
-    end
-    else
-      Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
+  end
+  else begin
+    LFillGradientStartPoint := TPointF.Zero;
+    LFillGradientEndPoint := TPointF.Zero;
   end;
   ALDrawCircle(
     ACanvas, // const ACanvas: TALCanvas;
@@ -13862,6 +12799,297 @@ begin
 
   // DrawCircle
   ALDrawCircle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, //const AOpacity: Single;
+    LFillColor, // const AFillColor: TAlphaColor;
+    LfillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    LfillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    LfillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+    LfillGradientAngle, // const AFillGradientAngle: Single;
+    LFillResourceName, // const AFillResourceName: String;
+    AFillResourceStream, // const AFillResourceStream: TStream;
+    LFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
+    LFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
+    LFillImageNoRadius, // Const AFillImageNoRadius: Boolean;
+    LFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    LStateLayerOpacity, // const AStateLayerOpacity: Single;
+    LStateLayerColor, // const AStateLayerColor: TAlphaColor;
+    LStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
+    LStateLayerXRadius, // const AStateLayerXRadius: Single;
+    LStateLayerYRadius, // const AStateLayerYRadius: Single;
+    ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
+    LStrokeColor, // const AStrokeColor: TalphaColor;
+    LStrokeThickness, // const AStrokeThickness: Single;
+    LShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    LShadowBlur, // const AShadowBlur: Single;
+    LShadowOffsetX, // const AShadowOffsetX: Single;
+    LShadowOffsetY); // const AShadowOffsetY: Single;
+end;
+
+{*********************}
+procedure ALDrawEllipse(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillResourceName: String;
+            const AFillResourceStream: TStream;
+            Const AFillBackgroundMarginsRect: TRectF;
+            Const AFillImageMarginsRect: TRectF;
+            Const AFillImageNoRadius: Boolean;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStateLayerOpacity: Single;
+            const AStateLayerColor: TAlphaColor;
+            Const AStateLayerMarginsRect: TRectF;
+            const AStateLayerXRadius: Single;
+            const AStateLayerYRadius: Single;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the Ellipse)
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single);
+begin
+
+  ALDrawRectangle(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, // const AOpacity: Single;
+    AFillColor, // const AFillColor: TAlphaColor;
+    AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+    AFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillResourceName, // const AFillResourceName: String;
+    AFillResourceStream, // const AFillResourceStream: TStream;
+    AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
+    AFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
+    AFillImageNoRadius, // Const AFillImageNoRadius: Boolean;
+    AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStateLayerOpacity, // const AStateLayerOpacity: Single;
+    AStateLayerColor, // const AStateLayerColor: TAlphaColor;
+    AStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
+    AStateLayerXRadius, // const AStateLayerXRadius: Single;
+    AStateLayerYRadius, // const AStateLayerYRadius: Single;
+    ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
+    AStrokeColor, // const AStrokeColor: TalphaColor;
+    AStrokeThickness, // const AStrokeThickness: Single;
+    AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+    AShadowBlur, // const AShadowBlur: Single;
+    AShadowOffsetX, // const AShadowOffsetX: Single;
+    AShadowOffsetY, // const AShadowOffsetY: Single;
+    ALLSides, // const ASides: TSides;
+    ALLCorners, // const ACorners: TCorners;
+    ADstRect.Width / 2, // const AXRadius: Single;
+    ADstRect.Height / 2); // const AYRadius: Single);
+
+end;
+
+{*********************}
+procedure ALDrawEllipse(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AFillColor: TAlphaColor;
+            const AFillGradientStyle: TGradientStyle;
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
+            const AFillGradientAngle: Single;
+            const AFillResourceName: String;
+            const AFillResourceStream: TStream;
+            Const AFillBackgroundMarginsRect: TRectF;
+            Const AFillImageMarginsRect: TRectF;
+            Const AFillImageNoRadius: Boolean;
+            Const AFillWrapMode: TALImageWrapMode;
+            const AStateLayerOpacity: Single;
+            const AStateLayerColor: TAlphaColor;
+            Const AStateLayerMarginsRect: TRectF;
+            const AStateLayerXRadius: Single;
+            const AStateLayerYRadius: Single;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStrokeColor: TalphaColor;
+            const AStrokeThickness: Single;
+            const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the Ellipse)
+            const AShadowBlur: Single;
+            const AShadowOffsetX: Single;
+            const AShadowOffsetY: Single); overload;
+begin
+  var LFillGradientStartPoint: TPointF;
+  var LFillGradientEndPoint: TPointF;
+  if length(AFillGradientColors) > 0 then begin
+    case AFillGradientStyle of
+      TGradientStyle.Linear: begin
+        ALGetLinearGradientCoordinates(
+          ADstRect.Size, // const ASize: TSizeF;
+          AFillGradientAngle, // const AAngle: Single;
+          LFillGradientStartPoint, // out AStartPoint: TPointF;
+          LFillGradientEndPoint); // out AEndPoint: TPointF;
+      end;
+      TGradientStyle.Radial: begin
+        LFillGradientStartPoint := ADstRect.CenterPoint;
+        LFillGradientEndPoint := ADstRect.TopLeft;
+      end
+      else
+        Raise Exception.Create('Error 69B128A0-83FC-4FF1-AC60-3BDF6044258D')
+    end;
+  end
+  else begin
+    LFillGradientStartPoint := TPointF.Zero;
+    LFillGradientEndPoint := TPointF.Zero;
+  end;
+  ALDrawEllipse(
+    ACanvas, // const ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, //const AOpacity: Single;
+    AFillColor, // const AFillColor: TAlphaColor;
+    AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
+    LFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    LFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillResourceName,// const AFillResourceName: String;
+    AFillResourceStream, // const AFillResourceStream: TStream;
+    AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
+    AFillImageMarginsRect, // Const AFillImageMarginsRect: TRectF;
+    AFillImageNoRadius, // Const AFillImageNoRadius: Boolean;
+    AFillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+    AStateLayerOpacity, // const AStateLayerOpacity: Single;
+    AStateLayerColor, // const AStateLayerColor: TAlphaColor;
+    AStateLayerMarginsRect, // Const AStateLayerMarginsRect: TRectF;
+    AStateLayerXRadius, // const AStateLayerXRadius: Single;
+    AStateLayerYRadius, // const AStateLayerYRadius: Single;
+    ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
+    AStrokeColor, // const AStrokeColor: TalphaColor;
+    AStrokeThickness, // const AStrokeThickness: Single;
+    AShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the Ellipse)
+    AShadowBlur, // const AShadowBlur: Single;
+    AShadowOffsetX, // const AShadowOffsetX: Single;
+    AShadowOffsetY); // const AShadowOffsetY: Single);
+end;
+
+{*********************}
+procedure ALDrawEllipse(
+            const ACanvas: TALCanvas;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AFill: TALBrush;
+            const AFillResourceStream: TStream;
+            const AStateLayer: TALStateLayer;
+            const AStateLayerContentColor: TAlphaColor;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow); // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
+begin
+  // AFill
+  var LFillColor: TAlphaColor;
+  var LFillGradientStyle: TGradientStyle;
+  var LFillGradientColors: TArray<TAlphaColor>;
+  var LFillGradientOffsets: TArray<Single>;
+  var LFillGradientAngle: Single;
+  var LFillResourceName: String;
+  var LFillBackgroundMarginsRect: TRectF;
+  var LFillImageMarginsRect: TRectF;
+  var LFillImageNoRadius: Boolean;
+  var LFillWrapMode: TALImageWrapMode;
+  if AFill <> nil then begin
+    LFillColor := AFill.Color;
+    LFillGradientStyle := Afill.Gradient.Style;
+    LFillGradientColors := Afill.Gradient.Colors;
+    LFillGradientOffsets := Afill.Gradient.Offsets;
+    LFillGradientAngle := Afill.Gradient.Angle;
+    LFillResourceName := AFill.ResourceName;
+    LFillBackgroundMarginsRect := AFill.BackgroundMargins.Rect;
+    LFillImageMarginsRect := AFill.ImageMargins.Rect;
+    LFillImageNoRadius := AFill.ImageNoRadius;
+    LFillWrapMode := AFill.WrapMode;
+  end
+  else begin
+    LFillColor := TAlphaColors.Null;
+    LFillGradientStyle := TGradientStyle.Linear;
+    LFillGradientColors := [];
+    LFillGradientOffsets := [];
+    LFillGradientAngle := 0;
+    LFillResourceName := '';
+    LFillBackgroundMarginsRect := TRectF.Empty;
+    LFillImageMarginsRect := TRectF.Empty;
+    LFillImageNoRadius := False;
+    LFillWrapMode := TALImageWrapMode.Fit;
+  end;
+
+  // AStateLayer
+  var LStateLayerOpacity: Single;
+  var LStateLayerColor: TAlphaColor;
+  var LStateLayerMarginsRect: TRectF;
+  var LStateLayerXRadius: Single;
+  var LStateLayerYRadius: single;
+  if AStateLayer <> nil then begin
+    LStateLayerOpacity := AStateLayer.Opacity;
+    if AStateLayer.UseContentColor then LStateLayerColor := AStateLayerContentColor
+    else LStateLayerColor := AStateLayer.Color;
+    LStateLayerMarginsRect := AStateLayer.Margins.Rect;
+    LStateLayerXRadius := AStateLayer.XRadius;
+    LStateLayerYRadius := AStateLayer.YRadius;
+  end
+  else begin
+    LStateLayerOpacity := 0;
+    LStateLayerColor := TAlphaColors.Null;
+    LStateLayerMarginsRect := TRectF.Empty;
+    LStateLayerXRadius := 0;
+    LStateLayerYRadius := 0;
+  end;
+
+  // AStroke
+  var LStrokeColor: TalphaColor;
+  var LStrokeThickness: Single;
+  if AStroke <> nil then begin
+    LStrokeColor := AStroke.Color;
+    LStrokeThickness := AStroke.Thickness;
+  end
+  else begin
+    LStrokeColor := TalphaColors.Null;
+    LStrokeThickness := 0;
+  end;
+
+  // AShadow
+  var LShadowColor: TAlphaColor;
+  var LShadowBlur: Single;
+  var LShadowOffsetX: Single;
+  var LShadowOffsetY: Single;
+  if AShadow <> nil then begin
+    LShadowColor := AShadow.Color;
+    LShadowBlur := AShadow.Blur;
+    LShadowOffsetX := AShadow.OffsetX;
+    LShadowOffsetY := AShadow.OffsetY;
+  end
+  else begin
+    LShadowColor := TalphaColors.Null;
+    LShadowBlur := 0;
+    LShadowOffsetX := 0;
+    LShadowOffsetY := 0;
+  end;
+
+  // DrawEllipse
+  ALDrawEllipse(
     ACanvas, // const ACanvas: TALCanvas;
     AScale, // const AScale: Single;
     AAlignToPixel, // const AAlignToPixel: Boolean;

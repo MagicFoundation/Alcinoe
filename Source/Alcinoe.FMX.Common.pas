@@ -346,9 +346,9 @@ type
   private
     FFamily: TFontName; // 8 bytes
     FSize: Single; // 4 bytes
-    FWeight: TFontWeight; // 4 bytes
-    FSlant: TFontSlant; // 4 bytes
-    FStretch: TFontStretch; // 4 bytes
+    FWeight: TFontWeight; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
+    FSlant: TFontSlant; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
+    FStretch: TFontStretch; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
     FColor: TAlphaColor; // 4 bytes
     procedure SetFamily(const AValue: TFontName);
     procedure SetSize(const AValue: Single);
@@ -596,7 +596,7 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALGradient = class(TALPersistentObserver)
   private
-    FStyle: TGradientStyle; // 4 bytes
+    FStyle: TGradientStyle; // 4 bytes (because FMX.Graphics use {$MINENUMSIZE 4})
     FAngle: Single; // 4 bytes
     FColors: TArray<TAlphaColor>; // 8 bytes
     FOffsets: TArray<Single>; // 8 bytes
@@ -710,9 +710,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInheritBrush = class(TALBrush)
   private
-    FParent: TALBrush;
-    FInherit: Boolean;
-    fSuperseded: Boolean;
+    FParent: TALBrush; // 8 bytes
+    FInherit: Boolean; // 1 byte
+    fSuperseded: Boolean; // 1 byte
     procedure SetInherit(const AValue: Boolean);
   protected
     function CreateSavedState: TALPersistentObserver; override;
@@ -765,9 +765,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInheritStrokeBrush = class(TALStrokeBrush)
   private
-    FParent: TALStrokeBrush;
-    FInherit: Boolean;
-    fSuperseded: Boolean;
+    FParent: TALStrokeBrush; // 8 bytes
+    FInherit: Boolean; // 1 byte
+    fSuperseded: Boolean; // 1 byte
     procedure SetInherit(const AValue: Boolean);
   protected
     function CreateSavedState: TALPersistentObserver; override;
@@ -792,12 +792,12 @@ type
   // circular shape and only one state layer can be applied at a given time.
   TALStateLayer = class(TALPersistentObserver)
   private
-    FOpacity: Single;
-    FColor: TAlphaColor;
-    FUseContentColor: Boolean;
-    FMargins: TALBounds;
-    FXRadius: Single;
-    FYRadius: Single;
+    FOpacity: Single; // 4 bytes
+    FColor: TAlphaColor; // 4 bytes
+    FUseContentColor: Boolean; // 1 byte
+    FMargins: TALBounds; // 8 bytes
+    FXRadius: Single; // 4 bytes
+    FYRadius: Single; // 4 bytes
     procedure SetOpacity(const Value: Single);
     procedure SetColor(const Value: TAlphaColor);
     procedure SetUseContentColor(const Value: Boolean);
@@ -848,10 +848,10 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALStateTransition = class(TALPersistentObserver)
   private
-    FAnimationType: TAnimationType;
-    FDuration: Single;
-    FInterpolation: TALInterpolationType;
-    FDelayClick: Boolean;
+    FAnimationType: TAnimationType; // 4 bytes (because FMX.Types use {$MINENUMSIZE 4})
+    FDuration: Single; // 4 bytes
+    FInterpolation: TALInterpolationType; // 1 byte
+    FDelayClick: Boolean; // 1 byte
     procedure SetAnimationType(const Value: TAnimationType);
     procedure SetDuration(const Value: Single);
     procedure SetInterpolation(const Value: TALInterpolationType);
@@ -883,15 +883,15 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALBaseStateStyle = class(TALPersistentObserver)
   private
-    FParent: Tobject;
-    FStateStyleParent: TALBaseStateStyle;
-    FControlParent: TALControl;
-    FFill: TALInheritBrush;
-    FStateLayer: TALStateLayer;
-    FStroke: TALInheritStrokeBrush;
-    FShadow: TALInheritShadow;
-    FScale: Single;
-    fSuperseded: Boolean;
+    FParent: Tobject; // 8 bytes
+    FStateStyleParent: TALBaseStateStyle; // 8 bytes
+    FControlParent: TALControl; // 8 bytes
+    FFill: TALInheritBrush; // 8 bytes
+    FStateLayer: TALStateLayer; // 8 bytes
+    FStroke: TALInheritStrokeBrush; // 8 bytes
+    FShadow: TALInheritShadow; // 8 bytes
+    FScale: Single; // 4 bytes
+    fSuperseded: Boolean; // 1 byte
     procedure SetFill(const AValue: TALInheritBrush);
     procedure SetStateLayer(const AValue: TALStateLayer);
     procedure SetStroke(const AValue: TALInheritStrokeBrush);
@@ -903,8 +903,8 @@ type
     procedure ShadowChanged(ASender: TObject);
     function IsScaleStored: Boolean;
   protected
-    BufDrawable: TALDrawable;
-    BufDrawableRect: TRectF;
+    BufDrawable: TALDrawable; // 8 bytes
+    BufDrawableRect: TRectF; // 16 bytes
     function CreateSavedState: TALPersistentObserver; override;
     function CreateFill(const AParent: TALBrush): TALInheritBrush; virtual;
     function CreateStateLayer: TALStateLayer; virtual;
@@ -971,19 +971,19 @@ type
   {***********************************************}
   TALBaseStateStyles = class(TALPersistentObserver)
   private
-    FParent: TALControl;
-    FTransition: TALStateTransition;
-    FTransitionAnimation: TALfloatAnimation;
-    FTransitionFrom: TALBaseStateStyle;
-    FTransitionTo: TALBaseStateStyle;
+    FParent: TALControl; // 8 bytes
+    FTransition: TALStateTransition; // 8 bytes
+    FTransitionAnimation: TALfloatAnimation; // 8 bytes
+    FTransitionFrom: TALBaseStateStyle; // 8 bytes
+    FTransitionTo: TALBaseStateStyle; // 8 bytes
     {$IF NOT DEFINED(ALSkiaCanvas)}
-    FTransitionBufSurface: TALSurface;
-    FTransitionBufCanvas: TALCanvas;
-    FTransitionBufDrawable: TALDrawable;
+    FTransitionBufSurface: TALSurface; // 8 bytes
+    FTransitionBufCanvas: TALCanvas; // 8 bytes
+    FTransitionBufDrawable: TALDrawable; // 8 bytes
     {$ENDIF}
-    FTransitionClickDelayed: Boolean;
-    FLastPaintedRawStyle: TALBaseStateStyle;
-    FCurrentAdjustedStyle: TALBaseStateStyle;
+    FTransitionClickDelayed: Boolean; // 1 byte
+    FLastPaintedRawStyle: TALBaseStateStyle; // 8 bytes
+    FCurrentAdjustedStyle: TALBaseStateStyle; // 8 bytes
     procedure SetTransition(const Value: TALStateTransition);
     procedure TransitionChanged(ASender: TObject);
   protected

@@ -48,6 +48,18 @@ uses
   ALcinoe.FMX.Controls,
   Alcinoe.FMX.ScrollEngine;
 
+var
+  // The ALBrokenImageResourceName variable specifies the
+  // name of the local image resource to be used as a fallback
+  // when the remote image assigned to a TImage is unreachable.
+  // The ALBrokenImageWidth and ALBrokenImageHeight variables
+  // define the dimensions (in pixels) of this fallback image,
+  // ensuring a consistent display when the intended remote image
+  // cannot be loaded.
+  ALBrokenImageResourceName: String;
+  ALBrokenImageWidth: Integer;
+  ALBrokenImageHeight: Integer;
+
 type
 
   // !! Workaround to avoid a circular unit reference. The declaration of TALSurface/TALCanvas/TALDrawable from Alcinoe.FMX.Graphics is duplicated here.
@@ -152,10 +164,10 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALPersistentObserver = class(TPersistent)
   private
-    FUpdateCount: Integer;
-    FIsChanged: Boolean;
-    FOnChanged: TNotifyEvent;
-    FSavedStates: TObjectQueue<TALPersistentObserver>;
+    FUpdateCount: Integer; // 4 Bytes
+    FIsChanged: Boolean; // 1 Bytes
+    FOnChanged: TNotifyEvent; // 16 Bytes
+    FSavedStates: TObjectQueue<TALPersistentObserver>; // 8 Bytes
     procedure DoChanged; virtual;
   protected
     function CreateSavedState: TALPersistentObserver; virtual;
@@ -180,11 +192,11 @@ type
   {$ENDIF}
   TALBounds = class(TPersistent)
   private
-    FLeft: Single;
-    FTop: Single;
-    FRight: Single;
-    FBottom: Single;
-    FOnChange: TNotifyEvent;
+    FLeft: Single; // 4 Bytes
+    FTop: Single; // 4 Bytes
+    FRight: Single; // 4 Bytes
+    FBottom: Single; // 4 Bytes
+    FOnChange: TNotifyEvent; // 16 Bytes
     function GetRect: TRectF;
     procedure SetRect(const Value: TRectF);
     procedure SetBottom(const Value: Single);
@@ -219,13 +231,45 @@ type
     property Bottom: Single read FBottom write SetBottom stored IsBottomStored nodefault;
   end;
 
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {$IFNDEF ALCompilerVersionSupported122}
+    {$MESSAGE WARN 'Check if FMX.Types.TPosition was not updated and adjust the IFDEF'}
+  {$ENDIF}
+  TALPosition = class(TPersistent)
+  private
+    FY: Single; // 4 Bytes
+    FX: Single; // 4 Bytes
+    FOnChange: TNotifyEvent; // 16 Bytes
+    procedure SetPoint(const Value: TPointF);
+    procedure SetX(const Value: Single);
+    procedure SetY(const Value: Single);
+    function GetPoint: TPointF;
+    function IsXStored: Boolean;
+    function IsYStored: Boolean;
+  protected
+    function GetDefaultValue: TPointF; virtual;
+    procedure DoChange; virtual;
+  public
+    constructor Create; virtual;
+    procedure Assign(Source: TPersistent); override;
+    procedure SetPointNoChange(const P: TPointF);
+    function Empty: Boolean;
+    procedure Reflect(const Normal: TPointF);
+    property Point: TPointF read GetPoint write SetPoint;
+    property DefaultValue: TPointF read GetDefaultValue;
+    property OnChange: TNotifyEvent read FOnChange write FOnChange;
+  published
+    property X: Single read FX write SetX stored IsXStored nodefault;
+    property Y: Single read FY write SetY stored IsYStored nodefault;
+  end;
+
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALShadow = class(TALPersistentObserver)
   private
-    FBlur: Single;
-    FOffsetX: Single;
-    FOffsetY: Single;
-    FColor: TAlphaColor;
+    FBlur: Single; // 4 bytes
+    FOffsetX: Single; // 4 bytes
+    FOffsetY: Single; // 4 bytes
+    FColor: TAlphaColor; // 4 bytes
     procedure setblur(const Value: Single);
     procedure setOffsetX(const Value: Single);
     procedure setOffsetY(const Value: Single);
@@ -267,9 +311,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInheritShadow = class(TALShadow)
   private
-    FParent: TALShadow;
-    FInherit: Boolean;
-    fSuperseded: Boolean;
+    FParent: TALShadow; // 8 bytes
+    FInherit: Boolean; // 1 byte
+    fSuperseded: Boolean; // 1 byte
     procedure SetInherit(const AValue: Boolean);
   protected
     function CreateSavedState: TALPersistentObserver; override;
@@ -300,12 +344,12 @@ type
   public
     class var SansSerifFamily: String;
   private
-    FFamily: TFontName;
-    FSize: Single;
-    FWeight: TFontWeight;
-    FSlant: TFontSlant;
-    FStretch: TFontStretch;
-    FColor: TAlphaColor;
+    FFamily: TFontName; // 8 bytes
+    FSize: Single; // 4 bytes
+    FWeight: TFontWeight; // 4 bytes
+    FSlant: TFontSlant; // 4 bytes
+    FStretch: TFontStretch; // 4 bytes
+    FColor: TAlphaColor; // 4 bytes
     procedure SetFamily(const AValue: TFontName);
     procedure SetSize(const AValue: Single);
     procedure SetWeight(const AValue: TFontWeight);
@@ -357,10 +401,10 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALTextDecoration = class(TALPersistentObserver)
   private
-    FKinds: TALTextDecorationKinds;
-    FStyle: TALTextDecorationStyle;
-    FThicknessMultiplier: Single;
-    FColor: TAlphaColor;
+    FKinds: TALTextDecorationKinds; // 1 byte
+    FStyle: TALTextDecorationStyle; // 1 byte
+    FThicknessMultiplier: Single; // 4 bytes
+    FColor: TAlphaColor; // 4 bytes
     procedure SetKinds(const AValue: TALTextDecorationKinds);
     procedure SetStyle(const AValue: TALTextDecorationStyle);
     procedure SetThicknessMultiplier(const AValue: Single);
@@ -394,9 +438,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALEllipsisSettings = class(TALPersistentObserver)
   private
-    FInherit: Boolean;
-    FFont: TALFont;
-    FDecoration: TALTextDecoration;
+    FInherit: Boolean; // 1 byte
+    FFont: TALFont; // 8 bytes
+    FDecoration: TALTextDecoration; // 8 bytes
     procedure SetInherit(const AValue: Boolean);
     procedure SetFont(const AValue: TALFont);
     procedure SetDecoration(const AValue: TALTextDecoration);
@@ -595,23 +639,35 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALBrush = class(TALPersistentObserver)
   private
+    {--- Logical order ---
     FColor: TAlphaColor;
     FGradient: TALGradient;
     FResourceName: String;
-    FWrapMode: TALImageWrapMode;
     FBackgroundMargins: TALBounds;
     FImageMargins: TALBounds;
+    FImageNoRadius: Boolean;
+    FWrapMode: TALImageWrapMode;
+    --- Memory Optimization ---}
+    FResourceName: String; // 8 bytes
+    FGradient: TALGradient; // 8 bytes
+    FBackgroundMargins: TALBounds; // 8 bytes
+    FImageMargins: TALBounds; // 8 bytes
+    FImageNoRadius: Boolean; // 1 byte
+    FWrapMode: TALImageWrapMode; // 1 byte
+    FColor: TAlphaColor; // 4 bytes
     procedure SetColor(const Value: TAlphaColor);
     procedure SetGradient(const Value: TALGradient);
     procedure SetResourceName(const Value: String);
-    procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure SetBackgroundMargins(const Value: TALBounds);
     procedure SetImageMargins(const Value: TALBounds);
+    procedure SetImageNoRadius(const Value: Boolean);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
     procedure GradientChanged(Sender: TObject); virtual;
     procedure BackgroundMarginsChanged(Sender: TObject); virtual;
     procedure ImageMarginsChanged(Sender: TObject); virtual;
     function IsColorStored: Boolean;
     function IsResourceNameStored: Boolean;
+    function IsImageNoRadiusStored: Boolean;
     function IsWrapModeStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
@@ -624,6 +680,7 @@ type
     function CreateImageMargins: TALBounds; virtual;
     function GetDefaultColor: TAlphaColor; virtual;
     function GetDefaultResourceName: String; virtual;
+    function GetDefaultImageNoRadius: Boolean; virtual;
     function GetDefaultWrapMode: TALImageWrapMode; virtual;
   public
     constructor Create; override;
@@ -635,16 +692,19 @@ type
     procedure InterpolateNoChanges(const ATo: TALBrush; const ANormalizedTime: Single);
     function HasFill: boolean; virtual;
     function Styles: TALBrushStyles; virtual;
+    function IsRemoteResource: Boolean;
     property DefaultColor: TAlphaColor read GetDefaultColor;
     property DefaultResourceName: String read GetDefaultResourceName;
+    property DefaultImageNoRadius: Boolean read GetDefaultImageNoRadius;
     property DefaultWrapMode: TALImageWrapMode read GetDefaultWrapMode;
   published
     property Color: TAlphaColor read FColor write SetColor stored IsColorStored;
     property Gradient: TALGradient read FGradient write SetGradient;
     property ResourceName: String read FResourceName write SetResourceName stored IsResourceNameStored nodefault;
-    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
     property BackgroundMargins: TALBounds read FBackgroundMargins write SetBackgroundMargins;
     property ImageMargins: TALBounds read FImageMargins write SetImageMargins;
+    property ImageNoRadius: Boolean read FImageNoRadius write SetImageNoRadius stored IsImageNoRadiusStored;
+    property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode stored IsWrapModeStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -672,8 +732,8 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALStrokeBrush = class(TALPersistentObserver)
   private
-    FColor: TAlphaColor;
-    FThickness: Single;
+    FColor: TAlphaColor; // 4 bytes
+    FThickness: Single; // 4 bytes
     procedure SetColor(const Value: TAlphaColor);
     procedure SetThickness(const Value: Single);
     function IsColorStored: Boolean;
@@ -1302,6 +1362,7 @@ uses
   Alcinoe.FMX.StdCtrls,
   Alcinoe.Common,
   Alcinoe.files,
+  Alcinoe.HTTP.Client,
   Alcinoe.stringList,
   ALcinoe.StringUtils;
 
@@ -1601,6 +1662,104 @@ procedure TALBounds.DoChange;
 begin
   if Assigned(OnChange) then
     OnChange(Self);
+end;
+
+{***************************}
+constructor TALPosition.Create;
+begin
+  inherited Create;
+  var LDefaultValue := DefaultValue;
+  FX := LDefaultValue.X;
+  FY := LDefaultValue.Y;
+end;
+
+{***************************}
+procedure TALPosition.Assign(Source: TPersistent);
+begin
+  if Source is TALPosition then
+    Point := TALPosition(Source).Point
+  else if Source is TPosition then
+    Point := TPosition(Source).Point
+  else
+    inherited
+end;
+
+{***************************}
+procedure TALPosition.SetPointNoChange(const P: TPointF);
+begin
+  FX := P.X;
+  FY := P.Y;
+end;
+
+{***************************}
+function TALPosition.Empty: Boolean;
+begin
+  Result := Point.IsZero;
+end;
+
+{***************************}
+procedure TALPosition.DoChange;
+begin
+  if Assigned(OnChange) then
+    OnChange(Self);
+end;
+
+{***************************}
+function TALPosition.IsXStored: Boolean;
+begin
+  Result := not SameValue(FX, DefaultValue.X, Epsilon);
+end;
+
+{***************************}
+function TALPosition.IsYStored: Boolean;
+begin
+  Result := not SameValue(FY, DefaultValue.Y, Epsilon);
+end;
+
+{***************************}
+procedure TALPosition.Reflect(const Normal: TPointF);
+begin
+  Point := Point.Reflect(Normal);
+end;
+
+{***************************}
+function TALPosition.GetDefaultValue: TPointF;
+begin
+  Result := TpointF.Zero;
+end;
+
+{***************************}
+function TALPosition.GetPoint: TPointF;
+begin
+  Result := TPointF.Create(FX, FY);
+end;
+
+{***************************}
+procedure TALPosition.SetPoint(const Value: TPointF);
+begin
+  var LChange := not (SameValue(FX, Value.X, Epsilon) and SameValue(FY, Value.Y, Epsilon));
+  FX := Value.X;
+  FY := Value.Y;
+  if LChange then
+    DoChange;
+end;
+
+{***************************}
+procedure TALPosition.SetX(const Value: Single);
+begin
+  var LChange := not SameValue(FX, Value, Epsilon);
+  FX := Value;
+  if LChange then
+    DoChange;
+end;
+
+{***************************}
+procedure TALPosition.SetY(const Value: Single);
+begin
+  var LChange := not SameValue(FY, Value, Epsilon);
+  FY := Value;
+  if LChange then
+    DoChange;
 end;
 
 {***************************}
@@ -3549,19 +3708,16 @@ end;
 constructor TALBrush.Create;
 begin
   inherited Create;
-  //--
   FColor := DefaultColor;
-  FResourceName := DefaultResourceName;
-  FWrapMode := DefaultWrapMode;
-  //--
   FGradient := TALGradient.Create;
   FGradient.OnChanged := GradientChanged;
-  //--
+  FResourceName := DefaultResourceName;
   FBackgroundMargins := CreateBackgroundMargins;
   FBackgroundMargins.OnChange := BackgroundMarginsChanged;
-  //--
   FImageMargins := CreateImageMargins;
   FImageMargins.OnChange := ImageMarginsChanged;
+  FImageNoRadius := DefaultImageNoRadius;
+  FWrapMode := DefaultWrapMode;
 end;
 
 {**************************}
@@ -3612,9 +3768,10 @@ begin
       Color := TALBrush(Source).Color;
       Gradient.Assign(TALBrush(Source).Gradient);
       ResourceName := TALBrush(Source).ResourceName;
-      WrapMode := TALBrush(Source).WrapMode;
       BackgroundMargins.Assign(TALBrush(Source).BackgroundMargins);
       ImageMargins.Assign(TALBrush(Source).ImageMargins);
+      ImageNoRadius := TALBrush(Source).ImageNoRadius;
+      WrapMode := TALBrush(Source).WrapMode;
     Finally
       EndUpdate;
     End;
@@ -3632,9 +3789,10 @@ begin
     Color := DefaultColor;
     Gradient.Reset;
     ResourceName := DefaultResourceName;
-    WrapMode := DefaultWrapMode;
     BackgroundMargins.Rect := BackgroundMargins.DefaultValue;
     ImageMargins.Rect := ImageMargins.DefaultValue;
+    ImageNoRadius := DefaultImageNoRadius;
+    WrapMode := DefaultWrapMode;
   finally
     EndUpdate;
   end;
@@ -3661,7 +3819,6 @@ begin
       Color := ALInterpolateColor(Color{Start}, ATo.Color{Stop}, ANormalizedTime);
       Gradient.Interpolate(aTo.Gradient, ANormalizedTime);
       ResourceName := ATo.ResourceName;
-      WrapMode := ATo.WrapMode;
       BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, ATo.BackgroundMargins.Left{Stop}, ANormalizedTime);
       BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, ATo.BackgroundMargins.Right{Stop}, ANormalizedTime);
       BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, ATo.BackgroundMargins.Top{Stop}, ANormalizedTime);
@@ -3670,12 +3827,13 @@ begin
       ImageMargins.Right := InterpolateSingle(ImageMargins.Right{Start}, ATo.ImageMargins.Right{Stop}, ANormalizedTime);
       ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ATo.ImageMargins.Top{Stop}, ANormalizedTime);
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ATo.ImageMargins.Bottom{Stop}, ANormalizedTime);
+      ImageNoRadius := ATo.ImageNoRadius;
+      WrapMode := ATo.WrapMode;
     end
     else begin
       Color := ALInterpolateColor(Color{Start}, DefaultColor{Stop}, ANormalizedTime);
       Gradient.Interpolate(nil, ANormalizedTime);
       ResourceName := DefaultResourceName;
-      WrapMode := DefaultWrapMode;
       BackgroundMargins.Left := InterpolateSingle(BackgroundMargins.Left{Start}, BackgroundMargins.DefaultValue.Left{Stop}, ANormalizedTime);
       BackgroundMargins.Right := InterpolateSingle(BackgroundMargins.Right{Start}, BackgroundMargins.DefaultValue.Right{Stop}, ANormalizedTime);
       BackgroundMargins.Top := InterpolateSingle(BackgroundMargins.Top{Start}, BackgroundMargins.DefaultValue.Top{Stop}, ANormalizedTime);
@@ -3684,6 +3842,8 @@ begin
       ImageMargins.Right := InterpolateSingle(ImageMargins.Right{Start}, ImageMargins.DefaultValue.Right{Stop}, ANormalizedTime);
       ImageMargins.Top := InterpolateSingle(ImageMargins.Top{Start}, ImageMargins.DefaultValue.Top{Stop}, ANormalizedTime);
       ImageMargins.Bottom := InterpolateSingle(ImageMargins.Bottom{Start}, ImageMargins.DefaultValue.Bottom{Stop}, ANormalizedTime);
+      ImageNoRadius := DefaultImageNoRadius;
+      WrapMode := DefaultWrapMode;
     end;
   finally
     EndUpdate;
@@ -3716,6 +3876,12 @@ begin
   if (ResourceName <> '') then result := result + [TALBrushStyle.Image];
 end;
 
+{******************************************}
+function TALBrush.IsRemoteResource: Boolean;
+begin
+  Result := AlIsHttpOrHttpsUrl(ResourceName);
+end;
+
 {***************************************}
 function TALBrush.IsColorStored: Boolean;
 begin
@@ -3726,6 +3892,12 @@ end;
 function TALBrush.IsResourceNameStored: Boolean;
 begin
   result := FResourceName <> DefaultResourceName;
+end;
+
+{******************************************}
+function TALBrush.IsImageNoRadiusStored: Boolean;
+begin
+  result := FImageNoRadius <> DefaultImageNoRadius;
 end;
 
 {******************************************}
@@ -3744,6 +3916,12 @@ end;
 function TALBrush.GetDefaultResourceName: String;
 begin
   Result := '';
+end;
+
+{*****************************************************}
+function TALBrush.GetDefaultImageNoRadius: Boolean;
+begin
+  Result := False;
 end;
 
 {*****************************************************}
@@ -3776,15 +3954,6 @@ begin
   end;
 end;
 
-{************************************************************}
-procedure TALBrush.SetWrapMode(const Value: TALImageWrapMode);
-begin
-  if fWrapMode <> Value then begin
-    fWrapMode := Value;
-    Change;
-  end;
-end;
-
 {**************************************************************}
 procedure TALBrush.SetBackgroundMargins(const Value: TALBounds);
 begin
@@ -3795,6 +3964,24 @@ end;
 procedure TALBrush.SetImageMargins(const Value: TALBounds);
 begin
   FImageMargins.Assign(Value);
+end;
+
+{************************************************************}
+procedure TALBrush.SetImageNoRadius(const Value: Boolean);
+begin
+  if fImageNoRadius <> Value then begin
+    fImageNoRadius := Value;
+    Change;
+  end;
+end;
+
+{************************************************************}
+procedure TALBrush.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if fWrapMode <> Value then begin
+    fWrapMode := Value;
+    Change;
+  end;
 end;
 
 {**************************************************}
@@ -5173,6 +5360,7 @@ begin
     var LFromSurfaceRect := ALGetShapeSurfaceRect(
                               ARect, // const ARect: TRectF;
                               FTransitionFrom.Fill, // const AFill: TALBrush;
+                              nil, // const AFillResourceStream: TStream;
                               FTransitionFrom.StateLayer, // const AStateLayer: TALStateLayer;
                               FTransitionFrom.Shadow); // const AShadow: TALShadow): TRectF;
     LSurfaceRect := TRectF.Union(LSurfaceRect, LFromSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -5181,6 +5369,7 @@ begin
     var LToSurfaceRect := ALGetShapeSurfaceRect(
                             ARect, // const ARect: TRectF;
                             FTransitionTo.Fill, // const AFill: TALBrush;
+                            nil, // const AFillResourceStream: TStream;
                             FTransitionTo.StateLayer, // const AStateLayer: TALStateLayer;
                             FTransitionTo.Shadow); // const AShadow: TALShadow): TRectF;
     LSurfaceRect := TRectF.Union(LSurfaceRect, LToSurfaceRect); // add the extra space needed to draw the shadow/statelayer
@@ -6197,6 +6386,9 @@ begin
 end;
 
 initialization
+  ALBrokenImageResourceName := 'broken_image';
+  ALBrokenImageWidth := 16;
+  ALBrokenImageHeight := 16;
   ALScreenScale := 0;
   ALCustomConvertFontFamilyProc := nil;
   ALCustomGetResourceFilenameProc := nil;

@@ -471,39 +471,39 @@ type
   public
     class var HorizontalEllipsis: String;
   private
-    FFont: TALFont;
-    FDecoration: TALTextDecoration;
-    FEllipsis: String;
-    FEllipsisSettings: TALEllipsisSettings;
-    FTrimming: TALTextTrimming;
-    FMaxLines: integer;
-    FHorzAlign: TALTextHorzAlign;
-    FVertAlign: TALTextVertAlign;
-    FLineHeightMultiplier: Single;
-    FLetterSpacing: Single;
-    FIsHtml: Boolean;
+    FFont: TALFont; // 8 bytes
+    FDecoration: TALTextDecoration; // 8 bytes
+    FEllipsis: String; // 8 bytes
+    FEllipsisSettings: TALEllipsisSettings; // 8 bytes
+    FMaxLines: integer; // 4 bytes
+    FIsHtml: Boolean; // 1 byte
+    FTrimming: TALTextTrimming; // 1 byte
+    FHorzAlign: TALTextHorzAlign; // 1 byte
+    FVertAlign: TALTextVertAlign; // 1 byte
+    FLineHeightMultiplier: Single; // 4 bytes
+    FLetterSpacing: Single; // 4 bytes
     procedure SetFont(const AValue: TALFont);
     procedure SetDecoration(const AValue: TALTextDecoration);
     procedure SetEllipsis(const AValue: String);
     procedure SetEllipsisSettings(const AValue: TALEllipsisSettings);
-    procedure SetTrimming(const AValue: TALTextTrimming);
     procedure SetMaxLines(const AValue: Integer);
+    procedure SetIsHtml(const AValue: Boolean);
+    procedure SetTrimming(const AValue: TALTextTrimming);
     procedure SetHorzAlign(const AValue: TALTextHorzAlign);
     procedure SetVertAlign(const AValue: TALTextVertAlign);
     procedure SetLineHeightMultiplier(const AValue: Single);
     procedure SetLetterSpacing(const AValue: Single);
-    procedure SetIsHtml(const AValue: Boolean);
     procedure FontChanged(ASender: TObject);
     procedure DecorationChanged(ASender: TObject);
     procedure EllipsisSettingsChanged(ASender: TObject);
     function IsEllipsisStored: Boolean;
-    function IsTrimmingStored: Boolean;
     function IsMaxLinesStored: Boolean;
+    function IsIsHtmlStored: Boolean;
+    function IsTrimmingStored: Boolean;
     function IsHorzAlignStored: Boolean;
     function IsVertAlignStored: Boolean;
     function IsLineHeightMultiplierStored: Boolean;
     function IsLetterSpacingStored: Boolean;
-    function IsIsHtmlStored: Boolean;
   {$IF defined(ALBackwardCompatible)}
   private
     procedure ReadFontColor(Reader: TReader);
@@ -517,13 +517,13 @@ type
     function CreateEllipsisSettings: TALEllipsisSettings; virtual;
     procedure AssignTo(Dest: TPersistent); override;
     function GetDefaultEllipsis: String; virtual;
-    function GetDefaultTrimming: TALTextTrimming; virtual;
     function GetDefaultMaxLines: Integer; virtual;
+    function GetDefaultIsHtml: Boolean; virtual;
+    function GetDefaultTrimming: TALTextTrimming; virtual;
     function GetDefaultHorzAlign: TALTextHorzAlign; virtual;
     function GetDefaultVertAlign: TALTextVertAlign; virtual;
     function GetDefaultLineHeightMultiplier: Single; virtual;
     function GetDefaultLetterSpacing: Single; virtual;
-    function GetDefaultIsHtml: Boolean; virtual;
   public
     constructor Create; override;
     destructor Destroy; override;
@@ -534,25 +534,25 @@ type
     procedure InterpolateNoChanges(const ATo: TALBaseTextSettings; const ANormalizedTime: Single);
     //--
     property DefaultEllipsis: String read GetDefaultEllipsis;
-    property DefaultTrimming: TALTextTrimming read GetDefaultTrimming;
     property DefaultMaxLines: Integer read GetDefaultMaxLines;
+    property DefaultIsHtml: Boolean read GetDefaultIsHtml;
+    property DefaultTrimming: TALTextTrimming read GetDefaultTrimming;
     property DefaultHorzAlign: TALTextHorzAlign read GetDefaultHorzAlign;
     property DefaultVertAlign: TALTextVertAlign read GetDefaultVertAlign;
     property DefaultLineHeightMultiplier: Single read GetDefaultLineHeightMultiplier;
     property DefaultLetterSpacing: Single read GetDefaultLetterSpacing;
-    property DefaultIsHtml: Boolean read GetDefaultIsHtml;
     //--
     property Font: TALFont read FFont write SetFont;
     property Decoration: TALTextDecoration read FDecoration write SetDecoration;
     property Ellipsis: String read FEllipsis write SetEllipsis stored IsEllipsisStored nodefault;
     property EllipsisSettings: TALEllipsisSettings read FEllipsisSettings write SetEllipsisSettings;
-    property Trimming: TALTextTrimming read FTrimming write SetTrimming stored IsTrimmingStored;
     property MaxLines: Integer read FMaxLines write SetMaxLines stored IsMaxLinesStored;
+    property IsHtml: Boolean read FIsHtml write SetIsHtml stored IsIsHtmlStored;
+    property Trimming: TALTextTrimming read FTrimming write SetTrimming stored IsTrimmingStored;
     property HorzAlign: TALTextHorzAlign read FHorzAlign write SetHorzAlign stored IsHorzAlignStored;
     property VertAlign: TALTextVertAlign read FVertAlign write SetVertAlign stored IsVertAlignStored;
     property LineHeightMultiplier: Single read FLineHeightMultiplier write SetLineHeightMultiplier stored IsLineHeightMultiplierStored nodefault;
     property LetterSpacing: Single read FLetterSpacing write SetLetterSpacing stored IsLetterSpacingStored nodefault;
-    property IsHtml: Boolean read FIsHtml write SetIsHtml stored IsIsHtmlStored;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -560,15 +560,15 @@ type
   published
     property Font;
     property Decoration;
-    property Trimming;
-    property MaxLines;
     property Ellipsis;
     property EllipsisSettings;
+    property MaxLines;
+    property IsHtml;
+    property Trimming;
     property HorzAlign;
     property VertAlign;
     property LineHeightMultiplier;
     property LetterSpacing;
-    property IsHtml;
   end;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
@@ -2712,22 +2712,20 @@ end;
 constructor TALBaseTextSettings.Create;
 begin
   inherited Create;
-  //--
   FFont := CreateFont;
   FFont.OnChanged := FontChanged;
   FDecoration := CreateDecoration;
   FDecoration.OnChanged := DecorationChanged;
+  FEllipsis := DefaultEllipsis;
   FEllipsisSettings := CreateEllipsisSettings;
   FEllipsisSettings.OnChanged := EllipsisSettingsChanged;
-  //--
-  FEllipsis := DefaultEllipsis;
-  FTrimming := DefaultTrimming;
   FMaxLines := DefaultMaxLines;
+  FIsHtml := DefaultIsHtml;
+  FTrimming := DefaultTrimming;
   FHorzAlign := DefaultHorzAlign;
   FVertAlign := DefaultVertAlign;
   FLineHeightMultiplier := DefaultLineHeightMultiplier;
   FLetterSpacing := DefaultLetterSpacing;
-  FIsHtml := DefaultIsHtml;
 end;
 
 {*************************************}
@@ -2835,15 +2833,15 @@ begin
     Try
       Font.Assign(TALBaseTextSettings(Source).Font);
       Decoration.Assign(TALBaseTextSettings(Source).Decoration);
-      EllipsisSettings.Assign(TALBaseTextSettings(Source).EllipsisSettings);
       Ellipsis             := TALBaseTextSettings(Source).Ellipsis;
-      Trimming             := TALBaseTextSettings(Source).Trimming;
+      EllipsisSettings.Assign(TALBaseTextSettings(Source).EllipsisSettings);
       MaxLines             := TALBaseTextSettings(Source).MaxLines;
+      IsHtml               := TALBaseTextSettings(Source).IsHtml;
+      Trimming             := TALBaseTextSettings(Source).Trimming;
       HorzAlign            := TALBaseTextSettings(Source).HorzAlign;
       VertAlign            := TALBaseTextSettings(Source).VertAlign;
       LineHeightMultiplier := TALBaseTextSettings(Source).LineHeightMultiplier;
       LetterSpacing        := TALBaseTextSettings(Source).LetterSpacing;
-      IsHtml               := TALBaseTextSettings(Source).IsHtml;
     Finally
       EndUpdate;
     End;
@@ -2856,16 +2854,17 @@ begin
       Decoration.reset;
       if TfontStyle.fsUnderline in TTextSettings(Source).Font.Style then Decoration.Kinds := Decoration.Kinds + [TALTextDecorationKind.Underline];
       if TfontStyle.fsStrikeOut in TTextSettings(Source).Font.Style then Decoration.Kinds := Decoration.Kinds + [TALTextDecorationKind.LineThrough];
-      EllipsisSettings.reset;
       Ellipsis := DefaultEllipsis;
+      EllipsisSettings.reset;
+      if not TTextSettings(Source).WordWrap then MaxLines := 1
+      else MaxLines := DefaultMaxLines;
+      IsHtml := DefaultIsHtml;
       case TTextSettings(Source).Trimming of
         TTextTrimming.None:      Trimming := DefaultTrimming;
         TTextTrimming.Character: Trimming := TALTextTrimming.Character;
         TTextTrimming.Word:      Trimming := TALTextTrimming.Word;
         else raise Exception.Create('Error FAFCFC8A-6C5F-464C-B2F3-0283C0D6072E');
       end;
-      if not TTextSettings(Source).WordWrap then MaxLines := 1
-      else                                       MaxLines := DefaultMaxLines;
       case TTextSettings(Source).HorzAlign of
         TTextAlign.Center:   HorzAlign := TALTextHorzAlign.Center;
         TTextAlign.Leading:  HorzAlign := TALTextHorzAlign.Leading;
@@ -2879,8 +2878,7 @@ begin
         else raise Exception.Create('Error F25E554C-CF12-4686-A99B-19927FC7E18D');
       end;
       LineHeightMultiplier := DefaultLineHeightMultiplier;
-      LetterSpacing        := DefaultLetterSpacing;
-      IsHtml               := DefaultIsHtml;
+      LetterSpacing := DefaultLetterSpacing;
     Finally
       EndUpdate;
     End;
@@ -2897,15 +2895,15 @@ begin
     inherited;
     Font.reset;
     Decoration.reset;
-    EllipsisSettings.reset;
     Ellipsis := DefaultEllipsis;
-    Trimming := DefaultTrimming;
+    EllipsisSettings.reset;
     MaxLines := DefaultMaxLines;
+    IsHtml := DefaultIsHtml;
+    Trimming := DefaultTrimming;
     HorzAlign := DefaultHorzAlign;
     VertAlign := DefaultVertAlign;
     LineHeightMultiplier := DefaultLineHeightMultiplier;
     LetterSpacing := DefaultLetterSpacing;
-    IsHtml := DefaultIsHtml;
   finally
     EndUpdate;
   end;
@@ -2933,28 +2931,28 @@ begin
     if ATo <> nil then begin
       Font.Interpolate(ATo.Font, ANormalizedTime);
       Decoration.Interpolate(ATo.Decoration, ANormalizedTime);
-      EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime);
       Ellipsis := ATo.Ellipsis;
-      Trimming := ATo.Trimming;
+      EllipsisSettings.Interpolate(ATo.EllipsisSettings, ANormalizedTime);
       MaxLines := ATo.MaxLines;
+      IsHtml := ATo.IsHtml;
+      Trimming := ATo.Trimming;
       HorzAlign := ATo.HorzAlign;
       VertAlign := ATo.VertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, ATo.LineHeightMultiplier{Stop}, ANormalizedTime);
       LetterSpacing := InterpolateSingle(LetterSpacing{Start}, ATo.LetterSpacing{Stop}, ANormalizedTime);
-      IsHtml := ATo.IsHtml;
     end
     else begin
       Font.Interpolate(nil, ANormalizedTime);
       Decoration.Interpolate(nil, ANormalizedTime);
-      EllipsisSettings.Interpolate(nil, ANormalizedTime);
       Ellipsis := DefaultEllipsis;
-      Trimming := DefaultTrimming;
+      EllipsisSettings.Interpolate(nil, ANormalizedTime);
       MaxLines := DefaultMaxLines;
+      IsHtml := DefaultIsHtml;
+      Trimming := DefaultTrimming;
       HorzAlign := DefaultHorzAlign;
       VertAlign := DefaultVertAlign;
       LineHeightMultiplier := InterpolateSingle(LineHeightMultiplier{Start}, DefaultLineHeightMultiplier{Stop}, ANormalizedTime);
       LetterSpacing := InterpolateSingle(LetterSpacing{Start}, DefaultLetterSpacing{Stop}, ANormalizedTime);
-      IsHtml := DefaultIsHtml;
     end;
   finally
     EndUpdate;
@@ -2997,15 +2995,21 @@ begin
 end;
 
 {*****************************************************}
-function TALBaseTextSettings.IsTrimmingStored: Boolean;
-begin
-  Result := FTrimming <> DefaultTrimming;
-end;
-
-{*****************************************************}
 function TALBaseTextSettings.IsMaxLinesStored: Boolean;
 begin
   Result := FMaxLines <> DefaultMaxLines;
+end;
+
+{***************************************************}
+function TALBaseTextSettings.IsIsHtmlStored: Boolean;
+begin
+  Result := FIsHtml <> DefaultIsHtml;
+end;
+
+{*****************************************************}
+function TALBaseTextSettings.IsTrimmingStored: Boolean;
+begin
+  Result := FTrimming <> DefaultTrimming;
 end;
 
 {******************************************************}
@@ -3032,28 +3036,28 @@ begin
   Result := not SameValue(FLetterSpacing, DefaultLetterSpacing, TEpsilon.FontSize);
 end;
 
-{***************************************************}
-function TALBaseTextSettings.IsIsHtmlStored: Boolean;
-begin
-  Result := FIsHtml <> DefaultIsHtml;
-end;
-
 {******************************************************}
 function TALBaseTextSettings.GetDefaultEllipsis: String;
 begin
   Result := HorizontalEllipsis;
 end;
 
-{***************************************************************}
-function TALBaseTextSettings.GetDefaultTrimming: TALTextTrimming;
-begin
-  Result := TALTextTrimming.Word;
-end;
-
 {*******************************************************}
 function TALBaseTextSettings.GetDefaultMaxLines: Integer;
 begin
   Result := 65535;
+end;
+
+{*****************************************************}
+function TALBaseTextSettings.GetDefaultIsHtml: Boolean;
+begin
+  Result := False;
+end;
+
+{***************************************************************}
+function TALBaseTextSettings.GetDefaultTrimming: TALTextTrimming;
+begin
+  Result := TALTextTrimming.Word;
 end;
 
 {*****************************************************************}
@@ -3080,12 +3084,6 @@ begin
   Result := 0;
 end;
 
-{*****************************************************}
-function TALBaseTextSettings.GetDefaultIsHtml: Boolean;
-begin
-  Result := False;
-end;
-
 {***********************************************************}
 procedure TALBaseTextSettings.SetFont(const AValue: TALFont);
 begin
@@ -3098,12 +3096,6 @@ begin
   FDecoration.Assign(AValue);
 end;
 
-{***********************************************************************************}
-procedure TALBaseTextSettings.SetEllipsisSettings(const AValue: TALEllipsisSettings);
-begin
-  FEllipsisSettings.Assign(AValue);
-end;
-
 {**************************************************************}
 procedure TALBaseTextSettings.SetEllipsis(const AValue: String);
 begin
@@ -3113,13 +3105,10 @@ begin
   end;
 end;
 
-{***********************************************************************}
-procedure TALBaseTextSettings.SetTrimming(const AValue: TALTextTrimming);
+{***********************************************************************************}
+procedure TALBaseTextSettings.SetEllipsisSettings(const AValue: TALEllipsisSettings);
 begin
-  If FTrimming <> AValue then begin
-    FTrimming := AValue;
-    Change;
-  end;
+  FEllipsisSettings.Assign(AValue);
 end;
 
 {***************************************************************}
@@ -3127,6 +3116,24 @@ procedure TALBaseTextSettings.SetMaxLines(const AValue: Integer);
 begin
   If FMaxLines <> AValue then begin
     FMaxLines := AValue;
+    Change;
+  end;
+end;
+
+{*************************************************************}
+procedure TALBaseTextSettings.SetIsHtml(const AValue: Boolean);
+begin
+  If FIsHtml <> AValue then begin
+    FIsHtml := AValue;
+    Change;
+  end;
+end;
+
+{***********************************************************************}
+procedure TALBaseTextSettings.SetTrimming(const AValue: TALTextTrimming);
+begin
+  If FTrimming <> AValue then begin
+    FTrimming := AValue;
     Change;
   end;
 end;
@@ -3163,15 +3170,6 @@ procedure TALBaseTextSettings.SetLetterSpacing(const AValue: Single);
 begin
   if not SameValue(FLetterSpacing, AValue, TEpsilon.FontSize) then begin
     FLetterSpacing := AValue;
-    Change;
-  end;
-end;
-
-{*************************************************************}
-procedure TALBaseTextSettings.SetIsHtml(const AValue: Boolean);
-begin
-  If FIsHtml <> AValue then begin
-    FIsHtml := AValue;
     Change;
   end;
 end;

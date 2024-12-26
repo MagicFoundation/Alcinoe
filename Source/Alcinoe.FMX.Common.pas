@@ -574,9 +574,9 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALInheritBaseTextSettings = class(TALBaseTextSettings)
   private
-    FParent: TALBaseTextSettings;
-    FInherit: Boolean;
-    fSuperseded: Boolean;
+    FParent: TALBaseTextSettings; // 8 bytes
+    FInherit: Boolean; // 1 byte
+    fSuperseded: Boolean; // 1 byte
     procedure SetInherit(const AValue: Boolean);
   protected
     function CreateSavedState: TALPersistentObserver; override;
@@ -596,15 +596,15 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALGradient = class(TALPersistentObserver)
   private
-    FStyle: TGradientStyle;
-    FColors: TArray<TAlphaColor>;
-    FOffsets: TArray<Single>;
-    FAngle: Single;
+    FStyle: TGradientStyle; // 4 bytes
+    FAngle: Single; // 4 bytes
+    FColors: TArray<TAlphaColor>; // 8 bytes
+    FOffsets: TArray<Single>; // 8 bytes
     function GetCSSFormat: String;
     procedure SetStyle(const Value: TGradientStyle);
+    procedure SetAngle(const Value: Single);
     procedure SetColors(const Value: TArray<TAlphaColor>);
     procedure SetOffsets(const Value: TArray<Single>);
-    procedure SetAngle(const Value: Single);
     procedure SetCSSFormat(const Value: String);
     function IsStyleStored: Boolean;
     function IsAngleStored: Boolean;
@@ -3281,9 +3281,9 @@ constructor TALGradient.Create;
 begin
   inherited Create;
   FStyle := DefaultStyle;
+  FAngle := DefaultAngle;
   FColors := [];
   FOffsets := [];
-  FAngle := DefaultAngle;
 end;
 
 {************************************************}
@@ -3293,9 +3293,9 @@ begin
     BeginUpdate;
     Try
       Style := TALGradient(Source).Style;
+      Angle := TALGradient(Source).Angle;
       Colors := TALGradient(Source).Colors;
       Offsets := TALGradient(Source).Offsets;
-      Angle := TALGradient(Source).Angle;
     Finally
       EndUpdate;
     End;
@@ -3311,9 +3311,9 @@ begin
   Try
     inherited;
     Style := DefaultStyle;
+    Angle := DefaultAngle;
     Colors := [];
     Offsets := [];
-    Angle := DefaultAngle;
   finally
     EndUpdate;
   end;
@@ -3329,24 +3329,24 @@ begin
          (length(Colors) = length(ATo.Colors)) and
          (length(Offsets) = length(ATo.Offsets)) then begin
         Style := ATo.Style;
+        Angle := InterpolateSingle(Angle{Start}, ATo.Angle{Stop}, ANormalizedTime);
         for var I := Low(Colors) to High(Colors) do
           Colors[i] := ALInterpolateColor(Colors[i]{Start}, ATo.Colors[i]{Stop}, ANormalizedTime);
         for var I := Low(Offsets) to High(Offsets) do
           Offsets[i] := InterpolateSingle(Offsets[i]{Start}, ATo.Offsets[i]{Stop}, ANormalizedTime);
-        Angle := InterpolateSingle(Angle{Start}, ATo.Angle{Stop}, ANormalizedTime);
       end
       else begin
         Style := ATo.Style;
+        Angle := ATo.Angle;
         Colors := ATo.Colors;
         Offsets := ATo.Offsets;
-        Angle := ATo.Angle;
       end;
     end
     else begin
       Style := DefaultStyle;
+      Angle := DefaultAngle;
       Colors := [];
       Offsets := [];
-      Angle := DefaultAngle;
     end;
   finally
     EndUpdate;
@@ -3493,6 +3493,15 @@ begin
   end;
 end;
 
+{**************************************************}
+procedure TALGradient.SetAngle(const Value: Single);
+begin
+  if fAngle <> Value then begin
+    fAngle := Value;
+    Change;
+  end;
+end;
+
 {****************************************************************}
 procedure TALGradient.SetColors(const Value: TArray<TAlphaColor>);
 begin
@@ -3507,15 +3516,6 @@ procedure TALGradient.SetOffsets(const Value: TArray<Single>);
 begin
   if fOffsets <> Value then begin
     fOffsets := Value;
-    Change;
-  end;
-end;
-
-{**************************************************}
-procedure TALGradient.SetAngle(const Value: Single);
-begin
-  if fAngle <> Value then begin
-    fAngle := Value;
     Change;
   end;
 end;

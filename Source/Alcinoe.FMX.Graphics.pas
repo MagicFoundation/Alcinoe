@@ -792,10 +792,10 @@ procedure ALDrawRectangle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
-            const AFillGradientColors: TArray<TAlphaColor>;
-            const AFillGradientOffsets: TArray<Single>;
             const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
             const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -826,9 +826,9 @@ procedure ALDrawRectangle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
+            const AFillGradientAngle: Single;
             const AFillGradientColors: TArray<TAlphaColor>;
             const AFillGradientOffsets: TArray<Single>;
-            const AFillGradientAngle: Single;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -878,10 +878,10 @@ procedure ALDrawCircle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
-            const AFillGradientColors: TArray<TAlphaColor>;
-            const AFillGradientOffsets: TArray<Single>;
             const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
             const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -908,9 +908,9 @@ procedure ALDrawCircle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
+            const AFillGradientAngle: Single;
             const AFillGradientColors: TArray<TAlphaColor>;
             const AFillGradientOffsets: TArray<Single>;
-            const AFillGradientAngle: Single;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -952,10 +952,10 @@ procedure ALDrawEllipse(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
-            const AFillGradientColors: TArray<TAlphaColor>;
-            const AFillGradientOffsets: TArray<Single>;
             const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
             const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -982,9 +982,9 @@ procedure ALDrawEllipse(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
+            const AFillGradientAngle: Single;
             const AFillGradientColors: TArray<TAlphaColor>;
             const AFillGradientOffsets: TArray<Single>;
-            const AFillGradientAngle: Single;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -3256,7 +3256,6 @@ begin
       LDestRect.Width,
       LDestRect.Height,
       LDestRect.Height)); // Adds an ellipse that fits inside the specified rectangle.
-  CGContextClosePath(Result); // Closes and terminates the current path’s subpath.
   CGContextClip(Result); // Modifies the current clipping path, using the nonzero winding number rule.
                          // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                          // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
@@ -4638,7 +4637,6 @@ begin
               LDestRect.Width,
               LDestRect.Height,
               LDestRect.Height)); // Adds an ellipse that fits inside the specified rectangle.
-        CGContextClosePath(Result); // Closes and terminates the current path’s subpath.
         CGContextClip(Result); // Modifies the current clipping path, using the nonzero winding number rule.
                                // Unlike the current path, the current clipping path is part of the graphics state. Therefore,
                                // to re-enlarge the paintable area by restoring the clipping path to a prior state, you must
@@ -10025,10 +10023,10 @@ procedure ALDrawRectangle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
-            const AFillGradientColors: TArray<TAlphaColor>;
-            const AFillGradientOffsets: TArray<Single>;
             const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
             const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -10136,9 +10134,8 @@ var
       LScaledYRadius := 0;
     end;
 
-    // use drawcircle
-    if SameValue(LRect.Width, LRect.Height, TEpsilon.position) and
-       SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
+    // use drawcircle/drawoval
+    if SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
        SameValue(LScaledYRadius, LRect.Height / 2, TEpsilon.position) and
        (ACorners = AllCorners) and
        (ASides=AllSides) then begin
@@ -10150,9 +10147,14 @@ var
         else if (LRectIsEqualsToStrokeRect) and (compareValue(LScaledStrokeThickness, 1, TEpsilon.position) > 0) then
           LRect.Inflate(-1, -1);
       end;
-      //--
-      var LCenterPoint := LRect.CenterPoint;
-      sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, aPaint);
+      // drawcircle
+      if SameValue(LRect.Width, LRect.Height, TEpsilon.position) then begin
+        var LCenterPoint := LRect.CenterPoint;
+        sk4d_canvas_draw_circle(ACanvas, @LCenterPoint{center}, LRect.width / 2{radius}, aPaint);
+      end
+      // drawoval
+      else
+        sk4d_canvas_draw_oval(ACanvas, @LRect{oval}, aPaint);
 
     end
 
@@ -10399,8 +10401,14 @@ var
            (TSide.right in ASides) then _RLineTo(LPathBuilder, 0, -LHeightMinusCorners)
         else _RMoveTo(LPathBuilder, 0, -LHeightMinusCorners);
         //-----
-        if (TSide.right in ASides) and
-           (TSide.top in ASides) then sk4d_pathbuilder_close(LPathBuilder);
+        // We cannot close the path because it would connect the last position
+        // of a moveTo to the current endpoint. For example, if we want to skip the
+        // bottom side (sides=[Top, Left, Right] and xRadius/yRadius > 0) by
+        // performing a moveTo from the BottomLeft to the BottomRight,
+        // closing the path when reaching the TopRight would incorrectly connect back
+        // to the BottomRight instead of the desired TopRight position.
+        //if (TSide.right in ASides) and
+        //   (TSide.top in ASides) then sk4d_pathbuilder_close(LPathBuilder);
 
 
         var LPath := sk4d_pathbuilder_detach(LPathBuilder);
@@ -10455,14 +10463,13 @@ var
       LScaledYRadius := 0;
     end;
 
-    // use drawcircle/addCircle+drawPath
-    if SameValue(LRect.Width, LRect.Height, TEpsilon.position) and
-       SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
+    // use drawcircle/drawOval/addCircle+drawPath/addOval+drawPath
+    if SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
        SameValue(LScaledYRadius, LRect.Height / 2, TEpsilon.position) and
        (ACorners = AllCorners) and
        (ASides=AllSides) then begin
 
-      // use drawcircle
+      // use drawcircle/drawOval
       if (not aForceDrawPath) and
          (not aClipPath) then begin
         if (LStrokeColor <> TalphaColorRec.Null) then begin
@@ -10473,10 +10480,13 @@ var
             LRect.Inflate(-1, -1);
         end;
         //--
-        aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, aPaint);
+        if SameValue(LRect.Width, LRect.Height, TEpsilon.position) then
+          aCanvas.drawCircle(LRect.CenterPoint.x{cx}, LRect.CenterPoint.y{cy}, LRect.width / 2{radius}, aPaint)
+        else
+          aCanvas.drawOval(LRect.Left{left}, LRect.Top{top}, LRect.Right{right}, LRect.Bottom{bottom}, aPaint);
       end
 
-      // use addCircle+drawPath
+      // use addCircle+drawPath/addOval+drawPath
       else begin
         var LPath := TJPath.Create;
         //--
@@ -10493,7 +10503,10 @@ var
           end;
         end;
         //--
-        LPath.addCircle(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius}, TJPath_Direction.JavaClass.CW{dir});
+        if SameValue(LRect.Width, LRect.Height, TEpsilon.position) then
+          LPath.addCircle(LRect.CenterPoint.x{x}, LRect.CenterPoint.y{y}, LRect.width / 2{radius}, TJPath_Direction.JavaClass.CW{dir})
+        else
+          LPath.addOval(LRect.Left{left}, LRect.Top{top}, LRect.Right{right}, LRect.Bottom{bottom}, TJPath_Direction.JavaClass.CW{dir});
         //--
         if aPaint <> nil then aCanvas.drawPath(LPath,aPaint);
         if aClipPath then begin
@@ -10746,8 +10759,14 @@ var
          (TSide.right in ASides) then LPath.rLineTo(0, -LHeightMinusCorners)
       else LPath.rMoveTo(0, -LHeightMinusCorners);
       //-----
-      if (TSide.right in ASides) and
-         (TSide.top in ASides) then LPath.close;
+      // We cannot close the path because it would connect the last position
+      // of a moveTo to the current endpoint. For example, if we want to skip the
+      // bottom side (sides=[Top, Left, Right] and xRadius/yRadius > 0) by
+      // performing a moveTo from the BottomLeft to the BottomRight,
+      // closing the path when reaching the TopRight would incorrectly connect back
+      // to the BottomRight instead of the desired TopRight position.
+      //if (TSide.right in ASides) and
+      //   (TSide.top in ASides) then LPath.close;
 
 
       if aPaint <> nil then aCanvas.drawPath(LPath,aPaint);
@@ -10844,8 +10863,7 @@ var
     end;
 
     // use AddEllipseInRect
-    if SameValue(LRect.Width, LRect.Height, TEpsilon.position) and
-       SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
+    if SameValue(LScaledXRadius, LRect.Width / 2, TEpsilon.position) and
        SameValue(LScaledYRadius, LRect.Height / 2, TEpsilon.position) and
        (ACorners = AllCorners) and
        (ASides=AllSides) then begin
@@ -10867,7 +10885,6 @@ var
           LRect.Width,
           LRect.Height,
           AGridHeight));
-      CGContextClosePath(ACanvas);
       if aClipPath then CGContextClip(ACanvas)
       else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
       else CGContextStrokePath(ACanvas);
@@ -10897,7 +10914,6 @@ var
           LRect.Width,
           LRect.Height,
           AGridHeight));
-      CGContextClosePath(ACanvas);
       if aClipPath then CGContextClip(ACanvas)
       else if not aDrawOnlyBorder then CGContextFillPath(ACanvas)
       else CGContextStrokePath(ACanvas);
@@ -11090,8 +11106,14 @@ var
          (TSide.right in ASides) then _rLineTo(0, -LHeightMinusCorners)
       else _rMoveTo(0, -LHeightMinusCorners);
       //-----
-      if (TSide.right in ASides) and
-         (TSide.top in ASides) then CGContextClosePath(ACanvas);
+      // We cannot close the path because it would connect the last position
+      // of a moveTo to the current endpoint. For example, if we want to skip the
+      // bottom side (sides=[Top, Left, Right] and xRadius/yRadius > 0) by
+      // performing a moveTo from the BottomLeft to the BottomRight,
+      // closing the path when reaching the TopRight would incorrectly connect back
+      // to the BottomRight instead of the desired TopRight position.
+      //if (TSide.right in ASides) and
+      //   (TSide.top in ASides) then CGContextClosePath(ACanvas);
 
 
       if aClipPath then CGContextClip(ACanvas)
@@ -11234,10 +11256,10 @@ var
       AStateLayerOpacity, // const AOpacity: Single;
       LStateLayerColor, // const AFillColor: TAlphaColor;
       TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
       TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
       TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
       '', // const AFillResourceName: String;
       nil, // const AFillResourceStream: TStream;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12310,9 +12332,9 @@ procedure ALDrawRectangle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
+            const AFillGradientAngle: Single;
             const AFillGradientColors: TArray<TAlphaColor>;
             const AFillGradientOffsets: TArray<Single>;
-            const AFillGradientAngle: Single;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -12367,10 +12389,10 @@ begin
     AOpacity, //const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
     AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     LFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
     LFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillResourceName, // const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12417,9 +12439,9 @@ begin
   // AFill
   var LFillColor: TAlphaColor;
   var LFillGradientStyle: TGradientStyle;
+  var LFillGradientAngle: Single;
   var LFillGradientColors: TArray<TAlphaColor>;
   var LFillGradientOffsets: TArray<Single>;
-  var LFillGradientAngle: Single;
   var LFillResourceName: String;
   var LFillBackgroundMarginsRect: TRectF;
   var LFillImageMarginsRect: TRectF;
@@ -12428,9 +12450,9 @@ begin
   if AFill <> nil then begin
     LFillColor := AFill.Color;
     LFillGradientStyle := Afill.Gradient.Style;
+    LFillGradientAngle := Afill.Gradient.Angle;
     LFillGradientColors := Afill.Gradient.Colors;
     LFillGradientOffsets := Afill.Gradient.Offsets;
-    LFillGradientAngle := Afill.Gradient.Angle;
     LFillResourceName := AFill.ResourceName;
     LFillBackgroundMarginsRect := AFill.BackgroundMargins.Rect;
     LFillImageMarginsRect := AFill.ImageMargins.Rect;
@@ -12440,9 +12462,9 @@ begin
   else begin
     LFillColor := TAlphaColors.Null;
     LFillGradientStyle := TGradientStyle.Linear;
+    LFillGradientAngle := 0;
     LFillGradientColors := [];
     LFillGradientOffsets := [];
-    LFillGradientAngle := 0;
     LFillResourceName := '';
     LFillBackgroundMarginsRect := TRectF.Empty;
     LFillImageMarginsRect := TRectF.Empty;
@@ -12511,9 +12533,9 @@ begin
     AOpacity, //const AOpacity: Single;
     LFillColor, // const AFillColor: TAlphaColor;
     LfillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    LfillGradientAngle, // const AFillGradientAngle: Single;
     LfillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
     LfillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-    LfillGradientAngle, // const AFillGradientAngle: Single;
     LFillResourceName, // const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     LFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12547,10 +12569,10 @@ procedure ALDrawCircle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
-            const AFillGradientColors: TArray<TAlphaColor>;
-            const AFillGradientOffsets: TArray<Single>;
             const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
             const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -12579,10 +12601,10 @@ begin
     AOpacity, // const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
     AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
     AFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillResourceName, // const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12617,9 +12639,9 @@ procedure ALDrawCircle(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
+            const AFillGradientAngle: Single;
             const AFillGradientColors: TArray<TAlphaColor>;
             const AFillGradientOffsets: TArray<Single>;
-            const AFillGradientAngle: Single;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -12670,10 +12692,10 @@ begin
     AOpacity, //const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
     AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     LFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
     LFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillResourceName,// const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12712,9 +12734,9 @@ begin
   // AFill
   var LFillColor: TAlphaColor;
   var LFillGradientStyle: TGradientStyle;
+  var LFillGradientAngle: Single;
   var LFillGradientColors: TArray<TAlphaColor>;
   var LFillGradientOffsets: TArray<Single>;
-  var LFillGradientAngle: Single;
   var LFillResourceName: String;
   var LFillBackgroundMarginsRect: TRectF;
   var LFillImageMarginsRect: TRectF;
@@ -12723,9 +12745,9 @@ begin
   if AFill <> nil then begin
     LFillColor := AFill.Color;
     LFillGradientStyle := Afill.Gradient.Style;
+    LFillGradientAngle := Afill.Gradient.Angle;
     LFillGradientColors := Afill.Gradient.Colors;
     LFillGradientOffsets := Afill.Gradient.Offsets;
-    LFillGradientAngle := Afill.Gradient.Angle;
     LFillResourceName := AFill.ResourceName;
     LFillBackgroundMarginsRect := AFill.BackgroundMargins.Rect;
     LFillImageMarginsRect := AFill.ImageMargins.Rect;
@@ -12735,9 +12757,9 @@ begin
   else begin
     LFillColor := TAlphaColors.Null;
     LFillGradientStyle := TGradientStyle.Linear;
+    LFillGradientAngle := 0;
     LFillGradientColors := [];
     LFillGradientOffsets := [];
-    LFillGradientAngle := 0;
     LFillResourceName := '';
     LFillBackgroundMarginsRect := TRectF.Empty;
     LFillImageMarginsRect := TRectF.Empty;
@@ -12806,9 +12828,9 @@ begin
     AOpacity, //const AOpacity: Single;
     LFillColor, // const AFillColor: TAlphaColor;
     LfillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    LfillGradientAngle, // const AFillGradientAngle: Single;
     LfillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
     LfillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-    LfillGradientAngle, // const AFillGradientAngle: Single;
     LFillResourceName, // const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     LFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12838,10 +12860,10 @@ procedure ALDrawEllipse(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
-            const AFillGradientColors: TArray<TAlphaColor>;
-            const AFillGradientOffsets: TArray<Single>;
             const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
             const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+            const AFillGradientColors: TArray<TAlphaColor>;
+            const AFillGradientOffsets: TArray<Single>;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -12870,10 +12892,10 @@ begin
     AOpacity, // const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
     AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
     AFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillResourceName, // const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -12908,9 +12930,9 @@ procedure ALDrawEllipse(
             const AOpacity: Single;
             const AFillColor: TAlphaColor;
             const AFillGradientStyle: TGradientStyle;
+            const AFillGradientAngle: Single;
             const AFillGradientColors: TArray<TAlphaColor>;
             const AFillGradientOffsets: TArray<Single>;
-            const AFillGradientAngle: Single;
             const AFillResourceName: String;
             const AFillResourceStream: TStream;
             Const AFillBackgroundMarginsRect: TRectF;
@@ -12961,10 +12983,10 @@ begin
     AOpacity, //const AOpacity: Single;
     AFillColor, // const AFillColor: TAlphaColor;
     AFillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     LFillGradientStartPoint, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
     LFillGradientEndPoint, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+    AFillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
+    AFillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
     AFillResourceName,// const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     AFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;
@@ -13003,9 +13025,9 @@ begin
   // AFill
   var LFillColor: TAlphaColor;
   var LFillGradientStyle: TGradientStyle;
+  var LFillGradientAngle: Single;
   var LFillGradientColors: TArray<TAlphaColor>;
   var LFillGradientOffsets: TArray<Single>;
-  var LFillGradientAngle: Single;
   var LFillResourceName: String;
   var LFillBackgroundMarginsRect: TRectF;
   var LFillImageMarginsRect: TRectF;
@@ -13014,9 +13036,9 @@ begin
   if AFill <> nil then begin
     LFillColor := AFill.Color;
     LFillGradientStyle := Afill.Gradient.Style;
+    LFillGradientAngle := Afill.Gradient.Angle;
     LFillGradientColors := Afill.Gradient.Colors;
     LFillGradientOffsets := Afill.Gradient.Offsets;
-    LFillGradientAngle := Afill.Gradient.Angle;
     LFillResourceName := AFill.ResourceName;
     LFillBackgroundMarginsRect := AFill.BackgroundMargins.Rect;
     LFillImageMarginsRect := AFill.ImageMargins.Rect;
@@ -13026,9 +13048,9 @@ begin
   else begin
     LFillColor := TAlphaColors.Null;
     LFillGradientStyle := TGradientStyle.Linear;
+    LFillGradientAngle := 0;
     LFillGradientColors := [];
     LFillGradientOffsets := [];
-    LFillGradientAngle := 0;
     LFillResourceName := '';
     LFillBackgroundMarginsRect := TRectF.Empty;
     LFillImageMarginsRect := TRectF.Empty;
@@ -13097,9 +13119,9 @@ begin
     AOpacity, //const AOpacity: Single;
     LFillColor, // const AFillColor: TAlphaColor;
     LfillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+    LfillGradientAngle, // const AFillGradientAngle: Single;
     LfillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
     LfillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-    LfillGradientAngle, // const AFillGradientAngle: Single;
     LFillResourceName, // const AFillResourceName: String;
     AFillResourceStream, // const AFillResourceStream: TStream;
     LFillBackgroundMarginsRect, // Const AFillBackgroundMarginsRect: TRectF;

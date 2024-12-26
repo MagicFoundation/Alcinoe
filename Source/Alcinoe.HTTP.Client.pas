@@ -1,7 +1,3 @@
-{****************************************
-TALHttpClient is a ancestor of class like
-TALWinInetHttpClient or TALWinHttpClient
-****************************************}
 unit Alcinoe.HTTP.Client;
 
 interface
@@ -468,6 +464,8 @@ Function  AlInternetCrackUrl(
             var Url: AnsiString; // if true return UrlPath
             var Anchor: AnsiString;
             const Query: TALStringsA): Boolean; overload;
+Function  AlIsHttpOrHttpsUrl(const AUrl: AnsiString): Boolean; overload;
+Function  AlIsHttpOrHttpsUrl(const AUrl: String): Boolean; overload;
 Function  AlRemoveAnchorFromUrl(aUrl: AnsiString; Var aAnchor: AnsiString): AnsiString; overload;
 Function  AlRemoveAnchorFromUrl(const aUrl: AnsiString): AnsiString; overload;
 {$IFDEF MSWINDOWS}
@@ -1361,8 +1359,8 @@ begin
   //try with relative url
   else begin
     tmpUrl := Url;
-    if tmpUrl[1] = '/' then tmpUrl := 'http://www.arkadia.com' + tmpUrl // we don't take care of the domaine name, it's will be skip, it's just to make the url valid
-    else tmpUrl := 'http://www.arkadia.com/' + tmpUrl;
+    if tmpUrl[1] = '/' then tmpUrl := 'http://www.example.com' + tmpUrl // we don't take care of the domaine name, it's will be skip, it's just to make the url valid
+    else tmpUrl := 'http://www.example.com/' + tmpUrl;
     Result := AlInternetCrackUrl(
                 tmpUrl,
                 SchemeName,
@@ -1376,6 +1374,52 @@ begin
     if Result then Url := UrlPath;
   end;
 
+end;
+
+{************************************************************************************}
+Function  AlIsHttpOrHttpsUrl(const AUrl: AnsiString): Boolean;
+begin
+  var LLowUrl := low(AUrl);
+  Result := (AUrl <> '') and
+            (length(AUrl) > 7) and
+            (AUrl[LLowUrl] in ['h','H']) and
+            (AUrl[LLowUrl+1] in ['t','T']) and
+            (AUrl[LLowUrl+2] in ['t','T']) and
+            (AUrl[LLowUrl+3] in ['p','P']);
+  if Result then begin
+    Result := (length(AUrl) > 8) and
+              (AUrl[LLowUrl+4] in ['s','S']) and
+              (AUrl[LLowUrl+5] = ':') and
+              (AUrl[LLowUrl+6] = '/') and
+              (AUrl[LLowUrl+7] = '/');
+    if not result then
+      Result := (AUrl[LLowUrl+4] = ':') and
+                (AUrl[LLowUrl+5] = '/') and
+                (AUrl[LLowUrl+6] = '/');
+  end;
+end;
+
+{************************************************************************************}
+Function  AlIsHttpOrHttpsUrl(const AUrl: String): Boolean;
+begin
+  var LLowUrl := low(AUrl);
+  Result := (AUrl <> '') and
+            (length(AUrl) > 7) and
+            (charInSet(AUrl[LLowUrl], ['h','H'])) and
+            (charInSet(AUrl[LLowUrl+1], ['t','T'])) and
+            (charInSet(AUrl[LLowUrl+2], ['t','T'])) and
+            (charInSet(AUrl[LLowUrl+3], ['p','P']));
+  if Result then begin
+    Result := (length(AUrl) > 8) and
+              (charInSet(AUrl[LLowUrl+4], ['s','S'])) and
+              (AUrl[LLowUrl+5] = ':') and
+              (AUrl[LLowUrl+6] = '/') and
+              (AUrl[LLowUrl+7] = '/');
+    if not result then
+      Result := (AUrl[LLowUrl+4] = ':') and
+                (AUrl[LLowUrl+5] = '/') and
+                (AUrl[LLowUrl+6] = '/');
+  end;
 end;
 
 {************************************************************************************}

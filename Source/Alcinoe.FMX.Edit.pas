@@ -646,12 +646,12 @@ type
         procedure AlignToPixel; override;
       published
         property Font;
-        property Trimming;
-        property MaxLines;
         property Ellipsis;
+        property MaxLines;
+        property IsHtml;
+        property Trimming;
         property LineHeightMultiplier;
         property LetterSpacing;
-        property IsHtml;
         property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TLabelTextLayout read FLayout write SetLayout default TLabelTextLayout.Floating;
         property Animation: TLabelTextAnimation read FAnimation write SetAnimation default TLabelTextAnimation.Translation;
@@ -689,12 +689,12 @@ type
         procedure AlignToPixel; override;
       published
         property Font;
-        property Trimming;
-        property MaxLines;
         property Ellipsis;
+        property MaxLines;
+        property IsHtml;
+        property Trimming;
         property LineHeightMultiplier;
         property LetterSpacing;
-        property IsHtml;
         property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TSupportingTextLayout read FLayout write SetLayout default TSupportingTextLayout.Floating;
       end;
@@ -5553,13 +5553,14 @@ begin
     //--
     //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
-    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
-    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageNoRadius: Boolean; // default = False
+    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -5678,13 +5679,14 @@ begin
     //--
     //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
-    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
-    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageNoRadius: Boolean; // default = False
+    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -5803,13 +5805,14 @@ begin
     //--
     //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
-    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
-    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageNoRadius: Boolean; // default = False
+    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -6181,6 +6184,7 @@ begin
           LocalRect, // const Rect: TrectF;
           AbsoluteOpacity, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
           True, // const ADrawStateLayerOnTop: Boolean;
@@ -6223,6 +6227,7 @@ begin
             LocalRect, // const Rect: TrectF;
             1, // const AOpacity: Single;
             LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+            nil, // const AFillResourceStream: TStream;
             LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
             LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
             True, // const ADrawStateLayerOnTop: Boolean;

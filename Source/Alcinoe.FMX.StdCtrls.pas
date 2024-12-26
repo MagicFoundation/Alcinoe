@@ -1433,14 +1433,14 @@ type
       published
         property Font;
         property Decoration;
-        property Trimming;
-        property MaxLines;
         property Ellipsis;
+        property MaxLines;
+        property IsHtml;
+        property Trimming;
         property HorzAlign;
         property VertAlign;
         property LineHeightMultiplier;
         property LetterSpacing;
-        property IsHtml;
       end;
       // ---------------
       // TBaseStateStyle
@@ -3840,6 +3840,7 @@ begin
         LocalRect, // const Rect: TrectF;
         AbsoluteOpacity, // const AOpacity: Single;
         LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+        nil, // const AFillResourceStream: TStream;
         LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
         TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
         True, // const ADrawStateLayerOnTop: Boolean;
@@ -3882,6 +3883,7 @@ begin
           LRect, // const Rect: TrectF;
           AbsoluteOpacity, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
           True, // const ADrawStateLayerOnTop: Boolean;
@@ -5077,6 +5079,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -5101,6 +5104,7 @@ begin
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
+        nil, // const AFillResourceStream: TStream;
         AStateLayer, // const StateLayer: TALStateLayer;
         AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
         ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
@@ -5147,14 +5151,16 @@ begin
           1, // const AOpacity: Single;
           AStopIndicator.Color, // const AFillColor: TAlphaColor;
           TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-          [], // const AFillGradientColors: TArray<TAlphaColor>;
-          [], // const AFillGradientOffsets: TArray<Single>;
           TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
           TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+          [], // const AFillGradientColors: TArray<TAlphaColor>;
+          [], // const AFillGradientOffsets: TArray<Single>;
           AStopIndicator.ResourceName, // const AFillResourceName: String;
-          AStopIndicator.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+          nil, // const AFillResourceStream: TStream;
           TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
           TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+          False, // Const AFillImageNoRadius: Boolean;
+          AStopIndicator.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
           0, // const AStateLayerOpacity: Single;
           TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
           TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -5225,6 +5231,7 @@ begin
       LocalRect, // const Rect: TrectF;
       AbsoluteOpacity, // const AOpacity: Single;
       LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+      nil, // const AFillResourceStream: TStream;
       LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
       TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
       True, // const ADrawStateLayerOnTop: Boolean;
@@ -7737,28 +7744,20 @@ end;
 
 {********************************************************}
 procedure TALBaseCheckBox.SetXRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FXRadius := NewValue;
+    FXRadius := Value;
     Repaint;
   end;
 end;
 
 {********************************************************}
 procedure TALBaseCheckBox.SetYRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FYRadius := NewValue;
+    FYRadius := Value;
     Repaint;
   end;
 end;
@@ -8133,14 +8132,16 @@ begin
       1, // const AOpacity: Single;
       ACheckMark.Color, // const AFillColor: TAlphaColor;
       TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
       TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
       TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
       ACheckMark.ResourceName, // const AFillResourceName: String;
-      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      nil, // const AFillResourceStream: TStream;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+      False, // Const AFillImageNoRadius: Boolean;
+      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
       0, // const AStateLayerOpacity: Single;
       TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
       TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -8180,6 +8181,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   if ACheckMark.HasCheckMark then begin
@@ -8209,6 +8211,7 @@ begin
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
+        nil, // const AFillResourceStream: TStream;
         AStateLayer, // const StateLayer: TALStateLayer;
         ACheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
         False, // const ADrawStateLayerOnTop: Boolean;
@@ -8300,6 +8303,7 @@ begin
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
+                            nil, // const AFillResourceStream: TStream;
                             LCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
@@ -8324,6 +8328,7 @@ begin
           LRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           LCurrentAdjustedStateStyle.CheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
           False, // const ADrawStateLayerOnTop: Boolean;
@@ -8380,6 +8385,7 @@ begin
           LRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           LCurrentAdjustedStateStyle.CheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
           False, // const ADrawStateLayerOnTop: Boolean;
@@ -8709,14 +8715,16 @@ begin
       1, // const AOpacity: Single;
       ACheckMark.Color, // const AFillColor: TAlphaColor;
       TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
       TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
       TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
       ACheckMark.ResourceName, // const AFillResourceName: String;
-      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      nil, // const AFillResourceStream: TStream;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+      False, // Const AFillImageNoRadius: Boolean;
+      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
       0, // const AStateLayerOpacity: Single;
       TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
       TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -8743,14 +8751,16 @@ begin
       1, // const AOpacity: Single;
       ACheckMark.Color, // const AFillColor: TAlphaColor;
       TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
       TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
       TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
+      [], // const AFillGradientColors: TArray<TAlphaColor>;
+      [], // const AFillGradientOffsets: TArray<Single>;
       ACheckMark.ResourceName, // const AFillResourceName: String;
-      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      nil, // const AFillResourceStream: TStream;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+      False, // Const AFillImageNoRadius: Boolean;
+      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
       0, // const AStateLayerOpacity: Single;
       TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
       TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -9334,28 +9344,20 @@ end;
 
 {*********************************************************}
 procedure TALSwitch.TTrack.SetXRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FXRadius := NewValue;
+    FXRadius := Value;
     Repaint;
   end;
 end;
 
 {*********************************************************}
 procedure TALSwitch.TTrack.SetYRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FYRadius := NewValue;
+    FYRadius := Value;
     Repaint;
   end;
 end;
@@ -9525,6 +9527,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -9549,6 +9552,7 @@ begin
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
+        nil, // const AFillResourceStream: TStream;
         AStateLayer, // const StateLayer: TALStateLayer;
         TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
         False, // const ADrawStateLayerOnTop: Boolean;
@@ -9633,6 +9637,7 @@ begin
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
+                            nil, // const AFillResourceStream: TStream;
                             LCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
@@ -9657,6 +9662,7 @@ begin
           LRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
           False, // const ADrawStateLayerOnTop: Boolean;
@@ -9704,6 +9710,7 @@ begin
           LRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
+          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
           False, // const ADrawStateLayerOnTop: Boolean;

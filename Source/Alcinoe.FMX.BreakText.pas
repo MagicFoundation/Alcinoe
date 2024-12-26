@@ -85,13 +85,14 @@ type
     //--
     FillColor: TAlphaColor; // default = TAlphaColors.null
     FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    FillGradientAngle: Single; // Default = 180;
     FillGradientColors: TArray<TAlphaColor>; // Default = [];
     FillGradientOffsets: TArray<Single>; // Default = [];
-    FillGradientAngle: Single; // Default = 180;
     FillResourceName: String; // default = ''
-    FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
+    FillImageNoRadius: Boolean; // default = False
+    FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
     //--
     StateLayerOpacity: Single; // Default = 0
     StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -276,6 +277,7 @@ function ALGetTextElementsByID(Const ATextElements: TALTextElements; Const AId: 
 implementation
 
 uses
+  System.Classes,
   System.Math.Vectors,
   system.SysUtils,
   System.Character,
@@ -376,13 +378,14 @@ begin
   //--
   FillColor := TAlphaColors.Null;
   FillGradientStyle := TGradientStyle.Linear;
+  FillGradientAngle := 180;
   FillGradientColors := [];
   FillGradientOffsets := [];
-  FillGradientAngle := 180;
   FillResourceName := '';
-  FillWrapMode := TALImageWrapMode.Fit;
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
+  FillImageNoRadius := False;
+  FillWrapMode := TALImageWrapMode.Fit;
   //--
   StateLayerOpacity := 0;
   StateLayerColor := TAlphaColors.null;
@@ -460,13 +463,14 @@ begin
   //--
   FillColor := Source.FillColor;
   FillGradientStyle := Source.FillGradientStyle;
+  FillGradientAngle := Source.FillGradientAngle;
   FillGradientColors := Source.FillGradientColors;
   FillGradientOffsets := Source.FillGradientOffsets;
-  FillGradientAngle := Source.FillGradientAngle;
   FillResourceName := Source.FillResourceName;
-  FillWrapMode := Source.FillWrapMode;
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
+  FillImageNoRadius := Source.FillImageNoRadius;
+  FillWrapMode := Source.FillWrapMode;
   //--
   StateLayerOpacity := Source.StateLayerOpacity;
   StateLayerColor := Source.StateLayerColor;
@@ -2451,6 +2455,7 @@ begin
                                     LOptions.FillColor, // const AFillColor: TAlphaColor;
                                     LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                                     LOptions.FillResourceName, // const AFillResourceName: String;
+                                    nil, // const AFillResourceStream: TStream;
                                     LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                                     LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                                     LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -2536,13 +2541,15 @@ begin
                       1, //const AOpacity: Single;
                       LOptions.FillColor, // const AFillColor: TAlphaColor;
                       LOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+                      LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
                       LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                       LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-                      LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
                       LOptions.FillResourceName, // const AFillResourceName: String;
-                      LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+                      nil, // const AFillResourceStream: TStream;
                       LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                       LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
+                      LOptions.FillImageNoRadius, // Const AFillImageNoRadius: Boolean;
+                      LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
                       LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
                       LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
                       LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
@@ -3729,6 +3736,7 @@ begin
                             LOptions.FillColor, // const AFillColor: TAlphaColor;
                             LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LOptions.FillResourceName, // const AFillResourceName: String;
+                            nil, // const AFillResourceStream: TStream;
                             LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                             LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                             LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -3838,13 +3846,15 @@ begin
               1, //const AOpacity: Single;
               LOptions.FillColor, // const AFillColor: TAlphaColor;
               LOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
+              LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
               LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
               LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-              LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
               LOptions.FillResourceName, // const AFillResourceName: String;
-              LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+              nil, // const AFillResourceStream: TStream;
               LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
               LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
+              LOptions.FillImageNoRadius, // Const AFillImageNoRadius: Boolean;
+              LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
               LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
               LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
               LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;

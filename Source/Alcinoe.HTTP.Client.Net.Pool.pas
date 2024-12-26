@@ -211,9 +211,7 @@ begin
 
         //get from the url
         if LNetHttpClientPoolRequest.Url <> '' then begin
-          var LLowerUrl := LNetHttpClientPoolRequest.Url.ToLower;
-          if (ALPosW('http://',LLowerUrl) = 1) or
-             (ALPosW('https://',LLowerUrl) = 1) then begin
+          if AlIsHttpOrHttpsUrl(LNetHttpClientPoolRequest.Url) then begin
             if LNetHttpClientPoolRequest.UseCache then begin
               if (not assigned(RetrieveCachedData)) or
                  (not RetrieveCachedData(LNetHttpClientPoolRequest.Url, LHTTPResponse, LResponseContent)) then begin

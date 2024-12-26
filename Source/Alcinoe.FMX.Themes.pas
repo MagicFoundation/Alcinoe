@@ -192,22 +192,22 @@ begin
       var LPrevIsHtml := TextSettings.IsHtml;
       TextSettings.Reset;
       TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * LRatio, -2);
-      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
       TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
       //--
       LPrevIsHtml := LabelTextSettings.IsHtml;
       LabelTextSettings.Reset;
       LabelTextSettings.Font.Size := RoundTo(LabelTextSettings.Font.DefaultSize * LRatio, -2);
+      LabelTextSettings.IsHtml := LPrevIsHtml;
       LabelTextSettings.LetterSpacing := RoundTo(LabelTextSettings.DefaultLetterSpacing * LRatio, -2);
       LabelTextSettings.Margins.Rect := ALScaleRect(LabelTextSettings.Margins.DefaultValue, LRatio).RoundTo(-2);
-      LabelTextSettings.IsHtml := LPrevIsHtml;
       //--
       LPrevIsHtml := SupportingTextSettings.IsHtml;
       SupportingTextSettings.Reset;
       SupportingTextSettings.Font.Size := RoundTo(SupportingTextSettings.Font.DefaultSize * LRatio, -2);
+      SupportingTextSettings.IsHtml := LPrevIsHtml;
       SupportingTextSettings.LetterSpacing := RoundTo(SupportingTextSettings.DefaultLetterSpacing * LRatio, -2);
       //SupportingTextSettings.Margins.Rect := ALScaleRect(SupportingTextSettings.Margins.DefaultValue, LRatio).RoundTo(-2);
-      SupportingTextSettings.IsHtml := LPrevIsHtml;
       //--
       StateStyles.Reset;
     Finally
@@ -911,8 +911,8 @@ begin
       var LPrevIsHtml := TextSettings.IsHtml;
       TextSettings.Reset;
       TextSettings.Font.Size := RoundTo(TextSettings.Font.DefaultSize * LRatio, -2);
-      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
       TextSettings.IsHtml := LPrevIsHtml;
+      TextSettings.LetterSpacing := RoundTo(TextSettings.DefaultLetterSpacing * LRatio, -2);
       StateStyles.Reset;
     Finally
       EndUpdate;

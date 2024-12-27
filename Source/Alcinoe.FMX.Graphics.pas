@@ -208,7 +208,7 @@ function ALCreateEmptyDrawable1x1: TALDrawable;
 //////////////////////////////////////////////
 
 {$REGION ' Load and FitInto'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or lower than w or h
+// Resize the src image ensuring that one side fit w or h keeping the other side equal or lower than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
@@ -249,7 +249,7 @@ function ALLoadFromFileAndFitIntoToDrawable(const AFileName: String; const W, H:
 {$ENDREGION}
 
 {$REGION ' Load and FitInto to RoundRect'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
+// Resize the src image within a round rectangle, ensuring that one side fit w or h keeping the other side equal or lower than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
@@ -290,7 +290,7 @@ function ALLoadFromFileAndFitIntoToRoundRectDrawable(const AFileName: String; co
 {$ENDREGION}
 
 {$REGION ' Load and FitInto to Circle'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
+// Resize the src image within a circle, ensuring that one side fit w or h keeping the other side equal or lower than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToCircleSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoToCircleSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
@@ -331,7 +331,7 @@ function ALLoadFromFileAndFitIntoToCircleDrawable(const AFileName: String; const
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Blur'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
+// Blur and resize the src image ensuring that one side fit w or h keeping the other side equal or lower than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
@@ -372,7 +372,7 @@ function ALLoadFromFileAndFitIntoAndBlurToDrawable(const AFileName: String; cons
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Blur to RoundRect'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
+// Blur and resize the src image within a round rectangle, ensuring that one side fit w or h keeping the other side equal or lower than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndBlurToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndBlurToRoundRectSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
@@ -413,7 +413,7 @@ function ALLoadFromFileAndFitIntoAndBlurToRoundRectDrawable(const AFileName: Str
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Blur to Circle'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
+// Blur and resize the src image within a circle, ensuring that one side fit w or h keeping the other side equal or lower than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
@@ -454,7 +454,7 @@ function ALLoadFromFileAndFitIntoAndBlurToCircleDrawable(const AFileName: String
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
+// Resize the src image ensuring that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -495,7 +495,7 @@ function ALLoadFromFileAndFitIntoAndCropToDrawable(const AFileName: String; cons
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop to RoundRect'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as round rect
+// Resize the src image within a round rectangle, ensuring that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -536,7 +536,7 @@ function ALLoadFromFileAndFitIntoAndCropToRoundRectDrawable(const AFileName: Str
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop to Circle'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
+// Resize the src image within a circle, ensuring that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStream; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -577,7 +577,7 @@ function ALLoadFromFileAndFitIntoAndCropToCircleDrawable(const AFileName: String
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop and Blur'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as rect
+// Blur and resize the src image ensuring that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -618,7 +618,7 @@ function ALLoadFromFileAndFitIntoAndCropAndBlurToDrawable(const AFileName: Strin
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop and Blur to RoundRect'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as round rect
+// Blur and resize the src image within a round rectangle, ensuring that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToRoundRectSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -659,7 +659,7 @@ function ALLoadFromFileAndFitIntoAndCropAndBlurToRoundRectDrawable(const AFileNa
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop and Blur to Circle'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image as circle
+// Blur and resize the src image within a circle, ensuring that one side fit w or h keeping the other side equal or bigger than w or h and then crop the src image
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
@@ -782,7 +782,7 @@ function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto'}
-// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+// Resize the src image ensuring that if any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoToSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
@@ -823,7 +823,7 @@ function ALLoadFromFileAndPlaceIntoToDrawable(const AFileName: String; const W, 
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto to RoundRect'}
-// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+// Resize the src image within a round rectangle, ensuring that if any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
@@ -864,7 +864,7 @@ function ALLoadFromFileAndPlaceIntoToRoundRectDrawable(const AFileName: String; 
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto to Circle'}
-// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+// Resize the src image within a circle, ensuring that if any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoToCircleSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
@@ -905,7 +905,7 @@ function ALLoadFromFileAndPlaceIntoToCircleDrawable(const AFileName: String; con
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto and Blur'}
-// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+// Blur and resize the src image ensuring that if any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
@@ -946,7 +946,7 @@ function ALLoadFromFileAndPlaceIntoAndBlurToDrawable(const AFileName: String; co
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto and Blur to RoundRect'}
-// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+// Blur and resize the src image within a round rectangle, ensuring that if any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
@@ -987,7 +987,7 @@ function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectDrawable(const AFileName: S
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto and Blur to Circle'}
-// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+// Blur and resize the src image within a circle, ensuring that if any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;

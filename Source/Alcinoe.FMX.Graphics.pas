@@ -249,7 +249,7 @@ function ALLoadFromFileAndFitIntoToDrawable(const AFileName: String; const W, H:
 {$ENDREGION}
 
 {$REGION ' Load and FitInto to RoundRect'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h as round rect
+// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
@@ -290,7 +290,7 @@ function ALLoadFromFileAndFitIntoToRoundRectDrawable(const AFileName: String; co
 {$ENDREGION}
 
 {$REGION ' Load and FitInto to Circle'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h as circle
+// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoToCircleSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoToCircleSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
@@ -331,7 +331,7 @@ function ALLoadFromFileAndFitIntoToCircleDrawable(const AFileName: String; const
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Blur'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h as rect
+// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndBlurToSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
@@ -372,7 +372,7 @@ function ALLoadFromFileAndFitIntoAndBlurToDrawable(const AFileName: String; cons
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Blur to RoundRect'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h as round rect
+// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndBlurToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndBlurToRoundRectSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
@@ -413,7 +413,7 @@ function ALLoadFromFileAndFitIntoAndBlurToRoundRectDrawable(const AFileName: Str
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Blur to Circle'}
-// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h as circle
+// Resize the src image to make that one side fit w or h keeping the other side equal or bigger than w or h
 {$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndFitIntoAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 function ALLoadFromStreamAndFitIntoAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
@@ -822,6 +822,88 @@ function ALLoadFromResourceAndPlaceIntoToDrawable(const AResName: String; const 
 function ALLoadFromFileAndPlaceIntoToDrawable(const AFileName: String; const W, H: single): TALDrawable;
 {$ENDREGION}
 
+{$REGION ' Load and PlaceInto to RoundRect'}
+// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+function ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+function ALLoadFromResourceAndPlaceIntoToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+function ALLoadFromFileAndPlaceIntoToRoundRectSkSurface(const AFileName: String; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+//--
+function ALLoadFromStreamAndPlaceIntoToRoundRectSkImage(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_image_t;
+function ALLoadFromResourceAndPlaceIntoToRoundRectSkImage(const AResName: String; const W, H: single; const XRadius, YRadius: single): sk_image_t;
+function ALLoadFromFileAndPlaceIntoToRoundRectSkImage(const AFileName: String; const W, H: single; const XRadius, YRadius: single): sk_image_t;
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoToRoundRectJBitmap(const ABitmap: JBitmap; const W, H: single; const XRadius, YRadius: single): JBitmap;
+function ALLoadFromStreamAndPlaceIntoToRoundRectJBitmap(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): JBitmap;
+function ALLoadFromResourceAndPlaceIntoToRoundRectJBitmap(const AResName: String; const W, H: single; const XRadius, YRadius: single): JBitmap;
+function ALLoadFromFileAndPlaceIntoToRoundRectJBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single): JBitmap;
+{$ENDIF}
+
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+function ALLoadFromStreamAndPlaceIntoToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+function ALLoadFromResourceAndPlaceIntoToRoundRectCGContextRef(const AResName: String; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+function ALLoadFromFileAndPlaceIntoToRoundRectCGContextRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+//--
+function ALLoadFromStreamAndPlaceIntoToRoundRectCGImageRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): CGImageRef;
+function ALLoadFromResourceAndPlaceIntoToRoundRectCGImageRef(const AResName: String; const W, H: single; const XRadius, YRadius: single): CGImageRef;
+function ALLoadFromFileAndPlaceIntoToRoundRectCGImageRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single): CGImageRef;
+{$ENDIF}
+
+function ALLoadFromBitmapAndPlaceIntoToRoundRectBitmap(const ABitmap: TBitmap; const W, H: single; const XRadius, YRadius: single): TBitmap;
+function ALLoadFromStreamAndPlaceIntoToRoundRectBitmap(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): TBitmap;
+function ALLoadFromResourceAndPlaceIntoToRoundRectBitmap(const AResName: String; const W, H: single; const XRadius, YRadius: single): TBitmap;
+function ALLoadFromFileAndPlaceIntoToRoundRectBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single): TBitmap;
+//--
+function ALLoadFromStreamAndPlaceIntoToRoundRectDrawable(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): TALDrawable;
+function ALLoadFromResourceAndPlaceIntoToRoundRectDrawable(const AResName: String; const W, H: single; const XRadius, YRadius: single): TALDrawable;
+function ALLoadFromFileAndPlaceIntoToRoundRectDrawable(const AFileName: String; const W, H: single; const XRadius, YRadius: single): TALDrawable;
+{$ENDREGION}
+
+{$REGION ' Load and PlaceInto to Circle'}
+// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
+function ALLoadFromStreamAndPlaceIntoToCircleSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+function ALLoadFromResourceAndPlaceIntoToCircleSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+function ALLoadFromFileAndPlaceIntoToCircleSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
+//--
+function ALLoadFromStreamAndPlaceIntoToCircleSkImage(const AStream: TStream; const W, H: single): sk_image_t;
+function ALLoadFromResourceAndPlaceIntoToCircleSkImage(const AResName: String; const W, H: single): sk_image_t;
+function ALLoadFromFileAndPlaceIntoToCircleSkImage(const AFileName: String; const W, H: single): sk_image_t;
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoToCircleJBitmap(const ABitmap: JBitmap; const W, H: single): JBitmap;
+function ALLoadFromStreamAndPlaceIntoToCircleJBitmap(const AStream: TStream; const W, H: single): JBitmap;
+function ALLoadFromResourceAndPlaceIntoToCircleJBitmap(const AResName: String; const W, H: single): JBitmap;
+function ALLoadFromFileAndPlaceIntoToCircleJBitmap(const AFileName: String; const W, H: single): JBitmap;
+{$ENDIF}
+
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoToCircleCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
+function ALLoadFromStreamAndPlaceIntoToCircleCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
+function ALLoadFromResourceAndPlaceIntoToCircleCGContextRef(const AResName: String; const W, H: single): CGContextRef;
+function ALLoadFromFileAndPlaceIntoToCircleCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
+//--
+function ALLoadFromStreamAndPlaceIntoToCircleCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
+function ALLoadFromResourceAndPlaceIntoToCircleCGImageRef(const AResName: String; const W, H: single): CGImageRef;
+function ALLoadFromFileAndPlaceIntoToCircleCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
+{$ENDIF}
+
+function ALLoadFromBitmapAndPlaceIntoToCircleBitmap(const ABitmap: TBitmap; const W, H: single): TBitmap;
+function ALLoadFromStreamAndPlaceIntoToCircleBitmap(const AStream: TStream; const W, H: single): TBitmap;
+function ALLoadFromResourceAndPlaceIntoToCircleBitmap(const AResName: String; const W, H: single): TBitmap;
+function ALLoadFromFileAndPlaceIntoToCircleBitmap(const AFileName: String; const W, H: single): TBitmap;
+//--
+function ALLoadFromStreamAndPlaceIntoToCircleDrawable(const AStream: TStream; const W, H: single): TALDrawable;
+function ALLoadFromResourceAndPlaceIntoToCircleDrawable(const AResName: String; const W, H: single): TALDrawable;
+function ALLoadFromFileAndPlaceIntoToCircleDrawable(const AFileName: String; const W, H: single): TALDrawable;
+{$ENDREGION}
+
 {$REGION ' Load and PlaceInto and Blur'}
 // If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
 {$IF defined(ALSkiaAvailable)}
@@ -861,6 +943,88 @@ function ALLoadFromFileAndPlaceIntoAndBlurToBitmap(const AFileName: String; cons
 function ALLoadFromStreamAndPlaceIntoAndBlurToDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single): TALDrawable;
 function ALLoadFromResourceAndPlaceIntoAndBlurToDrawable(const AResName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
 function ALLoadFromFileAndPlaceIntoAndBlurToDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
+{$ENDREGION}
+
+{$REGION ' Load and PlaceInto and Blur to RoundRect'}
+// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+//--
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_image_t;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_image_t;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_image_t;
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoAndBlurToRoundRectJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+{$ENDIF}
+
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoAndBlurToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+//--
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGImageRef;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGImageRef;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGImageRef;
+{$ENDIF}
+
+function ALLoadFromBitmapAndPlaceIntoAndBlurToRoundRectBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+//--
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TALDrawable;
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectDrawable(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TALDrawable;
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TALDrawable;
+{$ENDREGION}
+
+{$REGION ' Load and PlaceInto and Blur to Circle'}
+// If any dimension of the image is greater than W or H then the image is scaled down to best fit W and H
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+//--
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_image_t;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkImage(const AResName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
+{$ENDIF}
+
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoAndBlurToCircleJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single): JBitmap;
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single): JBitmap;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single): JBitmap;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): JBitmap;
+{$ENDIF}
+
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoAndBlurToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single): CGContextRef;
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGContextRef;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
+//--
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGImageRef;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
+{$ENDIF}
+
+function ALLoadFromBitmapAndPlaceIntoAndBlurToCircleBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single): TBitmap;
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single): TBitmap;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleBitmap(const AResName: String; const W, H: single; const ABlurRadius: single): TBitmap;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): TBitmap;
+//--
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single): TALDrawable;
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleDrawable(const AResName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
 {$ENDREGION}
 
 {$REGION ' Load and Stretch'}
@@ -9874,7 +10038,7 @@ end;
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndPlaceIntoToJBitmap(const ABitmap: JBitmap; const W, H: single): JBitmap;
 begin
-  var LSrcRect := TrectF.Create(0, 0, ABitmap.GetWidth, ABitmap.Getheight);
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.getWidth, ABitmap.getHeight);
   var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
   Result := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(ABitmap, LDestRect.Width, LDestRect.Height);
 end;
@@ -10070,7 +10234,7 @@ end;
 {*************************************************************************************************}
 function ALLoadFromBitmapAndPlaceIntoToBitmap(const ABitmap: TBitmap; const W, H: single): TBitmap;
 begin
-  var LSrcRect := TrectF.Create(0, 0, ABitmap.Width, ABitmap.height);
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
   var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
   Result := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, LDestRect.Width, LDestRect.Height);
 end;
@@ -10245,6 +10409,992 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(AImage, LDestRect.Width, LDestRect.Height, XRadius, YRadius);
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoToRoundRectSkSurface(const AResName: String; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(LStream, W, H, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoToRoundRectSkSurface(const AFileName: String; const W, H: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoToRoundRectSkImage(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): sk_image_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      var LSurface := ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
+      try
+        Result := ALCreateSkImageFromSkSurface(LSurface);
+      finally
+        sk4d_refcnt_unref(LSurface);
+      end;
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoToRoundRectSkImage(const AResName: String; const W, H: single; const XRadius, YRadius: single): sk_image_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToRoundRectSkImage(LStream, W, H, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoToRoundRectSkImage(const AFileName: String; const W, H: single; const XRadius, YRadius: single): sk_image_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    var LSurface := ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
+    try
+      Result := ALCreateSkImageFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoToRoundRectJBitmap(const ABitmap: JBitmap; const W, H: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.getWidth, ABitmap.getHeight);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromJBitmapAndFitIntoAndCropToRoundRectJBitmap(ABitmap, LDestRect.Width, LDestRect.Height, XRadius, YRadius);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromStreamAndPlaceIntoToRoundRectJBitmap(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LLength := AStream.Size-AStream.Position;
+  var LArray := TJavaArray<Byte>.Create(LLength);
+  try
+    AStream.ReadBuffer(LArray.Data^, LLength);
+    var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
+    try
+      Result := ALLoadFromJBitmapAndPlaceIntoToRoundRectJBitmap(LBitmap, W, H, XRadius, YRadius);
+    finally
+      if not LBitmap.equals(Result) then LBitmap.recycle;
+      LBitmap := nil;
+    end;
+    LOptions := nil;
+  finally
+    ALfreeandNil(LArray);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromResourceAndPlaceIntoToRoundRectJBitmap(const AResName: String; const W, H: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToRoundRectJBitmap(LStream, W, H, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromFileAndPlaceIntoToRoundRectJBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+  if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+  var LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+  if LBitmap = nil then raise Exception.create('Failed to load bitmap from file');
+  try
+    Result := ALLoadFromJBitmapAndPlaceIntoToRoundRectJBitmap(LBitmap, W, H, XRadius, YRadius);
+  finally
+    if not LBitmap.equals(Result) then LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  LOptions := nil;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromOSImageAndFitIntoAndCropToRoundRectCGContextRef(AImage, LDestRect.Width, LDestRect.Height, XRadius, YRadius);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LBuffer: Pointer := nil;
+  var LLength: Int64 := 0;
+  var LMemoryStream: TCustomMemoryStream := nil;
+  if (AStream is TCustomMemoryStream) and (AStream.Position = 0) then begin
+    LBuffer := TCustomMemoryStream(AStream).Memory;
+    LLength := AStream.Size;
+    AStream.Position := AStream.Size;
+  end
+  else LMemoryStream := TMemoryStream.Create;
+  try
+    if LMemoryStream <> nil then begin
+      LMemoryStream.CopyFrom(AStream, AStream.Size - AStream.Position);
+      LBuffer := LMemoryStream.Memory;
+      LLength := LMemoryStream.Size;
+    end;
+    var LData := TNSData.Wrap(
+                   TNSData.alloc.initWithBytesNoCopy(
+                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    try
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
+      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      try
+        result := ALLoadFromOSImageAndPlaceIntoToRoundRectCGContextRef(LImage, W, H, XRadius, YRadius);
+      finally
+        LImage.release;
+      end;
+    finally
+      LData.release;
+    end;
+  finally
+    ALFreeAndNil(LMemoryStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoToRoundRectCGContextRef(const AResName: String; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToRoundRectCGContextRef(LStream, W, H, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoToRoundRectCGContextRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
+  if LImage = nil then raise Exception.create('Failed to load image from file');
+  try
+    result := ALLoadFromOSImageAndPlaceIntoToRoundRectCGContextRef(LImage, W, H, XRadius, YRadius);
+  finally
+    LImage.release;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoToRoundRectCGImageRef(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromStreamAndPlaceIntoToRoundRectCGContextRef(AStream, W, H, XRadius, YRadius);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoToRoundRectCGImageRef(const AResName: String; const W, H: single; const XRadius, YRadius: single): CGImageRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToRoundRectCGImageRef(LStream, W, H, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoToRoundRectCGImageRef(const AFileName: String; const W, H: single; const XRadius, YRadius: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromFileAndPlaceIntoToRoundRectCGContextRef(AFileName, W, H, XRadius, YRadius);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{******************************************************************************************************************************************}
+function ALLoadFromBitmapAndPlaceIntoToRoundRectBitmap(const ABitmap: TBitmap; const W, H: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromBitmapAndFitIntoAndCropToRoundRectBitmap(ABitmap, LDestRect.Width, LDestRect.Height, XRadius, YRadius);
+end;
+
+{******************************************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoToRoundRectBitmap(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromStream(aStream);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoToRoundRectBitmap(LBitmap, W, H, XRadius, YRadius);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{********************************************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoToRoundRectBitmap(const AResName: String; const W, H: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToRoundRectBitmap(LStream, W, H, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{*****************************************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoToRoundRectBitmap(const AFileName: String; const W, H: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromFile(AFileName);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoToRoundRectBitmap(LBitmap, W, H, XRadius, YRadius);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{************************************************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoToRoundRectDrawable(const AStream: TStream; const W, H: single; const XRadius, YRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndPlaceIntoToRoundRectSkImage(AStream, W, H, XRadius, YRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(AStream, W, H, XRadius, YRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(AStream, W, H, XRadius, YRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromStreamAndPlaceIntoToRoundRectJBitmap(AStream, W, H, XRadius, YRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromStreamAndPlaceIntoToRoundRectCGContextRef(AStream, W, H, XRadius, YRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromStreamAndPlaceIntoToRoundRectBitmap(AStream, W, H, XRadius, YRadius);
+  {$ENDIF}
+end;
+
+{**************************************************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoToRoundRectDrawable(const AResName: String; const W, H: single; const XRadius, YRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndPlaceIntoToRoundRectSkImage(AResName, W, H, XRadius, YRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndPlaceIntoToRoundRectSkSurface(AResName, W, H, XRadius, YRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndPlaceIntoToRoundRectSkSurface(AResName, W, H, XRadius, YRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromResourceAndPlaceIntoToRoundRectJBitmap(AResName, W, H, XRadius, YRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromResourceAndPlaceIntoToRoundRectCGContextRef(AResName, W, H, XRadius, YRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromResourceAndPlaceIntoToRoundRectBitmap(AResName, W, H, XRadius, YRadius);
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoToRoundRectDrawable(const AFileName: String; const W, H: single; const XRadius, YRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndPlaceIntoToRoundRectSkImage(AFileName, W, H, XRadius, YRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndPlaceIntoToRoundRectSkSurface(AFileName, W, H, XRadius, YRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndPlaceIntoToRoundRectSkSurface(AFileName, W, H, XRadius, YRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromFileAndPlaceIntoToRoundRectJBitmap(AFileName, W, H, XRadius, YRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromFileAndPlaceIntoToRoundRectCGContextRef(AFileName, W, H, XRadius, YRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromFileAndPlaceIntoToRoundRectBitmap(AFileName, W, H, XRadius, YRadius);
+  {$ENDIF}
+end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(const AImage: sk_image_t; const W, H: single): sk_surface_t;
+begin
+  var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(AImage, LDestRect.Width, LDestRect.Height);
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoToCircleSkSurface(const AStream: TStream; const W, H: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(LImage, W, H);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoToCircleSkSurface(const AResName: String; const W, H: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToCircleSkSurface(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoToCircleSkSurface(const AFileName: String; const W, H: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(LImage, W, H);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoToCircleSkImage(const AStream: TStream; const W, H: single): sk_image_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      var LSurface := ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(LImage, W, H);
+      try
+        Result := ALCreateSkImageFromSkSurface(LSurface);
+      finally
+        sk4d_refcnt_unref(LSurface);
+      end;
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoToCircleSkImage(const AResName: String; const W, H: single): sk_image_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToCircleSkImage(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoToCircleSkImage(const AFileName: String; const W, H: single): sk_image_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    var LSurface := ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(LImage, W, H);
+    try
+      Result := ALCreateSkImageFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoToCircleJBitmap(const ABitmap: JBitmap; const W, H: single): JBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.getWidth, ABitmap.getHeight);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromJBitmapAndFitIntoAndCropToCircleJBitmap(ABitmap, LDestRect.Width, LDestRect.Height);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromStreamAndPlaceIntoToCircleJBitmap(const AStream: TStream; const W, H: single): JBitmap;
+begin
+  var LLength := AStream.Size-AStream.Position;
+  var LArray := TJavaArray<Byte>.Create(LLength);
+  try
+    AStream.ReadBuffer(LArray.Data^, LLength);
+    var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
+    try
+      Result := ALLoadFromJBitmapAndPlaceIntoToCircleJBitmap(LBitmap, W, H);
+    finally
+      if not LBitmap.equals(Result) then LBitmap.recycle;
+      LBitmap := nil;
+    end;
+    LOptions := nil;
+  finally
+    ALfreeandNil(LArray);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromResourceAndPlaceIntoToCircleJBitmap(const AResName: String; const W, H: single): JBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToCircleJBitmap(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromFileAndPlaceIntoToCircleJBitmap(const AFileName: String; const W, H: single): JBitmap;
+begin
+  var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+  if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+  var LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+  if LBitmap = nil then raise Exception.create('Failed to load bitmap from file');
+  try
+    Result := ALLoadFromJBitmapAndPlaceIntoToCircleJBitmap(LBitmap, W, H);
+  finally
+    if not LBitmap.equals(Result) then LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  LOptions := nil;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoToCircleCGContextRef(const AImage: ALOSImage; const W, H: single): CGContextRef;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromOSImageAndFitIntoAndCropToCircleCGContextRef(AImage, LDestRect.Width, LDestRect.Height);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoToCircleCGContextRef(const AStream: TStream; const W, H: single): CGContextRef;
+begin
+  var LBuffer: Pointer := nil;
+  var LLength: Int64 := 0;
+  var LMemoryStream: TCustomMemoryStream := nil;
+  if (AStream is TCustomMemoryStream) and (AStream.Position = 0) then begin
+    LBuffer := TCustomMemoryStream(AStream).Memory;
+    LLength := AStream.Size;
+    AStream.Position := AStream.Size;
+  end
+  else LMemoryStream := TMemoryStream.Create;
+  try
+    if LMemoryStream <> nil then begin
+      LMemoryStream.CopyFrom(AStream, AStream.Size - AStream.Position);
+      LBuffer := LMemoryStream.Memory;
+      LLength := LMemoryStream.Size;
+    end;
+    var LData := TNSData.Wrap(
+                   TNSData.alloc.initWithBytesNoCopy(
+                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    try
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
+      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      try
+        result := ALLoadFromOSImageAndPlaceIntoToCircleCGContextRef(LImage, W, H);
+      finally
+        LImage.release;
+      end;
+    finally
+      LData.release;
+    end;
+  finally
+    ALFreeAndNil(LMemoryStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoToCircleCGContextRef(const AResName: String; const W, H: single): CGContextRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToCircleCGContextRef(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoToCircleCGContextRef(const AFileName: String; const W, H: single): CGContextRef;
+begin
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
+  if LImage = nil then raise Exception.create('Failed to load image from file');
+  try
+    result := ALLoadFromOSImageAndPlaceIntoToCircleCGContextRef(LImage, W, H);
+  finally
+    LImage.release;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoToCircleCGImageRef(const AStream: TStream; const W, H: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromStreamAndPlaceIntoToCircleCGContextRef(AStream, W, H);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoToCircleCGImageRef(const AResName: String; const W, H: single): CGImageRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToCircleCGImageRef(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoToCircleCGImageRef(const AFileName: String; const W, H: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromFileAndPlaceIntoToCircleCGContextRef(AFileName, W, H);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{*******************************************************************************************************}
+function ALLoadFromBitmapAndPlaceIntoToCircleBitmap(const ABitmap: TBitmap; const W, H: single): TBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromBitmapAndFitIntoAndCropToCircleBitmap(ABitmap, LDestRect.Width, LDestRect.Height);
+end;
+
+{*******************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoToCircleBitmap(const AStream: TStream; const W, H: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromStream(aStream);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoToCircleBitmap(LBitmap, W, H);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{*********************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoToCircleBitmap(const AResName: String; const W, H: single): TBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoToCircleBitmap(LStream, W, H);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{******************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoToCircleBitmap(const AFileName: String; const W, H: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromFile(AFileName);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoToCircleBitmap(LBitmap, W, H);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{*************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoToCircleDrawable(const AStream: TStream; const W, H: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndPlaceIntoToCircleSkImage(AStream, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndPlaceIntoToCircleSkSurface(AStream, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndPlaceIntoToCircleSkSurface(AStream, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromStreamAndPlaceIntoToCircleJBitmap(AStream, W, H);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromStreamAndPlaceIntoToCircleCGContextRef(AStream, W, H);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromStreamAndPlaceIntoToCircleBitmap(AStream, W, H);
+  {$ENDIF}
+end;
+
+{***************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoToCircleDrawable(const AResName: String; const W, H: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndPlaceIntoToCircleSkImage(AResName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndPlaceIntoToCircleSkSurface(AResName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndPlaceIntoToCircleSkSurface(AResName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromResourceAndPlaceIntoToCircleJBitmap(AResName, W, H);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromResourceAndPlaceIntoToCircleCGContextRef(AResName, W, H);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromResourceAndPlaceIntoToCircleBitmap(AResName, W, H);
+  {$ENDIF}
+end;
+
+{************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoToCircleDrawable(const AFileName: String; const W, H: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndPlaceIntoToCircleSkImage(AFileName, W, H);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndPlaceIntoToCircleSkSurface(AFileName, W, H);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndPlaceIntoToCircleSkSurface(AFileName, W, H);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromFileAndPlaceIntoToCircleJBitmap(AFileName, W, H);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromFileAndPlaceIntoToCircleCGContextRef(AFileName, W, H);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromFileAndPlaceIntoToCircleBitmap(AFileName, W, H);
+  {$ENDIF}
+end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
 function ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
 begin
   var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
@@ -10367,7 +11517,7 @@ end;
 {$IF defined(ANDROID)}
 function ALLoadFromJBitmapAndPlaceIntoAndBlurToJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single): JBitmap;
 begin
-  var LSrcRect := TrectF.Create(0, 0, ABitmap.GetWidth, ABitmap.Getheight);
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.getWidth, ABitmap.getHeight);
   var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
   Result := ALLoadFromJBitmapAndFitIntoAndCropAndBlurToJBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius);
 end;
@@ -10563,7 +11713,7 @@ end;
 {***********************************************************************************************************************************}
 function ALLoadFromBitmapAndPlaceIntoAndBlurToBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single): TBitmap;
 begin
-  var LSrcRect := TrectF.Create(0, 0, ABitmap.Width, ABitmap.height);
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
   var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
   Result := ALLoadFromBitmapAndFitIntoAndCropAndBlurToBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius);
 end;
@@ -10733,6 +11883,992 @@ begin
   end;
   {$ELSE}
   Result := ALLoadFromFileAndPlaceIntoAndBlurToBitmap(AFileName, W, H, ABlurRadius);
+  {$ENDIF}
+end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToRoundRectSkSurface(AImage, LDestRect.Width, LDestRect.Height, ABlurRadius, XRadius, YRadius);
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(LStream, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_image_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
+      try
+        Result := ALCreateSkImageFromSkSurface(LSurface);
+      finally
+        sk4d_refcnt_unref(LSurface);
+      end;
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkImage(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_image_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkImage(LStream, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): sk_image_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      Result := ALCreateSkImageFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoAndBlurToRoundRectJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.getWidth, ABitmap.getHeight);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromJBitmapAndFitIntoAndCropAndBlurToRoundRectJBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius, XRadius, YRadius);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LLength := AStream.Size-AStream.Position;
+  var LArray := TJavaArray<Byte>.Create(LLength);
+  try
+    AStream.ReadBuffer(LArray.Data^, LLength);
+    var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
+    try
+      Result := ALLoadFromJBitmapAndPlaceIntoAndBlurToRoundRectJBitmap(LBitmap, W, H, ABlurRadius, XRadius, YRadius);
+    finally
+      if not LBitmap.equals(Result) then LBitmap.recycle;
+      LBitmap := nil;
+    end;
+    LOptions := nil;
+  finally
+    ALfreeandNil(LArray);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectJBitmap(LStream, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): JBitmap;
+begin
+  var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+  if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+  var LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+  if LBitmap = nil then raise Exception.create('Failed to load bitmap from file');
+  try
+    Result := ALLoadFromJBitmapAndPlaceIntoAndBlurToRoundRectJBitmap(LBitmap, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    if not LBitmap.equals(Result) then LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  LOptions := nil;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoAndBlurToRoundRectCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToRoundRectCGContextRef(AImage, LDestRect.Width, LDestRect.Height, ABlurRadius, XRadius, YRadius);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LBuffer: Pointer := nil;
+  var LLength: Int64 := 0;
+  var LMemoryStream: TCustomMemoryStream := nil;
+  if (AStream is TCustomMemoryStream) and (AStream.Position = 0) then begin
+    LBuffer := TCustomMemoryStream(AStream).Memory;
+    LLength := AStream.Size;
+    AStream.Position := AStream.Size;
+  end
+  else LMemoryStream := TMemoryStream.Create;
+  try
+    if LMemoryStream <> nil then begin
+      LMemoryStream.CopyFrom(AStream, AStream.Size - AStream.Position);
+      LBuffer := LMemoryStream.Memory;
+      LLength := LMemoryStream.Size;
+    end;
+    var LData := TNSData.Wrap(
+                   TNSData.alloc.initWithBytesNoCopy(
+                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    try
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
+      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      try
+        result := ALLoadFromOSImageAndPlaceIntoAndBlurToRoundRectCGContextRef(LImage, W, H, ABlurRadius, XRadius, YRadius);
+      finally
+        LImage.release;
+      end;
+    finally
+      LData.release;
+    end;
+  finally
+    ALFreeAndNil(LMemoryStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGContextRef(LStream, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGContextRef;
+begin
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
+  if LImage = nil then raise Exception.create('Failed to load image from file');
+  try
+    result := ALLoadFromOSImageAndPlaceIntoAndBlurToRoundRectCGContextRef(LImage, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    LImage.release;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGContextRef(AStream, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGImageRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGImageRef(LStream, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectCGContextRef(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{****************************************************************************************************************************************************************************}
+function ALLoadFromBitmapAndPlaceIntoAndBlurToRoundRectBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromBitmapAndFitIntoAndCropAndBlurToRoundRectBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius, XRadius, YRadius);
+end;
+
+{****************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromStream(aStream);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoAndBlurToRoundRectBitmap(LBitmap, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{******************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectBitmap(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectBitmap(LStream, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{***************************************************************************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromFile(AFileName);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoAndBlurToRoundRectBitmap(LBitmap, W, H, ABlurRadius, XRadius, YRadius);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{**********************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkImage(AStream, W, H, ABlurRadius, XRadius, YRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(AStream, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(AStream, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectJBitmap(AStream, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectCGContextRef(AStream, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectBitmap(AStream, W, H, ABlurRadius, XRadius, YRadius);
+  {$ENDIF}
+end;
+
+{************************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectDrawable(const AResName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkImage(AResName, W, H, ABlurRadius, XRadius, YRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkSurface(AResName, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectSkSurface(AResName, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectJBitmap(AResName, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectCGContextRef(AResName, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromResourceAndPlaceIntoAndBlurToRoundRectBitmap(AResName, W, H, ABlurRadius, XRadius, YRadius);
+  {$ENDIF}
+end;
+
+{*********************************************************************************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoAndBlurToRoundRectDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single; const XRadius, YRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkImage(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkSurface(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectSkSurface(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectJBitmap(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectCGContextRef(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromFileAndPlaceIntoAndBlurToRoundRectBitmap(AFileName, W, H, ABlurRadius, XRadius, YRadius);
+  {$ENDIF}
+end;
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(const AImage: sk_image_t; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LSrcRect := TrectF.Create(0, 0, sk4d_image_get_width(AImage), sk4d_image_get_Height(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(AImage, LDestRect.Width, LDestRect.Height, ABlurRadius);
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      Result := ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkSurface(const AResName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleSkSurface(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_surface_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    Result := ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkImage(const AStream: TStream; const W, H: single; const ABlurRadius: single): sk_image_t;
+begin
+  var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
+  try
+    var LStreamadapterProcs: sk_streamadapter_procs_t;
+    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
+    var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
+    try
+      var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
+      try
+        Result := ALCreateSkImageFromSkSurface(LSurface);
+      finally
+        sk4d_refcnt_unref(LSurface);
+      end;
+    finally
+      sk4d_refcnt_unref(LImage);
+    end;
+  finally
+    sk4d_streamadapter_destroy(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkImage(const AResName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkImage(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{****************************}
+{$IF defined(ALSkiaAvailable)}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleSkImage(const AFileName: String; const W, H: single; const ABlurRadius: single): sk_image_t;
+begin
+  var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
+  try
+    var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
+    try
+      Result := ALCreateSkImageFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+  finally
+    sk4d_refcnt_unref(LImage);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromJBitmapAndPlaceIntoAndBlurToCircleJBitmap(const ABitmap: JBitmap; const W, H: single; const ABlurRadius: single): JBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.getWidth, ABitmap.getHeight);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromJBitmapAndFitIntoAndCropAndBlurToCircleJBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius);
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleJBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single): JBitmap;
+begin
+  var LLength := AStream.Size-AStream.Position;
+  var LArray := TJavaArray<Byte>.Create(LLength);
+  try
+    AStream.ReadBuffer(LArray.Data^, LLength);
+    var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+    if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+    var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
+    if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
+    try
+      Result := ALLoadFromJBitmapAndPlaceIntoAndBlurToCircleJBitmap(LBitmap, W, H, ABlurRadius);
+    finally
+      if not LBitmap.equals(Result) then LBitmap.recycle;
+      LBitmap := nil;
+    end;
+    LOptions := nil;
+  finally
+    ALfreeandNil(LArray);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleJBitmap(const AResName: String; const W, H: single; const ABlurRadius: single): JBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleJBitmap(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{********************}
+{$IF defined(ANDROID)}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleJBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): JBitmap;
+begin
+  var LOptions := TJBitmapFactory_Options.Javaclass.Init;
+  if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
+  var LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
+  if LBitmap = nil then raise Exception.create('Failed to load bitmap from file');
+  try
+    Result := ALLoadFromJBitmapAndPlaceIntoAndBlurToCircleJBitmap(LBitmap, W, H, ABlurRadius);
+  finally
+    if not LBitmap.equals(Result) then LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  LOptions := nil;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromOSImageAndPlaceIntoAndBlurToCircleCGContextRef(const AImage: ALOSImage; const W, H: single; const ABlurRadius: single): CGContextRef;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ALOSImageGetWidth(AImage), ALOSImageGetHeight(AImage));
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromOSImageAndFitIntoAndCropAndBlurToCircleCGContextRef(AImage, LDestRect.Width, LDestRect.Height, ABlurRadius);
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGContextRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGContextRef;
+begin
+  var LBuffer: Pointer := nil;
+  var LLength: Int64 := 0;
+  var LMemoryStream: TCustomMemoryStream := nil;
+  if (AStream is TCustomMemoryStream) and (AStream.Position = 0) then begin
+    LBuffer := TCustomMemoryStream(AStream).Memory;
+    LLength := AStream.Size;
+    AStream.Position := AStream.Size;
+  end
+  else LMemoryStream := TMemoryStream.Create;
+  try
+    if LMemoryStream <> nil then begin
+      LMemoryStream.CopyFrom(AStream, AStream.Size - AStream.Position);
+      LBuffer := LMemoryStream.Memory;
+      LLength := LMemoryStream.Size;
+    end;
+    var LData := TNSData.Wrap(
+                   TNSData.alloc.initWithBytesNoCopy(
+                     LBuffer, // bytes: A buffer containing data for the new object. If flag is YES, bytes must point to a memory block allocated with malloc.
+                     LLength, // length: The number of bytes to hold from bytes. This value must not exceed the length of bytes.
+                     False)); // flag: If YES, the returned object takes ownership of the bytes pointer and frees it on deallocation.
+    try
+      var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
+      if LImage = nil then raise Exception.create('Failed to decode image from stream');
+      try
+        result := ALLoadFromOSImageAndPlaceIntoAndBlurToCircleCGContextRef(LImage, W, H, ABlurRadius);
+      finally
+        LImage.release;
+      end;
+    finally
+      LData.release;
+    end;
+  finally
+    ALFreeAndNil(LMemoryStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleCGContextRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGContextRef(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleCGContextRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGContextRef;
+begin
+  var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
+  if LImage = nil then raise Exception.create('Failed to load image from file');
+  try
+    result := ALLoadFromOSImageAndPlaceIntoAndBlurToCircleCGContextRef(LImage, W, H, ABlurRadius);
+  finally
+    LImage.release;
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGImageRef(const AStream: TStream; const W, H: single; const ABlurRadius: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGContextRef(AStream, W, H, ABlurRadius);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleCGImageRef(const AResName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGImageRef(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+{$ENDIF}
+
+{**********************}
+{$IF defined(ALAppleOS)}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleCGImageRef(const AFileName: String; const W, H: single; const ABlurRadius: single): CGImageRef;
+begin
+  var LContextRef := ALLoadFromFileAndPlaceIntoAndBlurToCircleCGContextRef(AFileName, W, H, ABlurRadius);
+  try
+    // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
+    // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
+    // follows copy-on-write semantics, so that the actual physical copy of the bits occur only if the underlying
+    // data in the bitmap graphics context is modified. As a consequence, you may want to use the resulting
+    // image and release it before you perform additional drawing into the bitmap graphics context. In this way,
+    // you can avoid the actual physical copy of the data.
+    result := CGBitmapContextCreateImage(LContextRef);
+    if result = nil then raise Exception.Create('Failed to create CGImageRef from CGContextRef');
+  finally
+    CGContextRelease(LContextRef);
+  end;
+end;
+{$ENDIF}
+
+{*****************************************************************************************************************************************}
+function ALLoadFromBitmapAndPlaceIntoAndBlurToCircleBitmap(const ABitmap: TBitmap; const W, H: single; const ABlurRadius: single): TBitmap;
+begin
+  var LSrcRect := TrectF.Create(0, 0, ABitmap.width, ABitmap.height);
+  var LDestRect := ALRectPlaceInto(LSrcRect, TrectF.Create(0, 0, W, H));
+  Result := ALLoadFromBitmapAndFitIntoAndCropAndBlurToCircleBitmap(ABitmap, LDestRect.Width, LDestRect.Height, ABlurRadius);
+end;
+
+{*****************************************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleBitmap(const AStream: TStream; const W, H: single; const ABlurRadius: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromStream(aStream);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoAndBlurToCircleBitmap(LBitmap, W, H, ABlurRadius);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{*******************************************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleBitmap(const AResName: String; const W, H: single; const ABlurRadius: single): TBitmap;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleBitmap(LStream, W, H, ABlurRadius);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{****************************************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleBitmap(const AFileName: String; const W, H: single; const ABlurRadius: single): TBitmap;
+begin
+  var LBitmap := Tbitmap.CreateFromFile(AFileName);
+  try
+    result := ALLoadFromBitmapAndPlaceIntoAndBlurToCircleBitmap(LBitmap, W, H, ABlurRadius);
+  finally
+    ALFreeAndNil(LBitmap);
+  end;
+end;
+
+{***********************************************************************************************************************************************}
+function ALLoadFromStreamAndPlaceIntoAndBlurToCircleDrawable(const AStream: TStream; const W, H: single; const ABlurRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkImage(AStream, W, H, ABlurRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(AStream, W, H, ABlurRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(AStream, W, H, ABlurRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromStreamAndPlaceIntoAndBlurToCircleJBitmap(AStream, W, H, ABlurRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromStreamAndPlaceIntoAndBlurToCircleCGContextRef(AStream, W, H, ABlurRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromStreamAndPlaceIntoAndBlurToCircleBitmap(AStream, W, H, ABlurRadius);
+  {$ENDIF}
+end;
+
+{*************************************************************************************************************************************************}
+function ALLoadFromResourceAndPlaceIntoAndBlurToCircleDrawable(const AResName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkImage(AResName, W, H, ABlurRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkSurface(AResName, W, H, ABlurRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromResourceAndPlaceIntoAndBlurToCircleSkSurface(AResName, W, H, ABlurRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromResourceAndPlaceIntoAndBlurToCircleJBitmap(AResName, W, H, ABlurRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromResourceAndPlaceIntoAndBlurToCircleCGContextRef(AResName, W, H, ABlurRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromResourceAndPlaceIntoAndBlurToCircleBitmap(AResName, W, H, ABlurRadius);
+  {$ENDIF}
+end;
+
+{**********************************************************************************************************************************************}
+function ALLoadFromFileAndPlaceIntoAndBlurToCircleDrawable(const AFileName: String; const W, H: single; const ABlurRadius: single): TALDrawable;
+begin
+  {$IF defined(ALSkiaEngine)}
+    {$IF defined(ALSkiaCanvas)}
+    Result := ALLoadFromFileAndPlaceIntoAndBlurToCircleSkImage(AFileName, W, H, ABlurRadius);
+    {$ELSEIF defined(ALGPUCanvas)}
+    var LSurface := ALLoadFromFileAndPlaceIntoAndBlurToCircleSkSurface(AFileName, W, H, ABlurRadius);
+    try
+      result := ALCreateTextureFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ELSE}
+    var LSurface := ALLoadFromFileAndPlaceIntoAndBlurToCircleSkSurface(AFileName, W, H, ABlurRadius);
+    try
+      result := ALCreateBitmapFromSkSurface(LSurface);
+    finally
+      sk4d_refcnt_unref(LSurface);
+    end;
+    {$ENDIF}
+  {$ELSEIF defined(ANDROID)}
+  var LBitmap := ALLoadFromFileAndPlaceIntoAndBlurToCircleJBitmap(AFileName, W, H, ABlurRadius);
+  try
+    result := ALCreateTextureFromJBitmap(LBitmap);
+  finally
+    LBitmap.recycle;
+    LBitmap := nil;
+  end;
+  {$ELSEIF defined(ALAppleOS)}
+  var LCGContextRef := ALLoadFromFileAndPlaceIntoAndBlurToCircleCGContextRef(AFileName, W, H, ABlurRadius);
+  try
+    {$IF defined(ALGPUCanvas)}
+    result := ALCreateTextureFromCGContextRef(LCGContextRef);
+    {$ELSE}
+    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    {$ENDIF}
+  finally
+    CGContextRelease(LCGContextRef);
+  end;
+  {$ELSE}
+  Result := ALLoadFromFileAndPlaceIntoAndBlurToCircleBitmap(AFileName, W, H, ABlurRadius);
   {$ENDIF}
 end;
 

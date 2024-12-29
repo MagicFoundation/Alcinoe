@@ -40,16 +40,20 @@ Type
   TALSurface =  {$IF defined(ALSkiaEngine)}sk_surface_t{$ELSEIF defined(ANDROID)}Jbitmap{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tbitmap{$ENDIF};
   TALCanvas =   {$IF defined(ALSkiaEngine)}sk_canvas_t{$ELSEIF defined(ANDROID)}Jcanvas{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tcanvas{$ENDIF};
   TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
+  TALMask =     {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
 
 const
   ALNullSurface = {$IF defined(ALSkiaEngine)}0{$ELSE}Nil{$ENDIF};
   ALNullCanvas = {$IF defined(ALSkiaEngine)}0{$ELSE}Nil{$ENDIF};
   ALNullDrawable = {$IF defined(ALSkiaCanvas)}0{$ELSE}Nil{$ENDIF};
+  ALNullMask = {$IF defined(ALSkiaEngine)}0{$ELSE}Nil{$ENDIF};
 
 function  ALIsSurfaceNull(const aSurface: TALSurface): Boolean; inline;
 function  ALIsCanvasNull(const aCanvas: TALCanvas): Boolean; inline;
 function  ALIsDrawableNull(const aDrawable: TALDrawable): Boolean; inline;
+function  ALIsMaskNull(const aMask: TALMask): Boolean; inline;
 procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable); inline;
+procedure ALFreeAndNilMask(var aMask: TALMask); inline;
 function  ALGetDrawableWidth(const aDrawable: TALDrawable): integer; inline;
 function  ALGetDrawableHeight(const aDrawable: TALDrawable): integer; inline;
 function  ALCanvasBeginScene(const aCanvas: TALCanvas): Boolean; inline;
@@ -735,9 +739,9 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskToBitmap(const AStream: TStream
 function ALLoadFromResourceAndFitIntoAndCropAndMaskToBitmap(const AResName: String; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 function ALLoadFromFileAndFitIntoAndCropAndMaskToBitmap(const AFileName: String; const AMask: TBitmap; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 //--
-function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: TALMask; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: TALMask; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: TALMask; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 {$ENDREGION}
 
 {$REGION ' Load and FitInto and Crop and Mask and Blur'}
@@ -776,9 +780,9 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToBitmap(const AStream: 
 function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToBitmap(const AResName: String; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToBitmap(const AFileName: String; const AMask: TBitmap; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 //--
-function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
-function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: TALMask; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: TALMask; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: TALMask; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 {$ENDREGION}
 
 {$REGION ' Load and PlaceInto'}
@@ -1071,42 +1075,46 @@ function ALLoadFromFileAndStretchToDrawable(const AFileName: String; const W, H:
 {$REGION ' Load and Wrap'}
 // Wrap the image inside w and h
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
-function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
-function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
-function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
+function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 //--
-function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
-function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
-function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
+function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
+function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 {$ENDIF}
 
 {$IF defined(ANDROID)}
-function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
-function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
-function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
-function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
+function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
+function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
+function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 {$ENDIF}
 
 {$IF defined(ALAppleOS)}
-function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
-function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
-function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
-function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
+function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 //--
-function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
-function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
-function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
+function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
+function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 {$ENDIF}
 
-function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
-function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
-function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
-function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
+function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
+function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
+function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 //--
-function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
-function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
-function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+//--
+function ALLoadFromStreamAndWrapToMask(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALMask;
+function ALLoadFromResourceAndWrapToMask(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALMask;
+function ALLoadFromFileAndWrapToMask(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALMask;
 {$ENDREGION}
 
 {$REGION ' Load and NormalizeOrientation'}
@@ -9087,8 +9095,8 @@ begin
   end;
 end;
 
-{******************************************************************************************************************************************************************************************************************************************************************************************************************}
-function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+{***************************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndFitIntoAndCropAndMaskToDrawable(const AStream: TStream; const AMask: TALMask; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
@@ -9132,8 +9140,8 @@ begin
   {$ENDIF}
 end;
 
-{********************************************************************************************************************************************************************************************************************************************************************************************************************}
-function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+{*****************************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable(const AResName: String; const AMask: TALMask; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
@@ -9177,8 +9185,8 @@ begin
   {$ENDIF}
 end;
 
-{*****************************************************************************************************************************************************************************************************************************************************************************************************************}
-function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+{**************************************************************************************************************************************************************************************}
+function ALLoadFromFileAndFitIntoAndCropAndMaskToDrawable(const AFileName: String; const AMask: TALMask; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
@@ -9779,8 +9787,8 @@ begin
   end;
 end;
 
-{****************************************************************************************************************************************************************************************************************************************************************************************************************************************************}
-function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+{*************************************************************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToDrawable(const AStream: TStream; const AMask: TALMask; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
@@ -9824,8 +9832,8 @@ begin
   {$ENDIF}
 end;
 
-{******************************************************************************************************************************************************************************************************************************************************************************************************************************************************}
-function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+{***************************************************************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable(const AResName: String; const AMask: TALMask; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
@@ -9869,8 +9877,8 @@ begin
   {$ENDIF}
 end;
 
-{***************************************************************************************************************************************************************************************************************************************************************************************************************************************************}
-function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF}; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
+{************************************************************************************************************************************************************************************************************************}
+function ALLoadFromFileAndFitIntoAndCropAndMaskAndBlurToDrawable(const AFileName: String; const AMask: TALMask; const ABlurRadius: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
@@ -13420,13 +13428,13 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromSkImageAndWrapToSkSurface(const AImage: sk_image_t; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   case AWrapMode of
     TALImageWrapMode.Fit: Result := ALLoadFromSkImageAndFitIntoToSkSurface(AImage, W, H);
     TALImageWrapMode.Stretch: Result := ALLoadFromSkImageAndStretchToSkSurface(AImage, W, H);
     TALImageWrapMode.Place: Result := ALLoadFromSkImageAndPlaceIntoToSkSurface(AImage, W, H);
-    TALImageWrapMode.FitAndCrop: Result := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(AImage, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(AImage, W, H, XCropCenter, YCropCenter);
     else Raise exception.Create('Error 4CE56031-47CC-4532-ABC2-49C939A186A6')
   end;
 end;
@@ -13434,7 +13442,7 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
@@ -13446,7 +13454,7 @@ begin
     sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
-      Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+      Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
     finally
       sk4d_refcnt_unref(LImage);
     end;
@@ -13458,11 +13466,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromResourceAndWrapToSkSurface(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
   try
-    result := ALLoadFromStreamAndWrapToSkSurface(LStream, AWrapMode, W, H);
+    result := ALLoadFromStreamAndWrapToSkSurface(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALfreeandNil(LStream);
   end;
@@ -13471,11 +13479,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_surface_t;
+function ALLoadFromFileAndWrapToSkSurface(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_surface_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
-    Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+    Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     sk4d_refcnt_unref(LImage);
   end;
@@ -13484,7 +13492,7 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
@@ -13496,7 +13504,7 @@ begin
     sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
-      var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+      var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
       try
         Result := ALCreateSkImageFromSkSurface(LSurface);
       finally
@@ -13513,11 +13521,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+function ALLoadFromResourceAndWrapToSkImage(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
   try
-    result := ALLoadFromStreamAndWrapToSkImage(LStream, AWrapMode, W, H);
+    result := ALLoadFromStreamAndWrapToSkImage(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALfreeandNil(LStream);
   end;
@@ -13526,11 +13534,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): sk_image_t;
+function ALLoadFromFileAndWrapToSkImage(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): sk_image_t;
 begin
   var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_file(MarshaledAString(UTF8String(AFileName))));
   try
-    var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H);
+    var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       Result := ALCreateSkImageFromSkSurface(LSurface);
     finally
@@ -13544,13 +13552,13 @@ end;
 
 {********************}
 {$IF defined(ANDROID)}
-function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromJBitmapAndWrapToJBitmap(const ABitmap: JBitmap; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
   case AWrapMode of
     TALImageWrapMode.Fit: Result := ALLoadFromJBitmapAndFitIntoToJBitmap(ABitmap, W, H);
     TALImageWrapMode.Stretch: Result := ALLoadFromJBitmapAndStretchToJBitmap(ABitmap, W, H);
     TALImageWrapMode.Place: Result := ALLoadFromJBitmapAndPlaceIntoToJBitmap(ABitmap, W, H);
-    TALImageWrapMode.FitAndCrop: Result := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(ABitmap, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(ABitmap, W, H, XCropCenter, YCropCenter);
     else Raise exception.Create('Error AB4C9111-6649-45D7-8116-70758938CD47')
   end;
 end;
@@ -13558,7 +13566,7 @@ end;
 
 {********************}
 {$IF defined(ANDROID)}
-function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromStreamAndWrapToJBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
   var LLength := AStream.Size-AStream.Position;
   var LArray := TJavaArray<Byte>.Create(LLength);
@@ -13569,7 +13577,7 @@ begin
     var LBitmap := TJBitmapFactory.JavaClass.decodeByteArray(LArray, 0, LLength, LOptions);
     if LBitmap = nil then raise Exception.create('Failed to decode bitmap from stream');
     try
-      Result := ALLoadFromJBitmapAndWrapToJBitmap(LBitmap, AWrapMode, W, H);
+      Result := ALLoadFromJBitmapAndWrapToJBitmap(LBitmap, AWrapMode, W, H, XCropCenter, YCropCenter);
     finally
       if not LBitmap.equals(Result) then LBitmap.recycle;
       LBitmap := nil;
@@ -13583,11 +13591,11 @@ end;
 
 {********************}
 {$IF defined(ANDROID)}
-function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromResourceAndWrapToJBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
   try
-    result := ALLoadFromStreamAndWrapToJBitmap(LStream, AWrapMode, W, H);
+    result := ALLoadFromStreamAndWrapToJBitmap(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALfreeandNil(LStream);
   end;
@@ -13596,14 +13604,14 @@ end;
 
 {********************}
 {$IF defined(ANDROID)}
-function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): JBitmap;
+function ALLoadFromFileAndWrapToJBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): JBitmap;
 begin
   var LOptions := TJBitmapFactory_Options.Javaclass.Init;
   if TOSVersion.Check(8, 0) then LOptions.inPreferredColorSpace := ALGetGlobalJColorSpace;
   var LBitmap := TJBitmapFactory.JavaClass.decodeFile(StringToJString(AFileName), LOptions);
   if LBitmap = nil then raise Exception.create('Failed to load bitmap from file');
   try
-    Result := ALLoadFromJBitmapAndWrapToJBitmap(LBitmap, AWrapMode, W, H);
+    Result := ALLoadFromJBitmapAndWrapToJBitmap(LBitmap, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     if not LBitmap.equals(Result) then LBitmap.recycle;
     LBitmap := nil;
@@ -13614,13 +13622,13 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromOSImageAndWrapToCGContextRef(const AImage: ALOSImage; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   case AWrapMode of
     TALImageWrapMode.Fit: Result := ALLoadFromOSImageAndFitIntoToCGContextRef(AImage, W, H);
     TALImageWrapMode.Stretch: Result := ALLoadFromOSImageAndStretchToCGContextRef(AImage, W, H);
     TALImageWrapMode.Place: Result := ALLoadFromOSImageAndPlaceIntoToCGContextRef(AImage, W, H);
-    TALImageWrapMode.FitAndCrop: Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromOSImageAndFitIntoAndCropToCGContextRef(AImage, W, H, XCropCenter, YCropCenter);
     else Raise exception.Create('Error 71B29EF2-207C-479A-B891-42075C545EA8')
   end;
 end;
@@ -13628,7 +13636,7 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromStreamAndWrapToCGContextRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LBuffer: Pointer := nil;
   var LLength: Int64 := 0;
@@ -13654,7 +13662,7 @@ begin
       var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithData(LData));
       if LImage = nil then raise Exception.create('Failed to decode image from stream');
       try
-        result := ALLoadFromOSImageAndWrapToCGContextRef(LImage, AWrapMode, W, H);
+        result := ALLoadFromOSImageAndWrapToCGContextRef(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
       finally
         LImage.release;
       end;
@@ -13669,11 +13677,11 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromResourceAndWrapToCGContextRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
   try
-    result := ALLoadFromStreamAndWrapToCGContextRef(LStream, AWrapMode, W, H);
+    result := ALLoadFromStreamAndWrapToCGContextRef(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALfreeandNil(LStream);
   end;
@@ -13682,12 +13690,12 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGContextRef;
+function ALLoadFromFileAndWrapToCGContextRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGContextRef;
 begin
   var LImage := TALOSImage.Wrap(TALOSImage.alloc.initWithContentsOfFile(StrToNSStr(AFilename)));
   if LImage = nil then raise Exception.create('Failed to load image from file');
   try
-    result := ALLoadFromOSImageAndWrapToCGContextRef(LImage, AWrapMode, W, H);
+    result := ALLoadFromOSImageAndWrapToCGContextRef(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     LImage.release;
   end;
@@ -13696,9 +13704,9 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+function ALLoadFromStreamAndWrapToCGImageRef(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
-  var LContextRef := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H);
+  var LContextRef := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
     // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
@@ -13716,11 +13724,11 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+function ALLoadFromResourceAndWrapToCGImageRef(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
   try
-    result := ALLoadFromStreamAndWrapToCGImageRef(LStream, AWrapMode, W, H);
+    result := ALLoadFromStreamAndWrapToCGImageRef(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALfreeandNil(LStream);
   end;
@@ -13729,9 +13737,9 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): CGImageRef;
+function ALLoadFromFileAndWrapToCGImageRef(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): CGImageRef;
 begin
-  var LContextRef := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H);
+  var LContextRef := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     // The CGImage object returned by this function is created by a copy operation. Subsequent changes to the bitmap
     // graphics context do not affect the contents of the returned image. In some cases the copy operation actually
@@ -13747,66 +13755,66 @@ begin
 end;
 {$ENDIF}
 
-{*******************************************************************************************************************************}
-function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+{*************************************************************************************************************************************************************************************************}
+function ALLoadFromBitmapAndWrapToBitmap(const ABitmap: TBitmap; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   case AWrapMode of
     TALImageWrapMode.Fit: Result := ALLoadFromBitmapAndFitIntoToBitmap(ABitmap, W, H);
     TALImageWrapMode.Stretch: Result := ALLoadFromBitmapAndStretchToBitmap(ABitmap, W, H);
     TALImageWrapMode.Place: Result := ALLoadFromBitmapAndPlaceIntoToBitmap(ABitmap, W, H);
-    TALImageWrapMode.FitAndCrop: Result := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, W, H);
+    TALImageWrapMode.FitAndCrop: Result := ALLoadFromBitmapAndFitIntoAndCropToBitmap(ABitmap, W, H, XCropCenter, YCropCenter);
     else Raise exception.Create('Error 68B96273-FB54-47B5-BD9B-A2DD75BEE07F')
   end;
 end;
 
-{*******************************************************************************************************************************}
-function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+{*************************************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndWrapToBitmap(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromStream(aStream);
   try
-    result := ALLoadFromBitmapAndWrapToBitmap(LBitmap, AWrapMode, W, H);
+    result := ALLoadFromBitmapAndWrapToBitmap(LBitmap, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALFreeAndNil(LBitmap);
   end;
 end;
 
-{*********************************************************************************************************************************}
-function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+{***************************************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndWrapToBitmap(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
   try
-    result := ALLoadFromStreamAndWrapToBitmap(LStream, AWrapMode, W, H);
+    result := ALLoadFromStreamAndWrapToBitmap(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALfreeandNil(LStream);
   end;
 end;
 
-{******************************************************************************************************************************}
-function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TBitmap;
+{************************************************************************************************************************************************************************************************}
+function ALLoadFromFileAndWrapToBitmap(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TBitmap;
 begin
   var LBitmap := Tbitmap.CreateFromFile(AFileName);
   try
-    result := ALLoadFromBitmapAndWrapToBitmap(LBitmap, AWrapMode, W, H);
+    result := ALLoadFromBitmapAndWrapToBitmap(LBitmap, AWrapMode, W, H, XCropCenter, YCropCenter);
   finally
     ALFreeAndNil(LBitmap);
   end;
 end;
 
-{*************************************************************************************************************************************}
-function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+{*******************************************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndWrapToDrawable(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
-    Result := ALLoadFromStreamAndWrapToSkImage(AStream, AWrapMode, W, H);
+    Result := ALLoadFromStreamAndWrapToSkImage(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
     {$ELSEIF defined(ALGPUCanvas)}
-    var LSurface := ALLoadFromStreamAndWrapToSkSurface(AStream, AWrapMode, W, H);
+    var LSurface := ALLoadFromStreamAndWrapToSkSurface(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       result := ALCreateTextureFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
     {$ELSE}
-    var LSurface := ALLoadFromStreamAndWrapToSkSurface(AStream, AWrapMode, W, H);
+    var LSurface := ALLoadFromStreamAndWrapToSkSurface(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       result := ALCreateBitmapFromSkSurface(LSurface);
     finally
@@ -13814,7 +13822,7 @@ begin
     end;
     {$ENDIF}
   {$ELSEIF defined(ANDROID)}
-  var LBitmap := ALLoadFromStreamAndWrapToJBitmap(AStream, AWrapMode, W, H);
+  var LBitmap := ALLoadFromStreamAndWrapToJBitmap(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     result := ALCreateTextureFromJBitmap(LBitmap);
   finally
@@ -13822,7 +13830,7 @@ begin
     LBitmap := nil;
   end;
   {$ELSEIF defined(ALAppleOS)}
-  var LCGContextRef := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H);
+  var LCGContextRef := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     {$IF defined(ALGPUCanvas)}
     result := ALCreateTextureFromCGContextRef(LCGContextRef);
@@ -13833,25 +13841,25 @@ begin
     CGContextRelease(LCGContextRef);
   end;
   {$ELSE}
-  Result := ALLoadFromStreamAndWrapToBitmap(AStream, AWrapMode, W, H);
+  Result := ALLoadFromStreamAndWrapToBitmap(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
   {$ENDIF}
 end;
 
-{***************************************************************************************************************************************}
-function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+{*********************************************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndWrapToDrawable(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
-    Result := ALLoadFromResourceAndWrapToSkImage(AResName, AWrapMode, W, H);
+    Result := ALLoadFromResourceAndWrapToSkImage(AResName, AWrapMode, W, H, XCropCenter, YCropCenter);
     {$ELSEIF defined(ALGPUCanvas)}
-    var LSurface := ALLoadFromResourceAndWrapToSkSurface(AResName, AWrapMode, W, H);
+    var LSurface := ALLoadFromResourceAndWrapToSkSurface(AResName, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       result := ALCreateTextureFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
     {$ELSE}
-    var LSurface := ALLoadFromResourceAndWrapToSkSurface(AResName, AWrapMode, W, H);
+    var LSurface := ALLoadFromResourceAndWrapToSkSurface(AResName, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       result := ALCreateBitmapFromSkSurface(LSurface);
     finally
@@ -13859,7 +13867,7 @@ begin
     end;
     {$ENDIF}
   {$ELSEIF defined(ANDROID)}
-  var LBitmap := ALLoadFromResourceAndWrapToJBitmap(AResName, AWrapMode, W, H);
+  var LBitmap := ALLoadFromResourceAndWrapToJBitmap(AResName, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     result := ALCreateTextureFromJBitmap(LBitmap);
   finally
@@ -13867,7 +13875,7 @@ begin
     LBitmap := nil;
   end;
   {$ELSEIF defined(ALAppleOS)}
-  var LCGContextRef := ALLoadFromResourceAndWrapToCGContextRef(AResName, AWrapMode, W, H);
+  var LCGContextRef := ALLoadFromResourceAndWrapToCGContextRef(AResName, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     {$IF defined(ALGPUCanvas)}
     result := ALCreateTextureFromCGContextRef(LCGContextRef);
@@ -13878,25 +13886,25 @@ begin
     CGContextRelease(LCGContextRef);
   end;
   {$ELSE}
-  Result := ALLoadFromResourceAndWrapToBitmap(AResName, AWrapMode, W, H);
+  Result := ALLoadFromResourceAndWrapToBitmap(AResName, AWrapMode, W, H, XCropCenter, YCropCenter);
   {$ENDIF}
 end;
 
-{************************************************************************************************************************************}
-function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single): TALDrawable;
+{******************************************************************************************************************************************************************************************************}
+function ALLoadFromFileAndWrapToDrawable(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALDrawable;
 begin
   {$IF defined(ALSkiaEngine)}
     {$IF defined(ALSkiaCanvas)}
-    Result := ALLoadFromFileAndWrapToSkImage(AFileName, AWrapMode, W, H);
+    Result := ALLoadFromFileAndWrapToSkImage(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
     {$ELSEIF defined(ALGPUCanvas)}
-    var LSurface := ALLoadFromFileAndWrapToSkSurface(AFileName, AWrapMode, W, H);
+    var LSurface := ALLoadFromFileAndWrapToSkSurface(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       result := ALCreateTextureFromSkSurface(LSurface);
     finally
       sk4d_refcnt_unref(LSurface);
     end;
     {$ELSE}
-    var LSurface := ALLoadFromFileAndWrapToSkSurface(AFileName, AWrapMode, W, H);
+    var LSurface := ALLoadFromFileAndWrapToSkSurface(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
     try
       result := ALCreateBitmapFromSkSurface(LSurface);
     finally
@@ -13904,7 +13912,7 @@ begin
     end;
     {$ENDIF}
   {$ELSEIF defined(ANDROID)}
-  var LBitmap := ALLoadFromFileAndWrapToJBitmap(AFileName, AWrapMode, W, H);
+  var LBitmap := ALLoadFromFileAndWrapToJBitmap(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     result := ALCreateTextureFromJBitmap(LBitmap);
   finally
@@ -13912,7 +13920,7 @@ begin
     LBitmap := nil;
   end;
   {$ELSEIF defined(ALAppleOS)}
-  var LCGContextRef := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H);
+  var LCGContextRef := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
   try
     {$IF defined(ALGPUCanvas)}
     result := ALCreateTextureFromCGContextRef(LCGContextRef);
@@ -13923,7 +13931,46 @@ begin
     CGContextRelease(LCGContextRef);
   end;
   {$ELSE}
-  Result := ALLoadFromFileAndWrapToBitmap(AFileName, AWrapMode, W, H);
+  Result := ALLoadFromFileAndWrapToBitmap(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ENDIF}
+end;
+
+{***********************************************************************************************************************************************************************************************}
+function ALLoadFromStreamAndWrapToMask(const AStream: TStream; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALMask;
+begin
+  {$IF defined(ALSkiaEngine)}
+  Result := ALLoadFromStreamAndWrapToSkImage(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ELSEIF defined(ANDROID)}
+  Result := ALLoadFromStreamAndWrapToJBitmap(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ELSEIF defined(ALAppleOS)}
+  Result := ALLoadFromStreamAndWrapToCGContextRef(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ELSE}
+  Result := ALLoadFromStreamAndWrapToBitmap(AStream, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ENDIF}
+end;
+
+{*************************************************************************************************************************************************************************************************}
+function ALLoadFromResourceAndWrapToMask(const AResName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALMask;
+begin
+  var LStream := TResourceStream.Create(HInstance, AResName, RT_RCDATA);
+  try
+    result := ALLoadFromStreamAndWrapToMask(LStream, AWrapMode, W, H, XCropCenter, YCropCenter);
+  finally
+    ALfreeandNil(LStream);
+  end;
+end;
+
+{**********************************************************************************************************************************************************************************************}
+function ALLoadFromFileAndWrapToMask(const AFileName: String; const AWrapMode: TALImageWrapMode; const W, H: single; const XCropCenter: single = -50; const YCropCenter: single = -50): TALMask;
+begin
+  {$IF defined(ALSkiaEngine)}
+  Result := ALLoadFromFileAndWrapToSkImage(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ELSEIF defined(ANDROID)}
+  Result := ALLoadFromFileAndWrapToJBitmap(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ELSEIF defined(ALAppleOS)}
+  Result := ALLoadFromFileAndWrapToCGContextRef(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
+  {$ELSE}
+  Result := ALLoadFromFileAndWrapToBitmap(AFileName, AWrapMode, W, H, XCropCenter, YCropCenter);
   {$ENDIF}
 end;
 
@@ -19025,6 +19072,16 @@ begin
   {$ENDIF}
 end;
 
+{****************************************************************}
+function  ALIsMaskNull(const aMask: TALMask): Boolean;
+begin
+  {$IF defined(ALSkiaEngine)}
+  result := aMask = 0
+  {$ELSE}
+  result := aMask = nil;
+  {$ENDIF}
+end;
+
 {*********************************************************}
 procedure ALFreeAndNilDrawable(var aDrawable: TALDrawable);
 begin
@@ -19036,6 +19093,24 @@ begin
   {$ELSE}
   ALFreeAndNil(aDrawable);
   {$ENDIF}
+end;
+
+{*********************************************************}
+procedure ALFreeAndNilMask(var aMask: TALMask);
+begin
+  {$IF defined(ALSkiaEngine)}
+  if aMask <> 0 then begin
+    sk4d_refcnt_unref(aMask);
+    aMask := 0;
+  end;
+  {$ELSEIF defined(ANDROID)}
+  aMask.recycle;
+  aMask := nil;
+  {$ELSEIF defined(ALAppleOS)}
+  CGImageRelease(aMask);
+  {$ELSE}
+  ALFreeAndNil(aMask);
+  {$ENDIF};
 end;
 
 {******************************************************************}

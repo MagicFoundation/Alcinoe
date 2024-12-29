@@ -1704,12 +1704,6 @@ function ALLoadFromStreamAndFitIntoToSkSurface(const AStream: TStream; const W, 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoToSkSurface(LImage, W, H);
@@ -1754,12 +1748,6 @@ function ALLoadFromStreamAndFitIntoToSkImage(const AStream: TStream; const W, H:
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoToSkSurface(LImage, W, H);
@@ -2197,12 +2185,6 @@ function ALLoadFromStreamAndFitIntoToRoundRectSkSurface(const AStream: TStream; 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
@@ -2247,12 +2229,6 @@ function ALLoadFromStreamAndFitIntoToRoundRectSkImage(const AStream: TStream; co
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
@@ -2690,12 +2666,6 @@ function ALLoadFromStreamAndFitIntoToCircleSkSurface(const AStream: TStream; con
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoToCircleSkSurface(LImage, W, H);
@@ -2740,12 +2710,6 @@ function ALLoadFromStreamAndFitIntoToCircleSkImage(const AStream: TStream; const
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoToCircleSkSurface(LImage, W, H);
@@ -3183,12 +3147,6 @@ function ALLoadFromStreamAndFitIntoAndBlurToSkSurface(const AStream: TStream; co
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
@@ -3233,12 +3191,6 @@ function ALLoadFromStreamAndFitIntoAndBlurToSkImage(const AStream: TStream; cons
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
@@ -3676,12 +3628,6 @@ function ALLoadFromStreamAndFitIntoAndBlurToRoundRectSkSurface(const AStream: TS
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
@@ -3726,12 +3672,6 @@ function ALLoadFromStreamAndFitIntoAndBlurToRoundRectSkImage(const AStream: TStr
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
@@ -4169,12 +4109,6 @@ function ALLoadFromStreamAndFitIntoAndBlurToCircleSkSurface(const AStream: TStre
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
@@ -4219,12 +4153,6 @@ function ALLoadFromStreamAndFitIntoAndBlurToCircleSkImage(const AStream: TStream
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
@@ -4684,12 +4612,6 @@ function ALLoadFromStreamAndFitIntoAndCropToSkSurface(const AStream: TStream; co
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(LImage, W, H, XCropCenter, YCropCenter);
@@ -4734,12 +4656,6 @@ function ALLoadFromStreamAndFitIntoAndCropToSkImage(const AStream: TStream; cons
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropToSkSurface(LImage, W, H, XCropCenter, YCropCenter);
@@ -5253,12 +5169,6 @@ function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkSurface(const AStream: TS
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
@@ -5303,12 +5213,6 @@ function ALLoadFromStreamAndFitIntoAndCropToRoundRectSkImage(const AStream: TStr
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropToRoundRectSkSurface(LImage, W, H, XRadius, YRadius, XCropCenter, YCropCenter);
@@ -5921,12 +5825,6 @@ function ALLoadFromStreamAndFitIntoAndCropToCircleSkSurface(const AStream: TStre
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(LImage, W, H, XCropCenter, YCropCenter);
@@ -5971,12 +5869,6 @@ function ALLoadFromStreamAndFitIntoAndCropToCircleSkImage(const AStream: TStream
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropToCircleSkSurface(LImage, W, H, XCropCenter, YCropCenter);
@@ -6521,12 +6413,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkSurface(const AStream: TStr
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -6571,12 +6457,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndBlurToSkImage(const AStream: TStrea
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -7258,12 +7138,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndBlurToRoundRectSkSurface(const AStr
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius, XCropCenter, YCropCenter);
@@ -7308,12 +7182,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndBlurToRoundRectSkImage(const AStrea
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius, XCropCenter, YCropCenter);
@@ -8004,12 +7872,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkSurface(const AStream
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -8054,12 +7916,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndBlurToCircleSkImage(const AStream: 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius, XCropCenter, YCropCenter);
@@ -8669,12 +8525,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkSurface(const AStream: TStr
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(LImage, AMask, XCropCenter, YCropCenter);
@@ -8719,12 +8569,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskToSkImage(const AStream: TStrea
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndMaskToSkSurface(LImage, AMask, XCropCenter, YCropCenter);
@@ -9300,12 +9144,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkSurface(const AStrea
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
@@ -9350,12 +9188,6 @@ function ALLoadFromStreamAndFitIntoAndCropAndMaskAndBlurToSkImage(const AStream:
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndFitIntoAndCropAndMaskAndBlurToSkSurface(LImage, AMask, ABlurRadius, XCropCenter, YCropCenter);
@@ -9938,12 +9770,6 @@ function ALLoadFromStreamAndPlaceIntoToSkSurface(const AStream: TStream; const W
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndPlaceIntoToSkSurface(LImage, W, H);
@@ -9988,12 +9814,6 @@ function ALLoadFromStreamAndPlaceIntoToSkImage(const AStream: TStream; const W, 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoToSkSurface(LImage, W, H);
@@ -10431,12 +10251,6 @@ function ALLoadFromStreamAndPlaceIntoToRoundRectSkSurface(const AStream: TStream
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
@@ -10481,12 +10295,6 @@ function ALLoadFromStreamAndPlaceIntoToRoundRectSkImage(const AStream: TStream; 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoToRoundRectSkSurface(LImage, W, H, XRadius, YRadius);
@@ -10924,12 +10732,6 @@ function ALLoadFromStreamAndPlaceIntoToCircleSkSurface(const AStream: TStream; c
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(LImage, W, H);
@@ -10974,12 +10776,6 @@ function ALLoadFromStreamAndPlaceIntoToCircleSkImage(const AStream: TStream; con
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoToCircleSkSurface(LImage, W, H);
@@ -11417,12 +11213,6 @@ function ALLoadFromStreamAndPlaceIntoAndBlurToSkSurface(const AStream: TStream; 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
@@ -11467,12 +11257,6 @@ function ALLoadFromStreamAndPlaceIntoAndBlurToSkImage(const AStream: TStream; co
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToSkSurface(LImage, W, H, ABlurRadius);
@@ -11910,12 +11694,6 @@ function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkSurface(const AStream: 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
@@ -11960,12 +11738,6 @@ function ALLoadFromStreamAndPlaceIntoAndBlurToRoundRectSkImage(const AStream: TS
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToRoundRectSkSurface(LImage, W, H, ABlurRadius, XRadius, YRadius);
@@ -12403,12 +12175,6 @@ function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkSurface(const AStream: TSt
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
@@ -12453,12 +12219,6 @@ function ALLoadFromStreamAndPlaceIntoAndBlurToCircleSkImage(const AStream: TStre
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndPlaceIntoAndBlurToCircleSkSurface(LImage, W, H, ABlurRadius);
@@ -12918,12 +12678,6 @@ function ALLoadFromStreamAndStretchToSkSurface(const AStream: TStream; const W, 
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndStretchToSkSurface(LImage, W, H);
@@ -12968,12 +12722,6 @@ function ALLoadFromStreamAndStretchToSkImage(const AStream: TStream; const W, H:
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndStretchToSkSurface(LImage, W, H);
@@ -13446,12 +13194,6 @@ function ALLoadFromStreamAndWrapToSkSurface(const AStream: TStream; const AWrapM
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
@@ -13496,12 +13238,6 @@ function ALLoadFromStreamAndWrapToSkImage(const AStream: TStream; const AWrapMod
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndWrapToSkSurface(LImage, AWrapMode, W, H, XCropCenter, YCropCenter);
@@ -14013,12 +13749,6 @@ function ALLoadFromStreamAndNormalizeOrientationToSkSurface(const AStream: TStre
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageAndNormalizeOrientationToSkSurface(LImage, AExifOrientationInfo);
@@ -14063,12 +13793,6 @@ function ALLoadFromStreamAndNormalizeOrientationToSkImage(const AStream: TStream
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       var LSurface := ALLoadFromSkImageAndNormalizeOrientationToSkSurface(LImage, AExifOrientationInfo);
@@ -14666,12 +14390,6 @@ function ALLoadFromStreamToSkSurface(const AStream: TStream): sk_surface_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     var LImage := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
     try
       Result := ALLoadFromSkImageToSkSurface(LImage);
@@ -14716,12 +14434,6 @@ function ALLoadFromStreamToSkImage(const AStream: TStream): sk_image_t;
 begin
   var LStream := ALSkCheckHandle(sk4d_streamadapter_create(AStream));
   try
-    var LStreamadapterProcs: sk_streamadapter_procs_t;
-    LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
-    LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
-    LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
-    LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
-    sk4d_streamadapter_set_procs(@LStreamadapterProcs);
     Result := ALSkCheckHandle(sk4d_image_make_from_encoded_stream(LStream));
   finally
     sk4d_streamadapter_destroy(LStream);
@@ -20365,6 +20077,13 @@ initialization
   ALGlobalSkColorSpace := 0;
   ALGlobalSkColorSpaceInitialized := False;
   ALGlobalSkPaint := 0;
+  //--
+  var LStreamadapterProcs: sk_streamadapter_procs_t;
+  LStreamadapterProcs.get_length := ALSkStreamAdapterGetLengthProc;
+  LStreamadapterProcs.get_position := ALSkStreamAdapterGetPositionProc;
+  LStreamadapterProcs.read := ALSkStreamAdapterReadProc;
+  LStreamadapterProcs.seek := ALSkStreamAdapterSeekProc;
+  sk4d_streamadapter_set_procs(@LStreamadapterProcs);
   {$ENDIF}
   {$IF defined(ANDROID)}
   ALGlobalJColorSpace := nil;

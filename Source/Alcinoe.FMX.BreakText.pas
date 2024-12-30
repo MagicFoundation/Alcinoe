@@ -89,13 +89,17 @@ type
     FillGradientColors: TArray<TAlphaColor>; // Default = [];
     FillGradientOffsets: TArray<Single>; // Default = [];
     FillResourceName: String; // default = ''
+    FillMaskResourceName: String; // default = ''
+    FillMaskImage: TALMask; // default = ALNullMask
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
     FillImageNoRadius: Boolean; // default = False
     FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    FillBlurRadius: single; // default = 0
     //--
-    StateLayerOpacity: Single; // Default = 0
-    StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
+    StateLayerOpacity: Single; // default = 0
+    StateLayerColor: TAlphaColor; // default = TAlphaColors.null
     StateLayerMargins: TRectF; // default = TRectF.Empty
     StateLayerXRadius: Single; // default = 0
     StateLayerYRadius: Single; // default = 0
@@ -382,10 +386,14 @@ begin
   FillGradientColors := [];
   FillGradientOffsets := [];
   FillResourceName := '';
+  FillMaskResourceName := '';
+  FillMaskImage := ALNullMask;
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
   FillImageNoRadius := False;
   FillWrapMode := TALImageWrapMode.Fit;
+  FillCropCenter := TPointF.create(-50,-50);
+  FillBlurRadius := 0;
   //--
   StateLayerOpacity := 0;
   StateLayerColor := TAlphaColors.null;
@@ -467,10 +475,14 @@ begin
   FillGradientColors := Source.FillGradientColors;
   FillGradientOffsets := Source.FillGradientOffsets;
   FillResourceName := Source.FillResourceName;
+  FillMaskResourceName := Source.FillMaskResourceName;
+  FillMaskImage := Source.FillMaskImage;
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
   FillImageNoRadius := Source.FillImageNoRadius;
   FillWrapMode := Source.FillWrapMode;
+  FillCropCenter := Source.FillCropCenter;
+  FillBlurRadius := Source.FillBlurRadius;
   //--
   StateLayerOpacity := Source.StateLayerOpacity;
   StateLayerColor := Source.StateLayerColor;
@@ -2546,10 +2558,14 @@ begin
                       LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
                       LOptions.FillResourceName, // const AFillResourceName: String;
                       nil, // const AFillResourceStream: TStream;
+                      LOptions.FillMaskResourceName, // const AFillMaskResourceName: String;
+                      LOptions.FillMaskImage, // const AFillMaskImage: TALMask;
                       LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                       LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                       LOptions.FillImageNoRadius, // Const AFillImageNoRadius: Boolean;
                       LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+                      LOptions.FillCropCenter, // const AFillCropCenter: TpointF;
+                      LOptions.FillBlurRadius, // const AFillBlurRadius: single;
                       LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
                       LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
                       LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
@@ -3851,10 +3867,14 @@ begin
               LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
               LOptions.FillResourceName, // const AFillResourceName: String;
               nil, // const AFillResourceStream: TStream;
+              LOptions.FillMaskResourceName, // const AFillMaskResourceName: String;
+              LOptions.FillMaskImage, // const AFillMaskImage: TALMask;
               LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
               LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
               LOptions.FillImageNoRadius, // Const AFillImageNoRadius: Boolean;
               LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
+              LOptions.FillCropCenter, // const AFillCropCenter: TpointF;
+              LOptions.FillBlurRadius, // const AFillBlurRadius: single;
               LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
               LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
               LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;

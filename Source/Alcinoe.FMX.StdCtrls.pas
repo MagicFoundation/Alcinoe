@@ -3840,7 +3840,6 @@ begin
         LocalRect, // const Rect: TrectF;
         AbsoluteOpacity, // const AOpacity: Single;
         LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-        nil, // const AFillResourceStream: TStream;
         LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
         TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
         True, // const ADrawStateLayerOnTop: Boolean;
@@ -5104,7 +5103,6 @@ begin
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
-        nil, // const AFillResourceStream: TStream;
         AStateLayer, // const StateLayer: TALStateLayer;
         AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
         ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
@@ -5157,10 +5155,14 @@ begin
           [], // const AFillGradientOffsets: TArray<Single>;
           AStopIndicator.ResourceName, // const AFillResourceName: String;
           nil, // const AFillResourceStream: TStream;
+          '', // const AFillMaskResourceName: String;
+          ALNullMask, // const AFillMaskImage: TALMask;
           TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
           TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
           False, // Const AFillImageNoRadius: Boolean;
           AStopIndicator.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+          TpointF.create(-50, -50), // const AFillCropCenter: TpointF;
+          0, // const AFillBlurRadius: single;
           0, // const AStateLayerOpacity: Single;
           TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
           TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -5231,7 +5233,6 @@ begin
       LocalRect, // const Rect: TrectF;
       AbsoluteOpacity, // const AOpacity: Single;
       LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-      nil, // const AFillResourceStream: TStream;
       LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
       TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
       True, // const ADrawStateLayerOnTop: Boolean;
@@ -8138,10 +8139,14 @@ begin
       [], // const AFillGradientOffsets: TArray<Single>;
       ACheckMark.ResourceName, // const AFillResourceName: String;
       nil, // const AFillResourceStream: TStream;
+      '', // const AFillMaskResourceName: String;
+      ALNullMask, // const AFillMaskImage: TALMask;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
       False, // Const AFillImageNoRadius: Boolean;
       ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      TpointF.create(-50, -50), // const AFillCropCenter: TpointF;
+      0, // const AFillBlurRadius: single;
       0, // const AStateLayerOpacity: Single;
       TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
       TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -8211,7 +8216,6 @@ begin
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
-        nil, // const AFillResourceStream: TStream;
         AStateLayer, // const StateLayer: TALStateLayer;
         ACheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
         False, // const ADrawStateLayerOnTop: Boolean;
@@ -8328,7 +8332,6 @@ begin
           LRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           LCurrentAdjustedStateStyle.CheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
           False, // const ADrawStateLayerOnTop: Boolean;
@@ -8721,10 +8724,14 @@ begin
       [], // const AFillGradientOffsets: TArray<Single>;
       ACheckMark.ResourceName, // const AFillResourceName: String;
       nil, // const AFillResourceStream: TStream;
+      '', // const AFillMaskResourceName: String;
+      ALNullMask, // const AFillMaskImage: TALMask;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
       False, // Const AFillImageNoRadius: Boolean;
       ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      TpointF.create(-50, -50), // const AFillCropCenter: TpointF;
+      0, // const AFillBlurRadius: single;
       0, // const AStateLayerOpacity: Single;
       TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
       TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -8757,10 +8764,14 @@ begin
       [], // const AFillGradientOffsets: TArray<Single>;
       ACheckMark.ResourceName, // const AFillResourceName: String;
       nil, // const AFillResourceStream: TStream;
+      '', // const AFillMaskResourceName: String;
+      ALNullMask, // const AFillMaskImage: TALMask;
       TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
       TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
       False, // Const AFillImageNoRadius: Boolean;
       ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
+      TpointF.create(-50, -50), // const AFillCropCenter: TpointF;
+      0, // const AFillBlurRadius: single;
       0, // const AStateLayerOpacity: Single;
       TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
       TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
@@ -9552,7 +9563,6 @@ begin
         ABufDrawableRect, // const Rect: TrectF;
         1, // const AOpacity: Single;
         AFill, // const Fill: TALBrush;
-        nil, // const AFillResourceStream: TStream;
         AStateLayer, // const StateLayer: TALStateLayer;
         TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
         False, // const ADrawStateLayerOnTop: Boolean;
@@ -9662,7 +9672,6 @@ begin
           LRect, // const Rect: TrectF;
           1, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
           False, // const ADrawStateLayerOnTop: Boolean;

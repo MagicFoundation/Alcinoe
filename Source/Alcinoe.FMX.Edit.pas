@@ -5557,10 +5557,14 @@ begin
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
+    //LOptions.FillMaskResourceName: String; // default = ''
+    //LOptions.FillMaskImage: TALMask; // default = ALNullMask
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -5683,10 +5687,14 @@ begin
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
+    //LOptions.FillMaskResourceName: String; // default = ''
+    //LOptions.FillMaskImage: TALMask; // default = ALNullMask
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -5809,10 +5817,14 @@ begin
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
+    //LOptions.FillMaskResourceName: String; // default = ''
+    //LOptions.FillMaskImage: TALMask; // default = ALNullMask
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
     //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -6184,7 +6196,6 @@ begin
           LocalRect, // const Rect: TrectF;
           AbsoluteOpacity, // const AOpacity: Single;
           LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          nil, // const AFillResourceStream: TStream;
           LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
           LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
           True, // const ADrawStateLayerOnTop: Boolean;

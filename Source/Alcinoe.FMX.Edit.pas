@@ -6189,22 +6189,19 @@ begin
                                                   true); // Const ASaveState: Boolean);
       try
 
-        ALDrawRectangle(
-          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-          1, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LocalRect, // const Rect: TrectF;
-          AbsoluteOpacity, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
-          True, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          Sides, // const Sides: TSides;
-          Corners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LocalRect)
+          .SetOpacity(AbsoluteOpacity)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.TextSettings.Font.Color)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(Sides)
+          .SetCorners(Corners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
       finally
         if LCanvasSaveState <> nil then
@@ -6231,23 +6228,19 @@ begin
 
           ALClearCanvas(LBufCanvas, TAlphaColors.Null);
 
-          ALDrawRectangle(
-            LBufCanvas, // const ACanvas: TALCanvas;
-            ALGetScreenScale, // const AScale: Single;
-            IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-            LocalRect, // const Rect: TrectF;
-            1, // const AOpacity: Single;
-            LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-            nil, // const AFillResourceStream: TStream;
-            LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-            LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
-            True, // const ADrawStateLayerOnTop: Boolean;
-            LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-            LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-            Sides, // const Sides: TSides;
-            Corners, // const Corners: TCorners;
-            XRadius, // const XRadius: Single = 0;
-            YRadius); // const YRadius: Single = 0);
+          TALDrawRectangleHelper.Create(LBufCanvas)
+            .SetScale(ALGetScreenScale)
+            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetDstRect(LocalRect)
+            .SetFill(LCurrentAdjustedStateStyle.Fill)
+            .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.TextSettings.Font.Color)
+            .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+            .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+            .SetSides(Sides)
+            .SetCorners(Corners)
+            .SetXRadius(XRadius)
+            .SetYRadius(YRadius)
+            .Draw;
 
         finally
           ALCanvasEndScene(LBufCanvas)

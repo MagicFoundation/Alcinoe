@@ -2545,43 +2545,40 @@ begin
                      (LOptions.StateLayerColor <> TalphaColors.Null) or
                      (LOptions.StrokeColor <> TalphaColors.Null) or
                      (LOptions.ShadowColor <> TalphaColors.Null) then begin
-                    ALDrawRectangle(
-                      ACanvas, // const ACanvas: TALCanvas;
-                      LOptions.Scale, // const AScale: Single;
-                      LOptions.AlignToPixel, // const AAlignToPixel: Boolean;
-                      ARect, // const ARect: TrectF;
-                      1, //const AOpacity: Single;
-                      LOptions.FillColor, // const AFillColor: TAlphaColor;
-                      LOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-                      LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-                      LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                      LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-                      LOptions.FillResourceName, // const AFillResourceName: String;
-                      nil, // const AFillResourceStream: TStream;
-                      LOptions.FillMaskResourceName, // const AFillMaskResourceName: String;
-                      LOptions.FillMaskImage, // const AFillMaskImage: TALMask;
-                      LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
-                      LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
-                      LOptions.FillImageNoRadius, // Const AFillImageNoRadius: Boolean;
-                      LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-                      LOptions.FillCropCenter, // const AFillCropCenter: TpointF;
-                      LOptions.FillBlurRadius, // const AFillBlurRadius: single;
-                      LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
-                      LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
-                      LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
-                      LOptions.StateLayerXRadius, // const AStateLayerXRadius: Single;
-                      LOptions.StateLayerYRadius, // const AStateLayerYRadius: Single;
-                      True, // const ADrawStateLayerOnTop: Boolean;
-                      LOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-                      LOptions.StrokeThickness, // const AStrokeThickness: Single;
-                      LOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-                      LOptions.ShadowBlur, // const AShadowBlur: Single;
-                      LOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
-                      LOptions.ShadowOffsetY, // const AShadowOffsetY: Single;
-                      LOptions.Sides, // const Sides: TSides;
-                      LOptions.Corners, // const Corners: TCorners;
-                      LOptions.XRadius, // const XRadius: Single = 0;
-                      LOptions.YRadius); // const YRadius: Single = 0);
+                    TALDrawRectangleHelper.Create(ACanvas)
+                      .SetScale(LOptions.Scale)
+                      .SetAlignToPixel(LOptions.AlignToPixel)
+                      .SetDstRect(ARect)
+                      .SetFillColor(LOptions.FillColor)
+                      .SetFillGradientStyle(LOptions.FillGradientStyle)
+                      .SetFillGradientAngle(LOptions.FillGradientAngle)
+                      .SetFillGradientColors(LOptions.FillGradientColors)
+                      .SetFillGradientOffsets(LOptions.FillGradientOffsets)
+                      .SetFillResourceName(LOptions.FillResourceName)
+                      .SetFillMaskResourceName(LOptions.FillMaskResourceName)
+                      .SetFillMaskImage(LOptions.FillMaskImage)
+                      .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
+                      .SetFillImageMarginsRect(LOptions.FillImageMargins)
+                      .SetFillImageNoRadius(LOptions.FillImageNoRadius)
+                      .SetFillWrapMode(LOptions.FillWrapMode)
+                      .SetFillCropCenter(LOptions.FillCropCenter)
+                      .SetFillBlurRadius(LOptions.FillBlurRadius)
+                      .SetStateLayerOpacity(LOptions.StateLayerOpacity)
+                      .SetStateLayerColor(LOptions.StateLayerColor)
+                      .SetStateLayerMarginsRect(LOptions.StateLayerMargins)
+                      .SetStateLayerXRadius(LOptions.StateLayerXRadius)
+                      .SetStateLayerYRadius(LOptions.StateLayerYRadius)
+                      .SetStrokeColor(LOptions.StrokeColor)
+                      .SetStrokeThickness(LOptions.StrokeThickness)
+                      .SetShadowColor(LOptions.ShadowColor)
+                      .SetShadowBlur(LOptions.ShadowBlur)
+                      .SetShadowOffsetX(LOptions.ShadowOffsetX)
+                      .SetShadowOffsetY(LOptions.ShadowOffsetY)
+                      .SetSides(LOptions.Sides)
+                      .SetCorners(LOptions.Corners)
+                      .SetXRadius(LOptions.XRadius)
+                      .SetYRadius(LOptions.YRadius)
+                      .Draw;
                   end;
 
                   // Handle custom event
@@ -3854,43 +3851,40 @@ begin
              (LOptions.StateLayerColor <> TalphaColors.Null) or
              (LOptions.StrokeColor <> TalphaColors.Null) or
              (LOptions.ShadowColor <> TalphaColors.Null) then begin
-            ALDrawRectangle(
-              ACanvas, // const ACanvas: TALCanvas;
-              LOptions.Scale, // const AScale: Single;
-              LOptions.AlignToPixel, // const AAlignToPixel: Boolean;
-              ARect, // const ARect: TrectF;
-              1, //const AOpacity: Single;
-              LOptions.FillColor, // const AFillColor: TAlphaColor;
-              LOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-              LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-              LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-              LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-              LOptions.FillResourceName, // const AFillResourceName: String;
-              nil, // const AFillResourceStream: TStream;
-              LOptions.FillMaskResourceName, // const AFillMaskResourceName: String;
-              LOptions.FillMaskImage, // const AFillMaskImage: TALMask;
-              LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
-              LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
-              LOptions.FillImageNoRadius, // Const AFillImageNoRadius: Boolean;
-              LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-              LOptions.FillCropCenter, // const AFillCropCenter: TpointF;
-              LOptions.FillBlurRadius, // const AFillBlurRadius: single;
-              LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
-              LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
-              LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
-              LOptions.StateLayerXRadius, // const AStateLayerXRadius: Single;
-              LOptions.StateLayerYRadius, // const AStateLayerYRadius: Single;
-              True, // const ADrawStateLayerOnTop: Boolean;
-              LOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-              LOptions.StrokeThickness, // const AStrokeThickness: Single;
-              LOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-              LOptions.ShadowBlur, // const AShadowBlur: Single;
-              LOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
-              LOptions.ShadowOffsetY, // const AShadowOffsetY: Single;
-              LOptions.Sides, // const Sides: TSides;
-              LOptions.Corners, // const Corners: TCorners;
-              LOptions.XRadius, // const XRadius: Single = 0;
-              LOptions.YRadius); // const YRadius: Single = 0);
+            TALDrawRectangleHelper.Create(ACanvas)
+              .SetScale(LOptions.Scale)
+              .SetAlignToPixel(LOptions.AlignToPixel)
+              .SetDstRect(ARect)
+              .SetFillColor(LOptions.FillColor)
+              .SetFillGradientStyle(LOptions.FillGradientStyle)
+              .SetFillGradientAngle(LOptions.FillGradientAngle)
+              .SetFillGradientColors(LOptions.FillGradientColors)
+              .SetFillGradientOffsets(LOptions.FillGradientOffsets)
+              .SetFillResourceName(LOptions.FillResourceName)
+              .SetFillMaskResourceName(LOptions.FillMaskResourceName)
+              .SetFillMaskImage(LOptions.FillMaskImage)
+              .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
+              .SetFillImageMarginsRect(LOptions.FillImageMargins)
+              .SetFillImageNoRadius(LOptions.FillImageNoRadius)
+              .SetFillWrapMode(LOptions.FillWrapMode)
+              .SetFillCropCenter(LOptions.FillCropCenter)
+              .SetFillBlurRadius(LOptions.FillBlurRadius)
+              .SetStateLayerOpacity(LOptions.StateLayerOpacity)
+              .SetStateLayerColor(LOptions.StateLayerColor)
+              .SetStateLayerMarginsRect(LOptions.StateLayerMargins)
+              .SetStateLayerXRadius(LOptions.StateLayerXRadius)
+              .SetStateLayerYRadius(LOptions.StateLayerYRadius)
+              .SetStrokeColor(LOptions.StrokeColor)
+              .SetStrokeThickness(LOptions.StrokeThickness)
+              .SetShadowColor(LOptions.ShadowColor)
+              .SetShadowBlur(LOptions.ShadowBlur)
+              .SetShadowOffsetX(LOptions.ShadowOffsetX)
+              .SetShadowOffsetY(LOptions.ShadowOffsetY)
+              .SetSides(LOptions.Sides)
+              .SetCorners(LOptions.Corners)
+              .SetXRadius(LOptions.XRadius)
+              .SetYRadius(LOptions.YRadius)
+              .Draw;
           end;
 
           // Handle custom event

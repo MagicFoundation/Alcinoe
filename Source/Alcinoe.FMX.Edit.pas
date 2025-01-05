@@ -5558,7 +5558,7 @@ begin
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillMaskResourceName: String; // default = ''
-    //LOptions.FillMaskImage: TALMask; // default = ALNullMask
+    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
@@ -5688,7 +5688,7 @@ begin
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillMaskResourceName: String; // default = ''
-    //LOptions.FillMaskImage: TALMask; // default = ALNullMask
+    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False
@@ -5818,7 +5818,7 @@ begin
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
     //LOptions.FillResourceName: String; // default = ''
     //LOptions.FillMaskResourceName: String; // default = ''
-    //LOptions.FillMaskImage: TALMask; // default = ALNullMask
+    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageNoRadius: Boolean; // default = False

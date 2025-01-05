@@ -62,9 +62,10 @@ var
 
 type
 
-  // !! Workaround to avoid a circular unit reference. The declaration of TALSurface/TALCanvas/TALDrawable from Alcinoe.FMX.Graphics is duplicated here.
+  // !! Workaround to avoid a circular unit reference. The declaration of TALSurface/TALCanvas/TALBitmap/TALDrawable from Alcinoe.FMX.Graphics is duplicated here.
   TALSurface =  {$IF defined(ALSkiaEngine)}sk_surface_t{$ELSEIF defined(ANDROID)}Jbitmap{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tbitmap{$ENDIF};
   TALCanvas =   {$IF defined(ALSkiaEngine)}sk_canvas_t{$ELSEIF defined(ANDROID)}Jcanvas{$ELSEIF defined(ALAppleOS)}CGContextRef{$ELSE}Tcanvas{$ENDIF};
+  TALBitmap =   {$IF defined(ALSkiaEngine)}sk_image_t{$ELSEIF defined(ANDROID)}JBitmap{$ELSEIF defined(ALAppleOS)}CGImageRef{$ELSE}Tbitmap{$ENDIF};
   TALDrawable = {$IF defined(ALSkiaCanvas)}sk_image_t{$ELSEIF defined(ALGpuCanvas)}TTexture{$ELSE}Tbitmap{$ENDIF};
 
   {~~~~~~~~~~~~~~~~~~}
@@ -102,10 +103,6 @@ type
     //   (placed one next to another) to fill the entire rectangle of the control. The images are placed beginning from
     //   the upper-left corner of the rectangle of the control.
     //Tile,
-
-    // Center the image to the rectangle of the control:
-    // * The image is always displayed at its original size (regardless whether the rectangle of the control is larger or smaller than the image size).
-    //Center,
 
     /// <summary>
     ///   Fit the image in the rectangle of the control:
@@ -1079,7 +1076,6 @@ function  ALGetFontMetrics(
             const AFontSize: single;
             const AFontWeight: TFontWeight;
             const AFontSlant: TFontSlant): TALFontMetrics;
-function  ALGetResourceDirectory: String;
 function  ALGetResourceFilename(const AResourceName: String): String;
 function  ALTranslate(const AText: string): string;
 Procedure ALMakeBufDrawables(const AControl: TControl; const AEnsureDoubleBuffered: Boolean = True);
@@ -5813,56 +5809,11 @@ begin
 
 end;
 
-{*}
-var
-  ALResourceDirectory: String;
-  ALResourceDirectoryLock: TLightweightMREW;
-
-{**************************************}
-function ALGetResourceDirectory: String;
-begin
-  ALResourceDirectoryLock.beginRead;
-  Try
-    result := ALResourceDirectory;
-  finally
-    ALResourceDirectoryLock.endRead;
-  end;
-
-  if result = '' then begin
-    ALResourceDirectoryLock.beginWrite;
-    Try
-
-      {$IF Defined(ANDROID)}
-      // asset:///resources
-      ALResourceDirectory := 'asset:///resources';
-      {$ELSEIF Defined(IOS)}
-      // /private/var/containers/Bundle/Application/1A22111C-63ED-2255-8899-33554D5FA659/myapp.app/Resources
-      var LBundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
-      ALResourceDirectory := TPath.combine(UTF8ToString(LBundle.resourcePath.UTF8String), 'Resources');
-      {$ELSEIF Defined(ALMacOS)}
-      // /Users/xxx/PAServer/scratch-dir/xxx-VMWare/myapp.app/Contents/Resources
-      var LBundle := TNSBundle.Wrap(TNSBundle.OCClass.mainBundle);
-      ALResourceDirectory := UTF8ToString(LBundle.resourcePath.UTF8String);
-      {$ELSEIF Defined(MSWINDOWS)}
-      // c:\Program Files\myapp\Resources
-      ALResourceDirectory := TPath.combine(ALGetModulePathW, 'Resources');
-      {$ELSE}
-      raise Exception.Create('Error 0F41B748-DFAD-48A8-957C-07C175AE5633');
-      {$ENDIF}
-
-      result := ALResourceDirectory;
-
-    finally
-      ALResourceDirectoryLock.endWrite;
-    end;
-  end;
-end;
-
 {******************************************************************}
 function ALGetResourceFilename(const AResourceName: String): String;
 begin
 
-  if AResourceName = '' then
+  if (AResourceName = '') or (ALIsHttpOrHttpsUrl(AResourceName)) then
     exit('');
 
   {$IFDEF ALDPK}
@@ -5897,7 +5848,7 @@ begin
   {$ELSE}
 
   if Assigned(ALCustomGetResourceFilenameProc) then Result := ALCustomGetResourceFilenameProc(AResourceName)
-  else If ALposW('.',AResourceName) > 0 then Result := TPath.combine(ALGetResourceDirectory, AResourceName)
+  else If ALposW(PathDelim,AResourceName) > 0 then Result := AResourceName
   else result := '';
 
   {$ENDIF}
@@ -6390,8 +6341,6 @@ initialization
   ALScreenScale := 0;
   ALCustomConvertFontFamilyProc := nil;
   ALCustomGetResourceFilenameProc := nil;
-  ALResourceDirectory := '';
-  //ALResourceDirectoryLock := ??; their is no TLightweightMREW.create but instead an ugly class operator TLightweightMREW.Initialize :(
   {$IFDEF ANDROID}
   ALViewStackCount := 0;
   _RenderScript := nil;

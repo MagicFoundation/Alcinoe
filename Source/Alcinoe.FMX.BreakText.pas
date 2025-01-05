@@ -90,7 +90,7 @@ type
     FillGradientOffsets: TArray<Single>; // Default = [];
     FillResourceName: String; // default = ''
     FillMaskResourceName: String; // default = ''
-    FillMaskImage: TALMask; // default = ALNullMask
+    FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
     FillImageNoRadius: Boolean; // default = False
@@ -387,7 +387,7 @@ begin
   FillGradientOffsets := [];
   FillResourceName := '';
   FillMaskResourceName := '';
-  FillMaskImage := ALNullMask;
+  FillMaskBitmap := ALNullBitmap;
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
   FillImageNoRadius := False;
@@ -476,7 +476,7 @@ begin
   FillGradientOffsets := Source.FillGradientOffsets;
   FillResourceName := Source.FillResourceName;
   FillMaskResourceName := Source.FillMaskResourceName;
-  FillMaskImage := Source.FillMaskImage;
+  FillMaskBitmap := Source.FillMaskBitmap;
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
   FillImageNoRadius := Source.FillImageNoRadius;
@@ -2556,7 +2556,7 @@ begin
                       .SetFillGradientOffsets(LOptions.FillGradientOffsets)
                       .SetFillResourceName(LOptions.FillResourceName)
                       .SetFillMaskResourceName(LOptions.FillMaskResourceName)
-                      .SetFillMaskImage(LOptions.FillMaskImage)
+                      .SetFillMaskBitmap(LOptions.FillMaskBitmap)
                       .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
                       .SetFillImageMarginsRect(LOptions.FillImageMargins)
                       .SetFillImageNoRadius(LOptions.FillImageNoRadius)
@@ -2615,7 +2615,18 @@ begin
                       var LFileName := ALGetResourceFilename(LImgSrc);
                       if LFileName <> '' then begin
                         try
-                          LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
+                          LImg := ALCreateSkImageFromResource(
+                                    LImgSrc, // const AResourceName: String;
+                                    nil, // const AResourceStream: TStream;
+                                    '', // const AMaskResourceName: String;
+                                    0, // const AMaskImage: sk_image_t;
+                                    1, // const AScale: Single;
+                                    LDstRect.Width, LDstRect.Height, // const W, H: single;
+                                    TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                                    TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    0, // const ABlurRadius: single;
+                                    0, // const AXRadius: Single;
+                                    0); // const AYRadius: Single);
                         except
                           LImg := 0;
                         end
@@ -2623,7 +2634,18 @@ begin
                       else
                         LImg := 0;
                       {$ELSE}
-                      var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
+                      var LImg := ALCreateSkImageFromResource(
+                                    LImgSrc, // const AResourceName: String;
+                                    nil, // const AResourceStream: TStream;
+                                    '', // const AMaskResourceName: String;
+                                    0, // const AMaskImage: sk_image_t;
+                                    1, // const AScale: Single;
+                                    LDstRect.Width, LDstRect.Height, // const W, H: single;
+                                    TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                                    TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    0, // const ABlurRadius: single;
+                                    0, // const AXRadius: Single;
+                                    0); // const AYRadius: Single);
                       {$ENDIF}
                       If LImg <> 0 then begin
                         try
@@ -3862,7 +3884,7 @@ begin
               .SetFillGradientOffsets(LOptions.FillGradientOffsets)
               .SetFillResourceName(LOptions.FillResourceName)
               .SetFillMaskResourceName(LOptions.FillMaskResourceName)
-              .SetFillMaskImage(LOptions.FillMaskImage)
+              .SetFillMaskBitmap(LOptions.FillMaskBitmap)
               .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
               .SetFillImageMarginsRect(LOptions.FillImageMargins)
               .SetFillImageNoRadius(LOptions.FillImageNoRadius)
@@ -3900,7 +3922,18 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              var LImg := ALCreateJbitmapFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            0, // const AMaskBitmap: JBitmap;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0); // const AYRadius: Single);
               try
                 ACanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
               finally
@@ -3954,7 +3987,18 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              var LImg := ALCreateCGImageRefFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            0, // const AMaskImage: CGImageRef;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0); // const AYRadius: Single);
               try
                 CGContextDrawImage(
                   ACanvas, // c: The graphics context in which to draw the image.
@@ -4026,7 +4070,18 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              var LImg := ALCreateBitmapFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            0, // const AMaskImage: CGImageRef;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0); // const AYRadius: Single);
               try
                 ACanvas.drawBitmap(
                   LImg,

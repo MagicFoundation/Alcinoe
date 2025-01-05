@@ -2999,15 +2999,28 @@ begin
 
   FBufDrawableRect := LocalRect;
   {$IFDEF ALDPK}
+  if (LFillResourceStream = nil) and (ALGetResourceFilename(LFillResourceName) = '') then
+    fBufDrawable := ALNullDrawable
+  else
   try
-    var LFileName := ALGetResourceFilename(FResourceName);
-    if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale)
-    else fBufDrawable := ALNullDrawable;
+  {$ENDIF}
+    fBufDrawable := ALCreateDrawableFromResource(
+                      FResourceName, // const AResourceName: String;
+                      nil, // const AResourceStream: TStream;
+                      '', // const AMaskResourceName: String;
+                      ALNullBitmap, // const AMaskBitmap: TALBitmap;
+                      1, // const AScale: Single;
+                      Width * (fframeCount div fRowCount) * ALGetScreenScale,
+                      Height * fRowCount * ALGetScreenScale, // const W, H: single;
+                      TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
+                      TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                      0, // const ABlurRadius: single;
+                      0, // const AXRadius: Single;
+                      0); // const AYRadius: Single);
+  {$IFDEF ALDPK}
   except
     fBufDrawable := ALNullDrawable;
   end;
-  {$ELSE}
-  FBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(FResourceName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale);
   {$ENDIF}
 
 end;

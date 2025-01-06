@@ -110,12 +110,12 @@ var
 
 function ALGetSkImageinfo(const W, H: int32_t): sk_imageinfo_t;
 function ALCreateSkSurface(Const W, H: integer): sk_surface_t;
-function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
-function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
-Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
-procedure ALUpdateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
-procedure ALUpdateBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
-procedure ALUpdateBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
+function ALCreateTBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
+function ALCreateTBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+Function ALCreateTBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+procedure ALUpdateTBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
+procedure ALUpdateTBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
+procedure ALUpdateTBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
 function ALCreateSkImageFromSkSurface(Const ASurface: sk_surface_t): sk_image_t;
 function ALCreateTextureFromSkSurface(Const ASurface: sk_surface_t): TTexture;
 function ALCreateTextureFromSkImage(Const AImage: sk_image_t): TTexture;
@@ -133,15 +133,15 @@ procedure ALUpdateTextureFromJBitmap(const aBitmap: Jbitmap; const ATexture: TTe
 {$ENDIF}
 {$IF defined(ALAppleOS)}
 function ALCreateTextureFromCGContextRef(const aCGContextRef: CGContextRef): TTexture;
-function ALCreateBitmapFromCGContextRef(const aCGContextRef: CGContextRef): TBitmap;
+function ALCreateTBitmapFromCGContextRef(const aCGContextRef: CGContextRef): TBitmap;
 procedure ALUpdateTextureFromCGContextRef(const aCGContextRef: CGContextRef; const ATexture: TTexture);
-procedure ALUpdateBitmapFromCGContextRef(const aCGContextRef: CGContextRef; const ABitmap: TBitmap);
+procedure ALUpdateTBitmapFromCGContextRef(const aCGContextRef: CGContextRef; const ABitmap: TBitmap);
 {$ENDIF}
 {$IFDEF ALGpuCanvas}
-function ALCreateTextureFromBitmapSurface(const aBitmapSurface: TbitmapSurface): TTexture;
-function ALCreateTextureFromBitmap(const aBitmap: Tbitmap): TTexture;
-procedure ALUpdateTextureFromBitmapSurface(const aBitmapSurface: TbitmapSurface; const ATexture: TTexture);
-procedure ALUpdateTextureFromBitmap(const aBitmap: Tbitmap; const ATexture: TTexture);
+function ALCreateTextureFromTBitmapSurface(const aBitmapSurface: TbitmapSurface): TTexture;
+function ALCreateTextureFromTBitmap(const aBitmap: Tbitmap): TTexture;
+procedure ALUpdateTextureFromTBitmapSurface(const aBitmapSurface: TbitmapSurface; const ATexture: TTexture);
+procedure ALUpdateTextureFromTBitmap(const aBitmap: Tbitmap; const ATexture: TTexture);
 {$ENDIF}
 
 {$IF defined(ANDROID)}
@@ -333,7 +333,7 @@ function ALCreateCGImageRefFromResource(
 {$ENDIF}
 
 {*********************}
-procedure ALDrawBitmap(
+procedure ALDrawTBitmap(
             const ACanvas: TCanvas;
             const ABitmap: TBitmap;
             const AScale: Single;
@@ -346,7 +346,7 @@ procedure ALDrawBitmap(
             const ABlurRadius: single;
             const AXRadius: Single;
             const AYRadius: Single);
-function ALCreateBitmapFromResource(
+function ALCreateTBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
@@ -358,6 +358,33 @@ function ALCreateBitmapFromResource(
            const ABlurRadius: single;
            const AXRadius: Single;
            const AYRadius: Single): TBitmap;
+
+{*********************}
+procedure ALDrawBitmap(
+            const ACanvas: TALCanvas;
+            const ABitmap: TALBitmap;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ASrcRect: TrectF; // In ABitmap coordinates (real pixels)
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AMaskBitmap: TALBitmap;
+            const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ABlurRadius: single;
+            const AXRadius: Single;
+            const AYRadius: Single); inline;
+function ALCreateBitmapFromResource(
+           const AResourceName: String;
+           const AResourceStream: TStream;
+           const AMaskResourceName: String;
+           const AMaskBitmap: TALBitmap;
+           const AScale: Single;
+           const W, H: single;
+           const AWrapMode: TALImageWrapMode;
+           const ACropCenter: TpointF;
+           const ABlurRadius: single;
+           const AXRadius: Single;
+           const AYRadius: Single): TALBitmap; inline;
 
 {***********************}
 procedure ALDrawDrawable(
@@ -641,11 +668,11 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-function ALCreateBitmapFromCGContextRef(const aCGContextRef: CGContextRef): TBitmap;
+function ALCreateTBitmapFromCGContextRef(const aCGContextRef: CGContextRef): TBitmap;
 begin
   Result := TBitmap.Create(CGBitmapContextGetWidth(aCGContextRef), CGBitmapContextGetHeight(aCGContextRef));
   try
-    ALUpdateBitmapFromCGContextRef(aCGContextRef, Result);
+    ALUpdateTBitmapFromCGContextRef(aCGContextRef, Result);
   except
     FreeAndNil(Result);
     raise;
@@ -663,7 +690,7 @@ end;
 
 {**********************}
 {$IF defined(ALAppleOS)}
-procedure ALUpdateBitmapFromCGContextRef(const aCGContextRef: CGContextRef; const ABitmap: TBitmap);
+procedure ALUpdateTBitmapFromCGContextRef(const aCGContextRef: CGContextRef; const ABitmap: TBitmap);
 begin
   var LBitmapData: TBitmapData;
   if ABitmap.Map(TMapAccess.Write, LBitmapData) then
@@ -677,11 +704,11 @@ end;
 
 {******************}
 {$IFDEF ALGpuCanvas}
-function ALCreateTextureFromBitmapSurface(const aBitmapSurface: TbitmapSurface): TTexture;
+function ALCreateTextureFromTBitmapSurface(const aBitmapSurface: TbitmapSurface): TTexture;
 begin
   result := TALTexture.Create;
   try
-    ALUpdateTextureFromBitmapSurface(aBitmapSurface, Result);
+    ALUpdateTextureFromTBitmapSurface(aBitmapSurface, Result);
   except
     ALFreeAndNil(result);
     raise;
@@ -691,11 +718,11 @@ end;
 
 {******************}
 {$IFDEF ALGpuCanvas}
-function ALCreateTextureFromBitmap(const aBitmap: Tbitmap): TTexture;
+function ALCreateTextureFromTBitmap(const aBitmap: Tbitmap): TTexture;
 begin
   Result := TalTexture.Create;
   try
-    ALUpdateTextureFromBitmap(aBitmap, Result);
+    ALUpdateTextureFromTBitmap(aBitmap, Result);
   except
     ALFreeAndNil(Result);
     raise;
@@ -705,7 +732,7 @@ end;
 
 {******************}
 {$IFDEF ALGpuCanvas}
-procedure ALUpdateTextureFromBitmapSurface(const aBitmapSurface: TbitmapSurface; const ATexture: TTexture);
+procedure ALUpdateTextureFromTBitmapSurface(const aBitmapSurface: TbitmapSurface; const ATexture: TTexture);
 begin
   ATexture.Assign(aBitmapSurface);
 end;
@@ -713,7 +740,7 @@ end;
 
 {******************}
 {$IFDEF ALGpuCanvas}
-procedure ALUpdateTextureFromBitmap(const aBitmap: Tbitmap; const ATexture: TTexture);
+procedure ALUpdateTextureFromTBitmap(const aBitmap: Tbitmap; const ATexture: TTexture);
 begin
   ATexture.assign(aBitmap);
 end;
@@ -2777,7 +2804,7 @@ end;
 {$ENDIF}
 
 {*********************}
-procedure ALDrawBitmap(
+procedure ALDrawTBitmap(
             const ACanvas: TCanvas;
             const ABitmap: TBitmap;
             const AScale: Single;
@@ -2928,7 +2955,7 @@ begin
 end;
 
 {**********************************}
-function ALCreateBitmapFromResource(
+function ALCreateTBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
            const AMaskResourceName: String;
@@ -2968,7 +2995,7 @@ begin
 
       // Create the MaskBitmap
       if (AMaskResourceName <> '') and (LMaskBitmap = nil) then begin
-        LMaskBitmap := ALCreateBitmapFromResource(
+        LMaskBitmap := ALCreateTBitmapFromResource(
                          AMaskResourceName, // const AResourceName: String;
                          nil, // const AResourceStream: TStream;
                          '', // const AMaskResourceName: String;
@@ -3042,7 +3069,7 @@ begin
       try
 
         Var LCanvas := Result.Canvas;
-        ALDrawBitmap(
+        ALDrawTBitmap(
           LCanvas, // const ACanvas: TCanvas;
           LBitmap, // const ABitmap: TBitmap;
           AScale, // const AScale: Single;
@@ -3070,6 +3097,149 @@ begin
     ALFreeAndNil(LBitmap);
   end;
 
+end;
+
+{*********************}
+procedure ALDrawBitmap(
+            const ACanvas: TALCanvas;
+            const ABitmap: TALBitmap;
+            const AScale: Single;
+            const AAlignToPixel: Boolean;
+            const ASrcRect: TrectF; // In ABitmap coordinates (real pixels)
+            const ADstRect: TrectF;
+            const AOpacity: Single;
+            const AMaskBitmap: TALBitmap;
+            const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+            const ABlurRadius: single;
+            const AXRadius: Single;
+            const AYRadius: Single);
+begin
+  {$IF defined(ALSkiaEngine)}
+  ALDrawSkImage(
+    ACanvas, // const ACanvas: sk_canvas_t;
+    ABitmap, // const AImage: sk_image_t;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ASrcRect, // const ASrcRect: TrectF; // In AImage coordinates (real pixels)
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, // const AOpacity: Single;
+    AMaskBitmap, // const AMaskImage: sk_image_t;
+    ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+    ABlurRadius, // const ABlurRadius: single;
+    AXRadius, // const AXRadius: Single;
+    AYRadius); // const AYRadius: Single);
+  {$ELSEIF defined(ANDROID)}
+  ALDrawJBitmap(
+    ACanvas, // const ACanvas: JCanvas;
+    ABitmap, // const ABitmap: JBitmap;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ASrcRect, // const ASrcRect: TrectF; // In ABitmap coordinates (real pixels)
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, // const AOpacity: Single;
+    AMaskBitmap, // const AMaskBitmap: JBitmap;
+    ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+    ABlurRadius, // const ABlurRadius: single;
+    AXRadius, // const AXRadius: Single;
+    AYRadius); // const AYRadius: Single);
+  {$ELSEIF defined(ALAppleOS)}
+  ALDrawCGImageRef(
+    ACanvas, // const ACanvas: CGContextRef;
+    ABitmap, // const AImage: CGImageRef;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ASrcRect, // const ASrcRect: TrectF; // In AImage coordinates (real pixels)
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, // const AOpacity: Single;
+    AMaskBitmap, // const AMaskImage: CGImageRef;
+    ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskImage is not nil to center the image on the mask
+    ABlurRadius, // const ABlurRadius: single;
+    AXRadius, // const AXRadius: Single;
+    AYRadius); // const AYRadius: Single);
+  {$ELSE}
+  ALDrawTBitmap(
+    ACanvas, // const ACanvas: TCanvas;
+    ABitmap, // const ABitmap: TBitmap;
+    AScale, // const AScale: Single;
+    AAlignToPixel, // const AAlignToPixel: Boolean;
+    ASrcRect, // const ASrcRect: TrectF; // In ABitmap coordinates (real pixels)
+    ADstRect, // const ADstRect: TrectF;
+    AOpacity, // const AOpacity: Single;
+    AMaskBitmap, // const AMaskBitmap: TBitmap;
+    ACropCenter, // const ACropCenter: TpointF; // Used only when AMaskBitmap is not nil to center the image on the mask
+    ABlurRadius, // const ABlurRadius: single;
+    AXRadius, // const AXRadius: Single;
+    AYRadius); // const AYRadius: Single);
+  {$ENDIF}
+end;
+
+{**********************************}
+function ALCreateBitmapFromResource(
+           const AResourceName: String;
+           const AResourceStream: TStream;
+           const AMaskResourceName: String;
+           const AMaskBitmap: TALBitmap;
+           const AScale: Single;
+           const W, H: single;
+           const AWrapMode: TALImageWrapMode;
+           const ACropCenter: TpointF;
+           const ABlurRadius: single;
+           const AXRadius: Single;
+           const AYRadius: Single): TALBitmap;
+begin
+  {$IF defined(ALSkiaEngine)}
+  Result := ALCreateSkImageFromResource(
+              AResourceName, // const AResourceName: String;
+              AResourceStream, // const AResourceStream: TStream;
+              AMaskResourceName, // const AMaskResourceName: String;
+              AMaskBitmap, // const AMaskImage: sk_image_t;
+              AScale, // const AScale: Single;
+              W, H, // const W, H: single;
+              AWrapMode, // const AWrapMode: TALImageWrapMode;
+              ACropCenter, // const ACropCenter: TpointF;
+              ABlurRadius, // const ABlurRadius: single;
+              AXRadius, // const AXRadius: Single;
+              AYRadius); // const AYRadius: Single);
+  {$ELSEIF defined(ANDROID)}
+  Result := ALCreateJBitmapFromResource(
+              AResourceName, // const AResourceName: String;
+              AResourceStream, // const AResourceStream: TStream;
+              AMaskResourceName, // const AMaskResourceName: String;
+              AMaskBitmap, // const AMaskBitmap: JBitmap;
+              AScale, // const AScale: Single;
+              W, H, // const W, H: single;
+              AWrapMode, // const AWrapMode: TALImageWrapMode;
+              ACropCenter, // const ACropCenter: TpointF;
+              ABlurRadius, // const ABlurRadius: single;
+              AXRadius, // const AXRadius: Single;
+              AYRadius); // const AYRadius: Single);
+  {$ELSEIF defined(ALAppleOS)}
+  Result := ALCreateCGImageRefFromResource(
+              AResourceName, // const AResourceName: String;
+              AResourceStream, // const AResourceStream: TStream;
+              AMaskResourceName, // const AMaskResourceName: String;
+              AMaskBitmap, // const AMaskImage: CGImageRef;
+              AScale, // const AScale: Single;
+              W, H, // const W, H: single;
+              AWrapMode, // const AWrapMode: TALImageWrapMode;
+              ACropCenter, // const ACropCenter: TpointF;
+              ABlurRadius, // const ABlurRadius: single;
+              AXRadius, // const AXRadius: Single;
+              AYRadius); // const AYRadius: Single);
+  {$ELSE}
+  Result := ALCreateTBitmapFromResource(
+              AResourceName, // const AResourceName: String;
+              AResourceStream, // const AResourceStream: TStream;
+              AMaskResourceName, // const AMaskResourceName: String;
+              AMaskBitmap, // const AMaskBitmap: TBitmap;
+              AScale, // const AScale: Single;
+              W, H, // const W, H: single;
+              AWrapMode, // const AWrapMode: TALImageWrapMode;
+              ACropCenter, // const ACropCenter: TpointF;
+              ABlurRadius, // const ABlurRadius: single;
+              AXRadius, // const AXRadius: Single;
+              AYRadius); // const AYRadius: Single);;
+  {$ENDIF}
 end;
 
 {***********************}
@@ -3253,7 +3423,7 @@ begin
       {$IF defined(ALGPUCanvas)}
       result := ALCreateTextureFromSkSurface(LSurface);
       {$ELSE}
-      result := ALCreateBitmapFromSkSurface(LSurface);
+      result := ALCreateTBitmapFromSkSurface(LSurface);
       {$ENDIF}
     finally
       sk4d_refcnt_unref(LSurface);
@@ -3295,13 +3465,13 @@ begin
     {$IF defined(ALGPUCanvas)}
     result := ALCreateTextureFromCGContextRef(LCGContextRef);
     {$ELSE}
-    result := ALCreateBitmapFromCGContextRef(LCGContextRef);
+    result := ALCreateTBitmapFromCGContextRef(LCGContextRef);
     {$ENDIF}
   finally
     CGContextRelease(LCGContextRef);
   end;
   {$ELSE}
-  Result := ALCreateBitmapFromResource(
+  Result := ALCreateTBitmapFromResource(
               AResourceName, // const AResourceName: String;
               AResourceStream, // const AResourceStream: TStream;
               AMaskResourceName, // const AMaskResourceName: String;
@@ -6317,7 +6487,7 @@ begin
     {$ELSEIF defined(ALGPUCanvas)}
     result := ALCreateTextureFromSkSurface(ASurface);
     {$ELSE}
-    result := ALCreateBitmapFromSkSurface(ASurface);
+    result := ALCreateTBitmapFromSkSurface(ASurface);
     {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   result := ALCreateTextureFromJBitmap(ASurface);
@@ -6325,7 +6495,7 @@ begin
     {$IF defined(ALGpuCanvas)}
     result := ALCreateTextureFromCGContextRef(ASurface);
     {$ELSE}
-    result := ALCreateBitmapFromCGContextRef(ASurface);
+    result := ALCreateTBitmapFromCGContextRef(ASurface);
     {$ENDIF}
   {$ELSE}
   Result := Tbitmap.Create;
@@ -6342,7 +6512,7 @@ begin
     {$ELSEIF defined(ALGPUCanvas)}
     ALUpdateTextureFromSkSurface(ASurface, aDrawable);
     {$ELSE}
-    ALUpdateBitmapFromSkSurface(ASurface, aDrawable);
+    ALUpdateTBitmapFromSkSurface(ASurface, aDrawable);
     {$ENDIF}
   {$ELSEIF defined(ANDROID)}
   ALUpdateTextureFromJBitmap(ASurface, aDrawable);
@@ -6350,7 +6520,7 @@ begin
     {$IF defined(ALGpuCanvas)}
     ALUpdateTextureFromCGContextRef(ASurface, aDrawable);
     {$ELSE}
-    ALUpdateBitmapFromCGContextRef(ASurface, aDrawable);
+    ALUpdateTBitmapFromCGContextRef(ASurface, aDrawable);
     {$ENDIF}
   {$ELSE}
   // To force CopyToNewReference
@@ -6677,13 +6847,13 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALCreateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
+function ALCreateTBitmapFromSkPixmap(Const APixmap: sk_pixmap_t): TBitmap;
 begin
   var LWidth := sk4d_pixmap_get_width(APixmap);
   var LHeight := sk4d_pixmap_get_Height(APixmap);
   Result := TBitmap.Create(LWidth, LHeight);
   Try
-    ALUpdateBitmapFromSkPixmap(APixmap, Result);
+    ALUpdateTBitmapFromSkPixmap(APixmap, Result);
   except
     ALFreeAndNil(Result);
     Raise;
@@ -6693,11 +6863,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-function ALCreateBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
+function ALCreateTBitmapFromSkSurface(Const ASurface: sk_surface_t): TBitmap;
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
   try
-    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+    Result := ALCreateTBitmapFromSkPixmap(LPixmap);
   finally
     sk4d_pixmap_destroy(LPixmap);
   end;
@@ -6706,11 +6876,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-Function ALCreateBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
+Function ALCreateTBitmapFromSkImage(const AImage: sk_image_t): TBitmap;
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
   try
-    Result := ALCreateBitmapFromSkPixmap(LPixmap);
+    Result := ALCreateTBitmapFromSkPixmap(LPixmap);
   finally
     sk4d_pixmap_destroy(LPixmap);
   end;
@@ -6719,7 +6889,7 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-procedure ALUpdateBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
+procedure ALUpdateTBitmapFromSkPixmap(Const APixmap: sk_pixmap_t; const ABitmap: Tbitmap);
 begin
   var LBitmapData: TBitmapData;
   if ABitmap.Map(TMapAccess.ReadWrite, LBitmapData) then begin
@@ -6756,11 +6926,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-procedure ALUpdateBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
+procedure ALUpdateTBitmapFromSkSurface(Const ASurface: sk_surface_t; const ABitmap: TBitmap);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_surface_peek_pixels(ASurface));
   try
-    ALUpdateBitmapFromSkPixmap(LPixmap, ABitmap);
+    ALUpdateTBitmapFromSkPixmap(LPixmap, ABitmap);
   finally
     sk4d_pixmap_destroy(LPixmap);
   end;
@@ -6769,11 +6939,11 @@ end;
 
 {****************************}
 {$IF defined(ALSkiaAvailable)}
-procedure ALUpdateBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
+procedure ALUpdateTBitmapFromSkImage(const AImage: sk_image_t; const ABitmap: TBitmap);
 begin
   var LPixmap := ALSkCheckHandle(sk4d_image_peek_pixels(AImage));
   try
-    ALUpdateBitmapFromSkPixmap(LPixmap, ABitmap);
+    ALUpdateTBitmapFromSkPixmap(LPixmap, ABitmap);
   finally
     sk4d_pixmap_destroy(LPixmap);
   end;

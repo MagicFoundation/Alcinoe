@@ -4070,7 +4070,7 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALCreateBitmapFromResource(
+              var LImg := ALCreateTBitmapFromResource(
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;

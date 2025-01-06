@@ -2767,7 +2767,7 @@ begin
       FBufCanvas, // canvas: sk_canvas_t;
       @LRect, // const dest: psk_rect_t;
       0); // render_flags: uint32_t); cdecl;
-    ALUpdateBitmapFromSkSurface(FBufSurface, FBufBitmap);
+    ALUpdateTBitmapFromSkSurface(FBufSurface, FBufBitmap);
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;
       FBufBitmap, // const ADrawable: TALDrawable;
@@ -2791,7 +2791,7 @@ begin
       FRenderRect, // const ADstRect: TrectF; // IN Virtual pixels !
       AbsoluteOpacity); // const AOpacity: Single)
     {$ELSE}
-    ALUpdateBitmapFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer), FBufBitmap);
+    ALUpdateTBitmapFromSkImage(sk4d_animcodecplayer_get_frame(fAnimcodecplayer), FBufBitmap);
     ALDrawDrawable(
       Canvas, // const ACanvas: Tcanvas;
       FBufBitmap, // const ADrawable: TALDrawable;

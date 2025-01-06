@@ -17,7 +17,7 @@ echo 1) Athens
 echo 2) Alexandria (deprecated)
 
 set COMPILER=
-set /P COMPILER=Enter number to select a compiler (Empty to auto select): %=%
+set /P COMPILER="Enter number to select a compiler (Empty to auto select):" %=%
 more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
 
 if "%COMPILER%"=="" (
@@ -54,6 +54,24 @@ REM --------------
 if not exist "%ALBaseDir%\Source\Alcinoe.inc" goto ERROR
 
 
+REM ----------------------------------------------------
+REM Ask if user wants to perform all steps automatically
+REM ----------------------------------------------------
+
+echo -------------------------------
+echo Perform all steps automatically
+echo -------------------------------
+echo.
+
+set ALNoPrompts=
+set /P ALNoPrompts="Perform all steps automatically without prompts? (Y/N, default=Y)?:" %=%
+more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+echo.
+
+if "%ALNoPrompts%"=="" set ALNoPrompts=Y
+if "%ALNoPrompts%"=="y" set ALNoPrompts=Y
+
+
 REM --------------------------------------------
 REM Copy and patch localy the delphi source code
 REM --------------------------------------------
@@ -65,10 +83,14 @@ echo Delphi source code
 echo ------------------
 echo.
 
-set ALCopyAndPatchDelphiSource=
-set /P ALCopyAndPatchDelphiSource=Copy the Delphi source code and patch it locally (Y/N, default=Y)?: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
-echo.
+if "%ALNoPrompts%"=="Y" (
+  set ALCopyAndPatchDelphiSource=Y
+) else (
+  set ALCopyAndPatchDelphiSource=
+  set /P ALCopyAndPatchDelphiSource="Copy the Delphi source code and patch it locally (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
+)
 
 if "%ALCopyAndPatchDelphiSource%"=="" set ALCopyAndPatchDelphiSource=Y
 if "%ALCopyAndPatchDelphiSource%"=="y" set ALCopyAndPatchDelphiSource=Y
@@ -95,10 +117,14 @@ echo Libraries
 echo ---------
 echo.
 
-set ALDownloadLibraries=
-set /P ALDownloadLibraries=Download libraries (Y/N, default=Y)?: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
-echo.
+if "%ALNoPrompts%"=="Y" (
+  set ALDownloadLibraries=Y
+) else (
+  set ALDownloadLibraries=
+  set /P ALDownloadLibraries="Download libraries (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
+)
 
 if "%ALDownloadLibraries%"=="" set ALDownloadLibraries=Y
 if "%ALDownloadLibraries%"=="y" set ALDownloadLibraries=Y
@@ -149,7 +175,7 @@ echo Normalize all units
 echo -------------------
 echo.
 
-call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas" -NoInteraction=true
+call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Demos\" -CreateBackup="false" -FilesToIgnore="superxmlparser.pas;supertimezone.pas;superobject.pas;superdate.pas;dwsXPlatform.pas;dwsUtils.pas;dwsJSON.pas;dwsStrings.pas" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
 call "%ALBaseDir%\Tools\UnitNormalizer\UnitNormalizer.exe" -Dir="%ALBaseDir%\Source\" -FilesToIgnore="ZLibExGZ.pas;ZLibExApi.pas;ZLibEx.pas;Grijjy.SymbolTranslator.pas;Grijjy.ErrorReporting.pas;Alcinoe.iOSapi.ImageIO.pas" -CreateBackup="false" -NoInteraction=true
 IF ERRORLEVEL 1 goto ERROR
@@ -171,10 +197,14 @@ echo Tests
 echo -----
 echo.
 
-set ALRunTests=
-set /P ALRunTests=Run tests (Y/N, default=Y)?: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
-echo.
+if "%ALNoPrompts%"=="Y" (
+  set ALRunTests=Y
+) else (
+  set ALRunTests=
+  set /P ALRunTests="Run tests (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
+)
 
 if "%ALRunTests%"=="" set ALRunTests=Y
 if "%ALRunTests%"=="y" set ALRunTests=Y
@@ -220,10 +250,14 @@ echo Build Jars
 echo ----------
 echo.
 
-set ALBuildJars=
-set /P ALBuildJars=Build Jars (Y/N, default=Y)?: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
-echo.
+if "%ALNoPrompts%"=="Y" (
+  set ALBuildJars=Y
+) else (
+  set ALBuildJars=
+  set /P ALBuildJars="Build Jars (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
+)
 
 if "%ALBuildJars%"=="" set ALBuildJars=Y
 if "%ALBuildJars%"=="y" set ALBuildJars=Y
@@ -250,10 +284,14 @@ echo Build Tools
 echo -----------
 echo.
 
-set ALBuildTools=
-set /P ALBuildTools=Build tools (Y/N, default=Y)?: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
-echo.
+if "%ALNoPrompts%"=="Y" (
+  set ALBuildTools=Y
+) else (
+  set ALBuildTools=
+  set /P ALBuildTools="Build tools (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+  echo.
+)
 
 if "%ALBuildTools%"=="" set ALBuildTools=Y
 if "%ALBuildTools%"=="y" set ALBuildTools=Y
@@ -285,9 +323,13 @@ echo Build demos
 echo -----------
 echo.
 
-set ALBuildDemos=
-set /P ALBuildDemos=Build demos (Y/N, default=Y)?: %=%
-more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+if "%ALNoPrompts%"=="Y" (
+  set ALBuildDemos=Y
+) else (
+  set ALBuildDemos=
+  set /P ALBuildDemos="Build demos (Y/N, default=Y)?:" %=%
+  more < nul > nul & REM This instruction to clear the ERRORLEVEL because previous instruction set ERRORLEVEL to 1 if empty input
+)
 
 if "%ALBuildDemos%"=="" set ALBuildDemos=Y
 if "%ALBuildDemos%"=="y" set ALBuildDemos=Y

@@ -10,6 +10,9 @@ program ALDUnitXTests;
 {$ENDIF}
 
 uses
+  {$IF defined(SKIA)}
+  FMX.Skia,
+  {$ENDIF}
   {$IFDEF MSWINDOWS}
     {$IFDEF TESTINSIGHT}
     TestInsight.DUnitX,
@@ -187,6 +190,11 @@ uses
   {$ENDIF}
 {$ENDIF}
 begin
+
+{$IF defined(SKIA)}
+  GlobalUseSkia := True;
+{$ENDIF}
+
 {$IFDEF MSWINDOWS}
 
     {$IFDEF DEBUG}

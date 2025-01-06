@@ -646,12 +646,12 @@ type
         procedure AlignToPixel; override;
       published
         property Font;
-        property Trimming;
-        property MaxLines;
         property Ellipsis;
+        property MaxLines;
+        property IsHtml;
+        property Trimming;
         property LineHeightMultiplier;
         property LetterSpacing;
-        property IsHtml;
         property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TLabelTextLayout read FLayout write SetLayout default TLabelTextLayout.Floating;
         property Animation: TLabelTextAnimation read FAnimation write SetAnimation default TLabelTextAnimation.Translation;
@@ -689,12 +689,12 @@ type
         procedure AlignToPixel; override;
       published
         property Font;
-        property Trimming;
-        property MaxLines;
         property Ellipsis;
+        property MaxLines;
+        property IsHtml;
+        property Trimming;
         property LineHeightMultiplier;
         property LetterSpacing;
-        property IsHtml;
         property Margins: TALBounds read FMargins write SetMargins;
         property Layout: TSupportingTextLayout read FLayout write SetLayout default TSupportingTextLayout.Floating;
       end;
@@ -5553,13 +5553,18 @@ begin
     //--
     //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
-    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
-    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillMaskResourceName: String; // default = ''
+    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageNoRadius: Boolean; // default = False
+    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -5678,13 +5683,18 @@ begin
     //--
     //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
-    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
-    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillMaskResourceName: String; // default = ''
+    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageNoRadius: Boolean; // default = False
+    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -5803,13 +5813,18 @@ begin
     //--
     //LOptions.FillColor: TAlphaColor; // default = TAlphaColors.null
     //LOptions.FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillGradientColors: TArray<TAlphaColor>; // Default = [];
     //LOptions.FillGradientOffsets: TArray<Single>; // Default = [];
-    //LOptions.FillGradientAngle: Single; // Default = 180;
     //LOptions.FillResourceName: String; // default = ''
-    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillMaskResourceName: String; // default = ''
+    //LOptions.FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     //LOptions.FillBackgroundMargins: TRectF; // default = TRectF.Empty
     //LOptions.FillImageMargins: TRectF; // default = TRectF.Empty
+    //LOptions.FillImageNoRadius: Boolean; // default = False
+    //LOptions.FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    //LOptions.FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    //LOptions.FillBlurRadius: single; // default = 0
     //--
     //LOptions.StateLayerOpacity: Single; // Default = 0
     //LOptions.StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
@@ -6174,22 +6189,19 @@ begin
                                                   true); // Const ASaveState: Boolean);
       try
 
-        ALDrawRectangle(
-          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-          1, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LocalRect, // const Rect: TrectF;
-          AbsoluteOpacity, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
-          True, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          Sides, // const Sides: TSides;
-          Corners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LocalRect)
+          .SetOpacity(AbsoluteOpacity)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.TextSettings.Font.Color)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(Sides)
+          .SetCorners(Corners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
       finally
         if LCanvasSaveState <> nil then
@@ -6216,22 +6228,19 @@ begin
 
           ALClearCanvas(LBufCanvas, TAlphaColors.Null);
 
-          ALDrawRectangle(
-            LBufCanvas, // const ACanvas: TALCanvas;
-            ALGetScreenScale, // const AScale: Single;
-            IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-            LocalRect, // const Rect: TrectF;
-            1, // const AOpacity: Single;
-            LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-            LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-            LCurrentAdjustedStateStyle.TextSettings.Font.Color, // const AStateLayerContentColor: TAlphaColor;
-            True, // const ADrawStateLayerOnTop: Boolean;
-            LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-            LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-            Sides, // const Sides: TSides;
-            Corners, // const Corners: TCorners;
-            XRadius, // const XRadius: Single = 0;
-            YRadius); // const YRadius: Single = 0);
+          TALDrawRectangleHelper.Create(LBufCanvas)
+            .SetScale(ALGetScreenScale)
+            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetDstRect(LocalRect)
+            .SetFill(LCurrentAdjustedStateStyle.Fill)
+            .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.TextSettings.Font.Color)
+            .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+            .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+            .SetSides(Sides)
+            .SetCorners(Corners)
+            .SetXRadius(XRadius)
+            .SetYRadius(YRadius)
+            .Draw;
 
         finally
           ALCanvasEndScene(LBufCanvas)

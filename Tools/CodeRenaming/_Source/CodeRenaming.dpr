@@ -473,6 +473,7 @@ begin
       LOldToNewNames.add('ALFmxMakeBufBitmaps=ALMakeBufDrawables');
       LOldToNewNames.add('ALGetCTFontRef=ALCreateCTFontRef');
       LOldToNewNames.add('ALAlignAbsolutePointToPixelRound=ALAlignToPixelRound');
+      LOldToNewNames.add('ALGetImageSize=ALGetImageDimensions');
 
       //type names
       LOldToNewNames.add('pALFormatSettings=pALFormatSettingsA');

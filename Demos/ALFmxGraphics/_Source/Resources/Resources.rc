@@ -1,0 +1,6 @@
+gbrcolorprofile RCDATA "gbrcolorprofile.jpg"
+landscape RCDATA "landscape.jpg"
+landscapelittle RCDATA "landscapelittle.jpg"
+mask RCDATA "mask.png"
+webkitlogop3 RCDATA "webkitlogop3.png"
+webkitlogosrgb RCDATA "webkitlogosrgb.png"

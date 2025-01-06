@@ -1433,14 +1433,14 @@ type
       published
         property Font;
         property Decoration;
-        property Trimming;
-        property MaxLines;
         property Ellipsis;
+        property MaxLines;
+        property IsHtml;
+        property Trimming;
         property HorzAlign;
         property VertAlign;
         property LineHeightMultiplier;
         property LetterSpacing;
-        property IsHtml;
       end;
       // ---------------
       // TBaseStateStyle
@@ -2999,15 +2999,28 @@ begin
 
   FBufDrawableRect := LocalRect;
   {$IFDEF ALDPK}
+  if ALGetResourceFilename(FResourceName) = '' then
+    fBufDrawable := ALNullDrawable
+  else
   try
-    var LFileName := ALGetResourceFilename(FResourceName);
-    if LFileName <> '' then fBufDrawable := ALLoadFromFileAndFitIntoToDrawable(LFileName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale)
-    else fBufDrawable := ALNullDrawable;
+  {$ENDIF}
+    fBufDrawable := ALCreateDrawableFromResource(
+                      FResourceName, // const AResourceName: String;
+                      nil, // const AResourceStream: TStream;
+                      '', // const AMaskResourceName: String;
+                      ALNullBitmap, // const AMaskBitmap: TALBitmap;
+                      1, // const AScale: Single;
+                      Width * (fframeCount div fRowCount) * ALGetScreenScale,
+                      Height * fRowCount * ALGetScreenScale, // const W, H: single;
+                      TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
+                      TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                      0, // const ABlurRadius: single;
+                      0, // const AXRadius: Single;
+                      0); // const AYRadius: Single);
+  {$IFDEF ALDPK}
   except
     fBufDrawable := ALNullDrawable;
   end;
-  {$ELSE}
-  FBufDrawable := ALLoadFromResourceAndFitIntoToDrawable(FResourceName, Width * (fframeCount div fRowCount) * ALGetScreenScale, Height * fRowCount * ALGetScreenScale);
   {$ENDIF}
 
 end;
@@ -3833,22 +3846,19 @@ begin
                                                 true); // Const ASaveState: Boolean);
     try
 
-      ALDrawRectangle(
-        TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-        1, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-        LocalRect, // const Rect: TrectF;
-        AbsoluteOpacity, // const AOpacity: Single;
-        LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-        LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-        TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-        True, // const ADrawStateLayerOnTop: Boolean;
-        LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-        LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-        Sides, // const Sides: TSides;
-        Corners, // const Corners: TCorners;
-        XRadius, // const XRadius: Single = 0;
-        YRadius); // const YRadius: Single = 0);
+      TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(LocalRect)
+        .SetOpacity(AbsoluteOpacity)
+        .SetFill(LCurrentAdjustedStateStyle.Fill)
+        .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TalphaColors.Null)
+        .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+        .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+        .SetSides(Sides)
+        .SetCorners(Corners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
     finally
       if LCanvasSaveState <> nil then
@@ -3875,22 +3885,20 @@ begin
 
         ALClearCanvas(LBufCanvas, TAlphaColors.Null);
 
-        ALDrawRectangle(
-          LBufCanvas, // const ACanvas: TALCanvas;
-          ALGetScreenScale, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LRect, // const Rect: TrectF;
-          AbsoluteOpacity, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-          True, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          Sides, // const Sides: TSides;
-          Corners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(LBufCanvas)
+          .SetScale(ALGetScreenScale)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LRect)
+          .SetOpacity(AbsoluteOpacity)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TalphaColors.Null)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(Sides)
+          .SetCorners(Corners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
       finally
         ALCanvasEndScene(LBufCanvas)
@@ -5077,6 +5085,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -5094,22 +5103,20 @@ begin
     if ALCanvasBeginScene(LCanvas) then
     try
 
-      ALDrawRectangle(
-        LCanvas, // const ACanvas: TALCanvas;
-        AScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-        ABufDrawableRect, // const Rect: TrectF;
-        1, // const AOpacity: Single;
-        AFill, // const Fill: TALBrush;
-        AStateLayer, // const StateLayer: TALStateLayer;
-        AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
-        ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
-        AStroke, // const Stroke: TALStrokeBrush;
-        AShadow, // const Shadow: TALShadow
-        Sides, // const Sides: TSides;
-        Corners, // const Corners: TCorners;
-        XRadius, // const XRadius: Single = 0;
-        YRadius); // const YRadius: Single = 0);
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(ABufDrawableRect)
+        .SetFill(AFill)
+        .SetStateLayer(AStateLayer, AStateLayerContentColor)
+        .SetDrawStateLayerOnTop(ADrawStateLayerOnTop)
+        .SetStroke(AStroke)
+        .SetShadow(AShadow)
+        .SetSides(Sides)
+        .SetCorners(Corners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
       If AStopIndicator.hasStopIndicator then begin
         var LStopIndicatorCount: integer;
@@ -5139,34 +5146,16 @@ begin
             LDstRect.SetLocation(LPos, LDstRect.Top)
           else
             LDstRect.SetLocation(LDstRect.Left, Lpos);
-        ALDrawCircle(
-          LCanvas, // const ACanvas: TALCanvas;
-          AScale, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LDstRect, // const ADstRect: TrectF;
-          1, // const AOpacity: Single;
-          AStopIndicator.Color, // const AFillColor: TAlphaColor;
-          TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-          [], // const AFillGradientColors: TArray<TAlphaColor>;
-          [], // const AFillGradientOffsets: TArray<Single>;
-          TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-          TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-          AStopIndicator.ResourceName, // const AFillResourceName: String;
-          AStopIndicator.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
-          TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
-          TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
-          0, // const AStateLayerOpacity: Single;
-          TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
-          TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
-          0, // const AStateLayerXRadius: Single;
-          0, // const AStateLayerYRadius: Single;
-          true, // const ADrawStateLayerOnTop: Boolean;
-          TalphaColors.Null, // const AStrokeColor: TalphaColor;
-          0, // const AStrokeThickness: Single;
-          TalphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the circle)
-          0, // const AShadowBlur: Single;
-          0, //const AShadowOffsetX: Single;
-          0); // const AShadowOffsetY: Single);
+          TALDrawRectangleHelper.Create(LCanvas)
+            .SetScale(AScale)
+            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LDstRect))
+            .SetFillColor(AStopIndicator.Color)
+            .SetFillResourceName(AStopIndicator.ResourceName)
+            .SetFillWrapMode(AStopIndicator.WrapMode)
+            .SetXRadius(-50)
+            .SetYRadius(-50)
+            .Draw;
         end;
       end;
 
@@ -5218,22 +5207,19 @@ begin
 
     {$IF DEFINED(ALSkiaCanvas)}
 
-    ALDrawRectangle(
-      TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      LocalRect, // const Rect: TrectF;
-      AbsoluteOpacity, // const AOpacity: Single;
-      LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-      LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-      TalphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-      True, // const ADrawStateLayerOnTop: Boolean;
-      LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-      LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-      Sides, // const Sides: TSides;
-      Corners, // const Corners: TCorners;
-      XRadius, // const XRadius: Single = 0;
-      YRadius); // const YRadius: Single = 0);
+    TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(LocalRect)
+      .SetOpacity(AbsoluteOpacity)
+      .SetFill(LCurrentAdjustedStateStyle.Fill)
+      .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TalphaColors.Null)
+      .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+      .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+      .SetSides(Sides)
+      .SetCorners(Corners)
+      .SetXRadius(XRadius)
+      .SetYRadius(YRadius)
+      .Draw;
 
     {$ELSE}
 
@@ -7737,28 +7723,20 @@ end;
 
 {********************************************************}
 procedure TALBaseCheckBox.SetXRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FXRadius := NewValue;
+    FXRadius := Value;
     Repaint;
   end;
 end;
 
 {********************************************************}
 procedure TALBaseCheckBox.SetYRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FYRadius := NewValue;
+    FYRadius := Value;
     Repaint;
   end;
 end;
@@ -8125,38 +8103,13 @@ begin
   // With ResourceName
   else begin
 
-    ALDrawRectangle(
-      ACanvas, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      LRect, // const ADstRect: TrectF;
-      1, // const AOpacity: Single;
-      ACheckMark.Color, // const AFillColor: TAlphaColor;
-      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
-      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      ACheckMark.ResourceName, // const AFillResourceName: String;
-      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
-      TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
-      TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
-      0, // const AStateLayerOpacity: Single;
-      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
-      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
-      0, // const AStateLayerXRadius: Single;
-      0, // const AStateLayerYRadius: Single;
-      False, // const ADrawStateLayerOnTop: Boolean;
-      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
-      0, // const AStrokeThickness: Single;
-      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
-      0, // const AShadowBlur: Single;
-      0, // const AShadowOffsetX: Single;
-      0, // const AShadowOffsetY: Single;
-      AllSides, // const ASides: TSides;
-      AllCorners, // const ACorners: TCorners;
-      0, // const AXRadius: Single;
-      0); // const AYRadius: Single)
+    TALDrawRectangleHelper.Create(ACanvas)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(LRect)
+      .SetFillColor(ACheckMark.Color)
+      .SetFillResourceName(ACheckMark.ResourceName)
+      .SetFillWrapMode(ACheckMark.WrapMode)
+      .Draw;
 
   end;
 
@@ -8180,6 +8133,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   if ACheckMark.HasCheckMark then begin
@@ -8202,22 +8156,20 @@ begin
     if ALCanvasBeginScene(LCanvas) then
     try
 
-      ALDrawRectangle(
-        LCanvas, // const ACanvas: TALCanvas;
-        AScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-        ABufDrawableRect, // const Rect: TrectF;
-        1, // const AOpacity: Single;
-        AFill, // const Fill: TALBrush;
-        AStateLayer, // const StateLayer: TALStateLayer;
-        ACheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
-        False, // const ADrawStateLayerOnTop: Boolean;
-        AStroke, // const Stroke: TALStrokeBrush;
-        AShadow, // const Shadow: TALShadow
-        AllSides, // const Sides: TSides;
-        AllCorners, // const Corners: TCorners;
-        XRadius, // const XRadius: Single = 0;
-        YRadius); // const YRadius: Single = 0);
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(ABufDrawableRect)
+        .SetFill(AFill)
+        .SetStateLayer(AStateLayer, ACheckMark.Color)
+        .SetDrawStateLayerOnTop(False)
+        .SetStroke(AStroke)
+        .SetShadow(AShadow)
+        .SetSides(AllSides)
+        .SetCorners(AllCorners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
       DrawCheckMark(
         LCanvas, // const ACanvas: TALCanvas;
@@ -8300,6 +8252,7 @@ begin
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
+                            nil, // const AFillResourceStream: TStream;
                             LCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
@@ -8317,22 +8270,19 @@ begin
       end;
       try
 
-        ALDrawRectangle(
-          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-          1, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LRect, // const Rect: TrectF;
-          1, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          LCurrentAdjustedStateStyle.CheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
-          False, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          AllSides, // const Sides: TSides;
-          AllCorners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LRect)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.CheckMark.Color)
+          .SetDrawStateLayerOnTop(False)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(AllSides)
+          .SetCorners(AllCorners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
         DrawCheckMark(
           TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
@@ -8373,22 +8323,20 @@ begin
 
         ALClearCanvas(LBufCanvas, TAlphaColors.Null);
 
-        ALDrawRectangle(
-          LBufCanvas, // const ACanvas: TALCanvas;
-          ALGetScreenScale, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LRect, // const Rect: TrectF;
-          1, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          LCurrentAdjustedStateStyle.CheckMark.Color, // const AStateLayerContentColor: TAlphaColor;
-          False, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          AllSides, // const Sides: TSides;
-          AllCorners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(LBufCanvas)
+          .SetScale(ALGetScreenScale)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LRect)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, LCurrentAdjustedStateStyle.CheckMark.Color)
+          .SetDrawStateLayerOnTop(False)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(AllSides)
+          .SetCorners(AllCorners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
         DrawCheckMark(
           LBufCanvas, // const ACanvas: TALCanvas;
@@ -8701,72 +8649,28 @@ begin
     if not AChecked then
       exit;
 
-    ALDrawCircle(
-      ACanvas, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      LRect, // const ADstRect: TrectF;
-      1, // const AOpacity: Single;
-      ACheckMark.Color, // const AFillColor: TAlphaColor;
-      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
-      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      ACheckMark.ResourceName, // const AFillResourceName: String;
-      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
-      TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
-      TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
-      0, // const AStateLayerOpacity: Single;
-      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
-      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
-      0, // const AStateLayerXRadius: Single;
-      0, // const AStateLayerYRadius: Single;
-      False, // const ADrawStateLayerOnTop: Boolean;
-      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
-      0, // const AStrokeThickness: Single;
-      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
-      0, // const AShadowBlur: Single;
-      0, // const AShadowOffsetX: Single;
-      0); // const AShadowOffsetY: Single;
+    TALDrawRectangleHelper.Create(ACanvas)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LRect))
+      .SetFillColor(ACheckMark.Color)
+      .SetFillResourceName(ACheckMark.ResourceName)
+      .SetFillWrapMode(ACheckMark.WrapMode)
+      .SetXRadius(-50)
+      .SetYRadius(-50)
+      .Draw;
 
   end
 
   // With ResourceName
   else begin
 
-    ALDrawRectangle(
-      ACanvas, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      LRect, // const ADstRect: TrectF;
-      1, // const AOpacity: Single;
-      ACheckMark.Color, // const AFillColor: TAlphaColor;
-      TGradientStyle.Linear, // const AFillGradientStyle: TGradientStyle;
-      [], // const AFillGradientColors: TArray<TAlphaColor>;
-      [], // const AFillGradientOffsets: TArray<Single>;
-      TPointF.Zero, // const AFillGradientStartPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      TPointF.Zero, // const AFillGradientEndPoint: TPointF; // Coordinates in ADstRect space. You can use ALGetLinearGradientCoordinates to convert angle to point
-      ACheckMark.ResourceName, // const AFillResourceName: String;
-      ACheckMark.WrapMode, // Const AFillWrapMode: TALImageWrapMode;
-      TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
-      TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
-      0, // const AStateLayerOpacity: Single;
-      TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
-      TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
-      0, // const AStateLayerXRadius: Single;
-      0, // const AStateLayerYRadius: Single;
-      False, // const ADrawStateLayerOnTop: Boolean;
-      TAlphaColors.Null, // const AStrokeColor: TalphaColor;
-      0, // const AStrokeThickness: Single;
-      TAlphaColors.Null, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, the Canvas should have adequate space to accommodate the shadow. You can use the ALGetShadowWidth function to estimate the required width.
-      0, // const AShadowBlur: Single;
-      0, // const AShadowOffsetX: Single;
-      0, // const AShadowOffsetY: Single;
-      AllSides, // const ASides: TSides;
-      AllCorners, // const ACorners: TCorners;
-      0, // const AXRadius: Single;
-      0); // const AYRadius: Single)
+    TALDrawRectangleHelper.Create(ACanvas)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(LRect)
+      .SetFillColor(ACheckMark.Color)
+      .SetFillResourceName(ACheckMark.ResourceName)
+      .SetFillWrapMode(ACheckMark.WrapMode)
+      .Draw;
 
   end;
 
@@ -9334,28 +9238,20 @@ end;
 
 {*********************************************************}
 procedure TALSwitch.TTrack.SetXRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FXRadius := NewValue;
+    FXRadius := Value;
     Repaint;
   end;
 end;
 
 {*********************************************************}
 procedure TALSwitch.TTrack.SetYRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FYRadius := NewValue;
+    FYRadius := Value;
     Repaint;
   end;
 end;
@@ -9525,6 +9421,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -9542,22 +9439,20 @@ begin
     if ALCanvasBeginScene(LCanvas) then
     try
 
-      ALDrawRectangle(
-        LCanvas, // const ACanvas: TALCanvas;
-        AScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-        ABufDrawableRect, // const Rect: TrectF;
-        1, // const AOpacity: Single;
-        AFill, // const Fill: TALBrush;
-        AStateLayer, // const StateLayer: TALStateLayer;
-        TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-        False, // const ADrawStateLayerOnTop: Boolean;
-        AStroke, // const Stroke: TALStrokeBrush;
-        AShadow, // const Shadow: TALShadow
-        AllSides, // const Sides: TSides;
-        AllCorners, // const Corners: TCorners;
-        XRadius, // const XRadius: Single = 0;
-        YRadius); // const YRadius: Single = 0);
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(ABufDrawableRect)
+        .SetFill(AFill)
+        .SetStateLayer(AStateLayer, TAlphaColors.Null)
+        .SetDrawStateLayerOnTop(False)
+        .SetStroke(AStroke)
+        .SetShadow(AShadow)
+        .SetSides(AllSides)
+        .SetCorners(AllCorners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
     finally
       ALCanvasEndScene(LCanvas)
@@ -9633,6 +9528,7 @@ begin
                             LCurrentAdjustedStateStyle.Fill.Color, // const AFillColor: TAlphaColor;
                             LCurrentAdjustedStateStyle.Fill.Gradient.Colors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LCurrentAdjustedStateStyle.Fill.ResourceName, // const AFillResourceName: String;
+                            nil, // const AFillResourceStream: TStream;
                             LCurrentAdjustedStateStyle.Fill.BackgroundMargins.Rect, // Const AFillBackgroundMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.Fill.ImageMargins.Rect, // Const AFillImageMarginsRect: TRectF;
                             LCurrentAdjustedStateStyle.StateLayer.Opacity, // const AStateLayerOpacity: Single;
@@ -9650,22 +9546,19 @@ begin
       end;
       try
 
-        ALDrawRectangle(
-          TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-          1, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LRect, // const Rect: TrectF;
-          1, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-          False, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          AllSides, // const Sides: TSides;
-          AllCorners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LRect)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TAlphaColors.Null)
+          .SetDrawStateLayerOnTop(False)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(AllSides)
+          .SetCorners(AllCorners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
       finally
         if compareValue(AbsoluteOpacity, 1, Tepsilon.Scale) < 0 then
@@ -9697,22 +9590,20 @@ begin
 
         ALClearCanvas(LBufCanvas, TAlphaColors.Null);
 
-        ALDrawRectangle(
-          LBufCanvas, // const ACanvas: TALCanvas;
-          ALGetScreenScale, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          LRect, // const Rect: TrectF;
-          1, // const AOpacity: Single;
-          LCurrentAdjustedStateStyle.Fill, // const Fill: TALBrush;
-          LCurrentAdjustedStateStyle.StateLayer, // const StateLayer: TALStateLayer;
-          TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-          False, // const ADrawStateLayerOnTop: Boolean;
-          LCurrentAdjustedStateStyle.Stroke, // const Stroke: TALStrokeBrush;
-          LCurrentAdjustedStateStyle.Shadow, // const Shadow: TALShadow
-          AllSides, // const Sides: TSides;
-          AllCorners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+        TALDrawRectangleHelper.Create(LBufCanvas)
+          .SetScale(ALGetScreenScale)
+          .SetAlignToPixel(IsPixelAlignmentEnabled)
+          .SetDstRect(LRect)
+          .SetFill(LCurrentAdjustedStateStyle.Fill)
+          .SetStateLayer(LCurrentAdjustedStateStyle.StateLayer, TAlphaColors.Null)
+          .SetDrawStateLayerOnTop(False)
+          .SetStroke(LCurrentAdjustedStateStyle.Stroke)
+          .SetShadow(LCurrentAdjustedStateStyle.Shadow)
+          .SetSides(AllSides)
+          .SetCorners(AllCorners)
+          .SetXRadius(XRadius)
+          .SetYRadius(YRadius)
+          .Draw;
 
       finally
         ALCanvasEndScene(LBufCanvas)

@@ -85,16 +85,21 @@ type
     //--
     FillColor: TAlphaColor; // default = TAlphaColors.null
     FillGradientStyle: TGradientStyle; // Default = TGradientStyle.Linear;
+    FillGradientAngle: Single; // Default = 180;
     FillGradientColors: TArray<TAlphaColor>; // Default = [];
     FillGradientOffsets: TArray<Single>; // Default = [];
-    FillGradientAngle: Single; // Default = 180;
     FillResourceName: String; // default = ''
-    FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    FillMaskResourceName: String; // default = ''
+    FillMaskBitmap: TALBitmap; // default = ALNullBitmap
     FillBackgroundMargins: TRectF; // default = TRectF.Empty
     FillImageMargins: TRectF; // default = TRectF.Empty
+    FillImageNoRadius: Boolean; // default = False
+    FillWrapMode: TALImageWrapMode; // default = TALImageWrapMode.Fit
+    FillCropCenter: TpointF; // default = TPointF.create(-50,-50)
+    FillBlurRadius: single; // default = 0
     //--
-    StateLayerOpacity: Single; // Default = 0
-    StateLayerColor: TAlphaColor; // Default = TAlphaColors.null
+    StateLayerOpacity: Single; // default = 0
+    StateLayerColor: TAlphaColor; // default = TAlphaColors.null
     StateLayerMargins: TRectF; // default = TRectF.Empty
     StateLayerXRadius: Single; // default = 0
     StateLayerYRadius: Single; // default = 0
@@ -276,6 +281,7 @@ function ALGetTextElementsByID(Const ATextElements: TALTextElements; Const AId: 
 implementation
 
 uses
+  System.Classes,
   System.Math.Vectors,
   system.SysUtils,
   System.Character,
@@ -376,13 +382,18 @@ begin
   //--
   FillColor := TAlphaColors.Null;
   FillGradientStyle := TGradientStyle.Linear;
+  FillGradientAngle := 180;
   FillGradientColors := [];
   FillGradientOffsets := [];
-  FillGradientAngle := 180;
   FillResourceName := '';
-  FillWrapMode := TALImageWrapMode.Fit;
+  FillMaskResourceName := '';
+  FillMaskBitmap := ALNullBitmap;
   FillBackgroundMargins := TRectF.Empty;
   FillImageMargins := TRectF.Empty;
+  FillImageNoRadius := False;
+  FillWrapMode := TALImageWrapMode.Fit;
+  FillCropCenter := TPointF.create(-50,-50);
+  FillBlurRadius := 0;
   //--
   StateLayerOpacity := 0;
   StateLayerColor := TAlphaColors.null;
@@ -460,13 +471,18 @@ begin
   //--
   FillColor := Source.FillColor;
   FillGradientStyle := Source.FillGradientStyle;
+  FillGradientAngle := Source.FillGradientAngle;
   FillGradientColors := Source.FillGradientColors;
   FillGradientOffsets := Source.FillGradientOffsets;
-  FillGradientAngle := Source.FillGradientAngle;
   FillResourceName := Source.FillResourceName;
-  FillWrapMode := Source.FillWrapMode;
+  FillMaskResourceName := Source.FillMaskResourceName;
+  FillMaskBitmap := Source.FillMaskBitmap;
   FillBackgroundMargins := Source.FillBackgroundMargins;
   FillImageMargins := Source.FillImageMargins;
+  FillImageNoRadius := Source.FillImageNoRadius;
+  FillWrapMode := Source.FillWrapMode;
+  FillCropCenter := Source.FillCropCenter;
+  FillBlurRadius := Source.FillBlurRadius;
   //--
   StateLayerOpacity := Source.StateLayerOpacity;
   StateLayerColor := Source.StateLayerColor;
@@ -2451,6 +2467,7 @@ begin
                                     LOptions.FillColor, // const AFillColor: TAlphaColor;
                                     LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                                     LOptions.FillResourceName, // const AFillResourceName: String;
+                                    nil, // const AFillResourceStream: TStream;
                                     LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                                     LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                                     LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -2528,37 +2545,40 @@ begin
                      (LOptions.StateLayerColor <> TalphaColors.Null) or
                      (LOptions.StrokeColor <> TalphaColors.Null) or
                      (LOptions.ShadowColor <> TalphaColors.Null) then begin
-                    ALDrawRectangle(
-                      ACanvas, // const ACanvas: TALCanvas;
-                      LOptions.Scale, // const AScale: Single;
-                      LOptions.AlignToPixel, // const AAlignToPixel: Boolean;
-                      ARect, // const ARect: TrectF;
-                      1, //const AOpacity: Single;
-                      LOptions.FillColor, // const AFillColor: TAlphaColor;
-                      LOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-                      LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-                      LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-                      LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-                      LOptions.FillResourceName, // const AFillResourceName: String;
-                      LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-                      LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
-                      LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
-                      LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
-                      LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
-                      LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
-                      LOptions.StateLayerXRadius, // const AStateLayerXRadius: Single;
-                      LOptions.StateLayerYRadius, // const AStateLayerYRadius: Single;
-                      True, // const ADrawStateLayerOnTop: Boolean;
-                      LOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-                      LOptions.StrokeThickness, // const AStrokeThickness: Single;
-                      LOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-                      LOptions.ShadowBlur, // const AShadowBlur: Single;
-                      LOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
-                      LOptions.ShadowOffsetY, // const AShadowOffsetY: Single;
-                      LOptions.Sides, // const Sides: TSides;
-                      LOptions.Corners, // const Corners: TCorners;
-                      LOptions.XRadius, // const XRadius: Single = 0;
-                      LOptions.YRadius); // const YRadius: Single = 0);
+                    TALDrawRectangleHelper.Create(ACanvas)
+                      .SetScale(LOptions.Scale)
+                      .SetAlignToPixel(LOptions.AlignToPixel)
+                      .SetDstRect(ARect)
+                      .SetFillColor(LOptions.FillColor)
+                      .SetFillGradientStyle(LOptions.FillGradientStyle)
+                      .SetFillGradientAngle(LOptions.FillGradientAngle)
+                      .SetFillGradientColors(LOptions.FillGradientColors)
+                      .SetFillGradientOffsets(LOptions.FillGradientOffsets)
+                      .SetFillResourceName(LOptions.FillResourceName)
+                      .SetFillMaskResourceName(LOptions.FillMaskResourceName)
+                      .SetFillMaskBitmap(LOptions.FillMaskBitmap)
+                      .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
+                      .SetFillImageMarginsRect(LOptions.FillImageMargins)
+                      .SetFillImageNoRadius(LOptions.FillImageNoRadius)
+                      .SetFillWrapMode(LOptions.FillWrapMode)
+                      .SetFillCropCenter(LOptions.FillCropCenter)
+                      .SetFillBlurRadius(LOptions.FillBlurRadius)
+                      .SetStateLayerOpacity(LOptions.StateLayerOpacity)
+                      .SetStateLayerColor(LOptions.StateLayerColor)
+                      .SetStateLayerMarginsRect(LOptions.StateLayerMargins)
+                      .SetStateLayerXRadius(LOptions.StateLayerXRadius)
+                      .SetStateLayerYRadius(LOptions.StateLayerYRadius)
+                      .SetStrokeColor(LOptions.StrokeColor)
+                      .SetStrokeThickness(LOptions.StrokeThickness)
+                      .SetShadowColor(LOptions.ShadowColor)
+                      .SetShadowBlur(LOptions.ShadowBlur)
+                      .SetShadowOffsetX(LOptions.ShadowOffsetX)
+                      .SetShadowOffsetY(LOptions.ShadowOffsetY)
+                      .SetSides(LOptions.Sides)
+                      .SetCorners(LOptions.Corners)
+                      .SetXRadius(LOptions.XRadius)
+                      .SetYRadius(LOptions.YRadius)
+                      .Draw;
                   end;
 
                   // Handle custom event
@@ -2595,7 +2615,18 @@ begin
                       var LFileName := ALGetResourceFilename(LImgSrc);
                       if LFileName <> '' then begin
                         try
-                          LImg := ALLoadFromFileAndStretchToSkImage(LFileName, LDstRect.Width, LDstRect.Height)
+                          LImg := ALCreateSkImageFromResource(
+                                    LImgSrc, // const AResourceName: String;
+                                    nil, // const AResourceStream: TStream;
+                                    '', // const AMaskResourceName: String;
+                                    0, // const AMaskImage: sk_image_t;
+                                    1, // const AScale: Single;
+                                    LDstRect.Width, LDstRect.Height, // const W, H: single;
+                                    TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                                    TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    0, // const ABlurRadius: single;
+                                    0, // const AXRadius: Single;
+                                    0); // const AYRadius: Single);
                         except
                           LImg := 0;
                         end
@@ -2603,7 +2634,18 @@ begin
                       else
                         LImg := 0;
                       {$ELSE}
-                      var LImg := ALLoadFromResourceAndStretchToSkImage(LImgSrc, LDstRect.Width, LDstRect.Height);
+                      var LImg := ALCreateSkImageFromResource(
+                                    LImgSrc, // const AResourceName: String;
+                                    nil, // const AResourceStream: TStream;
+                                    '', // const AMaskResourceName: String;
+                                    0, // const AMaskImage: sk_image_t;
+                                    1, // const AScale: Single;
+                                    LDstRect.Width, LDstRect.Height, // const W, H: single;
+                                    TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                                    TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                                    0, // const ABlurRadius: single;
+                                    0, // const AXRadius: Single;
+                                    0); // const AYRadius: Single);
                       {$ENDIF}
                       If LImg <> 0 then begin
                         try
@@ -3729,6 +3771,7 @@ begin
                             LOptions.FillColor, // const AFillColor: TAlphaColor;
                             LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
                             LOptions.FillResourceName, // const AFillResourceName: String;
+                            nil, // const AFillResourceStream: TStream;
                             LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
                             LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
                             LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
@@ -3830,37 +3873,40 @@ begin
              (LOptions.StateLayerColor <> TalphaColors.Null) or
              (LOptions.StrokeColor <> TalphaColors.Null) or
              (LOptions.ShadowColor <> TalphaColors.Null) then begin
-            ALDrawRectangle(
-              ACanvas, // const ACanvas: TALCanvas;
-              LOptions.Scale, // const AScale: Single;
-              LOptions.AlignToPixel, // const AAlignToPixel: Boolean;
-              ARect, // const ARect: TrectF;
-              1, //const AOpacity: Single;
-              LOptions.FillColor, // const AFillColor: TAlphaColor;
-              LOptions.FillGradientStyle, // const AFillGradientStyle: TGradientStyle;
-              LOptions.FillGradientColors, // const AFillGradientColors: TArray<TAlphaColor>;
-              LOptions.FillGradientOffsets, // const AFillGradientOffsets: TArray<Single>;
-              LOptions.FillGradientAngle, // const AFillGradientAngle: Single;
-              LOptions.FillResourceName, // const AFillResourceName: String;
-              LOptions.FillWrapMode, // Const AFillWrapMode: TALImageWrapMode;
-              LOptions.FillBackgroundMargins, // Const AFillBackgroundMarginsRect: TRectF;
-              LOptions.FillImageMargins, // Const AFillImageMarginsRect: TRectF;
-              LOptions.StateLayerOpacity, // const AStateLayerOpacity: Single;
-              LOptions.StateLayerColor, // const AStateLayerColor: TAlphaColor;
-              LOptions.StateLayerMargins, // Const AStateLayerMarginsRect: TRectF;
-              LOptions.StateLayerXRadius, // const AStateLayerXRadius: Single;
-              LOptions.StateLayerYRadius, // const AStateLayerYRadius: Single;
-              True, // const ADrawStateLayerOnTop: Boolean;
-              LOptions.StrokeColor, // const AStrokeColor: TalphaColor;
-              LOptions.StrokeThickness, // const AStrokeThickness: Single;
-              LOptions.ShadowColor, // const AShadowColor: TAlphaColor; // If ShadowColor is not null, then the Canvas must have enough space to draw the shadow (approximately ShadowBlur on each side of the rectangle)
-              LOptions.ShadowBlur, // const AShadowBlur: Single;
-              LOptions.ShadowOffsetX, // const AShadowOffsetX: Single;
-              LOptions.ShadowOffsetY, // const AShadowOffsetY: Single;
-              LOptions.Sides, // const Sides: TSides;
-              LOptions.Corners, // const Corners: TCorners;
-              LOptions.XRadius, // const XRadius: Single = 0;
-              LOptions.YRadius); // const YRadius: Single = 0);
+            TALDrawRectangleHelper.Create(ACanvas)
+              .SetScale(LOptions.Scale)
+              .SetAlignToPixel(LOptions.AlignToPixel)
+              .SetDstRect(ARect)
+              .SetFillColor(LOptions.FillColor)
+              .SetFillGradientStyle(LOptions.FillGradientStyle)
+              .SetFillGradientAngle(LOptions.FillGradientAngle)
+              .SetFillGradientColors(LOptions.FillGradientColors)
+              .SetFillGradientOffsets(LOptions.FillGradientOffsets)
+              .SetFillResourceName(LOptions.FillResourceName)
+              .SetFillMaskResourceName(LOptions.FillMaskResourceName)
+              .SetFillMaskBitmap(LOptions.FillMaskBitmap)
+              .SetFillBackgroundMarginsRect(LOptions.FillBackgroundMargins)
+              .SetFillImageMarginsRect(LOptions.FillImageMargins)
+              .SetFillImageNoRadius(LOptions.FillImageNoRadius)
+              .SetFillWrapMode(LOptions.FillWrapMode)
+              .SetFillCropCenter(LOptions.FillCropCenter)
+              .SetFillBlurRadius(LOptions.FillBlurRadius)
+              .SetStateLayerOpacity(LOptions.StateLayerOpacity)
+              .SetStateLayerColor(LOptions.StateLayerColor)
+              .SetStateLayerMarginsRect(LOptions.StateLayerMargins)
+              .SetStateLayerXRadius(LOptions.StateLayerXRadius)
+              .SetStateLayerYRadius(LOptions.StateLayerYRadius)
+              .SetStrokeColor(LOptions.StrokeColor)
+              .SetStrokeThickness(LOptions.StrokeThickness)
+              .SetShadowColor(LOptions.ShadowColor)
+              .SetShadowBlur(LOptions.ShadowBlur)
+              .SetShadowOffsetX(LOptions.ShadowOffsetX)
+              .SetShadowOffsetY(LOptions.ShadowOffsetY)
+              .SetSides(LOptions.Sides)
+              .SetCorners(LOptions.Corners)
+              .SetXRadius(LOptions.XRadius)
+              .SetYRadius(LOptions.YRadius)
+              .Draw;
           end;
 
           // Handle custom event
@@ -3876,7 +3922,18 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToJBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              var LImg := ALCreateJbitmapFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            nil, // const AMaskBitmap: JBitmap;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0); // const AYRadius: Single);
               try
                 ACanvas.drawBitmap(LImg, LDstRect.left {left}, LDstRect.top {top}, _Paint {paint});
               finally
@@ -3930,7 +3987,18 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToCGImageRef(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              var LImg := ALCreateCGImageRefFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            nil, // const AMaskImage: CGImageRef;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0); // const AYRadius: Single);
               try
                 CGContextDrawImage(
                   ACanvas, // c: The graphics context in which to draw the image.
@@ -4002,7 +4070,18 @@ begin
               Var LDstRect := LExtendedTextElement.Rect;
               LDstRect.Offset(LParagraphRect.TopLeft);
               var LSrcRect := TRectF.Create(0,0,LDstRect.Width, LDstRect.Height);
-              var LImg := ALLoadFromResourceAndStretchToBitmap(LExtendedTextElement.imgSrc, LDstRect.Width, LDstRect.Height);
+              var LImg := ALCreateTBitmapFromResource(
+                            LExtendedTextElement.imgSrc, // const AResourceName: String;
+                            nil, // const AResourceStream: TStream;
+                            '', // const AMaskResourceName: String;
+                            nil, // const AMaskBitmap: TBitmap;
+                            1, // const AScale: Single;
+                            LDstRect.Width, LDstRect.Height, // const W, H: single;
+                            TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
+                            TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                            0, // const ABlurRadius: single;
+                            0, // const AXRadius: Single;
+                            0); // const AYRadius: Single);
               try
                 ACanvas.drawBitmap(
                   LImg,

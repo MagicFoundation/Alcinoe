@@ -558,6 +558,7 @@ uses
   FMX.Context.GLES.iOS,
   FMX.Context.Metal,
   Alcinoe.StringUtils,
+  Alcinoe.HTTP.Client,
   {$ENDIF}
   {$IF defined(ALSkiaCanvas)}
   FMX.Skia.Canvas,
@@ -1696,9 +1697,7 @@ begin
                           {$ENDIF}
 
                           var P: Pointer;
-                          var LLowerDataSource := AlLowerCase(aDataSource);
-                          if (ALPosW('http://',LLowerDataSource) = 1) or
-                             (ALPosW('https://',LLowerDataSource) = 1) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
+                          if AlIsHttpOrHttpsUrl(aDataSource) then P := TNSUrl.OCClass.URLWithString(StrToNSStr(aDataSource)) // Creates and returns an NSURL object initialized with a provided URL string
                           else P := TNSUrl.OCClass.fileURLWithPath(StrToNSStr(aDataSource)); // Initializes and returns a newly created NSURL object as a file URL with a specified path.
                           if P = nil then exit; // << we can't call synchronize from here (else possible trouble when we will free the object) so we can't call onErrorEvent :(
                           var LURL := TNSUrl.Wrap(P);
@@ -2368,7 +2367,7 @@ end;
 constructor TALMacOSVideoPlayer.Create;
 begin
   inherited;
-  fDrawable := nil;
+  fDrawable := ALNullDrawable;
   fOnFrameAvailableEvent := nil;
   fOnCompletionEvent := nil;
   fOnErrorEvent := nil;
@@ -2379,7 +2378,7 @@ end;
 {*************************************}
 destructor TALMacOSVideoPlayer.Destroy;
 begin
-  ALFreeAndNil(fDrawable);
+  ALFreeAndNilDrawable(fDrawable);
   inherited;
 end;
 

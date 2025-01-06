@@ -29,7 +29,7 @@ procedure ALJavascriptDecodeV(Var Str: AnsiString); overload;
 procedure ALJavascriptDecodeV(Var Str: String); overload;
 function  ALJavascriptDecode(const Src: AnsiString): AnsiString; overload;
 function  ALJavascriptDecode(const Src: String): String; overload;
-{$IFDEF MSWINDOWS}
+{$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
 function  ALRunJavascript(const aCode: AnsiString): AnsiString;
 {$ENDIF}
 procedure ALHideHtmlUnwantedTagForHTMLHandleTagfunct(
@@ -46,7 +46,7 @@ uses
   System.Classes,
   System.sysutils,
   System.AnsiStrings,
-  {$IFDEF MSWINDOWS}
+  {$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
   System.Win.Comobj,
   Winapi.Ole2,
   Winapi.ActiveX,
@@ -1608,8 +1608,8 @@ begin
   ALJavascriptDecodeV(result);
 end;
 
-{****************}
-{$IFDEF MSWINDOWS}
+{*************************************************}
+{$IF (defined(MSWINDOWS)) and (not defined(ALDPK))}
 {This function evaluates the Javascript code given in the
  parameter "aCode" and returns result. The function works
  similar to browser's console, so you can send even the code

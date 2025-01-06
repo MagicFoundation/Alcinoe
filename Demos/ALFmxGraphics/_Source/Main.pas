@@ -47,21 +47,18 @@ type
     StatusLabel2: TALText;
     ButtonStop: TALButton;
     ALText61: TALText;
+    ALText62: TALText;
     ALLayout72: TALLayout;
-    ALLayout73: TALLayout;
-    ALText63: TALText;
     ALLayout74: TALLayout;
     Image1: TImage;
+    ALText63: TALText;
     ALLayout75: TALLayout;
-    ALLayout76: TALLayout;
-    ALText64: TALText;
-    ALLayout77: TALLayout;
     ALImage14: TALImage;
+    ALText64: TALText;
     ALLayout70: TALLayout;
-    ALLayout71: TALLayout;
-    ALText1: TALText;
-    ALLayout78: TALLayout;
     ALImage15: TALImage;
+    Text2: TALText;
+    ALText1: TALText;
     procedure FormPaint(Sender: TObject; Canvas: TCanvas; const ARect: TRectF);
     procedure FormCreate(Sender: TObject);
     procedure LoadImagePaintBoxPaint(Sender: TObject; Canvas: TCanvas);
@@ -103,6 +100,9 @@ uses
   {$IF defined(ALMacOS)}
   macapi.Foundation,
   Macapi.CoreGraphics,
+  {$ENDIF}
+  {$IF defined(ANDROID)}
+  Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(IOS)}
   iosApi.Foundation,
@@ -148,15 +148,15 @@ begin
   MainTitle.Text := LTitle;
 
   {$IF defined(ALSkiaCanvas)}
-  SubTitle.Text := 'sk_surface_t (ALSkiaCanvas)';
+  SubTitle.Text := 'sk_surface_t (Skia Canvas)';
   {$ELSEIF defined(ALSkiaEngine)}
-  SubTitle.Text := 'sk_surface_t (ALSkiaEngine)';
+  SubTitle.Text := 'sk_surface_t (Skia Engine)';
   {$ELSEIF defined(Android)}
-  SubTitle.Text := 'Jbitmap';
+  SubTitle.Text := 'Jbitmap (OS Engine)';
   {$ELSEIF defined(AlAppleOS)}
-  SubTitle.Text := 'CGContextRef';
+  SubTitle.Text := 'CGContextRef (OS Engine)';
   {$ELSE}
-  SubTitle.Text := 'Tbitmap';
+  SubTitle.Text := 'Tbitmap (Delphi Engine)';
   {$ENDIF}
 
   BeginUpdate;
@@ -173,17 +173,16 @@ begin
     CreateLoadImagePaintBox(09, 'Load and FitInto and Crop and Blur (Small image)');
     CreateLoadImagePaintBox(10, 'Load and FitInto and Crop and Blur to Circle (Big image)');
     CreateLoadImagePaintBox(11, 'Load and FitInto and Crop and Blur to Circle (Small image)');
-    CreateLoadImagePaintBox(12, 'Load and FitInto and Crop and Mask (Big image)');
-    CreateLoadImagePaintBox(13, 'Load and FitInto and Crop and Mask (Small image)');
-    CreateLoadImagePaintBox(14, 'Load and FitInto and Crop and Mask and Blur (Big image)');
-    CreateLoadImagePaintBox(15, 'Load and FitInto and Crop and Mask and Blur (Small image)');
+    CreateLoadImagePaintBox(12, 'Load and Mask (Big image)');
+    CreateLoadImagePaintBox(13, 'Load and Mask (Small image)');
+    CreateLoadImagePaintBox(14, 'Load and Mask and Blur (Big image)');
+    CreateLoadImagePaintBox(15, 'Load and Mask and Blur (Small image)');
     CreateLoadImagePaintBox(16, 'Load and PlaceInto (Big image)');
     CreateLoadImagePaintBox(17, 'Load and PlaceInto (Small image)');
     CreateLoadImagePaintBox(18, 'Load and PlaceInto and Blur (Big image)');
     CreateLoadImagePaintBox(19, 'Load and PlaceInto and Blur (Small image)');
     CreateLoadImagePaintBox(20, 'Load and Stretch (Big image)');
     CreateLoadImagePaintBox(21, 'Load and Stretch (Small image)');
-    CreateLoadImagePaintBox(22, 'Load and Normalize Orientation');
   finally
     EndUpdate;
   end;
@@ -210,7 +209,7 @@ begin
   LLayout1.parent := MainScrollBox;
   LLayout1.Align := TALALignLayout.Top;
   LLayout1.Position.Y := aIdx;
-  LLayout1.Margins.Top := 24;
+  LLayout1.Margins.bottom := 24;
   LLayout1.Size.Height := 150;
   var LPaintBox := TPaintBox.Create(LLayout1);
   LPaintBox.parent := LLayout1;
@@ -357,56 +356,28 @@ begin
     var W := 150 * ALGetScreenScale;
     var H := 150 * ALGetScreenScale;
     case i of
-      00: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoToDrawable('family', W, H);
-      01: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoToDrawable('familylittle', W, H);
-      02: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToDrawable('family', W, H, -65, -48);
-      03: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToDrawable('familylittle', W, H, -65, -48);
-      04: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToRoundRectDrawable('family', W, H, 25*ALGetScreenScale, 25*ALGetScreenScale, -65, -48);
-      05: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToRoundRectDrawable('familylittle', W, H, 25*ALGetScreenScale, 25*ALGetScreenScale, -65, -48);
-      06: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToCircleDrawable('family', W, H, -65, -48);
-      07: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToCircleDrawable('familylittle', W, H, -65, -48);
-      08: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToDrawable('family', W, H, 10*ALGetScreenScale, -65, -48);
-      09: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToDrawable('familylittle', W, H, 10*ALGetScreenScale, -65, -48);
-      10: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleDrawable('family', W, H, 10*ALGetScreenScale, -65, -48);
-      11: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleDrawable('familylittle', W, H, 10*ALGetScreenScale, -65, -48);
-      12, 13, 14, 15: begin
-        {$IF defined(ALSkiaEngine)}
-        var LMask := ALLoadFromResourceAndFitIntoToSKImage('mask', W, H);
-        {$ELSEIF defined(ANDROID)}
-        var LMask := ALLoadFromResourceAndFitIntoToJbitmap('mask', W, H);
-        {$ELSEIF defined(ALAppleOS)}
-        var LMask := ALLoadFromResourceAndFitIntoToCGImageRef('mask', W, H);
-        {$ELSE}
-        var LMask := ALLoadFromResourceAndFitIntoToBitmap('mask', W, H);
-        {$ENDIF}
-        try
-          case I of
-            12: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable('family', LMask, -65, -48);
-            13: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable('familylittle', LMask, -65, -48);
-            14: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable('family', LMask, 10*ALGetScreenScale, -65, -48);
-            15: FScrollBoxDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable('familylittle', LMask, 10*ALGetScreenScale, -65, -48);
-            else FScrollBoxDrawables[i] := ALNullDrawable;
-          end;
-        finally
-          {$IF defined(ALSkiaEngine)}
-          sk4d_refcnt_unref(LMask);
-          {$ELSEIF defined(ANDROID)}
-          LMask.recycle;
-          LMask := nil;
-          {$ELSEIF defined(ALAppleOS)}
-          CGImageRelease(LMask);
-          {$ELSE}
-          ALFreeAndNil(LMask);
-          {$ENDIF}
-        end;
-      end;
-      16: FScrollBoxDrawables[i] := ALLoadFromResourceAndPlaceIntoToDrawable('family', W, H);
-      17: FScrollBoxDrawables[i] := ALLoadFromResourceAndPlaceIntoToDrawable('familylittle', W, H);
-      18: FScrollBoxDrawables[i] := ALLoadFromResourceAndPlaceIntoAndBlurToDrawable('family', W, H, 10*ALGetScreenScale);
-      19: FScrollBoxDrawables[i] := ALLoadFromResourceAndPlaceIntoAndBlurToDrawable('familylittle', W, H, 10*ALGetScreenScale);
-      20: FScrollBoxDrawables[i] := ALLoadFromResourceAndStretchToDrawable('family', W, H);
-      21: FScrollBoxDrawables[i] := ALLoadFromResourceAndStretchToDrawable('familylittle', W, H);
-      22: FScrollBoxDrawables[i] := ALLoadFromResourceAndNormalizeOrientationToDrawable('familyrotate180', TalExifOrientationInfo.ROTATE_180);
+      00: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TpointF.create(-50, -50), 0, 0, 0);
+      01: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TpointF.create(-50, -50), 0, 0, 0);
+      02: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 0, 0);
+      03: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 0, 0);
+      04: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 25*ALGetScreenScale, 25*ALGetScreenScale);
+      05: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 25*ALGetScreenScale, 25*ALGetScreenScale);
+      06: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, min(W,h)/2, min(W,h)/2);
+      07: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, min(W,h)/2, min(W,h)/2);
+      08: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+      09: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+      10: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, min(W,h)/2, min(W,h)/2);
+      11: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, min(W,h)/2, min(W,h)/2);
+      12: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 0, 0, 0);
+      13: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 0, 0, 0);
+      14: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+      15: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+      16: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 0, 0, 0);
+      17: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 0, 0, 0);
+      18: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 5*ALGetScreenScale, 0, 0);
+      19: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 5*ALGetScreenScale, 0, 0);
+      20: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Stretch, TpointF.create(-50, -50), 0, 0, 0);
+      21: FScrollBoxDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Stretch, TpointF.create(-50, -50), 0, 0, 0);
       else FScrollBoxDrawables[i] := ALNullDrawable;
     end;
   end;
@@ -439,56 +410,28 @@ begin
       var W := 10 + random(150) * ALGetScreenScale;
       var H := 10 + random(150) * ALGetScreenScale;
       case i mod 22 of
-        00: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoToDrawable('family', W, H);
-        01: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoToDrawable('familylittle', W, H);
-        02: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToDrawable('family', W, H, -65, -48);
-        03: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToDrawable('familylittle', W, H, -65, -48);
-        04: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToRoundRectDrawable('family', W, H, 25*ALGetScreenScale, 25*ALGetScreenScale, -65, -48);
-        05: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToRoundRectDrawable('familylittle', W, H, 25*ALGetScreenScale, 25*ALGetScreenScale, -65, -48);
-        06: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToCircleDrawable('family', W, H, -65, -48);
-        07: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropToCircleDrawable('familylittle', W, H, -65, -48);
-        08: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToDrawable('family', W, H, 10*ALGetScreenScale, -65, -48);
-        09: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToDrawable('familylittle', W, H, 10*ALGetScreenScale, -65, -48);
-        10: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleDrawable('family', W, H, 10*ALGetScreenScale, -65, -48);
-        11: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndBlurToCircleDrawable('familylittle', W, H, 10*ALGetScreenScale, -65, -48);
-        12, 13, 14, 15: begin
-              {$IF defined(ALSkiaEngine)}
-              var LMask := ALLoadFromResourceAndFitIntoToSKImage('mask', W, H);
-              {$ELSEIF defined(ANDROID)}
-              var LMask := ALLoadFromResourceAndFitIntoToJbitmap('mask', W, H);
-              {$ELSEIF defined(ALAppleOS)}
-              var LMask := ALLoadFromResourceAndFitIntoToCGImageRef('mask', W, H);
-              {$ELSE}
-              var LMask := ALLoadFromResourceAndFitIntoToBitmap('mask', W, H);
-              {$ENDIF}
-              try
-                case i of
-                  12: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable('family', LMask, -65, -48);
-                  13: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskToDrawable('familylittle', LMask, -65, -48);
-                  14: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable('family', LMask, 10*ALGetScreenScale, -65, -48);
-                  15: FTestFPSDrawables[i] := ALLoadFromResourceAndFitIntoAndCropAndMaskAndBlurToDrawable('familylittle', LMask, 10*ALGetScreenScale, -65, -48);
-                  else FTestFPSDrawables[i] := ALNullDrawable;
-                end;
-              finally
-                {$IF defined(ALSkiaEngine)}
-                sk4d_refcnt_unref(LMask);
-                {$ELSEIF defined(ANDROID)}
-                LMask.recycle;
-                LMask := nil;
-                {$ELSEIF defined(ALAppleOS)}
-                CGImageRelease(LMask);
-                {$ELSE}
-                ALFreeAndNil(LMask);
-                {$ENDIF}
-              end;
-            end;
-        16: FTestFPSDrawables[i] := ALLoadFromResourceAndPlaceIntoToDrawable('family', W, H);
-        17: FTestFPSDrawables[i] := ALLoadFromResourceAndPlaceIntoToDrawable('familylittle', W, H);
-        18: FTestFPSDrawables[i] := ALLoadFromResourceAndPlaceIntoAndBlurToDrawable('family', W, H, 10*ALGetScreenScale);
-        19: FTestFPSDrawables[i] := ALLoadFromResourceAndPlaceIntoAndBlurToDrawable('familylittle', W, H, 10*ALGetScreenScale);
-        20: FTestFPSDrawables[i] := ALLoadFromResourceAndStretchToDrawable('family', W, H);
-        21: FTestFPSDrawables[i] := ALLoadFromResourceAndStretchToDrawable('familylittle', W, H);
-        22: FTestFPSDrawables[i] := ALLoadFromResourceAndNormalizeOrientationToDrawable('familyrotate180', TalExifOrientationInfo.ROTATE_180);
+        00: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TpointF.create(-50, -50), 0, 0, 0);
+        01: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TpointF.create(-50, -50), 0, 0, 0);
+        02: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 0, 0);
+        03: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 0, 0);
+        04: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 25*ALGetScreenScale, 25*ALGetScreenScale);
+        05: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, 25*ALGetScreenScale, 25*ALGetScreenScale);
+        06: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, min(W,h)/2, min(W,h)/2);
+        07: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 0, min(W,h)/2, min(W,h)/2);
+        08: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+        09: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+        10: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, min(W,h)/2, min(W,h)/2);
+        11: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.FitAndCrop, TPointF.create(-65, -48), 5*ALGetScreenScale, min(W,h)/2, min(W,h)/2);
+        12: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 0, 0, 0);
+        13: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 0, 0, 0);
+        14: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+        15: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, 'mask', ALNullBitmap, 1, W, H, TALImageWrapMode.Fit, TPointF.create(-65, -48), 5*ALGetScreenScale, 0, 0);
+        16: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 0, 0, 0);
+        17: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 0, 0, 0);
+        18: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 5*ALGetScreenScale, 0, 0);
+        19: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Place, TpointF.create(-50, -50), 5*ALGetScreenScale, 0, 0);
+        20: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscape', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Stretch, TpointF.create(-50, -50), 0, 0, 0);
+        21: FTestFPSDrawables[i] := ALCreateDrawableFromResource('landscapelittle', nil, '', ALNullBitmap, 1, W, H, TALImageWrapMode.Stretch, TpointF.create(-50, -50), 0, 0, 0);
         else FTestFPSDrawables[i] := ALNullDrawable;
       end;
     {$IF defined(ios)}
@@ -511,7 +454,6 @@ begin
   Result := LStopWatch.Elapsed.TotalMilliseconds;
 
 end;
-
 
 {******************************************************************}
 procedure TMainForm.ButtonCheckForMemoryLeaksClick(Sender: TObject);

@@ -21,7 +21,7 @@ object MainForm: TMainForm
     VScrollBar.Size.PlatformDefault = False
     VScrollBar.TabOrder = 4
     VScrollBar.Thumb.Size.Width = 4.000000000000000000
-    VScrollBar.Thumb.Size.Height = 33.000000000000000000
+    VScrollBar.Thumb.Size.Height = 32.000000000000000000
     VScrollBar.Thumb.Size.PlatformDefault = False
     VScrollBar.Thumb.StateStyles.Hovered.Fill.Color = x64000000
     VScrollBar.Thumb.StateStyles.Hovered.Fill.Inherit = False
@@ -55,7 +55,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Stroke.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -80,8 +79,8 @@ object MainForm: TMainForm
       Text = 'Launch ScrollBox Demo<br/>(Delphi Controls)'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
-      TextSettings.LetterSpacing = 0.129999995231628400
       TextSettings.IsHtml = True
+      TextSettings.LetterSpacing = 0.129999995231628400
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonLaunchScrollBoxDemoDelphiClick
@@ -105,7 +104,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -131,8 +129,8 @@ object MainForm: TMainForm
       Text = 'Launch TALScrollBox Demo<br/>(Alcinoe Controls)'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
-      TextSettings.LetterSpacing = 0.129999995231628400
       TextSettings.IsHtml = True
+      TextSettings.LetterSpacing = 0.129999995231628400
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonLaunchScrollBoxDemoAlcinoeClick
@@ -156,7 +154,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -207,7 +204,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Stroke.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -266,7 +262,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -317,7 +312,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Stroke.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -380,7 +374,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Stroke.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -439,7 +432,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -477,7 +469,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 16382.000000000000000000
+      Position.Y = 17112.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -486,8 +478,8 @@ object MainForm: TMainForm
         'ate left or right within the <span background-color="#e3e6e8" fo' +
         'nt-weight=500>TALTabControl</span>.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object Text9: TALText
       Align = Top
@@ -519,7 +511,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Stroke.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -540,7 +531,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = xFF79747E
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 213
+      TabOrder = 224
       Text = 'Bench TCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF6750A4
@@ -568,7 +559,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -590,7 +580,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 237
+      TabOrder = 249
       Text = 'Bench TALCircle'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -601,9 +591,8 @@ object MainForm: TMainForm
     end
     object ALRectangle9: TALRectangle
       Align = Top
-      Fill.Color = claWhite
       Margins.Top = 12.000000000000000000
-      Position.Y = 16484.000000000000000000
+      Position.Y = 17214.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -822,11 +811,11 @@ object MainForm: TMainForm
       Thumb.TouchTargetExpansion.Right = 22.000000000000000000
       Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14428.000000000000000000
+      Position.Y = 15158.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 260
+      TabOrder = 273
       Value = 25.000000000000000000
       ValueIndicator.Fill.Color = xFF322F35
       ValueIndicator.ShowOnInteraction = True
@@ -840,7 +829,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 16971.000000000000000000
+      Position.Y = 17701.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 416.000000000000000000
       Size.PlatformDefault = False
@@ -859,8 +848,8 @@ object MainForm: TMainForm
         'cking on'#13#10'the control and selecting from a list of'#13#10'predefined s' +
         'tyles.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object TextUpdateBat: TALText
       Align = Top
@@ -888,8 +877,8 @@ object MainForm: TMainForm
         'phiVersion}\update.bat</b><br/>'#13#10'in order to fetch and apply pat' +
         'ches to the original Delphi source code.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.HorzAlign = Center
       TextSettings.IsHtml = True
+      TextSettings.HorzAlign = Center
       XRadius = 12.000000000000000000
       YRadius = 12.000000000000000000
     end
@@ -899,7 +888,7 @@ object MainForm: TMainForm
       Fill.Color = xFF141218
       Margins.Top = 8.000000000000000000
       Margins.Bottom = 8.000000000000000000
-      Position.Y = 15378.000000000000000000
+      Position.Y = 16108.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 300.000000000000000000
       Size.PlatformDefault = False
@@ -984,7 +973,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14916.000000000000000000
+      Position.Y = 15646.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 442.000000000000000000
       Size.PlatformDefault = False
@@ -1003,8 +992,8 @@ object MainForm: TMainForm
         ' are not yet supported. This video '#13#10'player supports adaptive st' +
         'reaming (HLS) on Android and iOS.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALRectangle1: TALRectangle
       Align = Top
@@ -1035,7 +1024,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 10303.000000000000000000
+      Position.Y = 11033.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -1050,7 +1039,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 10430.000000000000000000
+      Position.Y = 11160.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 312.000000000000000000
       Size.PlatformDefault = False
@@ -1066,8 +1055,8 @@ object MainForm: TMainForm
         'ectly in the object inspector, and all '#13#10'customizations are stor' +
         'ed directly inside the <b>*.fmx</b> file.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout64: TALLayout
       Align = Top
@@ -1076,11 +1065,11 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 21.000000000000000000
-      Position.Y = 10920.000000000000000000
+      Position.Y = 11650.000000000000000000
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 148
+      TabOrder = 158
       object ALText53: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1133,11 +1122,11 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 10770.000000000000000000
+      Position.Y = 11500.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 144
+      TabOrder = 154
       object ALText49: TALText
         Align = LeftCenter
         AutoSize = True
@@ -1253,7 +1242,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 11222.000000000000000000
+      Position.Y = 11952.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -1268,7 +1257,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 11349.000000000000000000
+      Position.Y = 12079.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 156.000000000000000000
       Size.PlatformDefault = False
@@ -1281,8 +1270,8 @@ object MainForm: TMainForm
         'b>Hovered, Focused, Pressed</b>) is accomplished through smooth ' +
         'interpolated animations.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ButtonShowTALDatePickerDialog: TALButton
       Align = Top
@@ -1295,7 +1284,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 16141.000000000000000000
+      Position.Y = 16871.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -1303,7 +1292,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1325,7 +1313,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 341
+      TabOrder = 359
       Text = 'Show dialog'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1345,7 +1333,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 15698.000000000000000000
+      Position.Y = 16428.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -1353,7 +1341,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1375,7 +1362,7 @@ object MainForm: TMainForm
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
       Stroke.Thickness = 1.289999961853027000
-      TabOrder = 346
+      TabOrder = 364
       Text = 'Apply Effect to the Video'
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
@@ -1388,11 +1375,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 8.000000000000000000
-      Position.Y = 8887.000000000000000000
+      Position.Y = 9617.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 351
+      TabOrder = 369
       object ALButton6: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -1409,7 +1396,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Fill.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1456,7 +1442,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Fill.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1491,11 +1476,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9167.000000000000000000
+      Position.Y = 9897.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 357
+      TabOrder = 375
       object ALButton10: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1513,7 +1498,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Fill.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1559,7 +1543,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Fill.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1594,11 +1577,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9097.000000000000000000
+      Position.Y = 9827.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 360
+      TabOrder = 378
       object ALButton11: TALButton
         Align = LeftCenter
         Fill.Color = xFFF7F2FA
@@ -1619,7 +1602,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Shadow.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 3.859999895095825000
@@ -1670,7 +1652,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Shadow.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 3.859999895095825000
@@ -1705,11 +1686,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9027.000000000000000000
+      Position.Y = 9757.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 364
+      TabOrder = 382
       object ALButton14: TALButton
         Align = LeftCenter
         Enabled = False
@@ -1725,7 +1706,6 @@ object MainForm: TMainForm
         Size.PlatformDefault = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -1765,7 +1745,6 @@ object MainForm: TMainForm
         Size.PlatformDefault = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -1796,11 +1775,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 8957.000000000000000000
+      Position.Y = 9687.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 368
+      TabOrder = 386
       object ALButton17: TALButton
         Align = LeftCenter
         Fill.Color = claNull
@@ -1818,7 +1797,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Stroke.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -1865,7 +1843,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Stroke.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -1902,7 +1879,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 9391.000000000000000000
+      Position.Y = 10121.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 576.000000000000000000
       Size.PlatformDefault = False
@@ -1931,7 +1908,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Fill.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -1978,7 +1954,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Fill.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -2034,7 +2009,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Stroke.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -2081,7 +2055,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Stroke.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -2135,7 +2108,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Fill.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -2182,7 +2154,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Fill.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -2241,7 +2212,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Shadow.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 3.859999895095825000
@@ -2292,7 +2262,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Shadow.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 3.859999895095825000
@@ -2345,7 +2314,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -2386,7 +2354,6 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -2454,7 +2421,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Fill.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -2480,8 +2446,8 @@ object MainForm: TMainForm
           Text = '<img src="button_icon_dark">&nbsp; Disabled'
           TextSettings.Font.Size = 18.000000000000000000
           TextSettings.Font.Color = xFFE8DEF8
-          TextSettings.LetterSpacing = 0.129999995231628400
           TextSettings.IsHtml = True
+          TextSettings.LetterSpacing = 0.129999995231628400
           XRadius = -50.000000000000000000
           YRadius = -50.000000000000000000
         end
@@ -2501,7 +2467,6 @@ object MainForm: TMainForm
           StateStyles.Disabled.Fill.Inherit = False
           StateStyles.Disabled.TextSettings.Inherit = False
           StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-          StateStyles.Disabled.TextSettings.Font.Weight = Medium
           StateStyles.Disabled.TextSettings.Font.Color = x61E6E0E9
           StateStyles.Disabled.Opacity = 1.000000000000000000
           StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -2527,8 +2492,8 @@ object MainForm: TMainForm
           Text = '<img src="button_icon_dark">&nbsp; With icon'
           TextSettings.Font.Size = 18.000000000000000000
           TextSettings.Font.Color = xFFE8DEF8
-          TextSettings.LetterSpacing = 0.129999995231628400
           TextSettings.IsHtml = True
+          TextSettings.LetterSpacing = 0.129999995231628400
           XRadius = -50.000000000000000000
           YRadius = -50.000000000000000000
         end
@@ -2549,6 +2514,7 @@ object MainForm: TMainForm
           Fill.ImageMargins.Top = 8.000000000000000000
           Fill.ImageMargins.Right = 8.000000000000000000
           Fill.ImageMargins.Bottom = 8.000000000000000000
+          Fill.ImageNoRadius = True
           Margins.Left = 24.000000000000000000
           Position.X = 24.000000000000000000
           Size.Width = 40.000000000000000000
@@ -2592,6 +2558,7 @@ object MainForm: TMainForm
           Fill.ImageMargins.Top = 8.000000000000000000
           Fill.ImageMargins.Right = 8.000000000000000000
           Fill.ImageMargins.Bottom = 8.000000000000000000
+          Fill.ImageNoRadius = True
           Margins.Left = 16.000000000000000000
           Position.X = 80.000000000000000000
           Size.Width = 40.000000000000000000
@@ -2637,6 +2604,7 @@ object MainForm: TMainForm
           Fill.ImageMargins.Top = 8.000000000000000000
           Fill.ImageMargins.Right = 8.000000000000000000
           Fill.ImageMargins.Bottom = 8.000000000000000000
+          Fill.ImageNoRadius = True
           Margins.Left = 16.000000000000000000
           Position.X = 136.000000000000000000
           Size.Width = 40.000000000000000000
@@ -2674,6 +2642,7 @@ object MainForm: TMainForm
           Fill.ImageMargins.Top = 8.000000000000000000
           Fill.ImageMargins.Right = 8.000000000000000000
           Fill.ImageMargins.Bottom = 8.000000000000000000
+          Fill.ImageNoRadius = True
           Margins.Left = 16.000000000000000000
           Position.X = 192.000000000000000000
           Size.Width = 40.000000000000000000
@@ -2718,7 +2687,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 8249.000000000000000000
+      Position.Y = 8979.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 618.000000000000000000
       Size.PlatformDefault = False
@@ -2737,8 +2706,8 @@ object MainForm: TMainForm
         ' but not least, the onclick event does not fire when the parent ' +
         'scrollbox is'#13#10'moving, thus preventing unintended clicks.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object MainTitle: TALText
       Align = MostTop
@@ -2814,8 +2783,8 @@ object MainForm: TMainForm
         'l <span background-color="#e3e6e8" font-weight=500>TRectangle</s' +
         'pan>.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText23: TALText
       Align = Top
@@ -2943,7 +2912,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 11877.000000000000000000
+      Position.Y = 12607.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2961,7 +2930,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 8122.000000000000000000
+      Position.Y = 8852.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -2995,8 +2964,8 @@ object MainForm: TMainForm
         ' including '#13#10'the span ID and bounds. Try moving your '#13#10'mouse ove' +
         'r the text below to see this '#13#10'feature in action.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout32: TALLayout
       Align = Top
@@ -3010,7 +2979,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 43.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 425
+      TabOrder = 450
       object ALLayout33: TALLayout
         Align = Left
         AutoSize = True
@@ -3047,8 +3016,8 @@ object MainForm: TMainForm
         'over <b>TCanvasGPU'#39's</b> DrawCircle, '#13#10'regardless of the form qu' +
         'ality settings.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText26: TALText
       Align = Top
@@ -3057,7 +3026,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7727.000000000000000000
+      Position.Y = 8457.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -3067,8 +3036,8 @@ object MainForm: TMainForm
         'you prefer by setting the '#13#10'<span background-color="#e3e6e8" fon' +
         't-weight=500>ResourceName</span> property.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText28: TALText
       Align = Top
@@ -3077,7 +3046,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12004.000000000000000000
+      Position.Y = 12734.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -3090,8 +3059,8 @@ object MainForm: TMainForm
         'ncluding <b>Enabled, Hovered, Focused, Pressed, and Disabled</b>' +
         '. '
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText16: TALText
       Align = Top
@@ -3121,7 +3090,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 14789.000000000000000000
+      Position.Y = 15519.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3139,7 +3108,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 16255.000000000000000000
+      Position.Y = 16985.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3157,7 +3126,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 12806.000000000000000000
+      Position.Y = 13536.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3175,7 +3144,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 15812.000000000000000000
+      Position.Y = 16542.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3193,7 +3162,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 16844.000000000000000000
+      Position.Y = 17574.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3211,7 +3180,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 14143.000000000000000000
+      Position.Y = 14873.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -3231,7 +3200,7 @@ object MainForm: TMainForm
       Size.Width = 348.000000000000000000
       Size.Height = 66.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 448
+      TabOrder = 473
       object ALLayout36: TALLayout
         Align = Left
         AutoSize = True
@@ -3285,8 +3254,8 @@ object MainForm: TMainForm
         'superior quality '#13#10'over TCanvasGPU'#39's DrawLine, regardless of the' +
         ' form'#39's quality settings.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText34: TALText
       Align = Top
@@ -3295,7 +3264,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12933.000000000000000000
+      Position.Y = 13663.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 364.000000000000000000
       Size.PlatformDefault = False
@@ -3314,8 +3283,8 @@ object MainForm: TMainForm
         'k quite different, are indeed the same control. '#13#10'The main diffe' +
         'rence lies in their fill properties. '
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText35: TALText
       Align = Top
@@ -3324,7 +3293,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14270.000000000000000000
+      Position.Y = 15000.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 130.000000000000000000
       Size.PlatformDefault = False
@@ -3335,8 +3304,8 @@ object MainForm: TMainForm
         't control designed to allow users to select a range of values by' +
         ' sliding either end of the track bar to the desired positions.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText36: TALText
       Align = Top
@@ -3345,7 +3314,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 15939.000000000000000000
+      Position.Y = 16669.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -3357,8 +3326,8 @@ object MainForm: TMainForm
         'ly, TALDatePickerDialog is compatible with Android and '#13#10'iOS pla' +
         'tforms only.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText37: TALText
       Align = Top
@@ -3397,7 +3366,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17419.000000000000000000
+      Position.Y = 18149.000000000000000000
       PromptTextColor = xFF49454F
       Sides = [Bottom]
       Size.Width = 348.000000000000000000
@@ -3442,7 +3411,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 462
+      TabOrder = 488
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3465,11 +3434,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 16.000000000000000000
-      Position.Y = 9237.000000000000000000
+      Position.Y = 9967.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 464
+      TabOrder = 491
       object ALButton21: TALButton
         Align = LeftCenter
         Fill.Color = xFFE8DEF8
@@ -3486,7 +3455,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Fill.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -3512,8 +3480,8 @@ object MainForm: TMainForm
         Text = '<img src="button_icon">&nbsp; With icon'
         TextSettings.Font.Size = 18.000000000000000000
         TextSettings.Font.Color = xFF1D192B
-        TextSettings.LetterSpacing = 0.129999995231628400
         TextSettings.IsHtml = True
+        TextSettings.LetterSpacing = 0.129999995231628400
         XRadius = -50.000000000000000000
         YRadius = -50.000000000000000000
       end
@@ -3534,7 +3502,6 @@ object MainForm: TMainForm
         StateStyles.Disabled.Fill.Inherit = False
         StateStyles.Disabled.TextSettings.Inherit = False
         StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-        StateStyles.Disabled.TextSettings.Font.Weight = Medium
         StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
         StateStyles.Disabled.Opacity = 1.000000000000000000
         StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -3560,8 +3527,8 @@ object MainForm: TMainForm
         Text = '<img src="button_icon">&nbsp; Disabled'
         TextSettings.Font.Size = 18.000000000000000000
         TextSettings.Font.Color = xFF1D192B
-        TextSettings.LetterSpacing = 0.129999995231628400
         TextSettings.IsHtml = True
+        TextSettings.LetterSpacing = 0.129999995231628400
         XRadius = -50.000000000000000000
         YRadius = -50.000000000000000000
       end
@@ -3585,7 +3552,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17646.500000000000000000
+      Position.Y = 18376.500000000000000000
       PromptTextColor = xFF49454F
       Sides = [Bottom]
       Size.Width = 348.000000000000000000
@@ -3630,7 +3597,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 466
+      TabOrder = 494
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3641,11 +3608,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 32.000000000000000000
-      Position.Y = 17521.000000000000000000
+      Position.Y = 18251.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 93.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 468
+      TabOrder = 497
       object ALLayout47: TALLayout
         Align = Left
         AutoSize = True
@@ -3827,7 +3794,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17788.742187500000000000
+      Position.Y = 18518.742187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 60.000000000000000000
@@ -3871,7 +3838,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 471
+      TabOrder = 500
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -3894,11 +3861,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 40.000000000000000000
-      Position.Y = 17980.742187500000000000
+      Position.Y = 18710.742187500000000000
       Size.Width = 380.000000000000000000
       Size.Height = 83.500000000000000000
       Size.PlatformDefault = False
-      TabOrder = 472
+      TabOrder = 501
       object ALLayout49: TALLayout
         Align = Left
         AutoSize = True
@@ -4066,7 +4033,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18096.242187500000000000
+      Position.Y = 18826.242187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 99.242500305175780000
@@ -4110,7 +4077,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 474
+      TabOrder = 503
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4125,7 +4092,7 @@ object MainForm: TMainForm
       Margins.Top = 24.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 18321.484375000000000000
+      Position.Y = 19051.484375000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 888.484985351562500000
       Size.PlatformDefault = False
@@ -4874,7 +4841,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 18.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 17880.742187500000000000
+      Position.Y = 18610.742187500000000000
       PromptTextColor = xFF49454F
       Size.Width = 348.000000000000000000
       Size.Height = 60.000000000000000000
@@ -4918,7 +4885,7 @@ object MainForm: TMainForm
       SupportingTextSettings.Font.Color = xFF49454F
       SupportingTextSettings.Margins.Top = 4.500000000000000000
       SupportingTextSettings.Layout = Inline
-      TabOrder = 477
+      TabOrder = 506
       TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = xFF1D1B20
       TintColor = xFF6750A4
@@ -4961,14 +4928,14 @@ object MainForm: TMainForm
         'ping the interface uncluttered while still offering access to mo' +
         're detailed content if desired.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.MaxLines = 2
       TextSettings.Ellipsis = #8230' more[+]'
       TextSettings.EllipsisSettings.Inherit = False
       TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
       TextSettings.EllipsisSettings.Font.Weight = Semibold
       TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
+      TextSettings.MaxLines = 2
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
       OnElementClick = ALTextEllipsisElementClick
       OnElementMouseEnter = ALTextEllipsisElementMouseEnter
       OnElementMouseLeave = ALTextEllipsisElementMouseLeave
@@ -4998,23 +4965,26 @@ object MainForm: TMainForm
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 224
+      TabOrder = 236
       object ALAutoSizeLayoutImage: TALImage
         Align = MostLeftTop
+        Margins.Left = 12.000000000000000000
+        Position.X = 12.000000000000000000
         ResourceName = 'autosize'
         Size.Width = 158.000000000000000000
         Size.Height = 150.000000000000000000
         Size.PlatformDefault = False
+        WrapMode = FitAndCrop
       end
       object ALAutoSizeLayoutText: TALText
         Align = Top
         AutoSize = True
         HitTest = True
-        Margins.Left = 8.000000000000000000
+        Margins.Left = 12.000000000000000000
         Margins.Right = 12.000000000000000000
         MaxHeight = 150.000000000000000000
-        Position.X = 166.000000000000000000
-        Size.Width = 202.000000000000000000
+        Position.X = 182.000000000000000000
+        Size.Width = 186.000000000000000000
         Size.Height = 144.000000000000000000
         Size.PlatformDefault = False
         Text = 
@@ -5179,7 +5149,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7881.000000000000000000
+      Position.Y = 8611.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -5188,8 +5158,8 @@ object MainForm: TMainForm
         't=500>TALAnimatedImage</span> to display an astonishing loader u' +
         'sing Lottie animations or animated GIFs.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout67: TALLayout
       Align = Top
@@ -5198,11 +5168,11 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7979.000000000000000000
+      Position.Y = 8709.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 75.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 355
+      TabOrder = 373
       object ALAnimatedImage1: TALAnimatedImage
         Align = Left
         Animation.Enabled = True
@@ -5232,7 +5202,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 7600.000000000000000000
+      Position.Y = 8330.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -5247,7 +5217,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7024.000000000000000000
+      Position.Y = 7754.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 338.000000000000000000
       Size.PlatformDefault = False
@@ -5263,8 +5233,8 @@ object MainForm: TMainForm
         'yed with the app, it does not '#13#10'need to be activated as the prim' +
         'ary canvas of the application.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText59: TALText
       Align = Top
@@ -5275,20 +5245,21 @@ object MainForm: TMainForm
       Position.X = 16.000000000000000000
       Position.Y = 5827.000000000000000000
       Size.Width = 348.000000000000000000
-      Size.Height = 182.000000000000000000
+      Size.Height = 208.000000000000000000
       Size.PlatformDefault = False
       Text = 
         '<span background-color="#e3e6e8" font-weight=500>TALImage</span>' +
         ' differs from <span background-color="#e3e6e8" font-weight=500>T' +
         'Image</span> in that it does not store image data in the <b>*.fm' +
         'x</b> file. Instead, it loads the image directly from a resource' +
-        ' or a file specified by its <span background-color="#e3e6e8" fon' +
-        't-weight=500>ResourceName</span> property. In design mode, all i' +
-        'mages are loaded from the <b>/Resources/</b> sub-folder within t' +
-        'he project directory.'
+        ', a file, or downloads it from the internet using the URL specif' +
+        'ied in its <span background-color="#e3e6e8" font-weight=500>Reso' +
+        'urceName</span> property. In design mode, all images are loaded ' +
+        'from the <b>/Resources/</b> sub-folder within the project direct' +
+        'ory.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText58: TALText
       Align = Top
@@ -5300,7 +5271,7 @@ object MainForm: TMainForm
       Padding.Top = 45.000000000000000000
       Padding.Right = 16.000000000000000000
       Padding.Bottom = 15.000000000000000000
-      Position.Y = 6897.000000000000000000
+      Position.Y = 7627.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 103.000000000000000000
       Size.PlatformDefault = False
@@ -5365,8 +5336,8 @@ object MainForm: TMainForm
         'more details about '#13#10'the performance of each configuration, refe' +
         'r '#13#10'to the <b>ALFmxGraphics</b> Demo.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.HorzAlign = Center
       TextSettings.IsHtml = True
+      TextSettings.HorzAlign = Center
       XRadius = 12.000000000000000000
       YRadius = 12.000000000000000000
     end
@@ -5374,11 +5345,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Left = 16.000000000000000000
-      Margins.Top = 8.000000000000000000
+      Margins.Top = 12.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 6199.000000000000000000
+      Position.Y = 6233.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 104.000000000000000000
       Size.PlatformDefault = False
@@ -5387,18 +5358,18 @@ object MainForm: TMainForm
         'ensuring accurate '#13#10'representation of images using <b>P3</b> and' +
         ' other color profiles.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout72: TALLayout
       Align = Top
       AutoSize = True
-      Margins.Top = 24.000000000000000000
-      Position.Y = 6339.000000000000000000
+      Margins.Top = 12.000000000000000000
+      Position.Y = 6361.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 121
+      TabOrder = 131
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = True
@@ -7919,11 +7890,11 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 6513.000000000000000000
+      Position.Y = 6535.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 113
+      TabOrder = 123
       object ALImage14: TALImage
         Align = MostLeftTop
         Margins.Left = 12.000000000000000000
@@ -7967,7 +7938,7 @@ object MainForm: TMainForm
       Align = Top
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 6687.000000000000000000
+      Position.Y = 6709.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
@@ -8033,8 +8004,8 @@ object MainForm: TMainForm
         ' a top-notch scrolling experience, leveraging '#13#10'established and ' +
         'trusted technologies.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText66: TALText
       Align = Top
@@ -8044,7 +8015,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12590.000000000000000000
+      Position.Y = 13320.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 78.000000000000000000
       Size.PlatformDefault = False
@@ -8053,17 +8024,17 @@ object MainForm: TMainForm
         'or="#e3e6e8" font-weight=500>TALAnimatedImage</span> to '#13#10'have a' +
         ' beautiful animation.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout80: TALLayout
       Align = Top
       Margins.Top = 24.000000000000000000
-      Position.Y = 9315.000000000000000000
+      Position.Y = 10045.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 40.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 266
+      TabOrder = 268
       object ALButton25: TALButton
         Align = LeftCenter
         Fill.Color = xFF6750A4
@@ -8072,6 +8043,7 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
+        Fill.ImageNoRadius = True
         Margins.Left = 24.000000000000000000
         Position.X = 24.000000000000000000
         Size.Width = 40.000000000000000000
@@ -8115,6 +8087,7 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
+        Fill.ImageNoRadius = True
         Margins.Left = 16.000000000000000000
         Position.X = 80.000000000000000000
         Size.Width = 40.000000000000000000
@@ -8160,6 +8133,7 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
+        Fill.ImageNoRadius = True
         Margins.Left = 16.000000000000000000
         Position.X = 136.000000000000000000
         Size.Width = 40.000000000000000000
@@ -8197,6 +8171,7 @@ object MainForm: TMainForm
         Fill.ImageMargins.Top = 8.000000000000000000
         Fill.ImageMargins.Right = 8.000000000000000000
         Fill.ImageMargins.Bottom = 8.000000000000000000
+        Fill.ImageNoRadius = True
         Margins.Left = 16.000000000000000000
         Position.X = 192.000000000000000000
         Size.Width = 40.000000000000000000
@@ -8241,7 +8216,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 9987.000000000000000000
+      Position.Y = 10717.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 182.000000000000000000
       Size.PlatformDefault = False
@@ -8252,8 +8227,8 @@ object MainForm: TMainForm
         'xample of this animation where we define a scale-out effect in t' +
         'he pressed state.'
       TextSettings.Font.Size = 18.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout84: TALLayout
       Align = Top
@@ -8262,7 +8237,7 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 21.000000000000000000
-      Position.Y = 10866.000000000000000000
+      Position.Y = 11596.000000000000000000
       Size.Width = 343.000000000000000000
       Size.Height = 28.000000000000000000
       Size.PlatformDefault = False
@@ -8310,7 +8285,7 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 10818.000000000000000000
+      Position.Y = 11548.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -8427,7 +8402,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 10984.000000000000000000
+      Position.Y = 11714.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 178.000000000000000000
       Size.PlatformDefault = False
@@ -8692,7 +8667,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 11533.000000000000000000
+      Position.Y = 12263.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -8806,7 +8781,7 @@ object MainForm: TMainForm
       Margins.Top = 26.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 11581.000000000000000000
+      Position.Y = 12311.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 22.000000000000000000
       Size.PlatformDefault = False
@@ -8917,7 +8892,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 11639.000000000000000000
+      Position.Y = 12369.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 178.000000000000000000
       Size.PlatformDefault = False
@@ -9173,7 +9148,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 12378.000000000000000000
+      Position.Y = 13108.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 188.000000000000000000
       Size.PlatformDefault = False
@@ -9223,18 +9198,10 @@ object MainForm: TMainForm
           Align = LeftCenter
           TabOrder = 0
           Thumb.StateStyles.Checked.Default.CheckMark.Color = xFFEADDFF
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Checked.Default.CheckMark.Inherit = False
           Thumb.StateStyles.Checked.Default.Fill.Color = xFF381E72
           Thumb.StateStyles.Checked.Default.Fill.Inherit = False
           Thumb.StateStyles.Checked.Disabled.CheckMark.Color = x61E6E0E9
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit = False
           Thumb.StateStyles.Checked.Disabled.Fill.Color = xFF141218
           Thumb.StateStyles.Checked.Disabled.Fill.Inherit = False
@@ -9268,10 +9235,6 @@ object MainForm: TMainForm
           Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Right = -8.000000000000000000
           Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Bottom = -8.000000000000000000
           Thumb.StateStyles.Unchecked.Default.CheckMark.Color = claNull
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Unchecked.Default.CheckMark.Inherit = False
           Thumb.StateStyles.Unchecked.Default.Fill.Color = xFF938F99
           Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9280,10 +9243,6 @@ object MainForm: TMainForm
           Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Bottom = 4.000000000000000000
           Thumb.StateStyles.Unchecked.Default.Fill.Inherit = False
           Thumb.StateStyles.Unchecked.Disabled.CheckMark.Color = x6136343B
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Unchecked.Disabled.CheckMark.Inherit = False
           Thumb.StateStyles.Unchecked.Disabled.Fill.Color = x61E6E0E9
           Thumb.StateStyles.Unchecked.Disabled.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9376,18 +9335,10 @@ object MainForm: TMainForm
           Enabled = False
           TabOrder = 0
           Thumb.StateStyles.Checked.Default.CheckMark.Color = xFFEADDFF
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Checked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Checked.Default.CheckMark.Inherit = False
           Thumb.StateStyles.Checked.Default.Fill.Color = xFF381E72
           Thumb.StateStyles.Checked.Default.Fill.Inherit = False
           Thumb.StateStyles.Checked.Disabled.CheckMark.Color = x61E6E0E9
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit = False
           Thumb.StateStyles.Checked.Disabled.Fill.Color = xFF141218
           Thumb.StateStyles.Checked.Disabled.Fill.Inherit = False
@@ -9421,10 +9372,6 @@ object MainForm: TMainForm
           Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Right = -8.000000000000000000
           Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Bottom = -8.000000000000000000
           Thumb.StateStyles.Unchecked.Default.CheckMark.Color = claNull
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Unchecked.Default.CheckMark.Inherit = False
           Thumb.StateStyles.Unchecked.Default.Fill.Color = xFF938F99
           Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9433,10 +9380,6 @@ object MainForm: TMainForm
           Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Bottom = 4.000000000000000000
           Thumb.StateStyles.Unchecked.Default.Fill.Inherit = False
           Thumb.StateStyles.Unchecked.Disabled.CheckMark.Color = x6136343B
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-          Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
           Thumb.StateStyles.Unchecked.Disabled.CheckMark.Inherit = False
           Thumb.StateStyles.Unchecked.Disabled.Fill.Color = x61E6E0E9
           Thumb.StateStyles.Unchecked.Disabled.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9507,7 +9450,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 12214.000000000000000000
+      Position.Y = 12944.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9529,17 +9472,9 @@ object MainForm: TMainForm
         Checked = True
         TabOrder = 0
         Thumb.StateStyles.Checked.Default.CheckMark.Color = xFF4F378B
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Checked.Default.CheckMark.Inherit = False
         Thumb.StateStyles.Checked.Default.Fill.Inherit = False
         Thumb.StateStyles.Checked.Disabled.CheckMark.Color = x611D1B20
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit = False
         Thumb.StateStyles.Checked.Disabled.Fill.Color = xFFFEF7FF
         Thumb.StateStyles.Checked.Disabled.Fill.Inherit = False
@@ -9573,10 +9508,6 @@ object MainForm: TMainForm
         Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Right = -8.000000000000000000
         Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Bottom = -8.000000000000000000
         Thumb.StateStyles.Unchecked.Default.CheckMark.Color = claNull
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Unchecked.Default.CheckMark.Inherit = False
         Thumb.StateStyles.Unchecked.Default.Fill.Color = xFF79747E
         Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9585,10 +9516,6 @@ object MainForm: TMainForm
         Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Bottom = 4.000000000000000000
         Thumb.StateStyles.Unchecked.Default.Fill.Inherit = False
         Thumb.StateStyles.Unchecked.Disabled.CheckMark.Color = x61E6E0E9
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Unchecked.Disabled.CheckMark.Inherit = False
         Thumb.StateStyles.Unchecked.Disabled.Fill.Color = x611D1B20
         Thumb.StateStyles.Unchecked.Disabled.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9658,7 +9585,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 12262.000000000000000000
+      Position.Y = 12992.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9681,17 +9608,9 @@ object MainForm: TMainForm
         Enabled = False
         TabOrder = 0
         Thumb.StateStyles.Checked.Default.CheckMark.Color = xFF4F378B
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Checked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Checked.Default.CheckMark.Inherit = False
         Thumb.StateStyles.Checked.Default.Fill.Inherit = False
         Thumb.StateStyles.Checked.Disabled.CheckMark.Color = x611D1B20
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Checked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Checked.Disabled.CheckMark.Inherit = False
         Thumb.StateStyles.Checked.Disabled.Fill.Color = xFFFEF7FF
         Thumb.StateStyles.Checked.Disabled.Fill.Inherit = False
@@ -9725,10 +9644,6 @@ object MainForm: TMainForm
         Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Right = -8.000000000000000000
         Thumb.StateStyles.Checked.Focused.StateLayer.Margins.Bottom = -8.000000000000000000
         Thumb.StateStyles.Unchecked.Default.CheckMark.Color = claNull
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Default.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Unchecked.Default.CheckMark.Inherit = False
         Thumb.StateStyles.Unchecked.Default.Fill.Color = xFF79747E
         Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9737,10 +9652,6 @@ object MainForm: TMainForm
         Thumb.StateStyles.Unchecked.Default.Fill.BackgroundMargins.Bottom = 4.000000000000000000
         Thumb.StateStyles.Unchecked.Default.Fill.Inherit = False
         Thumb.StateStyles.Unchecked.Disabled.CheckMark.Color = x61E6E0E9
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Left = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Top = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Right = 6.000000000000000000
-        Thumb.StateStyles.Unchecked.Disabled.CheckMark.Margins.Bottom = 6.000000000000000000
         Thumb.StateStyles.Unchecked.Disabled.CheckMark.Inherit = False
         Thumb.StateStyles.Unchecked.Disabled.Fill.Color = x611D1B20
         Thumb.StateStyles.Unchecked.Disabled.Fill.BackgroundMargins.Left = 4.000000000000000000
@@ -9810,7 +9721,7 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 24.000000000000000000
-      Position.Y = 12310.000000000000000000
+      Position.Y = 13040.000000000000000000
       Size.Width = 340.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -9890,11 +9801,11 @@ object MainForm: TMainForm
       Margins.Top = 16.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13325.000000000000000000
+      Position.Y = 14055.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 228
+      TabOrder = 229
       Thumb.Fill.Color = xFF6750A4
       Thumb.Margins.Left = 6.000000000000000000
       Thumb.Margins.Right = 6.000000000000000000
@@ -9955,7 +9866,7 @@ object MainForm: TMainForm
       Margins.Top = 32.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13440.000000000000000000
+      Position.Y = 14170.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
@@ -9991,7 +9902,7 @@ object MainForm: TMainForm
       Margins.Top = 32.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13670.000000000000000000
+      Position.Y = 14400.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -10009,14 +9920,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13377.000000000000000000
+      Position.Y = 14107.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Material 3 - Continuous)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText83: TALText
       Align = Top
@@ -10026,14 +9937,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13607.000000000000000000
+      Position.Y = 14337.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Material 3 - Disabled)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALText84: TALText
       Align = Top
@@ -10043,14 +9954,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13710.000000000000000000
+      Position.Y = 14440.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Cupertino)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALTrackBar4: TALTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
@@ -10088,7 +9999,7 @@ object MainForm: TMainForm
       Margins.Top = 32.000000000000000000
       Margins.Right = 16.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13555.000000000000000000
+      Position.Y = 14285.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
@@ -10126,14 +10037,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 13492.000000000000000000
+      Position.Y = 14222.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Material 3 - Discrete)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALRectangle11: TALRectangle
       Align = Top
@@ -10142,7 +10053,7 @@ object MainForm: TMainForm
       Margins.Top = 36.000000000000000000
       Padding.Top = 24.000000000000000000
       Padding.Bottom = 24.000000000000000000
-      Position.Y = 13777.000000000000000000
+      Position.Y = 14507.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 306.000000000000000000
       Size.PlatformDefault = False
@@ -10242,8 +10153,8 @@ object MainForm: TMainForm
         Text = 'TALTrackBar (Material 3 - Continuous)'
         TextSettings.Font.Size = 16.000000000000000000
         TextSettings.Font.Color = claWhite
-        TextSettings.LineHeightMultiplier = 1.450000047683716000
         TextSettings.IsHtml = True
+        TextSettings.LineHeightMultiplier = 1.450000047683716000
       end
       object ALTrackBar6: TALTrackBar
         ActiveTrack.Fill.Color = xFFD0BCFF
@@ -10325,8 +10236,8 @@ object MainForm: TMainForm
         Text = 'TALTrackBar (Material 3 - Discrete)'
         TextSettings.Font.Size = 16.000000000000000000
         TextSettings.Font.Color = claWhite
-        TextSettings.LineHeightMultiplier = 1.450000047683716000
         TextSettings.IsHtml = True
+        TextSettings.LineHeightMultiplier = 1.450000047683716000
       end
     end
     object ALText90: TALText
@@ -10337,14 +10248,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14480.000000000000000000
+      Position.Y = 15210.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Material 3 - Continuous)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALRangeTrackBar2: TALRangeTrackBar
       ActiveTrack.Fill.Color = xFF6750A4
@@ -10402,7 +10313,7 @@ object MainForm: TMainForm
       Thumb.TouchTargetExpansion.Right = 22.000000000000000000
       Thumb.TouchTargetExpansion.Bottom = 2.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14543.000000000000000000
+      Position.Y = 15273.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 44.000000000000000000
       Size.PlatformDefault = False
@@ -10421,14 +10332,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14595.000000000000000000
+      Position.Y = 15325.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Material 3 - Discrete)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALRangeTrackBar3: TALRangeTrackBar
       ActiveTrack.StateStyles.Disabled.Fill.Color = x611D1B20
@@ -10449,7 +10360,7 @@ object MainForm: TMainForm
       Thumb.Size.Height = 32.000000000000000000
       Thumb.Size.PlatformDefault = False
       Position.X = 16.000000000000000000
-      Position.Y = 14658.000000000000000000
+      Position.Y = 15388.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 32.000000000000000000
       Size.PlatformDefault = False
@@ -10463,14 +10374,14 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 14698.000000000000000000
+      Position.Y = 15428.000000000000000000
       Size.Width = 348.000000000000000000
       Size.Height = 23.000000000000000000
       Size.PlatformDefault = False
       Text = 'TALTrackBar (Cupertino)'
       TextSettings.Font.Size = 16.000000000000000000
-      TextSettings.LineHeightMultiplier = 1.450000047683716000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALEdit13: TALEdit
       Align = Top
@@ -10488,7 +10399,7 @@ object MainForm: TMainForm
       Padding.Right = 18.000000000000000000
       Padding.Bottom = 13.500000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 18227.484375000000000000
+      Position.Y = 18957.484375000000000000
       PromptTextColor = xFF465A69
       Size.Width = 348.000000000000000000
       Size.Height = 70.000000000000000000
@@ -10543,11 +10454,11 @@ object MainForm: TMainForm
     object ALImage13: TALImage
       Align = TopLeft
       Margins.Left = 16.000000000000000000
-      Margins.Top = 8.000000000000000000
+      Margins.Top = 12.000000000000000000
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 12.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 6029.000000000000000000
+      Position.Y = 6059.000000000000000000
       ResourceName = 'house'
       Size.Width = 150.000000000000000000
       Size.Height = 150.000000000000000000
@@ -10564,7 +10475,7 @@ object MainForm: TMainForm
       Padding.Right = 30.860000610351560000
       Padding.Bottom = 15.430000305175780000
       Position.X = 16.000000000000000000
-      Position.Y = 10189.000000000000000000
+      Position.Y = 10919.000000000000000000
       Size.Width = 193.000000000000000000
       Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
@@ -10572,7 +10483,6 @@ object MainForm: TMainForm
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
       StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
       StateStyles.Hovered.Shadow.blur = 2.569999933242798000
@@ -10615,7 +10525,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 12688.000000000000000000
+      Position.Y = 13418.000000000000000000
       ResourceName = 'lottieswitch'
       Size.Width = 107.000000000000000000
       Size.Height = 50.000000000000000000
@@ -10630,7 +10540,7 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7382.000000000000000000
+      Position.Y = 8112.000000000000000000
       ResourceName = 'lottiesample'
       Size.Width = 150.000000000000000000
       Size.Height = 150.000000000000000000
@@ -10643,8 +10553,88 @@ object MainForm: TMainForm
       Margins.Right = 16.000000000000000000
       Margins.Bottom = 8.000000000000000000
       Position.X = 16.000000000000000000
-      Position.Y = 7825.000000000000000000
+      Position.Y = 8555.000000000000000000
       Interval = 0.050000000745058060
+    end
+    object ALText45: TALText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 24.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 12.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 6883.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 156.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        '<span style="background-color:#e3e6e8; font-weight:500;">TALImag' +
+        'e</span>'#13#10'enables seamless downloading of images directly from t' +
+        'he <b>internet</b>.'#13#10'To use this feature, simply set its'#13#10'<span ' +
+        'style="background-color:#e3e6e8; font-weight:500;">ResourceName<' +
+        '/span>'#13#10'property to the desired URL, and <span style="background' +
+        '-color:#e3e6e8; font-weight:500;">TALImage</span>'#13#10'will automati' +
+        'cally handle the background downloading of the image.'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
+    end
+    object ALImage12: TALImage
+      Align = Top
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 12.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 7063.000000000000000000
+      ResourceName = 
+        'https://github.com/MagicFoundation/Alcinoe/blob/master/Demos/ALF' +
+        'mxControls/_Design/landscape.jpg?raw=true'
+      Size.Width = 348.000000000000000000
+      Size.Height = 150.000000000000000000
+      Size.PlatformDefault = False
+      WrapMode = FitAndCrop
+      XRadius = 24.000000000000000000
+      YRadius = 24.000000000000000000
+    end
+    object ALText48: TALText
+      Align = Top
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 24.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 12.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 7237.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 156.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        '<span style="background-color:#e3e6e8; font-weight:500;">TALImag' +
+        'e</span>'#13#10'can utilize a mask to render images with customized sh' +
+        'apes.'#13#10'To achieve this, simply assign the desired mask to its'#13#10'<' +
+        'span style="background-color:#e3e6e8; font-weight:500;">MaskReso' +
+        'urceName</span>'#13#10'property, and <span style="background-color:#e3' +
+        'e6e8; font-weight:500;">TALImage</span>'#13#10'will seamlessly apply t' +
+        'he mask during the image rendering process.'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
+    end
+    object ALImage17: TALImage
+      Align = Top
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 12.000000000000000000
+      Margins.Right = 16.000000000000000000
+      MaskResourceName = 'mask'
+      Position.X = 16.000000000000000000
+      Position.Y = 7417.000000000000000000
+      ResourceName = 
+        'https://github.com/MagicFoundation/Alcinoe/blob/master/Demos/ALF' +
+        'mxControls/_Design/landscape.jpg?raw=true'
+      Size.Width = 348.000000000000000000
+      Size.Height = 150.000000000000000000
+      Size.PlatformDefault = False
     end
   end
 end

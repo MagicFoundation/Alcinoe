@@ -7,7 +7,7 @@
           android:versionName="%versionName%"
           android:installLocation="%installLocation%">
    
-  <uses-sdk android:minSdkVersion="21"
+  <uses-sdk android:minSdkVersion="%minSdkVersion%"
             android:targetSdkVersion="%targetSdkVersion%"/>
  
   <%uses-permission%>

@@ -403,6 +403,10 @@ type
     ALText92: TALText;
     ALEdit13: TALEdit;
     ALImage16: TALImage;
+    ALText45: TALText;
+    ALImage12: TALImage;
+    ALText48: TALText;
+    ALImage17: TALImage;
     procedure ButtonLaunchScrollBoxDemoAlcinoeClick(Sender: TObject);
     procedure ButtonBenchTALRectangleClick(Sender: TObject);
     procedure ButtonBenchTRectangleClick(Sender: TObject);
@@ -526,15 +530,15 @@ begin
   MainTitle.Text := LTitle;
 
   {$IF defined(ALSkiaCanvas)}
-  SubTitle.Text := 'sk_surface_t (ALSkiaCanvas)';
+  SubTitle.Text := 'sk_surface_t (Skia Canvas)';
   {$ELSEIF defined(ALSkiaEngine)}
-  SubTitle.Text := 'sk_surface_t (ALSkiaEngine)';
+  SubTitle.Text := 'sk_surface_t (Skia Engine)';
   {$ELSEIF defined(Android)}
-  SubTitle.Text := 'Jbitmap';
+  SubTitle.Text := 'Jbitmap (OS Engine)';
   {$ELSEIF defined(AlAppleOS)}
-  SubTitle.Text := 'CGContextRef';
+  SubTitle.Text := 'CGContextRef (OS Engine)';
   {$ELSE}
-  SubTitle.Text := 'Tbitmap';
+  SubTitle.Text := 'Tbitmap (Delphi Engine)';
   {$ENDIF}
   //-----
   ALVideoPlayerSurface1.Height := (width / 1920) * 1080;

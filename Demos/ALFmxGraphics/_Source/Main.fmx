@@ -19,7 +19,7 @@ object MainForm: TMainForm
     VScrollBar.Size.PlatformDefault = False
     VScrollBar.TabOrder = 0
     VScrollBar.Thumb.Size.Width = 4.000000000000000000
-    VScrollBar.Thumb.Size.Height = 438.000000000000000000
+    VScrollBar.Thumb.Size.Height = 362.000000000000000000
     VScrollBar.Thumb.Size.PlatformDefault = False
     Align = Client
     Size.Width = 380.000000000000000000
@@ -50,24 +50,23 @@ object MainForm: TMainForm
       Margins.Left = 12.000000000000000000
       Margins.Right = 12.000000000000000000
       Margins.Bottom = 12.000000000000000000
-      Padding.Left = 29.139999389648440000
-      Padding.Top = 14.569999694824220000
-      Padding.Right = 29.139999389648440000
-      Padding.Bottom = 14.569999694824220000
+      Padding.Left = 30.860000610351560000
+      Padding.Top = 15.430000305175780000
+      Padding.Right = 30.860000610351560000
+      Padding.Bottom = 15.430000305175780000
       Position.X = 12.000000000000000000
-      Position.Y = 520.000000000000000000
+      Position.Y = 572.000000000000000000
       Size.Width = 356.000000000000000000
-      Size.Height = 53.000000000000000000
+      Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       StateStyles.Disabled.Fill.Color = x1F1D1B20
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
-      StateStyles.Disabled.TextSettings.Font.Size = 17.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
+      StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
-      StateStyles.Hovered.Shadow.blur = 2.430000066757202000
-      StateStyles.Hovered.Shadow.OffsetY = 1.210000038146973000
+      StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+      StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
       StateStyles.Hovered.Shadow.Color = x80000000
       StateStyles.Hovered.Shadow.Inherit = False
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -84,12 +83,12 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
-      Stroke.Thickness = 1.210000038146973000
-      TabOrder = 6
+      Stroke.Thickness = 1.289999961853027000
+      TabOrder = 13
       Text = 'Recreate Buffers'
-      TextSettings.Font.Size = 17.000000000000000000
+      TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
-      TextSettings.LetterSpacing = 0.119999997317791000
+      TextSettings.LetterSpacing = 0.129999995231628400
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonRecreateBuffersClick
@@ -100,24 +99,23 @@ object MainForm: TMainForm
       Margins.Left = 12.000000000000000000
       Margins.Right = 12.000000000000000000
       Margins.Bottom = 12.000000000000000000
-      Padding.Left = 29.139999389648440000
-      Padding.Top = 14.569999694824220000
-      Padding.Right = 29.139999389648440000
-      Padding.Bottom = 14.569999694824220000
+      Padding.Left = 30.860000610351560000
+      Padding.Top = 15.430000305175780000
+      Padding.Right = 30.860000610351560000
+      Padding.Bottom = 15.430000305175780000
       Position.X = 12.000000000000000000
-      Position.Y = 585.000000000000000000
+      Position.Y = 638.000000000000000000
       Size.Width = 356.000000000000000000
-      Size.Height = 53.000000000000000000
+      Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       StateStyles.Disabled.Fill.Color = x1F1D1B20
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
-      StateStyles.Disabled.TextSettings.Font.Size = 17.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
+      StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
-      StateStyles.Hovered.Shadow.blur = 2.430000066757202000
-      StateStyles.Hovered.Shadow.OffsetY = 1.210000038146973000
+      StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+      StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
       StateStyles.Hovered.Shadow.Color = x80000000
       StateStyles.Hovered.Shadow.Inherit = False
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -134,12 +132,12 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
-      Stroke.Thickness = 1.210000038146973000
-      TabOrder = 5
+      Stroke.Thickness = 1.289999961853027000
+      TabOrder = 11
       Text = 'Test FPS'
-      TextSettings.Font.Size = 17.000000000000000000
+      TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
-      TextSettings.LetterSpacing = 0.119999997317791000
+      TextSettings.LetterSpacing = 0.129999995231628400
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonTestFPSClick
@@ -150,24 +148,23 @@ object MainForm: TMainForm
       Margins.Left = 12.000000000000000000
       Margins.Right = 12.000000000000000000
       Margins.Bottom = 12.000000000000000000
-      Padding.Left = 29.139999389648440000
-      Padding.Top = 14.569999694824220000
-      Padding.Right = 29.139999389648440000
-      Padding.Bottom = 14.569999694824220000
+      Padding.Left = 30.860000610351560000
+      Padding.Top = 15.430000305175780000
+      Padding.Right = 30.860000610351560000
+      Padding.Bottom = 15.430000305175780000
       Position.X = 12.000000000000000000
-      Position.Y = 715.000000000000000000
+      Position.Y = 770.000000000000000000
       Size.Width = 356.000000000000000000
-      Size.Height = 53.000000000000000000
+      Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       StateStyles.Disabled.Fill.Color = x1F1D1B20
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
-      StateStyles.Disabled.TextSettings.Font.Size = 17.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
+      StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
-      StateStyles.Hovered.Shadow.blur = 2.430000066757202000
-      StateStyles.Hovered.Shadow.OffsetY = 1.210000038146973000
+      StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+      StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
       StateStyles.Hovered.Shadow.Color = x80000000
       StateStyles.Hovered.Shadow.Inherit = False
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -184,12 +181,12 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
-      Stroke.Thickness = 1.210000038146973000
+      Stroke.Thickness = 1.289999961853027000
       TabOrder = 1
       Text = 'Check for Memory Leaks'
-      TextSettings.Font.Size = 17.000000000000000000
+      TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
-      TextSettings.LetterSpacing = 0.119999997317791000
+      TextSettings.LetterSpacing = 0.129999995231628400
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonCheckForMemoryLeaksClick
@@ -200,24 +197,23 @@ object MainForm: TMainForm
       Margins.Left = 12.000000000000000000
       Margins.Right = 12.000000000000000000
       Margins.Bottom = 12.000000000000000000
-      Padding.Left = 29.139999389648440000
-      Padding.Top = 14.569999694824220000
-      Padding.Right = 29.139999389648440000
-      Padding.Bottom = 14.569999694824220000
+      Padding.Left = 30.860000610351560000
+      Padding.Top = 15.430000305175780000
+      Padding.Right = 30.860000610351560000
+      Padding.Bottom = 15.430000305175780000
       Position.X = 12.000000000000000000
-      Position.Y = 650.000000000000000000
+      Position.Y = 704.000000000000000000
       Size.Width = 356.000000000000000000
-      Size.Height = 53.000000000000000000
+      Size.Height = 54.000000000000000000
       Size.PlatformDefault = False
       StateStyles.Disabled.Fill.Color = x1F1D1B20
       StateStyles.Disabled.Fill.Inherit = False
       StateStyles.Disabled.TextSettings.Inherit = False
-      StateStyles.Disabled.TextSettings.Font.Size = 17.000000000000000000
-      StateStyles.Disabled.TextSettings.Font.Weight = Medium
+      StateStyles.Disabled.TextSettings.Font.Size = 18.000000000000000000
       StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
       StateStyles.Disabled.Opacity = 1.000000000000000000
-      StateStyles.Hovered.Shadow.blur = 2.430000066757202000
-      StateStyles.Hovered.Shadow.OffsetY = 1.210000038146973000
+      StateStyles.Hovered.Shadow.blur = 2.569999933242798000
+      StateStyles.Hovered.Shadow.OffsetY = 1.289999961853027000
       StateStyles.Hovered.Shadow.Color = x80000000
       StateStyles.Hovered.Shadow.Inherit = False
       StateStyles.Hovered.StateLayer.Opacity = 0.079999998211860660
@@ -234,12 +230,12 @@ object MainForm: TMainForm
       StateStyles.Focused.StateLayer.YRadius = -50.000000000000000000
       StateStyles.Transition.Duration = 0.200000002980232200
       Stroke.Color = claNull
-      Stroke.Thickness = 1.210000038146973000
+      Stroke.Thickness = 1.289999961853027000
       TabOrder = 2
       Text = 'Test Multiline Text'
-      TextSettings.Font.Size = 17.000000000000000000
+      TextSettings.Font.Size = 18.000000000000000000
       TextSettings.Font.Color = claWhite
-      TextSettings.LetterSpacing = 0.119999997317791000
+      TextSettings.LetterSpacing = 0.129999995231628400
       XRadius = -50.000000000000000000
       YRadius = -50.000000000000000000
       OnClick = ButtonTestMultilineTextClick
@@ -269,76 +265,60 @@ object MainForm: TMainForm
       Position.X = 16.000000000000000000
       Position.Y = 106.000000000000000000
       Size.Width = 348.000000000000000000
-      Size.Height = 390.000000000000000000
+      Size.Height = 442.000000000000000000
       Size.PlatformDefault = False
       Text = 
-        'You must compile this demo in <b>Release</b> configuration to ob' +
-        'tain accurate statistics.'#13#10'The demo can be run in various config' +
-        'urations.'#13#10'Currently, it operates with a regular Canvas '#13#10'(<span' +
-        ' background-color="#e3e6e8" font-weight=500>TCanvasD2D</span>/<s' +
-        'pan background-color="#e3e6e8" font-weight=500>TCanvasGdiPlus</s' +
-        'pan>/<span background-color="#e3e6e8" font-weight=500>TCanvasGpu' +
-        '</span>), using the '#13#10'internal Alcinoe graphic engine backed by ' +
-        'the '#13#10'Skia Engine. Alternatively, you have the option '#13#10'to run i' +
-        't on a Skia Canvas (<span background-color="#e3e6e8" font-weight' +
-        '=500>TVKCanvas</span>/<span background-color="#e3e6e8" font-weig' +
-        'ht=500>TGlCanvas</span>/<span background-color="#e3e6e8" font-we' +
-        'ight=500>TMtlCanvas</span>/<span background-color="#e3e6e8" font' +
-        '-weight=500>TSkRasterCanvas</span>). '#13#10'To switch to a Skia Canva' +
-        's, go to the project '#13#10'options, replace the definition "<b>ALSki' +
-        'aEngine</b>" '#13#10'with "<b>SKIA</b>", and in the DPR file, add the ' +
-        'line '#13#10'"<span background-color="#e3e6e8" font-weight=500>GlobalU' +
-        'seSkia := True</span>".'
+        'You must compile this demo in the <b>Release</b> configuration t' +
+        'o obtain accurate statistics. The demo can be executed in variou' +
+        's configurations. Based on our testing, the best results are ach' +
+        'ieved using a regular canvas (<span background-color="#e3e6e8" f' +
+        'ont-weight=500>TCanvasD2D</span>, <span background-color="#e3e6e' +
+        '8" font-weight=500>TCanvasGdiPlus</span>, or <span background-co' +
+        'lor="#e3e6e8" font-weight=500>TCanvasGpu</span>) with the Alcino' +
+        'e graphic engine backed by the Skia Engine. However, you can exp' +
+        'eriment with different build configurations, such as running the' +
+        ' demo on a Skia canvas (<span background-color="#e3e6e8" font-we' +
+        'ight=500>TVKCanvas</span>, <span background-color="#e3e6e8" font' +
+        '-weight=500>TGlCanvas</span>, <span background-color="#e3e6e8" f' +
+        'ont-weight=500>TMtlCanvas</span>, or <span background-color="#e3' +
+        'e6e8" font-weight=500>TSkRasterCanvas</span>). To do so, select ' +
+        'the appropriate build configuration (e.g., Release_Skia, Release' +
+        '_Skia_Vulkan, Release_Skia_Metal, etc.) in the project tool wind' +
+        'ow.'
       TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.IsHtml = True
       TextSettings.HorzAlign = Center
       TextSettings.LineHeightMultiplier = 1.450000047683716000
+    end
+    object ALText62: TALText
+      Align = MostTop
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Top = 12.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 12.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 848.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 104.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'The Alcinoe graphic library supports <b>color '#13#10'management</b>, ' +
+        'ensuring accurate '#13#10'representation of images using <b>P3</b> and' +
+        ' other color profiles.'
+      TextSettings.Font.Size = 18.000000000000000000
       TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
     object ALLayout72: TALLayout
       Align = MostTop
       AutoSize = True
-      Margins.Top = 24.000000000000000000
-      Position.Y = 804.000000000000000000
+      Margins.Top = 12.000000000000000000
+      Position.Y = 976.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 92
-      object ALLayout73: TALLayout
-        Align = Top
-        AutoSize = True
-        Margins.Right = 12.000000000000000000
-        Position.X = 174.000000000000000000
-        Size.Width = 194.000000000000000000
-        Size.Height = 136.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 1
-        object ALText63: TALText
-          Align = Top
-          AutoSize = True
-          HitTest = True
-          MaxHeight = 150.000000000000000000
-          Size.Width = 194.000000000000000000
-          Size.Height = 136.000000000000000000
-          Size.PlatformDefault = False
-          Text = 
-            '<span font-weight="700" font-size="20px">TImage (GBR)</span><br>' +
-            #13#10'<span font-size="10px"> </span><br>'#13#10'<span font-size="18px">If' +
-            ' you see the right image in green instead of blue '#13#10'then you are' +
-            ' not in a color-managed pipeline with <span background-color="#e' +
-            '3e6e8" font-weight=500>TImage</span>. This means '#13#10'that any ICC ' +
-            'color profiles included in the image are being ignored.</span>'
-          TextSettings.Font.Size = 18.000000000000000000
-          TextSettings.Ellipsis = #8230' more[+]'
-          TextSettings.EllipsisSettings.Inherit = False
-          TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
-          TextSettings.EllipsisSettings.Font.Weight = Semibold
-          TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-          TextSettings.IsHtml = True
-          OnElementClick = TextEllipsisElementClick
-          OnElementMouseEnter = TextEllipsisElementMouseEnter
-          OnElementMouseLeave = TextEllipsisElementMouseLeave
-        end
-      end
+      TabOrder = 132
       object ALLayout74: TALLayout
         Align = MostLeft
         AutoSize = True
@@ -348,7 +328,7 @@ object MainForm: TMainForm
         Size.Width = 150.000000000000000000
         Size.Height = 150.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
+        TabOrder = 1
         object Image1: TImage
           MultiResBitmap.Height = 200
           MultiResBitmap.Width = 200
@@ -2820,9 +2800,6 @@ object MainForm: TMainForm
                 912282A4AEE768A3C17BEA1C922CA6D74D892281AE1D65E9A8E7608D793450E8
                 2C2508291A1F888D70D62C168301FB7089A825916A14E4FF2FC3D5009B80E6DA
                 640000000049454E44AE426082}
-              FileName = 
-                'C:\Dev\MagicFoundation\Alcinoe\Demos\ALFmxControls\_Source\Resou' +
-                'rces\gbrcolorprofile.jpg'
             end>
           Align = Top
           Size.Width = 150.000000000000000000
@@ -2830,135 +2807,148 @@ object MainForm: TMainForm
           Size.PlatformDefault = False
         end
       end
+      object ALText63: TALText
+        Align = Client
+        AutoSize = True
+        HitTest = True
+        Margins.Right = 12.000000000000000000
+        MaxHeight = 150.000000000000000000
+        Size.Width = 194.000000000000000000
+        Size.Height = 136.000000000000000000
+        Size.PlatformDefault = False
+        Text = 
+          '<span font-weight="700" font-size="20px">TImage (GBR)</span><br>' +
+          #13#10'<span font-size="10px"> </span><br>'#13#10'<span font-size="18px">If' +
+          ' you see the right image in green instead of blue '#13#10'then you are' +
+          ' not in a color-managed pipeline with <span background-color="#e' +
+          '3e6e8" font-weight=500>TImage</span>. This means '#13#10'that any ICC ' +
+          'color profiles included in the image are being ignored.</span>'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Ellipsis = #8230' more[+]'
+        TextSettings.EllipsisSettings.Inherit = False
+        TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
+        TextSettings.EllipsisSettings.Font.Weight = Semibold
+        TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
+        TextSettings.IsHtml = True
+        OnElementClick = TextEllipsisElementClick
+        OnElementMouseEnter = TextEllipsisElementMouseEnter
+        OnElementMouseLeave = TextEllipsisElementMouseLeave
+      end
     end
     object ALLayout75: TALLayout
       Align = MostTop
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 978.000000000000000000
+      Position.Y = 1150.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
-      TabOrder = 84
-      object ALLayout76: TALLayout
-        Align = Top
-        AutoSize = True
-        Margins.Right = 12.000000000000000000
-        Position.X = 174.000000000000000000
-        Size.Width = 194.000000000000000000
-        Size.Height = 136.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 1
-        object ALText64: TALText
-          Align = Top
-          AutoSize = True
-          HitTest = True
-          MaxHeight = 150.000000000000000000
-          Size.Width = 194.000000000000000000
-          Size.Height = 136.000000000000000000
-          Size.PlatformDefault = False
-          Text = 
-            '<span font-weight="700" font-size="20px">TALImage (GBR)</span><b' +
-            'r>'#13#10'<span font-size="10px"> </span><br>'#13#10'<span font-size="18px">' +
-            'If you see the right image in green '#13#10'instead of blue then you '#13 +
-            #10'are not in a color-managed pipeline with <span background-color' +
-            '="#e3e6e8" font-weight=500>TALImage</span>. This means '#13#10'that an' +
-            'y ICC color profiles included in the image are being ignored.</s' +
-            'pan>'
-          TextSettings.Font.Size = 18.000000000000000000
-          TextSettings.Ellipsis = #8230' more[+]'
-          TextSettings.EllipsisSettings.Inherit = False
-          TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
-          TextSettings.EllipsisSettings.Font.Weight = Semibold
-          TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-          TextSettings.IsHtml = True
-          OnElementClick = TextEllipsisElementClick
-          OnElementMouseEnter = TextEllipsisElementMouseEnter
-          OnElementMouseLeave = TextEllipsisElementMouseLeave
-        end
-      end
-      object ALLayout77: TALLayout
-        Align = MostLeft
-        AutoSize = True
+      TabOrder = 124
+      object ALImage14: TALImage
+        Align = MostLeftTop
         Margins.Left = 12.000000000000000000
         Margins.Right = 12.000000000000000000
         Position.X = 12.000000000000000000
+        ResourceName = 'gbrcolorprofile'
         Size.Width = 150.000000000000000000
         Size.Height = 150.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
-        object ALImage14: TALImage
-          Align = Top
-          ResourceName = 'gbrcolorprofile'
-          Size.Width = 150.000000000000000000
-          Size.Height = 150.000000000000000000
-          Size.PlatformDefault = False
-        end
+      end
+      object ALText64: TALText
+        Align = Client
+        AutoSize = True
+        HitTest = True
+        Margins.Right = 12.000000000000000000
+        MaxHeight = 150.000000000000000000
+        Size.Width = 194.000000000000000000
+        Size.Height = 136.000000000000000000
+        Size.PlatformDefault = False
+        Text = 
+          '<span font-weight="700" font-size="20px">TALImage (GBR)</span><b' +
+          'r>'#13#10'<span font-size="10px"> </span><br>'#13#10'<span font-size="18px">' +
+          'If you see the right image in blue '#13#10'instead of green then you '#13 +
+          #10'are in a color-managed pipeline with <span background-color="#e' +
+          '3e6e8" font-weight=500>TALImage</span>. '#13#10'This means that any IC' +
+          'C color profiles included in the image are being applied correct' +
+          'ly.</span>'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Ellipsis = #8230' more[+]'
+        TextSettings.EllipsisSettings.Inherit = False
+        TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
+        TextSettings.EllipsisSettings.Font.Weight = Semibold
+        TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
+        TextSettings.IsHtml = True
+        OnElementClick = TextEllipsisElementClick
+        OnElementMouseEnter = TextEllipsisElementMouseEnter
+        OnElementMouseLeave = TextEllipsisElementMouseLeave
       end
     end
     object ALLayout70: TALLayout
       Align = MostTop
       AutoSize = True
       Margins.Top = 24.000000000000000000
-      Position.Y = 1152.000000000000000000
+      Margins.Bottom = 24.000000000000000000
+      Position.Y = 1324.000000000000000000
       Size.Width = 380.000000000000000000
       Size.Height = 150.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 12
-      object ALLayout71: TALLayout
+      object ALImage15: TALImage
+        Align = MostLeftTop
+        Margins.Left = 12.000000000000000000
+        Margins.Right = 12.000000000000000000
+        Position.X = 12.000000000000000000
+        ResourceName = 'webkitlogop3'
+        Size.Width = 150.000000000000000000
+        Size.Height = 150.000000000000000000
+        Size.PlatformDefault = False
+      end
+      object Text2: TALText
         Align = Top
         AutoSize = True
+        HitTest = True
         Margins.Right = 12.000000000000000000
+        MaxHeight = 150.000000000000000000
         Position.X = 174.000000000000000000
         Size.Width = 194.000000000000000000
         Size.Height = 136.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 1
-        object ALText1: TALText
-          Align = Top
-          AutoSize = True
-          HitTest = True
-          MaxHeight = 150.000000000000000000
-          Size.Width = 194.000000000000000000
-          Size.Height = 136.000000000000000000
-          Size.PlatformDefault = False
-          Text = 
-            '<span font-weight="700" font-size="20px">TALImage (P3)</span><br' +
-            '>'#13#10'<span font-size="10px"> </span><br>'#13#10'<span font-size="18px">T' +
-            'he right image contains a P3 color profile. '#13#10'If you do not see ' +
-            'any logo in the left image, it means your '#13#10'device is color mana' +
-            'ged but does not support wide gamut. '#13#10'As a result, the image wa' +
-            's converted to sRGB.</span>'
-          TextSettings.Font.Size = 18.000000000000000000
-          TextSettings.Ellipsis = #8230' more[+]'
-          TextSettings.EllipsisSettings.Inherit = False
-          TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
-          TextSettings.EllipsisSettings.Font.Weight = Semibold
-          TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
-          TextSettings.IsHtml = True
-          OnElementClick = TextEllipsisElementClick
-          OnElementMouseEnter = TextEllipsisElementMouseEnter
-          OnElementMouseLeave = TextEllipsisElementMouseLeave
-        end
+        Text = 
+          '<span font-weight="700" font-size="20px">TALImage (P3)</span><br' +
+          '>'#13#10'<span font-size="10px"> </span><br>'#13#10'<span font-size="18px">T' +
+          'he right image contains a P3 color profile. '#13#10'If you do not see ' +
+          'any logo in the left image, it means your '#13#10'device is color mana' +
+          'ged but does not support wide gamut. '#13#10'As a result, the image wa' +
+          's converted to sRGB.</span>'
+        TextSettings.Font.Size = 18.000000000000000000
+        TextSettings.Ellipsis = #8230' more[+]'
+        TextSettings.EllipsisSettings.Inherit = False
+        TextSettings.EllipsisSettings.Font.Size = 18.000000000000000000
+        TextSettings.EllipsisSettings.Font.Weight = Semibold
+        TextSettings.EllipsisSettings.Font.Color = claSaddlebrown
+        TextSettings.IsHtml = True
+        OnElementClick = TextEllipsisElementClick
+        OnElementMouseEnter = TextEllipsisElementMouseEnter
+        OnElementMouseLeave = TextEllipsisElementMouseLeave
       end
-      object ALLayout78: TALLayout
-        Align = MostLeft
-        AutoSize = True
-        Margins.Left = 12.000000000000000000
-        Margins.Right = 12.000000000000000000
-        Position.X = 12.000000000000000000
-        Size.Width = 150.000000000000000000
-        Size.Height = 150.000000000000000000
-        Size.PlatformDefault = False
-        TabOrder = 2
-        object ALImage15: TALImage
-          Align = Top
-          ResourceName = 'webkitlogop3'
-          Size.Width = 150.000000000000000000
-          Size.Height = 150.000000000000000000
-          Size.PlatformDefault = False
-        end
-      end
+    end
+    object ALText1: TALText
+      Align = MostTop
+      AutoSize = True
+      Margins.Left = 16.000000000000000000
+      Margins.Right = 16.000000000000000000
+      Margins.Bottom = 24.000000000000000000
+      Position.X = 16.000000000000000000
+      Position.Y = 1498.000000000000000000
+      Size.Width = 348.000000000000000000
+      Size.Height = 52.000000000000000000
+      Size.PlatformDefault = False
+      Text = 
+        'Here are some examples of the Alcinoe graphic functions for imag' +
+        'e manipulation.'
+      TextSettings.Font.Size = 18.000000000000000000
+      TextSettings.IsHtml = True
+      TextSettings.LineHeightMultiplier = 1.450000047683716000
     end
   end
   object StatusLabel3: TALText
@@ -3023,7 +3013,6 @@ object MainForm: TMainForm
     StateStyles.Disabled.Fill.Inherit = False
     StateStyles.Disabled.TextSettings.Inherit = False
     StateStyles.Disabled.TextSettings.Font.Size = 17.000000000000000000
-    StateStyles.Disabled.TextSettings.Font.Weight = Medium
     StateStyles.Disabled.TextSettings.Font.Color = x611D1B20
     StateStyles.Disabled.Opacity = 1.000000000000000000
     StateStyles.Hovered.Shadow.blur = 2.430000066757202000

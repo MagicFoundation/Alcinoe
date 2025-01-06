@@ -13,6 +13,7 @@ uses
   System.Types,
   System.UITypes,
   System.Rtti,
+  System.Net.HttpClient,
   {$IFDEF DEBUG}
   System.Diagnostics,
   {$ENDIF}
@@ -93,35 +94,172 @@ type
   // bitmaps is fundamentally flawed.
   [ComponentPlatforms($FFFF)]
   TALImage = class(TALControl)
-  private
-    fExifOrientationInfo: TalExifOrientationInfo;
-    fRotateAccordingToExifOrientation: Boolean;
-    fResourceName: String;
-    FWrapMode: TALImageWrapMode;
-    fBufDrawable: TALDrawable;
-    fBufDrawableRect: TRectF;
-    procedure SetWrapMode(const Value: TALImageWrapMode);
-    procedure setResourceName(const Value: String);
+  public
+    type
+      TStroke = class(TALStrokeBrush)
+      protected
+        function GetDefaultColor: TAlphaColor; override;
+      end;
+      TCropCenter = class(TALPosition)
+      protected
+        function GetDefaultValue: TPointF; override;
+      end;
   protected
+    type
+      TResourceDownloadExtData = Class(TObject)
+      public
+        Owner: TALImage;
+        Rect: TRectF;
+        Scale: Single;
+        AlignToPixel: Boolean;
+        Color: TAlphaColor;
+        ResourceName: String;
+        ResourceStream: TStream;
+        MaskResourceName: String;
+        MaskBitmap: TALBitmap;
+        WrapMode: TALImageWrapMode;
+        CropCenter: TpointF;
+        RotateAccordingToExifOrientation: Boolean;
+        StrokeColor: TAlphaColor;
+        StrokeThickness: Single;
+        ShadowBlur: Single;
+        ShadowOffsetX: Single;
+        ShadowOffsetY: Single;
+        ShadowColor: TAlphaColor;
+        Corners: TCorners;
+        Sides: TSides;
+        XRadius: Single;
+        YRadius: Single;
+        BlurRadius: single;
+        constructor Create(const AOwner: TALImage); virtual;
+        destructor Destroy; override;
+      End;
+  private
+    FBackgroundColor: TAlphaColor; // 4 bytes
+    FLoadingColor: TAlphaColor; // 4 bytes
+    fResourceName: String; // 8 bytes
+    FMaskResourceName: String; // 8 bytes
+    FMaskBitmap: TALBitmap; // 8 bytes
+    FWrapMode: TALImageWrapMode; // 1 bytes
+    fExifOrientationInfo: TalExifOrientationInfo; // 1 bytes
+    fRotateAccordingToExifOrientation: Boolean; // 1 bytes
+    FCorners: TCorners; // 1 bytes
+    FSides: TSides; // 1 bytes
+    FXRadius: Single; // 4 bytes
+    FYRadius: Single; // 4 bytes
+    FBlurRadius: single; // 4 bytes
+    FCropCenter: TALPosition; // 8 bytes
+    FStroke: TALStrokeBrush; // 8 bytes
+    fShadow: TALShadow; // 8 bytes
+    FResourceDownloadExtData: TResourceDownloadExtData; // [MultiThread] | 8 bytes
+    fBufDrawable: TALDrawable; // 8 bytes
+    fBufDrawableRect: TRectF; // 16 bytes
+    function GetCropCenter: TALPosition;
+    procedure SetCropCenter(const Value: TALPosition);
+    function GetStroke: TALStrokeBrush;
+    procedure SetStroke(const Value: TALStrokeBrush);
+    function GetShadow: TALShadow;
+    procedure SetShadow(const Value: TALShadow);
+    procedure SetWrapMode(const Value: TALImageWrapMode);
+    procedure SetRotateAccordingToExifOrientation(const Value: Boolean);
+    procedure setResourceName(const Value: String);
+    procedure setMaskResourceName(const Value: String);
+    procedure setMaskBitmap(const Value: TALBitmap);
+    procedure setBackgroundColor(const Value: TAlphaColor);
+    procedure setLoadingColor(const Value: TAlphaColor);
+    function IsBackgroundColorStored: Boolean;
+    function IsLoadingColorStored: Boolean;
+    function IsCornersStored: Boolean;
+    function IsSidesStored: Boolean;
+    function IsXRadiusStored: Boolean;
+    function IsYRadiusStored: Boolean;
+    function IsBlurRadiusStored: Boolean;
+  protected
+    function CreateCropCenter: TALPosition; virtual;
+    function CreateStroke: TALStrokeBrush; virtual;
+    function CreateShadow: TALShadow; virtual;
     function GetDoubleBuffered: boolean; override;
-    procedure Paint; override;
+    function GetDefaultBackgroundColor: TalphaColor; virtual;
+    function GetDefaultLoadingColor: TalphaColor; virtual;
+    function GetDefaultXRadius: Single; virtual;
+    function GetDefaultYRadius: Single; virtual;
+    function GetDefaultBlurRadius: Single; virtual;
+    procedure SetXRadius(const Value: Single); virtual;
+    procedure SetYRadius(const Value: Single); virtual;
+    procedure SetBlurRadius(const Value: Single); virtual;
+    procedure SetCorners(const Value: TCorners); virtual;
+    procedure SetSides(const Value: TSides); virtual;
+    procedure CropCenterChanged(Sender: TObject); virtual;
+    procedure StrokeChanged(Sender: TObject); virtual;
+    procedure ShadowChanged(Sender: TObject); virtual;
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
+    procedure CancelResourceDownload;
+    class function CanStartResourceDownload(var AExtData: Tobject): boolean; virtual; // [MultiThread]
+    class procedure HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AExtData: TObject); virtual; // [MultiThread]
+    class procedure HandleResourceDownloadError(const AErrMessage: string; var AExtData: Tobject); virtual; // [MultiThread]
+    class function GetResourceDownloadPriority(const AExtData: Tobject): Int64; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(var AExtData: TObject); overload; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(
+                      var ABufDrawable: TALDrawable;
+                      out ABufDrawableRect: TRectF;
+                      out AExifOrientationInfo: TalExifOrientationInfo;
+                      const ARect: TRectF;
+                      const AScale: Single;
+                      const AAlignToPixel: Boolean;
+                      const AColor: TAlphaColor;
+                      const AResourceName: String;
+                      const AResourceStream: TStream;
+                      const AMaskResourceName: String;
+                      const AMaskBitmap: TALBitmap;
+                      const AWrapMode: TALImageWrapMode;
+                      const ACropCenter: TpointF;
+                      const ARotateAccordingToExifOrientation: Boolean;
+                      const AStrokeColor: TAlphaColor;
+                      const AStrokeThickness: Single;
+                      const AShadowBlur: Single;
+                      const AShadowOffsetX: Single;
+                      const AShadowOffsetY: Single;
+                      const AShadowColor: TAlphaColor;
+                      const ACorners: TCorners;
+                      const ASides: TSides;
+                      const AXRadius: Single;
+                      const AYRadius: Single;
+                      const ABlurRadius: Single); overload; virtual; // [MultiThread]
+    procedure Paint; override;
     procedure DoResized; override;
   public
     constructor Create(AOwner: TComponent); override;
+    destructor Destroy; override;
+    procedure AlignToPixel; override;
     procedure MakeBufDrawable; override;
     procedure ClearBufDrawable; override;
+    property DefaultBackgroundColor: TAlphaColor read GetDefaultBackgroundColor;
+    property DefaultLoadingColor: TAlphaColor read GetDefaultLoadingColor;
+    property DefaultXRadius: Single read GetDefaultXRadius;
+    property DefaultYRadius: Single read GetDefaultYRadius;
+    property DefaultBlurRadius: Single read GetDefaultBlurRadius;
+    // MaskBitmap will not be owned and will not be freed with the TALImage
+    property MaskBitmap: TALBitmap read fMaskBitmap write setMaskBitmap;
   published
     //property Action;
     property Align;
     property Anchors;
     //property AutoSize;
+    property BackgroundColor: TAlphaColor read fBackgroundColor write setBackgroundColor Stored IsBackgroundColorStored;
+    property LoadingColor: TAlphaColor read FLoadingColor write setLoadingColor Stored IsLoadingColorStored;
+    property BlurRadius: Single read FBlurRadius write SetBlurRadius stored IsBlurRadiusStored nodefault;
     //property CanFocus;
     //property CanParentFocus;
     //property DisableFocusEffect;
     property ClipChildren;
     //property ClipParent;
+    property Corners: TCorners read FCorners write SetCorners stored IsCornersStored;
+    // CropCenter is use when wrapmode = FitIntoAndCrop. It's define the center of
+    // crop in the source image (ex: center the result on a face instead
+    // of the middle of the bounds). If CropCenter contain negative value then it's
+    // indicate percentage
+    property CropCenter: TALPosition read GetCropCenter write SetCropCenter;
     property Cursor;
     //property DoubleBuffered;
     property DragMode;
@@ -134,27 +272,33 @@ type
     property HitTest;
     property Locked;
     property Margins;
+    property MaskResourceName: String read fMaskResourceName write setMaskResourceName;
     property Opacity;
     property Padding;
     property PopupMenu;
     property Position;
-    // If a file extension (e.g., .xxx) is detected in ResourceName, the image is loaded from the
+    // If a file extension (e.g., .png) is detected in ResourceName, the image is loaded from the
     // specified file (With the full path of the file obtained using ALGetResourceFilename).
+    // If ResourceName is a URL, the image is downloaded in the background from the internet.
     // In debug mode, the image is loaded from a file located in the /Resources/ sub-folder of the
     // project directory (with the extensions .png or .jpg).
     property ResourceName: String read fResourceName write setResourceName;
-    // under Android, work only when setting a file in ResourceName
-    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write fRotateAccordingToExifOrientation default false;
+    property RotateAccordingToExifOrientation: Boolean read fRotateAccordingToExifOrientation write SetRotateAccordingToExifOrientation default false;
     property RotationAngle;
     property RotationCenter;
     property Scale;
+    property Shadow: TALShadow read GetShadow write SetShadow;
+    property Sides: TSides read FSides write SetSides stored IsSidesStored;
     property Size;
+    property Stroke: TALStrokeBrush read GetStroke write SetStroke;
     //property TabOrder;
     //property TabStop;
     property TouchTargetExpansion;
     property Visible;
     property Width;
     property WrapMode: TALImageWrapMode read FWrapMode write SetWrapMode default TALImageWrapMode.Fit;
+    property XRadius: Single read FXRadius write SetXRadius stored IsXRadiusStored nodefault;
+    property YRadius: Single read FYRadius write SetYRadius stored IsYRadiusStored nodefault;
     //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
@@ -400,7 +544,6 @@ type
   {~~~~~~~~~~~~~~~~~~~~~~~~~}
   [ComponentPlatforms($FFFF)]
   TALRectangle = class(TALBaseRectangle)
-  protected
   published
     //property Action;
     property Align;
@@ -443,6 +586,100 @@ type
     property Width;
     property XRadius;
     property YRadius;
+    //property OnCanFocus;
+    property OnDragEnter;
+    property OnDragLeave;
+    property OnDragOver;
+    property OnDragDrop;
+    property OnDragEnd;
+    //property OnEnter;
+    //property OnExit;
+    property OnMouseEnter;
+    property OnMouseLeave;
+    property OnMouseDown;
+    property OnMouseUp;
+    property OnMouseMove;
+    property OnMouseWheel;
+    property OnClick;
+    //property OnDblClick;
+    //property OnKeyDown;
+    //property OnKeyUp;
+    property OnPainting;
+    property OnPaint;
+    //property OnResize;
+    property OnResized;
+  end;
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~}
+  [ComponentPlatforms($FFFF)]
+  TALEllipse = class(TALShape)
+  private
+    fDoubleBuffered: boolean;
+    fBufDrawable: TALDrawable;
+    fBufDrawableRect: TRectF;
+  protected
+    function GetDoubleBuffered: boolean; override;
+    procedure SetDoubleBuffered(const AValue: Boolean); override;
+    procedure FillChanged(Sender: TObject); override;
+    procedure StrokeChanged(Sender: TObject); override;
+    procedure ShadowChanged(Sender: TObject); override;
+    procedure Paint; override;
+    property BufDrawable: TALDrawable read fBufDrawable;
+    property BufDrawableRect: TRectF read fBufDrawableRect;
+    Procedure CreateBufDrawable(
+                var ABufDrawable: TALDrawable;
+                out ABufDrawableRect: TRectF;
+                const AScale: Single;
+                const AFill: TALBrush;
+                const AStateLayer: TALStateLayer;
+                const AStateLayerContentColor: TAlphaColor;
+                const ADrawStateLayerOnTop: Boolean;
+                const AStroke: TALStrokeBrush;
+                const AShadow: TALShadow); virtual;
+    procedure DoResized; override;
+  public
+    constructor Create(AOwner: TComponent); override;
+    procedure MakeBufDrawable; override;
+    procedure ClearBufDrawable; override;
+    function PointInObjectLocal(X, Y: Single): Boolean; override;
+  published
+    //property Action;
+    property Align;
+    property Anchors;
+    //property AutoSize;
+    //property CanFocus;
+    //property CanParentFocus;
+    //property DisableFocusEffect;
+    property ClipChildren;
+    //property ClipParent;
+    property Cursor;
+    property DoubleBuffered default true;
+    property DragMode;
+    property EnableDragHighlight;
+    property Enabled;
+    property Fill;
+    property Height;
+    //property Hint;
+    //property ParentShowHint;
+    //property ShowHint;
+    property HitTest;
+    property Locked;
+    property Margins;
+    property Opacity;
+    property Padding;
+    property PopupMenu;
+    property Position;
+    property RotationAngle;
+    property RotationCenter;
+    property Scale;
+    property Shadow;
+    property Size;
+    property Stroke;
+    //property TabOrder;
+    //property TabStop;
+    property TouchTargetExpansion;
+    property Visible;
+    property Width;
     //property OnCanFocus;
     property OnDragEnter;
     property OnDragLeave;
@@ -951,6 +1188,8 @@ uses
   DesignIntf,
   system.ioutils,
   {$ENDIF}
+  Alcinoe.Http.Client,
+  Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.StringUtils,
   Alcinoe.Common;
 
@@ -969,8 +1208,8 @@ end;
 {**************************}
 destructor TALShape.Destroy;
 begin
-  ALFreeAndNil(FStroke);
   ALFreeAndNil(FFill);
+  ALFreeAndNil(FStroke);
   ALFreeAndNil(fShadow);
   inherited;
 end;
@@ -999,8 +1238,8 @@ begin
   beginUpdate;
   try
     inherited;
-    Stroke.AlignToPixel;
     Fill.AlignToPixel;
+    Stroke.AlignToPixel;
     Shadow.AlignToPixel;
   finally
     EndUpdate;
@@ -1061,16 +1300,383 @@ begin
   FShadow.Assign(Value);
 end;
 
+{*****************************************************}
+function TALImage.TStroke.GetDefaultColor: TAlphaColor;
+begin
+  Result := TAlphaColors.Null;
+end;
+
+{*****************************************************}
+function TALImage.TCropCenter.GetDefaultValue: TPointF;
+begin
+  Result := TpointF.Create(-50,-50);
+end;
+
+{***************************************************************************}
+constructor TALImage.TResourceDownloadExtData.Create(const AOwner: TALImage);
+begin
+  inherited Create;
+  Owner := AOwner;
+  Rect := Owner.LocalRect;
+  Scale := ALGetScreenScale;
+  AlignToPixel := Owner.IsPixelAlignmentEnabled;
+  Color := Owner.BackgroundColor;
+  ResourceName := Owner.ResourceName;
+  ResourceStream := nil;
+  MaskResourceName := Owner.MaskResourceName;
+  MaskBitmap := Owner.MaskBitmap;
+  WrapMode := Owner.WrapMode;
+  CropCenter := Owner.CropCenter.Point;
+  RotateAccordingToExifOrientation := Owner.RotateAccordingToExifOrientation;
+  StrokeColor := Owner.Stroke.Color;
+  StrokeThickness := Owner.Stroke.Thickness;
+  ShadowBlur := Owner.Shadow.Blur;
+  ShadowOffsetX := Owner.Shadow.OffsetX;
+  ShadowOffsetY := Owner.Shadow.OffsetY;
+  ShadowColor := Owner.Shadow.Color;
+  Corners := Owner.Corners;
+  Sides := Owner.Sides;
+  XRadius := Owner.XRadius;
+  YRadius := Owner.YRadius;
+  BlurRadius := Owner.BlurRadius;
+end;
+
+{***************************************************}
+destructor TALImage.TResourceDownloadExtData.Destroy;
+begin
+  ALFreeAndNil(ResourceStream);
+  inherited
+end;
+
 {**********************************************}
 constructor TALImage.Create(AOwner: TComponent);
 begin
   inherited Create(AOwner);
+  FBackgroundColor := DefaultBackgroundColor;
+  FLoadingColor := DefaultLoadingColor;
+  fResourceName := '';
+  FMaskResourceName := '';
+  FMaskBitmap := ALNullBitmap;
+  FWrapMode := TALImageWrapMode.Fit;
   fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
   fRotateAccordingToExifOrientation := False;
-  fResourceName := '';
-  FWrapMode := TALImageWrapMode.Fit;
+  FCorners := AllCorners;
+  FSides := AllSides;
+  FXRadius := DefaultXRadius;
+  FYRadius := DefaultYRadius;
+  FBlurRadius := DefaultBlurRadius;
+  FCropCenter := CreateCropCenter;
+  FCropCenter.OnChange := CropCenterChanged;
+  FStroke := CreateStroke;
+  FStroke.OnChanged := StrokeChanged;
+  fShadow := CreateShadow;
+  fShadow.OnChanged := ShadowChanged;
+  FResourceDownloadExtData := nil;
   fBufDrawable := ALNullDrawable;
-  SetAcceptsControls(False);
+end;
+
+{**************************}
+destructor TALImage.Destroy;
+begin
+  ALFreeAndNil(fCropCenter);
+  ALFreeAndNil(FStroke);
+  ALFreeAndNil(fShadow);
+  inherited; // Will call CancelResourceDownload via ClearBufDrawable
+end;
+
+{**********************************************}
+function TALImage.CreateCropCenter: TALPosition;
+begin
+  Result := TCropCenter.create;
+end;
+
+{*********************************************}
+function TALImage.CreateStroke: TALStrokeBrush;
+begin
+  Result := TStroke.Create;
+end;
+
+{****************************************}
+function TALImage.CreateShadow: TALShadow;
+begin
+  Result := TALShadow.Create;
+end;
+
+{******************************}
+procedure TALImage.AlignToPixel;
+begin
+  beginUpdate;
+  try
+    inherited;
+    Stroke.AlignToPixel;
+    Shadow.AlignToPixel;
+  finally
+    EndUpdate;
+  end;
+end;
+
+{*******************************************}
+function TALImage.GetDoubleBuffered: boolean;
+begin
+  result := True;
+end;
+
+{*******************************************************}
+function TALImage.GetDefaultBackgroundColor: TalphaColor;
+begin
+  Result := TalphaColors.Null;
+end;
+
+{****************************************************}
+function TALImage.GetDefaultLoadingColor: TalphaColor;
+begin
+  Result := $FFe0e4e9;
+end;
+
+{******************************************}
+function TALImage.GetDefaultXRadius: Single;
+begin
+  Result := 0;
+end;
+
+{******************************************}
+function TALImage.GetDefaultYRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*********************************************}
+function TALImage.GetDefaultBlurRadius: Single;
+begin
+  Result := 0;
+end;
+
+{*******************************************}
+function TALImage.GetCropCenter: TALPosition;
+begin
+  Result := FCropCenter;
+end;
+
+{*********************************************************}
+procedure TALImage.SetCropCenter(const Value: TALPosition);
+begin
+  FCropCenter.Assign(Value);
+end;
+
+{******************************************}
+function TALImage.GetStroke: TALStrokeBrush;
+begin
+  Result := FStroke;
+end;
+
+{********************************************************}
+procedure TALImage.SetStroke(const Value: TALStrokeBrush);
+begin
+  FStroke.Assign(Value);
+end;
+
+{*************************************}
+function TALImage.GetShadow: TALShadow;
+begin
+  Result := FShadow;
+end;
+
+{***************************************************}
+procedure TALImage.SetShadow(const Value: TALShadow);
+begin
+  FShadow.Assign(Value);
+end;
+
+{************************************************************}
+procedure TALImage.SetWrapMode(const Value: TALImageWrapMode);
+begin
+  if FWrapMode <> Value then begin
+    ClearBufDrawable;
+    FWrapMode := Value;
+    Repaint;
+  end;
+end;
+
+{***************************************************************************}
+procedure TALImage.SetRotateAccordingToExifOrientation(const Value: Boolean);
+begin
+  if FRotateAccordingToExifOrientation <> Value then begin
+    ClearBufDrawable;
+    FRotateAccordingToExifOrientation := Value;
+    Repaint;
+  end;
+end;
+
+{******************************************************}
+procedure TALImage.setResourceName(const Value: String);
+begin
+  if FResourceName <> Value then begin
+    ClearBufDrawable;
+    FResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{**********************************************************}
+procedure TALImage.setMaskResourceName(const Value: String);
+begin
+  if FMaskResourceName <> Value then begin
+    ClearBufDrawable;
+    FMaskResourceName := Value;
+    Repaint;
+  end;
+end;
+
+{*******************************************************}
+procedure TALImage.setMaskBitmap(const Value: TALBitmap);
+begin
+  if FMaskBitmap <> Value then begin
+    ClearBufDrawable;
+    FMaskBitmap := Value;
+    Repaint;
+  end;
+end;
+
+{**************************************************************}
+procedure TALImage.setBackgroundColor(const Value: TAlphaColor);
+begin
+  if FBackgroundColor <> Value then begin
+    ClearBufDrawable;
+    FBackgroundColor := Value;
+    Repaint;
+  end;
+end;
+
+{***********************************************************}
+procedure TALImage.setLoadingColor(const Value: TAlphaColor);
+begin
+  if FLoadingColor <> Value then begin
+    ClearBufDrawable;
+    FLoadingColor := Value;
+    Repaint;
+  end;
+end;
+
+{*************************************************}
+procedure TALImage.SetXRadius(const Value: Single);
+begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
+    ClearBufDrawable;
+    FXRadius := Value;
+    Repaint;
+  end;
+end;
+
+{*************************************************}
+procedure TALImage.SetYRadius(const Value: Single);
+begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
+    ClearBufDrawable;
+    FYRadius := Value;
+    Repaint;
+  end;
+end;
+
+{****************************************************}
+procedure TALImage.SetBlurRadius(const Value: Single);
+begin
+  if not SameValue(FBlurRadius, Value, TEpsilon.Vector) then begin
+    ClearBufDrawable;
+    FBlurRadius := Value;
+    Repaint;
+  end;
+end;
+
+{***************************************************}
+procedure TALImage.SetCorners(const Value: TCorners);
+begin
+  if FCorners <> Value then
+  begin
+    ClearBufDrawable;
+    FCorners := Value;
+    Repaint;
+  end;
+end;
+
+{***********************************************}
+procedure TALImage.SetSides(const Value: TSides);
+begin
+  if FSides <> Value then
+  begin
+    ClearBufDrawable;
+    FSides := Value;
+    Repaint;
+  end;
+end;
+
+{*************************************************}
+function TALImage.IsBackgroundColorStored: Boolean;
+begin
+  Result := FBackgroundColor <> DefaultBackgroundColor;
+end;
+
+{**********************************************}
+function TALImage.IsLoadingColorStored: Boolean;
+begin
+  Result := FLoadingColor <> DefaultLoadingColor;
+end;
+
+{*****************************************}
+function TALImage.IsCornersStored: Boolean;
+begin
+  Result := FCorners <> AllCorners;
+end;
+
+{***************************************}
+function TALImage.IsSidesStored: Boolean;
+begin
+  Result := FSides <> AllSides
+end;
+
+{*****************************************}
+function TALImage.IsXRadiusStored: Boolean;
+begin
+  Result := not SameValue(FXRadius, DefaultXRadius, TEpsilon.Vector);
+end;
+
+{*****************************************}
+function TALImage.IsYRadiusStored: Boolean;
+begin
+  Result := not SameValue(FYRadius, DefaultYRadius, TEpsilon.Vector);
+end;
+
+{********************************************}
+function TALImage.IsBlurRadiusStored: Boolean;
+begin
+  Result := not SameValue(FBlurRadius, DefaultBlurRadius, TEpsilon.Vector);
+end;
+
+{****************************************************}
+procedure TALImage.CropCenterChanged(Sender: TObject);
+begin
+  ClearBufDrawable;
+  Repaint;
+end;
+
+{************************************************}
+procedure TALImage.StrokeChanged(Sender: TObject);
+begin
+  ClearBufDrawable;
+  Repaint;
+end;
+
+{************************************************}
+procedure TALImage.ShadowChanged(Sender: TObject);
+begin
+  ClearBufDrawable;
+  Repaint;
+end;
+
+{***************************}
+procedure TALImage.DoResized;
+begin
+  ClearBufDrawable;
+  inherited;
 end;
 
 {**********************************}
@@ -1081,7 +1687,344 @@ begin
      (not ALIsDrawableNull(fBufDrawable)) then
     ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
   {$endif}
+  CancelResourceDownload;
   ALFreeAndNilDrawable(fBufDrawable);
+end;
+
+{****************************************}
+procedure TALImage.CancelResourceDownload;
+begin
+  if FResourceDownloadExtData <> nil then begin
+    FResourceDownloadExtData.Owner := nil;
+    FResourceDownloadExtData := nil;
+  end;
+end;
+
+{*************}
+//[MultiThread]
+class function TALImage.CanStartResourceDownload(var AExtData: Tobject): boolean;
+begin
+  result := TResourceDownloadExtData(AExtData).owner <> nil;
+end;
+
+{*************}
+//[MultiThread]
+class procedure TALImage.HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AExtData: TObject);
+begin
+  var LResourceDownloadExtData := TALImage.TResourceDownloadExtData(AExtData);
+  if LResourceDownloadExtData.owner = nil then exit;
+  LResourceDownloadExtData.ResourceStream := AContentStream;
+  TALGraphicThreadPool.Instance.ExecuteProc(
+    CreateBufDrawable, // const AProc: TALWorkerThreadProc;
+    LResourceDownloadExtData, // const AExtData: Tobject; TALGraphicThreadPool.Instance will own and release the ExtData object
+    GetResourceDownloadPriority); // const APriority: Int64 = 0;
+  AContentStream := nil; // AContentStream Will be free by AExtData
+  AExtData := nil; // AExtData will be free by TALGraphicThreadPool.Instance
+end;
+
+{*************}
+//[MultiThread]
+class procedure TALImage.HandleResourceDownloadError(const AErrMessage: string; var AExtData: Tobject);
+begin
+  {$IFDEF ALDPK}
+  exit;
+  {$ENDIF}
+  var LResourceDownloadExtData := TALImage.TResourceDownloadExtData(AExtData);
+  if LResourceDownloadExtData.owner = nil then exit;
+  if LResourceDownloadExtData.ResourceName = ALBrokenImageResourceName then begin
+    ALLog(
+      'TALImage.HandleResourceDownloadError',
+      'BrokenImage resource is missing or incorrect | ' +
+      AErrMessage,
+      TalLogType.error);
+    exit;
+  end;
+  ALLog(
+    'TALImage.HandleResourceDownloadError',
+    'Url: ' + LResourceDownloadExtData.ResourceName + ' | ' +
+    AErrMessage,
+    TalLogType.warn);
+  LResourceDownloadExtData.Rect := TRectF.Create(
+                                     LResourceDownloadExtData.Rect.TopLeft,
+                                     ALBrokenImageWidth / LResourceDownloadExtData.Scale,
+                                     ALBrokenImageHeight / LResourceDownloadExtData.Scale);
+  //LResourceDownloadExtData.Scale: Single;
+  //LResourceDownloadExtData.AlignToPixel: Boolean;
+  LResourceDownloadExtData.Color := TalphaColors.Null;
+  LResourceDownloadExtData.ResourceName := ALBrokenImageResourceName;
+  ALFreeAndNil(LResourceDownloadExtData.ResourceStream);
+  LResourceDownloadExtData.MaskResourceName := '';
+  LResourceDownloadExtData.MaskBitmap := ALNullBitmap;
+  LResourceDownloadExtData.WrapMode := TALImageWrapMode.Fit;
+  //LResourceDownloadExtData.CropCenter: TpointF;
+  //LResourceDownloadExtData.RotateAccordingToExifOrientation: Boolean;
+  LResourceDownloadExtData.StrokeColor := TalphaColors.Null;
+  //LResourceDownloadExtData.StrokeThickness: Single;
+  //LResourceDownloadExtData.ShadowBlur: Single;
+  //LResourceDownloadExtData.ShadowOffsetX: Single;
+  //LResourceDownloadExtData.ShadowOffsetY: Single;
+  LResourceDownloadExtData.ShadowColor := TAlphaColors.Null;
+  LResourceDownloadExtData.Corners := AllCorners;
+  LResourceDownloadExtData.Sides := AllSides;
+  LResourceDownloadExtData.XRadius := 0;
+  LResourceDownloadExtData.YRadius := 0;
+  LResourceDownloadExtData.BlurRadius := 0;
+  TALGraphicThreadPool.Instance.ExecuteProc(
+    CreateBufDrawable, // const AProc: TALWorkerThreadProc;
+    LResourceDownloadExtData, // const AExtData: Tobject; TALGraphicThreadPool.Instance will own and release the ExtData object
+    GetResourceDownloadPriority); // const APriority: Int64 = 0;
+  AExtData := nil; // AExtData will be free by TALGraphicThreadPool.Instance
+end;
+
+{*************}
+//[MultiThread]
+class function TALImage.GetResourceDownloadPriority(const AExtData: Tobject): Int64;
+begin
+  result := TALNetHttpClientPool.Instance.PriorityStartingPoint;
+end;
+
+{*************}
+//[MultiThread]
+class Procedure TALImage.CreateBufDrawable(var AExtData: TObject);
+begin
+  var LResourceDownloadExtData := TALImage.TResourceDownloadExtData(AExtData);
+  if LResourceDownloadExtData.owner = nil then exit;
+  var LBufDrawable: TALDrawable := ALNullDrawable;
+  var LBufDrawableRect: TRectF;
+  var LExifOrientationInfo: TalExifOrientationInfo;
+  Try
+    CreateBufDrawable(
+      LBufDrawable, // var ABufDrawable: TALDrawable;
+      LBufDrawableRect, // out ABufDrawableRect: TRectF;
+      LExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
+      LResourceDownloadExtData.Rect, // const ARect: TRectF;
+      LResourceDownloadExtData.Scale, // const AScale: Single;
+      LResourceDownloadExtData.AlignToPixel, // const AAlignToPixel: Boolean;
+      LResourceDownloadExtData.Color, // const AColor: TAlphaColor;
+      LResourceDownloadExtData.ResourceName, // const AResourceName: String;
+      LResourceDownloadExtData.ResourceStream, // const AResourceStream: TStream;
+      LResourceDownloadExtData.MaskResourceName, // const AMaskResourceName: String;
+      LResourceDownloadExtData.MaskBitmap, // const AMaskBitmap: TALBitmap;
+      LResourceDownloadExtData.WrapMode, // const AWrapMode: TALImageWrapMode;
+      LResourceDownloadExtData.CropCenter, // const ACropCenter: TpointF;
+      LResourceDownloadExtData.RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
+      LResourceDownloadExtData.StrokeColor, // const AStrokeColor: TAlphaColor;
+      LResourceDownloadExtData.StrokeThickness, // const AStrokeThickness: Single;
+      LResourceDownloadExtData.ShadowBlur, // const AShadowBlur: Single;
+      LResourceDownloadExtData.ShadowOffsetX, // const AShadowOffsetX: Single;
+      LResourceDownloadExtData.ShadowOffsetY, // const AShadowOffsetY: Single;
+      LResourceDownloadExtData.ShadowColor, // const AShadowColor: TAlphaColor;
+      LResourceDownloadExtData.Corners, // const ACorners: TCorners;
+      LResourceDownloadExtData.Sides, // const ASides: TSides;
+      LResourceDownloadExtData.XRadius, // const AXRadius: Single;
+      LResourceDownloadExtData.YRadius, // const AYRadius: Single)
+      LResourceDownloadExtData.BlurRadius); // const ABlurRadius: Single)
+  except
+    On E: Exception do begin
+      HandleResourceDownloadError(E.Message, AExtData);
+      exit;
+    end;
+  End;
+  TThread.queue(nil,
+    procedure
+    begin
+      if LResourceDownloadExtData.Owner <> nil then begin
+        ALFreeAndNilDrawable(LResourceDownloadExtData.Owner.fBufDrawable);
+        LResourceDownloadExtData.Owner.fBufDrawable := LBufDrawable;
+        LResourceDownloadExtData.Owner.FBufDrawableRect := LBufDrawableRect;
+        LResourceDownloadExtData.Owner.FExifOrientationInfo := LExifOrientationInfo;
+        LResourceDownloadExtData.Owner.FResourceDownloadExtData := nil;
+        LResourceDownloadExtData.Owner.Repaint;
+      end;
+      ALFreeAndNil(LResourceDownloadExtData);
+    end);
+  AExtData := nil; // AExtData will be free by TThread.queue
+end;
+
+{*************}
+//[MultiThread]
+class Procedure TALImage.CreateBufDrawable(
+                  var ABufDrawable: TALDrawable;
+                  out ABufDrawableRect: TRectF;
+                  out AExifOrientationInfo: TalExifOrientationInfo;
+                  const ARect: TRectF;
+                  const AScale: Single;
+                  const AAlignToPixel: Boolean;
+                  const AColor: TAlphaColor;
+                  const AResourceName: String;
+                  const AResourceStream: TStream;
+                  const AMaskResourceName: String;
+                  const AMaskBitmap: TALBitmap;
+                  const AWrapMode: TALImageWrapMode;
+                  const ACropCenter: TpointF;
+                  const ARotateAccordingToExifOrientation: Boolean;
+                  const AStrokeColor: TAlphaColor;
+                  const AStrokeThickness: Single;
+                  const AShadowBlur: Single;
+                  const AShadowOffsetX: Single;
+                  const AShadowOffsetY: Single;
+                  const AShadowColor: TAlphaColor;
+                  const ACorners: TCorners;
+                  const ASides: TSides;
+                  const AXRadius: Single;
+                  const AYRadius: Single;
+                  const ABlurRadius: Single);
+begin
+
+  if (not ALIsDrawableNull(ABufDrawable)) then exit;
+
+  var lResourceName: String;
+  if ALIsHttpOrHttpsUrl(AResourceName) then lResourceName := ''
+  else lResourceName := AResourceName;
+  var LFileName := ALGetResourceFilename(lResourceName);
+
+  ABufDrawableRect := ARect;
+  if (ARotateAccordingToExifOrientation) then begin
+    {$IF defined(ALSkiaEngine)}
+    // SkImage automatically loads the image with the correct orientation based on EXIF data.
+    // Therefore, if we apply ExifOrientationInfo to rotate the image again, the result will be incorrect.
+    AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+    {$ELSE}
+    if LFileName <> '' then AExifOrientationInfo := AlGetExifOrientationInfo(LFilename)
+    else if AResourceStream <> nil then AExifOrientationInfo := AlGetExifOrientationInfo(AResourceStream)
+    else AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+    if AExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
+                                TalExifOrientationInfo.ROTATE_90,
+                                TalExifOrientationInfo.TRANSVERSE,
+                                TalExifOrientationInfo.ROTATE_270] then begin
+      ABufDrawableRect.Width := ARect.Height;
+      ABufDrawableRect.Height := ARect.Width;
+    end;
+    {$ENDIF}
+  end
+  else begin
+    {$IF defined(ALSkiaEngine)}
+    // SkImage automatically loads the image with the correct orientation based on EXIF data.
+    // If we want to disable this behavior, we need to manually rotate the image to its original orientation.
+    if LFileName <> '' then AExifOrientationInfo := AlGetExifOrientationInfo(LFilename)
+    else if AResourceStream <> nil then AExifOrientationInfo := AlGetExifOrientationInfo(AResourceStream)
+    else AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+    if AExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
+                                TalExifOrientationInfo.ROTATE_90,
+                                TalExifOrientationInfo.TRANSVERSE,
+                                TalExifOrientationInfo.ROTATE_270] then begin
+      ABufDrawableRect.Width := ARect.Height;
+      ABufDrawableRect.Height := ARect.Width;
+    end;
+    {$ELSE}
+    AExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+    {$ENDIF}
+  end;
+
+  {$REGION 'Use ALCreateDrawableFromResource'}
+  if ((AResourceStream <> nil) or (LFileName <> '') or (LResourceName <> '')) and
+     (ACorners = AllCorners) and
+     (Acolor = TalphaColors.Null) and
+     ((AShadowColor = TalphaColors.Null) or (CompareValue(AShadowBlur, 0, TEpsilon.position) <= 0)) and
+     ((AStrokeColor = TalphaColors.Null) or (CompareValue(AStrokeThickness, 0, TEpsilon.position) <= 0)) then begin
+
+    {$IFDEF ALDPK}
+    try
+    {$ENDIF}
+
+      ABufDrawable := ALCreateDrawableFromResource(
+                        AResourceName, // const AResourceName: String;
+                        AResourceStream, // const AResourceStream: TStream;
+                        AMaskResourceName, // const AMaskResourceName: String;
+                        AMaskBitmap, // const AMaskBitmap: TALBitmap;
+                        AScale, // const AScale: Single;
+                        ARect.Width, ARect.Height, // const W, H: single;
+                        AWrapMode, // const AWrapMode: TALImageWrapMode;
+                        ACropCenter, // const ACropCenter: TpointF;
+                        ABlurRadius, // const ABlurRadius: single;
+                        AXRadius, // const AXRadius: Single;
+                        AYRadius); // const AYRadius: Single);
+
+    {$IFDEF ALDPK}
+    except
+      ABufDrawable := ALCreateEmptyDrawable1x1;
+      Exit;
+    end;
+    {$ENDIF}
+
+  end;
+  {$ENDREGION}
+
+  if not ALIsDrawableNull(ABufDrawable) then begin
+    ABufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(ABufDrawable)/AScale, ALGetDrawableHeight(ABufDrawable)/AScale).CenterAt(ARect);
+    Exit;
+  end;
+
+  {$REGION 'Use TALDrawRectangleHelper'}
+  var LSurfaceRect := ALGetShapeSurfaceRect(
+                        ABufDrawableRect, // const ARect: TRectF;
+                        AColor, // const AFillColor: TAlphaColor;
+                        [], // const AFillGradientColors: TArray<TAlphaColor>;
+                        LResourceName, // const AFillResourceName: String;
+                        AResourceStream, // const AFillResourceStream: TStream;
+                        TRectF.Empty, // Const AFillBackgroundMarginsRect: TRectF;
+                        TRectF.Empty, // Const AFillImageMarginsRect: TRectF;
+                        0, // const AStateLayerOpacity: Single;
+                        TAlphaColors.Null, // const AStateLayerColor: TAlphaColor;
+                        False, // const AStateLayerUseContentColor: Boolean;
+                        TRectF.Empty, // Const AStateLayerMarginsRect: TRectF;
+                        AShadowColor, // const AShadowColor: TAlphaColor;
+                        AShadowBlur, // const AShadowBlur: Single;
+                        AShadowOffsetX, // const AShadowOffsetX: Single;
+                        AShadowOffsetY); // const AShadowOffsetY: Single): TRectF;
+  ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+
+  var LSurface: TALSurface;
+  var LCanvas: TALCanvas;
+  ALCreateSurface(
+    LSurface, // out ASurface: TALSurface;
+    LCanvas, // out ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    LSurfaceRect.Width, // const w: integer;
+    LSurfaceRect.height);// const h: integer)
+  try
+
+    if ALCanvasBeginScene(LCanvas) then
+    try
+
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(AAlignToPixel)
+        .SetDstRect(ABufDrawableRect)
+        .SetFillColor(AColor)
+        .SetFillResourceName(LResourceName)
+        .SetFillResourceStream(AResourceStream)
+        .SetFillMaskResourceName(AMaskResourceName)
+        .SetFillMaskBitmap(AMaskBitmap)
+        .SetFillWrapMode(AWrapMode)
+        .SetFillCropCenter(ACropCenter)
+        .SetFillBlurRadius(ABlurRadius)
+        .SetStrokeColor(AStrokecolor)
+        .SetStrokeThickness(AStrokeThickness)
+        .SetShadowColor(AShadowColor)
+        .SetShadowBlur(AShadowBlur)
+        .SetShadowOffsetX(AShadowOffsetX)
+        .SetShadowOffsetY(AShadowOffsetY)
+        .SetSides(ASides)
+        .SetCorners(ACorners)
+        .SetXRadius(AXRadius)
+        .SetYRadius(AYRadius)
+        .Draw;
+
+    finally
+      ALCanvasEndScene(LCanvas)
+    end;
+
+    ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+    // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+    // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
+
+  finally
+    ALFreeAndNilSurface(LSurface, LCanvas);
+  end;
+  {$ENDREGION}
+
 end;
 
 {*********************************}
@@ -1097,42 +2040,94 @@ begin
     exit;
   end;
 
-  if (not ALIsDrawableNull(fBufDrawable)) then exit;
+  if (not ALIsDrawableNull(FBufDrawable)) then exit;
 
   {$IFDEF debug}
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
   {$endif}
 
-  var LFileName := ALGetResourceFilename(FResourceName);
+  if (FResourceDownloadExtData = nil) and
+     (ALIsHttpOrHttpsUrl(ResourceName)) then begin
 
-  if (fRotateAccordingToExifOrientation) and (LFileName <> '') then fExifOrientationInfo := AlGetExifOrientationInfo(LFilename)
-  else fExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+    FResourceDownloadExtData := TResourceDownloadExtData.Create(Self);
+    Try
+      TALNetHttpClientPool.Instance.Get(
+        ResourceName, // const AUrl: String;
+        CanStartResourceDownload, // const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
+        HandleResourceDownloadSuccess, // const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
+        HandleResourceDownloadError, // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
+        FResourceDownloadExtData, // const AExtData: Tobject; // ExtData will be free by the worker thread
+        true, // const AUseCache: Boolean = True;
+        GetResourceDownloadPriority); // const APriority: Int64 = 0
+    except
+      ALFreeAndNil(FResourceDownloadExtData);
+      Raise;
+    End;
 
-  if fExifOrientationInfo in [TalExifOrientationInfo.TRANSPOSE,
-                              TalExifOrientationInfo.ROTATE_90,
-                              TalExifOrientationInfo.TRANSVERSE,
-                              TalExifOrientationInfo.ROTATE_270] then fBufDrawableRect := ALAlignDimensionToPixelRound(TRectF.Create(0, 0, Height, Width), ALGetScreenScale) // to have the pixel aligned width and height
-  // TalExifOrientationInfo.FLIP_HORIZONTAL
-  // TalExifOrientationInfo.FLIP_VERTICAL
-  // TalExifOrientationInfo.NORMAL
-  // TalExifOrientationInfo.ROTATE_180
-  // TalExifOrientationInfo.UNDEFINED
-  else fBufDrawableRect := ALAlignDimensionToPixelRound(LocalRect, ALGetScreenScale); // to have the pixel aligned width and height
+    if LoadingColor <> TAlphaColors.Null then begin
+      CreateBufDrawable(
+        FBufDrawable, // var ABufDrawable: TALDrawable;
+        FBufDrawableRect, // out ABufDrawableRect: TRectF;
+        FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
+        LocalRect, // const ARect: TRectF;
+        ALGetScreenScale, // const AScale: Single;
+        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+        LoadingColor, // const AColor: TAlphaColor;
+        '', // const AResourceName: String;
+        nil, // const AResourceStream: TStream;
+        MaskResourceName, // const AMaskResourceName: String;
+        MaskBitmap, // const AMaskBitmap: TALBitmap;
+        TALImageWrapMode.Fit, // const AWrapMode: TALImageWrapMode;
+        TpointF.Zero, // const ACropCenter: TpointF;
+        false, // const ARotateAccordingToExifOrientation: Boolean;
+        TAlphaColors.Null, // const AStrokeColor: TAlphaColor;
+        0, // const AStrokeThickness: Single;
+        0, // const AShadowBlur: Single;
+        0, // const AShadowOffsetX: Single;
+        0, // const AShadowOffsetY: Single;
+        TAlphaColors.Null, // const AShadowColor: TAlphaColor;
+        Corners, // const ACorners: TCorners;
+        Sides, // const ASides: TSides;
+        XRadius, // const AXRadius: Single;
+        YRadius, // const AYRadius: Single;
+        BlurRadius); // const ABlurRadius: Single);
+    end
+    else begin
+      FBufDrawable := ALCreateEmptyDrawable1x1;
+      FBufDrawableRect := TRectF.Create(0,0,1/ALGetScreenScale,1/ALGetScreenScale);
+      FExifOrientationInfo := TalExifOrientationInfo.UNDEFINED;
+    end;
 
-  {$IFDEF ALDPK}
-  try
-  {$ENDIF}
-    if LFileName <> '' then fBufDrawable := ALLoadFromFileAndWrapToDrawable(LFileName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale)
-    else fBufDrawable := {$IFDEF ALDPK}ALNullDrawable{$ELSE}ALLoadFromResourceAndWrapToDrawable(fResourceName, FWrapMode, fBufDrawableRect.Width * ALGetScreenScale, fBufDrawableRect.Height * ALGetScreenScale){$ENDIF};
-  {$IFDEF ALDPK}
-  except
-    fBufDrawable := ALNullDrawable;
+    exit;
+
   end;
-  {$ENDIF}
 
-  {$IFDEF ALDPK}if not ALIsDrawableNull(fBufDrawable) then{$ENDIF}
-    fBufDrawableRect := TrectF.Create(0,0, ALGetDrawableWidth(fBufDrawable)/ALGetScreenScale, ALGetDrawableHeight(fBufDrawable)/ALGetScreenScale).
-                          CenterAt(LocalRect);
+  CreateBufDrawable(
+    FBufDrawable, // var ABufDrawable: TALDrawable;
+    FBufDrawableRect, // out ABufDrawableRect: TRectF;
+    FExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
+    LocalRect, // const ARect: TRectF;
+    ALGetScreenScale, // const AScale: Single;
+    IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
+    BackGroundColor, // const AColor: TAlphaColor;
+    ResourceName, // const AResourceName: String;
+    nil, // const AResourceStream: TStream;
+    MaskResourceName, // const AMaskResourceName: String;
+    MaskBitmap, // const AMaskBitmap: TALBitmap;
+    WrapMode, // const AWrapMode: TALImageWrapMode;
+    CropCenter.Point, // const ACropCenter: TpointF;
+    RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
+    Stroke.Color, // const AStrokeColor: TAlphaColor;
+    Stroke.Thickness, // const AStrokeThickness: Single;
+    Shadow.Blur, // const AShadowBlur: Single;
+    Shadow.OffsetX, // const AShadowOffsetX: Single;
+    Shadow.OffsetY, // const AShadowOffsetY: Single;
+    Shadow.Color, // const AShadowColor: TAlphaColor;
+    Corners, // const ACorners: TCorners;
+    Sides, // const ASides: TSides;
+    XRadius, // const AXRadius: Single;
+    YRadius, // const AYRadius: Single)
+    BlurRadius); // const ABlurRadius: Single);
 
 end;
 
@@ -1149,69 +2144,84 @@ begin
 
   MakeBufDrawable;
 
-  var LMatrix: Tmatrix;
-  var LMatrixRotationCenter: TpointF;
   case fExifOrientationInfo of
     TalExifOrientationInfo.FLIP_HORIZONTAL: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
       LMatrix := LMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.FLIP_VERTICAL: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
       LMatrix := LMatrix * TMatrix.CreateScaling(1, -1); // matrix.setRotate(180); matrix.setScale(-1, 1);
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.NORMAL:;
     TalExifOrientationInfo.ROTATE_180: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
       LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(180)); // matrix.setRotate(180);
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.ROTATE_270: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      {$IF defined(ALSkiaEngine)}
+      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
+      {$ELSE}
       LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
+      {$ENDIF}
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.ROTATE_90: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      {$IF defined(ALSkiaEngine)}
+      LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
+      {$ELSE}
       LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
+      {$ENDIF}
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.TRANSPOSE: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
       LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(90)); // matrix.setRotate(90);
       LMatrix := LMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.TRANSVERSE: begin
+      var LMatrixRotationCenter: TpointF;
       LMatrixRotationCenter.X := (width / 2) + Canvas.Matrix.m31;
       LMatrixRotationCenter.Y := (height / 2) + Canvas.Matrix.m32;
-      LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
+      var LMatrix := Canvas.Matrix * TMatrix.CreateTranslation(-LMatrixRotationCenter.X,-LMatrixRotationCenter.Y);
       LMatrix := LMatrix * TMatrix.CreateRotation(DegToRad(-90)); // matrix.setRotate(-90);
       LMatrix := LMatrix * TMatrix.CreateScaling(-1, 1); // matrix.setScale(-1, 1);
       LMatrix := LMatrix * TMatrix.CreateTranslation(LMatrixRotationCenter.X,LMatrixRotationCenter.Y);
       Canvas.SetMatrix(LMatrix);
     end;
     TalExifOrientationInfo.UNDEFINED:;
+    else
+      Raise Exception.Create('Error 015D39FD-8A61-4F7F-A8AA-639A91FCBC37');
   end;
 
   ALDrawDrawable(
@@ -1220,39 +2230,6 @@ begin
     fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
-end;
-
-{************************************************************}
-procedure TALImage.SetWrapMode(const Value: TALImageWrapMode);
-begin
-  if FWrapMode <> Value then begin
-    ClearBufDrawable;
-    FWrapMode := Value;
-    Repaint;
-  end;
-end;
-
-{******************************************************}
-procedure TALImage.setResourceName(const Value: String);
-begin
-  if FResourceName <> Value then begin
-    ClearBufDrawable;
-    FResourceName := Value;
-    Repaint;
-  end;
-end;
-
-{***************************}
-procedure TALImage.DoResized;
-begin
-  ClearBufDrawable;
-  inherited;
-end;
-
-{*******************************************}
-function TALImage.GetDoubleBuffered: boolean;
-begin
-  result := True;
 end;
 
 {*****************************************************************************}
@@ -1649,6 +2626,7 @@ begin
   FRenderRect := TRectF.Create(0,0,LSize.width, LSize.height);
 
   case FWrapMode of
+    //TALImageWrapMode.Original: FRenderRect := FRenderRect.PlaceInto(LocalRect);
     TALImageWrapMode.Fit: FRenderRect := FRenderRect.FitInto(LocalRect);
     TALImageWrapMode.Stretch: FRenderRect := FRenderRect.FitInto(LocalRect); // TALImageWrapMode.Stretch not yet supported, use TALImageWrapMode.Fit instead
     TALImageWrapMode.Place: FRenderRect := FRenderRect.PlaceInto(LocalRect);
@@ -1901,7 +2879,7 @@ end;
 {***********************************************}
 function TALBaseRectangle.IsSidesStored: Boolean;
 begin
-  Result := FSides * AllSides <> AllSides
+  Result := FSides <> AllSides
 end;
 
 {*************************************************}
@@ -1951,28 +2929,20 @@ end;
 
 {*********************************************************}
 procedure TALBaseRectangle.SetXRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FXRadius := NewValue;
+    FXRadius := Value;
     Repaint;
   end;
 end;
 
 {*********************************************************}
 procedure TALBaseRectangle.SetYRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FYRadius := NewValue;
+    FYRadius := Value;
     Repaint;
   end;
 end;
@@ -2039,6 +3009,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -2056,22 +3027,20 @@ begin
     if ALCanvasBeginScene(LCanvas) then
     try
 
-      ALDrawRectangle(
-        LCanvas, // const ACanvas: TALCanvas;
-        AScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-        ABufDrawableRect, // const Rect: TrectF;
-        1, // const AOpacity: Single;
-        AFill, // const Fill: TALBrush;
-        AStateLayer, // const StateLayer: TALStateLayer;
-        AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
-        ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
-        AStroke, // const Stroke: TALStrokeBrush;
-        AShadow, // const Shadow: TALShadow
-        Sides, // const Sides: TSides;
-        Corners, // const Corners: TCorners;
-        XRadius, // const XRadius: Single = 0;
-        YRadius); // const YRadius: Single = 0);
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(ABufDrawableRect)
+        .SetFill(AFill)
+        .SetStateLayer(AStateLayer, AStateLayerContentColor)
+        .SetDrawStateLayerOnTop(ADrawStateLayerOnTop)
+        .SetStroke(AStroke)
+        .SetShadow(AShadow)
+        .SetSides(Sides)
+        .SetCorners(Corners)
+        .SetXRadius(XRadius)
+        .SetYRadius(YRadius)
+        .Draw;
 
     finally
       ALCanvasEndScene(LCanvas)
@@ -2142,22 +3111,18 @@ begin
 
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
-    ALDrawRectangle(
-      TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      LocalRect, // const Rect: TrectF;
-      AbsoluteOpacity, // const AOpacity: Single;
-      Fill, // const Fill: TALBrush;
-      nil, // const StateLayer: TALStateLayer;
-      TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-      True, // const ADrawStateLayerOnTop: Boolean;
-      Stroke, // const Stroke: TALStrokeBrush;
-      Shadow, // const Shadow: TALShadow
-      Sides, // const Sides: TSides;
-      Corners, // const Corners: TCorners;
-      XRadius, // const XRadius: Single = 0;
-      YRadius); // const YRadius: Single = 0);
+    TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(LocalRect)
+      .SetOpacity(AbsoluteOpacity)
+      .SetFill(Fill)
+      .SetStroke(Stroke)
+      .SetShadow(Shadow)
+      .SetSides(Sides)
+      .SetCorners(Corners)
+      .SetXRadius(XRadius)
+      .SetYRadius(YRadius)
+      .Draw;
     {$ELSE}
     {$IF defined(DEBUG)}
     if not doublebuffered then begin
@@ -2181,6 +3146,212 @@ begin
     fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
     AbsoluteOpacity); // const AOpacity: Single);
 
+end;
+
+{************************************************}
+constructor TALEllipse.Create(AOwner: TComponent);
+begin
+  inherited;
+  fDoubleBuffered := true;
+  fBufDrawable := ALNullDrawable;
+end;
+
+{************************************}
+procedure TALEllipse.ClearBufDrawable;
+begin
+  {$IFDEF debug}
+  if (not (csDestroying in ComponentState)) and
+     (not ALIsDrawableNull(fBufDrawable)) then
+    ALLog(Classname + '.ClearBufDrawable', 'BufDrawable has been cleared | Name: ' + Name, TalLogType.warn);
+  {$endif}
+  ALFreeAndNilDrawable(fBufDrawable);
+end;
+
+{*********************************************}
+function TALEllipse.GetDoubleBuffered: boolean;
+begin
+  result := fDoubleBuffered;
+end;
+
+{************************************************************}
+procedure TALEllipse.SetDoubleBuffered(const AValue: Boolean);
+begin
+  if AValue <> fDoubleBuffered then begin
+    fDoubleBuffered := AValue;
+    if not fDoubleBuffered then ClearBufDrawable;
+  end;
+end;
+
+{************************************************}
+procedure TALEllipse.FillChanged(Sender: TObject);
+begin
+  ClearBufDrawable;
+  inherited;
+end;
+
+{**************************************************}
+procedure TALEllipse.StrokeChanged(Sender: TObject);
+begin
+  ClearBufDrawable;
+  inherited;
+end;
+
+{**************************************************}
+procedure TALEllipse.ShadowChanged(Sender: TObject);
+begin
+  ClearBufDrawable;
+  inherited;
+end;
+
+{*************************************}
+Procedure TALEllipse.CreateBufDrawable(
+            var ABufDrawable: TALDrawable;
+            out ABufDrawableRect: TRectF;
+            const AScale: Single;
+            const AFill: TALBrush;
+            const AStateLayer: TALStateLayer;
+            const AStateLayerContentColor: TAlphaColor;
+            const ADrawStateLayerOnTop: Boolean;
+            const AStroke: TALStrokeBrush;
+            const AShadow: TALShadow);
+begin
+
+  if (not ALIsDrawableNull(ABufDrawable)) then exit;
+
+  ABufDrawableRect := LocalRect;
+  var LSurfaceRect := ALGetShapeSurfaceRect(
+                        ABufDrawableRect, // const ARect: TRectF;
+                        AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
+                        AStateLayer, // const AStateLayer: TALStateLayer;
+                        AShadow); // const AShadow: TALShadow): TRectF;
+  ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
+
+  var LSurface: TALSurface;
+  var LCanvas: TALCanvas;
+  ALCreateSurface(
+    LSurface, // out ASurface: TALSurface;
+    LCanvas, // out ACanvas: TALCanvas;
+    AScale, // const AScale: Single;
+    LSurfaceRect.Width, // const w: integer;
+    LSurfaceRect.Height); // const h: integer)
+  try
+
+    if ALCanvasBeginScene(LCanvas) then
+    try
+
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(ABufDrawableRect)
+        .SetFill(AFill)
+        .SetStateLayer(AStateLayer, AStateLayerContentColor)
+        .SetDrawStateLayerOnTop(ADrawStateLayerOnTop)
+        .SetStroke(AStroke)
+        .SetShadow(AShadow)
+        .SetXRadius(ABufDrawableRect.Width / 2)
+        .SetYRadius(ABufDrawableRect.Height / 2)
+        .Draw;
+
+    finally
+      ALCanvasEndScene(LCanvas)
+    end;
+
+    ABufDrawable := ALCreateDrawableFromSurface(LSurface);
+    // The Shadow or Statelayer are not included in the dimensions of the fBufDrawableRect rectangle.
+    // However, the fBufDrawableRect rectangle is offset by the dimensions of the shadow/Statelayer.
+    ABufDrawableRect.Offset(-2*ABufDrawableRect.Left, -2*ABufDrawableRect.Top);
+
+  finally
+    ALFreeAndNilSurface(LSurface, LCanvas);
+  end;
+
+end;
+
+{***********************************}
+procedure TALEllipse.MakeBufDrawable;
+begin
+
+  if //--- Do not create BufDrawable if not DoubleBuffered
+     {$IF not DEFINED(ALDPK)}(not DoubleBuffered) or{$ENDIF}
+     //--- Do not create BufDrawable if the size is 0
+     (Size.Size.IsZero) then begin
+    ClearBufDrawable;
+    exit;
+  end;
+
+  if (not ALIsDrawableNull(FBufDrawable)) then exit;
+
+  {$IFDEF debug}
+  ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
+  {$endif}
+
+  CreateBufDrawable(
+    FBufDrawable, // var ABufDrawable: TALDrawable;
+    FBufDrawableRect, // var ABufDrawableRect: TRectF;
+    ALGetScreenScale, // const AScale: Single;
+    Fill, // const AFill: TALBrush;
+    nil, // const AStateLayer: TALStateLayer;
+    TAlphaColors.null, // const AStateLayerContentColor: TAlphaColor;
+    True, // const ADrawStateLayerOnTop: Boolean;
+    Stroke, // const AStroke: TALStrokeBrush;
+    Shadow); // const AShadow: TALShadow);
+
+end;
+
+{*************************}
+procedure TALEllipse.Paint;
+begin
+
+  MakeBufDrawable;
+
+  if ALIsDrawableNull(fBufDrawable) then begin
+    {$IF DEFINED(ALSkiaCanvas)}
+    TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(LocalRect)
+      .SetOpacity(AbsoluteOpacity)
+      .SetFill(Fill)
+      .SetStroke(Stroke)
+      .SetShadow(Shadow)
+      .SetXRadius(Width / 2)
+      .SetYRadius(Height / 2)
+      .Draw;
+    {$ELSE}
+    {$IF defined(DEBUG)}
+    if not doublebuffered then begin
+      ALLog('TALEllipse.Paint', 'Controls that are not double-buffered only work when SKIA is enabled', TALLogType.ERROR);
+      exit;
+    end;
+    {$ENDIF}
+    {$ENDIF}
+    exit;
+  end;
+
+  ALDrawDrawable(
+    Canvas, // const ACanvas: Tcanvas;
+    fBufDrawable, // const ADrawable: TALDrawable;
+    fBufDrawableRect.TopLeft, // const ATopLeft: TpointF;
+    AbsoluteOpacity); // const AOpacity: Single);
+
+end;
+
+{************************************************************}
+function TALEllipse.PointInObjectLocal(X, Y: Single): Boolean;
+begin
+  Result := False;
+  if Width * Height = 0 then Exit;
+  var LShapeRect := LocalRect;
+  var LRadius := TSizeF.Create(LShapeRect.Width / 2, LShapeRect.Height / 2);
+  var LCenter := LShapeRect.CenterPoint;
+  Result := Sqr((X - LCenter.X) / LRadius.Width) + Sqr((Y - LCenter.Y) / LRadius.Height) <= 1;
+end;
+
+{*****************************}
+procedure TALEllipse.DoResized;
+begin
+  ClearBufDrawable;
+  inherited;
 end;
 
 {***********************************************}
@@ -2257,6 +3428,7 @@ begin
   var LSurfaceRect := ALGetShapeSurfaceRect(
                         ABufDrawableRect, // const ARect: TRectF;
                         AFill, // const AFill: TALBrush;
+                        nil, // const AFillResourceStream: TStream;
                         AStateLayer, // const AStateLayer: TALStateLayer;
                         AShadow); // const AShadow: TALShadow): TRectF;
   ABufDrawableRect.Offset(-LSurfaceRect.Left, -LSurfaceRect.Top);
@@ -2274,18 +3446,18 @@ begin
     if ALCanvasBeginScene(LCanvas) then
     try
 
-      ALDrawCircle(
-        LCanvas, // const ACanvas: TALCanvas;
-        AScale, // const AScale: Single;
-        IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-        ABufDrawableRect, // const Rect: TrectF;
-        1, // const AOpacity: Single;
-        AFill, // const Fill: TALBrush;
-        AStateLayer, // const StateLayer: TALStateLayer;
-        AStateLayerContentColor, // const AStateLayerContentColor: TAlphaColor;
-        ADrawStateLayerOnTop, // const ADrawStateLayerOnTop: Boolean;
-        AStroke, // const Stroke: TALStrokeBrush;
-        AShadow); // const Shadow: TALShadow
+      TALDrawRectangleHelper.Create(LCanvas)
+        .SetScale(AScale)
+        .SetAlignToPixel(IsPixelAlignmentEnabled)
+        .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(ABufDrawableRect))
+        .SetFill(AFill)
+        .SetStateLayer(AStateLayer, AStateLayerContentColor)
+        .SetDrawStateLayerOnTop(ADrawStateLayerOnTop)
+        .SetStroke(AStroke)
+        .SetShadow(AShadow)
+        .SetXRadius(-50)
+        .SetYRadius(-50)
+        .Draw;
 
     finally
       ALCanvasEndScene(LCanvas)
@@ -2341,18 +3513,17 @@ begin
 
   if ALIsDrawableNull(fBufDrawable) then begin
     {$IF DEFINED(ALSkiaCanvas)}
-    ALDrawCircle(
-      TSkCanvasCustom(Canvas).Canvas.Handle, // const ACanvas: TALCanvas;
-      1, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      TRectF.Create(0, 0, 1, 1).FitInto(LocalRect), // const Rect: TrectF;
-      AbsoluteOpacity, // const AOpacity: Single;
-      Fill, // const Fill: TALBrush;
-      nil, // const StateLayer: TALStateLayer;
-      TAlphaColors.Null, // const AStateLayerContentColor: TAlphaColor;
-      True, // const ADrawStateLayerOnTop: Boolean;
-      Stroke, // const Stroke: TALStrokeBrush;
-      Shadow); // const Shadow: TALShadow
+    TALDrawRectangleHelper.Create(TSkCanvasCustom(Canvas).Canvas.Handle)
+      .SetScale(1)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(TRectF.Create(0, 0, 1, 1).FitInto(LocalRect))
+      .SetOpacity(AbsoluteOpacity)
+      .SetFill(Fill)
+      .SetStroke(Stroke)
+      .SetShadow(Shadow)
+      .SetXRadius(-50)
+      .SetYRadius(-50)
+      .Draw;
     {$ELSE}
     {$IF defined(DEBUG)}
     if not doublebuffered then begin
@@ -2375,9 +3546,12 @@ end;
 {***********************************************************}
 function TALCircle.PointInObjectLocal(X, Y: Single): Boolean;
 begin
-  var LRect := TRectF.Create(0, 0, 1, 1).FitInto(LocalRect);
-  if LRect.Width * LRect.Height = 0 then Result := False
-  else Result := (Sqr((X * 2 - LRect.Width) / LRect.Width) + Sqr((Y * 2 - LRect.Height) / LRect.Height) <= 1);
+  Result := False;
+  if Width * Height = 0 then Exit;
+  var LShapeRect := TRectF.Create(0, 0, 1, 1).FitInto(LocalRect);
+  var LRadius := TSizeF.Create(LShapeRect.Width / 2, LShapeRect.Height / 2);
+  var LCenter := LShapeRect.CenterPoint;
+  Result := Sqr((X - LCenter.X) / LRadius.Width) + Sqr((Y - LCenter.Y) / LRadius.Height) <= 1;
 end;
 
 {****************************}
@@ -3090,7 +4264,7 @@ end;
 {******************************************}
 function TALBaseText.IsSidesStored: Boolean;
 begin
-  Result := FSides * AllSides <> AllSides
+  Result := FSides <> AllSides
 end;
 
 {******************************************************}
@@ -3117,28 +4291,20 @@ end;
 
 {****************************************************}
 procedure TALBaseText.SetXRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FXRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FXRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FXRadius := NewValue;
+    FXRadius := Value;
     Repaint;
   end;
 end;
 
 {****************************************************}
 procedure TALBaseText.SetYRadius(const Value: Single);
-var
-  NewValue: Single;
 begin
-  if csDesigning in ComponentState then NewValue := Max(-50, Min(Value, Min(Width / 2, Height / 2)))
-  else NewValue := Value;
-  if not SameValue(FYRadius, NewValue, TEpsilon.Vector) then begin
+  if not SameValue(FYRadius, Value, TEpsilon.Vector) then begin
     ClearBufDrawable;
-    FYRadius := NewValue;
+    FYRadius := Value;
     Repaint;
   end;
 end;
@@ -3334,13 +4500,18 @@ begin
   //--
   Result.FillColor := AFill.Color;
   Result.FillGradientStyle := AFill.Gradient.Style;
+  Result.FillGradientAngle := AFill.Gradient.Angle;
   Result.FillGradientColors := AFill.Gradient.Colors;
   Result.FillGradientOffsets := AFill.Gradient.Offsets;
-  Result.FillGradientAngle := AFill.Gradient.Angle;
   Result.FillResourceName := AFill.ResourceName;
-  Result.FillWrapMode := AFill.WrapMode;
+  Result.FillMaskResourceName := '';
+  Result.FillMaskBitmap := ALNullBitmap;
   Result.FillBackgroundMargins := AFill.BackgroundMargins.Rect;
   Result.FillImageMargins := AFill.ImageMargins.Rect;
+  Result.FillImageNoRadius := AFill.ImageNoRadius;
+  Result.FillWrapMode := AFill.WrapMode;
+  Result.FillCropCenter := TPointF.create(-50,-50);
+  Result.FillBlurRadius := 0;
   //--
   if AStateLayer <> nil then begin
     Result.StateLayerOpacity := AStateLayer.Opacity;
@@ -3473,22 +4644,21 @@ begin
       LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
       ARect); // Const ARect: TrectF
 
-    ALDrawRectangle(
-      ACanvas, // const ACanvas: TALCanvas;
-      AScale, // const AScale: Single;
-      IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-      ARect, // const Rect: TrectF;
-      AOpacity, // const AOpacity: Single;
-      AFill, // const Fill: TALBrush;
-      AStateLayer, // const StateLayer: TALStateLayer;
-      AFont.color, // const AStateLayerContentColor: TAlphaColor;
-      AText <> '', // const ADrawStateLayerOnTop: Boolean;
-      AStroke, // const Stroke: TALStrokeBrush;
-      AShadow, // const Shadow: TALShadow
-      Sides, // const Sides: TSides;
-      Corners, // const Corners: TCorners;
-      XRadius, // const XRadius: Single = 0;
-      YRadius); // const YRadius: Single = 0);
+    TALDrawRectangleHelper.Create(ACanvas)
+      .SetScale(AScale)
+      .SetAlignToPixel(IsPixelAlignmentEnabled)
+      .SetDstRect(ARect)
+      .SetOpacity(AOpacity)
+      .SetFill(AFill)
+      .SetStateLayer(AStateLayer, AFont.color)
+      .SetDrawStateLayerOnTop(AText <> '')
+      .SetStroke(AStroke)
+      .SetShadow(AShadow)
+      .SetSides(Sides)
+      .SetCorners(Corners)
+      .SetXRadius(XRadius)
+      .SetYRadius(YRadius)
+      .Draw;
 
     DrawMultilineTextBeforeDrawParagraph(
       ACanvas, //const ACanvas: TALCanvas;
@@ -3611,6 +4781,7 @@ begin
     var LSurfaceRect := ALGetShapeSurfaceRect(
                           ABufDrawableRect, // const ARect: TRectF;
                           AFill, // const AFill: TALBrush;
+                          nil, // const AFillResourceStream: TStream;
                           AStateLayer, // const AStateLayer: TALStateLayer;
                           AShadow); // const AShadow: TALShadow): TRectF;
     LSurfaceRect.Width := Min(MaxWidth, LSurfaceRect.Width);
@@ -3644,22 +4815,20 @@ begin
           LMultiLineTextOptions, // const AOptions: TALMultiLineTextOptions;
           ABufDrawableRect); // Const ARect: TrectF
 
-        ALDrawRectangle(
-          LCanvas, // const ACanvas: TALCanvas;
-          AScale, // const AScale: Single;
-          IsPixelAlignmentEnabled, // const AAlignToPixel: Boolean;
-          ABufDrawableRect, // const Rect: TrectF;
-          1, // const AOpacity: Single;
-          AFill, // const Fill: TALBrush;
-          AStateLayer, // const StateLayer: TALStateLayer;
-          AFont.color, // const AStateLayerContentColor: TAlphaColor;
-          Atext <> '', // const ADrawStateLayerOnTop: Boolean;
-          AStroke, // const Stroke: TALStrokeBrush;
-          AShadow, // const Shadow: TALShadow
-          Sides, // const Sides: TSides;
-          Corners, // const Corners: TCorners;
-          XRadius, // const XRadius: Single = 0;
-          YRadius); // const YRadius: Single = 0);
+          TALDrawRectangleHelper.Create(LCanvas)
+            .SetScale(AScale)
+            .SetAlignToPixel(IsPixelAlignmentEnabled)
+            .SetDstRect(ABufDrawableRect)
+            .SetFill(AFill)
+            .SetStateLayer(AStateLayer, AFont.color)
+            .SetDrawStateLayerOnTop(Atext <> '')
+            .SetStroke(AStroke)
+            .SetShadow(AShadow)
+            .SetSides(Sides)
+            .SetCorners(Corners)
+            .SetXRadius(XRadius)
+            .SetYRadius(YRadius)
+            .Draw;
 
         DrawMultilineTextBeforeDrawParagraph(
           LCanvas, //const ACanvas: TALCanvas;
@@ -3895,7 +5064,7 @@ end;
 {*****************}
 procedure Register;
 begin
-  RegisterComponents('Alcinoe', [TALImage, TALAnimatedImage, TALRectangle, TALCircle, TALLine, TALText]);
+  RegisterComponents('Alcinoe', [TALImage, TALAnimatedImage, TALRectangle, TALEllipse, TALCircle, TALLine, TALText]);
   {$IFDEF ALDPK}
   UnlistPublishedProperty(TALImage, 'Size');
   UnlistPublishedProperty(TALImage, 'StyleName');
@@ -3908,6 +5077,10 @@ begin
   UnlistPublishedProperty(TALRectangle, 'Size');
   UnlistPublishedProperty(TALRectangle, 'StyleName');
   UnlistPublishedProperty(TALRectangle, 'OnTap');
+  //--
+  UnlistPublishedProperty(TALEllipse, 'Size');
+  UnlistPublishedProperty(TALEllipse, 'StyleName');
+  UnlistPublishedProperty(TALEllipse, 'OnTap');
   //--
   UnlistPublishedProperty(TALCircle, 'Size');
   UnlistPublishedProperty(TALCircle, 'StyleName');
@@ -3924,6 +5097,6 @@ begin
 end;
 
 initialization
-  RegisterFmxClasses([TALImage, TALRectangle, TALCircle, TALLine, TALText]);
+  RegisterFmxClasses([TALImage, TALRectangle, TALEllipse, TALCircle, TALLine, TALText]);
 
 end.

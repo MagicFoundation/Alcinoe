@@ -3926,7 +3926,7 @@ begin
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
-                            0, // const AMaskBitmap: JBitmap;
+                            nil, // const AMaskBitmap: JBitmap;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -3991,7 +3991,7 @@ begin
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
-                            0, // const AMaskImage: CGImageRef;
+                            nil, // const AMaskImage: CGImageRef;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;
@@ -4074,7 +4074,7 @@ begin
                             LExtendedTextElement.imgSrc, // const AResourceName: String;
                             nil, // const AResourceStream: TStream;
                             '', // const AMaskResourceName: String;
-                            0, // const AMaskImage: CGImageRef;
+                            nil, // const AMaskBitmap: TBitmap;
                             1, // const AScale: Single;
                             LDstRect.Width, LDstRect.Height, // const W, H: single;
                             TALImageWrapMode.Stretch, // const AWrapMode: TALImageWrapMode;

@@ -1660,7 +1660,7 @@ begin
     OnChange(Self);
 end;
 
-{***************************}
+{*****************************}
 constructor TALPosition.Create;
 begin
   inherited Create;
@@ -1669,7 +1669,7 @@ begin
   FY := LDefaultValue.Y;
 end;
 
-{***************************}
+{************************************************}
 procedure TALPosition.Assign(Source: TPersistent);
 begin
   if Source is TALPosition then
@@ -1680,57 +1680,57 @@ begin
     inherited
 end;
 
-{***************************}
+{*******************************************************}
 procedure TALPosition.SetPointNoChange(const P: TPointF);
 begin
   FX := P.X;
   FY := P.Y;
 end;
 
-{***************************}
+{**********************************}
 function TALPosition.Empty: Boolean;
 begin
   Result := Point.IsZero;
 end;
 
-{***************************}
+{*****************************}
 procedure TALPosition.DoChange;
 begin
   if Assigned(OnChange) then
     OnChange(Self);
 end;
 
-{***************************}
+{**************************************}
 function TALPosition.IsXStored: Boolean;
 begin
   Result := not SameValue(FX, DefaultValue.X, Epsilon);
 end;
 
-{***************************}
+{**************************************}
 function TALPosition.IsYStored: Boolean;
 begin
   Result := not SameValue(FY, DefaultValue.Y, Epsilon);
 end;
 
-{***************************}
+{***************************************************}
 procedure TALPosition.Reflect(const Normal: TPointF);
 begin
   Point := Point.Reflect(Normal);
 end;
 
-{***************************}
+{********************************************}
 function TALPosition.GetDefaultValue: TPointF;
 begin
   Result := TpointF.Zero;
 end;
 
-{***************************}
+{*************************************}
 function TALPosition.GetPoint: TPointF;
 begin
   Result := TPointF.Create(FX, FY);
 end;
 
-{***************************}
+{***************************************************}
 procedure TALPosition.SetPoint(const Value: TPointF);
 begin
   var LChange := not (SameValue(FX, Value.X, Epsilon) and SameValue(FY, Value.Y, Epsilon));
@@ -1740,7 +1740,7 @@ begin
     DoChange;
 end;
 
-{***************************}
+{**********************************************}
 procedure TALPosition.SetX(const Value: Single);
 begin
   var LChange := not SameValue(FX, Value, Epsilon);
@@ -1749,7 +1749,7 @@ begin
     DoChange;
 end;
 
-{***************************}
+{**********************************************}
 procedure TALPosition.SetY(const Value: Single);
 begin
   var LChange := not SameValue(FY, Value, Epsilon);
@@ -3888,7 +3888,7 @@ begin
   result := FResourceName <> DefaultResourceName;
 end;
 
-{******************************************}
+{***********************************************}
 function TALBrush.IsImageNoRadiusStored: Boolean;
 begin
   result := FImageNoRadius <> DefaultImageNoRadius;
@@ -3912,7 +3912,7 @@ begin
   Result := '';
 end;
 
-{*****************************************************}
+{*************************************************}
 function TALBrush.GetDefaultImageNoRadius: Boolean;
 begin
   Result := False;
@@ -3960,7 +3960,7 @@ begin
   FImageMargins.Assign(Value);
 end;
 
-{************************************************************}
+{********************************************************}
 procedure TALBrush.SetImageNoRadius(const Value: Boolean);
 begin
   if fImageNoRadius <> Value then begin

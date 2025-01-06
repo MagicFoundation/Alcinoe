@@ -391,7 +391,7 @@ function ALCreateDrawableFromResource(
 
 Type
 
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   PALDrawRectangleHelper = ^TALDrawRectangleHelper;
   TALDrawRectangleHelper = record
   private
@@ -1792,8 +1792,8 @@ begin
       LDstRect.bottom := LDstRect.bottom / AScale;
 
       Result := ALCreateSkSurface(
-                    Round(LDstRect.Width * AScale),
-                    Round(LDstRect.Height * AScale));
+                  Round(LDstRect.Width * AScale),
+                  Round(LDstRect.Height * AScale));
       try
 
         Var LCanvas: sk_canvas_t := ALSkCheckHandle(sk4d_surface_get_canvas(Result));
@@ -2178,17 +2178,17 @@ begin
       // Create the MaskBitmap
       if (AMaskResourceName <> '') and (LMaskBitmap = nil) then begin
         LMaskBitmap := ALCreateJbitmapFromResource(
-                        AMaskResourceName, // const AResourceName: String;
-                        nil, // const AResourceStream: TStream;
-                        '', // const AMaskResourceName: String;
-                        nil, // const AMaskBitmap: JBitmap;
-                        AScale, // const AScale: Single;
-                        W, H, // const W, H: single;
-                        AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50, -50), // const ACropCenter: TpointF;
-                        0, // const ABlurRadius: single;
-                        AXRadius, // const AXRadius: Single;
-                        AYRadius); // const AYRadius: Single)
+                         AMaskResourceName, // const AResourceName: String;
+                         nil, // const AResourceStream: TStream;
+                         '', // const AMaskResourceName: String;
+                         nil, // const AMaskBitmap: JBitmap;
+                         AScale, // const AScale: Single;
+                         W, H, // const W, H: single;
+                         AWrapMode, // const AWrapMode: TALImageWrapMode;
+                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         0, // const ABlurRadius: single;
+                         AXRadius, // const AXRadius: Single;
+                         AYRadius); // const AYRadius: Single)
         LOwnMaskBitmap := True;
       end;
 
@@ -2308,7 +2308,7 @@ begin
 end;
 {$ENDIF}
 
-{*********************}
+{**********************}
 {$IF defined(ALAppleOS)}
 procedure ALDrawCGImageRef(
             const ACanvas: CGContextRef;
@@ -2543,7 +2543,7 @@ begin
 end;
 {$ENDIF}
 
-{*********************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALCreateCGContextRefFromResource(
            const AResourceName: String;
@@ -2699,8 +2699,8 @@ begin
       LDstRect.bottom := LDstRect.bottom / AScale;
 
       Result := ALCreateCGContextRef(
-                    Round(LDstRect.Width * AScale),
-                    Round(LDstRect.Height * AScale));
+                  Round(LDstRect.Width * AScale),
+                  Round(LDstRect.Height * AScale));
       try
 
         ALDrawCGImageRef(
@@ -2734,7 +2734,7 @@ begin
 end;
 {$ENDIF}
 
-{*********************}
+{**********************}
 {$IF defined(ALAppleOS)}
 function ALCreateCGImageRefFromResource(
            const AResourceName: String;
@@ -2776,7 +2776,7 @@ begin
 end;
 {$ENDIF}
 
-{**********************}
+{*********************}
 procedure ALDrawBitmap(
             const ACanvas: TCanvas;
             const ABitmap: TBitmap;
@@ -2927,7 +2927,7 @@ begin
 
 end;
 
-{***********************************}
+{**********************************}
 function ALCreateBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;
@@ -2969,17 +2969,17 @@ begin
       // Create the MaskBitmap
       if (AMaskResourceName <> '') and (LMaskBitmap = nil) then begin
         LMaskBitmap := ALCreateBitmapFromResource(
-                        AMaskResourceName, // const AResourceName: String;
-                        nil, // const AResourceStream: TStream;
-                        '', // const AMaskResourceName: String;
-                        nil, // const AMaskBitmap: TBitmap;
-                        AScale, // const AScale: Single;
-                        W, H, // const W, H: single;
-                        AWrapMode, // const AWrapMode: TALImageWrapMode;
-                        TpointF.Create(-50, -50), // const ACropCenter: TpointF;
-                        0, // const ABlurRadius: single;
-                        AXRadius, // const AXRadius: Single;
-                        AYRadius); // const AYRadius: Single)
+                         AMaskResourceName, // const AResourceName: String;
+                         nil, // const AResourceStream: TStream;
+                         '', // const AMaskResourceName: String;
+                         nil, // const AMaskBitmap: TBitmap;
+                         AScale, // const AScale: Single;
+                         W, H, // const W, H: single;
+                         AWrapMode, // const AWrapMode: TALImageWrapMode;
+                         TpointF.Create(-50, -50), // const ACropCenter: TpointF;
+                         0, // const ABlurRadius: single;
+                         AXRadius, // const AXRadius: Single;
+                         AYRadius); // const AYRadius: Single)
         LOwnMaskBitmap := True;
       end;
 
@@ -3037,8 +3037,8 @@ begin
       LDstRect.bottom := LDstRect.bottom / AScale;
 
       Result := TBitmap.Create(
-                    Round(LDstRect.Width * AScale),
-                    Round(LDstRect.Height * AScale));
+                  Round(LDstRect.Width * AScale),
+                  Round(LDstRect.Height * AScale));
       try
 
         Var LCanvas := Result.Canvas;
@@ -3316,7 +3316,7 @@ begin
   {$ENDIF}
 end;
 
-{******************************************************************}
+{**********************************************************************************}
 class operator TALDrawRectangleHelper.Initialize (out Dest: TALDrawRectangleHelper);
 begin
   // Because of :
@@ -3366,35 +3366,35 @@ begin
   FYRadius := 0;
 end;
 
-{**********************************************************************}
+{*************************************************************************************}
 function TALDrawRectangleHelper.SetScale(const AValue: Single): PALDrawRectangleHelper;
 begin
   FScale := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*********************************************************************************************}
 function TALDrawRectangleHelper.SetAlignToPixel(const AValue: Boolean): PALDrawRectangleHelper;
 begin
   FAlignToPixel := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***************************************************************************************}
 function TALDrawRectangleHelper.SetDstRect(const AValue: TrectF): PALDrawRectangleHelper;
 begin
   FDstRect := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***************************************************************************************}
 function TALDrawRectangleHelper.SetOpacity(const AValue: Single): PALDrawRectangleHelper;
 begin
   FOpacity := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*************************************************************************************}
 function TALDrawRectangleHelper.SetFill(const AFill: TALBrush): PALDrawRectangleHelper;
 begin
   Result := @Self;
@@ -3411,126 +3411,126 @@ begin
   FFillWrapMode := AFill.WrapMode;
 end;
 
-{**********************************************************************}
+{**********************************************************************************************}
 function TALDrawRectangleHelper.SetFillColor(const AValue: TAlphaColor): PALDrawRectangleHelper;
 begin
   FFillColor := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*********************************************************************************************************}
 function TALDrawRectangleHelper.SetFillGradientStyle(const AValue: TGradientStyle): PALDrawRectangleHelper;
 begin
   FFillGradientStyle := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*************************************************************************************************}
 function TALDrawRectangleHelper.SetFillGradientAngle(const AValue: Single): PALDrawRectangleHelper;
 begin
   FFillGradientAngle := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*******************************************************************************************************}
 function TALDrawRectangleHelper.SetFillGradientStartPoint(const AValue: TPointF): PALDrawRectangleHelper;
 begin
   FFillGradientStartPoint := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*****************************************************************************************************}
 function TALDrawRectangleHelper.SetFillGradientEndPoint(const AValue: TPointF): PALDrawRectangleHelper;
 begin
   FFillGradientEndPoint := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***************************************************************************************************************}
 function TALDrawRectangleHelper.SetFillGradientColors(const AValue: TArray<TAlphaColor>): PALDrawRectangleHelper;
 begin
   FFillGradientColors := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***********************************************************************************************************}
 function TALDrawRectangleHelper.SetFillGradientOffsets(const AValue: TArray<Single>): PALDrawRectangleHelper;
 begin
   FFillGradientOffsets := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{************************************************************************************************}
 function TALDrawRectangleHelper.SetFillResourceName(const AValue: String): PALDrawRectangleHelper;
 begin
   FFillResourceName := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***************************************************************************************************}
 function TALDrawRectangleHelper.SetFillResourceStream(const AValue: TStream): PALDrawRectangleHelper;
 begin
   FFillResourceStream := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{****************************************************************************************************}
 function TALDrawRectangleHelper.SetFillMaskResourceName(const AValue: String): PALDrawRectangleHelper;
 begin
   FFillMaskResourceName := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*************************************************************************************************}
 function TALDrawRectangleHelper.SetFillMaskBitmap(const AValue: TALBitmap): PALDrawRectangleHelper;
 begin
   FFillMaskBitmap := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*********************************************************************************************************}
 function TALDrawRectangleHelper.SetFillBackgroundMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
 begin
   FFillBackgroundMarginsRect := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{****************************************************************************************************}
 function TALDrawRectangleHelper.SetFillImageMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
 begin
   FFillImageMarginsRect := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{**************************************************************************************************}
 function TALDrawRectangleHelper.SetFillImageNoRadius(const AValue: Boolean): PALDrawRectangleHelper;
 begin
   FFillImageNoRadius := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{******************************************************************************************************}
 function TALDrawRectangleHelper.SetFillWrapMode(const AValue: TALImageWrapMode): PALDrawRectangleHelper;
 begin
   FFillWrapMode := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***********************************************************************************************}
 function TALDrawRectangleHelper.SetFillCropCenter(const AValue: TpointF): PALDrawRectangleHelper;
 begin
   FFillCropCenter := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{**********************************************************************************************}
 function TALDrawRectangleHelper.SetFillBlurRadius(const AValue: single): PALDrawRectangleHelper;
 begin
   FFillBlurRadius := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{****************************************************************************************************************************************}
 function TALDrawRectangleHelper.SetStateLayer(const AStateLayer: TALStateLayer; const AContentColor: TAlphaColor): PALDrawRectangleHelper;
 begin
   Result := @Self;
@@ -3543,49 +3543,49 @@ begin
   FStateLayerYRadius := AStateLayer.YRadius;
 end;
 
-{**********************************************************************}
+{*************************************************************************************************}
 function TALDrawRectangleHelper.SetStateLayerOpacity(const AValue: Single): PALDrawRectangleHelper;
 begin
   FStateLayerOpacity := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{****************************************************************************************************}
 function TALDrawRectangleHelper.SetStateLayerColor(const AValue: TAlphaColor): PALDrawRectangleHelper;
 begin
   FStateLayerColor := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*****************************************************************************************************}
 function TALDrawRectangleHelper.SetStateLayerMarginsRect(const AValue: TRectF): PALDrawRectangleHelper;
 begin
   FStateLayerMarginsRect := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*************************************************************************************************}
 function TALDrawRectangleHelper.SetStateLayerXRadius(const AValue: Single): PALDrawRectangleHelper;
 begin
   FStateLayerXRadius := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*************************************************************************************************}
 function TALDrawRectangleHelper.SetStateLayerYRadius(const AValue: Single): PALDrawRectangleHelper;
 begin
   FStateLayerYRadius := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{****************************************************************************************************}
 function TALDrawRectangleHelper.SetDrawStateLayerOnTop(const AValue: Boolean): PALDrawRectangleHelper;
 begin
   FDrawStateLayerOnTop := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***********************************************************************************************}
 function TALDrawRectangleHelper.SetStroke(const AStroke: TALStrokeBrush): PALDrawRectangleHelper;
 begin
   Result := @Self;
@@ -3594,21 +3594,21 @@ begin
   FStrokeThickness := AStroke.Thickness;
 end;
 
-{**********************************************************************}
+{************************************************************************************************}
 function TALDrawRectangleHelper.SetStrokeColor(const AValue: TalphaColor): PALDrawRectangleHelper;
 begin
   FStrokeColor := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***********************************************************************************************}
 function TALDrawRectangleHelper.SetStrokeThickness(const AValue: Single): PALDrawRectangleHelper;
 begin
   FStrokeThickness := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{******************************************************************************************}
 function TALDrawRectangleHelper.SetShadow(const AShadow: TALShadow): PALDrawRectangleHelper;
 begin
   Result := @Self;
@@ -3619,63 +3619,63 @@ begin
   FShadowOffsetY := AShadow.OffsetY;
 end;
 
-{**********************************************************************}
+{************************************************************************************************}
 function TALDrawRectangleHelper.SetShadowColor(const AValue: TAlphaColor): PALDrawRectangleHelper;
 begin
   FShadowColor := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{******************************************************************************************}
 function TALDrawRectangleHelper.SetShadowBlur(const AValue: Single): PALDrawRectangleHelper;
 begin
   FShadowBlur := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*********************************************************************************************}
 function TALDrawRectangleHelper.SetShadowOffsetX(const AValue: Single): PALDrawRectangleHelper;
 begin
   FShadowOffsetX := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*********************************************************************************************}
 function TALDrawRectangleHelper.SetShadowOffsetY(const AValue: Single): PALDrawRectangleHelper;
 begin
   FShadowOffsetY := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*************************************************************************************}
 function TALDrawRectangleHelper.SetSides(const AValue: TSides): PALDrawRectangleHelper;
 begin
   FSides := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{*****************************************************************************************}
 function TALDrawRectangleHelper.SetCorners(const AValue: TCorners): PALDrawRectangleHelper;
 begin
   FCorners := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***************************************************************************************}
 function TALDrawRectangleHelper.SetXRadius(const AValue: Single): PALDrawRectangleHelper;
 begin
   FXRadius := AValue;
   Result := @Self;
 end;
 
-{**********************************************************************}
+{***************************************************************************************}
 function TALDrawRectangleHelper.SetYRadius(const AValue: Single): PALDrawRectangleHelper;
 begin
   FYRadius := AValue;
   Result := @Self;
 end;
 
-{********************************}
+{************************************}
 procedure TALDrawRectangleHelper.Draw;
 
 var
@@ -5490,18 +5490,18 @@ begin
 
       // Fill with image
       if LFillWithImage then begin
-        var LBitmap := ALCreateJBitmapFromResource(
-                         LFillResourceName, // const AResourceName: String;
-                         LFillResourceStream, // const AResourceStream: TStream;
-                         FFillMaskResourceName, // const AMaskResourceName: String;
-                         FFillMaskBitmap, // const AMaskBitmap: JBitmap;
-                         1, // const AScale: Single;
-                         LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
-                         FFillWrapMode, // const AWrapMode: TALImageWrapMode;
-                         FFillCropCenter, // const ACropCenter: TpointF;
-                         FFillBlurRadius * FScale, // const ABlurRadius: single;
-                         0, // const AXRadius: Single;
-                         0); // const AYRadius: Single);
+        var LBitmap: JBitmap := ALCreateJBitmapFromResource(
+                                  LFillResourceName, // const AResourceName: String;
+                                  LFillResourceStream, // const AResourceStream: TStream;
+                                  FFillMaskResourceName, // const AMaskResourceName: String;
+                                  FFillMaskBitmap, // const AMaskBitmap: JBitmap;
+                                  1, // const AScale: Single;
+                                  LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
+                                  FFillWrapMode, // const AWrapMode: TALImageWrapMode;
+                                  FFillCropCenter, // const ACropCenter: TpointF;
+                                  FFillBlurRadius * FScale, // const ABlurRadius: single;
+                                  0, // const AXRadius: Single;
+                                  0); // const AYRadius: Single);
         try
 
           // On android the bitmap is drawed with the opacity of the paint color
@@ -5797,18 +5797,18 @@ begin
 
       // Fill with image
       if LFillWithImage then begin
-        var LImage: ALCreateCGImageRefFromResource(
-                      LFillResourceName, // const AResourceName: String;
-                      LFillResourceStream, // const AResourceStream: TStream;
-                      FFillMaskResourceName, // const AMaskResourceName: String;
-                      FFillMaskBitmap, // const AMaskImage: CGImageRef;
-                      1, // const AScale: Single;
-                      LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
-                      FFillWrapMode, // const AWrapMode: TALImageWrapMode;
-                      FFillCropCenter, // const ACropCenter: TpointF;
-                      FFillBlurRadius * FScale, // const ABlurRadius: single;
-                      0, // const AXRadius: Single;
-                      0); // const AYRadius: Single);
+        var LImage: CGImageRef := ALCreateCGImageRefFromResource(
+                                    LFillResourceName, // const AResourceName: String;
+                                    LFillResourceStream, // const AResourceStream: TStream;
+                                    FFillMaskResourceName, // const AMaskResourceName: String;
+                                    FFillMaskBitmap, // const AMaskImage: CGImageRef;
+                                    1, // const AScale: Single;
+                                    LScaledImageDstRect.Width, LScaledImageDstRect.Height, // const W, H: single;
+                                    FFillWrapMode, // const AWrapMode: TALImageWrapMode;
+                                    FFillCropCenter, // const ACropCenter: TpointF;
+                                    FFillBlurRadius * FScale, // const ABlurRadius: single;
+                                    0, // const AXRadius: Single;
+                                    0); // const AYRadius: Single);
         try
 
           // The shadow is made directly on the bitmap
@@ -5911,6 +5911,9 @@ begin
     if LFillColor <> TAlphaColorRec.Null then begin
       FCanvas.Fill.Kind := TBrushKind.Solid;
       FCanvas.Fill.Color := LFillColor;
+    end
+    else if LFillWithImage then begin
+      FCanvas.Fill.Kind := TBrushKind.None;
     end
     else FCanvas.Fill.Kind := TBrushKind.None;
     If LStrokeColor <> TalphaColorRec.Null then begin
@@ -6102,7 +6105,7 @@ begin
   {$ENDIF}
 end;
 
-{****************************************************************}
+{**********************************************************}
 function  ALIsBitmapNull(const aBitmap: TALBitmap): Boolean;
 begin
   {$IF defined(ALSkiaEngine)}
@@ -6125,7 +6128,7 @@ begin
   {$ENDIF}
 end;
 
-{*********************************************************}
+{***************************************************}
 procedure ALFreeAndNilBitmap(var aBitmap: TALBitmap);
 begin
   {$IF defined(ALSkiaEngine)}

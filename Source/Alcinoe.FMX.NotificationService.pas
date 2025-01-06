@@ -240,6 +240,7 @@ uses
   FMX.Helpers.iOS,
   {$ENDIF}
   ALcinoe.FMX.Graphics,
+  ALcinoe.FMX.Common,
   Alcinoe.HTTP.Client.Net.Pool,
   Alcinoe.stringUtils,
   Alcinoe.Common;
@@ -643,17 +644,21 @@ begin
     if (ANotification.FLargeIconStream <> nil) and (ANotification.FLargeIconStream.Size > 0)  then begin
       try
 
-        var LtmpBitmap := ALLoadFromStreamToJBitmap(ANotification.FLargeIconStream);
-        try
-          var W := LtmpBitmap.getWidth;
-          var H := LtmpBitmap.getHeight;
-          if W > H then W := H
-          else H := W;
-          LLargeIconBitmap := ALLoadFromJBitmapAndFitIntoAndCropToJBitmap(LtmpBitmap, W, H);
-        finally
-          if not LtmpBitmap.equals(LLargeIconBitmap) then LtmpBitmap.recycle;
-          LtmpBitmap := nil;
-        end;
+        var LIconSize := ALGetImageDimensions(ANotification.FLargeIconStream);
+        if LIconSize.Width > LIconSize.Height then LIconSize.Width := LIconSize.Height
+        else LIconSize.Height := LIconSize.Width;
+        LLargeIconBitmap := ALCreateJBitmapFromResource(
+                              '', // const AResourceName: String;
+                              ANotification.FLargeIconStream, // const AResourceStream: TStream;
+                              '', // const AMaskResourceName: String;
+                              nil, // const AMaskBitmap: JBitmap;
+                              0, // const AScale: Single;
+                              LIconSize.Width, LIconSize.Height, // const W, H: single;
+                              TALImageWrapMode.fitAndCrop, // const AWrapMode: TALImageWrapMode;
+                              TpointF.Create(-50,-50), // const ACropCenter: TpointF;
+                              0, // const ABlurRadius: single;
+                              0, // const AXRadius: Single;
+                              0); // const AYRadius: Single);
 
       except
         on E: Exception do begin

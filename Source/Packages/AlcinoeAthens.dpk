@@ -35,7 +35,8 @@ requires
   Fmx,
   DesignIDE,
   Skia.Package.RTL,
-  Skia.Package.FMX;
+  Skia.Package.FMX,
+  inet;
 
 contains
   Alcinoe.FMX.Materials.Canvas in 'Alcinoe.FMX.Materials.Canvas.pas',
@@ -64,6 +65,17 @@ contains
   Alcinoe.FMX.Controls in 'Alcinoe.FMX.Controls.pas',
   Alcinoe.Files in 'Alcinoe.Files.pas',
   Alcinoe.FMX.CustomThemes in 'Alcinoe.FMX.CustomThemes.pas',
-  Alcinoe.FMX.Themes in 'Alcinoe.FMX.Themes.pas';
+  Alcinoe.FMX.Themes in 'Alcinoe.FMX.Themes.pas',
+  Alcinoe.MultiPartParser in 'Alcinoe.MultiPartParser.pas',
+  Alcinoe.HTTP.Client in 'Alcinoe.HTTP.Client.pas',
+  Alcinoe.HTTP.Client.Net.Pool in 'Alcinoe.HTTP.Client.Net.Pool.pas',
+  Alcinoe.Cipher in 'Alcinoe.Cipher.pas',
+  Alcinoe.JSONDoc in 'Alcinoe.JSONDoc.pas',
+  Alcinoe.XMLDoc in 'Alcinoe.XMLDoc.pas',
+  Alcinoe.HTML in 'Alcinoe.HTML.pas',
+  Alcinoe.HTTP.Client.WinHTTP in 'Alcinoe.HTTP.Client.WinHTTP.pas',
+  Alcinoe.HTTP.Client.Net in 'Alcinoe.HTTP.Client.Net.pas',
+  Alcinoe.Mime in 'Alcinoe.Mime.pas';
 
 end.
+

@@ -1376,7 +1376,7 @@ begin
 
 end;
 
-{************************************************************************************}
+{************************************************************}
 Function  AlIsHttpOrHttpsUrl(const AUrl: AnsiString): Boolean;
 begin
   var LLowUrl := low(AUrl);
@@ -1399,7 +1399,7 @@ begin
   end;
 end;
 
-{************************************************************************************}
+{********************************************************}
 Function  AlIsHttpOrHttpsUrl(const AUrl: String): Boolean;
 begin
   var LLowUrl := low(AUrl);

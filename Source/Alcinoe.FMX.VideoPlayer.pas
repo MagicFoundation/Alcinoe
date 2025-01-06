@@ -2367,7 +2367,7 @@ end;
 constructor TALMacOSVideoPlayer.Create;
 begin
   inherited;
-  fDrawable := nil;
+  fDrawable := ALNullDrawable;
   fOnFrameAvailableEvent := nil;
   fOnCompletionEvent := nil;
   fOnErrorEvent := nil;
@@ -2378,7 +2378,7 @@ end;
 {*************************************}
 destructor TALMacOSVideoPlayer.Destroy;
 begin
-  ALFreeAndNil(fDrawable);
+  ALFreeAndNilDrawable(fDrawable);
   inherited;
 end;
 

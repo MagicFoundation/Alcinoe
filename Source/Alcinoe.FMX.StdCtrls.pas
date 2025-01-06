@@ -2999,7 +2999,7 @@ begin
 
   FBufDrawableRect := LocalRect;
   {$IFDEF ALDPK}
-  if (LFillResourceStream = nil) and (ALGetResourceFilename(LFillResourceName) = '') then
+  if ALGetResourceFilename(FResourceName) = '' then
     fBufDrawable := ALNullDrawable
   else
   try

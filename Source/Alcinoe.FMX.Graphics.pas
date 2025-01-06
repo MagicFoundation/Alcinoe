@@ -332,7 +332,7 @@ function ALCreateCGImageRefFromResource(
            const AYRadius: Single): CGImageRef;
 {$ENDIF}
 
-{*********************}
+{**********************}
 procedure ALDrawTBitmap(
             const ACanvas: TCanvas;
             const ABitmap: TBitmap;
@@ -2803,7 +2803,7 @@ begin
 end;
 {$ENDIF}
 
-{*********************}
+{**********************}
 procedure ALDrawTBitmap(
             const ACanvas: TCanvas;
             const ABitmap: TBitmap;
@@ -2954,7 +2954,7 @@ begin
 
 end;
 
-{**********************************}
+{***********************************}
 function ALCreateTBitmapFromResource(
            const AResourceName: String;
            const AResourceStream: TStream;

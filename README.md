@@ -1046,3 +1046,37 @@ History
 - **Removal of `TALFont.AutoConvert` Property**  
   The `AutoConvert` property has been removed from `TALFont`.  
   Its behavior is now always **enabled** (equivalent to `AutoConvert = True`).
+  
+#### 12/20/2024 ####
+
+- Added `FillMaskResourceName`, `FillMaskBitmap`, `FillImageNoRadius`, `FillCropCenter`, 
+  and `FillBlurRadius` properties to `TALMultiLineTextOptions`.  
+- Introduced global variables `ALBrokenImageResourceName`, `ALBrokenImageWidth`, and 
+  `ALBrokenImageHeight` to define the image shown when downloading an image in `TALImage` fails.  
+- Added the `TALPosition` component, a lightweight version of `TPosition`.  
+- Removed `ALGetResourceDirectory`.  
+- Introduced the `TALBitmap` type, along with the `ALNullBitmap` constant and the 
+  `ALIsBitmapNull` and `ALFreeAndNilBitmap` functions.  
+- Renamed the following functions:  
+  - `ALCreateBitmapFromSkPixmap`, `ALCreateBitmapFromSkSurface`, `ALCreateBitmapFromSkImage` 
+     to `ALCreateTBitmapFromSkPixmap`, `ALCreateTBitmapFromSkSurface`, `ALCreateTBitmapFromSkImage`.  
+  - `ALUpdateBitmapFromSkPixmap`, `ALUpdateBitmapFromSkSurface`, `ALUpdateBitmapFromSkImage` 
+     to `ALUpdateTBitmapFromSkPixmap`, `ALUpdateTBitmapFromSkSurface`, `ALUpdateTBitmapFromSkImage`.  
+  - `ALCreateBitmapFromCGContextRef`, `ALUpdateBitmapFromCGContextRef` to 
+    `ALCreateTBitmapFromCGContextRef`, `ALUpdateTBitmapFromCGContextRef`.  
+  - `ALCreateTextureFromBitmapSurface`, `ALCreateTextureFromBitmap`, `ALUpdateTextureFromBitmapSurface`, 
+    `ALUpdateTextureFromBitmap` to `ALCreateTextureFromTBitmapSurface`, `ALCreateTextureFromTBitmap`, 
+    `ALUpdateTextureFromTBitmapSurface`, `ALUpdateTextureFromTBitmap`.  
+- Corrected typo in `ALGetImageDimensions`.  
+- Added `ALGetExifOrientationInfo` to retrieve ExifOrientationInfo from a stream as 
+  well as from a file name.  
+- Added `AFillResourceStream` parameter to `ALGetShapeSurfaceRect`.  
+- Removed all auto-generated `ALLoadFromxxx` functions from `alcinoe.FMX.Graphics`. 
+  Use `ALCreatexxxFromResource` functions instead.  
+- Replaced the `ALDrawRectangle` function with the `TALDrawRectangleHelper` record.  
+- Removed the `ALDrawCircle` function; use `ALDrawRectangle` with radius instead.  
+- Updated `TALImage` to support downloading images from the Internet. Added 
+  `MaskResourceName`, `MaskBitmap`, `BackgroundColor`, `LoadingColor`, `BlurRadius`, 
+  `Corners`, `CropCenter`, `Shadow`, `Sides`, `Stroke`, `XRadius`, and `YRadius` properties.  
+- Added the `TALEllipse` component.  
+- Introduced the `AlIsHttpOrHttpsUrl` function.

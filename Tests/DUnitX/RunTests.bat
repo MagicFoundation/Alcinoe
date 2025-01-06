@@ -34,9 +34,9 @@ REM ---------------------------
 
 :BUILD_TESTS
 
-echo ---------------------
+echo ---------------------------
 echo Build ALDUnitXTests Project
-echo ---------------------
+echo ---------------------------
 echo.
 
 if NOT "%Standalone%"=="1" GOTO DO_BUILD_TESTS

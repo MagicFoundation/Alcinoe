@@ -1023,59 +1023,65 @@ begin
       LLength := LMemoryStream.Size;
       AStream.Position := LSavedPosition;
     end;
-    var LImgSourceRef := CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, LBuffer, LLength, kCFAllocatorNull);
-    if LImgSourceRef = nil then raise Exception.Create('Failed to create CGImageSource from URL');
+    var LDataRef := CFDataCreateWithBytesNoCopy(kCFAllocatorDefault, LBuffer, LLength, kCFAllocatorNull);
+    if LDataRef = nil then raise Exception.Create('Failed to create CFDataRef from given stream');
     try
-      var LDictionaryRef := CGImageSourceCopyPropertiesAtIndex(LImgSourceRef{isrc}, 0{index}, nil{options});
-      if LDictionaryRef = nil then raise Exception.Create('Failed to retrieve image properties');
+      var LImgSourceRef := CGImageSourceCreateWithData(LDataRef{CFDataRef}, nil{options});
+      if LImgSourceRef = nil then raise Exception.Create('Failed to create CGImageSource from CFDataRef');
       try
-        var LOrientation := TNSNumber.Wrap(CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation));
-        if LOrientation <> nil then begin
+        var LDictionaryRef := CGImageSourceCopyPropertiesAtIndex(LImgSourceRef{isrc}, 0{index}, nil{options});
+        if LDictionaryRef = nil then raise Exception.Create('Failed to retrieve image properties');
+        try
+          var LOrientation := TNSNumber.Wrap(CFDictionaryGetValue(LDictionaryRef, kCGImagePropertyOrientation));
+          if LOrientation <> nil then begin
 
-          //typedef CF_ENUM(uint32_t, CGImagePropertyOrientation) {
-          //    kCGImagePropertyOrientationUp = 1,        // 0th row at top,    0th column on left   - default orientation
-          //    kCGImagePropertyOrientationUpMirrored,    // 0th row at top,    0th column on right  - horizontal flip
-          //    kCGImagePropertyOrientationDown,          // 0th row at bottom, 0th column on right  - 180 deg rotation
-          //    kCGImagePropertyOrientationDownMirrored,  // 0th row at bottom, 0th column on left   - vertical flip
-          //    kCGImagePropertyOrientationLeftMirrored,  // 0th row on left,   0th column at top
-          //    kCGImagePropertyOrientationRight,         // 0th row on right,  0th column at top    - 90 deg CW
-          //    kCGImagePropertyOrientationRightMirrored, // 0th row on right,  0th column on bottom
-          //    kCGImagePropertyOrientationLeft           // 0th row on left,   0th column at bottom - 90 deg CCW
-          //};
+            //typedef CF_ENUM(uint32_t, CGImagePropertyOrientation) {
+            //    kCGImagePropertyOrientationUp = 1,        // 0th row at top,    0th column on left   - default orientation
+            //    kCGImagePropertyOrientationUpMirrored,    // 0th row at top,    0th column on right  - horizontal flip
+            //    kCGImagePropertyOrientationDown,          // 0th row at bottom, 0th column on right  - 180 deg rotation
+            //    kCGImagePropertyOrientationDownMirrored,  // 0th row at bottom, 0th column on left   - vertical flip
+            //    kCGImagePropertyOrientationLeftMirrored,  // 0th row on left,   0th column at top
+            //    kCGImagePropertyOrientationRight,         // 0th row on right,  0th column at top    - 90 deg CW
+            //    kCGImagePropertyOrientationRightMirrored, // 0th row on right,  0th column on bottom
+            //    kCGImagePropertyOrientationLeft           // 0th row on left,   0th column at bottom - 90 deg CCW
+            //};
 
-          case LOrientation.integerValue of
+            case LOrientation.integerValue of
 
-            //Top, left (UIImageOrientationUp)
-            1: result := TalExifOrientationInfo.NORMAL;
+              //Top, left (UIImageOrientationUp)
+              1: result := TalExifOrientationInfo.NORMAL;
 
-            //Top, right (UIImageOrientationUpMirrored)
-            2: result := TalExifOrientationInfo.FLIP_HORIZONTAL;
+              //Top, right (UIImageOrientationUpMirrored)
+              2: result := TalExifOrientationInfo.FLIP_HORIZONTAL;
 
-            //Bottom, right (UIImageOrientationDown)
-            3: result := TalExifOrientationInfo.ROTATE_180;
+              //Bottom, right (UIImageOrientationDown)
+              3: result := TalExifOrientationInfo.ROTATE_180;
 
-            //Bottom, left (UIImageOrientationDownMirrored)
-            4: result := TalExifOrientationInfo.FLIP_VERTICAL;
+              //Bottom, left (UIImageOrientationDownMirrored)
+              4: result := TalExifOrientationInfo.FLIP_VERTICAL;
 
-            //Left, top (UIImageOrientationLeftMirrored)
-            5: result := TalExifOrientationInfo.transpose;
+              //Left, top (UIImageOrientationLeftMirrored)
+              5: result := TalExifOrientationInfo.transpose;
 
-            //Right, top (UIImageOrientationRight)
-            6: result := TalExifOrientationInfo.ROTATE_90;
+              //Right, top (UIImageOrientationRight)
+              6: result := TalExifOrientationInfo.ROTATE_90;
 
-            //Right, bottom (UIImageOrientationRightMirrored)
-            7: result := TalExifOrientationInfo.transverse;
+              //Right, bottom (UIImageOrientationRightMirrored)
+              7: result := TalExifOrientationInfo.transverse;
 
-            //Left, bottom (UIImageOrientationLeft)
-            8: result := TalExifOrientationInfo.ROTATE_270;
+              //Left, bottom (UIImageOrientationLeft)
+              8: result := TalExifOrientationInfo.ROTATE_270;
 
+            end;
           end;
+        finally
+          CGImageRelease(LDictionaryRef);
         end;
       finally
-        CGImageRelease(LDictionaryRef);
+        CFRelease(LImgSourceRef);
       end;
     finally
-      CFRelease(LImgSourceRef);
+      CFRelease(LDataRef);
     end;
   finally
     ALFreeAndNil(LMemoryStream);

@@ -1746,8 +1746,8 @@ begin
     TalLogType.warn);
   LResourceDownloadExtData.Rect := TRectF.Create(
                                      LResourceDownloadExtData.Rect.TopLeft,
-                                     ALBrokenImageWidth / LResourceDownloadExtData.Scale,
-                                     ALBrokenImageHeight / LResourceDownloadExtData.Scale);
+                                     ALBrokenImageWidth,
+                                     ALBrokenImageHeight);
   //LResourceDownloadExtData.Scale: Single;
   //LResourceDownloadExtData.AlignToPixel: Boolean;
   LResourceDownloadExtData.Color := TalphaColors.Null;

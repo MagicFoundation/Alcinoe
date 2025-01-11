@@ -182,6 +182,7 @@ type
     TRANSVERSE,
     UNDEFINED);
 
+function ALIsDefaultContextOpenGL: Boolean;
 function ALGetImageDimensions(const aStream: TStream): TSize;
 function AlGetExifOrientationInfo(const aFilename: String): TalExifOrientationInfo; overload;
 function AlGetExifOrientationInfo(const aStream: TStream): TalExifOrientationInfo; overload;
@@ -595,11 +596,15 @@ uses
   Androidapi.Helpers,
   Androidapi.JNI.Media,
   Androidapi.Bitmap,
+  Androidapi.Gles2,
+  FMX.Context.GLES,
   Alcinoe.AndroidApi.Common,
   Alcinoe.Androidapi.JNI.GraphicsContentViewText,
   {$ENDIF}
   {$IF defined(IOS)}
   Fmx.Utils,
+  FMX.Context.GLES,
+  iOSapi.OpenGLES,
   iOSapi.Foundation,
   iOSapi.CoreImage,
   iOSapi.Helpers,
@@ -643,8 +648,14 @@ end;
 {$IF defined(ANDROID)}
 procedure ALUpdateTextureFromJBitmap(const aBitmap: Jbitmap; const ATexture: TTexture);
 begin
-  if ATexture is TALTexture then
-    TALTexture(ATexture).Assign(aBitmap)
+  if ATexture is TALTexture then begin
+    TALTexture(ATexture).Assign(aBitmap);
+    // Without calling glFinish on devices like the Samsung S24,
+    // if a texture is created in a background thread and later used
+    // on the main thread, the texture may not be available.
+    if (ALIsDefaultContextOpenGL) and (TThread.Current.ThreadID <> MainThreadID) then
+      glFinish;
+  end
   else
     raise Exception.Create('Only TALTexture is supported currently');
 end;
@@ -685,6 +696,12 @@ end;
 procedure ALUpdateTextureFromCGContextRef(const aCGContextRef: CGContextRef; const ATexture: TTexture);
 begin
   ATexture.UpdateTexture(CGBitmapContextGetData(aCGContextRef), CGBitmapContextGetBytesPerRow(aCGContextRef));
+  {$IF defined(IOS)}
+  // Without calling glFinish on devices like the Samsung S24 (uncertain about iPhone behavior),
+  // a texture created in a background thread may not be available when used later on the main thread.
+  if (ALIsDefaultContextOpenGL) and (TThread.Current.ThreadID <> MainThreadID) then
+    glFinish;
+  {$ENDIF}
 end;
 {$ENDIF}
 
@@ -735,6 +752,13 @@ end;
 procedure ALUpdateTextureFromTBitmapSurface(const aBitmapSurface: TbitmapSurface; const ATexture: TTexture);
 begin
   ATexture.Assign(aBitmapSurface);
+  {$IF defined(IOS) or defined(ANDROID)}
+  // Without calling glFinish on devices like the Samsung S24,
+  // if a texture is created in a background thread and later used
+  // on the main thread, the texture may not be available.
+  if (ALIsDefaultContextOpenGL) and (TThread.Current.ThreadID <> MainThreadID) then
+    glFinish;
+  {$ENDIF}
 end;
 {$ENDIF}
 
@@ -743,8 +767,33 @@ end;
 procedure ALUpdateTextureFromTBitmap(const aBitmap: Tbitmap; const ATexture: TTexture);
 begin
   ATexture.assign(aBitmap);
+  {$IF defined(IOS) or defined(ANDROID)}
+  // Without calling glFinish on devices like the Samsung S24,
+  // if a texture is created in a background thread and later used
+  // on the main thread, the texture may not be available.
+  if (ALIsDefaultContextOpenGL) and (TThread.Current.ThreadID <> MainThreadID) then
+    glFinish;
+  {$ENDIF}
 end;
 {$ENDIF}
+
+var
+  ALDefaultContextIsOpenGL: Boolean;
+  ALIsDefaultContextOpenGLDetermined: Boolean;
+
+{*****************************************}
+function ALIsDefaultContextOpenGL: Boolean;
+begin
+  if not ALIsDefaultContextOpenGLDetermined then begin
+    {$IF defined(IOS) or defined(ANDROID)}
+    ALDefaultContextIsOpenGL := TContextManager.DefaultContextClass.InheritsFrom(TCustomContextOpenGL);
+    {$ELSE}
+    ALDefaultContextIsOpenGL := False;
+    {$ENDIF}
+    ALIsDefaultContextOpenGLDetermined := True;
+  end;
+  result := ALDefaultContextIsOpenGL;
+end;
 
 {***********************************************************}
 function ALGetImageDimensions(const aStream: TStream): TSize;
@@ -7047,6 +7096,13 @@ begin
      (sk4d_pixmap_get_height(APixmap) <> ATexture.Height) then
     Raise Exception.Create('Pixmap and Texture dimensions mismatch');
   ATexture.UpdateTexture(sk4d_pixmap_get_pixels(APixmap), sk4d_pixmap_get_row_bytes(APixmap));
+  {$IF defined(IOS) or defined(ANDROID)}
+  // Without calling glFinish on devices like the Samsung S24,
+  // if a texture is created in a background thread and later used
+  // on the main thread, the texture may not be available.
+  if (ALIsDefaultContextOpenGL) and (TThread.Current.ThreadID <> MainThreadID) then
+    glFinish;
+  {$ENDIF}
 end;
 {$ENDIF}
 
@@ -7669,6 +7725,7 @@ initialization
   {$ENDIF}
   TALGraphicThreadPool.FInstance := nil;
   TALGraphicThreadPool.CreateInstanceFunc := @TALGraphicThreadPool.CreateInstance;
+  ALIsDefaultContextOpenGLDetermined := False;
 
 finalization
   ALFreeAndNil(TALGraphicThreadPool.FInstance);

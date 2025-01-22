@@ -1717,7 +1717,7 @@ begin
   TALGraphicThreadPool.Instance.ExecuteProc(
     CreateBufDrawable, // const AProc: TALWorkerThreadProc;
     LResourceDownloadExtData, // const AExtData: Tobject; TALGraphicThreadPool.Instance will own and release the ExtData object
-    GetResourceDownloadPriority); // const APriority: Int64 = 0;
+    GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
   AContentStream := nil; // AContentStream Will be free by AExtData
   AExtData := nil; // AExtData will be free by TALGraphicThreadPool.Instance
 end;
@@ -1772,7 +1772,7 @@ begin
   TALGraphicThreadPool.Instance.ExecuteProc(
     CreateBufDrawable, // const AProc: TALWorkerThreadProc;
     LResourceDownloadExtData, // const AExtData: Tobject; TALGraphicThreadPool.Instance will own and release the ExtData object
-    GetResourceDownloadPriority); // const APriority: Int64 = 0;
+    GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
   AExtData := nil; // AExtData will be free by TALGraphicThreadPool.Instance
 end;
 
@@ -2058,7 +2058,7 @@ begin
         HandleResourceDownloadError, // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
         FResourceDownloadExtData, // const AExtData: Tobject; // ExtData will be free by the worker thread
         true, // const AUseCache: Boolean = True;
-        GetResourceDownloadPriority); // const APriority: Int64 = 0
+        GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
     except
       ALFreeAndNil(FResourceDownloadExtData);
       Raise;

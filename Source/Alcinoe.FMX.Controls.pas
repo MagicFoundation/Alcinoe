@@ -71,26 +71,26 @@ type
   {$ENDIF}
   TALControl = class(TControl)
   private
-    FForm: TCommonCustomForm;
-    FParentALControl: TALControl;
-    FFocusOnMouseDown: Boolean;
-    FFocusOnMouseUp: Boolean;
-    FControlAbsolutePosAtMouseDown: TpointF;
-    FMouseDownAtLowVelocity: Boolean;
-    FDisableDoubleClickHandling: Boolean;
-    FIsPixelAlignmentEnabled: Boolean;
-    FFormerMarginsChangedHandler: TNotifyEvent;
-    FAlign: TALAlignLayout;
-    FIsSetBoundsLocked: Boolean;
+    FForm: TCommonCustomForm; // 8 bytes
+    FParentALControl: TALControl; // 8 bytes
+    FFormerMarginsChangedHandler: TNotifyEvent; // 16 bytes
+    FControlAbsolutePosAtMouseDown: TpointF; // 8 bytes
+    FFocusOnMouseDown: Boolean; // 1 byte
+    FFocusOnMouseUp: Boolean; // 1 byte
+    FMouseDownAtLowVelocity: Boolean; // 1 byte
+    FDisableDoubleClickHandling: Boolean; // 1 byte
+    FIsPixelAlignmentEnabled: Boolean; // 1 byte
+    FAlign: TALAlignLayout; // 1 byte
+    FIsSetBoundsLocked: Boolean; // 1 byte
     function GetPressed: Boolean;
     procedure SetPressed(const AValue: Boolean);
     procedure DelayOnResize(Sender: TObject);
     procedure DelayOnResized(Sender: TObject);
     procedure MarginsChangedHandler(Sender: TObject);
   protected
-    FAutoSize: Boolean;
-    FIsAdjustingSize: Boolean;
-    FAdjustSizeOnEndUpdate: Boolean;
+    FAutoSize: Boolean; // 1 byte
+    FIsAdjustingSize: Boolean; // 1 byte
+    FAdjustSizeOnEndUpdate: Boolean; // 1 byte
     function GetDoubleBuffered: boolean; virtual;
     procedure SetDoubleBuffered(const AValue: Boolean); virtual;
     function GetAutoSize: Boolean; virtual;
@@ -251,9 +251,9 @@ begin
   Size.SetPlatformDefaultWithoutNotification(False);
   FForm := nil;
   FParentALControl := nil;
+  FControlAbsolutePosAtMouseDown := TpointF.zero;
   FFocusOnMouseDown := False;
   FFocusOnMouseUp := False;
-  FControlAbsolutePosAtMouseDown := TpointF.zero;
   FMouseDownAtLowVelocity := True;
   // Double-clicks, or double-taps, are rarely used in mobile design due to
   // touch screen challenges and user experience considerations. Mobile devices
@@ -389,7 +389,7 @@ end;
 procedure TALControl.DoRealign;
 begin
   {$IF defined(debug)}
-  //ALLog(ClassName + '.DoRealign', 'Name: ' + Name + ' | FNeedAlign: ' + ALBoolToStrW(FNeedAlign));
+  //ALLog(ClassName + '.DoRealign', 'Name: ' + Name);
   {$ENDIF}
 
   {$IFNDEF ALCompilerVersionSupported122}
@@ -627,7 +627,8 @@ begin
       {$ENDIF}
 
       var LSize := TSizeF.Create(0,0);
-      for var LChildControl in Controls do begin
+      for var I := 0 to ControlsCount - 1 do begin
+        var LChildControl := Controls[I];
         if (csDesigning in ComponentState) and (LChildControl.ClassName = 'TGrabHandle.TGrabHandleRectangle') then
           continue;
 
@@ -857,7 +858,7 @@ begin
         TALAlignLayout.MostBottom,
         TALAlignLayout.Horizontal,
         TALAlignLayout.VertCenter:
-          Size.Height := ALAlignDimensionToPixelRound(Size.Height , ALGetScreenScale, TEpsilon.Position);
+          Size.Height := ALAlignDimensionToPixelRound(Size.Height, ALGetScreenScale, TEpsilon.Position);
         //--
         TALAlignLayout.Left,
         TALAlignLayout.MostLeft,
@@ -865,7 +866,7 @@ begin
         TALAlignLayout.MostRight,
         TALAlignLayout.Vertical,
         TALAlignLayout.HorzCenter:
-          Size.Width := ALAlignDimensionToPixelRound(Size.Width , ALGetScreenScale, TEpsilon.Position);
+          Size.Width := ALAlignDimensionToPixelRound(Size.Width, ALGetScreenScale, TEpsilon.Position);
         //--
         TALAlignLayout.Client,
         TALAlignLayout.Contents,
@@ -992,8 +993,8 @@ function TALControl.IsVisibleWithinFormBounds: Boolean;
 begin
   Result := GetParentedVisible;
   if not result then exit;
-  if FForm <> nil then
-    Result := FForm.ClientRect.IntersectsWith(LocalToAbsolute(LocalRect));
+  if Form <> nil then
+    Result := Form.ClientRect.IntersectsWith(LocalToAbsolute(LocalRect));
 end;
 
 {***********************************************}
@@ -1091,16 +1092,16 @@ begin
   if FDisableDoubleClickHandling then Shift := Shift - [ssDouble];
   //--
   var LScrollableControl: IALScrollableControl;
-  var LParent := Parent;
-  while LParent <> nil do begin
-    if Supports(LParent, IALScrollableControl, LScrollableControl) then begin
+  var LParentControl := ParentControl;
+  while LParentControl <> nil do begin
+    if Supports(LParentControl, IALScrollableControl, LScrollableControl) then begin
       if not LScrollableControl.GetScrollEngine.IsVelocityLow then begin
         FMouseDownAtLowVelocity := False;
         Break;
       end
-      else LParent := LParent.Parent;
+      else LParentControl := LParentControl.ParentControl;
     end
-    else LParent := LParent.Parent;
+    else LParentControl := LParentControl.ParentControl;
   end;
   //--
   if (not FFocusOnMouseDown) or (FFocusOnMouseUp) or (not FMouseDownAtLowVelocity) then begin

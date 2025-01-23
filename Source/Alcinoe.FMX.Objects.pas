@@ -108,7 +108,9 @@ type
     type
       TResourceDownloadContext = Class(TObject)
       public
+        Lock: TObject;
         Owner: TALImage;
+        FreeByThread: Boolean;
         Rect: TRectF;
         Scale: Single;
         AlignToPixel: Boolean;
@@ -1316,7 +1318,9 @@ end;
 constructor TALImage.TResourceDownloadContext.Create(const AOwner: TALImage);
 begin
   inherited Create;
+  Lock := TObject.Create;
   Owner := AOwner;
+  FreeByThread := True;
   Rect := Owner.LocalRect;
   Scale := ALGetScreenScale;
   AlignToPixel := Owner.IsPixelAlignmentEnabled;
@@ -1344,6 +1348,7 @@ end;
 {***************************************************}
 destructor TALImage.TResourceDownloadContext.Destroy;
 begin
+  ALFreeAndNil(Lock);
   ALFreeAndNil(ResourceStream);
   inherited
 end;
@@ -1694,12 +1699,22 @@ end;
 {****************************************}
 procedure TALImage.CancelResourceDownload;
 begin
+  // The FResourceDownloadContext pointer can only be
+  // updated in the main thread, so there is no need
+  // to lock its access for reading or updating.
   if FResourceDownloadContext <> nil then begin
-    if FResourceDownloadContext.Owner = nil then ALFreeAndNil(FResourceDownloadContext)
-    else begin
+    var LContextToFree: TResourceDownloadContext;
+    var LLock := FResourceDownloadContext.lock;
+    TMonitor.Enter(LLock);
+    try
+      if not FResourceDownloadContext.FreeByThread then LContextToFree := FResourceDownloadContext
+      else LContextToFree := nil;
       FResourceDownloadContext.Owner := nil;
       FResourceDownloadContext := nil;
-    end;
+    Finally
+      TMonitor.Exit(LLock);
+    End;
+    ALFreeAndNil(LContextToFree);
   end;
 end;
 
@@ -1728,26 +1743,19 @@ end;
 {*************}
 //[MultiThread]
 class procedure TALImage.HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject);
-
-  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  procedure FlagContextForCleanup(AContext: TResourceDownloadContext);
-  begin
-    TThread.queue(nil,
-      procedure
-      begin
-        if AContext.Owner = nil then
-          ALFreeAndNil(AContext)
-        else
-          AContext.Owner := nil; // AContext will be free by CancelResourceDownload
-      end);
-  end;
-
 begin
   var LContext := TResourceDownloadContext(AContext);
   if LContext.owner = nil then exit;
   {$IFDEF ALDPK}
-  FlagContextForCleanup(LContext);
-  AContext := Nil; // AContext will be free by CancelResourceDownload
+  TMonitor.Enter(LContext.Lock);
+  try
+    if LContext.Owner <> nil then begin
+      LContext.FreeByThread := False;
+      AContext := nil; // AContext will be free by CancelResourceDownload
+    end;
+  finally
+    TMonitor.Exit(LContext.Lock);
+  end;
   exit;
   {$ENDIF}
   if LContext.ResourceName = ALBrokenImageResourceName then begin
@@ -1756,8 +1764,15 @@ begin
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
-    FlagContextForCleanup(LContext);
-    AContext := nil; // AContext will be free by CancelResourceDownload
+    TMonitor.Enter(LContext.Lock);
+    try
+      if LContext.Owner <> nil then begin
+        LContext.FreeByThread := False;
+        AContext := nil; // AContext will be free by CancelResourceDownload
+      end;
+    finally
+      TMonitor.Exit(LContext.Lock);
+    end;
     exit;
   end;
   ALLog(

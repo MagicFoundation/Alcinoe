@@ -428,7 +428,7 @@ begin
 end;
 
 {***************************************************************************************************************************************}
-function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TALStringsA; ExtData: pointer; Var Handled: Boolean): AnsiString;
+function SQLFastTagReplaceFunct(const TagString: AnsiString; TagParams: TALStringsA; Context: pointer; Var Handled: Boolean): AnsiString;
 Var LMin, LMax: integer;
 begin
 

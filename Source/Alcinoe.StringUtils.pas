@@ -584,13 +584,13 @@ type
   TALHandleTagfunctA = function(
                          const TagString: AnsiString;
                          TagParams: TALStringsA;
-                         ExtData: pointer;
+                         Context: pointer;
                          Var Handled: Boolean): AnsiString;
 
   TALHandleTagExtendedfunctA = function(
                                  const TagString: AnsiString;
                                  TagParams: TALStringsA;
-                                 ExtData: pointer;
+                                 Context: pointer;
                                  Var Handled: Boolean;
                                  Const SourceString: AnsiString;
                                  Var TagPosition, TagLength: integer): AnsiString;
@@ -598,7 +598,7 @@ type
   TALHandleTagPrecompileFunctA = function(
                                    const TagString: AnsiString;
                                    TagParams: TALStringsA;
-                                   ExtData: pointer;
+                                   Context: pointer;
                                    Const SourceString: AnsiString;
                                    Var TagPosition, TagLength: integer): TALBasePrecompiledTagA;
 
@@ -606,7 +606,7 @@ function ALFastTagReplacePrecompileA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            PrecompileProc: TALHandleTagPrecompileFunctA;
            StripParamQuotes: Boolean;
-           ExtData: Pointer;
+           Context: Pointer;
            TagsContainer: TObjectList;
            Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
 function ALFastTagReplaceA(
@@ -615,21 +615,21 @@ function ALFastTagReplaceA(
            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
            StripParamQuotes: Boolean;
            Flags: TReplaceFlags;
-           ExtData: Pointer;
+           Context: Pointer;
            TagParamsClass: TALTagParamsClassA;
            const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 function  ALFastTagReplaceA(
             const SourceString, TagStart, TagEnd: AnsiString;
             ReplaceProc: TALHandleTagFunctA;
             StripParamQuotes: Boolean;
-            ExtData: Pointer;
+            Context: Pointer;
             Const flags: TReplaceFlags=[rfreplaceall];
             const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 function  ALFastTagReplaceA(
             const SourceString, TagStart, TagEnd: AnsiString;
             ReplaceExtendedProc: TALHandleTagExtendedfunctA;
             StripParamQuotes: Boolean;
-            ExtData: Pointer;
+            Context: Pointer;
             Const flags: TReplaceFlags=[rfreplaceall];
             const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 function  ALFastTagReplaceA(
@@ -9833,7 +9833,7 @@ function ALFastTagReplacePrecompileA(
            Const SourceString, TagStart, TagEnd: AnsiString;
            PrecompileProc: TALHandleTagPrecompileFunctA;
            StripParamQuotes: Boolean; // useless if PrecompileProc is provided
-           ExtData: Pointer;
+           Context: Pointer;
            TagsContainer: TObjectList; // just a container where all the PrecompiledTag will be store. must free all the PrecompiledTag at the end of the application
            Const flags: TReplaceFlags=[]): AnsiString; // rfreplaceall is ignored here, only rfIgnoreCase is matter
 
@@ -9966,7 +9966,7 @@ begin
           StripParamQuotes);
 
         T2 := T2 - T1;
-        PrecompiledTag := PrecompileProc(TokenStr, ParamList, ExtData, SourceString, T1, T2);
+        PrecompiledTag := PrecompileProc(TokenStr, ParamList, Context, SourceString, T1, T2);
         T2 := T2 + T1;
         if assigned(PrecompiledTag) then begin
           TagsContainer.Add(PrecompiledTag);
@@ -10003,7 +10003,7 @@ begin
                                          TagEnd,
                                          PrecompileProc,
                                          StripParamQuotes,
-                                         ExtData,
+                                         Context,
                                          TagsContainer,
                                          flags);
       PrecompiledTag.TagString := ALFastTagReplacePrecompileA(
@@ -10012,7 +10012,7 @@ begin
                                     TagEnd,
                                     PrecompileProc,
                                     StripParamQuotes,
-                                    ExtData,
+                                    Context,
                                     TagsContainer,
                                     flags);
     end;
@@ -10051,7 +10051,7 @@ function ALFastTagReplaceA(
            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
            StripParamQuotes: Boolean;
            Flags: TReplaceFlags;
-           ExtData: Pointer;
+           Context: Pointer;
            TagParamsClass: TALTagParamsClassA;
            const TagReplaceProcResult: Boolean = False): AnsiString; overload;
 
@@ -10197,10 +10197,10 @@ begin
       T2 := T2 + TagEndLength;
       if assigned(ReplaceExtendedProc) then begin
         T2 := T2 - T1;
-        ReplaceString := ReplaceExtendedProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, ExtData, TagHandled, SourceString, T1, T2);
+        ReplaceString := ReplaceExtendedProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, Context, TagHandled, SourceString, T1, T2);
         T2 := T2 + T1;
       end
-      else ReplaceString := ReplaceProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, ExtData, TagHandled);
+      else ReplaceString := ReplaceProc(PrecompiledTag.TagString, PrecompiledTag.TagParams, Context, TagHandled);
     end
 
     //else not precompiled tag
@@ -10223,10 +10223,10 @@ begin
           StripParamQuotes);
         if assigned(ReplaceExtendedProc) then begin
           T2 := T2 - T1;
-          ReplaceString := ReplaceExtendedProc(TokenStr, ParamList, ExtData, TagHandled, SourceString, T1, T2);
+          ReplaceString := ReplaceExtendedProc(TokenStr, ParamList, Context, TagHandled, SourceString, T1, T2);
           T2 := T2 + T1;
         end
-        else ReplaceString := ReplaceProc(TokenStr, ParamList, ExtData, TagHandled);
+        else ReplaceString := ReplaceProc(TokenStr, ParamList, Context, TagHandled);
       finally
         AlFreeAndNil(ParamList);
       end;
@@ -10242,7 +10242,7 @@ begin
                                                        ReplaceExtendedProc,
                                                        StripParamQuotes,
                                                        Flags,
-                                                       ExtData,
+                                                       Context,
                                                        TagParamsClass,
                                                        TagReplaceProcResult);
 
@@ -10300,7 +10300,7 @@ function ALFastTagReplaceA(
            const SourceString, TagStart, TagEnd: AnsiString;
            ReplaceProc: TALHandleTagFunctA;
            StripParamQuotes: Boolean;
-           ExtData: Pointer;
+           Context: Pointer;
            Const flags: TReplaceFlags=[rfreplaceall];
            const TagReplaceProcResult: Boolean = False): AnsiString;
 Begin
@@ -10312,7 +10312,7 @@ Begin
               nil,
               StripParamQuotes,
               flags,
-              extdata,
+              Context,
               TALStringListA,
               TagReplaceProcResult);
 end;
@@ -10322,7 +10322,7 @@ function ALFastTagReplaceA(
            const SourceString, TagStart, TagEnd: AnsiString;
            ReplaceExtendedProc: TALHandleTagExtendedfunctA;
            StripParamQuotes: Boolean;
-           ExtData: Pointer;
+           Context: Pointer;
            Const flags: TReplaceFlags=[rfreplaceall];
            const TagReplaceProcResult: Boolean = False): AnsiString;
 Begin
@@ -10334,7 +10334,7 @@ Begin
               ReplaceExtendedProc,
               StripParamQuotes,
               flags,
-              extdata,
+              Context,
               TALStringListA,
               TagReplaceProcResult);
 end;
@@ -10343,11 +10343,11 @@ end;
 function ALFastTagReplaceWithFunc(
            const TagString: AnsiString;
            TagParams: TALStringsA;
-           ExtData: pointer;
+           Context: pointer;
            Var Handled: Boolean): AnsiString;
 begin
   Handled := true;
-  result := AnsiString(ExtData);
+  result := AnsiString(Context);
 end;
 
 {*************************}

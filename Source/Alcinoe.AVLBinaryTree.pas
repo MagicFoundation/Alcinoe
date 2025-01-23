@@ -21,7 +21,7 @@ type
   TALAVLBinaryTreeIterateFunc = procedure(
                                   aTree: TALBaseAVLBinaryTree;
                                   aNode: TALBaseAVLBinaryTreeNode;
-                                  aExtData: Pointer;
+                                  aContext: Pointer;
                                   Var aContinue: Boolean);
 
   {TALBaseAVLBinaryTreeNode---------------}
@@ -46,7 +46,7 @@ type
     Function  CompareNode(IdVal: pointer; ANode: TALBaseAVLBinaryTreeNode): Integer; overload; Virtual; Abstract; {compares IdVal and aNode.keydata and returns 0 if they are equal. If IdVal is greater than aNode.keydata, returns an integer greater than 0. If aNode.keydata is less than IdVal, returns an integer less than 0.}
     Function  CompareNode(aNode1, ANode2: TALBaseAVLBinaryTreeNode): Integer; overload; Virtual; Abstract; {compares aNode1 and aNode2 and returns 0 if they are equal. If aNode1 is greater than aNode2, returns an integer greater than 0. If aNode1 is less than aNode2, returns an integer less than 0.}
     function  CreateNode: TALBaseAVLBinaryTreeNode; virtual; abstract;
-    procedure InternalIterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer); virtual;
+    procedure InternalIterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; Context: Pointer); virtual;
     function  InternalAddNode(aNode: TALBaseAVLBinaryTreeNode): Boolean; virtual;
     Function  InternalExtractNode(IdVal: Pointer): TALBaseAVLBinaryTreeNode; virtual;
     Function  InternalDeleteNode(IdVal: Pointer): Boolean; virtual;
@@ -63,7 +63,7 @@ type
   public
     Constructor Create; virtual;
     Destructor  Destroy; Override;
-    procedure   Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer); virtual;
+    procedure   Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; Context: Pointer); virtual;
     function    AddNode(aNode: TALBaseAVLBinaryTreeNode): Boolean; virtual;
     Function    ExtractNode(IdVal: Pointer): TALBaseAVLBinaryTreeNode; virtual;
     Function    DeleteNode(IdVal: Pointer): Boolean; virtual;
@@ -342,7 +342,7 @@ end;
 procedure AlAVLBinaryTree_IterateDestroyNodeFunc(
             aTree: TALBaseAVLBinaryTree;
             aNode: TALBaseAVLBinaryTreeNode;
-            aExtData: Pointer;
+            aContext: Pointer;
             Var aContinue: Boolean);
 
 begin
@@ -390,7 +390,7 @@ end;
 procedure TALBaseAVLBinaryTree.InternalIterate(
             Action: TALAVLBinaryTreeIterateFunc;
             Up: Boolean;
-            ExtData: Pointer);
+            Context: Pointer);
 var N1: TALBaseAVLBinaryTreeNode;
     N2: TALBaseAVLBinaryTreeNode;
     StackPos: Integer;
@@ -413,7 +413,7 @@ begin
     N2 := N1;
     N1 := N1.ChildNodes[Up];
 
-    Action(Self, N2, ExtData, Continue);
+    Action(Self, N2, Context, Continue);
     if not continue then Exit;
   until False;
 end;
@@ -911,9 +911,9 @@ begin
 end;
 
 {*********************************************************************************************************}
-procedure TALBaseAVLBinaryTree.Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; ExtData: Pointer);
+procedure TALBaseAVLBinaryTree.Iterate(Action: TALAVLBinaryTreeIterateFunc; Up: Boolean; Context: Pointer);
 begin
-  InternalIterate(Action, Up, ExtData);
+  InternalIterate(Action, Up, Context);
 end;
 
 {***********************************************************}

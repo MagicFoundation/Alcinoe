@@ -23,7 +23,7 @@ Type
   TalMySqlClientSelectDataOnNewRowFunct = reference to Procedure(
                                                          XMLRowData: TalXmlNode;
                                                          const ViewTag: AnsiString;
-                                                         ExtData: Pointer;
+                                                         Context: Pointer;
                                                          Var Continue: Boolean);
 
   {---------------------------------}
@@ -112,19 +112,19 @@ Type
                                          // cache or not. Values <= 0 deactivate the cache
                 XMLDATA: TalXMLNode;
                 OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 Skip: integer;
                 First: Integer;
                 OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
@@ -257,7 +257,7 @@ Type
                                          // cache or not. Values <= 0 deactivate the cache
                 XMLDATA: TalXMLNode;
                 OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA;
                 const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(
@@ -265,13 +265,13 @@ Type
                 Skip: integer;
                 First: Integer;
                 OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA;
                 const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA;
                 const ConnectionHandle: PMySql = nil); overload; virtual;
     Procedure SelectData(
@@ -613,7 +613,7 @@ procedure TalMySqlClient.SelectData(
                                      // cache or not. Values <= 0 deactivate the cache
             XMLDATA: TalXMLNode;
             OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA);
 Var LMySqlRes: PMYSQL_RES;
     LMySqlRow: PMYSQL_ROW;
@@ -773,7 +773,7 @@ begin
             //handle OnNewRowFunct
             if assigned(OnNewRowFunct) then begin
               LContinue := True;
-              OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+              OnNewRowFunct(LNewRec, ViewTag, Context, LContinue);
               if Not LContinue then Break;
             end;
 
@@ -830,7 +830,7 @@ procedure TalMySqlClient.SelectData(
             Skip: Integer;
             First: Integer;
             OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(
@@ -842,7 +842,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings);
 end;
 
@@ -850,7 +850,7 @@ end;
 procedure TalMySqlClient.SelectData(
             const SQL: AnsiString;
             OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(
@@ -862,7 +862,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings);
 end;
 
@@ -884,7 +884,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings);
 end;
 
@@ -904,7 +904,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings);
 end;
 
@@ -923,7 +923,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings);
 end;
 
@@ -1535,7 +1535,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(
                                      // cache or not. Values <= 0 deactivate the cache
             XMLDATA: TalXMLNode;
             OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA;
             const ConnectionHandle: PMySql = nil);
 
@@ -1702,7 +1702,7 @@ begin
               //handle OnNewRowFunct
               if assigned(OnNewRowFunct) then begin
                 LContinue := True;
-                OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+                OnNewRowFunct(LNewRec, ViewTag, Context, LContinue);
                 if Not LContinue then Break;
               end;
 
@@ -1778,7 +1778,7 @@ procedure TalMySqlConnectionPoolClient.SelectData(
             Skip: Integer;
             First: Integer;
             OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA;
             const ConnectionHandle: PMySql = nil);
 begin
@@ -1791,7 +1791,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -1800,7 +1800,7 @@ end;
 procedure TalMySqlConnectionPoolClient.SelectData(
             const SQL: AnsiString;
             OnNewRowFunct: TalMySqlClientSelectDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA;
             const ConnectionHandle: PMySql = nil);
 begin
@@ -1813,7 +1813,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -1837,7 +1837,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -1859,7 +1859,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -1880,7 +1880,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings,
     ConnectionHandle);
 end;

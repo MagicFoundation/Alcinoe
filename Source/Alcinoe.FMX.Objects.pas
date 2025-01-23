@@ -106,7 +106,7 @@ type
       end;
   protected
     type
-      TResourceDownloadExtData = Class(TObject)
+      TResourceDownloadContext = Class(TObject)
       public
         Owner: TALImage;
         Rect: TRectF;
@@ -151,7 +151,7 @@ type
     FCropCenter: TALPosition; // 8 bytes
     FStroke: TALStrokeBrush; // 8 bytes
     fShadow: TALShadow; // 8 bytes
-    FResourceDownloadExtData: TResourceDownloadExtData; // [MultiThread] | 8 bytes
+    FResourceDownloadContext: TResourceDownloadContext; // [MultiThread] | 8 bytes
     fBufDrawable: TALDrawable; // 8 bytes
     fBufDrawableRect: TRectF; // 16 bytes
     function GetCropCenter: TALPosition;
@@ -195,11 +195,11 @@ type
     property BufDrawable: TALDrawable read fBufDrawable;
     property BufDrawableRect: TRectF read fBufDrawableRect;
     procedure CancelResourceDownload;
-    class function CanStartResourceDownload(var AExtData: Tobject): boolean; virtual; // [MultiThread]
-    class procedure HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AExtData: TObject); virtual; // [MultiThread]
-    class procedure HandleResourceDownloadError(const AErrMessage: string; var AExtData: Tobject); virtual; // [MultiThread]
-    class function GetResourceDownloadPriority(const AExtData: Tobject): Int64; virtual; // [MultiThread]
-    class Procedure CreateBufDrawable(var AExtData: TObject); overload; virtual; // [MultiThread]
+    class function CanStartResourceDownload(var AContext: Tobject): boolean; virtual; // [MultiThread]
+    class procedure HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject); virtual; // [MultiThread]
+    class procedure HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject); virtual; // [MultiThread]
+    class function GetResourceDownloadPriority(const AContext: Tobject): Int64; virtual; // [MultiThread]
+    class Procedure CreateBufDrawable(var AContext: TObject); overload; virtual; // [MultiThread]
     class Procedure CreateBufDrawable(
                       var ABufDrawable: TALDrawable;
                       out ABufDrawableRect: TRectF;
@@ -1313,7 +1313,7 @@ begin
 end;
 
 {***************************************************************************}
-constructor TALImage.TResourceDownloadExtData.Create(const AOwner: TALImage);
+constructor TALImage.TResourceDownloadContext.Create(const AOwner: TALImage);
 begin
   inherited Create;
   Owner := AOwner;
@@ -1342,7 +1342,7 @@ begin
 end;
 
 {***************************************************}
-destructor TALImage.TResourceDownloadExtData.Destroy;
+destructor TALImage.TResourceDownloadContext.Destroy;
 begin
   ALFreeAndNil(ResourceStream);
   inherited
@@ -1371,7 +1371,7 @@ begin
   FStroke.OnChanged := StrokeChanged;
   fShadow := CreateShadow;
   fShadow.OnChanged := ShadowChanged;
-  FResourceDownloadExtData := nil;
+  FResourceDownloadContext := nil;
   fBufDrawable := ALNullDrawable;
 end;
 
@@ -1694,101 +1694,122 @@ end;
 {****************************************}
 procedure TALImage.CancelResourceDownload;
 begin
-  if FResourceDownloadExtData <> nil then begin
-    FResourceDownloadExtData.Owner := nil;
-    FResourceDownloadExtData := nil;
+  if FResourceDownloadContext <> nil then begin
+    if FResourceDownloadContext.Owner = nil then ALFreeAndNil(FResourceDownloadContext)
+    else begin
+      FResourceDownloadContext.Owner := nil;
+      FResourceDownloadContext := nil;
+    end;
   end;
 end;
 
 {*************}
 //[MultiThread]
-class function TALImage.CanStartResourceDownload(var AExtData: Tobject): boolean;
+class function TALImage.CanStartResourceDownload(var AContext: Tobject): boolean;
 begin
-  result := TResourceDownloadExtData(AExtData).owner <> nil;
+  result := TResourceDownloadContext(AContext).owner <> nil;
 end;
 
 {*************}
 //[MultiThread]
-class procedure TALImage.HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AExtData: TObject);
+class procedure TALImage.HandleResourceDownloadSuccess(const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject);
 begin
-  var LResourceDownloadExtData := TALImage.TResourceDownloadExtData(AExtData);
-  if LResourceDownloadExtData.owner = nil then exit;
-  LResourceDownloadExtData.ResourceStream := AContentStream;
+  var LContext := TResourceDownloadContext(AContext);
+  if LContext.owner = nil then exit;
+  LContext.ResourceStream := AContentStream;
   TALGraphicThreadPool.Instance.ExecuteProc(
     CreateBufDrawable, // const AProc: TALWorkerThreadProc;
-    LResourceDownloadExtData, // const AExtData: Tobject; TALGraphicThreadPool.Instance will own and release the ExtData object
+    LContext, // const AContext: Tobject; TALGraphicThreadPool.Instance will own and release the Context object
     GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
-  AContentStream := nil; // AContentStream Will be free by AExtData
-  AExtData := nil; // AExtData will be free by TALGraphicThreadPool.Instance
+  AContentStream := nil; // AContentStream Will be free by AContext
+  AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
 end;
 
 {*************}
 //[MultiThread]
-class procedure TALImage.HandleResourceDownloadError(const AErrMessage: string; var AExtData: Tobject);
+class procedure TALImage.HandleResourceDownloadError(const AErrMessage: string; var AContext: Tobject);
+
+  {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
+  procedure FlagContextForCleanup(AContext: TResourceDownloadContext);
+  begin
+    TThread.queue(nil,
+      procedure
+      begin
+        if AContext.Owner = nil then
+          ALFreeAndNil(AContext)
+        else
+          AContext.Owner := nil; // AContext will be free by CancelResourceDownload
+      end);
+  end;
+
 begin
+  var LContext := TResourceDownloadContext(AContext);
+  if LContext.owner = nil then exit;
   {$IFDEF ALDPK}
+  FlagContextForCleanup(LContext);
+  AContext := Nil; // AContext will be free by CancelResourceDownload
   exit;
   {$ENDIF}
-  var LResourceDownloadExtData := TALImage.TResourceDownloadExtData(AExtData);
-  if LResourceDownloadExtData.owner = nil then exit;
-  if LResourceDownloadExtData.ResourceName = ALBrokenImageResourceName then begin
+  if LContext.ResourceName = ALBrokenImageResourceName then begin
     ALLog(
       'TALImage.HandleResourceDownloadError',
       'BrokenImage resource is missing or incorrect | ' +
       AErrMessage,
       TalLogType.error);
+    FlagContextForCleanup(LContext);
+    AContext := nil; // AContext will be free by CancelResourceDownload
     exit;
   end;
   ALLog(
     'TALImage.HandleResourceDownloadError',
-    'Url: ' + LResourceDownloadExtData.ResourceName + ' | ' +
+    'Url: ' + LContext.ResourceName + ' | ' +
     AErrMessage,
     TalLogType.warn);
-  LResourceDownloadExtData.Rect := TRectF.Create(
-                                     LResourceDownloadExtData.Rect.TopLeft,
-                                     ALBrokenImageWidth,
-                                     ALBrokenImageHeight);
-  //LResourceDownloadExtData.Scale: Single;
-  //LResourceDownloadExtData.AlignToPixel: Boolean;
-  LResourceDownloadExtData.Color := TalphaColors.Null;
-  LResourceDownloadExtData.ResourceName := ALBrokenImageResourceName;
-  ALFreeAndNil(LResourceDownloadExtData.ResourceStream);
-  LResourceDownloadExtData.MaskResourceName := '';
-  LResourceDownloadExtData.MaskBitmap := ALNullBitmap;
-  LResourceDownloadExtData.WrapMode := TALImageWrapMode.Fit;
-  //LResourceDownloadExtData.CropCenter: TpointF;
-  //LResourceDownloadExtData.RotateAccordingToExifOrientation: Boolean;
-  LResourceDownloadExtData.StrokeColor := TalphaColors.Null;
-  //LResourceDownloadExtData.StrokeThickness: Single;
-  //LResourceDownloadExtData.ShadowBlur: Single;
-  //LResourceDownloadExtData.ShadowOffsetX: Single;
-  //LResourceDownloadExtData.ShadowOffsetY: Single;
-  LResourceDownloadExtData.ShadowColor := TAlphaColors.Null;
-  LResourceDownloadExtData.Corners := AllCorners;
-  LResourceDownloadExtData.Sides := AllSides;
-  LResourceDownloadExtData.XRadius := 0;
-  LResourceDownloadExtData.YRadius := 0;
-  LResourceDownloadExtData.BlurRadius := 0;
+  LContext.Rect := TRectF.Create(
+                     LContext.Rect.TopLeft,
+                     ALBrokenImageWidth,
+                     ALBrokenImageHeight);
+  //LContext.Scale: Single;
+  //LContext.AlignToPixel: Boolean;
+  LContext.Color := TalphaColors.Null;
+  LContext.ResourceName := ALBrokenImageResourceName;
+  ALFreeAndNil(LContext.ResourceStream);
+  LContext.MaskResourceName := '';
+  LContext.MaskBitmap := ALNullBitmap;
+  LContext.WrapMode := TALImageWrapMode.Fit;
+  //LContext.CropCenter: TpointF;
+  //LContext.RotateAccordingToExifOrientation: Boolean;
+  LContext.StrokeColor := TalphaColors.Null;
+  //LContext.StrokeThickness: Single;
+  //LContext.ShadowBlur: Single;
+  //LContext.ShadowOffsetX: Single;
+  //LContext.ShadowOffsetY: Single;
+  LContext.ShadowColor := TAlphaColors.Null;
+  LContext.Corners := AllCorners;
+  LContext.Sides := AllSides;
+  LContext.XRadius := 0;
+  LContext.YRadius := 0;
+  LContext.BlurRadius := 0;
   TALGraphicThreadPool.Instance.ExecuteProc(
     CreateBufDrawable, // const AProc: TALWorkerThreadProc;
-    LResourceDownloadExtData, // const AExtData: Tobject; TALGraphicThreadPool.Instance will own and release the ExtData object
+    LContext, // const AContext: Tobject; TALGraphicThreadPool.Instance will own and release the Context object
     GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
-  AExtData := nil; // AExtData will be free by TALGraphicThreadPool.Instance
+  AContext := nil; // AContext will be free by TALGraphicThreadPool.Instance
 end;
 
 {*************}
 //[MultiThread]
-class function TALImage.GetResourceDownloadPriority(const AExtData: Tobject): Int64;
+class function TALImage.GetResourceDownloadPriority(const AContext: Tobject): Int64;
 begin
   result := TALNetHttpClientPool.Instance.PriorityStartingPoint;
 end;
 
 {*************}
 //[MultiThread]
-class Procedure TALImage.CreateBufDrawable(var AExtData: TObject);
+class Procedure TALImage.CreateBufDrawable(var AContext: TObject);
 begin
-  var LResourceDownloadExtData := TALImage.TResourceDownloadExtData(AExtData);
-  if LResourceDownloadExtData.owner = nil then exit;
+  var LContext := TResourceDownloadContext(AContext);
+  if LContext.owner = nil then exit;
   var LBufDrawable: TALDrawable := ALNullDrawable;
   var LBufDrawableRect: TRectF;
   var LExifOrientationInfo: TalExifOrientationInfo;
@@ -1797,48 +1818,48 @@ begin
       LBufDrawable, // var ABufDrawable: TALDrawable;
       LBufDrawableRect, // out ABufDrawableRect: TRectF;
       LExifOrientationInfo, // out AExifOrientationInfo: TalExifOrientationInfo;
-      LResourceDownloadExtData.Rect, // const ARect: TRectF;
-      LResourceDownloadExtData.Scale, // const AScale: Single;
-      LResourceDownloadExtData.AlignToPixel, // const AAlignToPixel: Boolean;
-      LResourceDownloadExtData.Color, // const AColor: TAlphaColor;
-      LResourceDownloadExtData.ResourceName, // const AResourceName: String;
-      LResourceDownloadExtData.ResourceStream, // const AResourceStream: TStream;
-      LResourceDownloadExtData.MaskResourceName, // const AMaskResourceName: String;
-      LResourceDownloadExtData.MaskBitmap, // const AMaskBitmap: TALBitmap;
-      LResourceDownloadExtData.WrapMode, // const AWrapMode: TALImageWrapMode;
-      LResourceDownloadExtData.CropCenter, // const ACropCenter: TpointF;
-      LResourceDownloadExtData.RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
-      LResourceDownloadExtData.StrokeColor, // const AStrokeColor: TAlphaColor;
-      LResourceDownloadExtData.StrokeThickness, // const AStrokeThickness: Single;
-      LResourceDownloadExtData.ShadowBlur, // const AShadowBlur: Single;
-      LResourceDownloadExtData.ShadowOffsetX, // const AShadowOffsetX: Single;
-      LResourceDownloadExtData.ShadowOffsetY, // const AShadowOffsetY: Single;
-      LResourceDownloadExtData.ShadowColor, // const AShadowColor: TAlphaColor;
-      LResourceDownloadExtData.Corners, // const ACorners: TCorners;
-      LResourceDownloadExtData.Sides, // const ASides: TSides;
-      LResourceDownloadExtData.XRadius, // const AXRadius: Single;
-      LResourceDownloadExtData.YRadius, // const AYRadius: Single)
-      LResourceDownloadExtData.BlurRadius); // const ABlurRadius: Single)
+      LContext.Rect, // const ARect: TRectF;
+      LContext.Scale, // const AScale: Single;
+      LContext.AlignToPixel, // const AAlignToPixel: Boolean;
+      LContext.Color, // const AColor: TAlphaColor;
+      LContext.ResourceName, // const AResourceName: String;
+      LContext.ResourceStream, // const AResourceStream: TStream;
+      LContext.MaskResourceName, // const AMaskResourceName: String;
+      LContext.MaskBitmap, // const AMaskBitmap: TALBitmap;
+      LContext.WrapMode, // const AWrapMode: TALImageWrapMode;
+      LContext.CropCenter, // const ACropCenter: TpointF;
+      LContext.RotateAccordingToExifOrientation, // const ARotateAccordingToExifOrientation: Boolean;
+      LContext.StrokeColor, // const AStrokeColor: TAlphaColor;
+      LContext.StrokeThickness, // const AStrokeThickness: Single;
+      LContext.ShadowBlur, // const AShadowBlur: Single;
+      LContext.ShadowOffsetX, // const AShadowOffsetX: Single;
+      LContext.ShadowOffsetY, // const AShadowOffsetY: Single;
+      LContext.ShadowColor, // const AShadowColor: TAlphaColor;
+      LContext.Corners, // const ACorners: TCorners;
+      LContext.Sides, // const ASides: TSides;
+      LContext.XRadius, // const AXRadius: Single;
+      LContext.YRadius, // const AYRadius: Single)
+      LContext.BlurRadius); // const ABlurRadius: Single)
   except
     On E: Exception do begin
-      HandleResourceDownloadError(E.Message, AExtData);
+      HandleResourceDownloadError(E.Message, AContext);
       exit;
     end;
   End;
   TThread.queue(nil,
     procedure
     begin
-      if LResourceDownloadExtData.Owner <> nil then begin
-        ALFreeAndNilDrawable(LResourceDownloadExtData.Owner.fBufDrawable);
-        LResourceDownloadExtData.Owner.fBufDrawable := LBufDrawable;
-        LResourceDownloadExtData.Owner.FBufDrawableRect := LBufDrawableRect;
-        LResourceDownloadExtData.Owner.FExifOrientationInfo := LExifOrientationInfo;
-        LResourceDownloadExtData.Owner.FResourceDownloadExtData := nil;
-        LResourceDownloadExtData.Owner.Repaint;
+      if LContext.Owner <> nil then begin
+        ALFreeAndNilDrawable(LContext.Owner.fBufDrawable);
+        LContext.Owner.fBufDrawable := LBufDrawable;
+        LContext.Owner.FBufDrawableRect := LBufDrawableRect;
+        LContext.Owner.FExifOrientationInfo := LExifOrientationInfo;
+        LContext.Owner.FResourceDownloadContext := nil;
+        LContext.Owner.Repaint;
       end;
-      ALFreeAndNil(LResourceDownloadExtData);
+      ALFreeAndNil(LContext);
     end);
-  AExtData := nil; // AExtData will be free by TThread.queue
+  AContext := nil; // AContext will be free by TThread.queue
 end;
 
 {*************}
@@ -2046,21 +2067,21 @@ begin
   ALLog(Classname + '.MakeBufDrawable', 'Name: ' + Name + ' | Width: ' + ALFloatToStrW(Width, ALDefaultFormatSettingsW)+ ' | Height: ' + ALFloatToStrW(Height, ALDefaultFormatSettingsW));
   {$endif}
 
-  if (FResourceDownloadExtData = nil) and
+  if (FResourceDownloadContext = nil) and
      (ALIsHttpOrHttpsUrl(ResourceName)) then begin
 
-    FResourceDownloadExtData := TResourceDownloadExtData.Create(Self);
+    FResourceDownloadContext := TResourceDownloadContext.Create(Self);
     Try
       TALNetHttpClientPool.Instance.Get(
         ResourceName, // const AUrl: String;
         CanStartResourceDownload, // const ACanStartCallBack: TALNetHttpClientPoolCanStartProc;
         HandleResourceDownloadSuccess, // const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
         HandleResourceDownloadError, // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
-        FResourceDownloadExtData, // const AExtData: Tobject; // ExtData will be free by the worker thread
+        FResourceDownloadContext, // const AContext: Tobject; // Context will be free by the worker thread
         true, // const AUseCache: Boolean = True;
         GetResourceDownloadPriority); // const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
     except
-      ALFreeAndNil(FResourceDownloadExtData);
+      ALFreeAndNil(FResourceDownloadContext);
       Raise;
     End;
 

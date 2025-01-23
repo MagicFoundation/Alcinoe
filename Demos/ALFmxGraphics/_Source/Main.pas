@@ -475,7 +475,7 @@ begin
     DisableButtons(ButtonCheckForMemoryLeaks);
     HideStatusLabels;
     TALGraphicThreadPool.Instance.ExecuteProc(
-      procedure(var AExtData: Tobject)
+      procedure(var AContext: Tobject)
       Begin
         var I: integer := 0;
         while ButtonCheckForMemoryLeaks.Tag = 1 do begin
@@ -522,7 +522,7 @@ begin
         end;
         DisableButtons(nil);
         TALGraphicThreadPool.Instance.ExecuteProc(
-          procedure(var AExtData: Tobject)
+          procedure(var AContext: Tobject)
           Begin
             RandSeed := 0;
             var LRawTextStopWatch := TStopWatch.Create;
@@ -888,7 +888,7 @@ begin
         DisableButtons(ButtonStop);
         var Lcount := ALStrToInt(AValue[0]);
         TALGraphicThreadPool.Instance.ExecuteProc(
-          procedure(var AExtData: Tobject)
+          procedure(var AContext: Tobject)
           Begin
             var LTotalMilliseconds := InitTestFPSDrawables(Lcount, 0);
             TThread.Synchronize(nil,

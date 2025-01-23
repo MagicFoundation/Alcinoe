@@ -565,13 +565,13 @@ type
   public
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const APriority: Int64;
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); override;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const APriority: Int64;
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); override;
@@ -7635,7 +7635,7 @@ end;
 {*****************************************}
 procedure TALGraphicThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const APriority: Int64;
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
@@ -7651,25 +7651,25 @@ begin
     procedure
     begin
       try
-        var LExtData := AExtData;
+        var LContext := AContext;
         Try
-          if assigned(AProc) then aProc(LExtData);
+          if assigned(AProc) then aProc(LContext);
         finally
-          ALFreeAndNil(LExtData);
+          ALFreeAndNil(LContext);
         end;
       except
         //hide the exception
       end;
     end);
   {$ELSE}
-  inherited ExecuteProc(AProc, AExtData, APriority, AGetPriorityFunc, AAsync);
+  inherited ExecuteProc(AProc, AContext, APriority, AGetPriorityFunc, AAsync);
   {$endif}
 end;
 
 {*****************************************}
 procedure TALGraphicThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const APriority: Int64;
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
@@ -7685,18 +7685,18 @@ begin
     procedure
     begin
       try
-        var LExtData := AExtData;
+        var LContext := AContext;
         Try
-          if assigned(AProc) then aProc(LExtData);
+          if assigned(AProc) then aProc(LContext);
         finally
-          ALFreeAndNil(LExtData);
+          ALFreeAndNil(LContext);
         end;
       except
         //hide the exception
       end;
     end);
   {$ELSE}
-  inherited ExecuteProc(AProc, AExtData, APriority, AGetPriorityFunc, AAsync);
+  inherited ExecuteProc(AProc, AContext, APriority, AGetPriorityFunc, AAsync);
   {$endif}
 end;
 

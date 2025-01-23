@@ -22,16 +22,16 @@ uses
 type
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
-  TALWorkerThreadRefProc = reference to procedure(var AExtData: Tobject);
-  TALWorkerThreadObjProc = procedure(var AExtData: Tobject) of object;
-  TALWorkerThreadGetPriorityFunc = function(const AExtData: Tobject): Int64 of object;
+  TALWorkerThreadRefProc = reference to procedure(var AContext: Tobject);
+  TALWorkerThreadObjProc = procedure(var AContext: Tobject) of object;
+  TALWorkerThreadGetPriorityFunc = function(const AContext: Tobject): Int64 of object;
 
   {~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~}
   TALWorkerThreadRequest = Class(Tobject)
   private
     FRefProc: TALWorkerThreadRefProc;
     FObjProc: TALWorkerThreadObjProc;
-    FExtData: Tobject;
+    FContext: Tobject;
     FPriority: Int64;
     FGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
     FSignal: TEvent;
@@ -39,20 +39,20 @@ type
   public
     constructor Create(
                   const AProc: TALWorkerThreadRefProc;
-                  const AExtData: Tobject;
+                  const AContext: Tobject;
                   const APriority: Int64;
                   const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                   const ASignal: TEvent); overload;
     constructor Create(
                   const AProc: TALWorkerThreadobjProc;
-                  const AExtData: Tobject;
+                  const AContext: Tobject;
                   const APriority: Int64;
                   const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                   const ASignal: TEvent); overload;
     destructor Destroy; override;
     property RefProc: TALWorkerThreadRefProc read FRefProc;
     property ObjProc: TALWorkerThreadObjProc read FObjProc;
-    property ExtData: Tobject read FExtData;
+    property Context: Tobject read FContext;
     property Priority: Int64 read GetPriority;
     property Signal: TEvent read FSignal;
   end;
@@ -88,7 +88,7 @@ type
     fRequests: TObjectList<TALWorkerThreadRequest>;
     function GetPriorityDirection: TPriorityDirection;
     function GetPriorityStartingPoint: int64;
-    function GetPriorityStartingPointExt(const AExtData: Tobject): Int64;
+    function GetPriorityStartingPointExt(const AContext: Tobject): Int64;
     procedure SetPriorityDirection(const Value: TPriorityDirection);
     procedure SetPriorityStartingPoint(const Value: int64);
   protected
@@ -100,18 +100,18 @@ type
     //TALWorkerThreadRefProc
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const APriority: Int64;
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); overload; virtual;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const APriority: Int64;
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
@@ -124,7 +124,7 @@ type
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadRefProc;
@@ -132,18 +132,18 @@ type
     //TALWorkerThreadObjProc
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const APriority: Int64;
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); overload; virtual;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const APriority: Int64;
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
@@ -156,7 +156,7 @@ type
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
-                const AExtData: Tobject; // ExtData will be free by the worker thread
+                const AContext: Tobject; // Context will be free by the worker thread
                 Const AAsync: Boolean = True); overload;
     procedure ExecuteProc(
                 const AProc: TALWorkerThreadObjProc;
@@ -695,13 +695,13 @@ uses
 {****************************************}
 constructor TALWorkerThreadRequest.Create(
               const AProc: TALWorkerThreadRefProc;
-              const AExtData: Tobject;
+              const AContext: Tobject;
               const APriority: Int64;
               const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
               const ASignal: TEvent);
 begin
   FRefProc := AProc;
-  FExtData := AExtData;
+  FContext := AContext;
   FPriority := APriority;
   FGetPriorityFunc := AGetPriorityFunc;
   FSignal := ASignal;
@@ -710,13 +710,13 @@ end;
 {****************************************}
 constructor TALWorkerThreadRequest.Create(
               const AProc: TALWorkerThreadObjProc;
-              const AExtData: Tobject;
+              const AContext: Tobject;
               const APriority: Int64;
               const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
               const ASignal: TEvent);
 begin
   FObjProc := AProc;
-  FExtData := AExtData;
+  FContext := AContext;
   FPriority := APriority;
   FGetPriorityFunc := AGetPriorityFunc;
   FSignal := ASignal;
@@ -725,14 +725,14 @@ end;
 {****************************************}
 destructor TALWorkerThreadRequest.Destroy;
 begin
-  ALFreeAndNil(FExtData);
+  ALFreeAndNil(FContext);
   inherited;
 end;
 
 {*************************************************}
 function TALWorkerThreadRequest.GetPriority: Int64;
 begin
-  if Assigned(FGetPriorityFunc) then result := fGetPriorityFunc(FExtData)
+  if Assigned(FGetPriorityFunc) then result := fGetPriorityFunc(FContext)
   else result := FPriority;
 end;
 
@@ -786,8 +786,8 @@ begin
             //  'PriorityDirection:' + TRttiEnumerationType.GetName(FWorkerThreadPool.PriorityDirection),
             //  TalLogType.verbose);
             {$ENDIF}
-            if assigned(LWorkerThreadRequest.ObjProc) then LWorkerThreadRequest.ObjProc(LWorkerThreadRequest.FExtData)
-            else LWorkerThreadRequest.RefProc(LWorkerThreadRequest.FExtData);
+            if assigned(LWorkerThreadRequest.ObjProc) then LWorkerThreadRequest.ObjProc(LWorkerThreadRequest.FContext)
+            else LWorkerThreadRequest.RefProc(LWorkerThreadRequest.FContext);
           {$IF defined(ios)}
           finally
             LAutoReleasePool.release;
@@ -853,7 +853,7 @@ begin
 end;
 
 {***************************************************************************************}
-function TALWorkerThreadPool.GetPriorityStartingPointExt(const AExtData: Tobject): Int64;
+function TALWorkerThreadPool.GetPriorityStartingPointExt(const AContext: Tobject): Int64;
 begin
   result := GetPriorityStartingPoint;
 end;
@@ -965,7 +965,7 @@ end;
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const APriority: Int64;
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
@@ -975,7 +975,7 @@ begin
   try
     var LWorkerThreadRequest := TALWorkerThreadRequest.Create(
                                   AProc,
-                                  AExtData,
+                                  AContext,
                                   APriority,
                                   AGetPriorityFunc,
                                   LSignal);
@@ -994,21 +994,21 @@ end;
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const APriority: Int64;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, APriority, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, AContext, APriority, nil{AGetPriorityFunc}, AAsync);
 end;
 
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, 0{APriority}, AGetPriorityFunc, AAsync);
+  ExecuteProc(AProc, AContext, 0{APriority}, AGetPriorityFunc, AAsync);
 end;
 
 {****************************************}
@@ -1017,7 +1017,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const APriority: Int64;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, APriority, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, nil{AContext}, APriority, nil{AGetPriorityFunc}, AAsync);
 end;
 
 {****************************************}
@@ -1026,16 +1026,16 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, AGetPriorityFunc, AAsync);
+  ExecuteProc(AProc, nil{AContext}, 0{APriority}, AGetPriorityFunc, AAsync);
 end;
 
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, 0{APriority}, GetPriorityStartingPointExt, AAsync);
+  ExecuteProc(AProc, AContext, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {****************************************}
@@ -1043,13 +1043,13 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadRefProc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
+  ExecuteProc(AProc, nil{AContext}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const APriority: Int64;
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
@@ -1059,7 +1059,7 @@ begin
   try
     var LWorkerThreadRequest := TALWorkerThreadRequest.Create(
                                   AProc,
-                                  AExtData,
+                                  AContext,
                                   APriority,
                                   AGetPriorityFunc,
                                   LSignal);
@@ -1078,21 +1078,21 @@ end;
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const APriority: Int64;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, APriority, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, AContext, APriority, nil{AGetPriorityFunc}, AAsync);
 end;
 
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, 0{APriority}, AGetPriorityFunc, AAsync);
+  ExecuteProc(AProc, AContext, 0{APriority}, AGetPriorityFunc, AAsync);
 end;
 
 {****************************************}
@@ -1101,7 +1101,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const APriority: Int64;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, APriority, nil{AGetPriorityFunc}, AAsync);
+  ExecuteProc(AProc, nil{AContext}, APriority, nil{AGetPriorityFunc}, AAsync);
 end;
 
 {****************************************}
@@ -1110,16 +1110,16 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AGetPriorityFunc: TALWorkerThreadGetPriorityFunc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, AGetPriorityFunc, AAsync);
+  ExecuteProc(AProc, nil{AContext}, 0{APriority}, AGetPriorityFunc, AAsync);
 end;
 
 {****************************************}
 procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
-            const AExtData: Tobject; // ExtData will be free by the worker thread
+            const AContext: Tobject; // Context will be free by the worker thread
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, AExtData, 0{APriority}, GetPriorityStartingPointExt, AAsync);
+  ExecuteProc(AProc, AContext, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {****************************************}
@@ -1127,7 +1127,7 @@ procedure TALWorkerThreadPool.ExecuteProc(
             const AProc: TALWorkerThreadObjProc;
             Const AAsync: Boolean = True);
 begin
-  ExecuteProc(AProc, nil{AExtData}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
+  ExecuteProc(AProc, nil{AContext}, 0{APriority}, GetPriorityStartingPointExt, AAsync);
 end;
 
 {***********************************************}

@@ -605,7 +605,7 @@ begin
       LNotification.FLargeIconUrl,
       //
       // const AOnSuccessCallBack: TALNetHttpClientPoolOnSuccessProc;
-      procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AExtData: TObject)
+      procedure (const AResponse: IHTTPResponse; var AContentStream: TMemoryStream; var AContext: TObject)
       begin
         var LContentStream := AContentStream;
         TThread.Synchronize(nil,
@@ -617,7 +617,7 @@ begin
       end,
       //
       // const AOnErrorCallBack: TALNetHttpClientPoolOnErrorProc;
-      procedure (const AErrMessage: string; var AExtData: Tobject)
+      procedure (const AErrMessage: string; var AContext: Tobject)
       begin
         TThread.Synchronize(nil,
           procedure

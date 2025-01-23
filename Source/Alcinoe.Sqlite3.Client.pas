@@ -22,12 +22,12 @@ Type
   TalSqlite3ClientSelectXMLDataOnNewRowFunct = reference to Procedure(
                                                               XMLRowData: TalXmlNode;
                                                               const ViewTag: AnsiString;
-                                                              ExtData: Pointer;
+                                                              Context: Pointer;
                                                               Var Continue: Boolean);
   TalSqlite3ClientSelectJSONDataOnNewRowFunct = reference to Procedure(
                                                                JSONRowData: TALJSONNodeA;
                                                                const ViewTag: AnsiString;
-                                                               ExtData: Pointer;
+                                                               Context: Pointer;
                                                                Var Continue: Boolean);
 
   {--------------------------------}
@@ -95,17 +95,17 @@ Type
                                           // cache or not. Values <= 0 deactivate the cache
                 JSONDATA: TALJSONNodeA;
                 OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
-                ExtData: Pointer); overload; virtual;
+                Context: Pointer); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 Skip: integer;
                 First: Integer;
                 OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-                ExtData: Pointer); overload; virtual;
+                Context: Pointer); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-                ExtData: Pointer); overload; virtual;
+                Context: Pointer); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 const RowTag: AnsiString;
@@ -129,19 +129,19 @@ Type
                                           // cache or not. Values <= 0 deactivate the cache
                 XMLDATA: TalXMLNode;
                 OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 Skip: integer;
                 First: Integer;
                 OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
@@ -258,19 +258,19 @@ Type
                                           // cache or not. Values <= 0 deactivate the cache
                 JSONDATA: TALJSONNodeA;
                 OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 Skip: integer;
                 First: Integer;
                 OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
@@ -298,7 +298,7 @@ Type
                                           // cache or not. Values <= 0 deactivate the cache
                 XMLDATA: TalXMLNode;
                 OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA;
                 const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(
@@ -306,13 +306,13 @@ Type
                 Skip: integer;
                 First: Integer;
                 OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA;
                 const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(
                 const SQL: AnsiString;
                 OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-                ExtData: Pointer;
+                Context: Pointer;
                 const FormatSettings: TALFormatSettingsA;
                 const ConnectionHandle: SQLite3 = nil); overload; virtual;
     Procedure SelectData(
@@ -704,7 +704,7 @@ Procedure TalSqlite3Client.SelectData(
                                       // cache or not. Values <= 0 deactivate the cache
             JSONDATA: TALJSONNodeA;
             OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
-            ExtData: Pointer);
+            Context: Pointer);
 
 Var LStmt: SQLite3_Stmt;
     LStepResult: integer;
@@ -846,7 +846,7 @@ begin
             //handle OnNewRowFunct
             if assigned(OnNewRowFunct) then begin
               LContinue := True;
-              OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+              OnNewRowFunct(LNewRec, ViewTag, Context, LContinue);
               if Not LContinue then Break;
             end;
 
@@ -906,7 +906,7 @@ procedure TalSqlite3Client.SelectData(
             Skip: Integer;
             First: Integer;
             OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-            ExtData: Pointer);
+            Context: Pointer);
 begin
   SelectData(
     SQL,
@@ -917,14 +917,14 @@ begin
     -1, // CacheThreshold,
     nil, // JsonDATA,
     OnNewRowFunct,
-    ExtData);
+    Context);
 end;
 
 {************************************}
 procedure TalSqlite3Client.SelectData(
             const SQL: AnsiString;
             OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-            ExtData: Pointer);
+            Context: Pointer);
 begin
   SelectData(
     SQL,
@@ -935,7 +935,7 @@ begin
     -1, // CacheThreshold,
     nil, // JsonDATA,
     OnNewRowFunct,
-    ExtData);
+    Context);
 end;
 
 {************************************}
@@ -955,7 +955,7 @@ begin
     -1, // CacheThreshold,
     JsonDATA,
     nil, // OnNewRowFunct,
-    nil); // ExtData,
+    nil); // Context,
 end;
 
 {************************************}
@@ -973,7 +973,7 @@ begin
     -1, // CacheThreshold,
     JsonDATA,
     nil, // OnNewRowFunct,
-    nil); // ExtData,
+    nil); // Context,
 end;
 
 {************************************}
@@ -990,7 +990,7 @@ begin
     -1, // CacheThreshold,
     JsonDATA,
     nil, // OnNewRowFunct,
-    nil); // ExtData,
+    nil); // Context,
 end;
 
 {************************************}
@@ -1004,7 +1004,7 @@ procedure TalSqlite3Client.SelectData(
                                      // cache or not. Values <= 0 deactivate the cache
             XMLDATA: TalXMLNode;
             OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA);
 
 Var LStmt: SQLite3_Stmt;
@@ -1148,7 +1148,7 @@ begin
             //handle OnNewRowFunct
             if assigned(OnNewRowFunct) then begin
               LContinue := True;
-              OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+              OnNewRowFunct(LNewRec, ViewTag, Context, LContinue);
               if Not LContinue then Break;
             end;
 
@@ -1208,7 +1208,7 @@ procedure TalSqlite3Client.SelectData(
             Skip: Integer;
             First: Integer;
             OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(
@@ -1220,7 +1220,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings);
 end;
 
@@ -1228,7 +1228,7 @@ end;
 procedure TalSqlite3Client.SelectData(
             const SQL: AnsiString;
             OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA);
 begin
   SelectData(
@@ -1240,7 +1240,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings);
 end;
 
@@ -1262,7 +1262,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings);
 end;
 
@@ -1282,7 +1282,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings);
 end;
 
@@ -1301,7 +1301,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings);
 end;
 
@@ -1816,7 +1816,7 @@ Procedure TalSqlite3ConnectionPoolClient.SelectData(
                                       // cache or not. Values <= 0 deactivate the cache
             JSONDATA: TALJSONNodeA;
             OnNewRowFunct: TalSqlite3ClientSelectJSONDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const ConnectionHandle: SQLite3 = nil);
 
 Var LStmt: SQLite3_Stmt;
@@ -1964,7 +1964,7 @@ begin
               //handle OnNewRowFunct
               if assigned(OnNewRowFunct) then begin
                 LContinue := True;
-                OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+                OnNewRowFunct(LNewRec, ViewTag, Context, LContinue);
                 if Not LContinue then Break;
               end;
 
@@ -2039,7 +2039,7 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(
             Skip: Integer;
             First: Integer;
             OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(
@@ -2051,7 +2051,7 @@ begin
     -1, // CacheThreshold,
     nil, // JsonDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     ConnectionHandle);
 end;
 
@@ -2059,7 +2059,7 @@ end;
 procedure TalSqlite3ConnectionPoolClient.SelectData(
             const SQL: AnsiString;
             OnNewRowFunct: TalSqlite3ClientSelectJsonDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const ConnectionHandle: SQLite3 = nil);
 begin
   SelectData(
@@ -2071,7 +2071,7 @@ begin
     -1, // CacheThreshold,
     nil, // JsonDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     ConnectionHandle);
 end;
 
@@ -2093,7 +2093,7 @@ begin
     -1, // CacheThreshold,
     JsonDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     ConnectionHandle);
 end;
 
@@ -2113,7 +2113,7 @@ begin
     -1, // CacheThreshold,
     JsonDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     ConnectionHandle);
 end;
 
@@ -2132,7 +2132,7 @@ begin
     -1, // CacheThreshold,
     JsonDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     ConnectionHandle);
 end;
 
@@ -2147,7 +2147,7 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(
                                       // cache or not. Values <= 0 deactivate the cache
             XMLDATA: TalXMLNode;
             OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA;
             const ConnectionHandle: SQLite3 = nil);
 
@@ -2297,7 +2297,7 @@ begin
               //handle OnNewRowFunct
               if assigned(OnNewRowFunct) then begin
                 LContinue := True;
-                OnNewRowFunct(LNewRec, ViewTag, ExtData, LContinue);
+                OnNewRowFunct(LNewRec, ViewTag, Context, LContinue);
                 if Not LContinue then Break;
               end;
 
@@ -2372,7 +2372,7 @@ procedure TalSqlite3ConnectionPoolClient.SelectData(
             Skip: Integer;
             First: Integer;
             OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA;
             const ConnectionHandle: SQLite3 = nil);
 begin
@@ -2385,7 +2385,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -2394,7 +2394,7 @@ end;
 procedure TalSqlite3ConnectionPoolClient.SelectData(
             const SQL: AnsiString;
             OnNewRowFunct: TalSqlite3ClientSelectXMLDataOnNewRowFunct;
-            ExtData: Pointer;
+            Context: Pointer;
             const FormatSettings: TALFormatSettingsA;
             const ConnectionHandle: SQLite3 = nil);
 begin
@@ -2407,7 +2407,7 @@ begin
     -1, // CacheThreshold,
     nil, // XMLDATA,
     OnNewRowFunct,
-    ExtData,
+    Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -2431,7 +2431,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -2453,7 +2453,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings,
     ConnectionHandle);
 end;
@@ -2474,7 +2474,7 @@ begin
     -1, // CacheThreshold,
     XMLDATA,
     nil, // OnNewRowFunct,
-    nil, // ExtData,
+    nil, // Context,
     FormatSettings,
     ConnectionHandle);
 end;

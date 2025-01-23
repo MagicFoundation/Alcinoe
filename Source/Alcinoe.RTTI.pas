@@ -1931,7 +1931,7 @@ begin
   if not ALRttiTypeCache.TryGetValue(aQualifiedName, result) then begin
     Result := nil;
     {$IF defined(debug)}
-    ALLog(ALFormatW('Cannot obtain RTTI information for the type %s', [aQualifiedName], ALDefaultFormatSettingsW), TALLogType.Warn);
+    ALLog('Cannot obtain RTTI information for the type %s', [aQualifiedName], TALLogType.Warn);
     {$ENDIF}
     if aRaiseExceptionIfNotFound then
       raise EALException.CreateFmt('Cannot obtain RTTI information for the class %s', [aQualifiedName]);

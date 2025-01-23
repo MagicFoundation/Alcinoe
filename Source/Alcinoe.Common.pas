@@ -517,6 +517,9 @@ procedure _ALLog(
 procedure ALLog(Const Tag: String; Const msg: String; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; const &Type: TalLogType = TalLogType.VERBOSE); overload;
 procedure ALLog(Const Tag: String; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
+procedure ALLog(Const Tag: String; const TagArgs: array of const; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: String; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE); overload;
+procedure ALLog(Const Tag: String; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR); overload;
 
 var ALMaxLogHistory: integer = 0;
 function ALGetLogHistory(const AIgnoreLastLogItemMsg: Boolean = False): String;
@@ -2655,6 +2658,24 @@ begin
     ALCustomLogExceptionProc(Tag, E, &Type)
   else
     _ALLog(Tag, E.message, &Type, TThread.Current.ThreadID, True{CanPreserve});
+end;
+
+{****************************************************************************************************************************************************************}
+procedure ALLog(Const Tag: String; const TagArgs: array of const; Const msg: String; const msgArgs: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(ALFormatW(Tag, TagArgs), ALFormatW(msg, msgArgs), &Type);
+end;
+
+{***********************************************************************************************************}
+procedure ALLog(Const Tag: String; const Args: array of const; const &Type: TalLogType = TalLogType.VERBOSE);
+begin
+  ALLog(ALFormatW(Tag, Args), &Type);
+end;
+
+{*****************************************************************************************************************************}
+procedure ALLog(Const Tag: String; const Args: array of const; Const E: Exception; const &Type: TalLogType = TalLogType.ERROR);
+begin
+  ALLog(ALFormatW(Tag, Args), E, &Type);
 end;
 
 {************************}

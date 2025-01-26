@@ -2969,7 +2969,7 @@ function TALCubicBezier.SolveCurveX(X: Double): Double;
 begin
   var t0: Double := NAN;
   var t1: Double := NAN;
-  var x2: Double := NAN;
+  var x2: Double{ := NAN};
   var d2: Double;
 
   var t2: Double := x;

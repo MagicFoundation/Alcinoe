@@ -4445,6 +4445,7 @@ begin
   if FAutoSize <> Value then
   begin
     ClearBufDrawable;
+    Repaint;
     inherited;
   end;
 end;

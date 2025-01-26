@@ -47,7 +47,7 @@ object Form1: TForm1
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 2
+        TabOrder = 3
         object TextInterpolation: TALText
           AutoSize = True
           Position.X = 15.000000000000000000
@@ -77,13 +77,14 @@ object Form1: TForm1
           Size.Height = 22.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 3
+          OnChange = ComboBoxInterpolationChange
           OnResized = LayoutResized
         end
       end
       object LayoutAnimationType: TALLayout
         Align = Top
         Margins.Top = 15.000000000000000000
-        Position.Y = 52.000000000000000000
+        Position.Y = 89.000000000000000000
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
@@ -111,11 +112,11 @@ object Form1: TForm1
       object LayoutStart: TALLayout
         Align = Top
         Margins.Top = 20.000000000000000000
-        Position.Y = 94.000000000000000000
+        Position.Y = 131.000000000000000000
         Size.Width = 360.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 3
+        TabOrder = 4
         object ButtonStart: TButton
           Position.X = 15.000000000000000000
           TabOrder = 0
@@ -138,9 +139,9 @@ object Form1: TForm1
         Margins.Top = 20.000000000000000000
         Margins.Bottom = 25.000000000000000000
         Size.Width = 360.000000000000000000
-        Size.Height = 632.000000000000000000
+        Size.Height = 595.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 5
+        TabOrder = 6
         OnResized = LayoutResized
         object LayoutBullet: TALLayout
           Align = Left
@@ -149,7 +150,7 @@ object Form1: TForm1
           Position.X = 15.000000000000000000
           RotationAngle = 180.000000000000000000
           Size.Width = 20.000000000000000000
-          Size.Height = 632.000000000000000000
+          Size.Height = 595.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 4
           object CircleBullet: TALCircle
@@ -176,7 +177,7 @@ object Form1: TForm1
           Align = Client
           Margins.Right = 15.000000000000000000
           Size.Width = 285.000000000000000000
-          Size.Height = 632.000000000000000000
+          Size.Height = 595.000000000000000000
           Size.PlatformDefault = False
           OnPaint = PaintBoxChartPaint
         end
@@ -232,6 +233,39 @@ object Form1: TForm1
           Size.PlatformDefault = False
           Text = '1.0'
           TextSettings.Font.Size = 10.000000000000000000
+          OnResized = LayoutResized
+        end
+      end
+      object LayoutCustomInterpolation: TALLayout
+        Align = Top
+        Margins.Top = 15.000000000000000000
+        Position.Y = 52.000000000000000000
+        Size.Width = 360.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        object TextCustomInterpolation: TALText
+          AutoSize = True
+          Position.X = 15.000000000000000000
+          Size.Width = 132.000000000000000000
+          Size.Height = 19.000000000000000000
+          Size.PlatformDefault = False
+          Text = 'Custom Interpolation'
+          OnResized = LayoutResized
+        end
+        object ComboBoxCustomInterpolation: TComboBox
+          Enabled = False
+          Items.Strings = (
+            'ViscousFluid'
+            'cubic-bezier(0.42, 0, 1, 1)'
+            'cubic-bezier(0, 0, 0.58, 1)'
+            'cubic-bezier(0.42, 0, 0.58, 1)')
+          ItemIndex = 0
+          Position.X = 166.000000000000000000
+          Size.Width = 179.000000000000000000
+          Size.Height = 22.000000000000000000
+          Size.PlatformDefault = False
+          TabOrder = 3
           OnResized = LayoutResized
         end
       end

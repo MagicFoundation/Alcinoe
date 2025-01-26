@@ -1782,7 +1782,6 @@ begin
   if FAutoSizeLineCount <> Value then begin
     FAutoSizeLineCount := Max(0, Value);
     AdjustSize;
-    repaint;
   end;
 end;
 

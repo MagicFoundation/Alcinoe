@@ -608,11 +608,12 @@ end;
 {******************************}
 procedure TALControl.AdjustSize;
 begin
-  if (not (csLoading in ComponentState)) and // loaded will call again AdjustSize
-     (not (csDestroying in ComponentState)) and // if csDestroying do not do autosize
-     (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // if AutoSize is false nothing to adjust
+  if (not (csLoading in ComponentState)) and // Loaded will call again AdjustSize
+     (not (csDestroying in ComponentState)) and // If csDestroying do not do autosize
+     (ControlsCount > 0) and // If there are no controls, do not perform autosizing
+     (HasUnconstrainedAutosizeX or HasUnconstrainedAutosizeY) and // If AutoSize is false nothing to adjust
      (scene <> nil) and // SetNewScene will call again AdjustSize
-     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // non-reantrant
+     (TNonReentrantHelper.EnterSection(FIsAdjustingSize)) then begin // Non-reantrant
     try
 
       if IsUpdating then begin
@@ -924,7 +925,6 @@ begin
   begin
     FAutoSize := Value;
     AdjustSize;
-    repaint;
   end;
 end;
 

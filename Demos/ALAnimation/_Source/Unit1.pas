@@ -45,6 +45,9 @@ type
     ComboBoxStiffness: TComboBox;
     LayoutSpringForce: TALLayout;
     TextDragMe: TALText;
+    LayoutCustomInterpolation: TALLayout;
+    TextCustomInterpolation: TALText;
+    ComboBoxCustomInterpolation: TComboBox;
     procedure ButtonStartClick(Sender: TObject);
     procedure ALFloatPropertyAnimationProcess(Sender: TObject);
     procedure ALFloatPropertyAnimationFirstFrame(Sender: TObject);
@@ -58,6 +61,7 @@ type
     procedure LayoutSpringForceMouseMove(Sender: TObject; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseUp(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
     procedure LayoutSpringForceMouseLeave(Sender: TObject);
+    procedure ComboBoxInterpolationChange(Sender: TObject);
   private
     FPoints: Array[TALInterpolationType] of Tlist<Tpointf>;
     FStartTime: int64;
@@ -97,8 +101,45 @@ end;
 {***********************************************************************************}
 function TForm1.ALFloatPropertyAnimationCustomInterpolation(Sender: TObject): Single;
 begin
-  With TALFloatPropertyAnimation(Sender) do
-    result := ALInterpolateViscousFluid(CurrentTime / duration);
+  case ComboBoxCustomInterpolation.ItemIndex of
+    //ViscousFluid
+    0: begin
+        With TALFloatPropertyAnimation(Sender) do
+          result := ALInterpolateViscousFluid(CurrentTime / duration);
+       end;
+    //cubic-bezier(0.42, 0, 1, 1)
+    1: begin
+        var LCubicBezier := TALCubicBezier.Create(0.42, 0, 1, 1);
+        try
+          With TALFloatPropertyAnimation(Sender) do
+            result := LCubicBezier.SolveForY(CurrentTime / duration);
+        finally
+          ALFreeAndNil(LCubicBezier);
+        end;
+       end;
+    //cubic-bezier(0, 0, 0.58, 1)
+    2: begin
+        var LCubicBezier := TALCubicBezier.Create(0, 0, 0.58, 1);
+        try
+          With TALFloatPropertyAnimation(Sender) do
+            result := LCubicBezier.SolveForY(CurrentTime / duration);
+        finally
+          ALFreeAndNil(LCubicBezier);
+        end;
+       end;
+    //cubic-bezier(0.42, 0, 0.58, 1)
+    3: begin
+        var LCubicBezier := TALCubicBezier.Create(0.42, 0, 0.58, 1);
+        try
+          With TALFloatPropertyAnimation(Sender) do
+            result := LCubicBezier.SolveForY(CurrentTime / duration);
+        finally
+          ALFreeAndNil(LCubicBezier);
+        end;
+       end;
+    else
+      Raise Exception.Create('Error 1DC3C7D7-6157-4550-BEB0-C738C11B44E2')
+  end;
 end;
 
 {*******************************************************************}
@@ -139,6 +180,10 @@ begin
   TextInterpolation.Position.Y := (LayoutInterpolation.Height - TextInterpolation.Height) / 2;
   ComboBoxInterpolation.Position.Y := (LayoutInterpolation.Height - ComboBoxInterpolation.Height) / 2;
   ComboBoxInterpolation.Position.X := textInterpolation.position.X + textInterpolation.Width + 15;
+  LayoutCustomInterpolation.Height := max(ComboBoxCustomInterpolation.Height, TextCustomInterpolation.Height);
+  TextCustomInterpolation.Position.Y := (LayoutCustomInterpolation.Height - TextCustomInterpolation.Height) / 2;
+  ComboBoxCustomInterpolation.Position.Y := (LayoutCustomInterpolation.Height - ComboBoxCustomInterpolation.Height) / 2;
+  ComboBoxCustomInterpolation.Position.X := textCustomInterpolation.position.X + textCustomInterpolation.Width + 15;
   LayoutAnimationType.Height := max(ComboBoxAnimationType.Height, TextAnimationType.Height);
   TextAnimationType.Position.Y := (LayoutAnimationType.Height - TextAnimationType.Height) / 2;
   ComboBoxAnimationType.Position.Y := (LayoutAnimationType.Height - ComboBoxAnimationType.Height) / 2;
@@ -176,7 +221,14 @@ end;
 {*********************************************************}
 procedure TForm1.CheckBoxClearGraphChange(Sender: TObject);
 begin
+  for var I := Low(FPoints) to High(FPoints) do
+    FPoints[i].Clear;
   invalidate;
+end;
+
+procedure TForm1.ComboBoxInterpolationChange(Sender: TObject);
+begin
+  ComboBoxCustomInterpolation.Enabled := TALInterpolationType(GetEnumValue(TypeInfo(TALInterpolationType), ComboBoxInterpolation.Items[ComboBoxInterpolation.ItemIndex])) = TALInterpolationType.Custom;
 end;
 
 {********************************************************************}
